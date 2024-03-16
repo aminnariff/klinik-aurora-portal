@@ -1,0 +1,60 @@
+{
+    "button": {
+        "submit": "Submit",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "close": "Close",
+        "check": "Check",
+        "create": "Create",
+        "proceed": "Proceed",
+        "duplicate": "Duplicate",
+        "clear": "Clear",
+        "reSign": "Re-sign",
+        "save": "Save",
+        "understood": "Understood",
+        "edit": "Edit",
+        "profile": "Profile",
+        "delete": "Delete",
+        "reLogin": "Re-login",
+        "retry": "Retry",
+        "update": "Update",
+        "logout": "Log Out",
+        "login": "Log In"
+    },
+    "loginPage": {
+        "username": "Username",
+        "password": "Password",
+        "forgotPassword": "Forgot password?"
+    },
+    "version": {
+        "updateAvailable": "New Version Available",
+        "forceUpdateDescription":"A critical update for our mobile app is now available. To continue using our services without interruption, please update your app to the latest version immediately by visiting your app store. Thank you for your prompt action.",
+        "optionalUpdateDescription":"We're excited to share that a new update for our mobile app is ready. While this update is optional, we recommend updating to access new features and improvements. Simply visit your app store to update. Your feedback has been invaluable in making these updates."
+    },
+    "error-message": {
+        "mustBeAtLeast": "must be at least.",
+        "charactersLong": "characters long.",
+        "thisField": "This field",
+        "isRequired": "is required."
+    },
+    "error": {
+        "generic": "We encountered an unexpected error while processing your request. Please try again. If the issue persists, kindly contact our support team for assistance.",
+        "internal": "An internal server error occurred. We are working to fix it. Please try again later. Thank you for your understanding.",
+        "sessionExpired": "Oops! Your session has expired. Please log in again to continue.",
+        "suspendedUser": "Uh-oh! It seems your account is currently disabled. Please reach out to your company's administrator or our support team for immediate assistance. We're here to help you get back on track.",
+        "ONT-SN-NOT-FOUND":"ONT is not found",
+        "ONT-SN-UNAVAILABLE":"ONT is unavailable",
+        "ONT-SN-NOT-TYPE":"ONT type is not meant for the domain",
+        "ONT-AUTHENTICATE-FORBIDDEN":"ONT authentication wrong combination",
+        "err-1": "ONT not found",
+        "err-2": "Invalid NRIC/FIN/Passport",
+        "err-3": "No matching pending order found. Please verify your order details and retry.",
+        "err-4": "This item has been previously picked up. Duplicate pickup attempts are not permitted.",
+        "err-5": "The provided QR code or barcode cannot be scanned at the moment. Please verify its validity and positioning.",
+        "err-6": "Please verify your login details and try again.",
+        "err-7": "Please verify your login details and try again.",
+        "err-8": "Please verify your login details and try again.",
+        "err-9": "Please verify your login details and try again.",
+        "err-10": "No Order Found"
+    }
+}
