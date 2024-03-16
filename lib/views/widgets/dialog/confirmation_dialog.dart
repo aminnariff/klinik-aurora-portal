@@ -1,21 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:animate_do/animate_do.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/confirmation_dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_type.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:flutter/material.dart';
 
 class ConfirmationDialog extends StatelessWidget {
   final ConfirmationDialogAttribute attribute;
 
   const ConfirmationDialog(
     this.attribute, {
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

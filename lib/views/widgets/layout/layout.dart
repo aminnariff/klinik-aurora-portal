@@ -1,5 +1,5 @@
-import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class LayoutWidget extends StatelessWidget {
   final Widget mobile;
@@ -8,12 +8,12 @@ class LayoutWidget extends StatelessWidget {
   final Widget? ultra;
 
   const LayoutWidget({
-    Key? key,
+    super.key,
     required this.mobile,
     this.tablet,
     required this.desktop,
     this.ultra,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

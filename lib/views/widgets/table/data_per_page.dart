@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
-import 'package:flutter/material.dart';
 
 class PerPageWidget extends StatelessWidget {
   final String? perPage;
@@ -10,8 +10,8 @@ class PerPageWidget extends StatelessWidget {
   const PerPageWidget(
     this.perPage,
     this.dropdownAttributeList, {
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

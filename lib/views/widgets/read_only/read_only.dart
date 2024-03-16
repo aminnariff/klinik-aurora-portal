@@ -6,9 +6,9 @@ class ReadOnly extends StatelessWidget {
 
   const ReadOnly(
     this.widget, {
-    Key? key,
+    super.key,
     required this.isEditable,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

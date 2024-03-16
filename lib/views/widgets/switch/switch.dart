@@ -4,10 +4,10 @@ class AppCupertinoSwitch extends StatelessWidget {
   final void Function(bool)? onChanged;
   final bool value;
   const AppCupertinoSwitch({
-    Key? key,
+    super.key,
     required this.value,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

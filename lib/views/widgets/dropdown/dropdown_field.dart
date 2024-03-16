@@ -1,17 +1,17 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
-import 'package:flutter/material.dart';
 
 class AppDropdown extends StatefulWidget {
   final DropdownAttributeList attributeList;
 
   const AppDropdown({
-    Key? key,
+    super.key,
     required this.attributeList,
-  }) : super(key: key);
+  });
 
   @override
   State<AppDropdown> createState() => _AppDropdownState();
