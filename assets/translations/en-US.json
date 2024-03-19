@@ -24,6 +24,7 @@
     "loginPage": {
         "username": "Username",
         "password": "Password",
+        "rememberMe": "Remember Me",
         "forgotPassword": "Forgot password?"
     },
     "version": {

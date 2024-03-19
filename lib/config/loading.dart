@@ -1,6 +1,7 @@
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
+import 'package:lottie/lottie.dart';
 
 class AppLoading {
   static init() {
@@ -11,9 +12,9 @@ class AppLoading {
       // ..indicatorSize = 200.0
       // ..radius = 10.0
       ..indicatorWidget = CardContainer(
-        Image.asset(
-          'assets/gifs/loading.gif',
-          width: 500,
+        Lottie.asset(
+          'assets/lottie/simple-loading.json',
+          width: 140,
         ),
         margin: EdgeInsets.zero,
       )

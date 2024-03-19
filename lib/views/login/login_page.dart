@@ -257,8 +257,8 @@ class _LoginPageState extends State<LoginPage> {
                                     onTap: () {
                                       snapshot.remember = !snapshot.remember;
                                     },
-                                    child: const Text(
-                                      'Remember Me',
+                                    child: Text(
+                                      'loginPage'.tr(gender: 'rememberMe'),
                                     ),
                                   ),
                                 ],
