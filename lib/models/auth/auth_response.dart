@@ -1,71 +1,78 @@
 class AuthResponse {
   String? message;
-  JwtResponseModel? jwtResponseModel;
-  List<UserPermissions>? userPermissions;
+  Data? data;
 
-  AuthResponse({this.message, this.jwtResponseModel, this.userPermissions});
+  AuthResponse({this.message, this.data});
 
   AuthResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
-    jwtResponseModel = json['jwtResponseModel'] != null ? JwtResponseModel.fromJson(json['jwtResponseModel']) : null;
-    if (json['userPermissions'] != null) {
-      userPermissions = <UserPermissions>[];
-      json['userPermissions'].forEach((v) {
-        userPermissions!.add(UserPermissions.fromJson(v));
-      });
-    }
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['message'] = message;
-    if (jwtResponseModel != null) {
-      data['jwtResponseModel'] = jwtResponseModel!.toJson();
-    }
-    if (userPermissions != null) {
-      data['userPermissions'] = userPermissions!.map((v) => v.toJson()).toList();
+    if (this.data != null) {
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
-class JwtResponseModel {
-  String? token;
+class Data {
+  User? user;
+  String? accessToken;
+  String? refreshToken;
   String? issuedDt;
   String? expiryDt;
+  List<String>? userPermissions;
 
-  JwtResponseModel({this.token, this.issuedDt, this.expiryDt});
+  Data({this.user, this.accessToken, this.refreshToken, this.issuedDt, this.expiryDt, this.userPermissions});
 
-  JwtResponseModel.fromJson(Map<String, dynamic> json) {
-    token = json['token'];
+  Data.fromJson(Map<String, dynamic> json) {
+    user = json['user'] != null ? User.fromJson(json['user']) : null;
+    accessToken = json['accessToken'];
+    refreshToken = json['refreshToken'];
     issuedDt = json['issuedDt'];
     expiryDt = json['expiryDt'];
+    userPermissions = json['userPermissions'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['token'] = token;
+    if (user != null) {
+      data['user'] = user!.toJson();
+    }
+    data['accessToken'] = accessToken;
+    data['refreshToken'] = refreshToken;
     data['issuedDt'] = issuedDt;
     data['expiryDt'] = expiryDt;
+    data['userPermissions'] = userPermissions;
     return data;
   }
 }
 
-class UserPermissions {
-  String? name;
-  String? type;
+class User {
+  String? userId;
+  String? userEmail;
+  String? userName;
+  String? fullName;
 
-  UserPermissions({this.name, this.type});
+  User({this.userId, this.userEmail, this.userName, this.fullName});
 
-  UserPermissions.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    type = json['type'];
+  User.fromJson(Map<String, dynamic> json) {
+    userId = json['userId'];
+    userEmail = json['userEmail'];
+    userName = json['userName'];
+    fullName = json['fullName'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['name'] = name;
-    data['type'] = type;
+    data['userId'] = userId;
+    data['userEmail'] = userEmail;
+    data['userName'] = userName;
+    data['fullName'] = fullName;
     return data;
   }
 }

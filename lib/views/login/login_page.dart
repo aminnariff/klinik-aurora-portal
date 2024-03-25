@@ -16,13 +16,13 @@ import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
-import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
@@ -63,10 +63,8 @@ class _LoginPageState extends State<LoginPage> {
       });
     });
     if (kDebugMode) {
-      usernameController.text = 'app.user';
-      passwordController.text = 'appUser';
-      // usernameController.text = 'amin.ariff';
-      // passwordController.text = 'Welcome@2028';
+      usernameController.text = 'admin@auroramembership.com';
+      passwordController.text = 'Testing@1234';
     }
     super.initState();
   }
@@ -87,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
           return Consumer<AuthController>(
             builder: (context, controller, _) {
               if (controller.authenticationResponse != null &&
-                  !DateTime.parse(controller.authenticationResponse!.jwtResponseModel!.expiryDt!)
+                  !DateTime.parse(controller.authenticationResponse!.data!.expiryDt!)
                       .difference(DateTime.now())
                       .isNegative) {
                 Future.delayed(const Duration(milliseconds: 500), () {
@@ -208,40 +206,57 @@ class _LoginPageState extends State<LoginPage> {
                                     width: screenHeightByBreakpoint(80, 50, 24),
                                   ),
                                   AppPadding.vertical(),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      attribute: 'password',
-                                      controller: passwordController,
-                                      hintText: 'loginPage'.tr(gender: 'password'),
-                                      obscureText: true,
-                                      isPassword: true,
-                                      isEditableColor: const Color(0xFFEAF2FA),
-                                      errorMessage: snapshot.passwordError,
-                                      prefixIcon: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      InputField(
+                                        field: InputFieldAttribute(
+                                          attribute: 'password',
+                                          controller: passwordController,
+                                          hintText: 'loginPage'.tr(gender: 'password'),
+                                          obscureText: true,
+                                          isPassword: true,
+                                          isEditableColor: const Color(0xFFEAF2FA),
+                                          errorMessage: snapshot.passwordError,
+                                          prefixIcon: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              const SizedBox(
+                                                width: 12,
+                                              ),
+                                              const FaIcon(
+                                                Icons.lock,
+                                                color: primary,
+                                              ),
+                                              AppPadding.horizontal(denominator: 2),
+                                            ],
+                                          ),
+                                          obsecureAction: () {
+                                            isObscure.value = !isObscure.value;
+                                            return null;
+                                          },
+                                        ),
+                                        width: screenHeightByBreakpoint(80, 50, 24),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
-                                          const SizedBox(
-                                            width: 12,
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Text(
+                                              'loginPage'.tr(gender: 'forgotPassword'),
+                                              style: AppTypography.bodyMedium(context)
+                                                  .apply(fontWeightDelta: 1, color: Colors.grey),
+                                            ),
                                           ),
-                                          const FaIcon(
-                                            Icons.lock,
-                                            color: primary,
-                                          ),
-                                          AppPadding.horizontal(denominator: 2),
                                         ],
                                       ),
-                                      obsecureAction: () {
-                                        isObscure.value = !isObscure.value;
-                                        return null;
-                                      },
-                                    ),
-                                    width: screenHeightByBreakpoint(80, 50, 24),
+                                    ],
                                   ),
                                 ],
                               );
                             }),
-                            AppPadding.vertical(),
                             Consumer<AuthController>(builder: (context, snapshot, _) {
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -275,19 +290,20 @@ class _LoginPageState extends State<LoginPage> {
                                             AuthRequest(
                                                 username: usernameController.text, password: passwordController.text))
                                         .then((value) {
+                                      print(value.code);
                                       dismissLoading();
                                       if (responseCode(value.code)) {
+                                        print('sini');
+                                        print(value.data);
                                         context.read<AuthController>().setAuthenticationResponse(value.data,
                                             usernameValue: usernameController.text,
                                             passwordValue: passwordController.text);
-                                      } else if (value.code == 401) {
-                                        showDialogError(context, 'error'.tr(gender: 'err-6'));
                                       }
                                     });
                                   }
                                 });
                               },
-                              color: quaternaryColor,
+                              color: secondaryColor,
                               actionText: 'button'.tr(gender: 'login'),
                             ),
                             AppPadding.vertical(),

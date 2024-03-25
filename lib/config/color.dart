@@ -9,9 +9,9 @@ const primaryColors = [
   Color(0XFF6ad1e3),
 ];
 
-const secondaryColor = Color(0xFF7e2d40);
+const secondaryColor = Color(0XFF6ad1e3);
 const tertiaryColor = Color(0XFF07272d);
-const quaternaryColor = Color(0XFF6ad1e3);
+const quaternaryColor = Color(0xFF7e2d40);
 
 //TextFormField
 const textFormFieldEditableColor = Color(0XFFF8F8F8);

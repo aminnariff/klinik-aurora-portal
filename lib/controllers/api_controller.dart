@@ -18,6 +18,7 @@ import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:provider/provider.dart';
 
 enum Method {
@@ -29,21 +30,14 @@ enum Method {
 }
 
 enum BaseUrl {
-  gateway,
-  provisioning,
-  ont,
-  cfs,
+  portal,
 }
 
 class ApiController {
   final Dio _dio = Dio();
   String getDomain(BaseUrl baseUrl) {
-    if (baseUrl == BaseUrl.gateway) {
+    if (baseUrl == BaseUrl.portal) {
       return Environment.appUrl;
-    } else if (baseUrl == BaseUrl.provisioning) {
-      return Environment.provisioningUrl;
-    } else if (baseUrl == BaseUrl.cfs) {
-      return Environment.cfsUrl;
     } else {
       return '';
     }
@@ -99,15 +93,13 @@ class ApiController {
       return context.read<AuthController>().checkDateTime().then((value) async {
         String tokenStatus = value;
         debugPrint('tokenStatus : $tokenStatus');
-        debugPrint('expiredAt : ${context.read<AuthController>().jwt?.expiryDt}');
+        debugPrint('expiredAt : ${context.read<AuthController>().authenticationResponse?.data?.expiryDt}');
         if (tokenStatus == 'refresh') {
           return await RefreshTokenController.refresh(context).then((tokenRenewResponse) {
             if (responseCode(tokenRenewResponse.code)) {
               if (tokenRenewResponse.data != null) {
-                context.read<AuthController>().jwt = tokenRenewResponse.data?.jwtResponseModel;
                 context.read<AuthController>().setAuthenticationResponse(tokenRenewResponse.data);
-                prefs.setString(jwtResponse, json.encode(tokenRenewResponse.data));
-                prefs.setString(token, tokenRenewResponse.data!.jwtResponseModel!.token.toString());
+                prefs.setString(authResponse, json.encode(tokenRenewResponse.data));
                 return true;
               } else {
                 return true;
@@ -145,7 +137,7 @@ class ApiController {
 
   Future<ApiResponse> call(
     BuildContext context, {
-    BaseUrl baseUrl = BaseUrl.gateway,
+    BaseUrl baseUrl = BaseUrl.portal,
     required Method method,
     required String endpoint,
     Map<String, dynamic>? queryParameters,
@@ -240,7 +232,13 @@ class ApiController {
             debugPrint('Internet connection is now offline');
           } else {
             dismissLoading();
-            if (e.response?.statusCode == 401 || e.response?.statusCode == 403 || e.response?.statusCode == 410) {
+            if (e.response?.statusCode == 401 && isAuthenticated == false) {
+              Future.delayed(Duration.zero, () {
+                showDialogError(context, e.response?.data?['message'] ?? '');
+              });
+            } else if (e.response?.statusCode == 401 ||
+                e.response?.statusCode == 403 ||
+                e.response?.statusCode == 410) {
               if (isSessionExpiredDialogOpen == false) {
                 isSessionExpiredDialogOpen = true;
                 await promptDialog(context, action: () {

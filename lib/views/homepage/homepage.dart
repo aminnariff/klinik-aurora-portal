@@ -148,7 +148,7 @@ class _HomepageState extends State<Homepage> {
                 extendedTheme: SidebarXTheme(
                   width: screenWidth(15),
                   decoration: const BoxDecoration(
-                    color: primary,
+                    color: Color.fromARGB(255, 17, 141, 163),
                     borderRadius:
                         BorderRadius.only(topRight: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
                   ),
@@ -164,16 +164,23 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 8),
                     child: Column(
                       children: [
-                        const Image(
-                          image: AssetImage('assets/icons/logo/simba-white-logo.png'),
+                        Image(
+                          image: const AssetImage(
+                            'assets/icons/logo/klinik-aurora.png',
+                          ),
+                          width: extended ? 100 : 50,
+                          height: extended ? 100 : 50,
                         ),
                         if (extended)
-                          AppSelectableText(
-                            'GATEWAY',
-                            style: GoogleFonts.hindMadurai(
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 11,
-                              color: Colors.white,
+                          Padding(
+                            padding: EdgeInsets.only(top: screenPadding / 2),
+                            child: AppSelectableText(
+                              'GATEWAY',
+                              style: GoogleFonts.hindMadurai(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 11,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                       ],
@@ -250,16 +257,14 @@ class _HomepageState extends State<Homepage> {
                           children: [
                             Consumer<AuthController>(
                               builder: (context, authController, _) {
-                                return Text(authController.authenticationResponse?.userPermissions?[0].name
-                                        ?.replaceAll('_', ' ') ??
-                                    '');
+                                return Text(authController.authenticationResponse?.data?.user?.fullName ?? 'N/A');
                               },
                             ),
                             AppPadding.horizontal(denominator: 2),
                             Container(
                               padding: const EdgeInsets.all(4),
                               decoration: const BoxDecoration(
-                                color: primary,
+                                color: secondaryColor,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(

@@ -14,13 +14,11 @@ class AuthController extends ChangeNotifier {
   String? get usernameError => _usernameError;
   String? _passwordError;
   String? get passwordError => _passwordError;
-  JwtResponseModel? _jwt;
-  JwtResponseModel? get jwt => _jwt;
   bool _rememberMe = false;
   bool get remember => _rememberMe;
 
-  set jwt(JwtResponseModel? value) {
-    _jwt = value;
+  set authenticationResponse(AuthResponse? value) {
+    _authenticationResponse = value;
     notifyListeners();
   }
 
@@ -33,10 +31,9 @@ class AuthController extends ChangeNotifier {
   Future<String> checkDateTime() async {
     try {
       _authenticationResponse = AuthResponse.fromJson(json.decode(prefs.getString(authResponse).toString()));
-      _jwt = JwtResponseModel.fromJson(json.decode(prefs.getString(jwtResponse).toString()));
-      if (jwt?.expiryDt != null) {
+      if (_authenticationResponse?.data?.expiryDt != null) {
         DateTime now = DateTime.now();
-        DateTime targetTime = DateTime.parse(jwt!.expiryDt!);
+        DateTime targetTime = DateTime.parse(_authenticationResponse!.data!.expiryDt!);
         Duration difference = targetTime.difference(now);
         if (difference.isNegative) {
           return 'expired';
@@ -54,15 +51,15 @@ class AuthController extends ChangeNotifier {
   }
 
   String getName() {
-    return _authenticationResponse?.userPermissions?.first.name ?? '';
+    return _authenticationResponse?.data?.userPermissions?.first ?? '';
   }
 
   bool hasPermission(String permission) {
-    if (_authenticationResponse?.userPermissions == null) {
+    if (_authenticationResponse?.data?.userPermissions == null) {
       return false;
     } else {
       try {
-        _authenticationResponse!.userPermissions!.firstWhere((element) => element.name == permission);
+        _authenticationResponse!.data?.userPermissions!.firstWhere((element) => element == permission);
         return true;
       } catch (e) {
         return false;
@@ -76,7 +73,6 @@ class AuthController extends ChangeNotifier {
       _rememberMe = prefs.getBool(rememberMe) ?? false;
       Map<String, dynamic> dataMap = json.decode(auth.toString());
       _authenticationResponse = AuthResponse.fromJson(dataMap);
-      _jwt = JwtResponseModel.fromJson(json.decode(prefs.getString(jwtResponse).toString()));
       return _authenticationResponse;
     } catch (e) {
       _authenticationResponse = null;
@@ -105,6 +101,16 @@ class AuthController extends ChangeNotifier {
 
   setAuthenticationResponse(AuthResponse? value, {String? usernameValue, String? passwordValue}) async {
     if (value != null) {
+      value = AuthResponse(
+        data: Data(
+          user: value.data?.user,
+          accessToken: value.data?.accessToken,
+          refreshToken: value.data?.refreshToken,
+          issuedDt: DateTime.now().toString(),
+          expiryDt: DateTime.now().add(const Duration(minutes: 30)).toString(),
+          userPermissions: value.data?.userPermissions,
+        ),
+      );
       // if (_rememberMe) {
       prefs.setString(username, usernameValue ?? "");
       prefs.setString(password, passwordValue ?? "");
@@ -112,27 +118,96 @@ class AuthController extends ChangeNotifier {
       //   prefs.remove(username);
       //   prefs.remove(password);
       // }
-      prefs.setString(authResponse, json.encode(value));
-      prefs.setString(jwtResponse, json.encode(value.jwtResponseModel));
-      prefs.setString(token, value.jwtResponseModel?.token ?? '');
+      prefs.setString(
+        authResponse,
+        json.encode(value),
+      );
+      prefs.setString(token, value.data?.accessToken ?? '');
     } else if (value == null) {
       prefs.remove(authResponse);
       prefs.remove(jwtResponse);
       prefs.remove(token);
     }
+    print(value.toString());
     _authenticationResponse = value;
-    _jwt = value?.jwtResponseModel;
     notifyListeners();
   }
 
   static Future<ApiResponse<AuthResponse>> logIn(BuildContext context, AuthRequest request) async {
+    // return ApiResponse(
+    //   code: 200,
+    //   data: AuthResponse.fromJson(
+    //     {
+    //       "jwtResponseModel": {
+    //         "token": "kahjkjhajkhaa",
+    //         "issuedDt": DateTime.now().toString(),
+    //         "expiryDt": DateTime.now().add(const Duration(minutes: 30)).toString(),
+    //       },
+    //     },
+    //   ),
+    // );
+
     return ApiController()
         .call(
       context,
       method: Method.post,
-      baseUrl: BaseUrl.provisioning,
-      endpoint: 'api/v1/auth',
-      data: request,
+      endpoint: 'admin/authentication/login',
+      data: {
+        "userEmail": request.username,
+        "userPassword": request.password,
+      },
+      isAuthenticated: false,
+    )
+        .then((value) {
+      try {
+        return ApiResponse(
+          code: value.code,
+          data: AuthResponse.fromJson(value.data),
+        );
+      } catch (e) {
+        return ApiResponse(
+          code: 400,
+          message: e.toString(),
+        );
+      }
+    });
+  }
+
+  static Future<ApiResponse<AuthResponse>> forgotPassword(BuildContext context, String email) async {
+    return ApiController()
+        .call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/authentication/forgot-password',
+      data: {
+        "userEmail": email,
+      },
+      isAuthenticated: false,
+    )
+        .then((value) {
+      try {
+        return ApiResponse(
+          code: value.code,
+          data: AuthResponse.fromJson(value.data),
+        );
+      } catch (e) {
+        return ApiResponse(
+          code: 400,
+          message: e.toString(),
+        );
+      }
+    });
+  }
+
+  static Future<ApiResponse<AuthResponse>> changePassword(BuildContext context) async {
+    return ApiController()
+        .call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/authentication/forgot-password',
+      data: {
+        "userEmail": "admin@auroramembership.com",
+      },
       isAuthenticated: false,
     )
         .then((value) {
