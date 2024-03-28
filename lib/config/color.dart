@@ -12,6 +12,7 @@ const primaryColors = [
 const secondaryColor = Color(0XFF6ad1e3);
 const tertiaryColor = Color(0XFF07272d);
 const quaternaryColor = Color(0xFF7e2d40);
+const sidebarColor = Color(0xFF52AFBF);
 
 //TextFormField
 const textFormFieldEditableColor = Color(0XFFF8F8F8);
@@ -70,68 +71,14 @@ Color statusColor(status) {
     return const Color(0XFFDF184A);
   } else {
     switch (status) {
-      case 'COMPLETE':
-        return const Color(0XFF2ECC40);
-
-      case 'ORDER_COMPLETE':
-        return const Color(0XFF2ECC40);
-
-      case 'SWAPPED':
+      case 'active':
         return Colors.green.shade900;
 
-      case 'ACTIVE':
-        return Colors.green.shade900;
-
-      case 'ACTIVATED':
-        return Colors.green.shade900;
-
-      case 'RESOLVED':
-        return Colors.green.shade900;
-
-      case 'CANCELLED':
+      case 'inactive':
         return const Color(0XFFDF184A);
-
-      case 'WARNING':
-        return const Color(0XFFDF184A);
-
-      case 'ERROR_CALLBACK':
-        return const Color(0XFFDF184A);
-
-      case 'FAILED':
-        return const Color(0XFFDF184A);
-
-      case 'TERMINATED':
-        return const Color(0XFFDF184A);
-
-      case 'NLT_DELAY':
-        return const Color(0XFFDF184A);
-
-      case 'TASK_RAISED':
-        return const Color(0XFFDF184A);
-
-      case 'PENDING_TERMINATION':
-        return const Color(0xFFEDB81A);
-
-      case 'CONFIRM':
-        return const Color(0xFFEDB81A);
-
-      case 'IN_PROGRESS':
-        return const Color(0xFFEDB81A);
-
-      case 'PENDING':
-        return const Color(0xFFEDB81A);
 
       case 'RECONNECT':
         return const Color(0xFFFFC107);
-
-      case 'PENDING_ACTIVE':
-        return const Color(0xFF1C4B9D);
-
-      case 'WAITING_CALL_BACK':
-        return const Color(0xFF1C4B9D);
-
-      case 'OPEN':
-        return const Color(0xFF1C4B9D);
 
       case 'NEW':
         return const Color(0XFF0074D9);

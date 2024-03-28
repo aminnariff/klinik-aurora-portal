@@ -7,7 +7,10 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
+import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
+import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
@@ -18,11 +21,16 @@ import 'package:sidebarx/sidebarx.dart';
 final pageController = SidebarXController(selectedIndex: 0, extended: true);
 List<SidebarXItem> sideBarAttribute = [
   const SidebarXItem(iconWidget: Icon(Icons.dashboard_rounded, color: Colors.white), label: 'Dashboard'),
+  const SidebarXItem(iconWidget: Icon(Icons.person, color: Colors.white), label: UserHomepage.displayName),
+  const SidebarXItem(
+      iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
+  const SidebarXItem(iconWidget: Icon(Icons.business, color: Colors.white), label: BranchHomepage.displayName),
   // const SidebarXItem(iconWidget: Icon(Icons.router, color: Colors.white), label: OntHomepage.displayName),
 ];
 
 class Homepage extends StatefulWidget {
   static const routeName = '/';
+  static const displayName = '/';
   final String? location;
   final Widget child;
 
@@ -120,7 +128,7 @@ class _HomepageState extends State<Homepage> {
                   width: screenWidth(8),
                   margin: const EdgeInsets.all(0),
                   decoration: const BoxDecoration(
-                    color: primary,
+                    color: sidebarColor,
                     borderRadius:
                         BorderRadius.only(topRight: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
                   ),
@@ -148,7 +156,7 @@ class _HomepageState extends State<Homepage> {
                 extendedTheme: SidebarXTheme(
                   width: screenWidth(15),
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 17, 141, 163),
+                    color: sidebarColor,
                     borderRadius:
                         BorderRadius.only(topRight: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
                   ),
@@ -164,13 +172,26 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 8),
                     child: Column(
                       children: [
-                        Image(
-                          image: const AssetImage(
-                            'assets/icons/logo/klinik-aurora.png',
+                        if (extended)
+                          SlideInLeft(
+                            child: Image(
+                              image: const AssetImage(
+                                'assets/icons/logo/klinik-aurora.png',
+                              ),
+                              width: extended ? 100 : 50,
+                              height: extended ? 100 : 50,
+                            ),
                           ),
-                          width: extended ? 100 : 50,
-                          height: extended ? 100 : 50,
-                        ),
+                        if (!extended)
+                          SlideInRight(
+                            child: Image(
+                              image: const AssetImage(
+                                'assets/icons/logo/klinik-aurora.png',
+                              ),
+                              width: extended ? 100 : 50,
+                              height: extended ? 100 : 50,
+                            ),
+                          ),
                         if (extended)
                           Padding(
                             padding: EdgeInsets.only(top: screenPadding / 2),
@@ -290,6 +311,12 @@ class _HomepageState extends State<Homepage> {
     switch (label) {
       case 'Dashboard':
         context.go(Homepage.routeName);
+      case UserHomepage.displayName:
+        context.go(UserHomepage.routeName);
+      case AdminHomepage.displayName:
+        context.go(AdminHomepage.routeName);
+      case BranchHomepage.displayName:
+        context.go(BranchHomepage.routeName);
     }
   }
 

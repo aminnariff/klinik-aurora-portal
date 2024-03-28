@@ -13,10 +13,13 @@ import 'package:klinik_aurora_portal/config/routes.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/config/theme.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
+import 'package:klinik_aurora_portal/controllers/admin/admin_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:provider/provider.dart';
 
 // Production
@@ -65,8 +68,11 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return MultiProvider(
             providers: [
+              ChangeNotifierProvider<AdminController>(create: (_) => AdminController()),
               ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
+              ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),
               ChangeNotifierProvider<DarkModeController>(create: (_) => DarkModeController()),
+              ChangeNotifierProvider<UserController>(create: (_) => UserController()),
               ChangeNotifierProvider<TopBarController>(create: (_) => TopBarController()),
             ],
             child: MaterialApp.router(

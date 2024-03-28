@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
+import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/homepage/line_charts.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
+import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -39,8 +43,46 @@ final router = GoRouter(
             final orderReference = state.uri.queryParameters['orderReference'];
             return const NoTransitionPage(
               child: Scaffold(
-                  // body: Dashboard(),
-                  ),
+                body: LineChartWidget(
+                  isShowingMainData: true,
+                ),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: UserHomepage.routeName,
+          path: UserHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: Scaffold(
+                body: UserHomepage(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: BranchHomepage.routeName,
+          path: BranchHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: Scaffold(
+                body: BranchHomepage(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: AdminHomepage.routeName,
+          path: AdminHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: Scaffold(
+                body: AdminHomepage(),
+              ),
             );
           },
         ),
