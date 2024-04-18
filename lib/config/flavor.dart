@@ -42,6 +42,10 @@ class Environment {
     return data('appUrl');
   }
 
+  static String get imageUrl {
+    return data('imageUrl');
+  }
+
   static String get provisioningUrl {
     return data('provisioningUrl');
   }

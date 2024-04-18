@@ -83,10 +83,16 @@ Color statusColor(status) {
       case 'NEW':
         return const Color(0XFF0074D9);
 
+      case '1':
+        return const Color(0XFF2ECC40);
+
       case 'true':
         return const Color(0XFF2ECC40);
 
       case 'false':
+        return const Color(0XFFDF184A);
+
+      case '0':
         return const Color(0XFFDF184A);
 
       default:

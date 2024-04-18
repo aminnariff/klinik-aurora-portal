@@ -11,12 +11,15 @@ dependencies:
   flutter:
     sdk: flutter
   animate_do: ^3.3.4
+  calendar_date_picker2: ^0.5.5
   cupertino_icons: ^1.0.2
   data_table_2: ^2.5.11
   dio: ^5.4.1
+  dotted_border: ^2.1.0
   dropdown_button2: ^2.3.9
   easy_localization: ^3.0.5
   easy_stepper: ^0.8.3
+  file_picker: ^8.0.0+1
   fl_chart: ^0.66.2
   fluttertoast: ^8.2.4
   flutter_animate: ^4.5.0

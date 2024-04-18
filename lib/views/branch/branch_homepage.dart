@@ -11,7 +11,6 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
@@ -58,30 +57,23 @@ class _BranchHomepageState extends State<BranchHomepage> {
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'userEmail',
-      label: 'Email',
+      attribute: 'city',
+      label: 'City',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'userPhone',
-      label: 'Contact No.',
+      attribute: 'state',
+      label: 'State',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 130,
     ),
     TableHeaderAttribute(
-      attribute: 'userStatus',
-      label: 'Status',
+      attribute: 'branchStatus',
+      label: 'Branch Status',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 70,
-    ),
-    TableHeaderAttribute(
-      attribute: 'branchId',
-      label: 'Branch',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
       attribute: 'createdDate',
@@ -295,9 +287,9 @@ class _BranchHomepageState extends State<BranchHomepage> {
   }
 
   Widget orderTable() {
-    return Consumer<UserController>(
+    return Consumer<BranchController>(
       builder: (context, snapshot, child) {
-        if (snapshot.userAllResponse == null) {
+        if (snapshot.branchAllResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -311,7 +303,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
             ],
           );
         } else {
-          return snapshot.userAllResponse == null || snapshot.userAllResponse!.isEmpty
+          return snapshot.branchAllResponse == null || snapshot.branchAllResponse!.data!.data!.isEmpty
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -357,7 +349,9 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                   verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
                                 ),
                                 rows: [
-                                  for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
+                                  for (int index = 0;
+                                      index < (snapshot.branchAllResponse?.data?.data?.length ?? 0);
+                                      index++)
                                     DataRow(
                                       color: MaterialStateProperty.all(
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
@@ -367,44 +361,42 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                             onPressed: () {
                                               context.goNamed(
                                                 BranchHomepage.routeName,
-                                                queryParameters: {'userId': snapshot.userAllResponse?[index].userId},
+                                                queryParameters: {
+                                                  'userId': snapshot.branchAllResponse?.data?.data?[index].branchId
+                                                },
                                               );
                                             },
                                             child: Text(
-                                              snapshot.userAllResponse?[index].userFullname ??
-                                                  snapshot.userAllResponse?[index].userName ??
-                                                  'N/A',
+                                              snapshot.branchAllResponse?.data?.data?[index].branchName ?? 'N/A',
                                               style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
                                             ),
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(snapshot.userAllResponse?[index].userEmail ?? 'N/A'),
-                                        ),
-                                        DataCell(
-                                          InkWell(
-                                            onTap: () {
-                                              //TODO copy item
-                                            },
-                                            child: Text(snapshot.userAllResponse?[index].userPhone ?? '60 12 498 2969'),
-                                          ),
+                                          AppSelectableText(
+                                              snapshot.branchAllResponse?.data?.data?[index].city ?? 'N/A'),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.userAllResponse?[index].userStatus == 1 ? 'Active' : 'Inactive',
+                                              snapshot.branchAllResponse?.data?.data?[index].state ?? 'N/A'),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.branchAllResponse?.data?.data?[index].branchStatus == 1
+                                                ? 'Active'
+                                                : 'Inactive',
                                             style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(snapshot.userAllResponse?[index].userStatus == 1
-                                                    ? 'active'
-                                                    : 'inactive'),
+                                                color: statusColor(
+                                                    snapshot.branchAllResponse?.data?.data?[index].branchStatus == 1
+                                                        ? 'active'
+                                                        : 'inactive'),
                                                 fontWeightDelta: 1),
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(snapshot.userAllResponse?[index].branchId ?? 'N/A'),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                              dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A'),
+                                          AppSelectableText(dateConverter(
+                                                  snapshot.branchAllResponse?.data?.data?[index].createdDate) ??
+                                              'N/A'),
                                         ),
                                       ],
                                     ),
@@ -475,9 +467,9 @@ class _BranchHomepageState extends State<BranchHomepage> {
     BranchController.getAll(context).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.length ?? 0;
-        _totalPage = ((value.data?.length ?? 0) / _pageSize).ceil();
-        context.read<UserController>().userAllResponse = value.data;
+        _totalCount = value.data?.data?.length ?? 0;
+        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        context.read<BranchController>().branchAllResponse = value;
         // _page = 0;
       } else if (value.code == 404) {}
       return null;

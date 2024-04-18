@@ -3,10 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/error/error.dart';
+import 'package:klinik_aurora_portal/views/homepage/dashboard.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/homepage/line_charts.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
+import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
+import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -43,9 +45,7 @@ final router = GoRouter(
             final orderReference = state.uri.queryParameters['orderReference'];
             return const NoTransitionPage(
               child: Scaffold(
-                body: LineChartWidget(
-                  isShowingMainData: true,
-                ),
+                body: MainDashboard(),
               ),
             );
           },
@@ -82,6 +82,30 @@ final router = GoRouter(
             return const NoTransitionPage(
               child: Scaffold(
                 body: AdminHomepage(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: PromotionHomepage.routeName,
+          path: PromotionHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: Scaffold(
+                body: PromotionHomepage(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: VoucherHomepage.routeName,
+          path: VoucherHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: Scaffold(
+                body: VoucherHomepage(),
               ),
             );
           },

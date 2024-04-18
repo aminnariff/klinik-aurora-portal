@@ -27,6 +27,13 @@
         "rememberMe": "Remember Me",
         "forgotPassword": "Forgot password?"
     },
+    "promotionPage": {
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "promotionImage": "Promotion Image",
+        "browseFile": "Browse your files here (max 10MB)",
+        "forgotPassword": "Forgot password?"
+    },
     "version": {
         "updateAvailable": "New Version Available",
         "forceUpdateDescription":"A critical update for our mobile app is now available. To continue using our services without interruption, please update your app to the latest version immediately by visiting your app store. Thank you for your prompt action.",
@@ -56,6 +63,8 @@
         "err-7": "Please verify your login details and try again.",
         "err-8": "Please verify your login details and try again.",
         "err-9": "Please verify your login details and try again.",
-        "err-10": "No Order Found"
+        "err-10": "No Order Found",
+        "err-21": "The uploaded file exceeds the {}MB limit.",
+        "err-22": "The uploaded file is not a supported document type."
     }
 }

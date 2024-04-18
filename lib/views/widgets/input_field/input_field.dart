@@ -147,7 +147,7 @@ class InputField extends StatelessWidget {
         hintText: field.hintText,
         hintStyle: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.grey),
         labelText: field.labelText,
-        labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: primary, fontWeightDelta: 1),
+        labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
         errorText: field.errorMessage,
         errorStyle: Theme.of(context).textTheme.titleMedium!.apply(color: Colors.red),
         contentPadding: EdgeInsets.fromLTRB(screenPadding / 2, screenPadding / 3, screenPadding / 3, screenPadding / 3),
@@ -204,4 +204,35 @@ class InputField extends StatelessWidget {
       const SnackBar(content: Text('Text copied to clipboard')),
     );
   }
+}
+
+InputDecoration appInputDecoration(BuildContext context, String label) {
+  return InputDecoration(
+    filled: true,
+    fillColor: textFormFieldEditableColor,
+    contentPadding: EdgeInsets.fromLTRB(screenPadding / 2, screenPadding / 3, screenPadding / 3, screenPadding / 3),
+    border: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+      borderRadius: BorderRadius.circular(12.0),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+      borderRadius: BorderRadius.circular(12.0),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+      borderRadius: BorderRadius.circular(12.0),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.red, width: 1.0),
+      borderRadius: BorderRadius.circular(12.0),
+    ),
+    disabledBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+      borderRadius: BorderRadius.circular(12.0),
+    ),
+    labelText: label,
+    hintStyle: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.grey),
+    labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+  );
 }

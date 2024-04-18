@@ -8,7 +8,15 @@ bool notNullOrEmptyString(String? value) {
   return true;
 }
 
-String? dateConverter(String? value) {
+String statusTranslate(int? value) {
+  if (value == 1) {
+    return 'ACTIVE';
+  } else {
+    return 'INACTIVE';
+  }
+}
+
+String? dateConverter(String? value, {String? format}) {
   try {
     if (value == null) {
       return null;
@@ -16,7 +24,7 @@ String? dateConverter(String? value) {
       DateTime dateTime = DateTime.parse(value);
       dateTime = dateTime.toUtc().add(const Duration(hours: 8));
 
-      return DateFormat('dd-MM-yyyy HH:mm:ss').format(dateTime);
+      return DateFormat(format ?? 'dd-MM-yyyy HH:mm:ss').format(dateTime);
     }
   } catch (e) {
     return null;

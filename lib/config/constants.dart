@@ -17,9 +17,12 @@ const String jwtResponse = "jwtResponse";
 const String rememberMe = "rememberMe";
 const String username = "username";
 const String password = "password";
+List<String> supportedExtensions = ['jpg', 'jpeg', 'pdf', 'png'];
 List<DropdownAttribute> withdrawReason = [
   DropdownAttribute('1', 'Change of Mind'),
   DropdownAttribute('2', 'Better offer elsewhere'),
   DropdownAttribute('3', 'No longer needed'),
   DropdownAttribute('others', 'Others'),
 ];
+
+double fileSizeLimit = 10.0;

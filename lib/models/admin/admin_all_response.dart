@@ -30,9 +30,9 @@ class Data {
   String? userName;
   String? userEmail;
   String? branchId;
-  Null userStatus;
+  int? userStatus;
   String? createdDate;
-  Null modifiedDate;
+  String? modifiedDate;
 
   Data(
       {this.userId,

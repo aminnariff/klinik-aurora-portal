@@ -18,8 +18,10 @@ import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
+import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
+import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
 import 'package:provider/provider.dart';
 
 // Production
@@ -72,7 +74,9 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
               ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),
               ChangeNotifierProvider<DarkModeController>(create: (_) => DarkModeController()),
+              ChangeNotifierProvider<PromotionController>(create: (_) => PromotionController()),
               ChangeNotifierProvider<UserController>(create: (_) => UserController()),
+              ChangeNotifierProvider<VoucherController>(create: (_) => VoucherController()),
               ChangeNotifierProvider<TopBarController>(create: (_) => TopBarController()),
             ],
             child: MaterialApp.router(

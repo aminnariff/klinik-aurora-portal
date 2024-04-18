@@ -62,13 +62,13 @@ class _AdminHomepageState extends State<AdminHomepage> {
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
-    // TableHeaderAttribute(
-    //   attribute: 'userPhone',
-    //   label: 'Contact No.',
-    //   allowSorting: false,
-    //   columnSize: ColumnSize.S,
-    //   width: 130,
-    // ),
+    TableHeaderAttribute(
+      attribute: 'userPhone',
+      label: 'Contact No.',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 130,
+    ),
     TableHeaderAttribute(
       attribute: 'userStatus',
       label: 'Status',
@@ -76,12 +76,12 @@ class _AdminHomepageState extends State<AdminHomepage> {
       columnSize: ColumnSize.S,
       width: 70,
     ),
-    TableHeaderAttribute(
-      attribute: 'AdminId',
-      label: 'Admin',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+    // TableHeaderAttribute(
+    //   attribute: 'AdminId',
+    //   label: 'Admin',
+    //   allowSorting: false,
+    //   columnSize: ColumnSize.S,
+    // ),
     TableHeaderAttribute(
       attribute: 'createdDate',
       label: 'Created Date',
@@ -382,15 +382,16 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                         DataCell(
                                           AppSelectableText(snapshot.adminAllResponse?.data?[index].userEmail ?? 'N/A'),
                                         ),
-                                        // DataCell(
-                                        //   InkWell(
-                                        //     onTap: () {
-                                        //       //TODO copy item
-                                        //     },
-                                        //     child: Text(
-                                        //         snapshot.adminAllResponse?.data?[index].userPhone ?? '60 12 498 2969'),
-                                        //   ),
-                                        // ),
+                                        DataCell(
+                                          InkWell(
+                                            onTap: () {
+                                              //TODO copy item
+                                            },
+                                            child: Text(
+                                                // snapshot.adminAllResponse?.data?[index].userPhone ??
+                                                '60 12 4${index * 3}1 2${index * 8}69'),
+                                          ),
+                                        ),
                                         DataCell(
                                           AppSelectableText(
                                             snapshot.adminAllResponse?.data?[index].userStatus == 1
@@ -404,9 +405,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                                 fontWeightDelta: 1),
                                           ),
                                         ),
-                                        DataCell(
-                                          AppSelectableText(snapshot.adminAllResponse?.data?[index].branchId ?? 'N/A'),
-                                        ),
+                                        // DataCell(
+                                        //   AppSelectableText(snapshot.adminAllResponse?.data?[index].branchId ?? 'N/A'),
+                                        // ),
                                         DataCell(
                                           AppSelectableText(
                                               dateConverter(snapshot.adminAllResponse?.data?[index].createdDate) ??

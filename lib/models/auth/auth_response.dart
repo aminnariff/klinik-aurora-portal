@@ -25,9 +25,8 @@ class Data {
   String? refreshToken;
   String? issuedDt;
   String? expiryDt;
-  List<String>? userPermissions;
 
-  Data({this.user, this.accessToken, this.refreshToken, this.issuedDt, this.expiryDt, this.userPermissions});
+  Data({this.user, this.accessToken, this.issuedDt, this.expiryDt, this.refreshToken});
 
   Data.fromJson(Map<String, dynamic> json) {
     user = json['user'] != null ? User.fromJson(json['user']) : null;
@@ -35,7 +34,6 @@ class Data {
     refreshToken = json['refreshToken'];
     issuedDt = json['issuedDt'];
     expiryDt = json['expiryDt'];
-    userPermissions = json['userPermissions'];
   }
 
   Map<String, dynamic> toJson() {
@@ -47,7 +45,6 @@ class Data {
     data['refreshToken'] = refreshToken;
     data['issuedDt'] = issuedDt;
     data['expiryDt'] = expiryDt;
-    data['userPermissions'] = userPermissions;
     return data;
   }
 }
@@ -56,15 +53,19 @@ class User {
   String? userId;
   String? userEmail;
   String? userName;
-  String? fullName;
+  String? userFullname;
+  bool? isSuperadmin;
+  List<String>? permissions;
 
-  User({this.userId, this.userEmail, this.userName, this.fullName});
+  User({this.userId, this.userEmail, this.userName, this.userFullname, this.isSuperadmin, this.permissions});
 
   User.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     userEmail = json['userEmail'];
     userName = json['userName'];
-    fullName = json['fullName'];
+    userFullname = json['userFullname'];
+    isSuperadmin = json['isSuperadmin'];
+    permissions = json['permissions'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {
@@ -72,7 +73,9 @@ class User {
     data['userId'] = userId;
     data['userEmail'] = userEmail;
     data['userName'] = userName;
-    data['fullName'] = fullName;
+    data['userFullname'] = userFullname;
+    data['isSuperadmin'] = isSuperadmin;
+    data['permissions'] = permissions;
     return data;
   }
 }

@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
-import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
+import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
 
 class BranchController extends ChangeNotifier {
-  List<UserResponse>? _userAllResponse;
-  List<UserResponse>? get userAllResponse => _userAllResponse;
+  ApiResponse<BranchAllResponse>? _branchAllResponse;
+  ApiResponse<BranchAllResponse>? get branchAllResponse => _branchAllResponse;
 
-  set userAllResponse(List<UserResponse>? value) {
-    _userAllResponse = value;
+  set branchAllResponse(ApiResponse<BranchAllResponse>? value) {
+    _branchAllResponse = value;
     notifyListeners();
   }
 
-  static Future<ApiResponse<List<UserResponse>>> getAll(
+  static Future<ApiResponse<BranchAllResponse>> getAll(
     BuildContext context,
   ) async {
     return ApiController()
@@ -24,12 +24,7 @@ class BranchController extends ChangeNotifier {
     )
         .then((value) {
       try {
-        return ApiResponse(
-          code: value.code,
-          data: (value.data as List).map((item) {
-            return UserResponse.fromJson(item);
-          }).toList(),
-        );
+        return ApiResponse(code: value.code, data: BranchAllResponse.fromJson(value.data));
       } catch (e) {
         return ApiResponse(
           code: 400,

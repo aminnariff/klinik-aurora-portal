@@ -51,15 +51,15 @@ class AuthController extends ChangeNotifier {
   }
 
   String getName() {
-    return _authenticationResponse?.data?.userPermissions?.first ?? '';
+    return _authenticationResponse?.data?.user?.permissions?.first ?? '';
   }
 
   bool hasPermission(String permission) {
-    if (_authenticationResponse?.data?.userPermissions == null) {
+    if (_authenticationResponse?.data?.user?.permissions == null) {
       return false;
     } else {
       try {
-        _authenticationResponse!.data?.userPermissions!.firstWhere((element) => element == permission);
+        _authenticationResponse!.data?.user?.permissions!.firstWhere((element) => element == permission);
         return true;
       } catch (e) {
         return false;
@@ -108,7 +108,6 @@ class AuthController extends ChangeNotifier {
           refreshToken: value.data?.refreshToken,
           issuedDt: DateTime.now().toString(),
           expiryDt: DateTime.now().add(const Duration(minutes: 30)).toString(),
-          userPermissions: value.data?.userPermissions,
         ),
       );
       // if (_rememberMe) {
