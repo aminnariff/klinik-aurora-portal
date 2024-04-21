@@ -4,13 +4,13 @@ import 'dart:math' as math;
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/views/branch/branch_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
@@ -359,12 +359,14 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                         DataCell(
                                           TextButton(
                                             onPressed: () {
-                                              context.goNamed(
-                                                BranchHomepage.routeName,
-                                                queryParameters: {
-                                                  'userId': snapshot.branchAllResponse?.data?.data?[index].branchId
-                                                },
-                                              );
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return BranchDetail(
+                                                      branch: snapshot.branchAllResponse?.data?.data?[index],
+                                                      type: 'update',
+                                                    );
+                                                  });
                                             },
                                             child: Text(
                                               snapshot.branchAllResponse?.data?.data?[index].branchName ?? 'N/A',
@@ -600,6 +602,30 @@ class _BranchHomepageState extends State<BranchHomepage> {
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
+        TextButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const BranchDetail(
+                    type: 'create',
+                  );
+                });
+          },
+          child: Row(
+            children: [
+              const Icon(
+                Icons.add,
+                color: Colors.blue,
+              ),
+              AppPadding.horizontal(denominator: 2),
+              Text(
+                'Add new branch',
+                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
+              ),
+            ],
+          ),
+        ),
         TextButton(
           onPressed: () {
             showDialog(

@@ -1,5 +1,5 @@
-import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class CheckBoxWidget extends StatelessWidget {
   final bool? value;
@@ -36,6 +36,10 @@ class CheckBoxWidget extends StatelessWidget {
     if (states.any(interactiveStates.contains)) {
       return isDisable ? Colors.grey : secondaryColor;
     }
-    return isDisable ? Colors.grey : primary;
+    return isDisable
+        ? Colors.grey
+        : value == true
+            ? primary
+            : Colors.white;
   }
 }

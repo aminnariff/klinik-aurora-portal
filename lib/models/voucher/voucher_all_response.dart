@@ -28,7 +28,7 @@ class Data {
   String? voucherId;
   String? voucherName;
   String? voucherCode;
-  Null voucherDescription;
+  String? voucherDescription;
   int? voucherPoint;
   int? voucherStatus;
   String? createdDate;

@@ -2,16 +2,19 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
+import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch;
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/user/user_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
@@ -78,7 +81,7 @@ class _UserHomepageState extends State<UserHomepage> {
     ),
     TableHeaderAttribute(
       attribute: 'branchId',
-      label: 'Branch',
+      label: 'Registered Branch',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
@@ -90,14 +93,7 @@ class _UserHomepageState extends State<UserHomepage> {
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
-  final TextEditingController _ontController = TextEditingController();
-  final TextEditingController _slotController = TextEditingController();
-  final TextEditingController _portController = TextEditingController();
-  final TextEditingController _ontSNController = TextEditingController();
-  final TextEditingController _ontPonController = TextEditingController();
-  final TextEditingController _ontMacController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController();
-  String? _nltType;
+  String? _selectedBranch;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -106,6 +102,13 @@ class _UserHomepageState extends State<UserHomepage> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(UserHomepage.displayName);
     });
+    BranchController.getAll(context).then(
+      (value) {
+        if (responseCode(value.code)) {
+          context.read<BranchController>().branchAllResponse = value;
+        }
+      },
+    );
     filtering();
     super.initState();
   }
@@ -364,10 +367,18 @@ class _UserHomepageState extends State<UserHomepage> {
                                         DataCell(
                                           TextButton(
                                             onPressed: () {
-                                              context.goNamed(
-                                                UserHomepage.routeName,
-                                                queryParameters: {'userId': snapshot.userAllResponse?[index].userId},
-                                              );
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return UserDetail(
+                                                      user: snapshot.userAllResponse![index],
+                                                      type: 'update',
+                                                    );
+                                                  });
+                                              // context.goNamed(
+                                              //   UserHomepage.routeName,
+                                              //   queryParameters: {'userId': snapshot.userAllResponse?[index].userId},
+                                              // );
                                             },
                                             child: Text(
                                               snapshot.userAllResponse?[index].userFullname ??
@@ -399,7 +410,9 @@ class _UserHomepageState extends State<UserHomepage> {
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(snapshot.userAllResponse?[index].branchId ?? 'N/A'),
+                                          AppSelectableText(
+                                              translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
+                                                  'N/A'),
                                         ),
                                         DataCell(
                                           AppSelectableText(
@@ -456,6 +469,24 @@ class _UserHomepageState extends State<UserHomepage> {
         }
       },
     );
+  }
+
+  String? translateToBranchName(String branchId) {
+    try {
+      if (context.read<BranchController>().branchAllResponse?.data?.data != null) {
+        return context
+            .read<BranchController>()
+            .branchAllResponse
+            ?.data
+            ?.data!
+            .firstWhere((element) => element.branchId == branchId)
+            .branchName;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
   }
 
   void filtering({bool enableDebounce = true, int? page}) {
@@ -585,14 +616,7 @@ class _UserHomepageState extends State<UserHomepage> {
 
   resetAllFilter() {
     _orderReferenceController.text = '';
-    _ontController.text = '';
-    _slotController.text = '';
-    _portController.text = '';
-    _ontSNController.text = '';
-    _ontPonController.text = '';
-    _ontMacController.text = '';
-    _ipController.text = '';
-    _nltType = null;
+    _selectedBranch = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -627,6 +651,30 @@ class _UserHomepageState extends State<UserHomepage> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
+                  return const UserDetail(
+                    type: 'create',
+                  );
+                });
+          },
+          child: Row(
+            children: [
+              const Icon(
+                Icons.add,
+                color: Colors.blue,
+              ),
+              AppPadding.horizontal(denominator: 2),
+              Text(
+                'Add new user',
+                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
+              ),
+            ],
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -654,36 +702,6 @@ class _UserHomepageState extends State<UserHomepage> {
                                           hintText: 'Search',
                                           labelText: 'Order Reference'),
                                     ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontController, hintText: 'Search', labelText: 'ONT'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _slotController, hintText: 'Search', labelText: 'Slot'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _portController, hintText: 'Search', labelText: 'Port'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontSNController,
-                                          hintText: 'Search',
-                                          labelText: 'ONT Serial Number'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontPonController, hintText: 'Search', labelText: 'ONT PON'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontMacController, hintText: 'Search', labelText: 'ONT MAC'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ipController, hintText: 'Search', labelText: 'IP Address'),
-                                    ),
                                     AppPadding.vertical(),
                                     StreamBuilder<DateTime>(
                                         stream: rebuildDropdown.stream,
@@ -691,13 +709,20 @@ class _UserHomepageState extends State<UserHomepage> {
                                           return AppDropdown(
                                             attributeList: DropdownAttributeList(
                                               [
-                                                DropdownAttribute('CONFIRM', 'CONFIRM'),
-                                                DropdownAttribute('COMPLETE', 'COMPLETE'),
+                                                if (context.read<BranchController>().branchAllResponse?.data?.data !=
+                                                    null)
+                                                  for (branch.Data item in context
+                                                          .read<BranchController>()
+                                                          .branchAllResponse
+                                                          ?.data
+                                                          ?.data ??
+                                                      [])
+                                                    DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
                                               ],
-                                              labelText: 'nltType',
-                                              value: _nltType,
+                                              labelText: 'information'.tr(gender: 'registeredBranch'),
+                                              value: _selectedBranch,
                                               onChanged: (p0) {
-                                                _nltType = p0?.key;
+                                                _selectedBranch = p0?.key;
                                                 rebuildDropdown.add(DateTime.now());
                                                 filtering(page: 0);
                                               },

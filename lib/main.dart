@@ -18,6 +18,7 @@ import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
+import 'package:klinik_aurora_portal/controllers/permission/permission_controller.dart';
 import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
@@ -74,6 +75,7 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
               ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),
               ChangeNotifierProvider<DarkModeController>(create: (_) => DarkModeController()),
+              ChangeNotifierProvider<PermissionController>(create: (_) => PermissionController()),
               ChangeNotifierProvider<PromotionController>(create: (_) => PromotionController()),
               ChangeNotifierProvider<UserController>(create: (_) => UserController()),
               ChangeNotifierProvider<VoucherController>(create: (_) => VoucherController()),

@@ -111,4 +111,76 @@ class PromotionController extends ChangeNotifier {
       );
     }
   }
+
+  static Future<ApiResponse<CreatePromotionResponse>> update(
+      String orderReference, CreatePromotionRequest request) async {
+    Dio dio = Dio();
+    FormData formData = FormData();
+
+    for (FileAttribute item in request.documents) {
+      formData.files.add(
+        MapEntry(
+          "promotionImage",
+          MultipartFile.fromBytes(
+            item.value!,
+            filename: item.name,
+            contentType: item.name != null
+                ? item.name!.contains(".pdf")
+                    ? MediaType("application", "pdf")
+                    : MediaType("image", item.name.toString().split(".").last)
+                : MediaType("image", item.name.toString().split(".").last),
+          ),
+        ),
+      );
+    }
+    formData.fields.add(MapEntry('promotionName', request.promotionName));
+    formData.fields.add(MapEntry('promotionDescription', request.promotionDescription));
+    if (request.promotionTnc != null) {
+      formData.fields.add(MapEntry('promotionTnc', request.promotionTnc!));
+    }
+    formData.fields.add(MapEntry('promotionStartDate', request.promotionStartDate));
+    formData.fields.add(MapEntry('promotionEndDate', request.promotionEndDate));
+    if (request.voucherId != null) {
+      formData.fields.add(MapEntry('voucherId', request.voucherId!));
+    }
+    formData.fields.add(MapEntry('showOnStart', request.showOnStart.toString()));
+
+    debugPrint(formData.fields.toString());
+    debugPrint(formData.files[0].value.filename);
+    debugPrint(formData.files.toString());
+    try {
+      return dio
+          .put(
+        '${Environment.appUrl}admin/promotion/update',
+        options: Options(
+          method: 'PUT',
+          headers: {
+            Headers.acceptHeader: "*/*",
+            Headers.contentTypeHeader: "multipart/form-data",
+          },
+          contentType: "multipart/form-data",
+          responseType: ResponseType.json,
+        ),
+        data: formData,
+      )
+          .then((value) {
+        try {
+          return ApiResponse(
+            code: value.statusCode,
+            data: CreatePromotionResponse.fromJson(value.data),
+          );
+        } catch (e) {
+          return ApiResponse(
+            code: 400,
+            message: e.toString(),
+          );
+        }
+      });
+    } catch (e) {
+      return ApiResponse(
+        code: 400,
+        message: e.toString(),
+      );
+    }
+  }
 }

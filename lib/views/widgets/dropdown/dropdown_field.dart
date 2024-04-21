@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
 class AppDropdown extends StatefulWidget {
@@ -41,7 +42,7 @@ class _AppDropdownState extends State<AppDropdown> {
         if (widget.attributeList.labelText != null) ...[
           Text(
             widget.attributeList.labelText!,
-            style: AppTypography.bodyMedium(context).apply(color: primary, fontWeightDelta: 1),
+            style: AppTypography.bodyMedium(context).apply(color: textPrimaryColor, fontWeightDelta: 1),
           ),
           const SizedBox(height: 2),
         ],
@@ -95,13 +96,14 @@ class _AppDropdownState extends State<AppDropdown> {
             buttonStyleData: widget.attributeList.buttonStyleData ??
                 ButtonStyleData(
                   width: widget.attributeList.width ?? 70,
-                  padding: const EdgeInsets.only(left: 14, right: 14),
+                  padding: EdgeInsets.fromLTRB(screenPadding / 2, 5, screenPadding / 3, 5),
+                  // padding: const EdgeInsets.only(left: 14, right: 14),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: widget.attributeList.borderColor ?? primary.withOpacity(0.3),
-                    ),
-                    color: widget.attributeList.fieldColor ?? Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    // border: Border.all(
+                    //   color: widget.attributeList.borderColor ?? secondaryColor.withOpacity(0.3),
+                    // ),
+                    color: widget.attributeList.fieldColor ?? textFormFieldEditableColor,
                   ),
                   elevation: 0,
                 ),

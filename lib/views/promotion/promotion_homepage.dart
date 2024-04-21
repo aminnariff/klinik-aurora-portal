@@ -19,9 +19,11 @@ import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/promotion/create_promotion_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
+import 'package:klinik_aurora_portal/views/promotion/promotion_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
+import 'package:klinik_aurora_portal/views/widgets/checkbox/checkbox.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -59,7 +61,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   final TextEditingController _promotionTnc = TextEditingController();
   final TextEditingController _startDate = TextEditingController();
   final TextEditingController _endDate = TextEditingController();
-  final bool _showOnStart = false;
+  final ValueNotifier<bool> _showOnStart = ValueNotifier(false);
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
@@ -337,6 +339,32 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                                 isEditable: false,
                                               ),
                                             ),
+                                            AppPadding.vertical(denominator: 2),
+                                            ValueListenableBuilder<bool>(
+                                                valueListenable: _showOnStart,
+                                                builder: (context, snapshot, _) {
+                                                  return Row(
+                                                    children: [
+                                                      CheckBoxWidget(
+                                                        (p0) {
+                                                          _showOnStart.value = !snapshot;
+                                                        },
+                                                        value: snapshot,
+                                                      ),
+                                                      AppPadding.horizontal(denominator: 2),
+                                                      Flexible(
+                                                        child: GestureDetector(
+                                                          onTap: () {
+                                                            _showOnStart.value = !snapshot;
+                                                          },
+                                                          child: Text(
+                                                            'promotionPage'.tr(gender: 'showOnStart'),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                }),
                                           ],
                                         );
                                       },
@@ -344,31 +372,37 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                   ),
                                 ],
                               ),
-                              AppPadding.vertical(denominator: 2),
-                              Button(
-                                () {
-                                  PromotionController.create(
-                                    orderReference,
-                                    CreatePromotionRequest(
-                                      promotionName: _promotionName.text,
-                                      promotionDescription: _promotionName.text,
-                                      promotionStartDate: _startDate.text,
-                                      promotionEndDate: _endDate.text,
-                                      showOnStart: 0,
-                                      documents: [selectedFiles.first],
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      filtering();
-                                      context.pop();
-                                      showDialogSuccess(context,
-                                          'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
-                                    } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                    }
-                                  });
-                                },
-                                actionText: 'button'.tr(gender: 'create'),
+                              AppPadding.vertical(denominator: 1 / 1.5),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Button(
+                                    () {
+                                      PromotionController.create(
+                                        orderReference,
+                                        CreatePromotionRequest(
+                                          promotionName: _promotionName.text,
+                                          promotionDescription: _promotionName.text,
+                                          promotionStartDate: _startDate.text,
+                                          promotionEndDate: _endDate.text,
+                                          showOnStart: _showOnStart.value ? 1 : 0,
+                                          documents: [selectedFiles.first],
+                                        ),
+                                      ).then((value) {
+                                        if (responseCode(value.code)) {
+                                          filtering();
+                                          context.pop();
+                                          showDialogSuccess(context,
+                                              'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                        } else {
+                                          showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                        }
+                                      });
+                                    },
+                                    actionText: 'button'.tr(gender: 'create'),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -463,7 +497,13 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                       Consumer<DarkModeController>(builder: (context, darkMode, _) {
                         return GestureDetector(
                           onTap: () {
-                            // item.action();
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return PromotionDetail(
+                                    promotion: snapshot.promotionAllResponse!.data!.data![index],
+                                  );
+                                });
                           },
                           child: CardContainer(
                             elevation: 2.0,
@@ -491,10 +531,6 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                   Image.network(
                                     '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage}',
                                   ),
-                                  // SvgPicture.asset(
-                                  //   item.icon,
-                                  //   height: 35,
-                                  // ),
                                   AppPadding.vertical(denominator: 2),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

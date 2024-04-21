@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/admin/admin_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/permission/permission_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
@@ -106,6 +107,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(AdminHomepage.displayName);
     });
+    PermissionController.get(context).then((value) => {
+          if (responseCode(value.code)) {context.read<PermissionController>().permissionAllResponse = value.data}
+        });
     filtering();
     super.initState();
   }

@@ -27,6 +27,8 @@ class BranchAllResponse {
 class Data {
   String? branchId;
   String? branchName;
+  String? phoneNumber;
+  String? branchImage;
   String? address;
   int? postcode;
   String? city;
@@ -38,6 +40,8 @@ class Data {
   Data(
       {this.branchId,
       this.branchName,
+      this.phoneNumber,
+      this.branchImage,
       this.address,
       this.postcode,
       this.city,
@@ -49,6 +53,8 @@ class Data {
   Data.fromJson(Map<String, dynamic> json) {
     branchId = json['branchId'];
     branchName = json['branchName'];
+    phoneNumber = json['phoneNumber'];
+    branchImage = json['branchImage'];
     address = json['address'];
     postcode = json['postcode'];
     city = json['city'];
@@ -62,6 +68,8 @@ class Data {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['branchId'] = branchId;
     data['branchName'] = branchName;
+    data['phoneNumber'] = phoneNumber;
+    data['branchImage'] = branchImage;
     data['address'] = address;
     data['postcode'] = postcode;
     data['city'] = city;

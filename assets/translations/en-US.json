@@ -21,6 +21,27 @@
         "logout": "Log Out",
         "login": "Log In"
     },
+    "information": {
+        "username": "Username",
+        "fullName": "Full Name",
+        "password": "Password",
+        "email": "Email",
+        "registeredBranch": "Registered Branch",
+        "phoneNo": "Contact No.",
+        "dob": "Date of Birth",
+        "retypePassword": "Retype Password",
+        "userStatus": "Status"
+    },
+    "branchPage": {
+        "branchName": "Branch Name",
+        "branchCode": "Branch Code",
+        "phoneNo": "Contact No.",
+        "password": "Password",
+        "branchImage": "Branch Image",
+        "browseFile": "Browse your files here (max 10MB)",
+        "email": "Email",
+        "userStatus": "Status"
+    },
     "loginPage": {
         "username": "Username",
         "password": "Password",
@@ -30,6 +51,7 @@
     "promotionPage": {
         "startDate": "Start Date",
         "endDate": "End Date",
+        "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "promotionImage": "Promotion Image",
         "browseFile": "Browse your files here (max 10MB)",
         "forgotPassword": "Forgot password?"

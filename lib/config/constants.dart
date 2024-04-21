@@ -24,5 +24,23 @@ List<DropdownAttribute> withdrawReason = [
   DropdownAttribute('3', 'No longer needed'),
   DropdownAttribute('others', 'Others'),
 ];
+List<DropdownAttribute> states = [
+  DropdownAttribute('Selangor', 'Selangor'),
+  DropdownAttribute('Johor', 'Johor'),
+  DropdownAttribute('Kedah', 'Kedah'),
+  DropdownAttribute('Kelantan', 'Kelantan'),
+  DropdownAttribute('Kuala Lumpur', 'Kuala Lumpur'),
+  DropdownAttribute('Labuan', 'Labuan'),
+  DropdownAttribute('Melaka', 'Melaka'),
+  DropdownAttribute('Negeri Sembilan', 'Negeri Sembilan'),
+  DropdownAttribute('Pahang', 'Pahang'),
+  DropdownAttribute('Perak', 'Perak'),
+  DropdownAttribute('Perlis', 'Perlis'),
+  DropdownAttribute('Pulau Pinang', 'Pulau Pinang'),
+  DropdownAttribute('Putrajaya', 'Putrajaya'),
+  DropdownAttribute('Sabah', 'Sabah'),
+  DropdownAttribute('Sarawak', 'Sarawak'),
+  DropdownAttribute('Terengganu', 'Terengganu'),
+];
 
 double fileSizeLimit = 10.0;
