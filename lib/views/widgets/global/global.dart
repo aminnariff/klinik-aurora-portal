@@ -30,3 +30,11 @@ String? dateConverter(String? value, {String? format}) {
     return null;
   }
 }
+
+String convertStringToDate(String dateString) {
+  // Assuming the date is in day-month-year format
+  List<String> parts = dateString.split('-');
+  String formattedString = '${parts[2]}-${parts[1]}-${parts[0]}';
+
+  return DateTime.parse(formattedString).toString();
+}

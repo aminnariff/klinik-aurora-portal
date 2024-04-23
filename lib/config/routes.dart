@@ -10,12 +10,12 @@ import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   initialLocation: LoginPage.routeName,
-  navigatorKey: _rootNavigatorKey,
+  navigatorKey: rootNavigatorKey,
   routes: <RouteBase>[
     GoRoute(
       name: LoginPage.routeName,
@@ -42,7 +42,7 @@ final router = GoRouter(
           path: Homepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            final orderReference = state.uri.queryParameters['orderReference'];
+            // final orderReference = state.uri.queryParameters['orderReference'];
             return const NoTransitionPage(
               child: Scaffold(
                 body: MainDashboard(),

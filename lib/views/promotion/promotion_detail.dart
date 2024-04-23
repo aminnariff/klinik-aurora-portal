@@ -7,11 +7,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
-import 'package:klinik_aurora_portal/models/promotion/create_promotion_request.dart';
 import 'package:klinik_aurora_portal/models/promotion/promotion_all_response.dart';
+import 'package:klinik_aurora_portal/models/promotion/update_promotion_request.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/checkbox/checkbox.dart';
@@ -57,6 +58,12 @@ class _PromotionDetailState extends State<PromotionDetail> {
     _endDate.text = dateConverter(widget.promotion.promotionEndDate, format: 'dd-MM-yyyy') ?? '';
     _promotionName.text = widget.promotion.promotionName ?? '';
     _showOnStart.value = widget.promotion.showOnStart == 1;
+    selectedFiles.add(
+      FileAttribute(
+        path: widget.promotion.promotionImage,
+        name: widget.promotion.promotionImage,
+      ),
+    );
     super.initState();
   }
 
@@ -174,9 +181,54 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                       ],
                                       for (int index = 0; index < selectedFiles.length; index++)
                                         ListTile(
-                                          title: Text(
-                                            '${index + 1}.  ${selectedFiles[index].name ?? ''}',
-                                            style: AppTypography.bodyMedium(context),
+                                          title: GestureDetector(
+                                            onTap: () {
+                                              if (selectedFiles[index].path != null ||
+                                                  selectedFiles[index].value != null) {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return GestureDetector(
+                                                        onTap: () {
+                                                          context.pop();
+                                                        },
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Flexible(
+                                                              child: CardContainer(
+                                                                selectedFiles[index].value != null
+                                                                    ? Image.memory(selectedFiles[index].value!)
+                                                                    : selectedFiles[index].path != null
+                                                                        ? Padding(
+                                                                            padding: EdgeInsets.all(screenPadding),
+                                                                            child: Image.network(
+                                                                                '${Environment.imageUrl}${selectedFiles[index].path}'),
+                                                                          )
+                                                                        : const SizedBox(),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    });
+                                              }
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${index + 1}. ',
+                                                  style: AppTypography.bodyMedium(context),
+                                                ),
+                                                Flexible(
+                                                  child: Text(
+                                                    '  ${selectedFiles[index].name ?? ''}',
+                                                    style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                           enableFeedback: true,
                                           enabled: true,
@@ -288,14 +340,17 @@ class _PromotionDetailState extends State<PromotionDetail> {
                           children: [
                             Button(
                               () {
-                                PromotionController.create(
+                                PromotionController.update(
                                   orderReference,
-                                  CreatePromotionRequest(
+                                  UpdatePromotionRequest(
+                                    promotionId: widget.promotion.promotionId ?? '',
                                     promotionName: _promotionName.text,
-                                    promotionDescription: _promotionName.text,
-                                    promotionStartDate: _startDate.text,
-                                    promotionEndDate: _endDate.text,
+                                    promotionDescription: _promotionDescription.text,
+                                    promotionTnc: _promotionTnc.text,
+                                    promotionStartDate: convertStringToDate(_startDate.text),
+                                    promotionEndDate: convertStringToDate(_endDate.text),
                                     showOnStart: _showOnStart.value ? 1 : 0,
+                                    promotionStatus: widget.promotion.promotionStatus ?? 1,
                                     documents: [selectedFiles.first],
                                   ),
                                 ).then((value) {

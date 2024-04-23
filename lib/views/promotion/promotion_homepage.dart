@@ -383,9 +383,10 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                         orderReference,
                                         CreatePromotionRequest(
                                           promotionName: _promotionName.text,
-                                          promotionDescription: _promotionName.text,
-                                          promotionStartDate: _startDate.text,
-                                          promotionEndDate: _endDate.text,
+                                          promotionDescription: _promotionDescription.text,
+                                          promotionTnc: _promotionTnc.text,
+                                          promotionStartDate: convertStringToDate(_startDate.text),
+                                          promotionEndDate: convertStringToDate(_endDate.text),
                                           showOnStart: _showOnStart.value ? 1 : 0,
                                           documents: [selectedFiles.first],
                                         ),

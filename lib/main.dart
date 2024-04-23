@@ -15,6 +15,7 @@ import 'package:klinik_aurora_portal/config/theme.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
 import 'package:klinik_aurora_portal/controllers/admin/admin_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
+import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
@@ -59,8 +60,39 @@ Future<void> main() async {
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // late UserActivityHandler _activityHandler;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // _activityHandler = UserActivityHandler(
+    //   timeout: const Duration(milliseconds: 5000),
+    //   onTimeout: () {
+    //     if (mounted) {
+    //       context.read<AuthController>().logout(context);
+    //       Future.delayed(const Duration(milliseconds: 500), () {
+    //         rootNavigatorKey.currentContext?.pushReplacement(LoginPage.routeName);
+    //       });
+    //     }
+    //   },
+    // );
+    // _activityHandler.initialize();
+  }
+
+  // @override
+  // void dispose() {
+  //   _activityHandler.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +103,7 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return MultiProvider(
             providers: [
+              ChangeNotifierProvider(create: (_) => ActivityHandlerController()),
               ChangeNotifierProvider<AdminController>(create: (_) => AdminController()),
               ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
               ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),

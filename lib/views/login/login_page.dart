@@ -290,11 +290,8 @@ class _LoginPageState extends State<LoginPage> {
                                             AuthRequest(
                                                 username: usernameController.text, password: passwordController.text))
                                         .then((value) {
-                                      print(value.code);
                                       dismissLoading();
                                       if (responseCode(value.code)) {
-                                        print('sini');
-                                        print(value.data);
                                         context.read<AuthController>().setAuthenticationResponse(value.data,
                                             usernameValue: usernameController.text,
                                             passwordValue: passwordController.text);

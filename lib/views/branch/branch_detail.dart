@@ -119,14 +119,14 @@ class _BranchDetailState extends State<BranchDetail> {
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: _branchName,
-                                      labelText: 'branchpage'.tr(gender: 'branchName'),
+                                      labelText: 'branchPage'.tr(gender: 'branchName'),
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: _branchCode,
-                                      labelText: 'branchpage'.tr(gender: 'branchCode'),
+                                      labelText: 'branchPage'.tr(gender: 'branchCode'),
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
@@ -272,7 +272,7 @@ class _BranchDetailState extends State<BranchDetail> {
                                         InputField(
                                           field: InputFieldAttribute(
                                             controller: _branchPhone,
-                                            labelText: 'branchpage'.tr(gender: 'phoneNo'),
+                                            labelText: 'branchPage'.tr(gender: 'phoneNo'),
                                             isNumber: true,
                                             maxCharacter: 10,
                                             prefixIcon: Row(
@@ -311,7 +311,7 @@ class _BranchDetailState extends State<BranchDetail> {
                                 if (widget.type == 'create') {
                                   BranchController.create(
                                     CreateBranchRequest(
-                                      branchName: widget.branch?.branchName ?? '',
+                                      branchName: _branchName.text,
                                       branchCode: _branchCode.text,
                                       phoneNumber: _branchPhone.text,
                                       address: _address.text,
@@ -343,7 +343,7 @@ class _BranchDetailState extends State<BranchDetail> {
                                   BranchController.update(
                                     UpdateBranchRequest(
                                       branchId: widget.branch?.branchId ?? '',
-                                      branchName: widget.branch?.branchName ?? '',
+                                      branchName: _branchName.text,
                                       phoneNumber: _branchPhone.text,
                                       address: _address.text,
                                       city: _city.text,

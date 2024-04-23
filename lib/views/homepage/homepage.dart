@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
+import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
@@ -57,6 +58,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   void initState() {
+    super.initState();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       context.read<TopBarController>().pageValue = 0;
       if (context.read<AuthController>().authenticationResponse != null) {
@@ -68,15 +70,22 @@ class _HomepageState extends State<Homepage> {
         }
       }
     });
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: const MobileView(),
-      desktop: desktopView(context),
-    );
+    return Consumer<ActivityHandlerController>(builder: (context, snapshot, _) {
+      if (snapshot.status) {
+        SchedulerBinding.instance.scheduleFrameCallback((_) {
+          context.read<AuthController>().logout(context);
+          context.pushReplacement(LoginPage.routeName);
+        });
+      }
+      return LayoutWidget(
+        mobile: const MobileView(),
+        desktop: desktopView(context),
+      );
+    });
   }
 
   Widget desktopView(BuildContext context) {

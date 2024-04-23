@@ -14,6 +14,7 @@
         "understood": "Understood",
         "edit": "Edit",
         "profile": "Profile",
+        "remove": "Remove",
         "delete": "Delete",
         "reLogin": "Re-login",
         "retry": "Retry",
@@ -28,6 +29,10 @@
         "email": "Email",
         "registeredBranch": "Registered Branch",
         "phoneNo": "Contact No.",
+        "postalCode": "Postal Code",
+        "address": "Address",
+        "state": "State",
+        "city": "City",
         "dob": "Date of Birth",
         "retypePassword": "Retype Password",
         "userStatus": "Status"

@@ -4,9 +4,18 @@ class UpdateUserRequest {
   String? userFullname;
   String? branchId;
   String? userPhone;
+  String? userDob;
   int? userStatus;
 
-  UpdateUserRequest({this.userId, this.userName, this.userFullname, this.branchId, this.userPhone, this.userStatus});
+  UpdateUserRequest({
+    this.userId,
+    this.userName,
+    this.userFullname,
+    this.branchId,
+    this.userPhone,
+    this.userStatus,
+    this.userDob,
+  });
 
   UpdateUserRequest.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
@@ -15,6 +24,7 @@ class UpdateUserRequest {
     branchId = json['branchId'];
     userPhone = json['userPhone'];
     userStatus = json['userStatus'];
+    userDob = json['userDob'];
   }
 
   Map<String, dynamic> toJson() {
@@ -25,6 +35,7 @@ class UpdateUserRequest {
     data['branchId'] = branchId;
     data['userPhone'] = userPhone;
     data['userStatus'] = userStatus;
+    data['userDob'] = userDob;
     return data;
   }
 }

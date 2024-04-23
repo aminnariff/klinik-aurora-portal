@@ -28,6 +28,10 @@
         "email": "Email",
         "registeredBranch": "Registered Branch",
         "phoneNo": "Contact No.",
+        "postalCode": "Postal Code",
+        "address": "Address",
+        "state": "State",
+        "city": "City",
         "dob": "Date of Birth",
         "retypePassword": "Retype Password",
         "userStatus": "Status"
@@ -37,6 +41,8 @@
         "branchCode": "Branch Code",
         "phoneNo": "Contact No.",
         "password": "Password",
+        "branchImage": "Branch Image",
+        "browseFile": "Browse your files here (max 10MB)",
         "email": "Email",
         "userStatus": "Status"
     },
