@@ -102,13 +102,15 @@ class _UserHomepageState extends State<UserHomepage> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(UserHomepage.displayName);
     });
-    BranchController.getAll(context).then(
-      (value) {
-        if (responseCode(value.code)) {
-          context.read<BranchController>().branchAllResponse = value;
-        }
-      },
-    );
+    if (context.read<BranchController>().branchAllResponse == null) {
+      BranchController.getAll(context).then(
+        (value) {
+          if (responseCode(value.code)) {
+            context.read<BranchController>().branchAllResponse = value;
+          }
+        },
+      );
+    }
     filtering();
     super.initState();
   }
@@ -375,10 +377,6 @@ class _UserHomepageState extends State<UserHomepage> {
                                                       type: 'update',
                                                     );
                                                   });
-                                              // context.goNamed(
-                                              //   UserHomepage.routeName,
-                                              //   queryParameters: {'userId': snapshot.userAllResponse?[index].userId},
-                                              // );
                                             },
                                             child: Text(
                                               snapshot.userAllResponse?[index].userFullname ??

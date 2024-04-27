@@ -1,35 +1,35 @@
 import 'dart:async';
 
-import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/controllers/admin/admin_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
-import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
+import 'package:klinik_aurora_portal/controllers/permission/permission_controller.dart';
+import 'package:klinik_aurora_portal/models/admin/admin_all_response.dart' as admin;
+import 'package:klinik_aurora_portal/models/admin/create_admin_request.dart';
+import 'package:klinik_aurora_portal/models/admin/permission_admin_response.dart' as admin_permission;
+import 'package:klinik_aurora_portal/models/admin/update_admin_request.dart';
+import 'package:klinik_aurora_portal/models/admin/update_permission_admin_request.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
-import 'package:klinik_aurora_portal/models/user/create_user_request.dart';
-import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
-import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class AdminDetail extends StatefulWidget {
-  final UserResponse? user;
+  final admin.Data? user;
   final String type;
   const AdminDetail({super.key, this.user, required this.type});
 
@@ -42,36 +42,54 @@ class _AdminDetailState extends State<AdminDetail> {
   final TextEditingController _userFullname = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _branchId = TextEditingController();
-  final TextEditingController _userDob = TextEditingController();
   final TextEditingController _userPhone = TextEditingController();
   final TextEditingController _userEmail = TextEditingController();
   final ValueNotifier<bool> _userStatus = ValueNotifier(false);
+  bool allowEditableField = true;
   DropdownAttribute? _selectedBranch;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
+  List<admin_permission.Data> currentPermissionList = [];
+  List<String> selectedPermission = [];
 
   @override
   void initState() {
     if (widget.type == 'update') {
+      AdminController.getPermission(context, widget.user!.userId!).then(
+        (value) {
+          if (responseCode(value.code)) {
+            setState(() {
+              currentPermissionList = value.data?.data ?? [];
+              for (admin_permission.Data item in value.data?.data ?? []) {
+                selectedPermission.add(item.permissionId!);
+              }
+            });
+          }
+        },
+      );
+      setState(() {
+        allowEditableField = false;
+      });
       _userName.text = widget.user?.userName ?? '';
       _userFullname.text = widget.user?.userFullname ?? '';
       _branchId.text = widget.user?.branchId ?? '';
-      _userDob.text = dateConverter(widget.user?.userDob, format: 'dd-MM-yyyy') ?? '';
-      _userPhone.text = widget.user?.userPhone?.substring(1, widget.user?.userPhone?.length) ?? '';
+      // _userPhone.text = widget.user?.userPhone?.substring(1, widget.user?.userPhone?.length) ?? '';
       _userEmail.text = widget.user?.userEmail ?? '';
       _userStatus.value = widget.user?.userStatus == 1;
     }
     try {
-      Data? branch = context
-          .read<BranchController>()
-          .branchAllResponse
-          ?.data
-          ?.data
-          ?.firstWhere((element) => element.branchId == _branchId.text);
-      if (branch != null) {
-        setState(() {
-          _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
-        });
+      if (widget.user?.branchId != null) {
+        Data? branch = context
+            .read<BranchController>()
+            .branchAllResponse
+            ?.data
+            ?.data
+            ?.firstWhere((element) => element.branchId == widget.user!.branchId);
+        if (branch != null) {
+          setState(() {
+            _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
+          });
+        }
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -81,10 +99,10 @@ class _AdminDetailState extends State<AdminDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return editUser();
+    return editAdmin();
   }
 
-  editUser() {
+  editAdmin() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -107,7 +125,7 @@ class _AdminDetailState extends State<AdminDetail> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             AppSelectableText(
-                              'User Details',
+                              'Admin Details',
                               style: AppTypography.bodyLarge(context),
                             ),
                             CloseButton(
@@ -129,6 +147,7 @@ class _AdminDetailState extends State<AdminDetail> {
                                     field: InputFieldAttribute(
                                       controller: _userName,
                                       labelText: 'information'.tr(gender: 'username'),
+                                      isEditable: allowEditableField,
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
@@ -139,58 +158,6 @@ class _AdminDetailState extends State<AdminDetail> {
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      var results = await showCalendarDatePicker2Dialog(
-                                        context: context,
-                                        config: CalendarDatePicker2WithActionButtonsConfig(
-                                          lastDate: DateTime.now(),
-                                        ),
-                                        dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                        borderRadius: BorderRadius.circular(15),
-                                      );
-                                      if (results != null) {
-                                        _userDob.text = dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
-                                      }
-                                    },
-                                    child: ReadOnly(
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: _userDob,
-                                          isEditable: false,
-                                          labelText: 'information'.tr(gender: 'dob'),
-                                          suffixWidget: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_month,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      isEditable: false,
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  if (widget.type == 'create') ...[
-                                    InputField(
-                                      field: InputFieldAttribute(
-                                        controller: _password,
-                                        labelText: 'information'.tr(gender: 'password'),
-                                      ),
-                                    ),
-                                    AppPadding.vertical(denominator: 2),
-                                  ],
-                                ],
-                              ),
-                            ),
-                            AppPadding.horizontal(),
-                            SizedBox(
-                              width: screenWidth1728(30),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: _userPhone,
@@ -214,11 +181,30 @@ class _AdminDetailState extends State<AdminDetail> {
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
+                                  // if (widget.type == 'create') ...[
+                                  //   InputField(
+                                  //     field: InputFieldAttribute(
+                                  //       controller: _password,
+                                  //       labelText: 'information'.tr(gender: 'password'),
+                                  //     ),
+                                  //   ),
+                                  //   AppPadding.vertical(denominator: 2),
+                                  // ],
+                                ],
+                              ),
+                            ),
+                            AppPadding.horizontal(),
+                            SizedBox(
+                              width: screenWidth1728(30),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: _userEmail,
                                       labelText: 'information'.tr(gender: 'email'),
                                       isEmail: true,
+                                      isEditable: allowEditableField,
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
@@ -252,80 +238,74 @@ class _AdminDetailState extends State<AdminDetail> {
                           ],
                         ),
                         AppPadding.vertical(denominator: 1 / 1.5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Button(
-                              () {
-                                showLoading();
-                                if (widget.type == 'update') {
-                                  UserController.update(
-                                    context,
-                                    UpdateUserRequest(
-                                      userId: widget.user?.userId,
-                                      userName: _userName.text,
-                                      userFullname: _userFullname.text,
-                                      userPhone: _userPhone.text,
-                                      branchId: _selectedBranch?.key,
-                                      userStatus: _userStatus.value ? 1 : 0,
+                        if (widget.type == 'update')
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AppSelectableText(
+                                'Permission',
+                                style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                              ),
+                              AppPadding.vertical(denominator: 3),
+                              Wrap(
+                                direction: Axis.horizontal,
+                                children: [
+                                  for (int index = 0;
+                                      index <
+                                          (context.read<PermissionController>().permissionAllResponse?.data?.length ??
+                                              0);
+                                      index++)
+                                    Container(
+                                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Checkbox(
+                                            value: selectedPermission.contains(context
+                                                .read<PermissionController>()
+                                                .permissionAllResponse
+                                                ?.data?[index]
+                                                .permissionId),
+                                            onChanged: (value) {
+                                              try {
+                                                setState(() {
+                                                  if (value == true) {
+                                                    selectedPermission.add(context
+                                                        .read<PermissionController>()
+                                                        .permissionAllResponse!
+                                                        .data![index]
+                                                        .permissionId
+                                                        .toString());
+                                                  } else {
+                                                    selectedPermission.removeWhere((element) =>
+                                                        element ==
+                                                        context
+                                                            .read<PermissionController>()
+                                                            .permissionAllResponse!
+                                                            .data![index]
+                                                            .permissionId
+                                                            .toString());
+                                                  }
+                                                });
+                                              } catch (e) {
+                                                showDialogError(context, e.toString());
+                                              }
+                                            },
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text(
+                                              '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}'),
+                                        ],
+                                      ),
                                     ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      UserController.getAll(
-                                        context,
-                                      ).then((value) {
-                                        dismissLoading();
-                                        if (responseCode(value.code)) {
-                                          context.read<UserController>().userAllResponse = value.data;
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully updated customer information');
-                                        } else {
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully updated customer information');
-                                        }
-                                      });
-                                    } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                    }
-                                  });
-                                } else {
-                                  UserController.create(
-                                    context,
-                                    CreateUserRequest(
-                                      userName: _userName.text,
-                                      userFullname: _userFullname.text,
-                                      userPhone: '0${_userPhone.text}',
-                                      userEmail: _userEmail.text,
-                                      userPassword: _password.text,
-                                      userRetypePassword: _password.text,
-                                      branchId: _selectedBranch?.key,
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      UserController.getAll(
-                                        context,
-                                      ).then((value) {
-                                        dismissLoading();
-                                        if (responseCode(value.code)) {
-                                          context.read<UserController>().userAllResponse = value.data;
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully created customer');
-                                        } else {
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully created customer information');
-                                        }
-                                      });
-                                    } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                    }
-                                  });
-                                }
-                              },
-                              actionText: 'button'.tr(gender: widget.type),
-                            ),
-                          ],
-                        ),
+                                ],
+                              ),
+                              AppPadding.vertical(denominator: 3 / 2),
+                            ],
+                          ),
+                        button()
                       ],
                     ),
                   ),
@@ -333,6 +313,94 @@ class _AdminDetailState extends State<AdminDetail> {
               ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget button() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Button(
+          () {
+            showLoading();
+            if (widget.type == 'update') {
+              AdminController.update(
+                context,
+                UpdateAdminRequest(
+                  userId: widget.user?.userId,
+                  userFullname: _userFullname.text,
+                  branchId: _selectedBranch?.key,
+                  userPhone: _userPhone.text,
+                  userStatus: _userStatus.value ? 1 : 0,
+                ),
+              ).then((value) {
+                if (responseCode(value.code)) {
+                  AdminController.updatePermission(
+                    context,
+                    UpdatePermissionAdminRequest(
+                      userId: widget.user!.userId,
+                      permissionIds: selectedPermission,
+                    ),
+                  ).then((value) {
+                    if (responseCode(value.code)) {
+                      AdminController.getAll(
+                        context,
+                      ).then((value) {
+                        dismissLoading();
+                        if (responseCode(value.code)) {
+                          context.read<AdminController>().adminAllResponse = value.data;
+                          context.pop();
+                          showDialogSuccess(context, 'Successfully updated admin information');
+                        } else {
+                          context.pop();
+                          showDialogSuccess(context, 'Successfully updated admin information');
+                        }
+                      });
+                    } else {
+                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    }
+                  });
+                } else {
+                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                }
+              });
+            } else {
+              AdminController.create(
+                context,
+                CreateAdminRequest(
+                  userName: _userName.text,
+                  userFullname: _userFullname.text,
+                  userPhone: '0${_userPhone.text}',
+                  userEmail: _userEmail.text,
+                  userPassword: _password.text,
+                  userRetypePassword: _password.text,
+                  branchId: _selectedBranch?.key,
+                ),
+              ).then((value) {
+                if (responseCode(value.code)) {
+                  AdminController.getAll(
+                    context,
+                  ).then((value) {
+                    dismissLoading();
+                    if (responseCode(value.code)) {
+                      context.read<AdminController>().adminAllResponse = value.data;
+                      context.pop();
+                      showDialogSuccess(context, 'Successfully created admin');
+                    } else {
+                      context.pop();
+                      showDialogSuccess(context, 'Successfully created admin information');
+                    }
+                  });
+                } else {
+                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                }
+              });
+            }
+          },
+          actionText: 'button'.tr(gender: widget.type),
         ),
       ],
     );

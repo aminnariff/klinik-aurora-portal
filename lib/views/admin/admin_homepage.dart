@@ -4,14 +4,15 @@ import 'dart:math' as math;
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/admin/admin_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/permission/permission_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/views/admin/admin_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
@@ -107,9 +108,20 @@ class _AdminHomepageState extends State<AdminHomepage> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(AdminHomepage.displayName);
     });
-    PermissionController.get(context).then((value) => {
-          if (responseCode(value.code)) {context.read<PermissionController>().permissionAllResponse = value.data}
-        });
+    if (context.read<BranchController>().branchAllResponse == null) {
+      BranchController.getAll(context).then(
+        (value) {
+          if (responseCode(value.code)) {
+            context.read<BranchController>().branchAllResponse = value;
+          }
+        },
+      );
+    }
+    PermissionController.get(context).then((value) {
+      if (responseCode(value.code)) {
+        context.read<PermissionController>().permissionAllResponse = value.data;
+      }
+    });
     filtering();
     super.initState();
   }
@@ -368,12 +380,14 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                         DataCell(
                                           TextButton(
                                             onPressed: () {
-                                              context.goNamed(
-                                                AdminHomepage.routeName,
-                                                queryParameters: {
-                                                  'userId': snapshot.adminAllResponse?.data?[index].userId
-                                                },
-                                              );
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return AdminDetail(
+                                                      user: snapshot.adminAllResponse!.data![index],
+                                                      type: 'update',
+                                                    );
+                                                  });
                                             },
                                             child: Text(
                                               snapshot.adminAllResponse?.data?[index].userFullname ??
@@ -619,6 +633,30 @@ class _AdminHomepageState extends State<AdminHomepage> {
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
+        TextButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const AdminDetail(
+                    type: 'create',
+                  );
+                });
+          },
+          child: Row(
+            children: [
+              const Icon(
+                Icons.add,
+                color: Colors.blue,
+              ),
+              AppPadding.horizontal(denominator: 2),
+              Text(
+                'Add new admin',
+                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
+              ),
+            ],
+          ),
+        ),
         TextButton(
           onPressed: () {
             showDialog(
