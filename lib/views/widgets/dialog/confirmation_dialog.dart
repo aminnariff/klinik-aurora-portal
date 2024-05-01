@@ -124,6 +124,7 @@ class ConfirmationDialog extends StatelessWidget {
               Navigator.pop(context, true);
             },
         text: attribute.confrimButton?.text ?? 'Confirm',
+        color: attribute.confrimButton?.color,
         textColor: attribute.confrimButton?.textColor ?? Colors.white,
       ),
     );

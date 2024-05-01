@@ -1,5 +1,3 @@
-import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
-
 class UpdatePromotionRequest {
   final String promotionId;
   final String promotionName;
@@ -8,9 +6,8 @@ class UpdatePromotionRequest {
   final String? voucherId;
   final String promotionStartDate;
   final String promotionEndDate;
-  final int showOnStart;
-  final int promotionStatus;
-  List<FileAttribute> documents;
+  final bool showOnStart;
+  final bool promotionStatus;
 
   UpdatePromotionRequest({
     required this.promotionId,
@@ -22,6 +19,5 @@ class UpdatePromotionRequest {
     required this.promotionEndDate,
     required this.showOnStart,
     required this.promotionStatus,
-    required this.documents,
   });
 }

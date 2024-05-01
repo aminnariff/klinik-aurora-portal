@@ -26,6 +26,7 @@ import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectabl
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
+import 'package:provider/provider.dart';
 
 class PromotionDetail extends StatefulWidget {
   final Data promotion;
@@ -58,12 +59,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
     _endDate.text = dateConverter(widget.promotion.promotionEndDate, format: 'dd-MM-yyyy') ?? '';
     _promotionName.text = widget.promotion.promotionName ?? '';
     _showOnStart.value = widget.promotion.showOnStart == 1;
-    selectedFiles.add(
-      FileAttribute(
-        path: widget.promotion.promotionImage,
-        name: widget.promotion.promotionImage,
-      ),
-    );
+    for (String item in widget.promotion.promotionImage ?? []) {
+      selectedFiles.add(
+        FileAttribute(
+          path: item,
+          name: item,
+        ),
+      );
+    }
     super.initState();
   }
 
@@ -341,7 +344,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                             Button(
                               () {
                                 PromotionController.update(
-                                  orderReference,
+                                  context,
                                   UpdatePromotionRequest(
                                     promotionId: widget.promotion.promotionId ?? '',
                                     promotionName: _promotionName.text,
@@ -349,16 +352,42 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                     promotionTnc: _promotionTnc.text,
                                     promotionStartDate: convertStringToDate(_startDate.text),
                                     promotionEndDate: convertStringToDate(_endDate.text),
-                                    showOnStart: _showOnStart.value ? 1 : 0,
-                                    promotionStatus: widget.promotion.promotionStatus ?? 1,
-                                    documents: [selectedFiles.first],
+                                    showOnStart: _showOnStart.value,
+                                    promotionStatus: widget.promotion.promotionStatus == 1 ? true : false,
                                   ),
                                 ).then((value) {
                                   if (responseCode(value.code)) {
-                                    // filtering();
-                                    context.pop();
-                                    showDialogSuccess(context,
-                                        'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                    if (isAnyFileChange()) {
+                                      bool showError = false;
+                                      for (FileAttribute item in selectedFiles) {
+                                        if (item.name!.contains('images/promotion')) {
+                                          showError = true;
+                                          break;
+                                        }
+                                      }
+                                      if (showError) {
+                                        showDialogError(context,
+                                            'Please delete the outdated images and upload the updated versions.');
+                                      } else {
+                                        PromotionController.upload(
+                                                context, widget.promotion.promotionId!, selectedFiles)
+                                            .then((value) {
+                                          if (responseCode(value.code)) {
+                                            context.pop();
+                                            PromotionController.getAll(context).then((value) =>
+                                                context.read<PromotionController>().promotionAllResponse = value);
+                                            showDialogSuccess(context,
+                                                'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                          } else {
+                                            showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                          }
+                                        });
+                                      }
+                                    } else {
+                                      context.pop();
+                                      showDialogSuccess(context,
+                                          'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                    }
                                   } else {
                                     showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                                   }
@@ -378,6 +407,18 @@ class _PromotionDetailState extends State<PromotionDetail> {
         ),
       ],
     );
+  }
+
+  bool isAnyFileChange() {
+    bool temp = false;
+
+    for (FileAttribute item in selectedFiles) {
+      if (item.value != null) {
+        temp = true;
+        break;
+      }
+    }
+    return temp;
   }
 
   double bytesToMB(int bytes) {

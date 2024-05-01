@@ -1,5 +1,3 @@
-import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
-
 class CreatePromotionRequest {
   final String promotionName;
   final String promotionDescription;
@@ -8,7 +6,6 @@ class CreatePromotionRequest {
   final String promotionStartDate;
   final String promotionEndDate;
   final int showOnStart;
-  List<FileAttribute> documents;
 
   CreatePromotionRequest({
     required this.promotionName,
@@ -18,6 +15,5 @@ class CreatePromotionRequest {
     required this.promotionStartDate,
     required this.promotionEndDate,
     required this.showOnStart,
-    required this.documents,
   });
 }

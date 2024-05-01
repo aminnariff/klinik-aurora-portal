@@ -45,84 +45,73 @@ class PromotionController extends ChangeNotifier {
   }
 
   static Future<ApiResponse<CreatePromotionResponse>> create(
-      String orderReference, CreatePromotionRequest request) async {
-    Dio dio = Dio();
-    FormData formData = FormData();
-
-    for (FileAttribute item in request.documents) {
-      formData.files.add(
-        MapEntry(
-          "promotionImage",
-          MultipartFile.fromBytes(
-            item.value!,
-            filename: item.name,
-            contentType: item.name != null
-                ? item.name!.contains(".pdf")
-                    ? MediaType("application", "pdf")
-                    : MediaType("image", item.name.toString().split(".").last)
-                : MediaType("image", item.name.toString().split(".").last),
-          ),
-        ),
-      );
-    }
-    formData.fields.add(MapEntry('promotionName', request.promotionName));
-    formData.fields.add(MapEntry('promotionDescription', request.promotionDescription));
-    if (request.promotionTnc != null) {
-      formData.fields.add(MapEntry('promotionTnc', request.promotionTnc!));
-    }
-    formData.fields.add(MapEntry('promotionStartDate', request.promotionStartDate));
-    formData.fields.add(MapEntry('promotionEndDate', request.promotionEndDate));
-    if (request.voucherId != null) {
-      formData.fields.add(MapEntry('voucherId', request.voucherId!));
-    }
-    formData.fields.add(MapEntry('showOnStart', request.showOnStart.toString()));
-
-    debugPrint(formData.fields.toString());
-    debugPrint(formData.files[0].value.filename);
-    debugPrint(formData.files.toString());
-    try {
-      return dio
-          .post(
-        '${Environment.appUrl}admin/promotion/create',
-        options: Options(
-          method: 'POST',
-          headers: {
-            Headers.acceptHeader: "*/*",
-            Headers.contentTypeHeader: "multipart/form-data",
-            'Authorization': 'Bearer ${prefs.getString(token)}',
-          },
-          contentType: "multipart/form-data",
-          responseType: ResponseType.json,
-        ),
-        data: formData,
-      )
-          .then((value) {
-        try {
-          return ApiResponse(
-            code: value.statusCode,
-            data: CreatePromotionResponse.fromJson(value.data),
-          );
-        } catch (e) {
-          return ApiResponse(
-            code: 400,
-            message: e.toString(),
-          );
-        }
-      });
-    } catch (e) {
-      return ApiResponse(
-        code: 400,
-        message: e.toString(),
-      );
-    }
+      BuildContext context, CreatePromotionRequest request) async {
+    return ApiController().call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/promotion/create',
+      data: {
+        "promotionName": request.promotionName,
+        "promotionDescription": request.promotionDescription,
+        "promotionStartDate": request.promotionStartDate,
+        "promotionEndDate": request.promotionEndDate,
+        "showOnStart": request.showOnStart,
+        "promotionTnc": request.promotionTnc,
+        "voucherId": request.voucherId,
+      },
+    ).then((value) {
+      try {
+        return ApiResponse(
+          code: value.code,
+          data: CreatePromotionResponse.fromJson(value.data),
+        );
+      } catch (e) {
+        return ApiResponse(
+          code: 400,
+          message: e.toString(),
+        );
+      }
+    });
   }
 
   static Future<ApiResponse<UpdatePromotionResponse>> update(
-      String orderReference, UpdatePromotionRequest request) async {
+      BuildContext context, UpdatePromotionRequest request) async {
+    return ApiController().call(
+      context,
+      method: Method.put,
+      endpoint: 'admin/promotion/update',
+      data: {
+        "promotionId": request.promotionId,
+        "promotionName": request.promotionName,
+        "promotionDescription": request.promotionDescription,
+        "promotionStartDate": request.promotionStartDate,
+        "promotionEndDate": request.promotionEndDate,
+        "showOnStart": request.showOnStart,
+        "promotionStatus": request.promotionStatus,
+        "promotionTnc": request.promotionTnc,
+        "voucherId": request.voucherId,
+      },
+    ).then((value) {
+      try {
+        return ApiResponse(
+          code: value.code,
+          data: UpdatePromotionResponse.fromJson(value.data),
+        );
+      } catch (e) {
+        return ApiResponse(
+          code: 400,
+          message: e.toString(),
+        );
+      }
+    });
+  }
+
+  static Future<ApiResponse<UpdatePromotionResponse>> upload(
+      BuildContext context, String promotionId, List<FileAttribute> documents) async {
     Dio dio = Dio();
     FormData formData = FormData();
 
-    for (FileAttribute item in request.documents) {
+    for (FileAttribute item in documents) {
       formData.files.add(
         MapEntry(
           "promotionImage",
@@ -138,27 +127,12 @@ class PromotionController extends ChangeNotifier {
         ),
       );
     }
-    formData.fields.add(MapEntry('promotionId', request.promotionId));
-    formData.fields.add(MapEntry('promotionName', request.promotionName));
-    formData.fields.add(MapEntry('promotionDescription', request.promotionDescription));
-    if (request.promotionTnc != null) {
-      formData.fields.add(MapEntry('promotionTnc', request.promotionTnc!));
-    }
-    formData.fields.add(MapEntry('promotionStartDate', request.promotionStartDate));
-    formData.fields.add(MapEntry('promotionEndDate', request.promotionEndDate));
-    if (request.voucherId != null) {
-      formData.fields.add(MapEntry('voucherId', request.voucherId!));
-    }
-    formData.fields.add(MapEntry('showOnStart', request.showOnStart.toString()));
-    formData.fields.add(MapEntry('promotionStatus', request.promotionStatus.toString()));
+    formData.fields.add(MapEntry('promotionId', promotionId));
 
-    debugPrint(formData.fields.toString());
-    debugPrint(formData.files[0].value.filename);
-    debugPrint(formData.files.toString());
     try {
       return dio
           .put(
-        '${Environment.appUrl}admin/promotion/update',
+        '${Environment.appUrl}admin/promotion/upload',
         options: Options(
           method: 'PUT',
           headers: {

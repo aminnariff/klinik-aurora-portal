@@ -36,5 +36,5 @@ String convertStringToDate(String dateString) {
   List<String> parts = dateString.split('-');
   String formattedString = '${parts[2]}-${parts[1]}-${parts[0]}';
 
-  return DateTime.parse(formattedString).toString();
+  return DateFormat('yyyy-MM-dd').format(DateTime.parse(formattedString));
 }

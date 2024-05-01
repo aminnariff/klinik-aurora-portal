@@ -40,6 +40,10 @@
     "branchPage": {
         "branchName": "Branch Name",
         "branchCode": "Branch Code",
+        "launchDate": "Launch Date",
+        "openingHours": "Opening Hours",
+        "closingHours": "Closing Hours",
+        "open24Hours": "Open 24 Hours",
         "phoneNo": "Contact No.",
         "password": "Password",
         "branchImage": "Branch Image",

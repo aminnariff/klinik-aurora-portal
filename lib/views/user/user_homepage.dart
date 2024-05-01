@@ -13,11 +13,13 @@ import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch;
+import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -90,6 +92,13 @@ class _UserHomepageState extends State<UserHomepage> {
       label: 'Created Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
+    ),
+    TableHeaderAttribute(
+      attribute: 'action',
+      label: 'Action',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 131,
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
@@ -367,23 +376,10 @@ class _UserHomepageState extends State<UserHomepage> {
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
                                       cells: [
                                         DataCell(
-                                          TextButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return UserDetail(
-                                                      user: snapshot.userAllResponse![index],
-                                                      type: 'update',
-                                                    );
-                                                  });
-                                            },
-                                            child: Text(
-                                              snapshot.userAllResponse?[index].userFullname ??
-                                                  snapshot.userAllResponse?[index].userName ??
-                                                  'N/A',
-                                              style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                            ),
+                                          AppSelectableText(
+                                            snapshot.userAllResponse?[index].userFullname ??
+                                                snapshot.userAllResponse?[index].userName ??
+                                                'N/A',
                                           ),
                                         ),
                                         DataCell(
@@ -415,6 +411,90 @@ class _UserHomepageState extends State<UserHomepage> {
                                         DataCell(
                                           AppSelectableText(
                                               dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A'),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () async {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return UserDetail(
+                                                          user: snapshot.userAllResponse![index],
+                                                          type: 'update',
+                                                        );
+                                                      });
+                                                },
+                                                icon: const Icon(
+                                                  Icons.edit,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return UserDetail(
+                                                          user: snapshot.userAllResponse![index],
+                                                          type: 'update',
+                                                        );
+                                                      });
+                                                },
+                                                icon: const Icon(
+                                                  Icons.manage_accounts,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  try {
+                                                    if (await showConfirmDialog(
+                                                        context,
+                                                        snapshot.userAllResponse?[index].userStatus == 1
+                                                            ? 'Are you certain you wish to deactivate this user account? Please note, this action can be reversed at a later time.'
+                                                            : 'Are you certain you wish to activate this user account? Please note, this action can be reversed at a later time.')) {
+                                                      Future.delayed(Duration.zero, () {
+                                                        UserController.update(
+                                                          context,
+                                                          UpdateUserRequest(
+                                                            userId: snapshot.userAllResponse?[index].userId,
+                                                            userName: snapshot.userAllResponse?[index].userName,
+                                                            userFullname: snapshot.userAllResponse?[index].userFullname,
+                                                            userDob: dateConverter(
+                                                                snapshot.userAllResponse?[index].userDob,
+                                                                format: 'yyyy-MM-dd'),
+                                                            userPhone: snapshot.userAllResponse?[index].userPhone,
+                                                            branchId: snapshot.userAllResponse?[index].branchId,
+                                                            userStatus: snapshot.userAllResponse?[index].userStatus == 1
+                                                                ? 0
+                                                                : 1,
+                                                          ),
+                                                        ).then((value) {
+                                                          if (responseCode(value.code)) {
+                                                            filtering();
+                                                            showDialogSuccess(context,
+                                                                'The user account has been successfully ${snapshot.userAllResponse?[index].userStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                          } else {
+                                                            showDialogError(context, value.data?.message ?? '');
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(e.toString());
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  snapshot.userAllResponse?[index].userStatus == 1
+                                                      ? Icons.delete
+                                                      : Icons.play_arrow,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),

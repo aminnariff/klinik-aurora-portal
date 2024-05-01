@@ -34,7 +34,7 @@ import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class AdminHomepage extends StatefulWidget {
-  static const routeName = '/Admin';
+  static const routeName = '/admin';
   static const displayName = 'Admins';
   final String? orderReference;
   const AdminHomepage({super.key, this.orderReference});

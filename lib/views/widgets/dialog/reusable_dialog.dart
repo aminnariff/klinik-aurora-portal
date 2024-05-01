@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/confirmation_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/confirmation_dialog_attribute.dart';
@@ -5,8 +7,6 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_type.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 showDialogError(BuildContext context, String text) {
   showDialog(
@@ -38,7 +38,7 @@ showConfirmDialog(BuildContext context, String bodyText) async {
             logo: SvgPicture.asset(
               'assets/icons/failed/warning.svg',
               height: 120,
-              colorFilter: const ColorFilter.mode(Color(0XFF9200BA), BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(secondaryColor, BlendMode.srcIn),
             ),
             text: bodyText,
             confrimButton: DialogButtonAttribute(
@@ -46,6 +46,7 @@ showConfirmDialog(BuildContext context, String bodyText) async {
                 Navigator.pop(context, true);
               },
               text: 'Confirm',
+              color: secondaryColor,
               textColor: Colors.white,
             ),
             cancelButton: DialogButtonAttribute(

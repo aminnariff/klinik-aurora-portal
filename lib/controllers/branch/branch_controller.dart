@@ -63,6 +63,10 @@ class BranchController extends ChangeNotifier {
     formData.fields.add(MapEntry('postcode', request.postcode));
     formData.fields.add(MapEntry('city', request.city));
     formData.fields.add(MapEntry('state', request.state));
+    formData.fields.add(MapEntry('branchOpeningHours', request.branchOpeningHours));
+    formData.fields.add(MapEntry('branchClosingHours', request.branchClosingHours));
+    formData.fields.add(MapEntry('is24Hours', '${request.is24Hours}'));
+    formData.fields.add(MapEntry('branchLaunchDate', request.branchLaunchDate));
     debugPrint(formData.fields.toString());
     debugPrint(formData.files[0].value.filename);
     debugPrint(formData.files.toString());
@@ -119,24 +123,18 @@ class BranchController extends ChangeNotifier {
       );
     }
 
-    if (request.branchName != null) {
-      formData.fields.add(MapEntry('branchName', request.branchName!));
-    }
-    if (request.phoneNumber != null) {
-      formData.fields.add(MapEntry('phoneNumber', '0${request.phoneNumber!}'));
-    }
-    if (request.address != null) {
-      formData.fields.add(MapEntry('address', request.address!));
-    }
-    if (request.postcode != null) {
-      formData.fields.add(MapEntry('postcode', request.postcode!));
-    }
-    if (request.city != null) {
-      formData.fields.add(MapEntry('city', request.city!));
-    }
-    if (request.state != null) {
-      formData.fields.add(MapEntry('state', request.state!));
-    }
+    formData.fields.add(MapEntry('branchId', request.branchId));
+    formData.fields.add(MapEntry('branchName', request.branchName!));
+    formData.fields.add(MapEntry('branchCode', request.branchCode!));
+    formData.fields.add(MapEntry('phoneNumber', '0${request.phoneNumber!}'));
+    formData.fields.add(MapEntry('address', request.address!));
+    formData.fields.add(MapEntry('postcode', request.postcode!));
+    formData.fields.add(MapEntry('city', request.city!));
+    formData.fields.add(MapEntry('state', request.state!));
+    formData.fields.add(MapEntry('branchOpeningHours', request.branchOpeningHours));
+    formData.fields.add(MapEntry('branchClosingHours', request.branchClosingHours));
+    formData.fields.add(MapEntry('is24Hours', '${request.is24Hours}'));
+    formData.fields.add(MapEntry('branchLaunchDate', request.branchLaunchDate));
     try {
       return dio
           .put(

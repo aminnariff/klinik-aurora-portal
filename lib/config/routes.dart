@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
+import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/homepage/dashboard.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
@@ -94,6 +95,21 @@ final router = GoRouter(
             return const NoTransitionPage(
               child: Scaffold(
                 body: PromotionHomepage(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: DoctorHomepage.routeName,
+          path: DoctorHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            final String? branchId = state.extra as String?;
+            return NoTransitionPage(
+              child: Scaffold(
+                body: DoctorHomepage(
+                  branchId: branchId,
+                ),
               ),
             );
           },

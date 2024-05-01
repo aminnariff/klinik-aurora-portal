@@ -2,6 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
+import 'package:klinik_aurora_portal/models/voucher/create_voucher_request.dart';
+import 'package:klinik_aurora_portal/models/voucher/create_voucher_response.dart';
+import 'package:klinik_aurora_portal/models/voucher/update_voucher_request.dart';
+import 'package:klinik_aurora_portal/models/voucher/update_voucher_response.dart';
 import 'package:klinik_aurora_portal/models/voucher/voucher_all_response.dart';
 
 class VoucherController extends ChangeNotifier {
@@ -25,6 +29,64 @@ class VoucherController extends ChangeNotifier {
         .then((value) {
       try {
         return ApiResponse(code: value.code, data: VoucherAllResponse.fromJson(value.data));
+      } catch (e) {
+        return ApiResponse(
+          code: 400,
+          message: e.toString(),
+        );
+      }
+    });
+  }
+
+  static Future<ApiResponse<CreateVoucherResponse>> create(BuildContext context, CreateVoucherRequest request) async {
+    return ApiController().call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/voucher/create',
+      data: {
+        "voucherName": request.voucherName,
+        "voucherDescription": request.voucherDescription,
+        "voucherCode": request.voucherCode,
+        "voucherPoint": request.voucherPoint,
+        "voucherStartDate": request.voucherStartDate,
+        "voucherEndDate": request.voucherEndDate
+      },
+    ).then((value) {
+      try {
+        return ApiResponse(
+          code: value.code,
+          data: CreateVoucherResponse.fromJson(value.data),
+        );
+      } catch (e) {
+        return ApiResponse(
+          code: 400,
+          message: e.toString(),
+        );
+      }
+    });
+  }
+
+  static Future<ApiResponse<UpdateVoucherResponse>> update(BuildContext context, UpdateVoucherRequest request) async {
+    return ApiController().call(
+      context,
+      method: Method.put,
+      endpoint: 'admin/voucher/update',
+      data: {
+        "voucherId": request.voucherId,
+        "voucherName": request.voucherName,
+        "voucherDescription": request.voucherDescription,
+        "voucherCode": request.voucherCode,
+        "voucherPoint": request.voucherPoint,
+        "voucherStartDate": request.voucherStartDate,
+        "voucherEndDate": request.voucherEndDate,
+        "voucherStatus": request.voucherStatus,
+      },
+    ).then((value) {
+      try {
+        return ApiResponse(
+          code: value.code,
+          data: UpdateVoucherResponse.fromJson(value.data),
+        );
       } catch (e) {
         return ApiResponse(
           code: 400,

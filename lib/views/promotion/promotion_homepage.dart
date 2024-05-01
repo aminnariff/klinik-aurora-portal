@@ -380,7 +380,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                   Button(
                                     () {
                                       PromotionController.create(
-                                        orderReference,
+                                        context,
                                         CreatePromotionRequest(
                                           promotionName: _promotionName.text,
                                           promotionDescription: _promotionDescription.text,
@@ -388,14 +388,23 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                           promotionStartDate: convertStringToDate(_startDate.text),
                                           promotionEndDate: convertStringToDate(_endDate.text),
                                           showOnStart: _showOnStart.value ? 1 : 0,
-                                          documents: [selectedFiles.first],
                                         ),
                                       ).then((value) {
                                         if (responseCode(value.code)) {
-                                          filtering();
-                                          context.pop();
-                                          showDialogSuccess(context,
-                                              'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                          if (value.data?.id != null) {
+                                            PromotionController.upload(context, value.data!.id!, selectedFiles)
+                                                .then((value) {
+                                              if (responseCode(value.code)) {
+                                                filtering();
+                                                context.pop();
+                                                showDialogSuccess(context,
+                                                    'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                              } else {
+                                                showDialogError(
+                                                    context, value.data?.message ?? 'ERROR : ${value.code}');
+                                              }
+                                            });
+                                          }
                                         } else {
                                           showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                                         }
@@ -529,9 +538,11 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                     ],
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  Image.network(
-                                    '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage}',
-                                  ),
+                                  if (snapshot.promotionAllResponse?.data?.data?[index].promotionImage != null)
+                                    if (snapshot.promotionAllResponse!.data!.data![index].promotionImage!.isNotEmpty)
+                                      Image.network(
+                                        '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage?.first}',
+                                      ),
                                   AppPadding.vertical(denominator: 2),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
+import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
@@ -29,6 +30,7 @@ List<SidebarXItem> sideBarAttribute = [
   const SidebarXItem(
       iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
   const SidebarXItem(iconWidget: Icon(Icons.business, color: Colors.white), label: BranchHomepage.displayName),
+  const SidebarXItem(iconWidget: Icon(Icons.contact_emergency, color: Colors.white), label: DoctorHomepage.displayName),
   const SidebarXItem(iconWidget: Icon(Icons.image, color: Colors.white), label: PromotionHomepage.displayName),
   const SidebarXItem(
       iconWidget: Icon(Icons.card_giftcard_rounded, color: Colors.white), label: VoucherHomepage.displayName),
@@ -290,6 +292,8 @@ class _HomepageState extends State<Homepage> {
         context.go(AdminHomepage.routeName);
       case BranchHomepage.displayName:
         context.go(BranchHomepage.routeName);
+      case DoctorHomepage.displayName:
+        context.go(DoctorHomepage.routeName);
       case PromotionHomepage.displayName:
         context.go(PromotionHomepage.routeName);
       case VoucherHomepage.displayName:

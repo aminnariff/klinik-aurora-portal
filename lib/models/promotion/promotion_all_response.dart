@@ -33,7 +33,7 @@ class Data {
   String? promotionStartDate;
   String? promotionEndDate;
   int? showOnStart;
-  String? promotionImage;
+  List<String>? promotionImage;
   int? promotionStatus;
   String? createdDate;
   String? modifiedDate;
@@ -61,7 +61,7 @@ class Data {
     promotionStartDate = json['promotionStartDate'];
     promotionEndDate = json['promotionEndDate'];
     showOnStart = json['showOnStart'];
-    promotionImage = json['promotionImage'];
+    promotionImage = json['promotionImage'].cast<String>();
     promotionStatus = json['promotionStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];

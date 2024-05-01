@@ -10,13 +10,12 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
+import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -51,36 +50,30 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
 
   List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(
-      attribute: 'userFullname',
+      attribute: 'voucherCode',
+      label: 'Code',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+    ),
+    TableHeaderAttribute(
+      attribute: 'voucherName',
       label: 'Name',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'userEmail',
-      label: 'Email',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'userPhone',
-      label: 'Contact No.',
+      attribute: 'voucherPoint',
+      label: 'Points',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 130,
     ),
     TableHeaderAttribute(
-      attribute: 'userStatus',
+      attribute: 'voucherStatus',
       label: 'Status',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 70,
-    ),
-    TableHeaderAttribute(
-      attribute: 'branchId',
-      label: 'Branch',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
       attribute: 'createdDate',
@@ -90,14 +83,6 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
-  final TextEditingController _ontController = TextEditingController();
-  final TextEditingController _slotController = TextEditingController();
-  final TextEditingController _portController = TextEditingController();
-  final TextEditingController _ontSNController = TextEditingController();
-  final TextEditingController _ontPonController = TextEditingController();
-  final TextEditingController _ontMacController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController();
-  String? _nltType;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -294,9 +279,9 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
   }
 
   Widget orderTable() {
-    return Consumer<UserController>(
+    return Consumer<VoucherController>(
       builder: (context, snapshot, child) {
-        if (snapshot.userAllResponse == null) {
+        if (snapshot.voucherAllResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -310,7 +295,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
             ],
           );
         } else {
-          return snapshot.userAllResponse == null || snapshot.userAllResponse!.isEmpty
+          return snapshot.voucherAllResponse == null || snapshot.voucherAllResponse!.data!.data!.isEmpty
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -356,7 +341,9 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                   verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
                                 ),
                                 rows: [
-                                  for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
+                                  for (int index = 0;
+                                      index < (snapshot.voucherAllResponse?.data?.data?.length ?? 0);
+                                      index++)
                                     DataRow(
                                       color: MaterialStateProperty.all(
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
@@ -366,44 +353,44 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                             onPressed: () {
                                               context.goNamed(
                                                 VoucherHomepage.routeName,
-                                                queryParameters: {'userId': snapshot.userAllResponse?[index].userId},
+                                                queryParameters: {
+                                                  'userId': snapshot.voucherAllResponse?.data?.data?[index].voucherId
+                                                },
                                               );
                                             },
                                             child: Text(
-                                              snapshot.userAllResponse?[index].userFullname ??
-                                                  snapshot.userAllResponse?[index].userName ??
-                                                  'N/A',
+                                              snapshot.voucherAllResponse?.data?.data?[index].voucherCode ?? 'N/A',
                                               style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
                                             ),
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(snapshot.userAllResponse?[index].userEmail ?? 'N/A'),
+                                          AppSelectableText(
+                                              snapshot.voucherAllResponse?.data?.data?[index].voucherName ?? 'N/A'),
                                         ),
                                         DataCell(
                                           InkWell(
-                                            onTap: () {
-                                              //TODO copy item
-                                            },
-                                            child: Text(snapshot.userAllResponse?[index].userPhone ?? '60 12 498 2969'),
+                                            child: Text(
+                                                '${snapshot.voucherAllResponse?.data?.data?[index].voucherPoint ?? 'N/A'}'),
                                           ),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.userAllResponse?[index].userStatus == 1 ? 'Active' : 'Inactive',
+                                            snapshot.voucherAllResponse?.data?.data?[index].voucherStatus == 1
+                                                ? 'Active'
+                                                : 'Inactive',
                                             style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(snapshot.userAllResponse?[index].userStatus == 1
-                                                    ? 'active'
-                                                    : 'inactive'),
+                                                color: statusColor(
+                                                    snapshot.voucherAllResponse?.data?.data?[index].voucherStatus == 1
+                                                        ? 'active'
+                                                        : 'inactive'),
                                                 fontWeightDelta: 1),
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(snapshot.userAllResponse?[index].branchId ?? 'N/A'),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                              dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A'),
+                                          AppSelectableText(dateConverter(
+                                                  snapshot.voucherAllResponse?.data?.data?[index].createdDate) ??
+                                              'N/A'),
                                         ),
                                       ],
                                     ),
@@ -471,7 +458,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
     if (page != null) {
       _page = page;
     }
-    UserController.getAll(
+    VoucherController.getAll(
       context,
       // DeviceRequest(
       //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
@@ -489,9 +476,9 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.length ?? 0;
-        _totalPage = ((value.data?.length ?? 0) / _pageSize).ceil();
-        context.read<UserController>().userAllResponse = value.data;
+        _totalCount = value.data?.data?.length ?? 0;
+        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        context.read<VoucherController>().voucherAllResponse = value;
         // _page = 0;
       } else if (value.code == 404) {}
       return null;
@@ -585,14 +572,6 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
 
   resetAllFilter() {
     _orderReferenceController.text = '';
-    _ontController.text = '';
-    _slotController.text = '';
-    _portController.text = '';
-    _ontSNController.text = '';
-    _ontPonController.text = '';
-    _ontMacController.text = '';
-    _ipController.text = '';
-    _nltType = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -654,57 +633,6 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                           hintText: 'Search',
                                           labelText: 'Order Reference'),
                                     ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontController, hintText: 'Search', labelText: 'ONT'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _slotController, hintText: 'Search', labelText: 'Slot'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _portController, hintText: 'Search', labelText: 'Port'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontSNController,
-                                          hintText: 'Search',
-                                          labelText: 'ONT Serial Number'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontPonController, hintText: 'Search', labelText: 'ONT PON'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontMacController, hintText: 'Search', labelText: 'ONT MAC'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ipController, hintText: 'Search', labelText: 'IP Address'),
-                                    ),
-                                    AppPadding.vertical(),
-                                    StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                DropdownAttribute('CONFIRM', 'CONFIRM'),
-                                                DropdownAttribute('COMPLETE', 'COMPLETE'),
-                                              ],
-                                              labelText: 'nltType',
-                                              value: _nltType,
-                                              onChanged: (p0) {
-                                                _nltType = p0?.key;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 0);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
-                                          );
-                                        }),
                                     AppPadding.vertical(denominator: 1 / 3),
                                     AppOutlinedButton(
                                       () {
