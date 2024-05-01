@@ -81,6 +81,13 @@ class _BranchHomepageState extends State<BranchHomepage> {
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
+    TableHeaderAttribute(
+      attribute: 'action',
+      label: 'Action',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 131,
+    ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
   final TextEditingController _ontController = TextEditingController();

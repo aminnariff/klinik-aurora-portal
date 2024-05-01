@@ -30,6 +30,8 @@ class Data {
   String? voucherCode;
   String? voucherDescription;
   int? voucherPoint;
+  String? voucherStartDate;
+  String? voucherEndDate;
   int? voucherStatus;
   String? createdDate;
   String? modifiedDate;
@@ -40,6 +42,8 @@ class Data {
       this.voucherCode,
       this.voucherDescription,
       this.voucherPoint,
+      this.voucherStartDate,
+      this.voucherEndDate,
       this.voucherStatus,
       this.createdDate,
       this.modifiedDate});
@@ -50,6 +54,8 @@ class Data {
     voucherCode = json['voucherCode'];
     voucherDescription = json['voucherDescription'];
     voucherPoint = json['voucherPoint'];
+    voucherStartDate = json['voucherStartDate'];
+    voucherEndDate = json['voucherEndDate'];
     voucherStatus = json['voucherStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
@@ -62,6 +68,8 @@ class Data {
     data['voucherCode'] = voucherCode;
     data['voucherDescription'] = voucherDescription;
     data['voucherPoint'] = voucherPoint;
+    data['voucherStartDate'] = voucherStartDate;
+    data['voucherEndDate'] = voucherEndDate;
     data['voucherStatus'] = voucherStatus;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
