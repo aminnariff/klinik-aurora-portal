@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/point_management/point_management_controller.dart';
-import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
 import 'package:klinik_aurora_portal/models/point_management/create_point_request.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
@@ -38,11 +37,16 @@ class _PointDetailState extends State<PointDetail> {
   DropdownAttribute? _selectedVoucher;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
+  voucher.Data? selectedVoucher;
 
   @override
   void initState() {
     _userFullname.text = widget.user?.userFullname ?? '';
-    VoucherController.getAll(context).then((value) => context.read<VoucherController>().voucherAllResponse = value);
+    _userName.text = widget.user?.userName ?? '';
+    VoucherController.getAll(context).then((value) {
+      context.read<VoucherController>().voucherAllResponse = value;
+      rebuildDropdown.add(DateTime.now());
+    });
     super.initState();
   }
 
@@ -95,6 +99,7 @@ class _PointDetailState extends State<PointDetail> {
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: _userName,
+                                      isEditable: false,
                                       labelText: 'information'.tr(gender: 'username'),
                                     ),
                                   ),
@@ -102,6 +107,7 @@ class _PointDetailState extends State<PointDetail> {
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: _userFullname,
+                                      isEditable: false,
                                       labelText: 'information'.tr(gender: 'fullName'),
                                     ),
                                   ),
@@ -117,30 +123,60 @@ class _PointDetailState extends State<PointDetail> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  AppPadding.vertical(denominator: 2),
-                                  AppPadding.vertical(denominator: 2),
                                   Row(
                                     children: [
-                                      AppDropdown(
-                                        attributeList: DropdownAttributeList(
-                                          [
-                                            if (context.read<VoucherController>().voucherAllResponse?.data?.data !=
-                                                null)
-                                              for (voucher.Data item
-                                                  in context.read<VoucherController>().voucherAllResponse?.data?.data ??
-                                                      [])
-                                                DropdownAttribute(item.voucherId ?? '', item.voucherName ?? ''),
-                                          ],
-                                          onChanged: (selected) {
-                                            setState(() {
-                                              _selectedVoucher = selected;
-                                            });
-                                          },
-                                          value: _selectedVoucher?.name,
-                                          width: screenWidth1728(30),
-                                        ),
-                                      ),
+                                      StreamBuilder<DateTime>(
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return AppDropdown(
+                                              attributeList: DropdownAttributeList(
+                                                [
+                                                  if (context
+                                                          .read<VoucherController>()
+                                                          .voucherAllResponse
+                                                          ?.data
+                                                          ?.data !=
+                                                      null)
+                                                    for (voucher.Data item in context
+                                                            .read<VoucherController>()
+                                                            .voucherAllResponse
+                                                            ?.data
+                                                            ?.data ??
+                                                        [])
+                                                      DropdownAttribute(item.voucherId ?? '',
+                                                          '${item.voucherName} (${item.voucherCode})'),
+                                                ],
+                                                onChanged: (selected) {
+                                                  setState(() {
+                                                    try {
+                                                      selectedVoucher = context
+                                                          .read<VoucherController>()
+                                                          .voucherAllResponse
+                                                          ?.data
+                                                          ?.data!
+                                                          .firstWhere((element) => element.voucherId == selected?.key);
+                                                    } catch (e) {
+                                                      debugPrint(e.toString());
+                                                    }
+                                                    _selectedVoucher = selected;
+                                                  });
+                                                },
+                                                value: _selectedVoucher?.name,
+                                                width: screenWidth1728(30),
+                                              ),
+                                            );
+                                          }),
                                     ],
+                                  ),
+                                  AppPadding.vertical(denominator: 2),
+                                  InputField(
+                                    field: InputFieldAttribute(
+                                      controller: TextEditingController(
+                                        text: selectedVoucher?.voucherPoint.toString(),
+                                      ),
+                                      isEditable: false,
+                                      labelText: 'voucherPage'.tr(gender: 'voucherPoints'),
+                                    ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                 ],
@@ -165,17 +201,15 @@ class _PointDetailState extends State<PointDetail> {
                                   ),
                                 ).then((value) {
                                   if (responseCode(value.code)) {
-                                    UserController.getAll(
-                                      context,
-                                    ).then((value) {
+                                    PointManagementController.get(context, userId: widget.user?.userId).then((value) {
                                       dismissLoading();
                                       if (responseCode(value.code)) {
-                                        context.read<UserController>().userAllResponse = value.data;
+                                        context.read<PointManagementController>().userPointsResponse = value.data;
                                         context.pop();
-                                        showDialogSuccess(context, 'Successfully created customer');
+                                        showDialogSuccess(context, 'Successfully created customer\'s points');
                                       } else {
                                         context.pop();
-                                        showDialogSuccess(context, 'Successfully created customer information');
+                                        showDialogSuccess(context, 'Successfully created customer\'s points');
                                       }
                                     });
                                   } else {

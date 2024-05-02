@@ -135,7 +135,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: _voucherPoint,
-                                      labelText: 'voucherPage'.tr(gender: 'Points'),
+                                      labelText: 'voucherPage'.tr(gender: 'voucherPoints'),
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
@@ -156,7 +156,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                         field: InputFieldAttribute(
                                             controller: _startDate,
                                             isEditable: false,
-                                            labelText: 'voucherPoint'.tr(gender: 'startDate'),
+                                            labelText: 'voucherPage'.tr(gender: 'startDate'),
                                             suffixWidget: const Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
@@ -187,7 +187,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                         field: InputFieldAttribute(
                                           controller: _endDate,
                                           isEditable: false,
-                                          labelText: 'voucherPoint'.tr(gender: 'endDate'),
+                                          labelText: 'voucherPage'.tr(gender: 'endDate'),
                                           suffixWidget: const Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [

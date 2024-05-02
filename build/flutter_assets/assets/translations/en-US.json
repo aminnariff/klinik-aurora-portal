@@ -51,6 +51,15 @@
         "email": "Email",
         "userStatus": "Status"
     },
+    "voucherPage": {
+        "voucherName": "Voucher Name",
+        "voucherCode": "Voucher Code",
+        "voucherDescription": "Voucher Description",
+        "voucherPoints": "Voucher Points",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "voucherStatus": "Status"
+    },
     "loginPage": {
         "username": "Username",
         "password": "Password",

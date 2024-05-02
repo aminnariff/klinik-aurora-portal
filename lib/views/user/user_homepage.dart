@@ -16,6 +16,7 @@ import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as 
 import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_detail.dart';
+import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
@@ -414,6 +415,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                         ),
                                         DataCell(
                                           Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               IconButton(
                                                 onPressed: () async {
@@ -436,9 +438,8 @@ class _UserHomepageState extends State<UserHomepage> {
                                                   showDialog(
                                                       context: context,
                                                       builder: (BuildContext context) {
-                                                        return UserDetail(
+                                                        return UserPointDetail(
                                                           user: snapshot.userAllResponse![index],
-                                                          type: 'update',
                                                         );
                                                       });
                                                 },

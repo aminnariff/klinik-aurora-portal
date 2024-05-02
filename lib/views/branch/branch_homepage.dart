@@ -10,11 +10,14 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
+import 'package:klinik_aurora_portal/models/branch/update_branch_request.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -86,7 +89,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
       label: 'Action',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 131,
+      width: 100,
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
@@ -406,6 +409,63 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                           AppSelectableText(dateConverter(
                                                   snapshot.branchAllResponse?.data?.data?[index].createdDate) ??
                                               'N/A'),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {},
+                                                icon: const Icon(
+                                                  Icons.people,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  try {
+                                                    Data? data = snapshot.branchAllResponse?.data?.data?[index];
+                                                    if (await showConfirmDialog(
+                                                        context,
+                                                        data?.branchStatus == 1
+                                                            ? 'Are you certain you wish to deactivate this user account? Please note, this action can be reversed at a later time.'
+                                                            : 'Are you certain you wish to activate this user account? Please note, this action can be reversed at a later time.')) {
+                                                      Future.delayed(Duration.zero, () {
+                                                        BranchController.update(
+                                                          UpdateBranchRequest(
+                                                            branchId: data?.branchId ?? '',
+                                                            branchCode: data?.branchCode ?? '',
+                                                            branchName: data?.branchName ?? '',
+                                                            phoneNumber: data?.phoneNumber ?? '',
+                                                            branchOpeningHours: data?.branchOpeningHours ?? '',
+                                                            branchClosingHours: data?.branchClosingHours ?? '',
+                                                            branchLaunchDate: data?.branchLaunchDate ?? '',
+                                                            address: data?.address ?? '',
+                                                          ),
+                                                        ).then((value) {
+                                                          if (responseCode(value.code)) {
+                                                            filtering();
+                                                            showDialogSuccess(context,
+                                                                'The user account has been successfully ${data?.branchStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                          } else {
+                                                            showDialogError(context, value.data?.message ?? '');
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(e.toString());
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  snapshot.branchAllResponse?.data?.data?[index].branchStatus == 1
+                                                      ? Icons.delete
+                                                      : Icons.play_arrow,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
