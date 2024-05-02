@@ -10,8 +10,8 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch;
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_detail.dart';
@@ -53,26 +53,20 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
 
   List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(
-      attribute: 'userFullname',
+      attribute: 'doctorName',
       label: 'Name',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'userEmail',
-      label: 'Email',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'userPhone',
+      attribute: 'doctorPhone',
       label: 'Contact No.',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 130,
     ),
     TableHeaderAttribute(
-      attribute: 'userStatus',
+      attribute: 'doctorStatus',
       label: 'Status',
       allowSorting: false,
       columnSize: ColumnSize.S,
@@ -80,7 +74,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     ),
     TableHeaderAttribute(
       attribute: 'branchId',
-      label: 'Registered Branch',
+      label: 'Managing Branch',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
@@ -295,9 +289,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   Widget orderTable() {
-    return Consumer<UserController>(
+    return Consumer<DoctorController>(
       builder: (context, snapshot, child) {
-        if (snapshot.userAllResponse == null) {
+        if (snapshot.doctorBranchResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -311,7 +305,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             ],
           );
         } else {
-          return snapshot.userAllResponse == null || snapshot.userAllResponse!.isEmpty
+          return snapshot.doctorBranchResponse == null || snapshot.doctorBranchResponse!.data!.isEmpty
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -357,7 +351,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                   verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
                                 ),
                                 rows: [
-                                  for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
+                                  for (int index = 0;
+                                      index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
+                                      index++)
                                     DataRow(
                                       color: MaterialStateProperty.all(
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
@@ -365,52 +361,52 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                         DataCell(
                                           TextButton(
                                             onPressed: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return UserDetail(
-                                                      user: snapshot.userAllResponse![index],
-                                                      type: 'update',
-                                                    );
-                                                  });
+                                              // showDialog(
+                                              //     context: context,
+                                              //     builder: (BuildContext context) {
+                                              //       return UserDetail(
+                                              //         user: snapshot.doctorBranchResponse!.data![index],
+                                              //         type: 'update',
+                                              //       );
+                                              //     });
                                             },
                                             child: Text(
-                                              snapshot.userAllResponse?[index].userFullname ??
-                                                  snapshot.userAllResponse?[index].userName ??
-                                                  'N/A',
+                                              snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
                                               style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
                                             ),
                                           ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(snapshot.userAllResponse?[index].userEmail ?? 'N/A'),
                                         ),
                                         DataCell(
                                           InkWell(
                                             onTap: () {
                                               //TODO copy item
                                             },
-                                            child: Text(snapshot.userAllResponse?[index].userPhone ?? '60 12 498 2969'),
+                                            child: Text(snapshot.doctorBranchResponse?.data?[index].doctorPhone ??
+                                                '60 12 498 2969'),
                                           ),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.userAllResponse?[index].userStatus == 1 ? 'Active' : 'Inactive',
+                                            snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
+                                                ? 'Active'
+                                                : 'Inactive',
                                             style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(snapshot.userAllResponse?[index].userStatus == 1
-                                                    ? 'active'
-                                                    : 'inactive'),
+                                                color: statusColor(
+                                                    snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
+                                                        ? 'active'
+                                                        : 'inactive'),
                                                 fontWeightDelta: 1),
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(
-                                              translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
-                                                  'N/A'),
+                                          AppSelectableText(translateToBranchName(
+                                                  snapshot.doctorBranchResponse?.data?[index].branchId ?? '') ??
+                                              'N/A'),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                              dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A'),
+                                              dateConverter(snapshot.doctorBranchResponse?.data?[index].createdDate) ??
+                                                  'N/A'),
                                         ),
                                       ],
                                     ),
@@ -496,27 +492,15 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     if (page != null) {
       _page = page;
     }
-    UserController.getAll(
+    DoctorController.get(
       context,
-      // DeviceRequest(
-      //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
-      //   serialNumber: (_ontSNController.text != '') ? _ontSNController.text : null,
-      //   ont: (_ontController.text != '') ? _ontController.text : null,
-      //   port: (_portController.text != '') ? _portController.text : null,
-      //   card: (_slotController.text != '') ? _slotController.text : null,
-      //   ontPON: (_ontPonController.text != '') ? _ontPonController.text : null,
-      //   ontMAC: (_ontMacController.text != '') ? _ontMacController.text : null,
-      //   ipAddress: (_ipController.text != '') ? _ipController.text : null,
-      //   nltType: _nltType,
-      //   page: _page,
-      //   pageSize: _pageSize,
-      // ),
+      // branchId: '62743240-006d-11ef-a129-6677d190faa2',
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.length ?? 0;
-        _totalPage = ((value.data?.length ?? 0) / _pageSize).ceil();
-        context.read<UserController>().userAllResponse = value.data;
+        _totalCount = value.data?.data?.length ?? 0;
+        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        context.read<DoctorController>().doctorBranchResponse = value.data;
         // _page = 0;
       } else if (value.code == 404) {}
       return null;
@@ -658,7 +642,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               ),
               AppPadding.horizontal(denominator: 2),
               Text(
-                'Add new user',
+                'Add new PIC',
                 style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
               ),
             ],

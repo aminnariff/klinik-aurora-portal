@@ -60,6 +60,11 @@
         "endDate": "End Date",
         "voucherStatus": "Status"
     },
+    "doctorPage": {
+        "doctorName": "PIC Name",
+        "doctorPhone": "PIC Contact No.",
+        "voucherStatus": "Status"
+    },
     "loginPage": {
         "username": "Username",
         "password": "Password",
