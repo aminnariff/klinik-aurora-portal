@@ -147,8 +147,8 @@ class ApiController {
     bool isAuthenticated = true,
   }) async {
     return checkToken(context, isAuthenticated).then((value) async {
-      // String url = getDomain(baseUrl) + endpoint;
-      String url = kDebugMode ? (getDomain(baseUrl) + endpoint) : endpoint;
+      String url = getDomain(baseUrl) + endpoint;
+      // String url = kDebugMode ? (getDomain(baseUrl) + endpoint) : endpoint;
 
       try {
         switch (method) {
