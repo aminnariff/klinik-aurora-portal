@@ -7,7 +7,7 @@ class ErrorPage extends StatefulWidget {
 
   const ErrorPage({
     super.key,
-    required this.error,
+    this.error,
   });
 
   @override

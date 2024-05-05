@@ -7,6 +7,7 @@ import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/homepage/dashboard.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
+import 'package:klinik_aurora_portal/views/password_recovery/password_recovery.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
@@ -18,6 +19,16 @@ final router = GoRouter(
   initialLocation: LoginPage.routeName,
   navigatorKey: rootNavigatorKey,
   routes: <RouteBase>[
+    GoRoute(
+      name: PasswordRecoveryPage.routeName,
+      path: PasswordRecoveryPage.routeName,
+      builder: (BuildContext context, GoRouterState state) {
+        final token = state.uri.queryParameters['p1'];
+        return PasswordRecoveryPage(
+          token: token,
+        );
+      },
+    ),
     GoRoute(
       name: LoginPage.routeName,
       path: LoginPage.routeName,

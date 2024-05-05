@@ -13,6 +13,7 @@
         "save": "Save",
         "understood": "Understood",
         "edit": "Edit",
+        "resetPassword": "Reset Password",
         "profile": "Profile",
         "remove": "Remove",
         "delete": "Delete",
@@ -63,6 +64,15 @@
     "doctorPage": {
         "doctorName": "PIC Name",
         "doctorPhone": "PIC Contact No.",
+        "voucherStatus": "Status"
+    },
+    "passwordRecoveryPage": {
+        "changePassword": "Change Password",
+        "enterYourNewPassword": "Enter a new password below to change your password.",
+        "passwordRequirement": "Passwords must have at least 8 characters, 1 lowercase, 1 uppercase, 1 number, and 1 special characters.",
+        "passwordNotMatch": "Password confirmation doesn't match",
+        "password": "Password",
+        "reEnterPassword": "Re-enter new password",
         "voucherStatus": "Status"
     },
     "loginPage": {

@@ -28,6 +28,13 @@ import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
 import 'package:provider/provider.dart';
 
+// Admin Portal
+// firebase deploy --project klinik-aurora
+
+// Password Recovery
+// firebase deploy --project klinik-aurora-recovery
+// Your reliable assistant for retrieving lost passwords securely.
+
 // Production
 // flutter build web -t lib/main_production.dart
 

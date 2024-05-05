@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "klinik-aurora"
-  }
+    "default": "klinik-aurora",
+    "password-recovery": "klinik-aurora-recovery"
+  },
+  "targets": {},
+  "etags": {}
 }

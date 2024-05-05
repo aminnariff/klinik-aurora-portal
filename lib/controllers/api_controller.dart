@@ -144,6 +144,7 @@ class ApiController {
     required String endpoint,
     Map<String, dynamic>? queryParameters,
     dynamic data,
+    Options? headers,
     bool isAuthenticated = true,
   }) async {
     return checkToken(context, isAuthenticated).then((value) async {
@@ -157,7 +158,7 @@ class ApiController {
                 .get(
               url,
               queryParameters: queryParameters,
-              options: await getHeaders(baseUrl, isAuthenticated),
+              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
             )
                 .then((response) {
               printData(response);
@@ -172,7 +173,7 @@ class ApiController {
               url,
               data: data,
               queryParameters: queryParameters,
-              options: await getHeaders(baseUrl, isAuthenticated),
+              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
             )
                 .then((response) {
               printData(response);
@@ -187,7 +188,7 @@ class ApiController {
               url,
               data: data,
               queryParameters: queryParameters,
-              options: await getHeaders(baseUrl, isAuthenticated),
+              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
             )
                 .then((response) {
               printData(response);
@@ -202,7 +203,7 @@ class ApiController {
               url,
               data: data,
               queryParameters: queryParameters,
-              options: await getHeaders(baseUrl, isAuthenticated),
+              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
             )
                 .then((response) {
               printData(response);
@@ -217,7 +218,7 @@ class ApiController {
               url,
               data: data,
               queryParameters: queryParameters,
-              options: await getHeaders(baseUrl, isAuthenticated),
+              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
             )
                 .then((response) {
               printData(response);
@@ -228,7 +229,7 @@ class ApiController {
             });
         }
       } catch (e) {
-        debugPrint('$e');
+        debugPrint('ERROR: $e');
         if (e is DioException) {
           if (e.isNoConnectionError) {
             debugPrint('Internet connection is now offline');
