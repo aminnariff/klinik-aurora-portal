@@ -64,6 +64,8 @@
     "doctorPage": {
         "doctorName": "PIC Name",
         "doctorPhone": "PIC Contact No.",
+        "doctorImage": "PIC Image",
+        "browseFile": "Browse your files here (max 10MB)",
         "voucherStatus": "Status"
     },
     "passwordRecoveryPage": {
@@ -86,6 +88,14 @@
         "endDate": "End Date",
         "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "promotionImage": "Promotion Image",
+        "browseFile": "Browse your files here (max 10MB)",
+        "forgotPassword": "Forgot password?"
+    },
+    "rewardPage": {
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
+        "rewardImage": "Promotion Image",
         "browseFile": "Browse your files here (max 10MB)",
         "forgotPassword": "Forgot password?"
     },

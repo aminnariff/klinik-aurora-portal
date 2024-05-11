@@ -1,3 +1,29 @@
+class UserAllResponse {
+  String? message;
+  List<UserResponse>? data;
+
+  UserAllResponse({this.message, this.data});
+
+  UserAllResponse.fromJson(Map<String, dynamic> json) {
+    message = json['message'];
+    if (json['data'] != null) {
+      data = <UserResponse>[];
+      json['data'].forEach((v) {
+        data!.add(UserResponse.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['message'] = message;
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
 class UserResponse {
   String? userId;
   String? userEmail;

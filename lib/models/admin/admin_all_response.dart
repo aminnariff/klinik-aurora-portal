@@ -29,6 +29,7 @@ class Data {
   String? userFullname;
   String? userName;
   String? userEmail;
+  String? userPhone;
   String? branchId;
   int? userStatus;
   String? createdDate;
@@ -39,6 +40,7 @@ class Data {
       this.userFullname,
       this.userName,
       this.userEmail,
+      this.userPhone,
       this.branchId,
       this.userStatus,
       this.createdDate,
@@ -49,6 +51,7 @@ class Data {
     userFullname = json['userFullname'];
     userName = json['userName'];
     userEmail = json['userEmail'];
+    userPhone = json['userPhone'];
     branchId = json['branchId'];
     userStatus = json['userStatus'];
     createdDate = json['createdDate'];
@@ -61,6 +64,7 @@ class Data {
     data['userFullname'] = userFullname;
     data['userName'] = userName;
     data['userEmail'] = userEmail;
+    data['userPhone'] = userPhone;
     data['branchId'] = branchId;
     data['userStatus'] = userStatus;
     data['createdDate'] = createdDate;

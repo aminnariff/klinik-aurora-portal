@@ -45,7 +45,7 @@ class DoctorController extends ChangeNotifier {
         .call(
       context,
       method: Method.put,
-      endpoint: 'admin/doctor-management/update',
+      endpoint: 'admin/doctor/update',
       data: request.toJson(),
     )
         .then((value) {

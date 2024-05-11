@@ -30,7 +30,7 @@ class Data {
   int? permissionStatus;
   String? createdByEmail;
   String? createdDate;
-  Null modifiedDate;
+  String? modifiedDate;
 
   Data(
       {this.permissionId,

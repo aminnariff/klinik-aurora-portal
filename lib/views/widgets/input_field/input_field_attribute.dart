@@ -18,6 +18,7 @@ class InputFieldAttribute {
   bool isAlphaNumericOnly;
   String? errorMessage;
   String? prefixText;
+  String? tooltip;
   Widget? prefixIcon;
   int? lineNumber;
   int maxCharacter;
@@ -47,6 +48,7 @@ class InputFieldAttribute {
     this.isPassword = false,
     this.obscureText = false,
     this.isEditable = true,
+    this.tooltip,
     this.isNumber = false,
     this.isCurrency = false,
     this.isAlphaNumericOnly = false,

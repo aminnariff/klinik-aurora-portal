@@ -29,14 +29,16 @@ class Data {
   String? doctorName;
   String? doctorPhone;
   String? branchId;
+  String? doctorImage;
   int? doctorStatus;
   String? createdDate;
-  Null modifiedDate;
+  String? modifiedDate;
 
   Data(
       {this.doctorId,
       this.doctorName,
       this.doctorPhone,
+      this.doctorImage,
       this.branchId,
       this.doctorStatus,
       this.createdDate,
@@ -46,6 +48,7 @@ class Data {
     doctorId = json['doctorId'];
     doctorName = json['doctorName'];
     doctorPhone = json['doctorPhone'];
+    doctorImage = json['doctorImage'];
     branchId = json['branchId'];
     doctorStatus = json['doctorStatus'];
     createdDate = json['createdDate'];
@@ -57,6 +60,7 @@ class Data {
     data['doctorId'] = doctorId;
     data['doctorName'] = doctorName;
     data['doctorPhone'] = doctorPhone;
+    data['doctorImage'] = doctorImage;
     data['branchId'] = branchId;
     data['doctorStatus'] = doctorStatus;
     data['createdDate'] = createdDate;

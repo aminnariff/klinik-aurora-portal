@@ -7,6 +7,7 @@ import 'package:klinik_aurora_portal/models/user/create_user_response.dart';
 import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/update_user_response.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class UserController extends ChangeNotifier {
   List<UserResponse>? _userAllResponse;
@@ -17,22 +18,28 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<List<UserResponse>>> getAll(
+  static Future<ApiResponse<UserAllResponse>> getAll(
     BuildContext context,
+    String userFullName,
+    String userName,
+    String userPhone,
   ) async {
     return ApiController()
         .call(
       context,
       method: Method.get,
+      queryParameters: {
+        if (notNullOrEmptyString(userFullName)) 'userFullname': userFullName,
+        if (notNullOrEmptyString(userName)) 'userName': userName,
+        if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
+      },
       endpoint: 'admin/user-management',
     )
         .then((value) {
       try {
         return ApiResponse(
           code: value.code,
-          data: (value.data as List).map((item) {
-            return UserResponse.fromJson(item);
-          }).toList(),
+          data: UserAllResponse.fromJson(value.data),
         );
       } catch (e) {
         return ApiResponse(

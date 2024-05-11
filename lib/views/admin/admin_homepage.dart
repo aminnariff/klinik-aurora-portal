@@ -12,11 +12,14 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/permission/permission_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/models/admin/admin_all_response.dart';
+import 'package:klinik_aurora_portal/models/admin/update_admin_request.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -89,6 +92,13 @@ class _AdminHomepageState extends State<AdminHomepage> {
       label: 'Created Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
+    ),
+    TableHeaderAttribute(
+      attribute: 'action',
+      label: 'Action',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 100,
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
@@ -430,6 +440,72 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                           AppSelectableText(
                                               dateConverter(snapshot.adminAllResponse?.data?[index].createdDate) ??
                                                   'N/A'),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AdminDetail(
+                                                          user: snapshot.adminAllResponse!.data![index],
+                                                          type: 'update',
+                                                        );
+                                                      });
+                                                },
+                                                icon: const Icon(
+                                                  Icons.edit,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  try {
+                                                    Data? data = snapshot.adminAllResponse?.data?[index];
+                                                    if (await showConfirmDialog(
+                                                        context,
+                                                        data?.userStatus == 1
+                                                            ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
+                                                            : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.')) {
+                                                      Future.delayed(Duration.zero, () {
+                                                        AdminController.update(
+                                                          context,
+                                                          UpdateAdminRequest(
+                                                            userId: data?.userId,
+                                                            userFullname: data?.userFullname,
+                                                            userName: data?.userName,
+                                                            userEmail: data?.userEmail,
+                                                            branchId: data?.branchId,
+                                                            userPhone: data?.userPhone,
+                                                            userStatus: data?.userStatus == 1 ? 0 : 1,
+                                                          ),
+                                                        ).then((value) {
+                                                          if (responseCode(value.code)) {
+                                                            filtering();
+                                                            showDialogSuccess(context,
+                                                                'The PIC has been successfully ${data?.userStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                          } else {
+                                                            showDialogError(context, value.data?.message ?? '');
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(e.toString());
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  snapshot.adminAllResponse?.data?[index].userStatus == 1
+                                                      ? Icons.delete
+                                                      : Icons.play_arrow,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),

@@ -13,10 +13,13 @@ import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch;
+import 'package:klinik_aurora_portal/models/doctor/doctor_branch_response.dart';
+import 'package:klinik_aurora_portal/models/doctor/update_doctor_request.dart';
+import 'package:klinik_aurora_portal/views/doctor/doctor_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/user/user_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -83,6 +86,13 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       label: 'Created Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
+    ),
+    TableHeaderAttribute(
+      attribute: 'action',
+      label: 'Action',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 100,
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
@@ -408,6 +418,70 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                               dateConverter(snapshot.doctorBranchResponse?.data?[index].createdDate) ??
                                                   'N/A'),
                                         ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return DoctorDetails(
+                                                          doctor: snapshot.doctorBranchResponse!.data![index],
+                                                          type: 'update',
+                                                        );
+                                                      });
+                                                },
+                                                icon: const Icon(
+                                                  Icons.edit,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  try {
+                                                    Data? data = snapshot.doctorBranchResponse?.data?[index];
+                                                    if (await showConfirmDialog(
+                                                        context,
+                                                        data?.doctorStatus == 1
+                                                            ? 'Are you certain you wish to deactivate this PIC? Please note, this action can be reversed at a later time.'
+                                                            : 'Are you certain you wish to activate this PIC? Please note, this action can be reversed at a later time.')) {
+                                                      Future.delayed(Duration.zero, () {
+                                                        DoctorController.update(
+                                                          context,
+                                                          UpdateDoctorRequest(
+                                                            doctorId: data?.doctorId,
+                                                            doctorName: data?.doctorName,
+                                                            branchId: data?.branchId,
+                                                            doctorPhone: data?.doctorPhone,
+                                                            doctorStatus: data?.doctorStatus == 1 ? 0 : 1,
+                                                          ),
+                                                        ).then((value) {
+                                                          if (responseCode(value.code)) {
+                                                            filtering();
+                                                            showDialogSuccess(context,
+                                                                'The PIC has been successfully ${data?.doctorStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                          } else {
+                                                            showDialogError(context, value.data?.message ?? '');
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(e.toString());
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
+                                                      ? Icons.delete
+                                                      : Icons.play_arrow,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ],
                                     ),
                                 ],
@@ -629,7 +703,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return const UserDetail(
+                  return const DoctorDetails(
                     type: 'create',
                   );
                 });

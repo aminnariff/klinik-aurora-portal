@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
@@ -27,6 +28,7 @@ import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class DoctorDetails extends StatefulWidget {
@@ -54,7 +56,15 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     if (widget.type == 'update') {
       _doctorName.text = widget.doctor?.doctorName ?? '';
       _doctorPhone.text = widget.doctor?.doctorPhone?.substring(1, widget.doctor?.doctorPhone?.length) ?? '';
+      _branchId.text = widget.doctor?.branchId ?? '';
       try {
+        if (context.read<BranchController>().branchAllResponse == null) {
+          BranchController.getAll(context).then((value) {
+            if (responseCode(value.code)) {
+              context.read<BranchController>().branchAllResponse = value;
+            }
+          });
+        }
         branch_model.Data? branch = context
             .read<BranchController>()
             .branchAllResponse
@@ -100,7 +110,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             AppSelectableText(
-                              'Branch Details',
+                              'PIC Details',
                               style: AppTypography.bodyLarge(context),
                             ),
                             CloseButton(
@@ -148,6 +158,30 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
+                                  Row(
+                                    children: [
+                                      AppDropdown(
+                                        attributeList: DropdownAttributeList(
+                                          [
+                                            if (context.read<BranchController>().branchAllResponse?.data?.data != null)
+                                              for (branch_model.Data item
+                                                  in context.read<BranchController>().branchAllResponse?.data?.data ??
+                                                      [])
+                                                DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
+                                          ],
+                                          onChanged: (selected) {
+                                            setState(() {
+                                              _selectedBranch = selected;
+                                              _branchId.text = selected!.name;
+                                            });
+                                          },
+                                          value: _selectedBranch?.name,
+                                          width: screenWidth1728(26),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  AppPadding.vertical(denominator: 2),
                                 ],
                               ),
                             ),
@@ -160,110 +194,82 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                     return Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        // if (widget.type == 'create') ...[
-                                        //   selectedFile.value == null
-                                        //       ? UploadDocumentsField(
-                                        //           title: 'branchImage'.tr(gender: 'browseFile'),
-                                        //           fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                        //           // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                        //           action: () {
-                                        //             addPicture();
-                                        //           },
-                                        //           cancelAction: () {},
-                                        //         )
-                                        //       : Stack(
-                                        //           alignment: Alignment.topRight,
-                                        //           children: [
-                                        //             GestureDetector(
-                                        //               onTap: () {
-                                        //                 addPicture();
-                                        //               },
-                                        //               child: Image.memory(
-                                        //                 selectedFile.value as Uint8List,
-                                        //               ),
-                                        //             ),
-                                        //             IconButton(
-                                        //               onPressed: () {
-                                        //                 selectedFile = FileAttribute();
-                                        //                 fileRebuild.add(DateTime.now());
-                                        //               },
-                                        //               icon: const Icon(
-                                        //                 Icons.close,
-                                        //               ),
-                                        //             )
-                                        //           ],
-                                        //         ),
-                                        // ],
-                                        // if (widget.type == 'update')
-                                        //   widget.branch?.branchImage == null
-                                        //       ? selectedFile.name != null
-                                        //           ? Stack(
-                                        //               alignment: Alignment.topRight,
-                                        //               children: [
-                                        //                 GestureDetector(
-                                        //                   onTap: () {
-                                        //                     addPicture();
-                                        //                   },
-                                        //                   child: Image.memory(
-                                        //                     selectedFile.value as Uint8List,
-                                        //                   ),
-                                        //                 ),
-                                        //                 IconButton(
-                                        //                   onPressed: () {
-                                        //                     selectedFile = FileAttribute();
-                                        //                     fileRebuild.add(DateTime.now());
-                                        //                   },
-                                        //                   icon: const Icon(
-                                        //                     Icons.close,
-                                        //                   ),
-                                        //                 )
-                                        //               ],
-                                        //             )
-                                        //           : UploadDocumentsField(
-                                        //               title: 'branchImage'.tr(gender: 'browseFile'),
-                                        //               fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                        //               // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                        //               action: () {
-                                        //                 addPicture();
-                                        //               },
-                                        //               cancelAction: () {},
-                                        //             )
-                                        //       : GestureDetector(
-                                        //           onTap: () {
-                                        //             addPicture();
-                                        //           },
-                                        //           child: Image.network(
-                                        //             '${Environment.imageUrl}${widget.branch?.branchImage}',
-                                        //           ),
-                                        //         ),
-                                        // AppPadding.vertical(denominator: 2),
-                                        Row(
-                                          children: [
-                                            AppDropdown(
-                                              attributeList: DropdownAttributeList(
-                                                [
-                                                  if (context.read<BranchController>().branchAllResponse?.data?.data !=
-                                                      null)
-                                                    for (branch_model.Data item in context
-                                                            .read<BranchController>()
-                                                            .branchAllResponse
-                                                            ?.data
-                                                            ?.data ??
-                                                        [])
-                                                      DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                                ],
-                                                onChanged: (selected) {
-                                                  setState(() {
-                                                    _selectedBranch = selected;
-                                                    _branchId.text = selected!.name;
-                                                  });
-                                                },
-                                                value: _selectedBranch?.name,
-                                                width: screenWidth1728(30),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                        if (widget.type == 'create') ...[
+                                          selectedFile.value == null
+                                              ? UploadDocumentsField(
+                                                  title: 'doctorPage'.tr(gender: 'browseFile'),
+                                                  fieldTitle: 'doctorPage'.tr(gender: 'doctorImage'),
+                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                  action: () {
+                                                    addPicture();
+                                                  },
+                                                  cancelAction: () {},
+                                                )
+                                              : Stack(
+                                                  alignment: Alignment.topRight,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        addPicture();
+                                                      },
+                                                      child: Image.memory(
+                                                        selectedFile.value as Uint8List,
+                                                      ),
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        selectedFile = FileAttribute();
+                                                        fileRebuild.add(DateTime.now());
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.close,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                        ],
+                                        if (widget.type == 'update')
+                                          widget.doctor?.doctorImage == null
+                                              ? selectedFile.name != null
+                                                  ? Stack(
+                                                      alignment: Alignment.topRight,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            addPicture();
+                                                          },
+                                                          child: Image.memory(
+                                                            selectedFile.value as Uint8List,
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            selectedFile = FileAttribute();
+                                                            fileRebuild.add(DateTime.now());
+                                                          },
+                                                          icon: const Icon(
+                                                            Icons.close,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+                                                  : UploadDocumentsField(
+                                                      title: 'doctorPage'.tr(gender: 'browseFile'),
+                                                      fieldTitle: 'bdoctorPage'.tr(gender: 'doctorImage'),
+                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                      action: () {
+                                                        addPicture();
+                                                      },
+                                                      cancelAction: () {},
+                                                    )
+                                              : GestureDetector(
+                                                  onTap: () {
+                                                    addPicture();
+                                                  },
+                                                  child: Image.network(
+                                                    '${Environment.imageUrl}${widget.doctor?.doctorImage}',
+                                                  ),
+                                                ),
                                         AppPadding.vertical(denominator: 2),
                                       ],
                                     );
@@ -307,21 +313,12 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 CreateDoctorRequest(
                   doctorName: _doctorName.text,
                   doctorPhone: _doctorPhone.text,
-                  // branchImage: selectedFile,
+                  branchId: _selectedBranch?.key,
+                  // doctorImage: selectedFile,
                 ),
               ).then((value) {
                 if (responseCode(value.code)) {
-                  DoctorController.get(context).then((value) {
-                    dismissLoading();
-                    if (responseCode(value.code)) {
-                      context.read<DoctorController>().doctorBranchResponse = value.data;
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new PIC');
-                    } else {
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new PIC');
-                    }
-                  });
+                  getLatestData();
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -330,23 +327,15 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               DoctorController.update(
                 context,
                 UpdateDoctorRequest(
+                  doctorId: widget.doctor?.doctorId,
                   doctorName: _doctorName.text,
                   doctorPhone: _doctorPhone.text,
-                  // branchImage: selectedFile,
+                  doctorStatus: widget.doctor?.doctorStatus,
+                  // doctorImage: selectedFile,
                 ),
               ).then((value) {
                 if (responseCode(value.code)) {
-                  DoctorController.get(context).then((value) {
-                    dismissLoading();
-                    if (responseCode(value.code)) {
-                      context.read<DoctorController>().doctorBranchResponse = value.data;
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new PIC');
-                    } else {
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new PIC');
-                    }
-                  });
+                  getLatestData();
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -357,6 +346,28 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         ),
       ],
     );
+  }
+
+  getLatestData() {
+    DoctorController.get(context).then((value) {
+      dismissLoading();
+      if (responseCode(value.code)) {
+        context.read<DoctorController>().doctorBranchResponse = value.data;
+        context.pop();
+        if (widget.type == 'update') {
+          showDialogSuccess(context, 'Successfully updated PIC');
+        } else {
+          showDialogSuccess(context, 'Successfully created new PIC');
+        }
+      } else {
+        context.pop();
+        if (widget.type == 'update') {
+          showDialogSuccess(context, 'Successfully updated PIC');
+        } else {
+          showDialogSuccess(context, 'Successfully created new PIC');
+        }
+      }
+    });
   }
 
   addPicture() async {

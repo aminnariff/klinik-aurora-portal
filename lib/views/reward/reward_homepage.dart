@@ -8,19 +8,17 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
-import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/reward/reward_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
-import 'package:klinik_aurora_portal/models/branch/update_branch_request.dart';
-import 'package:klinik_aurora_portal/views/branch/branch_detail.dart';
-import 'package:klinik_aurora_portal/views/branch/doctor_list.dart';
+import 'package:klinik_aurora_portal/models/reward/reward_all_response.dart';
+import 'package:klinik_aurora_portal/models/reward/update_reward_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/reward/reward_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -35,17 +33,17 @@ import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
-class BranchHomepage extends StatefulWidget {
-  static const routeName = '/branch';
-  static const displayName = 'Branches';
+class RewardHomepage extends StatefulWidget {
+  static const routeName = '/reward';
+  static const displayName = 'Rewards';
   final String? orderReference;
-  const BranchHomepage({super.key, this.orderReference});
+  const RewardHomepage({super.key, this.orderReference});
 
   @override
-  State<BranchHomepage> createState() => _BranchHomepageState();
+  State<RewardHomepage> createState() => _RewardHomepageState();
 }
 
-class _BranchHomepageState extends State<BranchHomepage> {
+class _RewardHomepageState extends State<RewardHomepage> {
   int _page = 0;
   int _pageSize = pageSize;
   int _totalCount = 0;
@@ -55,26 +53,27 @@ class _BranchHomepageState extends State<BranchHomepage> {
 
   List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(
-      attribute: 'userFullname',
+      attribute: 'rewardCode',
+      label: 'Code',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+    ),
+    TableHeaderAttribute(
+      attribute: 'rewardName',
       label: 'Name',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'city',
-      label: 'City',
+      attribute: 'rewardPoint',
+      label: 'Points',
       allowSorting: false,
       columnSize: ColumnSize.S,
+      width: 130,
     ),
     TableHeaderAttribute(
-      attribute: 'state',
-      label: 'State',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'branchStatus',
-      label: 'Branch Status',
+      attribute: 'rewardStatus',
+      label: 'Status',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 70,
@@ -94,21 +93,13 @@ class _BranchHomepageState extends State<BranchHomepage> {
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
-  final TextEditingController _ontController = TextEditingController();
-  final TextEditingController _slotController = TextEditingController();
-  final TextEditingController _portController = TextEditingController();
-  final TextEditingController _ontSNController = TextEditingController();
-  final TextEditingController _ontPonController = TextEditingController();
-  final TextEditingController _ontMacController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController();
-  String? _nltType;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(BranchHomepage.displayName);
+      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(RewardHomepage.displayName);
     });
     filtering();
     super.initState();
@@ -261,7 +252,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
     );
     // : OrderDetailHomepage(
     //     orderReference: widget.orderReference!,
-    //     previousPage: BranchHomepage.routeName,
+    //     previousPage: RewardHomepage.routeName,
     //   );
   }
 
@@ -298,9 +289,9 @@ class _BranchHomepageState extends State<BranchHomepage> {
   }
 
   Widget orderTable() {
-    return Consumer<BranchController>(
+    return Consumer<RewardController>(
       builder: (context, snapshot, child) {
-        if (snapshot.branchAllResponse == null) {
+        if (snapshot.rewardAllResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -314,7 +305,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
             ],
           );
         } else {
-          return snapshot.branchAllResponse == null || snapshot.branchAllResponse!.data!.data!.isEmpty
+          return snapshot.rewardAllResponse == null || snapshot.rewardAllResponse!.data!.data!.isEmpty
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -361,7 +352,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                 ),
                                 rows: [
                                   for (int index = 0;
-                                      index < (snapshot.branchAllResponse?.data?.data?.length ?? 0);
+                                      index < (snapshot.rewardAllResponse?.data?.data?.length ?? 0);
                                       index++)
                                     DataRow(
                                       color: MaterialStateProperty.all(
@@ -370,37 +361,38 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                         DataCell(
                                           TextButton(
                                             onPressed: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return BranchDetail(
-                                                      branch: snapshot.branchAllResponse?.data?.data?[index],
-                                                      type: 'update',
-                                                    );
-                                                  });
+                                              // showDialog(
+                                              //     context: context,
+                                              //     builder: (BuildContext context) {
+                                              //       return RewardDetail(
+                                              //           type: 'update',
+                                              //           reward: snapshot.rewardAllResponse?.data?.data?[index]);
+                                              //     });
                                             },
                                             child: Text(
-                                              snapshot.branchAllResponse?.data?.data?[index].branchName ?? 'N/A',
+                                              snapshot.rewardAllResponse?.data?.data?[index].rewardName ?? 'N/A',
                                               style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
                                             ),
                                           ),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                              snapshot.branchAllResponse?.data?.data?[index].city ?? 'N/A'),
+                                              snapshot.rewardAllResponse?.data?.data?[index].rewardName ?? 'N/A'),
+                                        ),
+                                        DataCell(
+                                          InkWell(
+                                            child: Text(
+                                                '${snapshot.rewardAllResponse?.data?.data?[index].rewardPoint ?? 'N/A'}'),
+                                          ),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                              snapshot.branchAllResponse?.data?.data?[index].state ?? 'N/A'),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.branchAllResponse?.data?.data?[index].branchStatus == 1
+                                            snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
                                                 ? 'Active'
                                                 : 'Inactive',
                                             style: AppTypography.bodyMedium(context).apply(
                                                 color: statusColor(
-                                                    snapshot.branchAllResponse?.data?.data?[index].branchStatus == 1
+                                                    snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
                                                         ? 'active'
                                                         : 'inactive'),
                                                 fontWeightDelta: 1),
@@ -408,7 +400,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                         ),
                                         DataCell(
                                           AppSelectableText(dateConverter(
-                                                  snapshot.branchAllResponse?.data?.data?[index].createdDate) ??
+                                                  snapshot.rewardAllResponse?.data?.data?[index].createdDate) ??
                                               'N/A'),
                                         ),
                                         DataCell(
@@ -420,42 +412,44 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                                   showDialog(
                                                       context: context,
                                                       builder: (BuildContext context) {
-                                                        return DoctorList(
-                                                          branch: snapshot.branchAllResponse?.data?.data?[index],
+                                                        return RewardDetail(
+                                                          reward: snapshot.rewardAllResponse!.data!.data![index],
+                                                          type: 'update',
                                                         );
                                                       });
                                                 },
                                                 icon: const Icon(
-                                                  Icons.people,
+                                                  Icons.edit,
                                                   color: Colors.grey,
                                                 ),
                                               ),
                                               IconButton(
                                                 onPressed: () async {
                                                   try {
-                                                    Data? data = snapshot.branchAllResponse?.data?.data?[index];
+                                                    Data? data = snapshot.rewardAllResponse?.data?.data?[index];
                                                     if (await showConfirmDialog(
                                                         context,
-                                                        data?.branchStatus == 1
-                                                            ? 'Are you certain you wish to deactivate this user account? Please note, this action can be reversed at a later time.'
-                                                            : 'Are you certain you wish to activate this user account? Please note, this action can be reversed at a later time.')) {
+                                                        data?.rewardStatus == 1
+                                                            ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
+                                                            : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
                                                       Future.delayed(Duration.zero, () {
-                                                        BranchController.update(
-                                                          UpdateBranchRequest(
-                                                            branchId: data?.branchId ?? '',
-                                                            branchCode: data?.branchCode ?? '',
-                                                            branchName: data?.branchName ?? '',
-                                                            phoneNumber: data?.phoneNumber ?? '',
-                                                            branchOpeningHours: data?.branchOpeningHours ?? '',
-                                                            branchClosingHours: data?.branchClosingHours ?? '',
-                                                            branchLaunchDate: data?.branchLaunchDate ?? '',
-                                                            address: data?.address ?? '',
+                                                        RewardController.update(
+                                                          context,
+                                                          UpdateRewardRequest(
+                                                            rewardId: data?.rewardId ?? '',
+                                                            rewardName: data?.rewardName ?? '',
+                                                            rewardDescription: data?.rewardDescription ?? '',
+                                                            rewardPoint: data?.rewardPoint ?? 0,
+                                                            totalReward: data?.totalReward ?? 0,
+                                                            rewardStartDate: data?.rewardStartDate ?? '',
+                                                            rewardEndDate: data?.rewardEndDate ?? '',
+                                                            rewardStatus: data?.rewardStatus == 1 ? 0 : 1,
                                                           ),
                                                         ).then((value) {
                                                           if (responseCode(value.code)) {
                                                             filtering();
                                                             showDialogSuccess(context,
-                                                                'The user account has been successfully ${data?.branchStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                                'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
                                                           } else {
                                                             showDialogError(context, value.data?.message ?? '');
                                                           }
@@ -467,7 +461,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                                   }
                                                 },
                                                 icon: Icon(
-                                                  snapshot.branchAllResponse?.data?.data?[index].branchStatus == 1
+                                                  snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
                                                       ? Icons.delete
                                                       : Icons.play_arrow,
                                                   color: Colors.grey,
@@ -542,12 +536,27 @@ class _BranchHomepageState extends State<BranchHomepage> {
     if (page != null) {
       _page = page;
     }
-    BranchController.getAll(context).then((value) {
+    RewardController.getAll(
+      context,
+      // DeviceRequest(
+      //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
+      //   serialNumber: (_ontSNController.text != '') ? _ontSNController.text : null,
+      //   ont: (_ontController.text != '') ? _ontController.text : null,
+      //   port: (_portController.text != '') ? _portController.text : null,
+      //   card: (_slotController.text != '') ? _slotController.text : null,
+      //   ontPON: (_ontPonController.text != '') ? _ontPonController.text : null,
+      //   ontMAC: (_ontMacController.text != '') ? _ontMacController.text : null,
+      //   ipAddress: (_ipController.text != '') ? _ipController.text : null,
+      //   nltType: _nltType,
+      //   page: _page,
+      //   pageSize: _pageSize,
+      // ),
+    ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         _totalCount = value.data?.data?.length ?? 0;
         _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
-        context.read<BranchController>().branchAllResponse = value;
+        context.read<RewardController>().rewardAllResponse = value;
         // _page = 0;
       } else if (value.code == 404) {}
       return null;
@@ -641,14 +650,6 @@ class _BranchHomepageState extends State<BranchHomepage> {
 
   resetAllFilter() {
     _orderReferenceController.text = '';
-    _ontController.text = '';
-    _slotController.text = '';
-    _portController.text = '';
-    _ontSNController.text = '';
-    _ontPonController.text = '';
-    _ontMacController.text = '';
-    _ipController.text = '';
-    _nltType = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -683,7 +684,8 @@ class _BranchHomepageState extends State<BranchHomepage> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return const BranchDetail(
+                  return const RewardDetail(
+                    reward: null,
                     type: 'create',
                   );
                 });
@@ -696,7 +698,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
               ),
               AppPadding.horizontal(denominator: 2),
               Text(
-                'Add new branch',
+                'Add new reward',
                 style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
               ),
             ],
@@ -734,57 +736,6 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                           hintText: 'Search',
                                           labelText: 'Order Reference'),
                                     ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontController, hintText: 'Search', labelText: 'ONT'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _slotController, hintText: 'Search', labelText: 'Slot'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _portController, hintText: 'Search', labelText: 'Port'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontSNController,
-                                          hintText: 'Search',
-                                          labelText: 'ONT Serial Number'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontPonController, hintText: 'Search', labelText: 'ONT PON'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontMacController, hintText: 'Search', labelText: 'ONT MAC'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ipController, hintText: 'Search', labelText: 'IP Address'),
-                                    ),
-                                    AppPadding.vertical(),
-                                    StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                DropdownAttribute('CONFIRM', 'CONFIRM'),
-                                                DropdownAttribute('COMPLETE', 'COMPLETE'),
-                                              ],
-                                              labelText: 'nltType',
-                                              value: _nltType,
-                                              onChanged: (p0) {
-                                                _nltType = p0?.key;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 0);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
-                                          );
-                                        }),
                                     AppPadding.vertical(denominator: 1 / 3),
                                     AppOutlinedButton(
                                       () {

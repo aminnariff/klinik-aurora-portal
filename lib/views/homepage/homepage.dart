@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -14,6 +15,7 @@ import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
+import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -29,11 +31,15 @@ List<SidebarXItem> sideBarAttribute = [
   const SidebarXItem(iconWidget: Icon(Icons.person, color: Colors.white), label: UserHomepage.displayName),
   const SidebarXItem(
       iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
-  const SidebarXItem(iconWidget: Icon(Icons.business, color: Colors.white), label: BranchHomepage.displayName),
-  const SidebarXItem(iconWidget: Icon(Icons.contact_emergency, color: Colors.white), label: DoctorHomepage.displayName),
-  const SidebarXItem(iconWidget: Icon(Icons.image, color: Colors.white), label: PromotionHomepage.displayName),
   const SidebarXItem(
-      iconWidget: Icon(Icons.card_giftcard_rounded, color: Colors.white), label: VoucherHomepage.displayName),
+      iconWidget: Icon(FontAwesomeIcons.codeBranch, color: Colors.white), label: BranchHomepage.displayName),
+  const SidebarXItem(
+      iconWidget: Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white), label: DoctorHomepage.displayName),
+  const SidebarXItem(
+      iconWidget: Icon(FontAwesomeIcons.solidImage, color: Colors.white), label: PromotionHomepage.displayName),
+  const SidebarXItem(
+      iconWidget: Icon(FontAwesomeIcons.ticketSimple, color: Colors.white), label: VoucherHomepage.displayName),
+  const SidebarXItem(iconWidget: Icon(FontAwesomeIcons.gifts, color: Colors.white), label: RewardHomepage.displayName),
   // const SidebarXItem(iconWidget: Icon(Icons.router, color: Colors.white), label: OntHomepage.displayName),
 ];
 
@@ -298,6 +304,8 @@ class _HomepageState extends State<Homepage> {
         context.go(PromotionHomepage.routeName);
       case VoucherHomepage.displayName:
         context.go(VoucherHomepage.routeName);
+      case RewardHomepage.displayName:
+        context.go(RewardHomepage.routeName);
     }
   }
 

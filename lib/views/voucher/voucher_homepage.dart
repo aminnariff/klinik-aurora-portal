@@ -10,11 +10,14 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
+import 'package:klinik_aurora_portal/models/voucher/update_voucher_request.dart';
+import 'package:klinik_aurora_portal/models/voucher/voucher_all_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
@@ -80,6 +83,13 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
       label: 'Created Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
+    ),
+    TableHeaderAttribute(
+      attribute: 'action',
+      label: 'Action',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 100,
     ),
   ];
   final TextEditingController _orderReferenceController = TextEditingController();
@@ -361,7 +371,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                             },
                                             child: Text(
                                               snapshot.voucherAllResponse?.data?.data?[index].voucherCode ?? 'N/A',
-                                              style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                              style: AppTypography.bodyMedium(context),
                                             ),
                                           ),
                                         ),
@@ -392,6 +402,72 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                           AppSelectableText(dateConverter(
                                                   snapshot.voucherAllResponse?.data?.data?[index].createdDate) ??
                                               'N/A'),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return VoucherDetail(
+                                                            type: 'update',
+                                                            voucher: snapshot.voucherAllResponse?.data?.data?[index]);
+                                                      });
+                                                },
+                                                icon: const Icon(
+                                                  Icons.edit,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  try {
+                                                    Data? data = snapshot.voucherAllResponse?.data?.data?[index];
+                                                    if (await showConfirmDialog(
+                                                        context,
+                                                        data?.voucherStatus == 1
+                                                            ? 'Are you certain you wish to deactivate this voucher? Please note, this action can be reversed at a later time.'
+                                                            : 'Are you certain you wish to activate this voucher? Please note, this action can be reversed at a later time.')) {
+                                                      Future.delayed(Duration.zero, () {
+                                                        VoucherController.update(
+                                                          context,
+                                                          UpdateVoucherRequest(
+                                                            voucherId: data?.voucherId ?? '',
+                                                            voucherName: data?.voucherName ?? '',
+                                                            voucherDescription: data?.voucherDescription ?? '',
+                                                            voucherCode: data?.voucherCode ?? '',
+                                                            voucherPoint: data?.voucherPoint ?? 0,
+                                                            voucherStartDate: data?.voucherStartDate ?? '',
+                                                            voucherEndDate: data?.voucherEndDate ?? '',
+                                                            voucherStatus: data?.voucherStatus == 1 ? 0 : 1,
+                                                          ),
+                                                        ).then((value) {
+                                                          if (responseCode(value.code)) {
+                                                            filtering();
+                                                            showDialogSuccess(context,
+                                                                'The voucher has been successfully ${data?.voucherStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                          } else {
+                                                            showDialogError(context, value.data?.message ?? '');
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(e.toString());
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  snapshot.voucherAllResponse?.data?.data?[index].voucherStatus == 1
+                                                      ? Icons.delete
+                                                      : Icons.play_arrow,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),

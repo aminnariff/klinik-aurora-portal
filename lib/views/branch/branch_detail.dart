@@ -21,6 +21,7 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -160,8 +161,8 @@ class _BranchDetailState extends State<BranchDetail> {
                                           child: InputField(
                                             field: InputFieldAttribute(
                                               controller: _postcode,
+                                              maxCharacter: 5,
                                               labelText: 'information'.tr(gender: 'postalCode'),
-                                              isEmail: true,
                                             ),
                                           ),
                                         ),
@@ -208,7 +209,7 @@ class _BranchDetailState extends State<BranchDetail> {
                                         if (widget.type == 'create') ...[
                                           selectedFile.value == null
                                               ? UploadDocumentsField(
-                                                  title: 'branchImage'.tr(gender: 'browseFile'),
+                                                  title: 'branchPage'.tr(gender: 'browseFile'),
                                                   fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
                                                   // tooltipText: 'promotionPage'.tr(gender: 'browse'),
                                                   action: () {
@@ -495,78 +496,80 @@ class _BranchDetailState extends State<BranchDetail> {
       children: [
         Button(
           () {
-            showLoading();
-            if (widget.type == 'create') {
-              BranchController.create(
-                CreateBranchRequest(
-                  branchName: _branchName.text,
-                  branchCode: _branchCode.text,
-                  phoneNumber: _branchPhone.text,
-                  address: _address.text,
-                  city: _city.text,
-                  postcode: _postcode.text,
-                  state: _state.text,
-                  is24Hours: _is24Hours.value ? 1:0,
-                  branchOpeningHours: _openingHours.text,
-                  branchClosingHours: _closingHours.text,
-                  branchLaunchDate: convertStringToDate(_launchDate.text),
-                  branchImage: selectedFile,
-                ),
-              ).then((value) {
-                if (responseCode(value.code)) {
-                  BranchController.getAll(
-                    context,
-                  ).then((value) {
-                    dismissLoading();
-                    if (responseCode(value.code)) {
-                      context.read<BranchController>().branchAllResponse = value;
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new branch');
-                    } else {
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new branch');
-                    }
-                  });
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                }
-              });
-            } else {
-              BranchController.update(
-                UpdateBranchRequest(
-                  branchId: widget.branch?.branchId ?? '',
-                  branchCode: _branchCode.text,
-                  branchName: _branchName.text,
-                  phoneNumber: _branchPhone.text,
-                  address: _address.text,
-                  city: _city.text,
-                  postcode: _postcode.text,
-                  state: _state.text,
-                  is24Hours: _is24Hours.value ? 1 : 0,
-                  branchOpeningHours: _openingHours.text,
-                  branchClosingHours: _closingHours.text,
-                  branchLaunchDate: convertStringToDate(_launchDate.text),
-                  branchImage: selectedFile,
-                ),
-              ).then((value) {
-                if (responseCode(value.code)) {
-                  BranchController.getAll(
-                    context,
-                  ).then((value) {
-                    dismissLoading();
-                    if (responseCode(value.code)) {
-                      context.read<BranchController>().branchAllResponse = value;
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new branch');
-                    } else {
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created new branch');
-                    }
-                  });
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                }
-              });
+            if (validate()) {
+              showLoading();
+              if (widget.type == 'create') {
+                BranchController.create(
+                  CreateBranchRequest(
+                    branchName: _branchName.text,
+                    branchCode: _branchCode.text,
+                    phoneNumber: _branchPhone.text,
+                    address: _address.text,
+                    city: _city.text,
+                    postcode: _postcode.text,
+                    state: _state.text,
+                    is24Hours: _is24Hours.value ? 1 : 0,
+                    branchOpeningHours: _openingHours.text,
+                    branchClosingHours: _closingHours.text,
+                    branchLaunchDate: convertStringToDate(_launchDate.text),
+                    branchImage: selectedFile,
+                  ),
+                ).then((value) {
+                  if (responseCode(value.code)) {
+                    BranchController.getAll(
+                      context,
+                    ).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        context.read<BranchController>().branchAllResponse = value;
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully created new branch');
+                      } else {
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully created new branch');
+                      }
+                    });
+                  } else {
+                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  }
+                });
+              } else {
+                BranchController.update(
+                  UpdateBranchRequest(
+                    branchId: widget.branch?.branchId ?? '',
+                    branchCode: _branchCode.text,
+                    branchName: _branchName.text,
+                    phoneNumber: _branchPhone.text,
+                    address: _address.text,
+                    city: _city.text,
+                    postcode: _postcode.text,
+                    state: _state.text,
+                    is24Hours: _is24Hours.value ? 1 : 0,
+                    branchOpeningHours: _openingHours.text,
+                    branchClosingHours: _closingHours.text,
+                    branchLaunchDate: convertStringToDate(_launchDate.text),
+                    branchImage: selectedFile,
+                  ),
+                ).then((value) {
+                  if (responseCode(value.code)) {
+                    BranchController.getAll(
+                      context,
+                    ).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        context.read<BranchController>().branchAllResponse = value;
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully updated ${_branchName.text}');
+                      } else {
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully updated ${_branchName.text}');
+                      }
+                    });
+                  } else {
+                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  }
+                });
+              }
             }
           },
           actionText: 'button'.tr(gender: widget.type),
@@ -605,5 +608,43 @@ class _BranchDetailState extends State<BranchDetail> {
     double megabytes = bytes / 1048576.0;
     // double sizeInGB = sizeInBytes / 1073741824.0;
     return megabytes;
+  }
+
+  bool validate() {
+    bool temp = true;
+    if (_branchCode.text == '') {
+      showDialogError(context, ErrorMessage.required(field: 'Branch Code'));
+      return false;
+    }
+    if (_launchDate.text == '') {
+      showDialogError(context, ErrorMessage.required(field: 'Launch Date'));
+      return false;
+    }
+    // if (fullNameAttribute.controller.text == '') {
+    //   temp = false;
+    //   fullNameAttribute.errorMessage = ErrorMessage.required(field: fullNameAttribute.labelText);
+    // }
+    // if (contactNoAttribute.controller.text == '') {
+    //   temp = false;
+    //   contactNoAttribute.errorMessage = ErrorMessage.required(field: contactNoAttribute.labelText);
+    // }
+    // if (emailAttribute.controller.text == '') {
+    //   temp = false;
+    //   emailAttribute.errorMessage = ErrorMessage.required(field: emailAttribute.labelText);
+    // }
+    // if (dobAttribute.controller.text == '') {
+    //   temp = false;
+    //   dobAttribute.errorMessage = ErrorMessage.required(field: dobAttribute.labelText);
+    // }
+    // if (acceptTnc.value == false) {
+    //   temp = false;
+    //   launchAnimation = !launchAnimation;
+    // }
+    // if (_selectedBranch == null) {
+    //   temp = false;
+    //   selectedBranchErrorMessage = ErrorMessage.required(field: 'information'.tr(gender: 'registeredBranch'));
+    // }
+    // rebuild.add(DateTime.now());
+    return temp;
   }
 }

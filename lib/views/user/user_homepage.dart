@@ -40,8 +40,7 @@ import 'package:provider/provider.dart';
 class UserHomepage extends StatefulWidget {
   static const routeName = '/user';
   static const displayName = 'Users';
-  final String? orderReference;
-  const UserHomepage({super.key, this.orderReference});
+  const UserHomepage({super.key});
 
   @override
   State<UserHomepage> createState() => _UserHomepageState();
@@ -102,7 +101,9 @@ class _UserHomepageState extends State<UserHomepage> {
       width: 131,
     ),
   ];
-  final TextEditingController _orderReferenceController = TextEditingController();
+  final TextEditingController _userFullNameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _userPhoneController = TextEditingController();
   String? _selectedBranch;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
@@ -140,7 +141,7 @@ class _UserHomepageState extends State<UserHomepage> {
     return Column(
       children: [
         searchField(
-          InputFieldAttribute(controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+          InputFieldAttribute(controller: _userFullNameController, hintText: 'Search', labelText: 'Order Reference'),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -228,10 +229,7 @@ class _UserHomepageState extends State<UserHomepage> {
   }
 
   Widget desktopView() {
-    return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,8 +239,7 @@ class _UserHomepageState extends State<UserHomepage> {
             children: [
               AppPadding.horizontal(),
               searchField(
-                InputFieldAttribute(
-                    controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+                InputFieldAttribute(controller: _userFullNameController, hintText: 'Search', labelText: 'Full Name'),
               ),
               // AppPadding.horizontal(),
               // searchField(
@@ -270,10 +267,6 @@ class _UserHomepageState extends State<UserHomepage> {
         ],
       ),
     );
-    // : OrderDetailHomepage(
-    //     orderReference: widget.orderReference!,
-    //     previousPage: UserHomepage.routeName,
-    //   );
   }
 
   Widget searchField(InputFieldAttribute attribute) {
@@ -583,25 +576,15 @@ class _UserHomepageState extends State<UserHomepage> {
     }
     UserController.getAll(
       context,
-      // DeviceRequest(
-      //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
-      //   serialNumber: (_ontSNController.text != '') ? _ontSNController.text : null,
-      //   ont: (_ontController.text != '') ? _ontController.text : null,
-      //   port: (_portController.text != '') ? _portController.text : null,
-      //   card: (_slotController.text != '') ? _slotController.text : null,
-      //   ontPON: (_ontPonController.text != '') ? _ontPonController.text : null,
-      //   ontMAC: (_ontMacController.text != '') ? _ontMacController.text : null,
-      //   ipAddress: (_ipController.text != '') ? _ipController.text : null,
-      //   nltType: _nltType,
-      //   page: _page,
-      //   pageSize: _pageSize,
-      // ),
+      _userFullNameController.text,
+      _userNameController.text,
+      _userPhoneController.text,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.length ?? 0;
-        _totalPage = ((value.data?.length ?? 0) / _pageSize).ceil();
-        context.read<UserController>().userAllResponse = value.data;
+        _totalCount = value.data?.data?.length ?? 0;
+        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        context.read<UserController>().userAllResponse = value.data?.data;
         // _page = 0;
       } else if (value.code == 404) {}
       return null;
@@ -694,7 +677,9 @@ class _UserHomepageState extends State<UserHomepage> {
   }
 
   resetAllFilter() {
-    _orderReferenceController.text = '';
+    _userFullNameController.text = '';
+    _userNameController.text = '';
+    _userPhoneController.text = '';
     _selectedBranch = null;
     rebuildDropdown.add(DateTime.now());
 
@@ -777,9 +762,25 @@ class _UserHomepageState extends State<UserHomepage> {
                                   children: [
                                     searchField(
                                       InputFieldAttribute(
-                                          controller: _orderReferenceController,
+                                          controller: _userFullNameController,
                                           hintText: 'Search',
-                                          labelText: 'Order Reference'),
+                                          labelText: 'Full Name'),
+                                    ),
+                                    AppPadding.vertical(),
+                                    searchField(
+                                      InputFieldAttribute(
+                                        controller: _userNameController,
+                                        hintText: 'Search',
+                                        labelText: 'Username',
+                                      ),
+                                    ),
+                                    AppPadding.vertical(),
+                                    searchField(
+                                      InputFieldAttribute(
+                                        controller: _userPhoneController,
+                                        hintText: 'Search',
+                                        labelText: 'Contact Number',
+                                      ),
                                     ),
                                     AppPadding.vertical(),
                                     StreamBuilder<DateTime>(

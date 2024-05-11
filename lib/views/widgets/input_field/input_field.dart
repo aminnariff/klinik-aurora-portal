@@ -61,6 +61,14 @@ class InputField extends StatelessWidget {
                       rebuild.value = DateTime.now();
                     }),
                   ),
+                  if (field.tooltip != null)
+                    Tooltip(
+                      message: field.tooltip,
+                      child: IconButton(
+                        icon: const Icon(Icons.info),
+                        onPressed: () {},
+                      ),
+                    ),
                 ],
               );
             },

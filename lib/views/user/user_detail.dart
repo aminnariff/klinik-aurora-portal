@@ -273,12 +273,10 @@ class _UserDetailState extends State<UserDetail> {
                                     ),
                                   ).then((value) {
                                     if (responseCode(value.code)) {
-                                      UserController.getAll(
-                                        context,
-                                      ).then((value) {
+                                      UserController.getAll(context, '', '', '').then((value) {
                                         dismissLoading();
                                         if (responseCode(value.code)) {
-                                          context.read<UserController>().userAllResponse = value.data;
+                                          context.read<UserController>().userAllResponse = value.data?.data;
                                           context.pop();
                                           showDialogSuccess(context, 'Successfully updated customer information');
                                         } else {
@@ -305,12 +303,10 @@ class _UserDetailState extends State<UserDetail> {
                                     ),
                                   ).then((value) {
                                     if (responseCode(value.code)) {
-                                      UserController.getAll(
-                                        context,
-                                      ).then((value) {
+                                      UserController.getAll(context, '', '', '').then((value) {
                                         dismissLoading();
                                         if (responseCode(value.code)) {
-                                          context.read<UserController>().userAllResponse = value.data;
+                                          context.read<UserController>().userAllResponse = value.data?.data;
                                           context.pop();
                                           showDialogSuccess(context, 'Successfully created customer');
                                         } else {
