@@ -64,6 +64,8 @@
     "doctorPage": {
         "doctorName": "PIC Name",
         "doctorPhone": "PIC Contact No.",
+        "doctorImage": "PIC Image",
+        "browseFile": "Browse your files here (max 10MB)",
         "voucherStatus": "Status"
     },
     "passwordRecoveryPage": {

@@ -1,6 +1,6 @@
 class DevelopmentEnvironment {
-  Map<String, dynamic> data = {
-    "appUrl": "http://91.108.104.155/",
-    "imageUrl": "http://91.108.104.155/",
+Map<String, dynamic> data = {
+  "appUrl": "https://srv495548.hstgr.cloud/",
+  "imageUrl": "https://srv495548.hstgr.cloud/",
   };
 }

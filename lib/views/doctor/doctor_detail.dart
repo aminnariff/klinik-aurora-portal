@@ -57,6 +57,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       _doctorName.text = widget.doctor?.doctorName ?? '';
       _doctorPhone.text = widget.doctor?.doctorPhone?.substring(1, widget.doctor?.doctorPhone?.length) ?? '';
       _branchId.text = widget.doctor?.branchId ?? '';
+      selectedFile = FileAttribute(path: widget.doctor?.doctorImage, name: widget.doctor?.doctorImage);
       try {
         if (context.read<BranchController>().branchAllResponse == null) {
           BranchController.getAll(context).then((value) {
@@ -72,12 +73,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             ?.data
             ?.firstWhere((element) => element.branchId == _branchId.text);
         setState(() {
-          _selectedBranch = DropdownAttribute(branch?.branchId ?? '', branch?.branchName ?? '');
+          _selectedBranch = DropdownAttribute(_branchId.text, branch?.branchName ?? '');
         });
       } catch (e) {
         debugPrint(e.toString());
       }
-      // selectedFile = FileAttribute(path: widget.branch?.branchImage, name: widget.branch?.branchImage);
     }
     super.initState();
   }
@@ -318,7 +318,13 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 ),
               ).then((value) {
                 if (responseCode(value.code)) {
-                  getLatestData();
+                  DoctorController.upload(context, value.data!.id!, selectedFile).then((value) {
+                    if (responseCode(value.code)) {
+                      getLatestData();
+                    } else {
+                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    }
+                  });
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -331,11 +337,17 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                   doctorName: _doctorName.text,
                   doctorPhone: _doctorPhone.text,
                   doctorStatus: widget.doctor?.doctorStatus,
-                  // doctorImage: selectedFile,
+                  branchId: _selectedBranch?.key,
                 ),
               ).then((value) {
                 if (responseCode(value.code)) {
-                  getLatestData();
+                  DoctorController.upload(context, widget.doctor!.doctorId!, selectedFile).then((value) {
+                    if (responseCode(value.code)) {
+                      getLatestData();
+                    } else {
+                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    }
+                  });
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }

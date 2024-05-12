@@ -173,15 +173,15 @@ class _UserDetailState extends State<UserDetail> {
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  if (widget.type == 'create') ...[
-                                    InputField(
-                                      field: InputFieldAttribute(
-                                        controller: _password,
-                                        labelText: 'information'.tr(gender: 'password'),
-                                      ),
-                                    ),
-                                    AppPadding.vertical(denominator: 2),
-                                  ],
+                                  // if (widget.type == 'create') ...[
+                                  //   InputField(
+                                  //     field: InputFieldAttribute(
+                                  //       controller: _password,
+                                  //       labelText: 'information'.tr(gender: 'password'),
+                                  //     ),
+                                  //   ),
+                                  //   AppPadding.vertical(denominator: 2),
+                                  // ],
                                 ],
                               ),
                             ),
