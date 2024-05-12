@@ -43,7 +43,7 @@ class PasswordRecoveryController extends ChangeNotifier {
         headers: {
           Headers.acceptHeader: '*/*',
           Headers.contentTypeHeader: 'application/json',
-          'Host': '91.108.104.155',
+          'Host': 'srv495548.hstgr.cloud',
           'Authorization': 'Bearer ${prefs.getString(token)}',
         },
       ),
