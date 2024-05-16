@@ -71,13 +71,13 @@ Color statusColor(status) {
     return const Color(0XFFDF184A);
   } else {
     switch (status) {
-      case 'active':
+      case 'active' || 'completed':
         return Colors.green.shade900;
 
       case 'inactive':
         return const Color(0XFFDF184A);
 
-      case 'RECONNECT':
+      case 'in-progress':
         return const Color(0xFFFFC107);
 
       case 'NEW':

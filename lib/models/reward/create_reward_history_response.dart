@@ -1,10 +1,10 @@
-class CreatePointResponse {
+class CreateRewardHistoryResponse {
   String? message;
   String? id;
 
-  CreatePointResponse({this.message, this.id});
+  CreateRewardHistoryResponse({this.message, this.id});
 
-  CreatePointResponse.fromJson(Map<String, dynamic> json) {
+  CreateRewardHistoryResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     id = json['id'];
   }

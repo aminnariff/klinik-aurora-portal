@@ -503,7 +503,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   CreateBranchRequest(
                     branchName: _branchName.text,
                     branchCode: _branchCode.text,
-                    phoneNumber: _branchPhone.text,
+                    phoneNumber: '0${_branchPhone.text}',
                     address: _address.text,
                     city: _city.text,
                     postcode: _postcode.text,
@@ -539,7 +539,7 @@ class _BranchDetailState extends State<BranchDetail> {
                     branchId: widget.branch?.branchId ?? '',
                     branchCode: _branchCode.text,
                     branchName: _branchName.text,
-                    phoneNumber: _branchPhone.text,
+                    phoneNumber: '0${_branchPhone.text}',
                     address: _address.text,
                     city: _city.text,
                     postcode: _postcode.text,

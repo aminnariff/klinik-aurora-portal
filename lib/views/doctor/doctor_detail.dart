@@ -312,7 +312,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 context,
                 CreateDoctorRequest(
                   doctorName: _doctorName.text,
-                  doctorPhone: _doctorPhone.text,
+                  doctorPhone: '0${_doctorPhone.text}',
                   branchId: _selectedBranch?.key,
                   // doctorImage: selectedFile,
                 ),
@@ -335,7 +335,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 UpdateDoctorRequest(
                   doctorId: widget.doctor?.doctorId,
                   doctorName: _doctorName.text,
-                  doctorPhone: _doctorPhone.text,
+                  doctorPhone: '0${_doctorPhone.text}',
                   doctorStatus: widget.doctor?.doctorStatus,
                   branchId: _selectedBranch?.key,
                 ),

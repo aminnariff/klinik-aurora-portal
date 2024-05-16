@@ -16,6 +16,7 @@ import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
+import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -40,6 +41,8 @@ List<SidebarXItem> sideBarAttribute = [
   const SidebarXItem(
       iconWidget: Icon(FontAwesomeIcons.ticketSimple, color: Colors.white), label: VoucherHomepage.displayName),
   const SidebarXItem(iconWidget: Icon(FontAwesomeIcons.gifts, color: Colors.white), label: RewardHomepage.displayName),
+  const SidebarXItem(
+      iconWidget: Icon(Icons.local_shipping, color: Colors.white), label: RewardHistoryHomepage.displayName),
   // const SidebarXItem(iconWidget: Icon(Icons.router, color: Colors.white), label: OntHomepage.displayName),
 ];
 
@@ -306,6 +309,8 @@ class _HomepageState extends State<Homepage> {
         context.go(VoucherHomepage.routeName);
       case RewardHomepage.displayName:
         context.go(RewardHomepage.routeName);
+      case RewardHistoryHomepage.displayName:
+        context.go(RewardHistoryHomepage.routeName);
     }
   }
 

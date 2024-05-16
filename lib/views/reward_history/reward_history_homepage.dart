@@ -8,16 +8,13 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
-import 'package:klinik_aurora_portal/controllers/reward/reward_controller.dart';
+import 'package:klinik_aurora_portal/controllers/reward/reward_history_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/models/reward/reward_all_response.dart';
-import 'package:klinik_aurora_portal/models/reward/update_reward_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
-import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
@@ -33,17 +30,16 @@ import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
-class RewardHomepage extends StatefulWidget {
-  static const routeName = '/reward';
-  static const displayName = 'Rewards';
-  final String? orderReference;
-  const RewardHomepage({super.key, this.orderReference});
+class RewardHistoryHomepage extends StatefulWidget {
+  static const routeName = '/reward-history';
+  static const displayName = 'Manage Rewards';
+  const RewardHistoryHomepage({super.key});
 
   @override
-  State<RewardHomepage> createState() => _RewardHomepageState();
+  State<RewardHistoryHomepage> createState() => _RewardHistoryHomepageState();
 }
 
-class _RewardHomepageState extends State<RewardHomepage> {
+class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   int _page = 0;
   int _pageSize = pageSize;
   int _totalCount = 0;
@@ -53,30 +49,23 @@ class _RewardHomepageState extends State<RewardHomepage> {
 
   List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(
-      attribute: 'rewardCode',
-      label: 'Code',
+      attribute: 'transactionId',
+      label: 'Transaction Id',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'rewardName',
-      label: 'Name',
+      attribute: 'description',
+      label: 'Staff Comment',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'rewardPoint',
-      label: 'Points',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 130,
-    ),
-    TableHeaderAttribute(
-      attribute: 'rewardStatus',
+      attribute: 'status',
       label: 'Status',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 70,
+      width: 110,
     ),
     TableHeaderAttribute(
       attribute: 'createdDate',
@@ -99,7 +88,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(RewardHomepage.displayName);
+      Provider.of<TopBarController>(context, listen: false).pageValue =
+          Homepage.getPageId(RewardHistoryHomepage.displayName);
     });
     filtering();
     super.initState();
@@ -208,10 +198,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
   }
 
   Widget desktopView() {
-    return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,10 +237,6 @@ class _RewardHomepageState extends State<RewardHomepage> {
         ],
       ),
     );
-    // : OrderDetailHomepage(
-    //     orderReference: widget.orderReference!,
-    //     previousPage: RewardHomepage.routeName,
-    //   );
   }
 
   Widget searchField(InputFieldAttribute attribute) {
@@ -289,9 +272,9 @@ class _RewardHomepageState extends State<RewardHomepage> {
   }
 
   Widget orderTable() {
-    return Consumer<RewardController>(
+    return Consumer<RewardHistoryController>(
       builder: (context, snapshot, child) {
-        if (snapshot.rewardAllResponse == null) {
+        if (snapshot.rewardHistoryResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -305,7 +288,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
             ],
           );
         } else {
-          return snapshot.rewardAllResponse == null || snapshot.rewardAllResponse!.data!.data!.isEmpty
+          return snapshot.rewardHistoryResponse == null || snapshot.rewardHistoryResponse!.data!.data!.isEmpty
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -336,7 +319,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                               child: DataTable2(
                                 columnSpacing: 12,
                                 horizontalMargin: 12,
-                                minWidth: 1300,
+                                minWidth: 900,
                                 isHorizontalScrollBarVisible: true,
                                 isVerticalScrollBarVisible: true,
                                 columns: columns(),
@@ -352,7 +335,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                 ),
                                 rows: [
                                   for (int index = 0;
-                                      index < (snapshot.rewardAllResponse?.data?.data?.length ?? 0);
+                                      index < (snapshot.rewardHistoryResponse?.data?.data?.length ?? 0);
                                       index++)
                                     DataRow(
                                       color: WidgetStateProperty.all(
@@ -366,41 +349,37 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                               //     builder: (BuildContext context) {
                                               //       return RewardDetail(
                                               //           type: 'update',
-                                              //           reward: snapshot.rewardAllResponse?.data?.data?[index]);
+                                              //           reward: snapshot.rewardHistoryResponse?.data?.data?[index]);
                                               //     });
                                             },
                                             child: Text(
-                                              snapshot.rewardAllResponse?.data?.data?[index].rewardName ?? 'N/A',
+                                              snapshot.rewardHistoryResponse?.data?.data?[index].rewardId ?? 'N/A',
                                               style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
                                             ),
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(
-                                              snapshot.rewardAllResponse?.data?.data?[index].rewardName ?? 'N/A'),
-                                        ),
-                                        DataCell(
-                                          InkWell(
-                                            child: Text(
-                                                '${snapshot.rewardAllResponse?.data?.data?[index].rewardPoint ?? 'N/A'}'),
-                                          ),
+                                          AppSelectableText(snapshot
+                                                  .rewardHistoryResponse?.data?.data?[index].rewardHistoryDescription ??
+                                              'N/A'),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
-                                                ? 'Active'
-                                                : 'Inactive',
+                                            snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryStatus == 1
+                                                ? 'In-Progress'
+                                                : 'Completed',
                                             style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(
-                                                    snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
-                                                        ? 'active'
-                                                        : 'inactive'),
+                                                color: statusColor(snapshot.rewardHistoryResponse?.data?.data?[index]
+                                                            .rewardHistoryStatus ==
+                                                        1
+                                                    ? 'in-progress'
+                                                    : 'completed'),
                                                 fontWeightDelta: 1),
                                           ),
                                         ),
                                         DataCell(
-                                          AppSelectableText(dateConverter(
-                                                  snapshot.rewardAllResponse?.data?.data?[index].createdDate) ??
+                                          AppSelectableText(dateConverter(snapshot.rewardHistoryResponse?.data
+                                                  ?.data?[index].rewardHistoryCreatedDate) ??
                                               'N/A'),
                                         ),
                                         DataCell(
@@ -409,64 +388,66 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                             children: [
                                               IconButton(
                                                 onPressed: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return RewardDetail(
-                                                          reward: snapshot.rewardAllResponse!.data!.data![index],
-                                                          type: 'update',
-                                                        );
-                                                      });
+                                                  // showDialog(
+                                                  //     context: context,
+                                                  //     builder: (BuildContext context) {
+                                                  //       return RewardDetail(
+                                                  //         reward: snapshot.rewardHistoryResponse!.data!.data![index],
+                                                  //         type: 'update',
+                                                  //       );
+                                                  //     });
                                                 },
                                                 icon: const Icon(
                                                   Icons.edit,
                                                   color: Colors.grey,
                                                 ),
                                               ),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  try {
-                                                    Data? data = snapshot.rewardAllResponse?.data?.data?[index];
-                                                    if (await showConfirmDialog(
-                                                        context,
-                                                        data?.rewardStatus == 1
-                                                            ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
-                                                            : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
-                                                      Future.delayed(Duration.zero, () {
-                                                        RewardController.update(
-                                                          context,
-                                                          UpdateRewardRequest(
-                                                            rewardId: data?.rewardId ?? '',
-                                                            rewardName: data?.rewardName ?? '',
-                                                            rewardDescription: data?.rewardDescription ?? '',
-                                                            rewardPoint: data?.rewardPoint ?? 0,
-                                                            totalReward: data?.totalReward ?? 0,
-                                                            rewardStartDate: data?.rewardStartDate ?? '',
-                                                            rewardEndDate: data?.rewardEndDate ?? '',
-                                                            rewardStatus: data?.rewardStatus == 1 ? 0 : 1,
-                                                          ),
-                                                        ).then((value) {
-                                                          if (responseCode(value.code)) {
-                                                            filtering();
-                                                            showDialogSuccess(context,
-                                                                'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
-                                                          } else {
-                                                            showDialogError(context, value.data?.message ?? '');
-                                                          }
-                                                        });
-                                                      });
-                                                    }
-                                                  } catch (e) {
-                                                    debugPrint(e.toString());
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
-                                                      ? Icons.delete
-                                                      : Icons.play_arrow,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
+                                              // IconButton(
+                                              //   onPressed: () async {
+                                              //     try {
+                                              //       Data? data = snapshot.rewardHistoryResponse?.data?.data?[index];
+                                              //       if (await showConfirmDialog(
+                                              //           context,
+                                              //           data?.rewardStatus == 1
+                                              //               ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
+                                              //               : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
+                                              //         Future.delayed(Duration.zero, () {
+                                              //           RewardController.update(
+                                              //             context,
+                                              //             UpdateRewardRequest(
+                                              //               rewardId: data?.rewardId ?? '',
+                                              //               rewardName: data?.rewardName ?? '',
+                                              //               rewardDescription: data?.rewardDescription ?? '',
+                                              //               rewardPoint: data?.rewardPoint ?? 0,
+                                              //               totalReward: data?.totalReward ?? 0,
+                                              //               rewardStartDate: data?.rewardStartDate ?? '',
+                                              //               rewardEndDate: data?.rewardEndDate ?? '',
+                                              //               rewardStatus: data?.rewardStatus == 1 ? 0 : 1,
+                                              //             ),
+                                              //           ).then((value) {
+                                              //             if (responseCode(value.code)) {
+                                              //               filtering();
+                                              //               showDialogSuccess(context,
+                                              //                   'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
+                                              //             } else {
+                                              //               showDialogError(context, value.data?.message ?? '');
+                                              //             }
+                                              //           });
+                                              //         });
+                                              //       }
+                                              //     } catch (e) {
+                                              //       debugPrint(e.toString());
+                                              //     }
+                                              //   },
+                                              //   icon: Icon(
+                                              //     snapshot.rewardHistoryResponse?.data?.data?[index]
+                                              //                 .rewardHistoryStatus ==
+                                              //             1
+                                              //         ? Icons.delete
+                                              //         : Icons.play_arrow,
+                                              //     color: Colors.grey,
+                                              //   ),
+                                              // ),
                                             ],
                                           ),
                                         ),
@@ -536,7 +517,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
     if (page != null) {
       _page = page;
     }
-    RewardController.getAll(
+    RewardHistoryController.getAll(
       context,
       // DeviceRequest(
       //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
@@ -556,7 +537,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
       if (responseCode(value.code)) {
         _totalCount = value.data?.data?.length ?? 0;
         _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
-        context.read<RewardController>().rewardAllResponse = value;
+        context.read<RewardHistoryController>().rewardHistoryResponse = value;
         // _page = 0;
       } else if (value.code == 404) {}
       return null;

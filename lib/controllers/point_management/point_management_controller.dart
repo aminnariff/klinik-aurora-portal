@@ -22,13 +22,16 @@ class PointManagementController extends ChangeNotifier {
       endpoint: 'admin/admin-permission',
       data: {
         "userId": request.userId,
-        if (request.pointType != null) "pointType": request.pointType, // 1 = referral, 2 = voucher
+        if (request.pointType != null)
+          "pointType": request.pointType, // 1 = referral, 2 = voucher, 3 = reward, null = add points to the user
         // required when point type = null
         if (request.pointType == null) "totalPoint": request.totalPoint,
         // required when point type = 1
         if (request.pointType == 1) "referralUserId": request.referralUserId,
         // requred when point type = 2
         if (request.pointType == 2) "voucherId": request.voucherId,
+        // requred when point type = 3
+        if (request.pointType == 3) "rewardId": request.rewardId,
       },
     ).then((value) {
       try {
