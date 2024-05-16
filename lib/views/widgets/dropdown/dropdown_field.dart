@@ -135,6 +135,15 @@ class _AppDropdownState extends State<AppDropdown> {
             ),
           ),
         ),
+        if (widget.attributeList.errorMessage != null) ...[
+          Padding(
+            padding: EdgeInsets.only(left: screenPadding / 2, top: 8),
+            child: Text(
+              widget.attributeList.errorMessage!,
+              style: AppTypography.bodyMedium(context).apply(color: errorColor),
+            ),
+          ),
+        ],
       ],
     );
   }
