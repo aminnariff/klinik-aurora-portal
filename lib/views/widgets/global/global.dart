@@ -38,3 +38,12 @@ String convertStringToDate(String dateString) {
 
   return DateFormat('yyyy-MM-dd').format(DateTime.parse(formattedString));
 }
+
+String convertToMonthYear(int month, int year) {
+  List<String> months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  if (month < 1 || month > 12) {
+    throw ArgumentError('Month must be between 1 and 12');
+  }
+  String monthName = months[month - 1];
+  return '$monthName $year';
+}

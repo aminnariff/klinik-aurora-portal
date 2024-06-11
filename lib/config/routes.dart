@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/privacy/privacy_policy.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
+import 'package:klinik_aurora_portal/views/delete_account/delete_account.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/homepage/dashboard.dart';
@@ -29,6 +31,20 @@ final router = GoRouter(
         return PasswordRecoveryPage(
           token: token,
         );
+      },
+    ),
+    GoRoute(
+      name: DeleteAccountPage.routeName,
+      path: DeleteAccountPage.routeName,
+      builder: (BuildContext context, GoRouterState state) {
+        return const DeleteAccountPage();
+      },
+    ),
+    GoRoute(
+      name: PrivacyPolicy.routeName,
+      path: PrivacyPolicy.routeName,
+      builder: (BuildContext context, GoRouterState state) {
+        return const PrivacyPolicy();
       },
     ),
     GoRoute(

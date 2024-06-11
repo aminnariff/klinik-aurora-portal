@@ -1,5 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
+import 'package:klinik_aurora_portal/models/dashboard/dashboard_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:provider/provider.dart';
 
 class GraphWidget extends StatefulWidget {
   const GraphWidget({super.key});
@@ -21,7 +27,7 @@ class _GraphWidgetState extends State<GraphWidget> {
     return Stack(
       children: <Widget>[
         AspectRatio(
-          aspectRatio: 5,
+          aspectRatio: 4,
           child: DecoratedBox(
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(
@@ -30,34 +36,25 @@ class _GraphWidgetState extends State<GraphWidget> {
               color: Color(0xff232d37),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(
-                right: 18,
-                left: 12,
-                top: 24,
+              padding: EdgeInsets.only(
+                right: screenPadding * 1.5,
+                left: screenPadding * 1.5,
+                top: screenPadding * 1.5,
                 bottom: 12,
               ),
-              child: LineChart(
-                showAvg ? avgData() : mainData(),
-              ),
+              child: Consumer<DashboardController>(builder: (context, snapshot, _) {
+                return LineChart(
+                  showAvg ? avgData() : mainData(context.read<DashboardController>().dashboardResponse?.data),
+                );
+              }),
             ),
           ),
         ),
-        SizedBox(
-          width: 60,
-          height: 34,
-          child: TextButton(
-            onPressed: () {
-              setState(() {
-                showAvg = !showAvg;
-              });
-            },
-            child: Text(
-              'avg',
-              style: TextStyle(
-                fontSize: 12,
-                color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
-              ),
-            ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, 0, 0),
+          child: Text(
+            'Registrations in the Past Three Months',
+            style: AppTypography.displayMedium(context).apply(color: Colors.white),
           ),
         ),
       ],
@@ -71,15 +68,31 @@ class _GraphWidgetState extends State<GraphWidget> {
       fontSize: 16,
     );
     Widget text;
+    Data? response = context.read<DashboardController>().dashboardResponse?.data;
     switch (value.toInt()) {
+      case 0:
+        text = response == null
+            ? const SizedBox()
+            : Text(
+                convertToMonthYear(
+                    response.totalRegistrationByMonth?[0].month ?? 0, response.totalRegistrationByMonth?[0].year ?? 0),
+                style: style);
+        break;
+      case 1:
+        text = response == null
+            ? const SizedBox()
+            : Text(
+                convertToMonthYear(
+                    response.totalRegistrationByMonth?[1].month ?? 0, response.totalRegistrationByMonth?[1].year ?? 0),
+                style: style);
+        break;
       case 2:
-        text = const Text('MAR', style: style);
-        break;
-      case 5:
-        text = const Text('JUN', style: style);
-        break;
-      case 8:
-        text = const Text('SEP', style: style);
+        text = response == null
+            ? const SizedBox()
+            : Text(
+                convertToMonthYear(
+                    response.totalRegistrationByMonth?[2].month ?? 0, response.totalRegistrationByMonth?[2].year ?? 0),
+                style: style);
         break;
       default:
         text = const Text('', style: style);
@@ -99,15 +112,20 @@ class _GraphWidgetState extends State<GraphWidget> {
       fontSize: 15,
     );
     String text;
+    Data? response = context.read<DashboardController>().dashboardResponse?.data;
+    List<int> totalRegistrations = [];
+    for (TotalRegistrationByMonth? element in response?.totalRegistrationByMonth ?? []) {
+      totalRegistrations.add(element?.totalRegistrationByMonth ?? 0);
+    }
     switch (value.toInt()) {
       case 1:
-        text = '10K';
+        text = '${getYAxisLabelsWithGap(totalRegistrations)[0]}';
         break;
       case 3:
-        text = '30k';
+        text = '${getYAxisLabelsWithGap(totalRegistrations)[1]}';
         break;
       case 5:
-        text = '50k';
+        text = '${getYAxisLabelsWithGap(totalRegistrations)[2]}';
         break;
       default:
         return Container();
@@ -116,7 +134,33 @@ class _GraphWidgetState extends State<GraphWidget> {
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
-  LineChartData mainData() {
+  List<int> getYAxisLabelsWithGap(List<int> data) {
+    if (data.isEmpty) return [0, 0, 0];
+    data.sort();
+    int min = data.first;
+    int max = data.last;
+    int median = data[data.length ~/ 2];
+
+    // Adjust values to create a gap for better visualization
+    int adjustedMin = (min * 0.8).floor(); // Example: 20% less
+    int adjustedMax = (max * 1.5).ceil(); // Example: 50% more
+
+    if (adjustedMin < 0) {
+      adjustedMin = 0;
+    }
+
+    return [adjustedMin, median, adjustedMax];
+  }
+
+  LineChartData mainData(Data? response) {
+    double first = response?.totalRegistrationByMonth?[0].totalRegistrationByMonth?.toDouble() ?? 0;
+    double second = response?.totalRegistrationByMonth?[1].totalRegistrationByMonth?.toDouble() ?? 0;
+    double third = response?.totalRegistrationByMonth?[2].totalRegistrationByMonth?.toDouble() ?? 0;
+
+    List<int> totalRegistrations = [];
+    for (TotalRegistrationByMonth? element in response?.totalRegistrationByMonth ?? []) {
+      totalRegistrations.add(element?.totalRegistrationByMonth ?? 0);
+    }
     return LineChartData(
       gridData: FlGridData(
         show: true,
@@ -124,24 +168,24 @@ class _GraphWidgetState extends State<GraphWidget> {
         horizontalInterval: 1,
         verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
+          return const FlLine(
+            color: Color(0xff37434d),
             strokeWidth: 1,
           );
         },
         getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
+          return const FlLine(
+            color: Color(0xff37434d),
             strokeWidth: 1,
           );
         },
       ),
       titlesData: FlTitlesData(
         show: true,
-        rightTitles: AxisTitles(
+        rightTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
-        topTitles: AxisTitles(
+        topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
         bottomTitles: AxisTitles(
@@ -166,19 +210,15 @@ class _GraphWidgetState extends State<GraphWidget> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 11,
+      maxX: 2,
       minY: 0,
-      maxY: 6,
+      maxY: getYAxisLabelsWithGap(totalRegistrations)[2].toDouble(),
       lineBarsData: [
         LineChartBarData(
-          spots: const [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
+          spots: [
+            FlSpot(0, first),
+            FlSpot(1, second),
+            FlSpot(2, third),
           ],
           isCurved: true,
           gradient: LinearGradient(
@@ -186,7 +226,7 @@ class _GraphWidgetState extends State<GraphWidget> {
           ),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: FlDotData(
+          dotData: const FlDotData(
             show: false,
           ),
           belowBarData: BarAreaData(
@@ -202,21 +242,21 @@ class _GraphWidgetState extends State<GraphWidget> {
 
   LineChartData avgData() {
     return LineChartData(
-      lineTouchData: LineTouchData(enabled: false),
+      lineTouchData: const LineTouchData(enabled: false),
       gridData: FlGridData(
         show: true,
         drawHorizontalLine: true,
         verticalInterval: 1,
         horizontalInterval: 1,
         getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
+          return const FlLine(
+            color: Color(0xff37434d),
             strokeWidth: 1,
           );
         },
         getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
+          return const FlLine(
+            color: Color(0xff37434d),
             strokeWidth: 1,
           );
         },
@@ -239,10 +279,10 @@ class _GraphWidgetState extends State<GraphWidget> {
             interval: 1,
           ),
         ),
-        topTitles: AxisTitles(
+        topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
-        rightTitles: AxisTitles(
+        rightTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
       ),
@@ -274,7 +314,7 @@ class _GraphWidgetState extends State<GraphWidget> {
           ),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: FlDotData(
+          dotData: const FlDotData(
             show: false,
           ),
           belowBarData: BarAreaData(
