@@ -230,7 +230,13 @@ class _UserDetailState extends State<UserDetail> {
                                         ),
                                         AppPadding.vertical(denominator: 2),
                                         InputField(
-                                          field: emailAttribute,
+                                          field: InputFieldAttribute(
+                                            controller: emailAttribute.controller,
+                                            labelText: emailAttribute.labelText,
+                                            isEmail: true,
+                                            errorMessage: emailAttribute.errorMessage,
+                                            isEditable: widget.type == 'update' ? false : true,
+                                          ),
                                         ),
                                         AppPadding.vertical(denominator: 2),
                                         Row(

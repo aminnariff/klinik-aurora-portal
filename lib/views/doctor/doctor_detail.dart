@@ -22,6 +22,7 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -41,9 +42,32 @@ class DoctorDetails extends StatefulWidget {
 }
 
 class _DoctorDetailsState extends State<DoctorDetails> {
-  final TextEditingController _doctorName = TextEditingController();
-  final TextEditingController _doctorPhone = TextEditingController();
-  final TextEditingController _branchId = TextEditingController();
+  final InputFieldAttribute _doctorName = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'doctorPage'.tr(gender: 'doctorName'),
+  );
+  final InputFieldAttribute _doctorPhone = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'doctorPage'.tr(gender: 'phoneNo'),
+    isNumber: true,
+    maxCharacter: 10,
+    prefixIcon: Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
+          child: const Text(
+            '+60',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0, color: textPrimaryColor),
+          ),
+        ),
+      ],
+    ),
+  );
+  final InputFieldAttribute _branchId = InputFieldAttribute(
+    controller: TextEditingController(),
+  );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
   DropdownAttribute? _selectedBranch;
@@ -54,9 +78,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   @override
   void initState() {
     if (widget.type == 'update') {
-      _doctorName.text = widget.doctor?.doctorName ?? '';
-      _doctorPhone.text = widget.doctor?.doctorPhone?.substring(1, widget.doctor?.doctorPhone?.length) ?? '';
-      _branchId.text = widget.doctor?.branchId ?? '';
+      _doctorName.controller.text = widget.doctor?.doctorName ?? '';
+      _doctorPhone.controller.text = widget.doctor?.doctorPhone?.substring(1, widget.doctor?.doctorPhone?.length) ?? '';
+      _branchId.controller.text = widget.doctor?.branchId ?? '';
       selectedFile = FileAttribute(path: widget.doctor?.doctorImage, name: widget.doctor?.doctorImage);
       try {
         if (context.read<BranchController>().branchAllResponse == null) {
@@ -71,9 +95,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             .branchAllResponse
             ?.data
             ?.data
-            ?.firstWhere((element) => element.branchId == _branchId.text);
+            ?.firstWhere((element) => element.branchId == _branchId.controller.text);
         setState(() {
-          _selectedBranch = DropdownAttribute(_branchId.text, branch?.branchName ?? '');
+          _selectedBranch = DropdownAttribute(_branchId.controller.text, branch?.branchName ?? '');
         });
       } catch (e) {
         debugPrint(e.toString());
@@ -129,33 +153,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                               child: Column(
                                 children: [
                                   InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _doctorName,
-                                      labelText: 'doctorPage'.tr(gender: 'doctorName'),
-                                    ),
+                                    field: _doctorName,
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                   InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _doctorPhone,
-                                      labelText: 'information'.tr(gender: 'phoneNo'),
-                                      isNumber: true,
-                                      maxCharacter: 10,
-                                      prefixIcon: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
-                                            child: const Text(
-                                              '+60',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w700, fontSize: 15.0, color: textPrimaryColor),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                    field: _doctorPhone,
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                   Row(
@@ -171,10 +173,14 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                           ],
                                           onChanged: (selected) {
                                             setState(() {
+                                              if (_branchId.errorMessage != null) {
+                                                _branchId.errorMessage = null;
+                                              }
                                               _selectedBranch = selected;
-                                              _branchId.text = selected!.name;
+                                              _branchId.controller.text = selected!.name;
                                             });
                                           },
+                                          errorMessage: _branchId.errorMessage,
                                           value: _selectedBranch?.name,
                                           width: screenWidth1728(26),
                                         ),
@@ -306,52 +312,60 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       children: [
         Button(
           () {
-            showLoading();
-            if (widget.type == 'create') {
-              DoctorController.create(
-                context,
-                CreateDoctorRequest(
-                  doctorName: _doctorName.text,
-                  doctorPhone: '0${_doctorPhone.text}',
-                  branchId: _selectedBranch?.key,
-                  // doctorImage: selectedFile,
-                ),
-              ).then((value) {
-                if (responseCode(value.code)) {
-                  DoctorController.upload(context, value.data!.id!, selectedFile).then((value) {
-                    if (responseCode(value.code)) {
-                      getLatestData();
-                    } else {
-                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                    }
-                  });
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                }
-              });
-            } else {
-              DoctorController.update(
-                context,
-                UpdateDoctorRequest(
-                  doctorId: widget.doctor?.doctorId,
-                  doctorName: _doctorName.text,
-                  doctorPhone: '0${_doctorPhone.text}',
-                  doctorStatus: widget.doctor?.doctorStatus,
-                  branchId: _selectedBranch?.key,
-                ),
-              ).then((value) {
-                if (responseCode(value.code)) {
-                  DoctorController.upload(context, widget.doctor!.doctorId!, selectedFile).then((value) {
-                    if (responseCode(value.code)) {
-                      getLatestData();
-                    } else {
-                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                    }
-                  });
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                }
-              });
+            if (validate()) {
+              showLoading();
+              if (widget.type == 'create') {
+                DoctorController.create(
+                  context,
+                  CreateDoctorRequest(
+                    doctorName: _doctorName.controller.text,
+                    doctorPhone: '0${_doctorPhone.controller.text}',
+                    branchId: _selectedBranch?.key,
+                    // doctorImage: selectedFile,
+                  ),
+                ).then((value) {
+                  dismissLoading();
+                  if (responseCode(value.code)) {
+                    showLoading();
+                    DoctorController.upload(context, value.data!.id!, selectedFile).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        getLatestData();
+                      } else {
+                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                      }
+                    });
+                  } else {
+                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  }
+                });
+              } else {
+                DoctorController.update(
+                  context,
+                  UpdateDoctorRequest(
+                    doctorId: widget.doctor?.doctorId,
+                    doctorName: _doctorName.controller.text,
+                    doctorPhone: '0${_doctorPhone.controller.text}',
+                    doctorStatus: widget.doctor?.doctorStatus,
+                    branchId: _selectedBranch?.key,
+                  ),
+                ).then((value) {
+                  dismissLoading();
+                  if (responseCode(value.code)) {
+                    showLoading();
+                    DoctorController.upload(context, widget.doctor!.doctorId!, selectedFile).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        getLatestData();
+                      } else {
+                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                      }
+                    });
+                  } else {
+                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  }
+                });
+              }
             }
           },
           actionText: 'button'.tr(gender: widget.type),
@@ -412,5 +426,27 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     double megabytes = bytes / 1048576.0;
     // double sizeInGB = sizeInBytes / 1073741824.0;
     return megabytes;
+  }
+
+  bool validate() {
+    bool temp = true;
+    if (_doctorName.controller.text == '') {
+      temp = false;
+      _doctorName.errorMessage = ErrorMessage.required(field: _doctorName.labelText);
+    }
+    if (_doctorPhone.controller.text == '') {
+      temp = false;
+      _doctorPhone.errorMessage = ErrorMessage.required(field: _doctorPhone.labelText);
+    }
+    if (_branchId.controller.text == '') {
+      temp = false;
+      _branchId.errorMessage = ErrorMessage.required(field: _branchId.labelText);
+    }
+    if (selectedFile.value == null) {
+      temp = false;
+      showDialogError(context, 'Please upload an image for the person in charge (PIC).');
+    }
+    setState(() {});
+    return temp;
   }
 }

@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/models/voucher/voucher_all_response.dart' a
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -33,25 +34,44 @@ class VoucherDetail extends StatefulWidget {
 }
 
 class _VoucherDetailState extends State<VoucherDetail> {
-  final TextEditingController _voucherName = TextEditingController();
-  final TextEditingController _voucherDescription = TextEditingController();
-  final TextEditingController _voucherCode = TextEditingController();
-  final TextEditingController _voucherPoint = TextEditingController();
-  final TextEditingController _startDate = TextEditingController();
-  final TextEditingController _endDate = TextEditingController();
+  final InputFieldAttribute _voucherName = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'voucherPage'.tr(gender: 'voucherName'),
+  );
+  final InputFieldAttribute _voucherDescription = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'voucherPage'.tr(gender: 'voucherDescription'),
+  );
+  final InputFieldAttribute _voucherCode = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'voucherPage'.tr(gender: 'voucherCode'),
+    hintText: 'Max (10 characters)',
+    maxCharacter: 10,
+  );
+  final InputFieldAttribute _voucherPoint = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'voucherPage'.tr(gender: 'voucherPoints'),
+    maxCharacter: 7,
+    isNumber: true,
+  );
+  final InputFieldAttribute _startDate = InputFieldAttribute(
+    controller: TextEditingController(),
+  );
+  final InputFieldAttribute _endDate = InputFieldAttribute(
+    controller: TextEditingController(),
+  );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
 
   @override
   void initState() {
     if (widget.type == 'update') {
-      _voucherName.text = widget.voucher?.voucherName ?? '';
-      _voucherDescription.text = widget.voucher?.voucherDescription ?? '';
-      _voucherCode.text = widget.voucher?.voucherCode ?? '';
-      _startDate.text = dateConverter(widget.voucher?.voucherStartDate, format: 'dd-MM-yyyy') ?? '';
-      _endDate.text = dateConverter(widget.voucher?.voucherEndDate, format: 'dd-MM-yyyy') ?? '';
-      _voucherPoint.text = widget.voucher?.voucherPoint.toString() ?? '';
-      _voucherDescription.text = widget.voucher?.voucherDescription ?? '';
+      _voucherName.controller.text = widget.voucher?.voucherName ?? '';
+      _voucherDescription.controller.text = widget.voucher?.voucherDescription ?? '';
+      _voucherCode.controller.text = widget.voucher?.voucherCode ?? '';
+      _startDate.controller.text = dateConverter(widget.voucher?.voucherStartDate, format: 'dd-MM-yyyy') ?? '';
+      _endDate.controller.text = dateConverter(widget.voucher?.voucherEndDate, format: 'dd-MM-yyyy') ?? '';
+      _voucherPoint.controller.text = widget.voucher?.voucherPoint.toString() ?? '';
     }
     super.initState();
   }
@@ -103,24 +123,15 @@ class _VoucherDetailState extends State<VoucherDetail> {
                               child: Column(
                                 children: [
                                   InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _voucherName,
-                                      labelText: 'voucherPage'.tr(gender: 'voucherName'),
-                                    ),
+                                    field: _voucherName,
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                   InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _voucherDescription,
-                                      labelText: 'voucherPage'.tr(gender: 'voucherDescription'),
-                                    ),
+                                    field: _voucherDescription,
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                   InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _voucherCode,
-                                      labelText: 'voucherPage'.tr(gender: 'voucherCode'),
-                                    ),
+                                    field: _voucherCode,
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                 ],
@@ -133,10 +144,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _voucherPoint,
-                                      labelText: 'voucherPage'.tr(gender: 'voucherPoints'),
-                                    ),
+                                    field: _voucherPoint,
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                   GestureDetector(
@@ -149,13 +157,20 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
                                       );
-                                      _startDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                      if (_startDate.errorMessage != null) {
+                                        setState(() {
+                                          _startDate.errorMessage = null;
+                                        });
+                                      }
+                                      _startDate.controller.text =
+                                          dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
                                     },
                                     child: ReadOnly(
                                       InputField(
                                         field: InputFieldAttribute(
-                                            controller: _startDate,
+                                            controller: _startDate.controller,
                                             isEditable: false,
+                                            errorMessage: _startDate.errorMessage,
                                             labelText: 'voucherPage'.tr(gender: 'startDate'),
                                             suffixWidget: const Row(
                                               mainAxisSize: MainAxisSize.min,
@@ -180,12 +195,19 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
                                       );
-                                      _endDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                      if (_endDate.errorMessage != null) {
+                                        setState(() {
+                                          _endDate.errorMessage = null;
+                                        });
+                                      }
+                                      _endDate.controller.text =
+                                          dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
                                     },
                                     child: ReadOnly(
                                       InputField(
                                         field: InputFieldAttribute(
-                                          controller: _endDate,
+                                          controller: _endDate.controller,
+                                          errorMessage: _endDate.errorMessage,
                                           isEditable: false,
                                           labelText: 'voucherPage'.tr(gender: 'endDate'),
                                           suffixWidget: const Row(
@@ -214,69 +236,73 @@ class _VoucherDetailState extends State<VoucherDetail> {
                           children: [
                             Button(
                               () {
-                                showLoading();
-                                if (widget.type == 'update') {
-                                  VoucherController.update(
-                                    context,
-                                    UpdateVoucherRequest(
-                                      voucherId: widget.voucher?.voucherId,
-                                      voucherName: _voucherName.text,
-                                      voucherDescription: _voucherDescription.text,
-                                      voucherStartDate: convertStringToDate(_startDate.text),
-                                      voucherEndDate: convertStringToDate(_endDate.text),
-                                      voucherStatus: widget.voucher?.voucherStatus,
-                                      voucherCode: _voucherCode.text,
-                                      voucherPoint: int.parse(_voucherPoint.text),
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      VoucherController.getAll(
-                                        context,
-                                      ).then((value) {
-                                        dismissLoading();
-                                        if (responseCode(value.code)) {
-                                          context.read<VoucherController>().voucherAllResponse = value;
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully updated voucher voucherPage');
-                                        } else {
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully updated voucher voucherPage');
-                                        }
-                                      });
-                                    } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                    }
-                                  });
-                                } else {
-                                  VoucherController.create(
-                                    context,
-                                    CreateVoucherRequest(
-                                      voucherName: _voucherName.text,
-                                      voucherDescription: _voucherDescription.text,
-                                      voucherStartDate: convertStringToDate(_startDate.text),
-                                      voucherEndDate: convertStringToDate(_endDate.text),
-                                      voucherCode: _voucherCode.text,
-                                      voucherPoint: int.parse(_voucherPoint.text),
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      VoucherController.getAll(
-                                        context,
-                                      ).then((value) {
-                                        dismissLoading();
-                                        if (responseCode(value.code)) {
-                                          context.read<VoucherController>().voucherAllResponse = value;
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully created voucher');
-                                        } else {
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully created customer voucherPage');
-                                        }
-                                      });
-                                    } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                    }
-                                  });
+                                if (validate()) {
+                                  showLoading();
+                                  if (widget.type == 'update') {
+                                    VoucherController.update(
+                                      context,
+                                      UpdateVoucherRequest(
+                                        voucherId: widget.voucher?.voucherId,
+                                        voucherName: _voucherName.controller.text,
+                                        voucherDescription: _voucherDescription.controller.text,
+                                        voucherStartDate: convertStringToDate(_startDate.controller.text),
+                                        voucherEndDate: convertStringToDate(_endDate.controller.text),
+                                        voucherStatus: widget.voucher?.voucherStatus,
+                                        voucherCode: _voucherCode.controller.text,
+                                        voucherPoint: int.parse(_voucherPoint.controller.text),
+                                      ),
+                                    ).then((value) {
+                                      if (responseCode(value.code)) {
+                                        VoucherController.getAll(
+                                          context,
+                                        ).then((value) {
+                                          dismissLoading();
+                                          if (responseCode(value.code)) {
+                                            context.read<VoucherController>().voucherAllResponse = value;
+                                            context.pop();
+                                            showDialogSuccess(context, 'Successfully updated voucher voucherPage');
+                                          } else {
+                                            context.pop();
+                                            showDialogSuccess(context, 'Successfully updated voucher voucherPage');
+                                          }
+                                        });
+                                      } else {
+                                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                      }
+                                    });
+                                  } else {
+                                    showLoading();
+                                    VoucherController.create(
+                                      context,
+                                      CreateVoucherRequest(
+                                        voucherName: _voucherName.controller.text,
+                                        voucherDescription: _voucherDescription.controller.text,
+                                        voucherStartDate: convertStringToDate(_startDate.controller.text),
+                                        voucherEndDate: convertStringToDate(_endDate.controller.text),
+                                        voucherCode: _voucherCode.controller.text,
+                                        voucherPoint: int.parse(_voucherPoint.controller.text),
+                                      ),
+                                    ).then((value) {
+                                      dismissLoading();
+                                      if (responseCode(value.code)) {
+                                        VoucherController.getAll(
+                                          context,
+                                        ).then((value) {
+                                          dismissLoading();
+                                          if (responseCode(value.code)) {
+                                            context.read<VoucherController>().voucherAllResponse = value;
+                                            context.pop();
+                                            showDialogSuccess(context, 'Successfully created voucher');
+                                          } else {
+                                            context.pop();
+                                            showDialogSuccess(context, 'Successfully created customer voucherPage');
+                                          }
+                                        });
+                                      } else {
+                                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                      }
+                                    });
+                                  }
                                 }
                               },
                               actionText: 'button'.tr(gender: widget.type),
@@ -293,5 +319,35 @@ class _VoucherDetailState extends State<VoucherDetail> {
         ),
       ],
     );
+  }
+
+  bool validate() {
+    bool temp = true;
+    if (_voucherName.controller.text == '') {
+      temp = false;
+      _voucherName.errorMessage = ErrorMessage.required(field: _voucherName.labelText);
+    }
+    if (_voucherDescription.controller.text == '') {
+      temp = false;
+      _voucherDescription.errorMessage = ErrorMessage.required(field: _voucherDescription.labelText);
+    }
+    if (_voucherCode.controller.text == '') {
+      temp = false;
+      _voucherCode.errorMessage = ErrorMessage.required(field: _voucherCode.labelText);
+    }
+    if (_voucherPoint.controller.text == '') {
+      temp = false;
+      _voucherPoint.errorMessage = ErrorMessage.required(field: _voucherPoint.labelText);
+    }
+    if (_startDate.controller.text == '') {
+      temp = false;
+      _startDate.errorMessage = ErrorMessage.required(field: _startDate.labelText);
+    }
+    if (_endDate.controller.text == '') {
+      temp = false;
+      _endDate.errorMessage = ErrorMessage.required(field: _endDate.labelText);
+    }
+    setState(() {});
+    return temp;
   }
 }

@@ -353,7 +353,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                 isHorizontalScrollBarVisible: true,
                                 isVerticalScrollBarVisible: true,
                                 columns: columns(),
-                                headingRowColor: MaterialStateProperty.all(Colors.white),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
                                 headingRowHeight: 51,
                                 decoration: const BoxDecoration(),
                                 border: TableBorder(
@@ -366,7 +366,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                 rows: [
                                   for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
                                     DataRow(
-                                      color: MaterialStateProperty.all(
+                                      color: WidgetStateProperty.all(
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
                                       cells: [
                                         DataCell(
@@ -381,10 +381,8 @@ class _UserHomepageState extends State<UserHomepage> {
                                         ),
                                         DataCell(
                                           InkWell(
-                                            onTap: () {
-                                              //TODO copy item
-                                            },
-                                            child: Text(snapshot.userAllResponse?[index].userPhone ?? '60 12 498 2969'),
+                                            onTap: () {},
+                                            child: Text(snapshot.userAllResponse?[index].userPhone ?? 'N/A'),
                                           ),
                                         ),
                                         DataCell(

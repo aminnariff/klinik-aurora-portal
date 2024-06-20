@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
+import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
@@ -27,24 +28,7 @@ import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';
 
 final pageController = SidebarXController(selectedIndex: 0, extended: true);
-List<SidebarXItem> sideBarAttribute = [
-  const SidebarXItem(iconWidget: Icon(Icons.dashboard_rounded, color: Colors.white), label: 'Dashboard'),
-  const SidebarXItem(iconWidget: Icon(Icons.person, color: Colors.white), label: UserHomepage.displayName),
-  const SidebarXItem(
-      iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
-  const SidebarXItem(
-      iconWidget: Icon(FontAwesomeIcons.codeBranch, color: Colors.white), label: BranchHomepage.displayName),
-  const SidebarXItem(
-      iconWidget: Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white), label: DoctorHomepage.displayName),
-  const SidebarXItem(
-      iconWidget: Icon(FontAwesomeIcons.solidImage, color: Colors.white), label: PromotionHomepage.displayName),
-  const SidebarXItem(
-      iconWidget: Icon(FontAwesomeIcons.ticketSimple, color: Colors.white), label: VoucherHomepage.displayName),
-  const SidebarXItem(iconWidget: Icon(FontAwesomeIcons.gifts, color: Colors.white), label: RewardHomepage.displayName),
-  const SidebarXItem(
-      iconWidget: Icon(Icons.local_shipping, color: Colors.white), label: RewardHistoryHomepage.displayName),
-  // const SidebarXItem(iconWidget: Icon(Icons.router, color: Colors.white), label: OntHomepage.displayName),
-];
+List<SidebarXItem> sideBarAttribute = [];
 
 class Homepage extends StatefulWidget {
   static const routeName = '/';
@@ -69,15 +53,52 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   void initState() {
+    sideBarAttribute = [
+      const SidebarXItem(iconWidget: Icon(Icons.dashboard_rounded, color: Colors.white), label: 'Dashboard'),
+      const SidebarXItem(iconWidget: Icon(Icons.person, color: Colors.white), label: UserHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(FontAwesomeIcons.codeBranch, color: Colors.white), label: BranchHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white),
+          label: DoctorHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(FontAwesomeIcons.solidImage, color: Colors.white), label: PromotionHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(FontAwesomeIcons.ticketSimple, color: Colors.white), label: VoucherHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(FontAwesomeIcons.gifts, color: Colors.white), label: RewardHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(Icons.local_shipping, color: Colors.white), label: RewardHistoryHomepage.displayName),
+    ];
     super.initState();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       context.read<TopBarController>().pageValue = 0;
       if (context.read<AuthController>().authenticationResponse != null) {
-        if (context.read<AuthController>().hasPermission('CRM_ADMIN') ||
-            context.read<AuthController>().hasPermission('APP_SUPPORT_ADMIN')) {
-          debugPrint('admin');
-        } else {
-          sideBarAttribute.removeWhere((element) => element.label == 'Bulk Task Resolution');
+        if (!context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
+          sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
+        }
+        if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f')) {
+          sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
+        }
+        if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f')) {
+          sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
+        }
+        if (!context.read<AuthController>().hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
+          sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
+        }
+        if (!context.read<AuthController>().hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
+          sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
+        }
+        if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f')) {
+          sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
+        }
+        if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
+          sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
+        }
+        if (!context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2')) {
+          sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
         }
       }
     });
@@ -249,6 +270,7 @@ class _HomepageState extends State<Homepage> {
             child: Stack(
               alignment: Alignment.topRight,
               children: [
+                if (sideBarAttribute.isEmpty) const NoPermission(),
                 widget.child,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,

@@ -87,7 +87,7 @@ class _MainDashboardState extends State<MainDashboard> {
   firstContent() {
     return Consumer<DashboardController>(builder: (context, snapshot, _) {
       return SizedBox(
-        width: screenWidth1728(85),
+        width: screenWidth(85),
         child: Column(
           children: [
             Container(
@@ -97,14 +97,15 @@ class _MainDashboardState extends State<MainDashboard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  firstRowContent(darkModeCardColor, "Total Users", "${snapshot.dashboardResponse?.data?.totalUser}",
+                  firstRowContent(
+                      darkModeCardColor, "Total Users", "${snapshot.dashboardResponse?.data?.totalUser ?? ''}",
                       textColor: Colors.white),
                   firstRowContent(
-                      cardColor, "Total Active Users", "${snapshot.dashboardResponse?.data?.totalActiveUser}"),
+                      cardColor, "Total Active Users", "${snapshot.dashboardResponse?.data?.totalActiveUser ?? ''}"),
                   firstRowContent(
-                      cardColor, "Total Active Branch", "${snapshot.dashboardResponse?.data?.totalActiveBranch}"),
-                  firstRowContent(
-                      cardColor, "Total Active Promotion", "${snapshot.dashboardResponse?.data?.totalActivePromotion}"),
+                      cardColor, "Total Active Branch", "${snapshot.dashboardResponse?.data?.totalActiveBranch ?? ''}"),
+                  firstRowContent(cardColor, "Total Active Promotion",
+                      "${snapshot.dashboardResponse?.data?.totalActivePromotion ?? ''}"),
                 ],
               ),
             ),

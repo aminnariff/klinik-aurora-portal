@@ -379,6 +379,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                 children: [
                                   Button(
                                     () {
+                                      showLoading();
                                       PromotionController.create(
                                         context,
                                         CreatePromotionRequest(
@@ -387,13 +388,16 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                           promotionTnc: _promotionTnc.text,
                                           promotionStartDate: convertStringToDate(_startDate.text),
                                           promotionEndDate: convertStringToDate(_endDate.text),
-                                          showOnStart: _showOnStart.value ? 1 : 0,
+                                          showOnStart: _showOnStart.value,
                                         ),
                                       ).then((value) {
+                                        dismissLoading();
                                         if (responseCode(value.code)) {
                                           if (value.data?.id != null) {
+                                            showLoading();
                                             PromotionController.upload(context, value.data!.id!, selectedFiles)
                                                 .then((value) {
+                                              dismissLoading();
                                               if (responseCode(value.code)) {
                                                 filtering();
                                                 context.pop();
@@ -498,9 +502,9 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                   padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding / 2),
                   childAspectRatio: 0.8,
                   shrinkWrap: true,
-                  crossAxisCount: 5,
+                  crossAxisCount: screenWidth(100) > 1280 ? 4 : 3,
                   crossAxisSpacing: screenPadding,
-                  mainAxisSpacing: 2.0,
+                  mainAxisSpacing: screenPadding,
                   primary: false,
                   children: [
                     for (int index = 0; index < (snapshot.promotionAllResponse?.data?.data?.length ?? 0); index++)

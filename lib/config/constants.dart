@@ -44,3 +44,23 @@ List<DropdownAttribute> states = [
 ];
 
 double fileSizeLimit = 10.0;
+
+
+    // "permissionId": "1bda631e-ef17-11ee-bd1b-cc801b09db2f",
+    // "permissionName": "User Management",
+    // "permissionId": "4ac042fa-ef2d-11ee-bd1b-cc801b09db2f",
+    // "permissionName": "Admin Management",
+    // "permissionId": "68c537d4-ef31-11ee-bd1b-cc801b09db2f",
+    // "permissionName": "Branch",
+    // "permissionId": "a231db36-058d-11ef-943b-626efeb17d5e",
+    // "permissionName": "Point Management",
+    // "permissionId": "d98236e8-f490-11ee-befc-aabaa50b463f",
+    // "permissionName": "Voucher",
+    // "permissionId": "dc4e7a5a-0e15-11ef-82b0-94653af51fb9",
+    // "permissionName": "Reward Management",
+    // "permissionId": "e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f",
+    // "permissionName": "Promotion",
+    // "permissionId": "f90f9f18-057b-11ef-943b-626efeb17d5e",
+    // "permissionName": "Doctor",
+    // "permissionId": "6e0fe1f8-2f1f-11ef-8db9-6677d190faa2",
+    // "permissionName": "Rewards",

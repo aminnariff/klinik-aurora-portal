@@ -247,60 +247,63 @@ class _AdminDetailState extends State<AdminDetail> {
                                 style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                               ),
                               AppPadding.vertical(denominator: 3),
-                              Wrap(
-                                direction: Axis.horizontal,
-                                children: [
-                                  for (int index = 0;
-                                      index <
-                                          (context.read<PermissionController>().permissionAllResponse?.data?.length ??
-                                              0);
-                                      index++)
-                                    Container(
-                                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Checkbox(
-                                            value: selectedPermission.contains(context
-                                                .read<PermissionController>()
-                                                .permissionAllResponse
-                                                ?.data?[index]
-                                                .permissionId),
-                                            onChanged: (value) {
-                                              try {
-                                                setState(() {
-                                                  if (value == true) {
-                                                    selectedPermission.add(context
-                                                        .read<PermissionController>()
-                                                        .permissionAllResponse!
-                                                        .data![index]
-                                                        .permissionId
-                                                        .toString());
-                                                  } else {
-                                                    selectedPermission.removeWhere((element) =>
-                                                        element ==
-                                                        context
-                                                            .read<PermissionController>()
-                                                            .permissionAllResponse!
-                                                            .data![index]
-                                                            .permissionId
-                                                            .toString());
-                                                  }
-                                                });
-                                              } catch (e) {
-                                                showDialogError(context, e.toString());
-                                              }
-                                            },
-                                          ),
-                                          const SizedBox(
-                                            width: 8,
-                                          ),
-                                          Text(
-                                              '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}'),
-                                        ],
+                              SizedBox(
+                                width: screenWidth(80),
+                                child: Wrap(
+                                  direction: Axis.horizontal,
+                                  children: [
+                                    for (int index = 0;
+                                        index <
+                                            (context.read<PermissionController>().permissionAllResponse?.data?.length ??
+                                                0);
+                                        index++)
+                                      Container(
+                                        padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Checkbox(
+                                              value: selectedPermission.contains(context
+                                                  .read<PermissionController>()
+                                                  .permissionAllResponse
+                                                  ?.data?[index]
+                                                  .permissionId),
+                                              onChanged: (value) {
+                                                try {
+                                                  setState(() {
+                                                    if (value == true) {
+                                                      selectedPermission.add(context
+                                                          .read<PermissionController>()
+                                                          .permissionAllResponse!
+                                                          .data![index]
+                                                          .permissionId
+                                                          .toString());
+                                                    } else {
+                                                      selectedPermission.removeWhere((element) =>
+                                                          element ==
+                                                          context
+                                                              .read<PermissionController>()
+                                                              .permissionAllResponse!
+                                                              .data![index]
+                                                              .permissionId
+                                                              .toString());
+                                                    }
+                                                  });
+                                                } catch (e) {
+                                                  showDialogError(context, e.toString());
+                                                }
+                                              },
+                                            ),
+                                            const SizedBox(
+                                              width: 8,
+                                            ),
+                                            Text(
+                                                '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}'),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                               AppPadding.vertical(denominator: 3 / 2),
                             ],

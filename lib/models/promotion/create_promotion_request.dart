@@ -5,7 +5,7 @@ class CreatePromotionRequest {
   final String? voucherId;
   final String promotionStartDate;
   final String promotionEndDate;
-  final int showOnStart;
+  final bool showOnStart;
 
   CreatePromotionRequest({
     required this.promotionName,

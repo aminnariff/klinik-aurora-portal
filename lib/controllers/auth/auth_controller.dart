@@ -127,7 +127,6 @@ class AuthController extends ChangeNotifier {
       prefs.remove(jwtResponse);
       prefs.remove(token);
     }
-    print(value.toString());
     _authenticationResponse = value;
     notifyListeners();
   }
