@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
-import 'package:klinik_aurora_portal/models/doctor/update_doctor_response.dart';
+import 'package:klinik_aurora_portal/models/password_recovery/change_password_response.dart';
 import 'package:klinik_aurora_portal/models/password_recovery/forgot_password_response.dart';
 
 class PasswordRecoveryController extends ChangeNotifier {
@@ -15,7 +13,7 @@ class PasswordRecoveryController extends ChangeNotifier {
       method: Method.post,
       endpoint: 'admin/authentication/forgot-password',
       isAuthenticated: false,
-      queryParameters: {
+      data: {
         "userEmail": email,
       },
     ).then((value) {
@@ -33,7 +31,8 @@ class PasswordRecoveryController extends ChangeNotifier {
     });
   }
 
-  static Future<ApiResponse<UpdateDoctorResponse>> changePassword(BuildContext context, String? password) async {
+  static Future<ApiResponse<ChangePasswordResponse>> changePassword(
+      BuildContext context, String token, String otp, String password, String retypePassword) async {
     return ApiController().call(
       context,
       method: Method.post,
@@ -44,17 +43,19 @@ class PasswordRecoveryController extends ChangeNotifier {
           Headers.acceptHeader: '*/*',
           Headers.contentTypeHeader: 'application/json',
           'Host': 'srv495548.hstgr.cloud',
-          'Authorization': 'Bearer ${prefs.getString(token)}',
+          'Authorization': 'Bearer $token',
         },
       ),
       data: {
         "userPassword": password,
+        "userRetypePassword": retypePassword,
+        "userOTP": otp,
       },
     ).then((value) {
       try {
         return ApiResponse(
           code: value.code,
-          data: UpdateDoctorResponse.fromJson(value.data),
+          data: ChangePasswordResponse.fromJson(value.data),
         );
       } catch (e) {
         return ApiResponse(

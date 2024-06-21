@@ -26,6 +26,7 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/checkbox/checkbox.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -379,40 +380,42 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                 children: [
                                   Button(
                                     () {
-                                      showLoading();
-                                      PromotionController.create(
-                                        context,
-                                        CreatePromotionRequest(
-                                          promotionName: _promotionName.text,
-                                          promotionDescription: _promotionDescription.text,
-                                          promotionTnc: _promotionTnc.text,
-                                          promotionStartDate: convertStringToDate(_startDate.text),
-                                          promotionEndDate: convertStringToDate(_endDate.text),
-                                          showOnStart: _showOnStart.value,
-                                        ),
-                                      ).then((value) {
-                                        dismissLoading();
-                                        if (responseCode(value.code)) {
-                                          if (value.data?.id != null) {
-                                            showLoading();
-                                            PromotionController.upload(context, value.data!.id!, selectedFiles)
-                                                .then((value) {
-                                              dismissLoading();
-                                              if (responseCode(value.code)) {
-                                                filtering();
-                                                context.pop();
-                                                showDialogSuccess(context,
-                                                    'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
-                                              } else {
-                                                showDialogError(
-                                                    context, value.data?.message ?? 'ERROR : ${value.code}');
-                                              }
-                                            });
+                                      if (validate()) {
+                                        showLoading();
+                                        PromotionController.create(
+                                          context,
+                                          CreatePromotionRequest(
+                                            promotionName: _promotionName.text,
+                                            promotionDescription: _promotionDescription.text,
+                                            promotionTnc: _promotionTnc.text,
+                                            promotionStartDate: convertStringToDate(_startDate.text),
+                                            promotionEndDate: convertStringToDate(_endDate.text),
+                                            showOnStart: _showOnStart.value,
+                                          ),
+                                        ).then((value) {
+                                          dismissLoading();
+                                          if (responseCode(value.code)) {
+                                            if (value.data?.id != null) {
+                                              showLoading();
+                                              PromotionController.upload(context, value.data!.id!, selectedFiles)
+                                                  .then((value) {
+                                                dismissLoading();
+                                                if (responseCode(value.code)) {
+                                                  filtering();
+                                                  context.pop();
+                                                  showDialogSuccess(context,
+                                                      'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                                } else {
+                                                  showDialogError(
+                                                      context, value.data?.message ?? 'ERROR : ${value.code}');
+                                                }
+                                              });
+                                            }
+                                          } else {
+                                            showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                                           }
-                                        } else {
-                                          showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                        }
-                                      });
+                                        });
+                                      }
                                     },
                                     actionText: 'button'.tr(gender: 'create'),
                                   ),
@@ -429,6 +432,26 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
             ],
           );
         });
+  }
+
+  bool validate() {
+    bool temp = true;
+    if (_promotionName.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'Name'));
+    } else if (_promotionDescription.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'Description'));
+    }
+    if (_startDate.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'promotionPage'.tr(gender: 'startDate')));
+    } else if (_endDate.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'promotionPage'.tr(gender: 'endDate')));
+    }
+    setState(() {});
+    return temp;
   }
 
   double bytesToMB(int bytes) {

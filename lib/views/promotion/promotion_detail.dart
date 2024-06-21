@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/flavor.dart';
+import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
@@ -17,6 +18,7 @@ import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/checkbox/checkbox.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -343,55 +345,61 @@ class _PromotionDetailState extends State<PromotionDetail> {
                           children: [
                             Button(
                               () {
-                                PromotionController.update(
-                                  context,
-                                  UpdatePromotionRequest(
-                                    promotionId: widget.promotion.promotionId ?? '',
-                                    promotionName: _promotionName.text,
-                                    promotionDescription: _promotionDescription.text,
-                                    promotionTnc: _promotionTnc.text,
-                                    promotionStartDate: convertStringToDate(_startDate.text),
-                                    promotionEndDate: convertStringToDate(_endDate.text),
-                                    showOnStart: _showOnStart.value,
-                                    promotionStatus: widget.promotion.promotionStatus == 1 ? true : false,
-                                  ),
-                                ).then((value) {
-                                  if (responseCode(value.code)) {
-                                    if (isAnyFileChange()) {
-                                      bool showError = false;
-                                      for (FileAttribute item in selectedFiles) {
-                                        if (item.name!.contains('images/promotion')) {
-                                          showError = true;
-                                          break;
-                                        }
-                                      }
-                                      if (showError) {
-                                        showDialogError(context,
-                                            'Please delete the outdated images and upload the updated versions.');
-                                      } else {
-                                        PromotionController.upload(
-                                                context, widget.promotion.promotionId!, selectedFiles)
-                                            .then((value) {
-                                          if (responseCode(value.code)) {
-                                            context.pop();
-                                            PromotionController.getAll(context).then((value) =>
-                                                context.read<PromotionController>().promotionAllResponse = value);
-                                            showDialogSuccess(context,
-                                                'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
-                                          } else {
-                                            showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                if (validate()) {
+                                  showLoading();
+                                  PromotionController.update(
+                                    context,
+                                    UpdatePromotionRequest(
+                                      promotionId: widget.promotion.promotionId ?? '',
+                                      promotionName: _promotionName.text,
+                                      promotionDescription: _promotionDescription.text,
+                                      promotionTnc: _promotionTnc.text,
+                                      promotionStartDate: convertStringToDate(_startDate.text),
+                                      promotionEndDate: convertStringToDate(_endDate.text),
+                                      showOnStart: _showOnStart.value,
+                                      promotionStatus: widget.promotion.promotionStatus == 1 ? true : false,
+                                    ),
+                                  ).then((value) {
+                                    dismissLoading();
+                                    if (responseCode(value.code)) {
+                                      if (isAnyFileChange()) {
+                                        bool showError = false;
+                                        for (FileAttribute item in selectedFiles) {
+                                          if (item.name!.contains('images/promotion')) {
+                                            showError = true;
+                                            break;
                                           }
-                                        });
+                                        }
+                                        if (showError) {
+                                          showDialogError(context,
+                                              'Please delete the outdated images and upload the updated versions.');
+                                        } else {
+                                          showLoading();
+                                          PromotionController.upload(
+                                                  context, widget.promotion.promotionId!, selectedFiles)
+                                              .then((value) {
+                                            dismissLoading();
+                                            if (responseCode(value.code)) {
+                                              context.pop();
+                                              PromotionController.getAll(context).then((value) =>
+                                                  context.read<PromotionController>().promotionAllResponse = value);
+                                              showDialogSuccess(context,
+                                                  'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                            } else {
+                                              showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                            }
+                                          });
+                                        }
+                                      } else {
+                                        context.pop();
+                                        showDialogSuccess(context,
+                                            'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
                                       }
                                     } else {
-                                      context.pop();
-                                      showDialogSuccess(context,
-                                          'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                                     }
-                                  } else {
-                                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                  }
-                                });
+                                  });
+                                }
                               },
                               actionText: 'button'.tr(gender: 'update'),
                             ),
@@ -425,5 +433,25 @@ class _PromotionDetailState extends State<PromotionDetail> {
     double megabytes = bytes / 1048576.0;
     // double sizeInGB = sizeInBytes / 1073741824.0;
     return megabytes;
+  }
+
+  bool validate() {
+    bool temp = true;
+    if (_promotionName.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'Name'));
+    } else if (_promotionDescription.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'Description'));
+    }
+    if (_startDate.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'promotionPage'.tr(gender: 'startDate')));
+    } else if (_endDate.text == '') {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'promotionPage'.tr(gender: 'endDate')));
+    }
+    setState(() {});
+    return temp;
   }
 }

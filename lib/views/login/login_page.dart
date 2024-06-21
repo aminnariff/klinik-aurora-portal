@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -11,11 +13,14 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/password_recovery/password_recovery_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -45,6 +50,11 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   ValueNotifier<bool> isObscure = ValueNotifier<bool>(false);
+  InputFieldAttribute emailAttribute = InputFieldAttribute(
+    controller: TextEditingController(text: ''),
+    hintText: 'information'.tr(gender: 'email'),
+    isEmail: true,
+  );
 
   @override
   void initState() {
@@ -243,7 +253,9 @@ class _LoginPageState extends State<LoginPage> {
                                         mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
                                           TextButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              forgotPassword();
+                                            },
                                             child: Text(
                                               'loginPage'.tr(gender: 'forgotPassword'),
                                               style: AppTypography.bodyMedium(context)
@@ -330,6 +342,97 @@ class _LoginPageState extends State<LoginPage> {
       temp = false;
     }
     return temp;
+  }
+
+  forgotPassword() {
+    StreamController<DateTime> rebuild = StreamController.broadcast();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StreamBuilder<DateTime>(
+              stream: rebuild.stream,
+              builder: (context, snapshot) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              FocusScope.of(context).unfocus();
+                            },
+                            child: CardContainer(
+                              Padding(
+                                padding: EdgeInsets.all(screenPadding),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'loginPage'.tr(gender: 'forgotPassword'),
+                                      style: AppTypography.displayMedium(context),
+                                    ),
+                                    AppPadding.vertical(),
+                                    Text(
+                                      'loginPage'.tr(gender: 'enterEmailAddress'),
+                                      style: AppTypography.bodyMedium(context),
+                                    ),
+                                    AppPadding.vertical(),
+                                    SizedBox(
+                                      width: screenWidth1728(20),
+                                      child: InputField(
+                                        field: emailAttribute,
+                                      ),
+                                    ),
+                                    AppPadding.vertical(),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Button(
+                                            () {
+                                              if (emailAttribute.controller.text == '') {
+                                                emailAttribute.errorMessage =
+                                                    ErrorMessage.required(field: emailAttribute.hintText);
+                                                rebuild.add(DateTime.now());
+                                              } else if (!RegExp(
+                                                      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
+                                                  .hasMatch(emailAttribute.controller.text)) {
+                                                emailAttribute.errorMessage = 'Invalid ${emailAttribute.hintText}';
+                                                rebuild.add(DateTime.now());
+                                              } else {
+                                                showLoading();
+                                                PasswordRecoveryController.forgotPassword(
+                                                        context, emailAttribute.controller.text)
+                                                    .then((value) {
+                                                  if (responseCode(value.code)) {
+                                                    dismissLoading();
+                                                    context.pop();
+                                                    context.pushNamed(AdminPasswordRecoveryPage.routeName,
+                                                        extra: value.data?.data?.token ?? '');
+                                                  } else {
+                                                    showDialogError(context, value.data?.message ?? '');
+                                                  }
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              });
+        });
   }
 
   Widget loadingScreen() {

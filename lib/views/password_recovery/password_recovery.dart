@@ -7,8 +7,6 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
-import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
-import 'package:klinik_aurora_portal/controllers/password_recovery/password_recovery_controller.dart';
 import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
@@ -237,14 +235,17 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                 validateField().then((value) {
                   if (value == true) {
                     showLoading();
-                    PasswordRecoveryController.changePassword(context, passwordAttribute.controller.text).then((value) {
-                      dismissLoading();
-                      if (responseCode(value.code)) {
-                        isSuccess.value = true;
-                      } else {
-                        isSuccess.value = false;
-                      }
-                    });
+                    // PasswordRecoveryController.changePassword(
+                    //   context,
+                    //   passwordAttribute.controller.text,
+                    // ).then((value) {
+                    //   dismissLoading();
+                    //   if (responseCode(value.code)) {
+                    //     isSuccess.value = true;
+                    //   } else {
+                    //     isSuccess.value = false;
+                    //   }
+                    // });
                   }
                 });
               },

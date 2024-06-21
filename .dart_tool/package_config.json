@@ -530,6 +530,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "pinput",
+      "rootUri": "file:///Users/aminariff/.pub-cache/hosted/pub.dev/pinput-5.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "platform",
       "rootUri": "file:///Users/aminariff/.pub-cache/hosted/pub.dev/platform-3.1.4",
       "packageUri": "lib/",
@@ -692,6 +698,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "universal_platform",
+      "rootUri": "file:///Users/aminariff/.pub-cache/hosted/pub.dev/universal_platform-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "url_launcher",
       "rootUri": "file:///Users/aminariff/.pub-cache/hosted/pub.dev/url_launcher-6.2.5",
       "packageUri": "lib/",
@@ -806,7 +818,7 @@
       "languageVersion": "3.3"
     }
   ],
-  "generated": "2024-05-30T15:29:17.413679Z",
+  "generated": "2024-06-21T05:22:46.675952Z",
   "generator": "pub",
   "generatorVersion": "3.4.1",
   "flutterRoot": "file:///Users/aminariff/fvm/versions/3.22.1",
