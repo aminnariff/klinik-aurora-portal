@@ -73,8 +73,8 @@ class _LoginPageState extends State<LoginPage> {
       });
     });
     if (kDebugMode) {
-      usernameController.text = 'superadmin@auroramembership.com';
-      passwordController.text = 'Testing@1234';
+      usernameController.text = 'superadmin';
+      passwordController.text = 'Admin12345!';
     }
     super.initState();
   }
