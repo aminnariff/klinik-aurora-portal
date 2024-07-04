@@ -371,7 +371,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                 isHorizontalScrollBarVisible: true,
                                 isVerticalScrollBarVisible: true,
                                 columns: columns(),
-                                headingRowColor: MaterialStateProperty.all(Colors.white),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
                                 headingRowHeight: 51,
                                 decoration: const BoxDecoration(),
                                 border: TableBorder(
@@ -384,7 +384,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                 rows: [
                                   for (int index = 0; index < (snapshot.adminAllResponse?.data?.length ?? 0); index++)
                                     DataRow(
-                                      color: MaterialStateProperty.all(
+                                      color: WidgetStateProperty.all(
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
                                       cells: [
                                         DataCell(
@@ -415,9 +415,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                             onTap: () {
                                               //TODO copy item
                                             },
-                                            child: Text(
-                                                // snapshot.adminAllResponse?.data?[index].userPhone ??
-                                                '60 12 4${index * 3}1 2${index * 8}69'),
+                                            child: Text(snapshot.adminAllResponse?.data?[index].userPhone ?? 'N/A'),
                                           ),
                                         ),
                                         DataCell(

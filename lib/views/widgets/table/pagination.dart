@@ -1,7 +1,7 @@
 library pagination;
 
-import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class Pagination extends StatefulWidget {
   const Pagination(
@@ -100,11 +100,11 @@ class _PaginationState extends State<Pagination> {
             child: TextButton(
               style: i == widget.selectedPage
                   ? ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(secondaryColor),
-                      elevation: MaterialStateProperty.all(15),
+                      backgroundColor: WidgetStateProperty.all(secondaryColor),
+                      elevation: WidgetStateProperty.all(15),
                     )
                   : ButtonStyle(
-                      elevation: MaterialStateProperty.all(0),
+                      elevation: WidgetStateProperty.all(0),
                     ),
               onPressed: () => widget.onPageChanged(i),
               child: Text(

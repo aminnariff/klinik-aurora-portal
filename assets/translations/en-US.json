@@ -72,6 +72,7 @@
         "changePassword": "Change Password",
         "enterYourNewPassword": "Enter a new password below to change your password.",
         "passwordRequirement": "Passwords must have at least 8 characters, 1 lowercase, 1 uppercase, 1 number, and 1 special characters.",
+        "forgotPasswordDescription": "Please check your email for the OTP. If you don't see it, check your spam folder. Do not share the OTP with others.",
         "passwordNotMatch": "Password confirmation doesn't match",
         "password": "Password",
         "reEnterPassword": "Re-enter new password",

@@ -4,6 +4,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
@@ -170,6 +171,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                         field: InputFieldAttribute(
                                             controller: _startDate.controller,
                                             isEditable: false,
+                                            uneditableColor: textFormFieldEditableColor,
                                             errorMessage: _startDate.errorMessage,
                                             labelText: 'voucherPage'.tr(gender: 'startDate'),
                                             suffixWidget: const Row(
@@ -209,6 +211,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                           controller: _endDate.controller,
                                           errorMessage: _endDate.errorMessage,
                                           isEditable: false,
+                                          uneditableColor: textFormFieldEditableColor,
                                           labelText: 'voucherPage'.tr(gender: 'endDate'),
                                           suffixWidget: const Row(
                                             mainAxisSize: MainAxisSize.min,

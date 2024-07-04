@@ -340,7 +340,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                 isHorizontalScrollBarVisible: true,
                                 isVerticalScrollBarVisible: true,
                                 columns: columns(),
-                                headingRowColor: MaterialStateProperty.all(Colors.white),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
                                 headingRowHeight: 51,
                                 decoration: const BoxDecoration(),
                                 border: TableBorder(
@@ -355,7 +355,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                       index < (snapshot.voucherAllResponse?.data?.data?.length ?? 0);
                                       index++)
                                     DataRow(
-                                      color: MaterialStateProperty.all(
+                                      color: WidgetStateProperty.all(
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
                                       cells: [
                                         DataCell(

@@ -116,7 +116,7 @@ class _DoctorListState extends State<DoctorList> {
                                         isHorizontalScrollBarVisible: true,
                                         isVerticalScrollBarVisible: true,
                                         columns: columns(),
-                                        headingRowColor: MaterialStateProperty.all(Colors.white),
+                                        headingRowColor: WidgetStateProperty.all(Colors.white),
                                         headingRowHeight: 51,
                                         decoration: const BoxDecoration(),
                                         border: TableBorder(
@@ -131,7 +131,7 @@ class _DoctorListState extends State<DoctorList> {
                                               index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
                                               index++)
                                             DataRow(
-                                              color: MaterialStateProperty.all(
+                                              color: WidgetStateProperty.all(
                                                   index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
                                               cells: [
                                                 DataCell(
@@ -246,20 +246,22 @@ class _DoctorListState extends State<DoctorList> {
                           ),
                         ),
                       ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: secondaryColor,
-                          ),
-                          child: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.add),
-                          ),
-                        ),
-                      ),
+                      // Positioned(
+                      //   top: 10,
+                      //   right: 10,
+                      //   child: Container(
+                      //     decoration: const BoxDecoration(
+                      //       shape: BoxShape.circle,
+                      //       color: secondaryColor,
+                      //     ),
+                      //     child: IconButton(
+                      //       onPressed: () {
+
+                      //       },
+                      //       icon: const Icon(Icons.add),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 );

@@ -18,7 +18,7 @@ class CheckBoxWidget extends StatelessWidget {
       scale: 1.5,
       child: Checkbox(
         value: value,
-        fillColor: MaterialStateProperty.resolveWith(getColor),
+        fillColor: WidgetStateProperty.resolveWith(getColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(3),
         ),
@@ -27,11 +27,11 @@ class CheckBoxWidget extends StatelessWidget {
     );
   }
 
-  Color getColor(Set<MaterialState> states) {
-    const Set<MaterialState> interactiveStates = <MaterialState>{
-      MaterialState.pressed,
-      MaterialState.hovered,
-      MaterialState.focused,
+  Color getColor(Set<WidgetState> states) {
+    const Set<WidgetState> interactiveStates = <WidgetState>{
+      WidgetState.pressed,
+      WidgetState.hovered,
+      WidgetState.focused,
     };
     if (states.any(interactiveStates.contains)) {
       return isDisable ? Colors.grey : secondaryColor;

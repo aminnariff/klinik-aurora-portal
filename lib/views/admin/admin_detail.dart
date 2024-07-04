@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/admin/admin_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -158,28 +157,28 @@ class _AdminDetailState extends State<AdminDetail> {
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _userPhone,
-                                      labelText: 'information'.tr(gender: 'phoneNo'),
-                                      isNumber: true,
-                                      maxCharacter: 10,
-                                      prefixIcon: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
-                                            child: const Text(
-                                              '+60',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w700, fontSize: 15.0, color: textPrimaryColor),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                  // InputField(
+                                  //   field: InputFieldAttribute(
+                                  //     controller: _userPhone,
+                                  //     labelText: 'information'.tr(gender: 'phoneNo'),
+                                  //     isNumber: true,
+                                  //     maxCharacter: 10,
+                                  //     prefixIcon: Row(
+                                  //       mainAxisSize: MainAxisSize.min,
+                                  //       crossAxisAlignment: CrossAxisAlignment.center,
+                                  //       children: [
+                                  //         Padding(
+                                  //           padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
+                                  //           child: const Text(
+                                  //             '+60',
+                                  //             style: TextStyle(
+                                  //                 fontWeight: FontWeight.w700, fontSize: 15.0, color: textPrimaryColor),
+                                  //           ),
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   AppPadding.vertical(denominator: 2),
                                   // if (widget.type == 'create') ...[
                                   //   InputField(
@@ -238,76 +237,75 @@ class _AdminDetailState extends State<AdminDetail> {
                           ],
                         ),
                         AppPadding.vertical(denominator: 1 / 1.5),
-                        if (widget.type == 'update')
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AppSelectableText(
-                                'Permission',
-                                style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                              ),
-                              AppPadding.vertical(denominator: 3),
-                              SizedBox(
-                                width: screenWidth(80),
-                                child: Wrap(
-                                  direction: Axis.horizontal,
-                                  children: [
-                                    for (int index = 0;
-                                        index <
-                                            (context.read<PermissionController>().permissionAllResponse?.data?.length ??
-                                                0);
-                                        index++)
-                                      Container(
-                                        padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Checkbox(
-                                              value: selectedPermission.contains(context
-                                                  .read<PermissionController>()
-                                                  .permissionAllResponse
-                                                  ?.data?[index]
-                                                  .permissionId),
-                                              onChanged: (value) {
-                                                try {
-                                                  setState(() {
-                                                    if (value == true) {
-                                                      selectedPermission.add(context
-                                                          .read<PermissionController>()
-                                                          .permissionAllResponse!
-                                                          .data![index]
-                                                          .permissionId
-                                                          .toString());
-                                                    } else {
-                                                      selectedPermission.removeWhere((element) =>
-                                                          element ==
-                                                          context
-                                                              .read<PermissionController>()
-                                                              .permissionAllResponse!
-                                                              .data![index]
-                                                              .permissionId
-                                                              .toString());
-                                                    }
-                                                  });
-                                                } catch (e) {
-                                                  showDialogError(context, e.toString());
-                                                }
-                                              },
-                                            ),
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
-                                            Text(
-                                                '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}'),
-                                          ],
-                                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppSelectableText(
+                              'Permission',
+                              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                            ),
+                            AppPadding.vertical(denominator: 3),
+                            SizedBox(
+                              width: screenWidth(80),
+                              child: Wrap(
+                                direction: Axis.horizontal,
+                                children: [
+                                  for (int index = 0;
+                                      index <
+                                          (context.read<PermissionController>().permissionAllResponse?.data?.length ??
+                                              0);
+                                      index++)
+                                    Container(
+                                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Checkbox(
+                                            value: selectedPermission.contains(context
+                                                .read<PermissionController>()
+                                                .permissionAllResponse
+                                                ?.data?[index]
+                                                .permissionId),
+                                            onChanged: (value) {
+                                              try {
+                                                setState(() {
+                                                  if (value == true) {
+                                                    selectedPermission.add(context
+                                                        .read<PermissionController>()
+                                                        .permissionAllResponse!
+                                                        .data![index]
+                                                        .permissionId
+                                                        .toString());
+                                                  } else {
+                                                    selectedPermission.removeWhere((element) =>
+                                                        element ==
+                                                        context
+                                                            .read<PermissionController>()
+                                                            .permissionAllResponse!
+                                                            .data![index]
+                                                            .permissionId
+                                                            .toString());
+                                                  }
+                                                });
+                                              } catch (e) {
+                                                showDialogError(context, e.toString());
+                                              }
+                                            },
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text(
+                                              '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}'),
+                                        ],
                                       ),
-                                  ],
-                                ),
+                                    ),
+                                ],
                               ),
-                              AppPadding.vertical(denominator: 3 / 2),
-                            ],
-                          ),
+                            ),
+                            AppPadding.vertical(denominator: 3 / 2),
+                          ],
+                        ),
                         button()
                       ],
                     ),
@@ -384,19 +382,35 @@ class _AdminDetailState extends State<AdminDetail> {
                 ),
               ).then((value) {
                 if (responseCode(value.code)) {
-                  AdminController.getAll(
-                    context,
-                  ).then((value) {
-                    dismissLoading();
-                    if (responseCode(value.code)) {
-                      context.read<AdminController>().adminAllResponse = value.data;
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created admin');
-                    } else {
-                      context.pop();
-                      showDialogSuccess(context, 'Successfully created admin information');
-                    }
-                  });
+                  if (responseCode(value.code)) {
+                    AdminController.updatePermission(
+                      context,
+                      UpdatePermissionAdminRequest(
+                        userId: widget.user!.userId,
+                        permissionIds: selectedPermission,
+                      ),
+                    ).then((updateResponse) {
+                      dismissLoading();
+                      if (responseCode(updateResponse.code)) {
+                        showLoading();
+                        AdminController.getAll(
+                          context,
+                        ).then((adminResponse) {
+                          dismissLoading();
+                          if (responseCode(adminResponse.code)) {
+                            context.read<AdminController>().adminAllResponse = adminResponse.data;
+                            context.pop();
+                            showDialogSuccess(context, 'Successfully created admin');
+                          } else {
+                            context.pop();
+                            showDialogSuccess(context, 'Successfully created admin');
+                          }
+                        });
+                      } else {
+                        showDialogError(context, updateResponse.data?.message ?? 'ERROR : ${updateResponse.code}');
+                      }
+                    });
+                  }
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }

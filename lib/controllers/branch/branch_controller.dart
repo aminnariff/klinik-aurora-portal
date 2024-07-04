@@ -126,7 +126,7 @@ class BranchController extends ChangeNotifier {
     formData.fields.add(MapEntry('branchId', request.branchId));
     formData.fields.add(MapEntry('branchName', request.branchName!));
     formData.fields.add(MapEntry('branchCode', request.branchCode!));
-    formData.fields.add(MapEntry('phoneNumber', '0${request.phoneNumber!}'));
+    formData.fields.add(MapEntry('phoneNumber', request.phoneNumber!));
     formData.fields.add(MapEntry('address', request.address!));
     formData.fields.add(MapEntry('postcode', request.postcode!));
     formData.fields.add(MapEntry('city', request.city!));

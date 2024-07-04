@@ -248,6 +248,7 @@ class _RewardDetailState extends State<RewardDetail> {
                                                     },
                                                     child: Image.memory(
                                                       selectedFile?.value as Uint8List,
+                                                      height: 410,
                                                     ),
                                                   ),
                                                   IconButton(
@@ -274,6 +275,7 @@ class _RewardDetailState extends State<RewardDetail> {
                                                         },
                                                         child: Image.memory(
                                                           selectedFile?.value as Uint8List,
+                                                          height: 410,
                                                         ),
                                                       ),
                                                       IconButton(
@@ -302,6 +304,7 @@ class _RewardDetailState extends State<RewardDetail> {
                                                 },
                                                 child: Image.network(
                                                   '${Environment.imageUrl}${widget.reward?.rewardImage}',
+                                                  height: 410,
                                                 ),
                                               ),
                                       AppPadding.vertical(denominator: 2),

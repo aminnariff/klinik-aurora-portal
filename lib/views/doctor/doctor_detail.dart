@@ -220,6 +220,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                       },
                                                       child: Image.memory(
                                                         selectedFile.value as Uint8List,
+                                                        height: 410,
                                                       ),
                                                     ),
                                                     IconButton(
@@ -246,6 +247,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                           },
                                                           child: Image.memory(
                                                             selectedFile.value as Uint8List,
+                                                            height: 410,
                                                           ),
                                                         ),
                                                         IconButton(
@@ -274,6 +276,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                   },
                                                   child: Image.network(
                                                     '${Environment.imageUrl}${widget.doctor?.doctorImage}',
+                                                    height: 410,
                                                   ),
                                                 ),
                                         AppPadding.vertical(denominator: 2),
@@ -353,14 +356,18 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                   dismissLoading();
                   if (responseCode(value.code)) {
                     showLoading();
-                    DoctorController.upload(context, widget.doctor!.doctorId!, selectedFile).then((value) {
-                      dismissLoading();
-                      if (responseCode(value.code)) {
-                        getLatestData();
-                      } else {
-                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                      }
-                    });
+                    if (selectedFile.value != null) {
+                      DoctorController.upload(context, widget.doctor!.doctorId!, selectedFile).then((value) {
+                        dismissLoading();
+                        if (responseCode(value.code)) {
+                          getLatestData();
+                        } else {
+                          showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                        }
+                      });
+                    } else {
+                      getLatestData();
+                    }
                   } else {
                     showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                   }
@@ -442,9 +449,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       temp = false;
       _branchId.errorMessage = ErrorMessage.required(field: _branchId.labelText);
     }
-    if (selectedFile.value == null) {
-      temp = false;
-      showDialogError(context, 'Please upload an image for the person in charge (PIC).');
+    if (widget.type == 'create') {
+      if (selectedFile.value == null) {
+        temp = false;
+        showDialogError(context, 'Please upload an image for the person in charge (PIC).');
+      }
     }
     setState(() {});
     return temp;

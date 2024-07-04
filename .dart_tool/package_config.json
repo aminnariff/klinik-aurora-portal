@@ -171,7 +171,7 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.1/packages/flutter",
+      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.2/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -237,7 +237,7 @@
     },
     {
       "name": "flutter_localizations",
-      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.1/packages/flutter_localizations",
+      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.2/packages/flutter_localizations",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -309,7 +309,7 @@
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.1/packages/flutter_test",
+      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.2/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -321,7 +321,7 @@
     },
     {
       "name": "flutter_web_plugins",
-      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.1/packages/flutter_web_plugins",
+      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.2/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -651,7 +651,7 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.1/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///Users/aminariff/fvm/versions/3.22.2/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -818,10 +818,10 @@
       "languageVersion": "3.3"
     }
   ],
-  "generated": "2024-06-21T05:22:46.675952Z",
+  "generated": "2024-07-04T03:33:18.263741Z",
   "generator": "pub",
-  "generatorVersion": "3.4.1",
-  "flutterRoot": "file:///Users/aminariff/fvm/versions/3.22.1",
-  "flutterVersion": "3.22.1",
+  "generatorVersion": "3.4.3",
+  "flutterRoot": "file:///Users/aminariff/fvm/versions/3.22.2",
+  "flutterVersion": "3.22.2",
   "pubCache": "file:///Users/aminariff/.pub-cache"
 }
