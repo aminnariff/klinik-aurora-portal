@@ -105,7 +105,7 @@ class PrivacyPolicy extends StatelessWidget {
                   ),
                   const TextSpan(
                     text:
-                        'If you have any questions about this Privacy Policy, please contact us at info@klinikaurora.my.\n',
+                        'If you have any questions about this Privacy Policy, please contact us at support@klinikaurora.my.\n',
                   ),
                 ],
               ),
