@@ -253,9 +253,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                         onTap: () async {
                                           var results = await showCalendarDatePicker2Dialog(
                                             context: context,
-                                            config: CalendarDatePicker2WithActionButtonsConfig(
-                                              firstDate: DateTime.now(),
-                                            ),
+                                            config: CalendarDatePicker2WithActionButtonsConfig(),
                                             dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                             borderRadius: BorderRadius.circular(15),
                                           );
@@ -285,9 +283,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                         onTap: () async {
                                           var results = await showCalendarDatePicker2Dialog(
                                             context: context,
-                                            config: CalendarDatePicker2WithActionButtonsConfig(
-                                              firstDate: DateTime.now(),
-                                            ),
+                                            config: CalendarDatePicker2WithActionButtonsConfig(),
                                             dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                             borderRadius: BorderRadius.circular(15),
                                           );
