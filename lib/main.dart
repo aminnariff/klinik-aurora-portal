@@ -115,7 +115,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context, child) {
           return MultiProvider(
             providers: [
-              ChangeNotifierProvider(create: (_) => ActivityHandlerController()),
+              ChangeNotifierProvider<ActivityHandlerController>(create: (_) => ActivityHandlerController()),
               ChangeNotifierProvider<AdminController>(create: (_) => AdminController()),
               ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
               ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),

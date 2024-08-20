@@ -155,7 +155,7 @@ class _RewardDetailState extends State<RewardDetail> {
                                       var results = await showCalendarDatePicker2Dialog(
                                         context: context,
                                         config: CalendarDatePicker2WithActionButtonsConfig(
-                                          firstDate: DateTime.now(),
+                                          currentDate: DateTime.now(),
                                         ),
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
@@ -186,7 +186,7 @@ class _RewardDetailState extends State<RewardDetail> {
                                       var results = await showCalendarDatePicker2Dialog(
                                         context: context,
                                         config: CalendarDatePicker2WithActionButtonsConfig(
-                                          firstDate: DateTime.now(),
+                                          currentDate: DateTime.now().add(const Duration(days: 1)),
                                         ),
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
@@ -341,7 +341,6 @@ class _RewardDetailState extends State<RewardDetail> {
                                         RewardController.upload(context, widget.reward!.rewardId!, selectedFile!)
                                             .then((value) {
                                           if (responseCode(value.code)) {
-                                            context.pop();
                                             getLatestData();
                                           } else {
                                             showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
@@ -402,7 +401,6 @@ class _RewardDetailState extends State<RewardDetail> {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<RewardController>().rewardAllResponse = value;
-        context.pop();
         if (widget.type == 'update') {
           showDialogSuccess(context,
               'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉');
@@ -410,7 +408,6 @@ class _RewardDetailState extends State<RewardDetail> {
           showDialogSuccess(context, 'Successfully created a new reward');
         }
       } else {
-        context.pop();
         if (widget.type == 'update') {
           showDialogSuccess(context,
               'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉');
