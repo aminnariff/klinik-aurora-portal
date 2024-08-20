@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/confirmation_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/confirmation_dialog_attribute.dart';
@@ -28,7 +29,7 @@ showDialogSuccess(BuildContext context, String text) {
       });
 }
 
-showConfirmDialog(BuildContext context, String bodyText) async {
+Future<bool> showConfirmDialog(BuildContext context, String bodyText) async {
   return await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -43,7 +44,7 @@ showConfirmDialog(BuildContext context, String bodyText) async {
             text: bodyText,
             confrimButton: DialogButtonAttribute(
               () {
-                Navigator.pop(context, true);
+                context.pop(true);
               },
               text: 'Confirm',
               color: secondaryColor,
@@ -51,7 +52,7 @@ showConfirmDialog(BuildContext context, String bodyText) async {
             ),
             cancelButton: DialogButtonAttribute(
               () {
-                Navigator.pop(context, false);
+                context.pop(false);
               },
               text: 'Cancel',
               color: const Color(0XFFEAEAEA),

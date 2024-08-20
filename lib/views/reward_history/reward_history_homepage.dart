@@ -11,8 +11,7 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/reward/reward_history_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/reward/reward_detail.dart';
-import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
+import 'package:klinik_aurora_portal/views/reward_history/reward_history_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -48,9 +47,15 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
+    // TableHeaderAttribute(
+    //   attribute: 'transactionId',
+    //   label: 'Transaction Id',
+    //   allowSorting: false,
+    //   columnSize: ColumnSize.S,
+    // ),
     TableHeaderAttribute(
-      attribute: 'transactionId',
-      label: 'Transaction Id',
+      attribute: 'userFullName',
+      label: 'Customer Name',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
@@ -81,7 +86,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       width: 100,
     ),
   ];
-  final TextEditingController _orderReferenceController = TextEditingController();
+  final TextEditingController _customerNameController = TextEditingController();
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -110,7 +115,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     return Column(
       children: [
         searchField(
-          InputFieldAttribute(controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+          InputFieldAttribute(controller: _customerNameController, hintText: 'Search', labelText: 'Customer Name'),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -209,7 +214,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
               AppPadding.horizontal(),
               searchField(
                 InputFieldAttribute(
-                    controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+                    controller: _customerNameController, hintText: 'Search', labelText: 'Customer Name'),
               ),
               // AppPadding.horizontal(),
               // searchField(
@@ -341,22 +346,26 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                       color: WidgetStateProperty.all(
                                           index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
                                       cells: [
+                                        // DataCell(
+                                        //   TextButton(
+                                        //     onPressed: () {
+                                        //       // showDialog(
+                                        //       //     context: context,
+                                        //       //     builder: (BuildContext context) {
+                                        //       //       return RewardDetail(
+                                        //       //           type: 'update',
+                                        //       //           reward: snapshot.rewardHistoryResponse?.data?.data?[index]);
+                                        //       //     });
+                                        //     },
+                                        //     child: Text(
+                                        //       snapshot.rewardHistoryResponse?.data?.data?[index].rewardId ?? 'N/A',
+                                        //       style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                        //     ),
+                                        //   ),
+                                        // ),
                                         DataCell(
-                                          TextButton(
-                                            onPressed: () {
-                                              // showDialog(
-                                              //     context: context,
-                                              //     builder: (BuildContext context) {
-                                              //       return RewardDetail(
-                                              //           type: 'update',
-                                              //           reward: snapshot.rewardHistoryResponse?.data?.data?[index]);
-                                              //     });
-                                            },
-                                            child: Text(
-                                              snapshot.rewardHistoryResponse?.data?.data?[index].rewardId ?? 'N/A',
-                                              style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                            ),
-                                          ),
+                                          AppSelectableText(
+                                              snapshot.rewardHistoryResponse?.data?.data?[index].userFullname ?? 'N/A'),
                                         ),
                                         DataCell(
                                           AppSelectableText(snapshot
@@ -388,14 +397,14 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                             children: [
                                               IconButton(
                                                 onPressed: () {
-                                                  // showDialog(
-                                                  //     context: context,
-                                                  //     builder: (BuildContext context) {
-                                                  //       return RewardDetail(
-                                                  //         reward: snapshot.rewardHistoryResponse!.data!.data![index],
-                                                  //         type: 'update',
-                                                  //       );
-                                                  //     });
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return RewardHistoryDetail(
+                                                          data: snapshot.rewardHistoryResponse!.data!.data![index],
+                                                          type: 'update',
+                                                        );
+                                                      });
                                                 },
                                                 icon: const Icon(
                                                   Icons.edit,
@@ -519,19 +528,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     }
     RewardHistoryController.getAll(
       context,
-      // DeviceRequest(
-      //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
-      //   serialNumber: (_ontSNController.text != '') ? _ontSNController.text : null,
-      //   ont: (_ontController.text != '') ? _ontController.text : null,
-      //   port: (_portController.text != '') ? _portController.text : null,
-      //   card: (_slotController.text != '') ? _slotController.text : null,
-      //   ontPON: (_ontPonController.text != '') ? _ontPonController.text : null,
-      //   ontMAC: (_ontMacController.text != '') ? _ontMacController.text : null,
-      //   ipAddress: (_ipController.text != '') ? _ipController.text : null,
-      //   nltType: _nltType,
-      //   page: _page,
-      //   pageSize: _pageSize,
-      // ),
+      customerName: _customerNameController.text != '' ? _customerNameController.text : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -630,7 +627,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   }
 
   resetAllFilter() {
-    _orderReferenceController.text = '';
+    _customerNameController.text = '';
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -660,104 +657,79 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const RewardDetail(
-                    reward: null,
-                    type: 'create',
-                  );
-                });
-          },
-          child: Row(
-            children: [
-              const Icon(
-                Icons.add,
-                color: Colors.blue,
-              ),
-              AppPadding.horizontal(denominator: 2),
-              Text(
-                'Add new reward',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: Card(
-                          surfaceTintColor: Colors.white,
-                          elevation: 5.0,
-                          color: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                                child: Column(
-                                  children: [
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _orderReferenceController,
-                                          hintText: 'Search',
-                                          labelText: 'Order Reference'),
-                                    ),
-                                    AppPadding.vertical(denominator: 1 / 3),
-                                    AppOutlinedButton(
-                                      () {
-                                        resetAllFilter();
-                                        filtering(enableDebounce: true, page: 0);
-                                      },
-                                      backgroundColor: Colors.white,
-                                      borderRadius: 15,
-                                      width: 131,
-                                      height: 45,
-                                      text: 'Clear',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CloseButton(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                });
-          },
-          child: Row(
-            children: [
-              const Icon(
-                Icons.filter_list,
-                color: Colors.blue,
-              ),
-              AppPadding.horizontal(denominator: 2),
-              Text(
-                'Filter',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
-            ],
-          ),
-        ),
+        // TextButton(
+        //   onPressed: () {
+        //     showDialog(
+        //         context: context,
+        //         builder: (BuildContext context) {
+        //           return Row(
+        //             mainAxisAlignment: MainAxisAlignment.end,
+        //             children: [
+        //               Flexible(
+        //                 child: Card(
+        //                   surfaceTintColor: Colors.white,
+        //                   elevation: 5.0,
+        //                   color: Colors.white,
+        //                   shape: const RoundedRectangleBorder(
+        //                     borderRadius: BorderRadius.only(
+        //                       topLeft: Radius.circular(15),
+        //                       bottomLeft: Radius.circular(15),
+        //                     ),
+        //                   ),
+        //                   child: Stack(
+        //                     alignment: Alignment.topRight,
+        //                     children: [
+        //                       Padding(
+        //                         padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+        //                         child: Column(
+        //                           children: [
+        //                             searchField(
+        //                               InputFieldAttribute(
+        //                                   controller: _customerNameController,
+        //                                   hintText: 'Search',
+        //                                   labelText: 'Order Reference'),
+        //                             ),
+        //                             AppPadding.vertical(denominator: 1 / 3),
+        //                             AppOutlinedButton(
+        //                               () {
+        //                                 resetAllFilter();
+        //                                 filtering(enableDebounce: true, page: 0);
+        //                               },
+        //                               backgroundColor: Colors.white,
+        //                               borderRadius: 15,
+        //                               width: 131,
+        //                               height: 45,
+        //                               text: 'Clear',
+        //                             ),
+        //                           ],
+        //                         ),
+        //                       ),
+        //                       const Padding(
+        //                         padding: EdgeInsets.all(8.0),
+        //                         child: CloseButton(),
+        //                       ),
+        //                     ],
+        //                   ),
+        //                 ),
+        //               ),
+        //             ],
+        //           );
+        //         });
+        //   },
+        //   child: Row(
+        //     children: [
+        //       const Icon(
+        //         Icons.filter_list,
+        //         color: Colors.blue,
+        //       ),
+        //       AppPadding.horizontal(denominator: 2),
+        //       Text(
+        //         'Filter',
+        //         style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         TextButton(
           onPressed: () {
             resetAllFilter();

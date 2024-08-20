@@ -44,6 +44,26 @@ class PromotionController extends ChangeNotifier {
     });
   }
 
+  static Future<ApiResponse<UpdatePromotionResponse>> remove(BuildContext context, String id) async {
+    return ApiController().call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/promotion/upload/remove',
+      data: {
+        'id': id,
+      },
+    ).then((value) {
+      try {
+        return ApiResponse(code: value.code, data: UpdatePromotionResponse.fromJson(value.data));
+      } catch (e) {
+        return ApiResponse(
+          code: 400,
+          message: e.toString(),
+        );
+      }
+    });
+  }
+
   static Future<ApiResponse<CreatePromotionResponse>> create(
       BuildContext context, CreatePromotionRequest request) async {
     return ApiController().call(

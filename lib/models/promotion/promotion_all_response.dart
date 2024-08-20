@@ -33,7 +33,7 @@ class Data {
   String? promotionStartDate;
   String? promotionEndDate;
   int? showOnStart;
-  List<String>? promotionImage;
+  List<PromotionImage>? promotionImage;
   int? promotionStatus;
   String? createdDate;
   String? modifiedDate;
@@ -61,7 +61,12 @@ class Data {
     promotionStartDate = json['promotionStartDate'];
     promotionEndDate = json['promotionEndDate'];
     showOnStart = json['showOnStart'];
-    promotionImage = json['promotionImage'].cast<String>();
+    if (json['promotionImage'] != null) {
+      promotionImage = <PromotionImage>[];
+      json['promotionImage'].forEach((v) {
+        promotionImage!.add(PromotionImage.fromJson(v));
+      });
+    }
     promotionStatus = json['promotionStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
@@ -77,10 +82,31 @@ class Data {
     data['promotionStartDate'] = promotionStartDate;
     data['promotionEndDate'] = promotionEndDate;
     data['showOnStart'] = showOnStart;
-    data['promotionImage'] = promotionImage;
+    if (promotionImage != null) {
+      data['promotionImage'] = promotionImage!.map((v) => v.toJson()).toList();
+    }
     data['promotionStatus'] = promotionStatus;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
+    return data;
+  }
+}
+
+class PromotionImage {
+  String? id;
+  String? path;
+
+  PromotionImage({this.id, this.path});
+
+  PromotionImage.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    path = json['path'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['path'] = path;
     return data;
   }
 }

@@ -61,11 +61,11 @@ class _PromotionDetailState extends State<PromotionDetail> {
     _endDate.text = dateConverter(widget.promotion.promotionEndDate, format: 'dd-MM-yyyy') ?? '';
     _promotionName.text = widget.promotion.promotionName ?? '';
     _showOnStart.value = widget.promotion.showOnStart == 1;
-    for (String item in widget.promotion.promotionImage ?? []) {
+    for (PromotionImage item in widget.promotion.promotionImage ?? []) {
       selectedFiles.add(
         FileAttribute(
-          path: item,
-          name: item,
+          path: item.path,
+          name: item.id,
         ),
       );
     }
@@ -243,8 +243,16 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                             ),
                                             tooltip: 'button'.tr(gender: 'remove'),
                                             onPressed: () {
-                                              selectedFiles.removeAt(index);
-                                              fileRebuild.add(DateTime.now());
+                                              PromotionController.remove(context, selectedFiles[index].name ?? "").then(
+                                                (value) {
+                                                  if (responseCode(value.code)) {
+                                                    selectedFiles.removeAt(index);
+                                                    fileRebuild.add(DateTime.now());
+                                                  } else {
+                                                    showDialogError(context, 'unable to delete image');
+                                                  }
+                                                },
+                                              );
                                             },
                                           ),
                                         ),
@@ -371,20 +379,34 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                               'Please delete the outdated images and upload the updated versions.');
                                         } else {
                                           showLoading();
-                                          PromotionController.upload(
-                                                  context, widget.promotion.promotionId!, selectedFiles)
-                                              .then((value) {
-                                            dismissLoading();
-                                            if (responseCode(value.code)) {
+                                          for (int i = 0; i < selectedFiles.length; i++) {
+                                            if (selectedFiles[i].value != null) {
+                                              PromotionController.upload(
+                                                      context, widget.promotion.promotionId!, [selectedFiles[i]])
+                                                  .then((value) {
+                                                dismissLoading();
+                                                if (responseCode(value.code)) {
+                                                  if (i == selectedFiles.length - 1) {
+                                                    context.pop();
+                                                    PromotionController.getAll(context).then((value) => context
+                                                        .read<PromotionController>()
+                                                        .promotionAllResponse = value);
+                                                    showDialogSuccess(context,
+                                                        'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                                  }
+                                                } else {
+                                                  showDialogError(
+                                                      context, value.data?.message ?? 'ERROR : ${value.code}');
+                                                }
+                                              });
+                                            } else if (i == selectedFiles.length - 1) {
                                               context.pop();
                                               PromotionController.getAll(context).then((value) =>
                                                   context.read<PromotionController>().promotionAllResponse = value);
                                               showDialogSuccess(context,
                                                   'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
-                                            } else {
-                                              showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                                             }
-                                          });
+                                          }
                                         }
                                       } else {
                                         context.pop();

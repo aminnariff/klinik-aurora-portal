@@ -24,16 +24,17 @@ class RewardHistoryController extends ChangeNotifier {
   }
 
   static Future<ApiResponse<RewardHistoryResponse>> getAll(BuildContext context,
-      {String? pointTransactionId, String? rewardId}) async {
+      {String? pointTransactionId, String? rewardId, String? customerName}) async {
     return ApiController()
         .call(
       context,
       method: Method.get,
       endpoint: 'admin/reward-history',
-      queryParameters: rewardId != null || pointTransactionId != null
+      queryParameters: rewardId != null || pointTransactionId != null || customerName != null
           ? {
               if (rewardId != null) "rewardId": rewardId,
               if (pointTransactionId != null) "pointTransactionId": pointTransactionId,
+              if (customerName != null) "userFullname": customerName,
             }
           : null,
     )

@@ -111,7 +111,7 @@ class _MyAppState extends State<MyApp> {
     return ScreenUtilInit(
         designSize: const Size(1728, 829),
         minTextAdapt: true,
-        splitScreenMode: true,
+        splitScreenMode: false,
         builder: (context, child) {
           return MultiProvider(
             providers: [

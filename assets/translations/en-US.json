@@ -107,6 +107,14 @@
         "browseFile": "Browse your files here (max 10MB)",
         "forgotPassword": "Forgot password?"
     },
+    "rewardHistoryPage": {
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
+        "rewardImage": "Promotion Image",
+        "browseFile": "Browse your files here (max 10MB)",
+        "forgotPassword": "Forgot password?"
+    },
     "version": {
         "updateAvailable": "New Version Available",
         "forceUpdateDescription":"A critical update for our mobile app is now available. To continue using our services without interruption, please update your app to the latest version immediately by visiting your app store. Thank you for your prompt action.",

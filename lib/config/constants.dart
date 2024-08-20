@@ -24,6 +24,10 @@ List<DropdownAttribute> withdrawReason = [
   DropdownAttribute('3', 'No longer needed'),
   DropdownAttribute('others', 'Others'),
 ];
+List<DropdownAttribute> rewardHistoryStatus = [
+  DropdownAttribute('0', 'Completed'),
+  DropdownAttribute('1', 'In-Progress'),
+];
 List<DropdownAttribute> states = [
   DropdownAttribute('Selangor', 'Selangor'),
   DropdownAttribute('Johor', 'Johor'),

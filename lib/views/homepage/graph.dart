@@ -165,7 +165,6 @@ class _GraphWidgetState extends State<GraphWidget> {
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
-        horizontalInterval: 1,
         verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
           return const FlLine(
@@ -198,7 +197,7 @@ class _GraphWidgetState extends State<GraphWidget> {
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
-            showTitles: true,
+            showTitles: false,
             interval: 1,
             getTitlesWidget: leftTitleWidgets,
             reservedSize: 42,
@@ -273,7 +272,7 @@ class _GraphWidgetState extends State<GraphWidget> {
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
-            showTitles: true,
+            showTitles: false,
             getTitlesWidget: leftTitleWidgets,
             reservedSize: 42,
             interval: 1,

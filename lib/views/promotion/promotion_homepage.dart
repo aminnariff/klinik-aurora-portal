@@ -295,9 +295,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                               onTap: () async {
                                                 var results = await showCalendarDatePicker2Dialog(
                                                   context: context,
-                                                  config: CalendarDatePicker2WithActionButtonsConfig(
-                                                    firstDate: DateTime.now(),
-                                                  ),
+                                                  config: CalendarDatePicker2WithActionButtonsConfig(),
                                                   dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                                   borderRadius: BorderRadius.circular(15),
                                                 );
@@ -568,7 +566,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                   if (snapshot.promotionAllResponse?.data?.data?[index].promotionImage != null)
                                     if (snapshot.promotionAllResponse!.data!.data![index].promotionImage!.isNotEmpty)
                                       Image.network(
-                                        '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage?.first}',
+                                        '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage?.first.path}',
                                       ),
                                   AppPadding.vertical(denominator: 2),
                                   Row(

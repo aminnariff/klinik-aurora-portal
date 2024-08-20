@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
@@ -24,36 +25,38 @@ class _MainDashboardState extends State<MainDashboard> {
 
   @override
   void initState() {
-    DashboardController.get(context).then((value) {
-      if (responseCode(value.code)) {
-        final currentDate = DateTime.now();
-        final List<TotalRegistrationByMonth> totalRegistrationList = value.data?.data?.totalRegistrationByMonth ?? [];
-        final List<TotalRegistrationByMonth> lastThreeMonths = [];
-        for (int i = 2; i >= 0; i--) {
-          final targetMonth = DateTime(currentDate.year, currentDate.month - i, 1);
-          final registrationData = totalRegistrationList.firstWhere(
-            (item) => item.year == targetMonth.year && item.month == targetMonth.month,
-            orElse: () => TotalRegistrationByMonth(
-              year: targetMonth.year,
-              month: targetMonth.month,
-              totalRegistrationByMonth: 0,
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      DashboardController.get(context).then((value) {
+        if (responseCode(value.code)) {
+          final currentDate = DateTime.now();
+          final List<TotalRegistrationByMonth> totalRegistrationList = value.data?.data?.totalRegistrationByMonth ?? [];
+          final List<TotalRegistrationByMonth> lastThreeMonths = [];
+          for (int i = 2; i >= 0; i--) {
+            final targetMonth = DateTime(currentDate.year, currentDate.month - i, 1);
+            final registrationData = totalRegistrationList.firstWhere(
+              (item) => item.year == targetMonth.year && item.month == targetMonth.month,
+              orElse: () => TotalRegistrationByMonth(
+                year: targetMonth.year,
+                month: targetMonth.month,
+                totalRegistrationByMonth: 0,
+              ),
+            );
+            lastThreeMonths.add(registrationData);
+          }
+          if (!mounted) return;
+          context.read<DashboardController>().dashboardResponse = DashboardResponse(
+            message: value.data?.message,
+            data: Data(
+              totalActiveUser: value.data?.data?.totalActiveUser,
+              totalActiveBranch: value.data?.data?.totalActiveBranch,
+              totalActivePromotion: value.data?.data?.totalActivePromotion,
+              totalUser: value.data?.data?.totalUser,
+              totalRegistrationByMonth: lastThreeMonths,
             ),
           );
-          lastThreeMonths.add(registrationData);
+          value.data;
         }
-
-        context.read<DashboardController>().dashboardResponse = DashboardResponse(
-          message: value.data?.message,
-          data: Data(
-            totalActiveUser: value.data?.data?.totalActiveUser,
-            totalActiveBranch: value.data?.data?.totalActiveBranch,
-            totalActivePromotion: value.data?.data?.totalActivePromotion,
-            totalUser: value.data?.data?.totalUser,
-            totalRegistrationByMonth: lastThreeMonths,
-          ),
-        );
-        value.data;
-      }
+      });
     });
 
     // FirebaseFirestore.instance.collection('users').where('isLocum', isEqualTo: true).get().then((val) {
