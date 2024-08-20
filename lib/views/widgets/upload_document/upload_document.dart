@@ -16,7 +16,7 @@ class UploadDocumentsField extends StatelessWidget {
   final Function() cancelAction;
 
   const UploadDocumentsField({
-    Key? key,
+    super.key,
     required this.title,
     this.width,
     this.tooltipText,
@@ -25,7 +25,7 @@ class UploadDocumentsField extends StatelessWidget {
     this.cancelIcon = false,
     required this.cancelAction,
     required this.fieldTitle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

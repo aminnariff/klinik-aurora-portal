@@ -153,7 +153,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                       var results = await showCalendarDatePicker2Dialog(
                                         context: context,
                                         config: CalendarDatePicker2WithActionButtonsConfig(
-                                          firstDate: DateTime.now(),
+                                          currentDate: DateTime.now(),
                                         ),
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
@@ -192,7 +192,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                       var results = await showCalendarDatePicker2Dialog(
                                         context: context,
                                         config: CalendarDatePicker2WithActionButtonsConfig(
-                                          firstDate: DateTime.now(),
+                                          currentDate: DateTime.now().add(const Duration(days: 1)),
                                         ),
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
