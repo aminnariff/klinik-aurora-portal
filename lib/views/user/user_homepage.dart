@@ -47,7 +47,7 @@ class UserHomepage extends StatefulWidget {
 }
 
 class _UserHomepageState extends State<UserHomepage> {
-  int _page = 0;
+  int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
   int _totalPage = 0;
@@ -104,7 +104,9 @@ class _UserHomepageState extends State<UserHomepage> {
   final TextEditingController _userFullNameController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _userPhoneController = TextEditingController();
-  String? _selectedBranch;
+  final TextEditingController _userEmailController = TextEditingController();
+  DropdownAttribute? _selectedBranch;
+  DropdownAttribute? _selectedUserStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -114,7 +116,7 @@ class _UserHomepageState extends State<UserHomepage> {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(UserHomepage.displayName);
     });
     if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context).then(
+      BranchController.getAll(context, 1, 100).then(
         (value) {
           if (responseCode(value.code)) {
             context.read<BranchController>().branchAllResponse = value;
@@ -280,7 +282,7 @@ class _UserHomepageState extends State<UserHomepage> {
             labelText: attribute.labelText,
             suffixWidget: TextButton(
               onPressed: () {
-                filtering(page: 0);
+                filtering(page: 1);
               },
               child: const Icon(
                 Icons.search,
@@ -289,10 +291,10 @@ class _UserHomepageState extends State<UserHomepage> {
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 0);
+              filtering(enableDebounce: true, page: 1);
             },
             onChanged: (value) {
-              filtering(enableDebounce: true, page: 0);
+              // filtering(enableDebounce: true, page: 1);
             },
           ),
           width: screenWidthByBreakpoint(90, 70, 26),
@@ -528,7 +530,7 @@ class _UserHomepageState extends State<UserHomepage> {
                             ),
                             if (!isMobile && !isTablet)
                               Text(
-                                '${((_page + 1) * _pageSize) - _pageSize + 1} - ${((_page + 1) * _pageSize < _totalCount) ? ((_page + 1) * _pageSize) : _totalCount} of $_totalCount',
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
                               ),
                           ],
                         ),
@@ -574,14 +576,25 @@ class _UserHomepageState extends State<UserHomepage> {
     }
     UserController.getAll(
       context,
-      _userFullNameController.text,
-      _userNameController.text,
-      _userPhoneController.text,
+      page ?? 1,
+      _pageSize,
+      userFullName: _userFullNameController.text,
+      userName: _userNameController.text,
+      userPhone: _userPhoneController.text,
+      userEmail: _userEmailController.text,
+      branchId: _selectedBranch?.key,
+      userStatus: _selectedUserStatus != null
+          ? _selectedUserStatus?.key == '1'
+              ? 1
+              : _selectedUserStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.data?.length ?? 0;
-        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalCount = value.data?.totalCount ?? 0;
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<UserController>().userAllResponse = value.data?.data;
         // _page = 0;
       } else if (value.code == 404) {}
@@ -678,7 +691,9 @@ class _UserHomepageState extends State<UserHomepage> {
     _userFullNameController.text = '';
     _userNameController.text = '';
     _userPhoneController.text = '';
+    _userEmailController.text = '';
     _selectedBranch = null;
+    _selectedUserStatus = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -781,38 +796,71 @@ class _UserHomepageState extends State<UserHomepage> {
                                       ),
                                     ),
                                     AppPadding.vertical(),
+                                    searchField(
+                                      InputFieldAttribute(
+                                        controller: _userEmailController,
+                                        hintText: 'Search',
+                                        labelText: 'Email',
+                                      ),
+                                    ),
+                                    AppPadding.vertical(),
                                     StreamBuilder<DateTime>(
                                         stream: rebuildDropdown.stream,
                                         builder: (context, snapshot) {
-                                          return AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                if (context.read<BranchController>().branchAllResponse?.data?.data !=
-                                                    null)
-                                                  for (branch.Data item in context
-                                                          .read<BranchController>()
-                                                          .branchAllResponse
-                                                          ?.data
-                                                          ?.data ??
-                                                      [])
-                                                    DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                              ],
-                                              labelText: 'information'.tr(gender: 'registeredBranch'),
-                                              value: _selectedBranch,
-                                              onChanged: (p0) {
-                                                _selectedBranch = p0?.key;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 0);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
+                                          return Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    if (context
+                                                            .read<BranchController>()
+                                                            .branchAllResponse
+                                                            ?.data
+                                                            ?.data !=
+                                                        null)
+                                                      for (branch.Data item in context
+                                                              .read<BranchController>()
+                                                              .branchAllResponse
+                                                              ?.data
+                                                              ?.data ??
+                                                          [])
+                                                        DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'registeredBranch'),
+                                                  value: _selectedBranch?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedBranch = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                              AppPadding.vertical(),
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'userStatus'),
+                                                  value: _selectedUserStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedUserStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
                                           );
                                         }),
                                     AppPadding.vertical(denominator: 1 / 3),
                                     AppOutlinedButton(
                                       () {
                                         resetAllFilter();
-                                        filtering(enableDebounce: true, page: 0);
+                                        filtering(enableDebounce: true, page: 1);
                                       },
                                       backgroundColor: Colors.white,
                                       borderRadius: 15,
@@ -852,7 +900,7 @@ class _UserHomepageState extends State<UserHomepage> {
         TextButton(
           onPressed: () {
             resetAllFilter();
-            filtering(enableDebounce: true, page: 0);
+            filtering(enableDebounce: true, page: 1);
           },
           child: Row(
             children: [
@@ -891,11 +939,11 @@ class _UserHomepageState extends State<UserHomepage> {
   Widget pagination() {
     return Pagination(
       numOfPages: _totalPage,
-      selectedPage: _page + 1,
-      pagesVisible: isMobile ? 3 : 5,
+      selectedPage: _page,
+      pagesVisible: 5,
       spacing: 10,
       onPageChanged: (page) {
-        _movePage(page - 1);
+        _movePage(page);
       },
     );
   }

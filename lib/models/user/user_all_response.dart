@@ -1,8 +1,15 @@
 class UserAllResponse {
   String? message;
   List<UserResponse>? data;
+  int? totalPage;
+  int? totalCount;
 
-  UserAllResponse({this.message, this.data});
+  UserAllResponse({
+    this.message,
+    this.data,
+    this.totalPage,
+    this.totalCount,
+  });
 
   UserAllResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -12,6 +19,8 @@ class UserAllResponse {
         data!.add(UserResponse.fromJson(v));
       });
     }
+    totalPage = json['totalPage'];
+    totalCount = json['totalCount'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,6 +29,8 @@ class UserAllResponse {
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
+    data['totalPage'] = totalPage;
+    data['totalCount'] = totalCount;
     return data;
   }
 }

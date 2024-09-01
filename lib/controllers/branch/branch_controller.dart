@@ -22,11 +22,15 @@ class BranchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<BranchAllResponse>> getAll(BuildContext context) async {
+  static Future<ApiResponse<BranchAllResponse>> getAll(BuildContext context, int page, int pageSize) async {
     return ApiController()
         .call(
       context,
       method: Method.get,
+      queryParameters: {
+        'page': page,
+        'pageSize': pageSize,
+      },
       endpoint: 'admin/branch',
     )
         .then((value) {

@@ -84,7 +84,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       selectedFile = FileAttribute(path: widget.doctor?.doctorImage, name: widget.doctor?.doctorImage);
       try {
         if (context.read<BranchController>().branchAllResponse == null) {
-          BranchController.getAll(context).then((value) {
+          BranchController.getAll(context, 1, pageSize).then((value) {
             if (responseCode(value.code)) {
               context.read<BranchController>().branchAllResponse = value;
             }

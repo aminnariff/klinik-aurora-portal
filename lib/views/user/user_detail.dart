@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
@@ -297,7 +298,9 @@ class _UserDetailState extends State<UserDetail> {
                                             ),
                                           ).then((value) {
                                             if (responseCode(value.code)) {
-                                              UserController.getAll(context, '', '', '').then((value) {
+                                              UserController.getAll(context, 1, pageSize,
+                                                      userFullName: '', userName: '', userPhone: '')
+                                                  .then((value) {
                                                 dismissLoading();
                                                 if (responseCode(value.code)) {
                                                   context.read<UserController>().userAllResponse = value.data?.data;
@@ -329,7 +332,9 @@ class _UserDetailState extends State<UserDetail> {
                                             ),
                                           ).then((value) {
                                             if (responseCode(value.code)) {
-                                              UserController.getAll(context, '', '', '').then((value) {
+                                              UserController.getAll(context, 1, pageSize,
+                                                      userFullName: '', userPhone: '', userName: '')
+                                                  .then((value) {
                                                 dismissLoading();
                                                 if (responseCode(value.code)) {
                                                   context.read<UserController>().userAllResponse = value.data?.data;

@@ -20,10 +20,15 @@ class UserController extends ChangeNotifier {
 
   static Future<ApiResponse<UserAllResponse>> getAll(
     BuildContext context,
-    String userFullName,
-    String userName,
-    String userPhone,
-  ) async {
+    int page,
+    int pageSize, {
+    String? userFullName,
+    String? userName,
+    String? userPhone,
+    String? userEmail,
+    String? branchId,
+    int? userStatus,
+  }) async {
     return ApiController()
         .call(
       context,
@@ -32,6 +37,11 @@ class UserController extends ChangeNotifier {
         if (notNullOrEmptyString(userFullName)) 'userFullname': userFullName,
         if (notNullOrEmptyString(userName)) 'userName': userName,
         if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
+        if (notNullOrEmptyString(userEmail)) 'userEmail': userEmail,
+        if (notNullOrEmptyString(branchId)) 'branchId': branchId,
+        if (userStatus != null) 'userStatus': userStatus,
+        'page': page,
+        'pageSize': pageSize,
       },
       endpoint: 'admin/user-management',
     )

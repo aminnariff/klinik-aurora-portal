@@ -516,9 +516,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   ),
                 ).then((value) {
                   if (responseCode(value.code)) {
-                    BranchController.getAll(
-                      context,
-                    ).then((value) {
+                    BranchController.getAll(context, 1, pageSize).then((value) {
                       dismissLoading();
                       if (responseCode(value.code)) {
                         context.read<BranchController>().branchAllResponse = value;
@@ -554,6 +552,8 @@ class _BranchDetailState extends State<BranchDetail> {
                   if (responseCode(value.code)) {
                     BranchController.getAll(
                       context,
+                      1,
+                      pageSize,
                     ).then((value) {
                       dismissLoading();
                       if (responseCode(value.code)) {

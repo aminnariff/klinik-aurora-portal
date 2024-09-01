@@ -119,7 +119,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(AdminHomepage.displayName);
     });
     if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context).then(
+      BranchController.getAll(context, 1, 100).then(
         (value) {
           if (responseCode(value.code)) {
             context.read<BranchController>().branchAllResponse = value;

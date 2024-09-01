@@ -46,7 +46,7 @@ class BranchHomepage extends StatefulWidget {
 }
 
 class _BranchHomepageState extends State<BranchHomepage> {
-  int _page = 0;
+  int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
   int _totalPage = 0;
@@ -516,7 +516,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                             ),
                             if (!isMobile && !isTablet)
                               Text(
-                                '${((_page + 1) * _pageSize) - _pageSize + 1} - ${((_page + 1) * _pageSize < _totalCount) ? ((_page + 1) * _pageSize) : _totalCount} of $_totalCount',
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
                               ),
                           ],
                         ),
@@ -542,11 +542,11 @@ class _BranchHomepageState extends State<BranchHomepage> {
     if (page != null) {
       _page = page;
     }
-    BranchController.getAll(context).then((value) {
+    BranchController.getAll(context, _page, _pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.data?.length ?? 0;
-        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalCount = value.data?.totalCount ?? 0;
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<BranchController>().branchAllResponse = value;
         // _page = 0;
       } else if (value.code == 404) {}
@@ -868,11 +868,11 @@ class _BranchHomepageState extends State<BranchHomepage> {
   Widget pagination() {
     return Pagination(
       numOfPages: _totalPage,
-      selectedPage: _page + 1,
-      pagesVisible: isMobile ? 3 : 5,
+      selectedPage: _page,
+      pagesVisible: 5,
       spacing: 10,
       onPageChanged: (page) {
-        _movePage(page - 1);
+        _movePage(page);
       },
     );
   }
