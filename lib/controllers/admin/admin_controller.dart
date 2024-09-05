@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/models/admin/update_admin_request.dart';
 import 'package:klinik_aurora_portal/models/admin/update_admin_response.dart';
 import 'package:klinik_aurora_portal/models/admin/update_permission_admin_request.dart';
 import 'package:klinik_aurora_portal/models/admin/update_permission_admin_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class AdminController extends ChangeNotifier {
   AdminAllResponse? _adminAllResponse;
@@ -22,14 +23,26 @@ class AdminController extends ChangeNotifier {
 
   static Future<ApiResponse<AdminAllResponse>> getAll(
     BuildContext context,
-  ) async {
-    return ApiController()
-        .call(
+    int page,
+    int pageSize, {
+    String? userName,
+    String? userPhone,
+    String? userEmail,
+    int? userStatus,
+  }) async {
+    return ApiController().call(
       context,
       method: Method.get,
       endpoint: 'admin/admin-management',
-    )
-        .then((value) {
+      queryParameters: {
+        if (notNullOrEmptyString(userName)) 'userName': userName,
+        if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
+        if (notNullOrEmptyString(userEmail)) 'userEmail': userEmail,
+        if (userStatus != null) 'userStatus': userStatus,
+        'page': page,
+        'pageSize': pageSize,
+      },
+    ).then((value) {
       try {
         return ApiResponse(code: value.code, data: AdminAllResponse.fromJson(value.data));
       } catch (e) {

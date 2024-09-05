@@ -12,9 +12,11 @@ import 'package:klinik_aurora_portal/controllers/reward/reward_history_controlle
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_detail.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -39,7 +41,7 @@ class RewardHistoryHomepage extends StatefulWidget {
 }
 
 class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
-  int _page = 0;
+  int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
   int _totalPage = 0;
@@ -60,8 +62,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'description',
-      label: 'Staff Comment',
+      attribute: 'rewardName',
+      label: 'Reward',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
@@ -73,10 +75,17 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       width: 110,
     ),
     TableHeaderAttribute(
-      attribute: 'createdDate',
-      label: 'Created Date',
+      attribute: 'description',
+      label: 'Remark',
       allowSorting: false,
       columnSize: ColumnSize.S,
+    ),
+    TableHeaderAttribute(
+      attribute: 'updatedDate',
+      label: 'Last Update',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 120,
     ),
     TableHeaderAttribute(
       attribute: 'action',
@@ -87,6 +96,11 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     ),
   ];
   final TextEditingController _customerNameController = TextEditingController();
+  final TextEditingController _customerUserNameController = TextEditingController();
+  final TextEditingController _rewardNameController = TextEditingController();
+  final TextEditingController _customerPhoneController = TextEditingController();
+  DropdownAttribute? _rewardHistoryStatus;
+  DropdownAttribute? _rewardStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -255,7 +269,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             labelText: attribute.labelText,
             suffixWidget: TextButton(
               onPressed: () {
-                filtering(page: 0);
+                filtering(page: 1);
               },
               child: const Icon(
                 Icons.search,
@@ -264,10 +278,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 0);
-            },
-            onChanged: (value) {
-              filtering(enableDebounce: true, page: 0);
+              filtering(enableDebounce: true, page: 1);
             },
           ),
           width: screenWidthByBreakpoint(90, 70, 26),
@@ -368,9 +379,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                               snapshot.rewardHistoryResponse?.data?.data?[index].userFullname ?? 'N/A'),
                                         ),
                                         DataCell(
-                                          AppSelectableText(snapshot
-                                                  .rewardHistoryResponse?.data?.data?[index].rewardHistoryDescription ??
-                                              'N/A'),
+                                          AppSelectableText(
+                                              snapshot.rewardHistoryResponse?.data?.data?[index].rewardName ?? 'N/A'),
                                         ),
                                         DataCell(
                                           AppSelectableText(
@@ -387,8 +397,15 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                           ),
                                         ),
                                         DataCell(
+                                          AppSelectableText(snapshot
+                                                  .rewardHistoryResponse?.data?.data?[index].rewardHistoryDescription ??
+                                              'N/A'),
+                                        ),
+                                        DataCell(
                                           AppSelectableText(dateConverter(snapshot.rewardHistoryResponse?.data
-                                                  ?.data?[index].rewardHistoryCreatedDate) ??
+                                                  ?.data?[index].rewardHistoryModifiedDate) ??
+                                              dateConverter(snapshot.rewardHistoryResponse?.data?.data?[index]
+                                                  .rewardHistoryCreatedDate) ??
                                               'N/A'),
                                         ),
                                         DataCell(
@@ -500,7 +517,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                             ),
                             if (!isMobile && !isTablet)
                               Text(
-                                '${((_page + 1) * _pageSize) - _pageSize + 1} - ${((_page + 1) * _pageSize < _totalCount) ? ((_page + 1) * _pageSize) : _totalCount} of $_totalCount',
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
                               ),
                           ],
                         ),
@@ -528,12 +545,31 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     }
     RewardHistoryController.getAll(
       context,
+      _page,
+      _pageSize,
       customerName: _customerNameController.text != '' ? _customerNameController.text : null,
+      customerUsername: _customerUserNameController.text != '' ? _customerUserNameController.text : null,
+      userPhone: _customerPhoneController.text != '' ? _customerPhoneController.text : null,
+      rewardName: _rewardNameController.text != '' ? _rewardNameController.text : null,
+      rewardHistoryStatus: _rewardHistoryStatus != null
+          ? _rewardHistoryStatus?.key == '1'
+              ? 1
+              : _rewardHistoryStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
+      rewardStatus: _rewardStatus != null
+          ? _rewardStatus?.key == '1'
+              ? 1
+              : _rewardStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.data?.length ?? 0;
-        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalCount = value.data?.totalCount ?? 0;
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<RewardHistoryController>().rewardHistoryResponse = value;
         // _page = 0;
       } else if (value.code == 404) {}
@@ -628,6 +664,11 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
 
   resetAllFilter() {
     _customerNameController.text = '';
+    _customerUserNameController.text = '';
+    _rewardNameController.text = '';
+    _customerPhoneController.text = '';
+    _rewardHistoryStatus = null;
+    _rewardStatus = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -657,83 +698,145 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // TextButton(
-        //   onPressed: () {
-        //     showDialog(
-        //         context: context,
-        //         builder: (BuildContext context) {
-        //           return Row(
-        //             mainAxisAlignment: MainAxisAlignment.end,
-        //             children: [
-        //               Flexible(
-        //                 child: Card(
-        //                   surfaceTintColor: Colors.white,
-        //                   elevation: 5.0,
-        //                   color: Colors.white,
-        //                   shape: const RoundedRectangleBorder(
-        //                     borderRadius: BorderRadius.only(
-        //                       topLeft: Radius.circular(15),
-        //                       bottomLeft: Radius.circular(15),
-        //                     ),
-        //                   ),
-        //                   child: Stack(
-        //                     alignment: Alignment.topRight,
-        //                     children: [
-        //                       Padding(
-        //                         padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-        //                         child: Column(
-        //                           children: [
-        //                             searchField(
-        //                               InputFieldAttribute(
-        //                                   controller: _customerNameController,
-        //                                   hintText: 'Search',
-        //                                   labelText: 'Order Reference'),
-        //                             ),
-        //                             AppPadding.vertical(denominator: 1 / 3),
-        //                             AppOutlinedButton(
-        //                               () {
-        //                                 resetAllFilter();
-        //                                 filtering(enableDebounce: true, page: 0);
-        //                               },
-        //                               backgroundColor: Colors.white,
-        //                               borderRadius: 15,
-        //                               width: 131,
-        //                               height: 45,
-        //                               text: 'Clear',
-        //                             ),
-        //                           ],
-        //                         ),
-        //                       ),
-        //                       const Padding(
-        //                         padding: EdgeInsets.all(8.0),
-        //                         child: CloseButton(),
-        //                       ),
-        //                     ],
-        //                   ),
-        //                 ),
-        //               ),
-        //             ],
-        //           );
-        //         });
-        //   },
-        //   child: Row(
-        //     children: [
-        //       const Icon(
-        //         Icons.filter_list,
-        //         color: Colors.blue,
-        //       ),
-        //       AppPadding.horizontal(denominator: 2),
-        //       Text(
-        //         'Filter',
-        //         style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-        //       ),
-        //     ],
-        //   ),
-        // ),
+        TextButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: Card(
+                          surfaceTintColor: Colors.white,
+                          elevation: 5.0,
+                          color: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              bottomLeft: Radius.circular(15),
+                            ),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                                child: Column(
+                                  children: [
+                                    searchField(
+                                      InputFieldAttribute(
+                                          controller: _customerNameController,
+                                          hintText: 'Search',
+                                          labelText: 'Customer Name'),
+                                    ),
+                                    AppPadding.vertical(),
+                                    searchField(
+                                      InputFieldAttribute(
+                                          controller: _customerUserNameController,
+                                          hintText: 'Search',
+                                          labelText: 'Customer Username'),
+                                    ),
+                                    AppPadding.vertical(),
+                                    searchField(
+                                      InputFieldAttribute(
+                                          controller: _customerPhoneController,
+                                          hintText: 'Search',
+                                          labelText: 'Customer Contact No.'),
+                                    ),
+                                    AppPadding.vertical(),
+                                    searchField(
+                                      InputFieldAttribute(
+                                          controller: _rewardNameController,
+                                          hintText: 'Search',
+                                          labelText: 'Reward Name'),
+                                    ),
+                                    AppPadding.vertical(),
+                                    StreamBuilder<DateTime>(
+                                        stream: rebuildDropdown.stream,
+                                        builder: (context, snapshot) {
+                                          return Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'In-Progress'),
+                                                    DropdownAttribute('0', 'Completed'),
+                                                  ],
+                                                  labelText: 'Reward History Status',
+                                                  value: _rewardHistoryStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _rewardHistoryStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'Reward Status',
+                                                  value: _rewardStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _rewardStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }),
+                                    AppPadding.vertical(denominator: 1 / 3),
+                                    AppOutlinedButton(
+                                      () {
+                                        resetAllFilter();
+                                        filtering(enableDebounce: true, page: 1);
+                                      },
+                                      backgroundColor: Colors.white,
+                                      borderRadius: 15,
+                                      width: 131,
+                                      height: 45,
+                                      text: 'Clear',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: CloseButton(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                });
+          },
+          child: Row(
+            children: [
+              const Icon(
+                Icons.filter_list,
+                color: Colors.blue,
+              ),
+              AppPadding.horizontal(denominator: 2),
+              Text(
+                'Filter',
+                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
+              ),
+            ],
+          ),
+        ),
         TextButton(
           onPressed: () {
             resetAllFilter();
-            filtering(enableDebounce: true, page: 0);
+            filtering(enableDebounce: true, page: 1);
           },
           child: Row(
             children: [
@@ -772,11 +875,11 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   Widget pagination() {
     return Pagination(
       numOfPages: _totalPage,
-      selectedPage: _page + 1,
-      pagesVisible: isMobile ? 3 : 5,
+      selectedPage: _page,
+      pagesVisible: 5,
       spacing: 10,
       onPageChanged: (page) {
-        _movePage(page - 1);
+        _movePage(page);
       },
     );
   }

@@ -399,9 +399,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
   }
 
   _onRefresh() {
-    RewardHistoryController.getAll(
-      context,
-    ).then((value) {
+    RewardHistoryController.getAll(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<RewardHistoryController>().rewardHistoryResponse = value;
@@ -411,9 +409,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
   }
 
   getLatestData() {
-    RewardController.getAll(
-      context,
-    ).then((value) {
+    RewardController.getAll(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<RewardController>().rewardAllResponse = value;

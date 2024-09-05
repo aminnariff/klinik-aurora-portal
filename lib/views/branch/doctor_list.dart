@@ -2,6 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
@@ -64,7 +65,7 @@ class _DoctorListState extends State<DoctorList> {
   ];
   @override
   void initState() {
-    DoctorController.get(context, branchId: widget.branch?.branchId).then((value) {
+    DoctorController.get(context, 1, 10000, branchId: widget.branch?.branchId).then((value) {
       if (responseCode(value.code)) {
         context.read<DoctorController>().doctorBranchResponse = value.data;
       } else {
@@ -200,7 +201,7 @@ class _DoctorListState extends State<DoctorList> {
                                                                   ),
                                                                 ).then((value) {
                                                                   if (responseCode(value.code)) {
-                                                                    DoctorController.get(context,
+                                                                    DoctorController.get(context, 1, pageSize,
                                                                             branchId: snapshot.doctorBranchResponse
                                                                                 ?.data?[index].branchId)
                                                                         .then((value) {

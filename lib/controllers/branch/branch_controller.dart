@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/models/branch/create_branch_request.dart';
 import 'package:klinik_aurora_portal/models/branch/create_branch_response.dart';
 import 'package:klinik_aurora_portal/models/branch/update_branch_request.dart';
 import 'package:klinik_aurora_portal/models/branch/update_branch_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class BranchController extends ChangeNotifier {
   ApiResponse<BranchAllResponse>? _branchAllResponse;
@@ -22,7 +23,14 @@ class BranchController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<BranchAllResponse>> getAll(BuildContext context, int page, int pageSize) async {
+  static Future<ApiResponse<BranchAllResponse>> getAll(
+    BuildContext context,
+    int page,
+    int pageSize, {
+    String? branchName,
+    int? branchStatus,
+    String? branchState,
+  }) async {
     return ApiController()
         .call(
       context,
@@ -30,6 +38,9 @@ class BranchController extends ChangeNotifier {
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
+        if (notNullOrEmptyString(branchName)) 'branchName': branchName,
+        if (notNullOrEmptyString(branchState)) 'state': branchState,
+        if (branchStatus != null) 'branchStatus': branchStatus,
       },
       endpoint: 'admin/branch',
     )

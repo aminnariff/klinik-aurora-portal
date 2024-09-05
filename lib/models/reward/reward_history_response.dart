@@ -1,8 +1,15 @@
 class RewardHistoryResponse {
   String? message;
   List<Data>? data;
+  int? totalPage;
+  int? totalCount;
 
-  RewardHistoryResponse({this.message, this.data});
+  RewardHistoryResponse({
+    this.message,
+    this.data,
+    this.totalPage,
+    this.totalCount,
+  });
 
   RewardHistoryResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -12,6 +19,8 @@ class RewardHistoryResponse {
         data!.add(Data.fromJson(v));
       });
     }
+    totalPage = json['totalPage'];
+    totalCount = json['totalCount'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,6 +29,8 @@ class RewardHistoryResponse {
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
+    data['totalPage'] = totalPage;
+    data['totalCount'] = totalCount;
     return data;
   }
 }

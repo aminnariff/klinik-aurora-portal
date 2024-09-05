@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/models/reward/create_reward_history_respons
 import 'package:klinik_aurora_portal/models/reward/reward_history_response.dart';
 import 'package:klinik_aurora_portal/models/reward/update_reward_history_request.dart';
 import 'package:klinik_aurora_portal/models/reward/update_reward_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class RewardHistoryController extends ChangeNotifier {
   ApiResponse<RewardHistoryResponse>? _rewardHistoryResponse;
@@ -23,22 +24,36 @@ class RewardHistoryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<RewardHistoryResponse>> getAll(BuildContext context,
-      {String? pointTransactionId, String? rewardId, String? customerName}) async {
-    return ApiController()
-        .call(
+  static Future<ApiResponse<RewardHistoryResponse>> getAll(
+    BuildContext context,
+    int page,
+    int pageSize, {
+    String? pointTransactionId,
+    String? rewardId,
+    String? customerName,
+    String? customerUsername,
+    String? userPhone,
+    String? rewardName,
+    int? rewardHistoryStatus,
+    int? rewardStatus,
+  }) async {
+    return ApiController().call(
       context,
       method: Method.get,
       endpoint: 'admin/reward-history',
-      queryParameters: rewardId != null || pointTransactionId != null || customerName != null
-          ? {
-              if (rewardId != null) "rewardId": rewardId,
-              if (pointTransactionId != null) "pointTransactionId": pointTransactionId,
-              if (customerName != null) "userFullname": customerName,
-            }
-          : null,
-    )
-        .then((value) {
+      queryParameters: {
+        if (notNullOrEmptyString(rewardId)) "rewardId": rewardId,
+        if (notNullOrEmptyString(pointTransactionId)) "pointTransactionId": pointTransactionId,
+        if (notNullOrEmptyString(customerName)) "userFullname": customerName,
+        if (notNullOrEmptyString(customerUsername)) "userName": customerUsername,
+        if (notNullOrEmptyString(userPhone)) "userPhone": userPhone,
+        if (notNullOrEmptyString(rewardName)) "rewardName": rewardName,
+        if (rewardStatus != null) "rewardStatus": rewardStatus,
+        if (rewardHistoryStatus != null) "rewardHistoryStatus": rewardHistoryStatus,
+        'page': page,
+        'pageSize': pageSize,
+      },
+    ).then((value) {
       try {
         return ApiResponse(code: value.code, data: RewardHistoryResponse.fromJson(value.data));
       } catch (e) {

@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
@@ -256,9 +257,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                       ),
                                     ).then((value) {
                                       if (responseCode(value.code)) {
-                                        VoucherController.getAll(
-                                          context,
-                                        ).then((value) {
+                                        VoucherController.getAll(context, 1, pageSize).then((value) {
                                           dismissLoading();
                                           if (responseCode(value.code)) {
                                             context.read<VoucherController>().voucherAllResponse = value;
@@ -288,9 +287,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                     ).then((value) {
                                       dismissLoading();
                                       if (responseCode(value.code)) {
-                                        VoucherController.getAll(
-                                          context,
-                                        ).then((value) {
+                                        VoucherController.getAll(context, 1, pageSize).then((value) {
                                           dismissLoading();
                                           if (responseCode(value.code)) {
                                             context.read<VoucherController>().voucherAllResponse = value;

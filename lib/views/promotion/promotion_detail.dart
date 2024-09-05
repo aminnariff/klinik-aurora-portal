@@ -391,9 +391,9 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                                 if (responseCode(value.code)) {
                                                   if (i == selectedFiles.length - 1) {
                                                     context.pop();
-                                                    PromotionController.getAll(context).then((value) => context
-                                                        .read<PromotionController>()
-                                                        .promotionAllResponse = value);
+                                                    PromotionController.getAll(context, 1, pageSize).then((value) =>
+                                                        context.read<PromotionController>().promotionAllResponse =
+                                                            value);
                                                     showDialogSuccess(context,
                                                         'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
                                                   }
@@ -404,7 +404,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                               });
                                             } else if (i == selectedFiles.length - 1) {
                                               context.pop();
-                                              PromotionController.getAll(context).then((value) =>
+                                              PromotionController.getAll(context, 1, pageSize).then((value) =>
                                                   context.read<PromotionController>().promotionAllResponse = value);
                                               showDialogSuccess(context,
                                                   'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');

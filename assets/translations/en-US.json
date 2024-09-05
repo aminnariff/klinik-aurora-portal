@@ -28,6 +28,7 @@
         "fullName": "Full Name",
         "password": "Password",
         "email": "Email",
+        "status": "Status",
         "registeredBranch": "Registered Branch",
         "phoneNo": "Contact No.",
         "postalCode": "Postal Code",

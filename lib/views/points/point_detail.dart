@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/point_management/point_management_controller.dart';
@@ -51,14 +52,14 @@ class _PointDetailState extends State<PointDetail> {
   void initState() {
     _userFullname.text = widget.user?.userFullname ?? '';
     _userName.text = widget.user?.userName ?? '';
-    _userPoints.text = widget.user?.userPoints == null ? '0' : widget.user?.userPoints.toString() ?? '';
+    _userPoints.text = widget.user?.totalPoint == null ? '0' : widget.user?.totalPoint.toString() ?? '';
     if (context.read<VoucherController>().voucherAllResponse == null) {
-      VoucherController.getAll(context).then((value) {
+      VoucherController.getAll(context, 1, pageSize).then((value) {
         context.read<VoucherController>().voucherAllResponse = value;
       });
     }
     if (context.read<RewardController>().rewardAllResponse == null) {
-      RewardController.getAll(context).then((value) {
+      RewardController.getAll(context, 1, pageSize).then((value) {
         context.read<RewardController>().rewardAllResponse = value;
       });
     }
@@ -363,7 +364,7 @@ class _PointDetailState extends State<PointDetail> {
       if ((selectedReward == null)) {
         showDialogError(context, 'Please select one of the rewards');
         temp = false;
-      } else if ((selectedReward?.rewardPoint ?? 0) > (widget.user?.userPoints ?? 0)) {
+      } else if ((selectedReward?.rewardPoint ?? 0) > (widget.user?.totalPoint ?? 0)) {
         temp = false;
         showDialogError(context, 'User points is insufficient to redeem the reward');
       }

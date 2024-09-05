@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/models/reward/create_reward_response.dart';
 import 'package:klinik_aurora_portal/models/reward/reward_all_response.dart';
 import 'package:klinik_aurora_portal/models/reward/update_reward_request.dart';
 import 'package:klinik_aurora_portal/models/reward/update_reward_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class RewardController extends ChangeNotifier {
   ApiResponse<RewardAllResponse>? _rewardAllResponse;
@@ -23,21 +24,20 @@ class RewardController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<RewardAllResponse>> getAll(BuildContext context,
-      {String? rewardName, String? rewardId}) async {
-    return ApiController()
-        .call(
+  static Future<ApiResponse<RewardAllResponse>> getAll(BuildContext context, int page, int pageSize,
+      {String? rewardName, String? rewardId, int? rewardStatus}) async {
+    return ApiController().call(
       context,
       method: Method.get,
       endpoint: 'admin/reward-management',
-      queryParameters: rewardId != null || rewardName != null
-          ? {
-              if (rewardId != null) "rewardId": rewardId,
-              if (rewardName != null) "rewardName": rewardName,
-            }
-          : null,
-    )
-        .then((value) {
+      queryParameters: {
+        if (notNullOrEmptyString(rewardId)) "rewardId": rewardId,
+        if (notNullOrEmptyString(rewardName)) "rewardName": rewardName,
+        if (rewardStatus != null) "rewardStatus": rewardStatus,
+        'page': page,
+        'pageSize': pageSize,
+      },
+    ).then((value) {
       try {
         return ApiResponse(code: value.code, data: RewardAllResponse.fromJson(value.data));
       } catch (e) {

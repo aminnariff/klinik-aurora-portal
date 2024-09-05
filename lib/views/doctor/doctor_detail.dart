@@ -382,7 +382,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   }
 
   getLatestData() {
-    DoctorController.get(context).then((value) {
+    DoctorController.get(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<DoctorController>().doctorBranchResponse = value.data;

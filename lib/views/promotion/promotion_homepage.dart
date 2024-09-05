@@ -26,6 +26,8 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/checkbox/checkbox.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
@@ -36,6 +38,8 @@ import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
+import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
+import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
@@ -51,12 +55,14 @@ class PromotionHomepage extends StatefulWidget {
 }
 
 class _PromotionHomepageState extends State<PromotionHomepage> {
-  int _page = 0;
-  final int _pageSize = pageSize;
+  int _page = 1;
+  int _pageSize = pageSize;
+  int _totalCount = 0;
   int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
-  final TextEditingController _orderReferenceController = TextEditingController();
+  final TextEditingController _promotionNameController = TextEditingController();
+  DropdownAttribute? _promotionStatus;
   final TextEditingController _promotionName = TextEditingController();
   final TextEditingController _promotionDescription = TextEditingController();
   final TextEditingController _promotionTnc = TextEditingController();
@@ -64,6 +70,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   final TextEditingController _endDate = TextEditingController();
   final ValueNotifier<bool> _showOnStart = ValueNotifier(false);
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
+  StreamController<DateTime> rebuild = StreamController.broadcast();
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
@@ -118,13 +125,50 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
+          AppPadding.vertical(),
           Row(
             children: [
               AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(
-              //       controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
-              // ),
+              searchField(
+                InputFieldAttribute(controller: _promotionNameController, hintText: 'Search', labelText: 'Name'),
+              ),
+              AppPadding.horizontal(),
+              StreamBuilder<DateTime>(
+                  stream: rebuildDropdown.stream,
+                  builder: (context, snapshot) {
+                    return Column(
+                      children: [
+                        AppDropdown(
+                          attributeList: DropdownAttributeList(
+                            [
+                              DropdownAttribute('1', 'Active'),
+                              DropdownAttribute('0', 'Inactive'),
+                            ],
+                            labelText: 'information'.tr(gender: 'status'),
+                            value: _promotionStatus?.name,
+                            onChanged: (p0) {
+                              _promotionStatus = p0;
+                              rebuildDropdown.add(DateTime.now());
+                              filtering(page: 1);
+                            },
+                            width: screenWidthByBreakpoint(90, 70, 26),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+              AppPadding.horizontal(),
+              AppOutlinedButton(
+                () {
+                  resetAllFilter();
+                  filtering(enableDebounce: true, page: 1);
+                },
+                backgroundColor: Colors.white,
+                borderRadius: 15,
+                width: 131,
+                height: 45,
+                text: 'Reset',
+              ),
             ],
           ),
           Expanded(
@@ -140,7 +184,47 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                 ),
               ],
             ),
-          )
+          ),
+          StreamBuilder<DateTime>(
+              stream: rebuild.stream,
+              builder: (context, snapshot) {
+                return SizedBox(
+                  width: 500,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: pagination(),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (!isMobile && !isTablet)
+                                  const Flexible(
+                                    child: Text(
+                                      'Items per page: ',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                perPage(),
+                              ],
+                            ),
+                          ),
+                          if (!isMobile && !isTablet)
+                            Text(
+                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -157,6 +241,38 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
     //     orderReference: widget.orderReference!,
     //     previousPage: PromotionHomepage.routeName,
     //   );
+  }
+
+  Widget perPage() {
+    return PerPageWidget(
+      _pageSize.toString(),
+      DropdownAttributeList(
+        [],
+        onChanged: (selected) {
+          DropdownAttribute item = selected as DropdownAttribute;
+          _pageSize = int.parse(item.key);
+          filtering(
+            enableDebounce: false,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget pagination() {
+    return Pagination(
+      numOfPages: _totalPage,
+      selectedPage: _page,
+      pagesVisible: 5,
+      spacing: 10,
+      onPageChanged: (page) {
+        _movePage(page);
+      },
+    );
+  }
+
+  void _movePage(int page) {
+    filtering(page: page, enableDebounce: false);
   }
 
   createNewPromotion() {
@@ -469,7 +585,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
             labelText: attribute.labelText,
             suffixWidget: TextButton(
               onPressed: () {
-                filtering(page: 0);
+                filtering(page: 1);
               },
               child: const Icon(
                 Icons.search,
@@ -478,10 +594,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 0);
-            },
-            onChanged: (value) {
-              filtering(enableDebounce: true, page: 0);
+              filtering(enableDebounce: true, page: 1);
             },
           ),
           width: screenWidthByBreakpoint(90, 70, 26),
@@ -508,11 +621,10 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
           );
         } else {
           return snapshot.promotionAllResponse == null || snapshot.promotionAllResponse!.data!.data!.isEmpty
-              ? Column(
+              ? const Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    tableButton(),
-                    const Expanded(
+                    Expanded(
                       child: Center(
                         child: NoRecordsWidget(),
                       ),
@@ -521,9 +633,9 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                 )
               : GridView.count(
                   padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding / 2),
-                  childAspectRatio: 0.8,
+                  childAspectRatio: 0.7,
                   shrinkWrap: true,
-                  crossAxisCount: screenWidth(100) > 1280 ? 4 : 3,
+                  crossAxisCount: screenWidth(100) > 1280 ? 5 : 4,
                   crossAxisSpacing: screenPadding,
                   mainAxisSpacing: screenPadding,
                   primary: false,
@@ -622,17 +734,23 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
     }
     PromotionController.getAll(
       context,
-      // DeviceRequest(
-      //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
-      //   page: _page,
-      //   pageSize: _pageSize,
-      // ),
+      _page,
+      _pageSize,
+      promotionName: _promotionNameController.text,
+      promotionStatus: _promotionStatus != null
+          ? _promotionStatus?.key == '1'
+              ? 1
+              : _promotionStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalCount = value.data?.totalCount ?? 0;
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<PromotionController>().promotionAllResponse = value;
-        // _page = 0;
+        rebuild.add(DateTime.now());
       } else if (value.code == 404) {}
       return null;
     });
@@ -643,108 +761,8 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   }
 
   resetAllFilter() {
-    _orderReferenceController.text = '';
+    _promotionNameController.text = '';
+    _promotionStatus = null;
     rebuildDropdown.add(DateTime.now());
-  }
-
-  Widget tableButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: Card(
-                          surfaceTintColor: Colors.white,
-                          elevation: 5.0,
-                          color: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                                child: Column(
-                                  children: [
-                                    // searchField(
-                                    //   InputFieldAttribute(
-                                    //       controller: _orderReferenceController,
-                                    //       hintText: 'Search',
-                                    //       labelText: 'Order Reference'),
-                                    // ),
-                                    AppPadding.vertical(denominator: 1 / 3),
-                                    AppOutlinedButton(
-                                      () {
-                                        resetAllFilter();
-                                        filtering(enableDebounce: true, page: 0);
-                                      },
-                                      backgroundColor: Colors.white,
-                                      borderRadius: 15,
-                                      width: 131,
-                                      height: 45,
-                                      text: 'Clear',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CloseButton(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                });
-          },
-          child: Row(
-            children: [
-              const Icon(
-                Icons.filter_list,
-                color: Colors.blue,
-              ),
-              AppPadding.horizontal(denominator: 2),
-              Text(
-                'Filter',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            resetAllFilter();
-            filtering(enableDebounce: true, page: 0);
-          },
-          child: Row(
-            children: [
-              const Icon(
-                Icons.refresh,
-                color: Colors.blue,
-              ),
-              AppPadding.horizontal(denominator: 2),
-              Text(
-                'Reset',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }

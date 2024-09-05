@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -19,6 +20,7 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -44,7 +46,7 @@ class RewardHomepage extends StatefulWidget {
 }
 
 class _RewardHomepageState extends State<RewardHomepage> {
-  int _page = 0;
+  int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
   int _totalPage = 0;
@@ -92,7 +94,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
       width: 100,
     ),
   ];
-  final TextEditingController _orderReferenceController = TextEditingController();
+  final TextEditingController _rewardNameController = TextEditingController();
+  DropdownAttribute? _rewardStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -119,9 +122,6 @@ class _RewardHomepageState extends State<RewardHomepage> {
     //   builder: (context, snapshot) {
     return Column(
       children: [
-        searchField(
-          InputFieldAttribute(controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
-        ),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -217,19 +217,20 @@ class _RewardHomepageState extends State<RewardHomepage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
-          Row(
-            children: [
-              AppPadding.horizontal(),
-              searchField(
-                InputFieldAttribute(
-                    controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
-              ),
-              // AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
-              // ),
-            ],
-          ),
+          AppPadding.vertical(),
+          // Row(
+          //   children: [
+          //     AppPadding.horizontal(),
+          //     searchField(
+          //       InputFieldAttribute(
+          //           controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+          //     ),
+          //     // AppPadding.horizontal(),
+          //     // searchField(
+          //     //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
+          //     // ),
+          //   ],
+          // ),
           Expanded(
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -267,7 +268,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
             labelText: attribute.labelText,
             suffixWidget: TextButton(
               onPressed: () {
-                filtering(page: 0);
+                filtering(page: 1);
               },
               child: const Icon(
                 Icons.search,
@@ -276,10 +277,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 0);
-            },
-            onChanged: (value) {
-              filtering(enableDebounce: true, page: 0);
+              filtering(enableDebounce: true, page: 1);
             },
           ),
           width: screenWidthByBreakpoint(90, 70, 26),
@@ -510,7 +508,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                             ),
                             if (!isMobile && !isTablet)
                               Text(
-                                '${((_page + 1) * _pageSize) - _pageSize + 1} - ${((_page + 1) * _pageSize < _totalCount) ? ((_page + 1) * _pageSize) : _totalCount} of $_totalCount',
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
                               ),
                           ],
                         ),
@@ -538,24 +536,21 @@ class _RewardHomepageState extends State<RewardHomepage> {
     }
     RewardController.getAll(
       context,
-      // DeviceRequest(
-      //   orderReference: (_orderReferenceController.text != '') ? _orderReferenceController.text : null,
-      //   serialNumber: (_ontSNController.text != '') ? _ontSNController.text : null,
-      //   ont: (_ontController.text != '') ? _ontController.text : null,
-      //   port: (_portController.text != '') ? _portController.text : null,
-      //   card: (_slotController.text != '') ? _slotController.text : null,
-      //   ontPON: (_ontPonController.text != '') ? _ontPonController.text : null,
-      //   ontMAC: (_ontMacController.text != '') ? _ontMacController.text : null,
-      //   ipAddress: (_ipController.text != '') ? _ipController.text : null,
-      //   nltType: _nltType,
-      //   page: _page,
-      //   pageSize: _pageSize,
-      // ),
+      _page,
+      _pageSize,
+      rewardName: _rewardNameController.text,
+      rewardStatus: _rewardStatus != null
+          ? _rewardStatus?.key == '1'
+              ? 1
+              : _rewardStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.data?.length ?? 0;
-        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalCount = value.data?.totalCount ?? 0;
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<RewardController>().rewardAllResponse = value;
         // _page = 0;
       } else if (value.code == 404) {}
@@ -649,7 +644,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
   }
 
   resetAllFilter() {
-    _orderReferenceController.text = '';
+    _rewardNameController.text = '';
+    _rewardStatus = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -732,15 +728,40 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                   children: [
                                     searchField(
                                       InputFieldAttribute(
-                                          controller: _orderReferenceController,
+                                          controller: _rewardNameController,
                                           hintText: 'Search',
-                                          labelText: 'Order Reference'),
+                                          labelText: 'Reward Name'),
                                     ),
+                                    AppPadding.vertical(),
+                                    StreamBuilder<DateTime>(
+                                        stream: rebuildDropdown.stream,
+                                        builder: (context, snapshot) {
+                                          return Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'status'),
+                                                  value: _rewardStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _rewardStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }),
                                     AppPadding.vertical(denominator: 1 / 3),
                                     AppOutlinedButton(
                                       () {
                                         resetAllFilter();
-                                        filtering(enableDebounce: true, page: 0);
+                                        filtering(enableDebounce: true, page: 1);
                                       },
                                       backgroundColor: Colors.white,
                                       borderRadius: 15,
@@ -780,7 +801,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         TextButton(
           onPressed: () {
             resetAllFilter();
-            filtering(enableDebounce: true, page: 0);
+            filtering(enableDebounce: true, page: 1);
           },
           child: Row(
             children: [
@@ -819,11 +840,11 @@ class _RewardHomepageState extends State<RewardHomepage> {
   Widget pagination() {
     return Pagination(
       numOfPages: _totalPage,
-      selectedPage: _page + 1,
-      pagesVisible: isMobile ? 3 : 5,
+      selectedPage: _page,
+      pagesVisible: 5,
       spacing: 10,
       onPageChanged: (page) {
-        _movePage(page - 1);
+        _movePage(page);
       },
     );
   }

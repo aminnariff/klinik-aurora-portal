@@ -23,6 +23,7 @@ import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
+import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -77,6 +78,13 @@ class _UserHomepageState extends State<UserHomepage> {
     TableHeaderAttribute(
       attribute: 'userStatus',
       label: 'Status',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 70,
+    ),
+    TableHeaderAttribute(
+      attribute: 'totalPoints',
+      label: 'Points',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 70,
@@ -373,7 +381,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                       cells: [
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.userAllResponse?[index].userFullname ??
+                                            snapshot.userAllResponse?[index].userFullname?.titleCase() ??
                                                 snapshot.userAllResponse?[index].userName ??
                                                 'N/A',
                                           ),
@@ -395,6 +403,15 @@ class _UserHomepageState extends State<UserHomepage> {
                                                     ? 'active'
                                                     : 'inactive'),
                                                 fontWeightDelta: 1),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              AppSelectableText(
+                                                  '${snapshot.userAllResponse?[index].totalPoint ?? 'N/A'}'),
+                                            ],
                                           ),
                                         ),
                                         DataCell(
@@ -576,7 +593,7 @@ class _UserHomepageState extends State<UserHomepage> {
     }
     UserController.getAll(
       context,
-      page ?? 1,
+      _page,
       _pageSize,
       userFullName: _userFullNameController.text,
       userName: _userNameController.text,
@@ -596,7 +613,6 @@ class _UserHomepageState extends State<UserHomepage> {
         _totalCount = value.data?.totalCount ?? 0;
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<UserController>().userAllResponse = value.data?.data;
-        // _page = 0;
       } else if (value.code == 404) {}
       return null;
     });

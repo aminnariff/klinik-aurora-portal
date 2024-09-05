@@ -1,8 +1,15 @@
 class DoctorBranchResponse {
   String? message;
   List<Data>? data;
+  int? totalPage;
+  int? totalCount;
 
-  DoctorBranchResponse({this.message, this.data});
+  DoctorBranchResponse({
+    this.message,
+    this.data,
+    this.totalPage,
+    this.totalCount,
+  });
 
   DoctorBranchResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -12,6 +19,8 @@ class DoctorBranchResponse {
         data!.add(Data.fromJson(v));
       });
     }
+    totalPage = json['totalPage'];
+    totalCount = json['totalCount'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,6 +29,8 @@ class DoctorBranchResponse {
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
+    data['totalPage'] = totalPage;
+    data['totalCount'] = totalCount;
     return data;
   }
 }

@@ -1,8 +1,15 @@
 class PromotionAllResponse {
   String? message;
   List<Data>? data;
+  int? totalPage;
+  int? totalCount;
 
-  PromotionAllResponse({this.message, this.data});
+  PromotionAllResponse({
+    this.message,
+    this.data,
+    this.totalPage,
+    this.totalCount,
+  });
 
   PromotionAllResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -12,6 +19,8 @@ class PromotionAllResponse {
         data!.add(Data.fromJson(v));
       });
     }
+    totalPage = json['totalPage'];
+    totalCount = json['totalCount'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,6 +29,8 @@ class PromotionAllResponse {
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
+    data['totalPage'] = totalPage;
+    data['totalCount'] = totalCount;
     return data;
   }
 }

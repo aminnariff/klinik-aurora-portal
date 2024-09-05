@@ -45,7 +45,7 @@ class UserResponse {
   String? userPhone;
   String? userReferral;
   int? userStatus;
-  int? userPoints;
+  int? totalPoint;
   String? createdDate;
   String? modifiedDate;
 
@@ -58,7 +58,7 @@ class UserResponse {
       this.branchId,
       this.userPhone,
       this.userReferral,
-      this.userPoints,
+      this.totalPoint,
       this.userStatus,
       this.createdDate,
       this.modifiedDate});
@@ -73,7 +73,7 @@ class UserResponse {
     userPhone = json['userPhone'];
     userReferral = json['userReferral'];
     userStatus = json['userStatus'];
-    userPoints = json['userPoints'];
+    totalPoint = json['totalPoint'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
   }
@@ -89,7 +89,7 @@ class UserResponse {
     data['userPhone'] = userPhone;
     data['userReferral'] = userReferral;
     data['userStatus'] = userStatus;
-    data['userPoints'] = userPoints;
+    data['totalPoint'] = totalPoint;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
     return data;

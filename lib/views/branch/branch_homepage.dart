@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -93,15 +94,9 @@ class _BranchHomepageState extends State<BranchHomepage> {
       width: 100,
     ),
   ];
-  final TextEditingController _orderReferenceController = TextEditingController();
-  final TextEditingController _ontController = TextEditingController();
-  final TextEditingController _slotController = TextEditingController();
-  final TextEditingController _portController = TextEditingController();
-  final TextEditingController _ontSNController = TextEditingController();
-  final TextEditingController _ontPonController = TextEditingController();
-  final TextEditingController _ontMacController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController();
-  String? _nltType;
+  final TextEditingController _branchNameController = TextEditingController();
+  DropdownAttribute? _selectedBranchStatus;
+  DropdownAttribute? _selectedState;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -129,7 +124,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
     return Column(
       children: [
         searchField(
-          InputFieldAttribute(controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+          InputFieldAttribute(controller: _branchNameController, hintText: 'Search', labelText: 'Order Reference'),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -226,19 +221,19 @@ class _BranchHomepageState extends State<BranchHomepage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
-          Row(
-            children: [
-              AppPadding.horizontal(),
-              searchField(
-                InputFieldAttribute(
-                    controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
-              ),
-              // AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
-              // ),
-            ],
-          ),
+          AppPadding.vertical(),
+          // Row(
+          //   children: [
+          //     AppPadding.horizontal(),
+          //     searchField(
+          //       InputFieldAttribute(controller: _branchNameController, hintText: 'Search', labelText: 'Branch Name'),
+          //     ),
+          //     // AppPadding.horizontal(),
+          //     // searchField(
+          //     //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
+          //     // ),
+          //   ],
+          // ),
           Expanded(
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -276,7 +271,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
             labelText: attribute.labelText,
             suffixWidget: TextButton(
               onPressed: () {
-                filtering(page: 0);
+                filtering(page: 1);
               },
               child: const Icon(
                 Icons.search,
@@ -285,10 +280,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 0);
-            },
-            onChanged: (value) {
-              filtering(enableDebounce: true, page: 0);
+              filtering(enableDebounce: true, page: 1);
             },
           ),
           width: screenWidthByBreakpoint(90, 70, 26),
@@ -542,7 +534,20 @@ class _BranchHomepageState extends State<BranchHomepage> {
     if (page != null) {
       _page = page;
     }
-    BranchController.getAll(context, _page, _pageSize).then((value) {
+    BranchController.getAll(
+      context,
+      _page,
+      _pageSize,
+      branchName: _branchNameController.text,
+      branchState: _selectedState?.key,
+      branchStatus: _selectedBranchStatus != null
+          ? _selectedBranchStatus?.key == '1'
+              ? 1
+              : _selectedBranchStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
+    ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         _totalCount = value.data?.totalCount ?? 0;
@@ -640,15 +645,9 @@ class _BranchHomepageState extends State<BranchHomepage> {
   }
 
   resetAllFilter() {
-    _orderReferenceController.text = '';
-    _ontController.text = '';
-    _slotController.text = '';
-    _portController.text = '';
-    _ontSNController.text = '';
-    _ontPonController.text = '';
-    _ontMacController.text = '';
-    _ipController.text = '';
-    _nltType = null;
+    _branchNameController.text = '';
+    _selectedBranchStatus = null;
+    _selectedState = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -730,66 +729,54 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                   children: [
                                     searchField(
                                       InputFieldAttribute(
-                                          controller: _orderReferenceController,
+                                          controller: _branchNameController,
                                           hintText: 'Search',
-                                          labelText: 'Order Reference'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontController, hintText: 'Search', labelText: 'ONT'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _slotController, hintText: 'Search', labelText: 'Slot'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _portController, hintText: 'Search', labelText: 'Port'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontSNController,
-                                          hintText: 'Search',
-                                          labelText: 'ONT Serial Number'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontPonController, hintText: 'Search', labelText: 'ONT PON'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontMacController, hintText: 'Search', labelText: 'ONT MAC'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ipController, hintText: 'Search', labelText: 'IP Address'),
+                                          labelText: 'Branch Name'),
                                     ),
                                     AppPadding.vertical(),
                                     StreamBuilder<DateTime>(
                                         stream: rebuildDropdown.stream,
                                         builder: (context, snapshot) {
-                                          return AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                DropdownAttribute('CONFIRM', 'CONFIRM'),
-                                                DropdownAttribute('COMPLETE', 'COMPLETE'),
-                                              ],
-                                              labelText: 'nltType',
-                                              value: _nltType,
-                                              onChanged: (p0) {
-                                                _nltType = p0?.key;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 0);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
+                                          return Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'registeredBranch'),
+                                                  value: _selectedBranchStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedBranchStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                              AppPadding.vertical(),
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  states,
+                                                  labelText: 'information'.tr(gender: 'state'),
+                                                  value: _selectedState?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedState = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
                                           );
                                         }),
                                     AppPadding.vertical(denominator: 1 / 3),
                                     AppOutlinedButton(
                                       () {
                                         resetAllFilter();
-                                        filtering(enableDebounce: true, page: 0);
+                                        filtering(enableDebounce: true, page: 1);
                                       },
                                       backgroundColor: Colors.white,
                                       borderRadius: 15,
@@ -829,7 +816,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
         TextButton(
           onPressed: () {
             resetAllFilter();
-            filtering(enableDebounce: true, page: 0);
+            filtering(enableDebounce: true, page: 1);
           },
           child: Row(
             children: [

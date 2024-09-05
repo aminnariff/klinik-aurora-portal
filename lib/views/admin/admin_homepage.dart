@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -47,11 +48,15 @@ class AdminHomepage extends StatefulWidget {
 }
 
 class _AdminHomepageState extends State<AdminHomepage> {
-  int _page = 0;
+  int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
   int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _userPhoneController = TextEditingController();
+  final TextEditingController _userEmailController = TextEditingController();
+  DropdownAttribute? _selectedUserStatus;
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
@@ -101,15 +106,6 @@ class _AdminHomepageState extends State<AdminHomepage> {
       width: 100,
     ),
   ];
-  final TextEditingController _orderReferenceController = TextEditingController();
-  final TextEditingController _ontController = TextEditingController();
-  final TextEditingController _slotController = TextEditingController();
-  final TextEditingController _portController = TextEditingController();
-  final TextEditingController _ontSNController = TextEditingController();
-  final TextEditingController _ontPonController = TextEditingController();
-  final TextEditingController _ontMacController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController();
-  String? _nltType;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -151,7 +147,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
     return Column(
       children: [
         searchField(
-          InputFieldAttribute(controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+          InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'Admin Name'),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -252,8 +248,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
             children: [
               AppPadding.horizontal(),
               searchField(
-                InputFieldAttribute(
-                    controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+                InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'Admin Name'),
               ),
               // AppPadding.horizontal(),
               // searchField(
@@ -298,7 +293,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
             labelText: attribute.labelText,
             suffixWidget: TextButton(
               onPressed: () {
-                filtering(page: 0);
+                filtering(page: 1);
               },
               child: const Icon(
                 Icons.search,
@@ -307,10 +302,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 0);
-            },
-            onChanged: (value) {
-              filtering(enableDebounce: true, page: 0);
+              filtering(enableDebounce: true, page: 1);
             },
           ),
           width: screenWidthByBreakpoint(90, 70, 26),
@@ -545,7 +537,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             ),
                             if (!isMobile && !isTablet)
                               Text(
-                                '${((_page + 1) * _pageSize) - _pageSize + 1} - ${((_page + 1) * _pageSize < _totalCount) ? ((_page + 1) * _pageSize) : _totalCount} of $_totalCount',
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
                               ),
                           ],
                         ),
@@ -571,11 +563,25 @@ class _AdminHomepageState extends State<AdminHomepage> {
     if (page != null) {
       _page = page;
     }
-    AdminController.getAll(context).then((value) {
+    AdminController.getAll(
+      context,
+      _page,
+      _pageSize,
+      userName: _userNameController.text,
+      userPhone: _userPhoneController.text,
+      userEmail: _userEmailController.text,
+      userStatus: _selectedUserStatus != null
+          ? _selectedUserStatus?.key == '1'
+              ? 1
+              : _selectedUserStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
+    ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.data?.length ?? 0;
-        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalCount = value.data?.totalCount ?? 0;
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<AdminController>().adminAllResponse = value.data;
         // _page = 0;
       } else if (value.code == 404) {}
@@ -669,15 +675,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
   }
 
   resetAllFilter() {
-    _orderReferenceController.text = '';
-    _ontController.text = '';
-    _slotController.text = '';
-    _portController.text = '';
-    _ontSNController.text = '';
-    _ontPonController.text = '';
-    _ontMacController.text = '';
-    _ipController.text = '';
-    _nltType = null;
+    _userNameController.text = '';
+    _userPhoneController.text = '';
+    _userEmailController.text = '';
+    _selectedUserStatus = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -759,66 +760,57 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                   children: [
                                     searchField(
                                       InputFieldAttribute(
-                                          controller: _orderReferenceController,
-                                          hintText: 'Search',
-                                          labelText: 'Order Reference'),
+                                        controller: _userNameController,
+                                        hintText: 'Search',
+                                        labelText: 'Username',
+                                      ),
                                     ),
+                                    AppPadding.vertical(),
                                     searchField(
                                       InputFieldAttribute(
-                                          controller: _ontController, hintText: 'Search', labelText: 'ONT'),
+                                        controller: _userPhoneController,
+                                        hintText: 'Search',
+                                        labelText: 'Contact Number',
+                                      ),
                                     ),
+                                    AppPadding.vertical(),
                                     searchField(
                                       InputFieldAttribute(
-                                          controller: _slotController, hintText: 'Search', labelText: 'Slot'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _portController, hintText: 'Search', labelText: 'Port'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontSNController,
-                                          hintText: 'Search',
-                                          labelText: 'ONT Serial Number'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontPonController, hintText: 'Search', labelText: 'ONT PON'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ontMacController, hintText: 'Search', labelText: 'ONT MAC'),
-                                    ),
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _ipController, hintText: 'Search', labelText: 'IP Address'),
+                                        controller: _userEmailController,
+                                        hintText: 'Search',
+                                        labelText: 'Email',
+                                      ),
                                     ),
                                     AppPadding.vertical(),
                                     StreamBuilder<DateTime>(
                                         stream: rebuildDropdown.stream,
                                         builder: (context, snapshot) {
-                                          return AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                DropdownAttribute('CONFIRM', 'CONFIRM'),
-                                                DropdownAttribute('COMPLETE', 'COMPLETE'),
-                                              ],
-                                              labelText: 'nltType',
-                                              value: _nltType,
-                                              onChanged: (p0) {
-                                                _nltType = p0?.key;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 0);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
+                                          return Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'userStatus'),
+                                                  value: _selectedUserStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedUserStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
                                           );
                                         }),
                                     AppPadding.vertical(denominator: 1 / 3),
                                     AppOutlinedButton(
                                       () {
                                         resetAllFilter();
-                                        filtering(enableDebounce: true, page: 0);
+                                        filtering(enableDebounce: true, page: 1);
                                       },
                                       backgroundColor: Colors.white,
                                       borderRadius: 15,
@@ -858,7 +850,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
         TextButton(
           onPressed: () {
             resetAllFilter();
-            filtering(enableDebounce: true, page: 0);
+            filtering(enableDebounce: true, page: 1);
           },
           child: Row(
             children: [
@@ -897,11 +889,11 @@ class _AdminHomepageState extends State<AdminHomepage> {
   Widget pagination() {
     return Pagination(
       numOfPages: _totalPage,
-      selectedPage: _page + 1,
-      pagesVisible: isMobile ? 3 : 5,
+      selectedPage: _page,
+      pagesVisible: 5,
       spacing: 10,
       onPageChanged: (page) {
-        _movePage(page - 1);
+        _movePage(page);
       },
     );
   }

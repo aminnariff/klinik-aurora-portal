@@ -395,9 +395,7 @@ class _RewardDetailState extends State<RewardDetail> {
   }
 
   getLatestData() {
-    RewardController.getAll(
-      context,
-    ).then((value) {
+    RewardController.getAll(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<RewardController>().rewardAllResponse = value;

@@ -7,6 +7,7 @@ import 'package:klinik_aurora_portal/models/voucher/create_voucher_response.dart
 import 'package:klinik_aurora_portal/models/voucher/update_voucher_request.dart';
 import 'package:klinik_aurora_portal/models/voucher/update_voucher_response.dart';
 import 'package:klinik_aurora_portal/models/voucher/voucher_all_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class VoucherController extends ChangeNotifier {
   ApiResponse<VoucherAllResponse>? _voucherAllResponse;
@@ -17,16 +18,20 @@ class VoucherController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<VoucherAllResponse>> getAll(
-    BuildContext context,
-  ) async {
-    return ApiController()
-        .call(
+  static Future<ApiResponse<VoucherAllResponse>> getAll(BuildContext context, int page, int pageSize,
+      {String? voucherName, String? voucherCode, int? voucherStatus}) async {
+    return ApiController().call(
       context,
       method: Method.get,
       endpoint: 'admin/voucher',
-    )
-        .then((value) {
+      queryParameters: {
+        if (notNullOrEmptyString(voucherName)) 'voucherName': voucherName,
+        if (notNullOrEmptyString(voucherCode)) 'voucherCode': voucherCode,
+        if (voucherStatus != null) 'voucherStatus': voucherStatus,
+        'page': page,
+        'pageSize': pageSize,
+      },
+    ).then((value) {
       try {
         return ApiResponse(code: value.code, data: VoucherAllResponse.fromJson(value.data));
       } catch (e) {

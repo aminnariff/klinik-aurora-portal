@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/models/promotion/create_promotion_response.
 import 'package:klinik_aurora_portal/models/promotion/promotion_all_response.dart';
 import 'package:klinik_aurora_portal/models/promotion/update_promotion_request.dart';
 import 'package:klinik_aurora_portal/models/promotion/update_promotion_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class PromotionController extends ChangeNotifier {
   ApiResponse<PromotionAllResponse>? _promotionAllResponse;
@@ -23,16 +24,19 @@ class PromotionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<PromotionAllResponse>> getAll(
-    BuildContext context,
-  ) async {
-    return ApiController()
-        .call(
+  static Future<ApiResponse<PromotionAllResponse>> getAll(BuildContext context, int page, int pageSize,
+      {String? promotionName, int? promotionStatus}) async {
+    return ApiController().call(
       context,
       method: Method.get,
       endpoint: 'admin/promotion',
-    )
-        .then((value) {
+      queryParameters: {
+        if (notNullOrEmptyString(promotionName)) 'promotionName': promotionName,
+        if (promotionStatus != null) 'promotionStatus': promotionStatus,
+        'page': page,
+        'pageSize': pageSize,
+      },
+    ).then((value) {
       try {
         return ApiResponse(code: value.code, data: PromotionAllResponse.fromJson(value.data));
       } catch (e) {

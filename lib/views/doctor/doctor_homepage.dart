@@ -12,11 +12,11 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch;
 import 'package:klinik_aurora_portal/models/doctor/doctor_branch_response.dart';
 import 'package:klinik_aurora_portal/models/doctor/update_doctor_request.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -47,7 +47,7 @@ class DoctorHomepage extends StatefulWidget {
 }
 
 class _DoctorHomepageState extends State<DoctorHomepage> {
-  int _page = 0;
+  int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
   int _totalPage = 0;
@@ -95,8 +95,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       width: 100,
     ),
   ];
-  final TextEditingController _orderReferenceController = TextEditingController();
-  String? _selectedBranch;
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _userPhoneController = TextEditingController();
+  DropdownAttribute? _selectedUserStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -133,7 +134,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     return Column(
       children: [
         searchField(
-          InputFieldAttribute(controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
+          InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'PIC Name'),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -277,7 +278,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             labelText: attribute.labelText,
             suffixWidget: TextButton(
               onPressed: () {
-                filtering(page: 0);
+                filtering(page: 1);
               },
               child: const Icon(
                 Icons.search,
@@ -286,10 +287,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 0);
-            },
-            onChanged: (value) {
-              filtering(enableDebounce: true, page: 0);
+              filtering(enableDebounce: true, page: 1);
             },
           ),
           width: screenWidthByBreakpoint(90, 70, 26),
@@ -522,7 +520,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                             ),
                             if (!isMobile && !isTablet)
                               Text(
-                                '${((_page + 1) * _pageSize) - _pageSize + 1} - ${((_page + 1) * _pageSize < _totalCount) ? ((_page + 1) * _pageSize) : _totalCount} of $_totalCount',
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
                               ),
                           ],
                         ),
@@ -567,13 +565,22 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       _page = page;
     }
     DoctorController.get(
-      context,
+      context, _page, _pageSize,
+      doctorName: _userNameController.text,
+      doctorPhone: _userPhoneController.text,
+      doctorStatus: _selectedUserStatus != null
+          ? _selectedUserStatus?.key == '1'
+              ? 1
+              : _selectedUserStatus?.key == '0'
+                  ? 0
+                  : null
+          : null,
       // branchId: '62743240-006d-11ef-a129-6677d190faa2',
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        _totalCount = value.data?.data?.length ?? 0;
-        _totalPage = ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalCount = value.data?.totalCount ?? 0;
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<DoctorController>().doctorBranchResponse = value.data;
         // _page = 0;
       } else if (value.code == 404) {}
@@ -667,8 +674,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   resetAllFilter() {
-    _orderReferenceController.text = '';
-    _selectedBranch = null;
+    _userNameController.text = '';
+    _userPhoneController.text = '';
+    _selectedUserStatus = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -748,52 +756,58 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
                                 child: Column(
                                   children: [
-                                    // searchField(
-                                    //   InputFieldAttribute(
-                                    //       controller: _orderReferenceController,
-                                    //       hintText: 'Search',
-                                    //       labelText: 'Order Reference'),
-                                    // ),
+                                    searchField(
+                                      InputFieldAttribute(
+                                        controller: _userNameController,
+                                        hintText: 'Search',
+                                        labelText: 'PIC Name',
+                                      ),
+                                    ),
+                                    AppPadding.vertical(),
+                                    searchField(
+                                      InputFieldAttribute(
+                                        controller: _userPhoneController,
+                                        hintText: 'Search',
+                                        labelText: 'PIC Contact Number',
+                                      ),
+                                    ),
                                     AppPadding.vertical(),
                                     StreamBuilder<DateTime>(
                                         stream: rebuildDropdown.stream,
                                         builder: (context, snapshot) {
-                                          return AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                if (context.read<BranchController>().branchAllResponse?.data?.data !=
-                                                    null)
-                                                  for (branch.Data item in context
-                                                          .read<BranchController>()
-                                                          .branchAllResponse
-                                                          ?.data
-                                                          ?.data ??
-                                                      [])
-                                                    DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                              ],
-                                              labelText: 'information'.tr(gender: 'registeredBranch'),
-                                              value: _selectedBranch,
-                                              onChanged: (p0) {
-                                                _selectedBranch = p0?.key;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 0);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
+                                          return Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'userStatus'),
+                                                  value: _selectedUserStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedUserStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
                                           );
                                         }),
                                     AppPadding.vertical(denominator: 1 / 3),
-                                    // AppOutlinedButton(
-                                    //   () {
-                                    //     resetAllFilter();
-                                    //     filtering(enableDebounce: true, page: 0);
-                                    //   },
-                                    //   backgroundColor: Colors.white,
-                                    //   borderRadius: 15,
-                                    //   width: 131,
-                                    //   height: 45,
-                                    //   text: 'Clear',
-                                    // ),
+                                    AppOutlinedButton(
+                                      () {
+                                        resetAllFilter();
+                                        filtering(enableDebounce: true, page: 1);
+                                      },
+                                      backgroundColor: Colors.white,
+                                      borderRadius: 15,
+                                      width: 131,
+                                      height: 45,
+                                      text: 'Clear',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -826,7 +840,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         TextButton(
           onPressed: () {
             resetAllFilter();
-            filtering(enableDebounce: true, page: 0);
+            filtering(enableDebounce: true, page: 1);
           },
           child: Row(
             children: [
@@ -865,11 +879,11 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   Widget pagination() {
     return Pagination(
       numOfPages: _totalPage,
-      selectedPage: _page + 1,
+      selectedPage: _page,
       pagesVisible: isMobile ? 3 : 5,
       spacing: 10,
       onPageChanged: (page) {
-        _movePage(page - 1);
+        _movePage(page);
       },
     );
   }

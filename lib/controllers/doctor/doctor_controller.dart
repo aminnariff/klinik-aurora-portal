@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/models/doctor/doctor_branch_response.dart';
 import 'package:klinik_aurora_portal/models/doctor/update_doctor_request.dart';
 import 'package:klinik_aurora_portal/models/doctor/update_doctor_response.dart';
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class DoctorController extends ChangeNotifier {
   DoctorBranchResponse? _doctorBranchResponse;
@@ -23,13 +24,26 @@ class DoctorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<DoctorBranchResponse>> get(BuildContext context, {String? branchId}) async {
+  static Future<ApiResponse<DoctorBranchResponse>> get(
+    BuildContext context,
+    int page,
+    int pageSize, {
+    String? branchId,
+    String? doctorName,
+    String? doctorPhone,
+    int? doctorStatus,
+  }) async {
     return ApiController().call(
       context,
       method: Method.get,
       endpoint: 'admin/doctor',
       queryParameters: {
         'branchId': branchId,
+        if (notNullOrEmptyString(doctorName)) 'doctorName': doctorName,
+        if (notNullOrEmptyString(doctorPhone)) 'doctorPhone': doctorPhone,
+        if (doctorStatus != null) 'doctorStatus': doctorStatus,
+        'page': page,
+        'pageSize': pageSize,
       },
     ).then((value) {
       try {
