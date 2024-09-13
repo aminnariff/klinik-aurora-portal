@@ -1,6 +1,6 @@
 class ProductionEnvironment {
   Map<String, dynamic> data = {
-    "appUrl": "https://srv495548.hstgr.cloud/",
-    "imageUrl": "https://srv495548.hstgr.cloud/",
+    "appUrl": "https://vps.klinikauroramembership.com/",
+    "imageUrl": "https://vps.klinikauroramembership.com/",
   };
 }

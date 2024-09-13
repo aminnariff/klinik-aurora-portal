@@ -74,7 +74,6 @@ class ApiController {
       headers: {
         Headers.acceptHeader: '*/*',
         Headers.contentTypeHeader: 'application/json',
-        'Host': 'srv495548.hstgr.cloud',
         'Authorization': 'Bearer $token',
       },
     );
@@ -85,7 +84,6 @@ class ApiController {
       headers: {
         Headers.acceptHeader: '*/*',
         Headers.contentTypeHeader: 'application/json',
-        'Host': 'srv495548.hstgr.cloud',
       },
     );
   }

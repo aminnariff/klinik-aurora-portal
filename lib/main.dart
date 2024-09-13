@@ -52,7 +52,7 @@ Future<void> main() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     await EasyLocalization.ensureInitialized();
-    environment = Flavor.development;
+    environment = Flavor.production;
     AppVersion.init();
     AppLoading.init();
     Storage.init();
