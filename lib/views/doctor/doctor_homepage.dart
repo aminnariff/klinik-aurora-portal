@@ -107,7 +107,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(DoctorHomepage.displayName);
     });
     if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context, 1, pageSize).then(
+      BranchController.getAll(context, 1, 1000).then(
         (value) {
           if (responseCode(value.code)) {
             context.read<BranchController>().branchAllResponse = value;

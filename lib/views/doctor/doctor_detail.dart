@@ -69,7 +69,6 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     controller: TextEditingController(),
   );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
-  StreamController<DateTime> validateRebuild = StreamController.broadcast();
   DropdownAttribute? _selectedBranch;
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
@@ -83,22 +82,14 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       _branchId.controller.text = widget.doctor?.branchId ?? '';
       selectedFile = FileAttribute(path: widget.doctor?.doctorImage, name: widget.doctor?.doctorImage);
       try {
-        if (context.read<BranchController>().branchAllResponse == null) {
-          BranchController.getAll(context, 1, pageSize).then((value) {
-            if (responseCode(value.code)) {
-              context.read<BranchController>().branchAllResponse = value;
-            }
-          });
-        }
         branch_model.Data? branch = context
             .read<BranchController>()
             .branchAllResponse
             ?.data
             ?.data
             ?.firstWhere((element) => element.branchId == _branchId.controller.text);
-        setState(() {
-          _selectedBranch = DropdownAttribute(_branchId.controller.text, branch?.branchName ?? '');
-        });
+        _selectedBranch = DropdownAttribute(_branchId.controller.text, branch?.branchName ?? '');
+        rebuildDropdown.add(DateTime.now());
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -162,29 +153,36 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                   AppPadding.vertical(denominator: 2),
                                   Row(
                                     children: [
-                                      AppDropdown(
-                                        attributeList: DropdownAttributeList(
-                                          [
-                                            if (context.read<BranchController>().branchAllResponse?.data?.data != null)
-                                              for (branch_model.Data item
-                                                  in context.read<BranchController>().branchAllResponse?.data?.data ??
-                                                      [])
-                                                DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                          ],
-                                          onChanged: (selected) {
-                                            setState(() {
-                                              if (_branchId.errorMessage != null) {
-                                                _branchId.errorMessage = null;
-                                              }
-                                              _selectedBranch = selected;
-                                              _branchId.controller.text = selected!.name;
-                                            });
-                                          },
-                                          errorMessage: _branchId.errorMessage,
-                                          value: _selectedBranch?.name,
-                                          width: screenWidth1728(26),
-                                        ),
-                                      ),
+                                      StreamBuilder<DateTime>(
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return AppDropdown(
+                                              attributeList: DropdownAttributeList(
+                                                [
+                                                  if (context.read<BranchController>().branchAllResponse?.data?.data !=
+                                                      null)
+                                                    for (branch_model.Data item in context
+                                                            .read<BranchController>()
+                                                            .branchAllResponse
+                                                            ?.data
+                                                            ?.data ??
+                                                        [])
+                                                      DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
+                                                ],
+                                                onChanged: (selected) {
+                                                  if (_branchId.errorMessage != null) {
+                                                    _branchId.errorMessage = null;
+                                                  }
+                                                  _selectedBranch = selected;
+                                                  _branchId.controller.text = selected!.name;
+                                                  rebuildDropdown.add(DateTime.now());
+                                                },
+                                                errorMessage: _branchId.errorMessage,
+                                                value: _selectedBranch?.name,
+                                                width: screenWidth1728(26),
+                                              ),
+                                            );
+                                          }),
                                     ],
                                   ),
                                   AppPadding.vertical(denominator: 2),
@@ -277,6 +275,37 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                   child: Image.network(
                                                     '${Environment.imageUrl}${widget.doctor?.doctorImage}',
                                                     height: 410,
+                                                    loadingBuilder: (BuildContext context, Widget child,
+                                                        ImageChunkEvent? loadingProgress) {
+                                                      if (loadingProgress == null) {
+                                                        return child; // The image is fully loaded
+                                                      }
+                                                      return Center(
+                                                        child: CircularProgressIndicator(
+                                                          // You can use any loading indicator
+                                                          value: loadingProgress.expectedTotalBytes != null
+                                                              ? loadingProgress.cumulativeBytesLoaded /
+                                                                  (loadingProgress.expectedTotalBytes ?? 1)
+                                                              : null,
+                                                        ),
+                                                      );
+                                                    },
+                                                    errorBuilder:
+                                                        (BuildContext context, Object error, StackTrace? stackTrace) {
+                                                      return Container(
+                                                        padding: EdgeInsets.all(screenPadding),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(12),
+                                                          color: disabledColor,
+                                                        ),
+                                                        child: const Center(
+                                                          child: Icon(
+                                                            Icons.error,
+                                                            color: errorColor,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
                                                   ),
                                                 ),
                                         AppPadding.vertical(denominator: 2),
