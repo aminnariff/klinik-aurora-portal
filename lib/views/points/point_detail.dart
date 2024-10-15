@@ -37,7 +37,6 @@ class PointDetail extends StatefulWidget {
 class _PointDetailState extends State<PointDetail> {
   final TextEditingController _userName = TextEditingController();
   final TextEditingController _userFullname = TextEditingController();
-  final TextEditingController _totalPoint = TextEditingController();
   final TextEditingController _userPoints = TextEditingController();
   final TextEditingController _points = TextEditingController();
   DropdownAttribute? _selectedVoucher;
@@ -161,7 +160,8 @@ class _PointDetailState extends State<PointDetail> {
                                                 onChanged: (selected) {
                                                   setState(() {
                                                     _selectedType = selected;
-                                                    _selectedReward = null;
+                                                    print('_selectedType?.key ${_selectedType?.key}');
+                                                    selectedReward;
                                                     _selectedVoucher = null;
                                                     selectedVoucher = null;
                                                     selectedReward = null;
@@ -306,7 +306,7 @@ class _PointDetailState extends State<PointDetail> {
                                       pointType: _selectedType?.key != null && _selectedType?.key != ''
                                           ? int.parse(_selectedType!.key)
                                           : null,
-                                      totalPoint: _selectedType?.key == '' ? int.parse(_totalPoint.text) : null,
+                                      totalPoint: _selectedType?.key == '' ? int.parse(_points.text) : null,
                                       voucherId: _selectedVoucher?.key,
                                       rewardId: _selectedReward?.key,
                                     ),

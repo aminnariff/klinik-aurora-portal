@@ -19,7 +19,7 @@ class PointManagementController extends ChangeNotifier {
     return ApiController().call(
       context,
       method: Method.post,
-      endpoint: 'admin/admin-permission',
+      endpoint: 'admin/point-management/create',
       data: {
         "userId": request.userId,
         if (request.pointType != null)
