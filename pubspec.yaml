@@ -2,7 +2,7 @@ name: klinik_aurora_portal
 description: "Simplifying healthcare management from scheduling to inventory, ensuring efficient clinic operations and superior patient care."
 publish_to: 'none' 
 
-version: 1.0.3+4
+version: 1.0.4+4
 
 environment:
   sdk: '>=3.3.1 <4.0.0'

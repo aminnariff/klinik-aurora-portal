@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -51,7 +52,7 @@ class _PointHomepageState extends State<PointHomepage> {
     // prefixIcon: Row(children: [Text('RM')],),
   );
   final InputFieldAttribute _msisdn = InputFieldAttribute(
-    controller: TextEditingController(text: '012'),
+    controller: TextEditingController(text: kDebugMode ? '012' : ''),
     labelText: 'Contact No',
   );
   @override
@@ -322,11 +323,15 @@ class _PointHomepageState extends State<PointHomepage> {
   }
 
   Widget paginationWidget() {
-    return Row(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          child: pagination(),
+        Row(
+          children: [
+            Expanded(
+              child: pagination(),
+            ),
+          ],
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -377,7 +382,7 @@ class _PointHomepageState extends State<PointHomepage> {
     return Pagination(
       numOfPages: _totalPage,
       selectedPage: _page,
-      pagesVisible: 5,
+      pagesVisible: 3,
       spacing: 10,
       onPageChanged: (page) {
         _movePage(page);
