@@ -62,7 +62,6 @@ class _PointHomepageState extends State<PointHomepage> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(PointHomepage.displayName);
     });
-    runFiltering();
   }
 
   @override
