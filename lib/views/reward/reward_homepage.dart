@@ -385,12 +385,16 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
+                                            snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1 &&
+                                                    checkEndDate(
+                                                        snapshot.rewardAllResponse?.data?.data?[index].rewardEndDate)
                                                 ? 'Active'
                                                 : 'Inactive',
                                             style: AppTypography.bodyMedium(context).apply(
                                                 color: statusColor(
-                                                    snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1
+                                                    snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1 &&
+                                                            checkEndDate(snapshot
+                                                                .rewardAllResponse?.data?.data?[index].rewardEndDate)
                                                         ? 'active'
                                                         : 'inactive'),
                                                 fontWeightDelta: 1),

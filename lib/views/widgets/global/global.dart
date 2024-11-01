@@ -47,3 +47,22 @@ String convertToMonthYear(int month, int year) {
   String monthName = months[month - 1];
   return '$monthName $year';
 }
+
+bool checkEndDate(String? endDate) {
+  if (endDate == null) {
+    return false;
+  } else {
+    try {
+      return DateTime.parse(endDate).isAfter(DateTime.now());
+    } catch (e) {
+      return false;
+    }
+  }
+}
+
+int calculateCustomerPoints(String amount) {
+  double paidAmount = double.tryParse(amount) ?? 0.0;
+  int points = (paidAmount / 10).floor();
+
+  return points;
+}

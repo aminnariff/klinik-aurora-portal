@@ -17,6 +17,7 @@ class DropdownAttributeList {
   Color? fieldColor;
   Color? borderColor;
   bool? titleCase;
+  String? tooltip;
 
   DropdownAttributeList(
     this.items, {
@@ -34,6 +35,7 @@ class DropdownAttributeList {
     this.fieldColor,
     this.borderColor,
     this.titleCase = false,
+    this.tooltip,
   });
 }
 

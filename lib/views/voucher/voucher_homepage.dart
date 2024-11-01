@@ -386,12 +386,17 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.voucherAllResponse?.data?.data?[index].voucherStatus == 1
+                                            snapshot.voucherAllResponse?.data?.data?[index].voucherStatus == 1 &&
+                                                    checkEndDate(
+                                                        snapshot.voucherAllResponse?.data?.data?[index].voucherEndDate)
                                                 ? 'Active'
                                                 : 'Inactive',
                                             style: AppTypography.bodyMedium(context).apply(
                                                 color: statusColor(
-                                                    snapshot.voucherAllResponse?.data?.data?[index].voucherStatus == 1
+                                                    snapshot.voucherAllResponse?.data?.data?[index].voucherStatus ==
+                                                                1 &&
+                                                            checkEndDate(snapshot
+                                                                .voucherAllResponse?.data?.data?[index].voucherEndDate)
                                                         ? 'active'
                                                         : 'inactive'),
                                                 fontWeightDelta: 1),

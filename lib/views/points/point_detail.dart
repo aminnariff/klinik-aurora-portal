@@ -337,7 +337,7 @@ class _PointDetailState extends State<PointDetail> {
   }
 
   postAction() {
-    PointManagementController.get(context, userId: widget.user?.userId).then((value) {
+    PointManagementController.get(context, 1, userId: widget.user?.userId).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<PointManagementController>().userPointsResponse = value.data;

@@ -1,8 +1,10 @@
 class UserPointsResponse {
   String? message;
   List<Data>? data;
+  int? totalCount;
+  int? totalPage;
 
-  UserPointsResponse({this.message, this.data});
+  UserPointsResponse({this.message, this.data, this.totalCount, this.totalPage});
 
   UserPointsResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -12,6 +14,8 @@ class UserPointsResponse {
         data!.add(Data.fromJson(v));
       });
     }
+    totalCount = json['totalCount'];
+    totalPage = json['totalPage'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,6 +24,8 @@ class UserPointsResponse {
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
+    data['totalCount'] = totalCount;
+    data['totalPage'] = totalPage;
     return data;
   }
 }
@@ -29,6 +35,7 @@ class Data {
   String? refNo;
   String? userId;
   String? username;
+  String? pointDescription;
   int? pointType;
   String? voucherId;
   String? voucherName;
@@ -36,25 +43,31 @@ class Data {
   String? referralUsername;
   int? totalPoint;
   String? createdDate;
+  String? createdByEmail;
+  String? createdByFullname;
 
   Data(
       {this.transactionId,
       this.refNo,
       this.userId,
       this.username,
+      this.pointDescription,
       this.pointType,
       this.voucherId,
       this.voucherName,
       this.referralUserId,
       this.referralUsername,
       this.totalPoint,
-      this.createdDate});
+      this.createdDate,
+      this.createdByEmail,
+      this.createdByFullname});
 
   Data.fromJson(Map<String, dynamic> json) {
     transactionId = json['transactionId'];
     refNo = json['refNo'];
     userId = json['userId'];
     username = json['username'];
+    pointDescription = json['pointDescription'];
     pointType = json['pointType'];
     voucherId = json['voucherId'];
     voucherName = json['voucherName'];
@@ -62,6 +75,8 @@ class Data {
     referralUsername = json['referralUsername'];
     totalPoint = json['totalPoint'];
     createdDate = json['createdDate'];
+    createdByEmail = json['createdByEmail'];
+    createdByFullname = json['createdByFullname'];
   }
 
   Map<String, dynamic> toJson() {
@@ -70,6 +85,7 @@ class Data {
     data['refNo'] = refNo;
     data['userId'] = userId;
     data['username'] = username;
+    data['pointDescription'] = pointDescription;
     data['pointType'] = pointType;
     data['voucherId'] = voucherId;
     data['voucherName'] = voucherName;
@@ -77,6 +93,8 @@ class Data {
     data['referralUsername'] = referralUsername;
     data['totalPoint'] = totalPoint;
     data['createdDate'] = createdDate;
+    data['createdByEmail'] = createdByEmail;
+    data['createdByFullname'] = createdByFullname;
     return data;
   }
 }

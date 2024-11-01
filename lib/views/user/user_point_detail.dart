@@ -56,7 +56,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
   ];
   @override
   void initState() {
-    PointManagementController.get(context, userId: widget.user.userId).then((value) {
+    PointManagementController.get(context, 1, userId: widget.user.userId).then((value) {
       if (responseCode(value.code)) {
         context.read<PointManagementController>().userPointsResponse = value.data;
       } else {

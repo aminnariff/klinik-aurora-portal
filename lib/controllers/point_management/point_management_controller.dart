@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/point_management/create_point_request.dart';
 import 'package:klinik_aurora_portal/models/point_management/create_point_response.dart';
@@ -22,6 +23,7 @@ class PointManagementController extends ChangeNotifier {
       endpoint: 'admin/point-management/create',
       data: {
         "userId": request.userId,
+        if (request.pointDescription != null) "pointDescription": request.pointDescription,
         if (request.pointType != null)
           "pointType": request.pointType, // 1 = referral, 2 = voucher, 3 = reward, null = add points to the user
         // required when point type = null
@@ -45,19 +47,19 @@ class PointManagementController extends ChangeNotifier {
     });
   }
 
-  static Future<ApiResponse<UserPointsResponse>> get(BuildContext context, {String? userId}) async {
-    return ApiController()
-        .call(
+  static Future<ApiResponse<UserPointsResponse>> get(BuildContext context, int page,
+      {String? userId, String? createdByEmail, int? size = pageSize}) async {
+    return ApiController().call(
       context,
       method: Method.get,
       endpoint: 'admin/point-management',
-      queryParameters: userId != null
-          ? {
-              'userId': userId,
-            }
-          : null,
-    )
-        .then((value) {
+      queryParameters: {
+        if (userId != null) 'userId': userId,
+        if (createdByEmail != null) 'createdByEmail': userId,
+        'page': page,
+        'pageSize': size,
+      },
+    ).then((value) {
       try {
         return ApiResponse(code: value.code, data: UserPointsResponse.fromJson(value.data));
       } catch (e) {

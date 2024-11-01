@@ -8,13 +8,17 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/reward/reward_controller.dart';
 import 'package:klinik_aurora_portal/controllers/voucher/voucher_controller.dart';
+import 'package:klinik_aurora_portal/models/reward/reward_all_response.dart' as reward_model;
 import 'package:klinik_aurora_portal/models/voucher/create_voucher_request.dart';
 import 'package:klinik_aurora_portal/models/voucher/update_voucher_request.dart';
 import 'package:klinik_aurora_portal/models/voucher/voucher_all_response.dart' as voucher_model;
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
@@ -64,6 +68,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
   );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
+  List<DropdownAttribute> rewards = [];
 
   @override
   void initState() {
@@ -75,6 +80,21 @@ class _VoucherDetailState extends State<VoucherDetail> {
       _endDate.controller.text = dateConverter(widget.voucher?.voucherEndDate, format: 'dd-MM-yyyy') ?? '';
       _voucherPoint.controller.text = widget.voucher?.voucherPoint.toString() ?? '';
     }
+    RewardController.getAll(context, 1, pageSize).then(
+      (value) {
+        rewards = [];
+        if (responseCode(value.code)) {
+          context.read<RewardController>().rewardAllResponse = value;
+          for (reward_model.Data item in value.data?.data ?? []) {
+            if (item.rewardStatus == 1 && checkEndDate(item.rewardEndDate)) {
+              rewards.add(DropdownAttribute(item.rewardId ?? '', item.rewardName ?? ''));
+            }
+            rewards.add(DropdownAttribute(item.rewardId ?? '', item.rewardName ?? ''));
+          }
+          rebuildDropdown.add(DateTime.now());
+        }
+      },
+    );
     super.initState();
   }
 
@@ -136,6 +156,51 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                     field: _voucherCode,
                                   ),
                                   AppPadding.vertical(denominator: 2),
+                                  widget.type == 'update'
+                                      ? InputField(
+                                          field: InputFieldAttribute(
+                                            controller: TextEditingController(text: widget.voucher?.rewardId ?? ''),
+                                            isEditable: false,
+                                          ),
+                                        )
+                                      : Consumer<RewardController>(builder: (context, snapshot, _) {
+                                          return StreamBuilder<DateTime>(
+                                              stream: rebuildDropdown.stream,
+                                              builder: (context, snapshot) {
+                                                return rewards.isEmpty
+                                                    ? Text(
+                                                        'No rewards available. Please add rewards to attach to this voucher if needed. When a staff member scans the customer\'s QR code, any voucher linked to a reward will be automatically redeemed by the customer, eliminating the need for them to redeem it manually in the rewards section.',
+                                                        style: AppTypography.bodyMedium(context),
+                                                        textAlign: TextAlign.justify,
+                                                      )
+                                                    : SizedBox(
+                                                        width: screenWidth1728(26),
+                                                        child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          children: [
+                                                            AppDropdown(
+                                                              attributeList: DropdownAttributeList(
+                                                                rewards,
+                                                                hintText: 'Select Reward (Optional)',
+                                                                onChanged: (a) {},
+                                                                width: screenWidth1728(23),
+                                                              ),
+                                                            ),
+                                                            const Tooltip(
+                                                              message:
+                                                                  'Note: Adding rewards to a voucher is optional. If a voucher is created without rewards, the customer will receive points only',
+                                                              child: Padding(
+                                                                padding: EdgeInsets.only(left: 12),
+                                                                child: Icon(
+                                                                  Icons.info_outline,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                              });
+                                        }),
                                 ],
                               ),
                             ),

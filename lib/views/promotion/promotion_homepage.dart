@@ -665,12 +665,22 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Text(
-                                        statusTranslate(
-                                            snapshot.promotionAllResponse?.data?.data?[index].promotionStatus),
+                                        snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
+                                                checkEndDate(
+                                                    snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate)
+                                            ? statusTranslate(
+                                                snapshot.promotionAllResponse?.data?.data?[index].promotionStatus)
+                                            : 'INACTIVE',
                                         style: AppTypography.bodyMedium(context).apply(
-                                            fontWeightDelta: 1,
-                                            color: statusColor(
-                                                '${snapshot.promotionAllResponse?.data?.data?[index].promotionStatus}')),
+                                          fontWeightDelta: 1,
+                                          color: statusColor(
+                                            snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
+                                                    checkEndDate(snapshot
+                                                        .promotionAllResponse?.data?.data?[index].promotionEndDate)
+                                                ? 'active'
+                                                : 'inactive',
+                                          ),
+                                        ),
                                       )
                                     ],
                                   ),

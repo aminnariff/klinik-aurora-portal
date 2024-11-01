@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/currency_formatter.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
@@ -195,7 +196,7 @@ class InputField extends StatelessWidget {
       onTap: () => _copyToClipboard,
       inputFormatters: [
         if (field.isCurrency) FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
-        // if (field.isCurrency) CurrencyTextInputFormatter(symbol: ''),
+        if (field.isCurrency) CurrencyInputFormatter(),
         if (field.isNumber) FilteringTextInputFormatter.digitsOnly,
         if (field.isAlphaNumericOnly) FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
         LengthLimitingTextInputFormatter(field.maxCharacter),

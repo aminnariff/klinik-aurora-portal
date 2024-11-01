@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/views/homepage/dashboard.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
+import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
@@ -76,6 +77,18 @@ final router = GoRouter(
             return const NoTransitionPage(
               child: Scaffold(
                 body: MainDashboard(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: PointHomepage.routeName,
+          path: PointHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: Scaffold(
+                body: PointHomepage(),
               ),
             );
           },

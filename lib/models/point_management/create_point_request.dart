@@ -5,6 +5,7 @@ class CreatePointRequest {
   String? referralUserId;
   String? voucherId;
   String? rewardId;
+  String? pointDescription;
 
   CreatePointRequest({
     this.userId,
@@ -13,6 +14,7 @@ class CreatePointRequest {
     this.referralUserId,
     this.voucherId,
     this.rewardId,
+    this.pointDescription,
   });
 
   CreatePointRequest.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class CreatePointRequest {
     referralUserId = json['referralUserId'];
     voucherId = json['voucherId'];
     rewardId = json['rewardId'];
+    pointDescription = json['pointDescription'];
   }
 
   Map<String, dynamic> toJson() {
@@ -32,6 +35,7 @@ class CreatePointRequest {
     data['referralUserId'] = referralUserId;
     data['voucherId'] = voucherId;
     data['rewardId'] = rewardId;
+    data['pointDescription'] = pointDescription;
     return data;
   }
 }

@@ -46,18 +46,21 @@ class Data {
   int? voucherStatus;
   String? createdDate;
   String? modifiedDate;
+  String? rewardId;
 
-  Data(
-      {this.voucherId,
-      this.voucherName,
-      this.voucherCode,
-      this.voucherDescription,
-      this.voucherPoint,
-      this.voucherStartDate,
-      this.voucherEndDate,
-      this.voucherStatus,
-      this.createdDate,
-      this.modifiedDate});
+  Data({
+    this.voucherId,
+    this.voucherName,
+    this.voucherCode,
+    this.voucherDescription,
+    this.voucherPoint,
+    this.voucherStartDate,
+    this.voucherEndDate,
+    this.voucherStatus,
+    this.createdDate,
+    this.modifiedDate,
+    this.rewardId,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     voucherId = json['voucherId'];
@@ -70,6 +73,7 @@ class Data {
     voucherStatus = json['voucherStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
+    rewardId = json['rewardId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -84,6 +88,7 @@ class Data {
     data['voucherStatus'] = voucherStatus;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
+    data['rewardId'] = rewardId;
     return data;
   }
 }
