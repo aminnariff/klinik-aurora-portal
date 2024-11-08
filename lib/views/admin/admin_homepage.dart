@@ -739,6 +739,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 builder: (BuildContext context) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Flexible(
                         child: Card(
@@ -785,23 +786,28 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                     StreamBuilder<DateTime>(
                                         stream: rebuildDropdown.stream,
                                         builder: (context, snapshot) {
-                                          return Column(
+                                          return Row(
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    DropdownAttribute('1', 'Active'),
-                                                    DropdownAttribute('0', 'Inactive'),
-                                                  ],
-                                                  labelText: 'information'.tr(gender: 'userStatus'),
-                                                  value: _selectedUserStatus?.name,
-                                                  onChanged: (p0) {
-                                                    _selectedUserStatus = p0;
-                                                    rebuildDropdown.add(DateTime.now());
-                                                    filtering(page: 1);
-                                                  },
-                                                  width: screenWidthByBreakpoint(90, 70, 26),
-                                                ),
+                                              Column(
+                                                children: [
+                                                  AppDropdown(
+                                                    attributeList: DropdownAttributeList(
+                                                      [
+                                                        DropdownAttribute('1', 'Active'),
+                                                        DropdownAttribute('0', 'Inactive'),
+                                                      ],
+                                                      labelText: 'information'.tr(gender: 'userStatus'),
+                                                      value: _selectedUserStatus?.name,
+                                                      onChanged: (p0) {
+                                                        _selectedUserStatus = p0;
+                                                        rebuildDropdown.add(DateTime.now());
+                                                        filtering(page: 1);
+                                                      },
+                                                      width: screenWidthByBreakpoint(90, 70, 26),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           );

@@ -181,15 +181,15 @@ class _AdminDetailState extends State<AdminDetail> {
                                   //   ),
                                   // ),
                                   AppPadding.vertical(denominator: 2),
-                                  // if (widget.type == 'create') ...[
-                                  //   InputField(
-                                  //     field: InputFieldAttribute(
-                                  //       controller: _password,
-                                  //       labelText: 'information'.tr(gender: 'password'),
-                                  //     ),
-                                  //   ),
-                                  //   AppPadding.vertical(denominator: 2),
-                                  // ],
+                                  if (widget.type == 'create') ...[
+                                    InputField(
+                                      field: InputFieldAttribute(
+                                        controller: _password,
+                                        labelText: 'information'.tr(gender: 'password'),
+                                      ),
+                                    ),
+                                    AppPadding.vertical(denominator: 2),
+                                  ],
                                 ],
                               ),
                             ),
@@ -304,6 +304,9 @@ class _AdminDetailState extends State<AdminDetail> {
                                 ],
                               ),
                             ),
+                            AppPadding.vertical(denominator: 2),
+                            const Text(
+                                'Note: Choose User Management, Point Management, and Reward Management for branch use in the Staff App.'),
                             AppPadding.vertical(denominator: 3 / 2),
                           ],
                         ),

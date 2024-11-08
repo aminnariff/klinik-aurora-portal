@@ -62,8 +62,8 @@ class AdminController extends ChangeNotifier {
       data: {
         "userEmail": request.userEmail,
         "userName": request.userName,
-        "userPassword": 'abCD1234',
-        "userRetypePassword": "abCD1234",
+        "userPassword": request.userPassword,
+        "userRetypePassword": request.userPassword,
         "userFullname": request.userFullname,
         if (request.branchId != null) "branchId": request.branchId,
       },

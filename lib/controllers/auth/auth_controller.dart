@@ -197,7 +197,7 @@ class AuthController extends ChangeNotifier {
     });
   }
 
-  static Future<ApiResponse<AuthResponse>> changePassword(BuildContext context) async {
+  static Future<ApiResponse<AuthResponse>> changePassword(BuildContext context, String email) async {
     return ApiController()
         .call(
       context,

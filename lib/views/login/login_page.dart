@@ -254,7 +254,8 @@ class _LoginPageState extends State<LoginPage> {
                                         children: [
                                           TextButton(
                                             onPressed: () {
-                                              context.pushNamed(AdminPasswordRecoveryPage.routeName, extra: '');
+                                              forgotPassword();
+                                              // context.pushNamed(AdminPasswordRecoveryPage.routeName, extra: '');
                                             },
                                             child: Text(
                                               'loginPage'.tr(gender: 'forgotPassword'),
