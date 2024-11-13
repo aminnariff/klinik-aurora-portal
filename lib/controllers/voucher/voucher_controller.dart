@@ -54,7 +54,8 @@ class VoucherController extends ChangeNotifier {
         "voucherCode": request.voucherCode,
         "voucherPoint": request.voucherPoint,
         "voucherStartDate": request.voucherStartDate,
-        "voucherEndDate": request.voucherEndDate
+        "voucherEndDate": request.voucherEndDate,
+        "rewardId": request.rewardId
       },
     ).then((value) {
       try {

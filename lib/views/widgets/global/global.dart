@@ -48,6 +48,16 @@ String convertToMonthYear(int month, int year) {
   return '$monthName $year';
 }
 
+String convertToDayMonth(String dateTimeString) {
+  try {
+    DateTime dateTime = DateTime.parse(dateTimeString);
+    String formattedDate = DateFormat('dd-MM').format(dateTime);
+    return formattedDate;
+  } catch (e) {
+    return dateTimeString;
+  }
+}
+
 bool checkEndDate(String? endDate) {
   if (endDate == null) {
     return false;
@@ -63,6 +73,10 @@ bool checkEndDate(String? endDate) {
 int calculateCustomerPoints(String amount) {
   double paidAmount = double.tryParse(amount) ?? 0.0;
   int points = (paidAmount / 10).floor();
+
+  if (paidAmount < 10 && paidAmount > 0) {
+    return 1;
+  }
 
   return points;
 }

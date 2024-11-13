@@ -24,6 +24,7 @@ class Data {
   int? totalActiveUser;
   int? totalActiveBranch;
   int? totalActivePromotion;
+  List<TotalRegistrationByDay>? totalRegistrationByDay;
   List<TotalRegistrationByMonth>? totalRegistrationByMonth;
 
   Data(
@@ -31,6 +32,7 @@ class Data {
       this.totalActiveUser,
       this.totalActiveBranch,
       this.totalActivePromotion,
+      this.totalRegistrationByDay,
       this.totalRegistrationByMonth});
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,12 @@ class Data {
     totalActiveUser = json['totalActiveUser'];
     totalActiveBranch = json['totalActiveBranch'];
     totalActivePromotion = json['totalActivePromotion'];
+    if (json['totalRegistrationByDay'] != null) {
+      totalRegistrationByDay = <TotalRegistrationByDay>[];
+      json['totalRegistrationByDay'].forEach((v) {
+        totalRegistrationByDay!.add(TotalRegistrationByDay.fromJson(v));
+      });
+    }
     if (json['totalRegistrationByMonth'] != null) {
       totalRegistrationByMonth = <TotalRegistrationByMonth>[];
       json['totalRegistrationByMonth'].forEach((v) {
@@ -52,9 +60,31 @@ class Data {
     data['totalActiveUser'] = totalActiveUser;
     data['totalActiveBranch'] = totalActiveBranch;
     data['totalActivePromotion'] = totalActivePromotion;
+    if (totalRegistrationByDay != null) {
+      data['totalRegistrationByDay'] = totalRegistrationByDay!.map((v) => v.toJson()).toList();
+    }
     if (totalRegistrationByMonth != null) {
       data['totalRegistrationByMonth'] = totalRegistrationByMonth!.map((v) => v.toJson()).toList();
     }
+    return data;
+  }
+}
+
+class TotalRegistrationByDay {
+  String? date;
+  int? totalRegistrationByDay;
+
+  TotalRegistrationByDay({this.date, this.totalRegistrationByDay});
+
+  TotalRegistrationByDay.fromJson(Map<String, dynamic> json) {
+    date = json['date'];
+    totalRegistrationByDay = json['totalRegistrationByDay'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['totalRegistrationByDay'] = totalRegistrationByDay;
     return data;
   }
 }

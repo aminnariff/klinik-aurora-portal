@@ -363,10 +363,11 @@ class _RewardDetailState extends State<RewardDetail> {
                                       rewardPoint: int.parse(_rewardPoint.text),
                                       rewardStartDate: convertStringToDate(_startDate.text),
                                       rewardEndDate: convertStringToDate(_endDate.text),
-                                      totalReward: int.parse(_rewardTotal.text),
+                                      totalReward: _rewardTotal.text != '' ? int.parse(_rewardTotal.text) : null,
                                     ),
                                   ).then((value) {
                                     if (responseCode(value.code)) {
+                                      context.pop();
                                       RewardController.upload(context, value.data!.id!, selectedFile!).then((value) {
                                         if (responseCode(value.code)) {
                                           getLatestData();

@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/controllers/point_management/point_management_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
@@ -55,6 +56,7 @@ class _PointHomepageState extends State<PointHomepage> {
     controller: TextEditingController(text: kDebugMode ? '012' : ''),
     labelText: 'Contact No',
   );
+  bool isExpanded = false;
   @override
   void initState() {
     super.initState();
@@ -136,6 +138,8 @@ class _PointHomepageState extends State<PointHomepage> {
               style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
             ),
             AppPadding.vertical(),
+            pointDetails(),
+            AppPadding.vertical(),
             InputField(
               field: InputFieldAttribute(
                   controller: _amount.controller,
@@ -172,6 +176,10 @@ class _PointHomepageState extends State<PointHomepage> {
                         if (_amount.controller.text == '') {
                           setState(() {
                             _amount.errorMessage = ErrorMessage.required(field: _amount.labelText);
+                          });
+                        } else if (calculateCustomerPoints(_amount.controller.text) <= 0) {
+                          setState(() {
+                            _amount.errorMessage = 'Amount is invalid';
                           });
                         } else {
                           showLoading();
@@ -269,6 +277,189 @@ class _PointHomepageState extends State<PointHomepage> {
         ),
       ),
       margin: EdgeInsets.fromLTRB(screenPadding, screenPadding, 0, screenPadding),
+    );
+  }
+
+  Widget pointDetails() {
+    return Column(
+      children: [
+        Column(
+          children: [
+            AppPadding.vertical(),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.monetization_on, color: Colors.orange),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      "How do patients collect points?",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                ],
+              ),
+            ),
+            if (isExpanded == false) AppPadding.vertical(),
+            if (isExpanded) ...[
+              const SizedBox(height: 16),
+              const Text(
+                "With every service payment at Klinik Aurora. Terms & conditions apply.",
+                style: TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildPointsOption(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'RM 100  = ',
+                          style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1, fontSizeDelta: -1),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.amber,
+                            border: Border.all(
+                              color: Colors.yellow,
+                              width: 3.4,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '10',
+                              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1, fontSizeDelta: -2),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppPadding.horizontal(),
+                  _buildPointsOption(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.amber,
+                            border: Border.all(
+                              color: Colors.yellow,
+                              width: 3.4,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '10',
+                              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1, fontSizeDelta: -2),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          ' =  RM 1',
+                          style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1, fontSizeDelta: -1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: screenHeightByBreakpoint(90, 70, 50),
+                                  child: CardContainer(
+                                    Padding(
+                                      padding: EdgeInsets.all(screenPadding),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            'Terms and Conditions',
+                                            style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                          ),
+                                          AppPadding.vertical(),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  // •	Refer a friend and earn an extra points when they make their first payment!\n
+                                                  '•	Earn extra points on special occasions and during promotional events!\n•	Points expire after 12 months.\n•	For every RM 10, you earn 1 point.\n•	Each transaction gives you a minimum of 1 point and a maximum of 1,000 points.\n• Points can be redeemed for discounts or exclusive rewards at Klinik Aurora',
+                                                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 0),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.blue),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Text(
+                    "Learn more",
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPointsOption(Widget child) {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 1),
+          decoration: BoxDecoration(
+            color: context.read<DarkModeController>().darkMode ? Colors.white54 : Colors.grey[200],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: child,
+        ),
+      ],
     );
   }
 

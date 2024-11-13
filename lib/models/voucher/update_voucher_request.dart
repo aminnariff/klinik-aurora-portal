@@ -7,6 +7,7 @@ class UpdateVoucherRequest {
   int? voucherStatus;
   String? voucherStartDate;
   String? voucherEndDate;
+  String? rewardId;
 
   UpdateVoucherRequest({
     this.voucherId,
@@ -17,6 +18,7 @@ class UpdateVoucherRequest {
     this.voucherStatus,
     this.voucherStartDate,
     this.voucherEndDate,
+    this.rewardId,
   });
 
   UpdateVoucherRequest.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class UpdateVoucherRequest {
     voucherStatus = json['voucherStatus'];
     voucherStartDate = json['voucherStartDate'];
     voucherEndDate = json['voucherEndDate'];
+    rewardId = json['rewardId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -40,6 +43,7 @@ class UpdateVoucherRequest {
     data['voucherStatus'] = voucherStatus;
     data['voucherStartDate'] = voucherStartDate;
     data['voucherEndDate'] = voucherEndDate;
+    data['rewardId'] = rewardId;
     return data;
   }
 }

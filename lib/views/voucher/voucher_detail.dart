@@ -69,6 +69,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
   List<DropdownAttribute> rewards = [];
+  DropdownAttribute? selectedReward;
 
   @override
   void initState() {
@@ -79,6 +80,9 @@ class _VoucherDetailState extends State<VoucherDetail> {
       _startDate.controller.text = dateConverter(widget.voucher?.voucherStartDate, format: 'dd-MM-yyyy') ?? '';
       _endDate.controller.text = dateConverter(widget.voucher?.voucherEndDate, format: 'dd-MM-yyyy') ?? '';
       _voucherPoint.controller.text = widget.voucher?.voucherPoint.toString() ?? '';
+      if (widget.voucher?.rewardId != null) {
+        selectedReward = DropdownAttribute(widget.voucher?.rewardId ?? '', widget.voucher?.rewardId ?? '');
+      }
     }
     RewardController.getAll(context, 1, pageSize).then(
       (value) {
@@ -88,8 +92,10 @@ class _VoucherDetailState extends State<VoucherDetail> {
           for (reward_model.Data item in value.data?.data ?? []) {
             if (item.rewardStatus == 1 && checkEndDate(item.rewardEndDate)) {
               rewards.add(DropdownAttribute(item.rewardId ?? '', item.rewardName ?? ''));
+              if (selectedReward?.key == item.rewardId) {
+                selectedReward = DropdownAttribute(item.rewardId ?? '', item.rewardName ?? '');
+              }
             }
-            rewards.add(DropdownAttribute(item.rewardId ?? '', item.rewardName ?? ''));
           }
           rebuildDropdown.add(DateTime.now());
         }
@@ -156,51 +162,61 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                     field: _voucherCode,
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  widget.type == 'update'
-                                      ? InputField(
-                                          field: InputFieldAttribute(
-                                            controller: TextEditingController(text: widget.voucher?.rewardId ?? ''),
-                                            isEditable: false,
-                                          ),
-                                        )
-                                      : Consumer<RewardController>(builder: (context, snapshot, _) {
-                                          return StreamBuilder<DateTime>(
-                                              stream: rebuildDropdown.stream,
-                                              builder: (context, snapshot) {
-                                                return rewards.isEmpty
-                                                    ? Text(
-                                                        'No rewards available. Please add rewards to attach to this voucher if needed. When a staff member scans the customer\'s QR code, any voucher linked to a reward will be automatically redeemed by the customer, eliminating the need for them to redeem it manually in the rewards section.',
-                                                        style: AppTypography.bodyMedium(context),
-                                                        textAlign: TextAlign.justify,
-                                                      )
-                                                    : SizedBox(
-                                                        width: screenWidth1728(26),
-                                                        child: Row(
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            AppDropdown(
-                                                              attributeList: DropdownAttributeList(
-                                                                rewards,
-                                                                hintText: 'Select Reward (Optional)',
-                                                                onChanged: (a) {},
-                                                                width: screenWidth1728(23),
+                                  Consumer<RewardController>(builder: (context, snapshot, _) {
+                                    return StreamBuilder<DateTime>(
+                                        stream: rebuildDropdown.stream,
+                                        builder: (context, snapshot) {
+                                          return widget.type == 'update'
+                                              ? selectedReward?.name != null
+                                                  ? InputField(
+                                                      field: InputFieldAttribute(
+                                                        controller:
+                                                            TextEditingController(text: selectedReward?.name ?? ''),
+                                                        isEditable: false,
+                                                      ),
+                                                    )
+                                                  : const SizedBox()
+                                              : rewards.isEmpty
+                                                  ? Text(
+                                                      'No rewards available. Please add rewards to attach to this voucher if needed. When a staff member scans the customer\'s QR code, any voucher linked to a reward will be automatically redeemed by the customer, eliminating the need for them to redeem it manually in the rewards section.',
+                                                      style: AppTypography.bodyMedium(context),
+                                                      textAlign: TextAlign.justify,
+                                                    )
+                                                  : SizedBox(
+                                                      width: screenWidth1728(26),
+                                                      child: Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        children: [
+                                                          AppDropdown(
+                                                            attributeList: DropdownAttributeList(
+                                                              rewards,
+                                                              hintText: 'Select Reward (Optional)',
+                                                              value: selectedReward?.name,
+                                                              onChanged: (a) {
+                                                                if (a != null) {
+                                                                  setState(() {
+                                                                    selectedReward = a;
+                                                                  });
+                                                                }
+                                                              },
+                                                              width: screenWidth1728(23),
+                                                            ),
+                                                          ),
+                                                          const Tooltip(
+                                                            message:
+                                                                'Note: Adding rewards to a voucher is optional. If a voucher is created without rewards, the customer will receive points only',
+                                                            child: Padding(
+                                                              padding: EdgeInsets.only(left: 12),
+                                                              child: Icon(
+                                                                Icons.info_outline,
                                                               ),
                                                             ),
-                                                            const Tooltip(
-                                                              message:
-                                                                  'Note: Adding rewards to a voucher is optional. If a voucher is created without rewards, the customer will receive points only',
-                                                              child: Padding(
-                                                                padding: EdgeInsets.only(left: 12),
-                                                                child: Icon(
-                                                                  Icons.info_outline,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                              });
-                                        }),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                        });
+                                  }),
                                 ],
                               ),
                             ),
@@ -319,6 +335,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                         voucherStatus: widget.voucher?.voucherStatus,
                                         voucherCode: _voucherCode.controller.text,
                                         voucherPoint: int.parse(_voucherPoint.controller.text),
+                                        rewardId: selectedReward?.key,
                                       ),
                                     ).then((value) {
                                       if (responseCode(value.code)) {
@@ -348,6 +365,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                         voucherEndDate: convertStringToDate(_endDate.controller.text),
                                         voucherCode: _voucherCode.controller.text,
                                         voucherPoint: int.parse(_voucherPoint.controller.text),
+                                        rewardId: selectedReward?.key,
                                       ),
                                     ).then((value) {
                                       dismissLoading();
