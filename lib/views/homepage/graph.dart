@@ -45,7 +45,7 @@ class _GraphWidgetState extends State<GraphWidget> {
               ),
               child: Consumer<DashboardController>(builder: (context, snapshot, _) {
                 return LineChart(
-                  showAvg ? avgData() : mainData(context.read<DashboardController>().dashboardResponse?.data),
+                  showAvg ? avgData() : mainData(snapshot.dashboardResponse?.data),
                 );
               }),
             ),
@@ -196,7 +196,7 @@ class _GraphWidgetState extends State<GraphWidget> {
     double forth = response?.totalRegistrationByMonth?[3].totalRegistrationByMonth?.toDouble() ?? 0;
     double fifth = response?.totalRegistrationByMonth?[4].totalRegistrationByMonth?.toDouble() ?? 0;
     double sixth = response?.totalRegistrationByMonth?[5].totalRegistrationByMonth?.toDouble() ?? 0;
-    double seventh = response?.totalRegistrationByMonth?[6].totalRegistrationByMonth?.toDouble() ?? 0;
+    // double seventh = response?.totalRegistrationByMonth?[6].totalRegistrationByMonth?.toDouble() ?? 0;
 
     for (TotalRegistrationByMonth? element in response?.totalRegistrationByMonth ?? []) {
       totalRegistrations.add(element?.totalRegistrationByMonth ?? 0);
@@ -249,7 +249,7 @@ class _GraphWidgetState extends State<GraphWidget> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 6,
+      maxX: 5,
       minY: 0,
       maxY: getYAxisLabelsWithGap(totalRegistrations)[3].toDouble(),
       lineBarsData: [
@@ -261,7 +261,7 @@ class _GraphWidgetState extends State<GraphWidget> {
             FlSpot(3, forth),
             FlSpot(4, fifth),
             FlSpot(5, sixth),
-            FlSpot(6, seventh),
+            // FlSpot(6, seventh),
           ],
           isCurved: true,
           gradient: LinearGradient(
