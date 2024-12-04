@@ -1,6 +1,7 @@
 import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 
 void main() {
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'Get Klinik Aurora',
       home: PlatformRedirectPage(),
     );
   }
@@ -55,7 +57,7 @@ class _PlatformRedirectPageState extends State<PlatformRedirectPage> {
     }
 
     if (url != null) {
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
       html.window.location.href = url;
     } else {
       setState(() {
@@ -74,14 +76,28 @@ class _PlatformRedirectPageState extends State<PlatformRedirectPage> {
                 children: [
                   CircularProgressIndicator(
                     color: quaternaryColor,
+                    strokeWidth: 4,
                   ),
                   SizedBox(height: 16),
                   Text('Redirecting, please wait...'),
                 ],
               )
-            : const Text(
-                'Unsupported platform. Unable to redirect.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/failed/warning.svg',
+                    height: 100,
+                    colorFilter: const ColorFilter.mode(Color(0XFFDF184A), BlendMode.srcIn),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  const Text(
+                    'Unsupported platform. Unable to redirect.',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
       ),
     );
