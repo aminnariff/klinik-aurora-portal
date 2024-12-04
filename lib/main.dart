@@ -36,6 +36,9 @@ import 'package:provider/provider.dart';
 
 // Password Recovery
 // firebase deploy --project klinik-aurora-recovery
+
+// Get Klinik Aurora
+// firebase deploy --project get-klinik-aurora
 // Your reliable assistant for retrieving lost passwords securely.
 
 // Production
