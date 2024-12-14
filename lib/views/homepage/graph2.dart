@@ -171,13 +171,13 @@ class _Graph2WidgetState extends State<Graph2Widget> {
   }
 
   LineChartData mainData(Data? response) {
-    double first = response?.totalRegistrationByDay?[0].totalRegistrationByDay?.toDouble() ?? 0;
-    double second = response?.totalRegistrationByDay?[1].totalRegistrationByDay?.toDouble() ?? 0;
-    double third = response?.totalRegistrationByDay?[2].totalRegistrationByDay?.toDouble() ?? 0;
-    double forth = response?.totalRegistrationByDay?[3].totalRegistrationByDay?.toDouble() ?? 0;
-    double fifth = response?.totalRegistrationByDay?[4].totalRegistrationByDay?.toDouble() ?? 0;
-    double sixth = response?.totalRegistrationByDay?[5].totalRegistrationByDay?.toDouble() ?? 0;
-    double seventh = response?.totalRegistrationByDay?[6].totalRegistrationByDay?.toDouble() ?? 0;
+    // double first = response?.totalRegistrationByDay?[0].totalRegistrationByDay?.toDouble() ?? 0;
+    // double second = response?.totalRegistrationByDay?[1].totalRegistrationByDay?.toDouble() ?? 0;
+    // double third = response?.totalRegistrationByDay?[2].totalRegistrationByDay?.toDouble() ?? 0;
+    // double forth = response?.totalRegistrationByDay?[3].totalRegistrationByDay?.toDouble() ?? 0;
+    // double fifth = response?.totalRegistrationByDay?[4].totalRegistrationByDay?.toDouble() ?? 0;
+    // double sixth = response?.totalRegistrationByDay?[5].totalRegistrationByDay?.toDouble() ?? 0;
+    // double seventh = response?.totalRegistrationByDay?[6].totalRegistrationByDay?.toDouble() ?? 0;
 
     List<int> totalRegistrations = [];
     for (TotalRegistrationByDay? element in response?.totalRegistrationByDay ?? []) {
@@ -231,19 +231,22 @@ class _Graph2WidgetState extends State<Graph2Widget> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 6,
+      maxX: ((response?.totalRegistrationByDay?.length.toDouble()) ?? 0) - 1,
       minY: 0,
       maxY: getYAxisLabelsWithGap(totalRegistrations)[3].toDouble(),
       lineBarsData: [
         LineChartBarData(
           spots: [
-            FlSpot(0, first),
-            FlSpot(1, second),
-            FlSpot(2, third),
-            FlSpot(3, forth),
-            FlSpot(4, fifth),
-            FlSpot(5, sixth),
-            FlSpot(6, seventh),
+            for (int index = 0; index < (response?.totalRegistrationByDay?.length ?? 0); index++)
+              FlSpot(
+                  index.toDouble(), response?.totalRegistrationByDay?[index].totalRegistrationByDay?.toDouble() ?? 0),
+            // FlSpot(0, first),
+            // FlSpot(1, second),
+            // FlSpot(2, third),
+            // FlSpot(3, forth),
+            // FlSpot(4, fifth),
+            // FlSpot(5, sixth),
+            // FlSpot(6, seventh),
           ],
           isCurved: true,
           gradient: LinearGradient(

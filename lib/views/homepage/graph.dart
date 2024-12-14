@@ -190,12 +190,12 @@ class _GraphWidgetState extends State<GraphWidget> {
   }
 
   LineChartData mainData(Data? response) {
-    double first = response?.totalRegistrationByMonth?[0].totalRegistrationByMonth?.toDouble() ?? 0;
-    double second = response?.totalRegistrationByMonth?[1].totalRegistrationByMonth?.toDouble() ?? 0;
-    double third = response?.totalRegistrationByMonth?[2].totalRegistrationByMonth?.toDouble() ?? 0;
-    double forth = response?.totalRegistrationByMonth?[3].totalRegistrationByMonth?.toDouble() ?? 0;
-    double fifth = response?.totalRegistrationByMonth?[4].totalRegistrationByMonth?.toDouble() ?? 0;
-    double sixth = response?.totalRegistrationByMonth?[5].totalRegistrationByMonth?.toDouble() ?? 0;
+    // double first = response?.totalRegistrationByMonth?[0].totalRegistrationByMonth?.toDouble() ?? 0;
+    // double second = response?.totalRegistrationByMonth?[1].totalRegistrationByMonth?.toDouble() ?? 0;
+    // double third = response?.totalRegistrationByMonth?[2].totalRegistrationByMonth?.toDouble() ?? 0;
+    // double forth = response?.totalRegistrationByMonth?[3].totalRegistrationByMonth?.toDouble() ?? 0;
+    // double fifth = response?.totalRegistrationByMonth?[4].totalRegistrationByMonth?.toDouble() ?? 0;
+    // double sixth = response?.totalRegistrationByMonth?[5].totalRegistrationByMonth?.toDouble() ?? 0;
     // double seventh = response?.totalRegistrationByMonth?[6].totalRegistrationByMonth?.toDouble() ?? 0;
 
     for (TotalRegistrationByMonth? element in response?.totalRegistrationByMonth ?? []) {
@@ -249,18 +249,21 @@ class _GraphWidgetState extends State<GraphWidget> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 5,
+      maxX: ((response?.totalRegistrationByMonth?.length.toDouble()) ?? 0) - 1,
       minY: 0,
       maxY: getYAxisLabelsWithGap(totalRegistrations)[3].toDouble(),
       lineBarsData: [
         LineChartBarData(
           spots: [
-            FlSpot(0, first),
-            FlSpot(1, second),
-            FlSpot(2, third),
-            FlSpot(3, forth),
-            FlSpot(4, fifth),
-            FlSpot(5, sixth),
+            for (int index = 0; index < (response?.totalRegistrationByMonth?.length ?? 0); index++)
+              FlSpot(index.toDouble(),
+                  response?.totalRegistrationByMonth?[index].totalRegistrationByMonth?.toDouble() ?? 0),
+            // FlSpot(0, first),
+            // FlSpot(1, second),
+            // FlSpot(2, third),
+            // FlSpot(3, forth),
+            // FlSpot(4, fifth),
+            // FlSpot(5, sixth),
             // FlSpot(6, seventh),
           ],
           isCurved: true,
