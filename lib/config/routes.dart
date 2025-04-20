@@ -14,6 +14,7 @@ import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
+import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 
@@ -137,6 +138,18 @@ final router = GoRouter(
             return const NoTransitionPage(
               child: Scaffold(
                 body: BranchHomepage(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: ServiceHomepage.routeName,
+          path: ServiceHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(
+              child: Scaffold(
+                body: ServiceHomepage(),
               ),
             );
           },

@@ -64,7 +64,7 @@
     },
     "doctorPage": {
         "doctorName": "PIC Name",
-        "doctorPhone": "PIC Contact No.",
+        "phoneNo": "PIC Contact No.",
         "doctorImage": "PIC Image",
         "browseFile": "Browse your files here (max 10MB)",
         "voucherStatus": "Status"
@@ -115,6 +115,17 @@
         "rewardImage": "Promotion Image",
         "browseFile": "Browse your files here (max 10MB)",
         "forgotPassword": "Forgot password?"
+    },
+    "servicesHomepage": {
+        "serviceName": "Name",
+        "serviceDescription": "ServiceDescription",
+        "servicePrice": "Price",
+        "serviceBookingFee": "Booking Fee",
+        "doctorType": "Type",
+        "serviceTime": "Service Time",
+        "serviceImage": "Service Image",
+        "browseFile": "Browse your files here (max 10MB)",
+        "serviceCategory": "Category"
     },
     "version": {
         "updateAvailable": "New Version Available",

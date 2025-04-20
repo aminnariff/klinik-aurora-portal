@@ -19,6 +19,7 @@ import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
+import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -58,6 +59,8 @@ class _HomepageState extends State<Homepage> {
       const SidebarXItem(iconWidget: Icon(Icons.dashboard_rounded, color: Colors.white), label: 'Dashboard'),
       const SidebarXItem(
           iconWidget: Icon(Icons.add_circle_outline_rounded, color: Colors.white), label: PointHomepage.displayName),
+      const SidebarXItem(
+          iconWidget: Icon(Icons.medical_services, color: Colors.white), label: ServiceHomepage.displayName),
       const SidebarXItem(iconWidget: Icon(Icons.person, color: Colors.white), label: UserHomepage.displayName),
       const SidebarXItem(
           iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
@@ -322,6 +325,8 @@ class _HomepageState extends State<Homepage> {
         context.go(Homepage.routeName);
       case PointHomepage.displayName:
         context.go(PointHomepage.routeName);
+      case ServiceHomepage.displayName:
+        context.go(ServiceHomepage.routeName);
       case UserHomepage.displayName:
         context.go(UserHomepage.routeName);
       case AdminHomepage.displayName:

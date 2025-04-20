@@ -61,7 +61,6 @@ flutter:
     - assets/riv/
     - assets/typography/
     - assets/icons/failed/
-    - assets/icons/general/
     - assets/icons/logo/
     - assets/icons/success/
     - assets/images/status/
