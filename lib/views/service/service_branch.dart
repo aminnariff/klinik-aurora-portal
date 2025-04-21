@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as 
 import 'package:klinik_aurora_portal/models/service/services_response.dart' as service_model;
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
+import 'package:klinik_aurora_portal/views/service/service_detail_timing.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -105,7 +106,15 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                           in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
                                         ListTile(
                                           onTap: () {
-                                            //TODO: add timing
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return TimeListManager(
+                                                  serviceBranch: serviceBranch(
+                                                      item?.branchId ?? ' ', widget.service.serviceId ?? ''),
+                                                );
+                                              },
+                                            );
                                           },
                                           title: Text(
                                             '${item?.branchName}',

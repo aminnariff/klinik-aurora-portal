@@ -415,7 +415,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
   }
 
   getLatestData() {
-    ServiceController.getAll(context, 1, pageSize).then((value) {
+    ServiceController.getAll(context, 1, 100).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<ServiceController>().servicesResponse = value.data;
