@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import 'package:klinik_aurora_portal/models/service_branch/update_service_branch
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -17,8 +20,9 @@ import 'package:provider/provider.dart';
 
 class TimeListManager extends StatefulWidget {
   final service_branch_model.Data? serviceBranch;
+  final void Function() onChanged;
 
-  const TimeListManager({super.key, required this.serviceBranch});
+  const TimeListManager({super.key, required this.serviceBranch, required this.onChanged});
 
   @override
   State<TimeListManager> createState() => _TimeListManagerState();
@@ -27,18 +31,19 @@ class TimeListManager extends StatefulWidget {
 class _TimeListManagerState extends State<TimeListManager> {
   late List<String> timeList;
   TimeOfDay? selectedTime;
+  StreamController<DateTime> rebuild = StreamController.broadcast();
 
   @override
   void initState() {
     super.initState();
-    timeList = List<String>.from(widget.serviceBranch?.serviceBranchAvailableTime ?? []);
+    if (widget.serviceBranch?.serviceBranchAvailableTime != null) {
+      timeList =
+          widget.serviceBranch!.serviceBranchAvailableTime!.map((time) => convert24HourToAmPmFormat(time)).toList();
+    }
   }
 
   void _pickTime() async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
+    final TimeOfDay? picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
 
     if (picked != null) {
       setState(() {
@@ -60,6 +65,27 @@ class _TimeListManagerState extends State<TimeListManager> {
     setState(() {
       timeList.removeAt(index);
     });
+  }
+
+  String convertAmPmTo24HourFormat(String time) {
+    final format = RegExp(r'^(\d{1,2}):(\d{2}) (AM|PM)$');
+    final match = format.firstMatch(time);
+
+    if (match != null) {
+      int hour = int.parse(match.group(1)!);
+      int minute = int.parse(match.group(2)!);
+      String period = match.group(3)!;
+
+      if (period == 'PM' && hour != 12) {
+        hour += 12;
+      } else if (period == 'AM' && hour == 12) {
+        hour = 0;
+      }
+
+      return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}:00';
+    } else {
+      throw FormatException('Invalid time format: $time');
+    }
   }
 
   @override
@@ -84,21 +110,12 @@ class _TimeListManagerState extends State<TimeListManager> {
                         children: [
                           InputField(
                             field: InputFieldAttribute(
-                              controller: TextEditingController(
-                                text: selectedTime?.format(context),
-                              ),
+                              controller: TextEditingController(text: selectedTime?.format(context)),
                               isEditable: false,
                               labelText: 'Selected Time',
                               suffixWidget: Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: _pickTime,
-                                    icon: const Icon(
-                                      Icons.add,
-                                    ),
-                                  ),
-                                ],
+                                children: [IconButton(onPressed: _pickTime, icon: const Icon(Icons.add))],
                               ),
                             ),
                             width: 300,
@@ -130,46 +147,41 @@ class _TimeListManagerState extends State<TimeListManager> {
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               child: Row(
                                 children: [
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    timeList[index],
-                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(timeList[index]),
                                   IconButton(
                                     icon: const Icon(Icons.close, color: Colors.black),
                                     onPressed: () => _removeTimeFromList(index),
-                                  )
+                                  ),
                                 ],
                               ),
                             ),
                         ],
                       ),
-                      if (timeList.isEmpty)
-                        const Text(
-                          'No slots available.',
-                        ),
+                      if (timeList.isEmpty) const Text('No slots available.'),
                       AppPadding.vertical(),
-                      Button(
-                        () {
-                          ServiceBranchController.update(
+                      Button(() {
+                        List<String> convertedTimes = timeList.map((time) => convertAmPmTo24HourFormat(time)).toList();
+                        ServiceBranchController.update(
+                          context,
+                          UpdateServiceBranchRequest(
+                            serviceBranchId: widget.serviceBranch?.serviceBranchId,
+                            serviceBranchStatus: widget.serviceBranch?.serviceBranchStatus,
+                            serviceBranchAvailableTime: convertedTimes,
+                          ),
+                        ).then((value) {
+                          if (responseCode(value.code)) {
+                            getLatestData();
+                            widget.onChanged();
+                            context.pop();
+                          } else {
+                            showDialogError(
                               context,
-                              UpdateServiceBranchRequest(
-                                serviceBranchId: widget.serviceBranch?.serviceBranchId,
-                                serviceBranchStatus: widget.serviceBranch?.serviceBranchStatus,
-                                serviceBranchAvailableTime: timeList,
-                              )).then((value) {
-                            if (responseCode(value.code)) {
-                              context.pop();
-                              getLatestData();
-                            } else {
-                              showDialogError(
-                                  context, value.data?.message ?? value.message ?? 'error'.tr(gender: 'generic'));
-                            }
-                          });
-                        },
-                        actionText: 'Update',
-                      )
+                              value.data?.message ?? value.message ?? 'error'.tr(gender: 'generic'),
+                            );
+                          }
+                        });
+                      }, actionText: 'Update'),
                     ],
                   ),
                 ),
@@ -183,8 +195,13 @@ class _TimeListManagerState extends State<TimeListManager> {
 
   getLatestData() {
     showLoading();
-    ServiceBranchController.getAll(context, 1, 100, serviceId: widget.serviceBranch?.serviceId, serviceBranchStatus: 1)
-        .then((value) {
+    ServiceBranchController.getAll(
+      context,
+      1,
+      100,
+      serviceId: widget.serviceBranch?.serviceId,
+      serviceBranchStatus: 1,
+    ).then((value) {
       dismissLoading();
       context.read<ServiceBranchController>().serviceBranchResponse = value.data;
       showDialogSuccess(context, 'Timing for ${widget.serviceBranch?.branchName} has been successfully updated.');

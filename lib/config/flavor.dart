@@ -2,11 +2,7 @@ import 'package:klinik_aurora_portal/env/development.dart';
 import 'package:klinik_aurora_portal/env/production.dart';
 import 'package:klinik_aurora_portal/env/staging.dart';
 
-enum Flavor {
-  development,
-  staging,
-  production,
-}
+enum Flavor { development, staging, production }
 
 Flavor environment = Flavor.staging;
 
@@ -19,9 +15,6 @@ class Environment {
         return "FBB Gateway Staging";
       case Flavor.production:
         return "FBB Gateway";
-
-      default:
-        return "FBB Gateway";
     }
   }
 
@@ -32,8 +25,6 @@ class Environment {
       case Flavor.staging:
         return StagingEnvironment().data[value];
       case Flavor.production:
-        return ProductionEnvironment().data[value];
-      default:
         return ProductionEnvironment().data[value];
     }
   }

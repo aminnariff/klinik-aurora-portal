@@ -42,11 +42,7 @@ class Homepage extends StatefulWidget {
     return sideBarAttribute.indexWhere((element) => element.label == label);
   }
 
-  const Homepage({
-    super.key,
-    this.location,
-    required this.child,
-  });
+  const Homepage({super.key, this.location, required this.child});
 
   @override
   State<Homepage> createState() => _HomepageState();
@@ -56,27 +52,72 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     sideBarAttribute = [
-      const SidebarXItem(iconWidget: Icon(Icons.dashboard_rounded, color: Colors.white), label: 'Dashboard'),
-      const SidebarXItem(
-          iconWidget: Icon(Icons.add_circle_outline_rounded, color: Colors.white), label: PointHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(Icons.medical_services, color: Colors.white), label: ServiceHomepage.displayName),
-      const SidebarXItem(iconWidget: Icon(Icons.person, color: Colors.white), label: UserHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.codeBranch, color: Colors.white), label: BranchHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white),
-          label: DoctorHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.solidImage, color: Colors.white), label: PromotionHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.ticketSimple, color: Colors.white), label: VoucherHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.gifts, color: Colors.white), label: RewardHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(Icons.local_shipping, color: Colors.white), label: RewardHistoryHomepage.displayName),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+        },
+        label: 'Dashboard',
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+        },
+        label: PointHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.medical_services, color: Colors.white);
+        },
+        label: ServiceHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.person, color: Colors.white);
+        },
+        label: UserHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.admin_panel_settings, color: Colors.white);
+        },
+        label: AdminHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.codeBranch, color: Colors.white);
+        },
+        label: BranchHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white);
+        },
+        label: DoctorHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.solidImage, color: Colors.white);
+        },
+        label: PromotionHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.ticketSimple, color: Colors.white);
+        },
+        label: VoucherHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.gifts, color: Colors.white);
+        },
+        label: RewardHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.local_shipping, color: Colors.white);
+        },
+        label: RewardHistoryHomepage.displayName,
+      ),
     ];
     super.initState();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
@@ -112,18 +153,17 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ActivityHandlerController>(builder: (context, snapshot, _) {
-      if (snapshot.status) {
-        SchedulerBinding.instance.scheduleFrameCallback((_) {
-          context.read<AuthController>().logout(context);
-          context.pushReplacement(LoginPage.routeName);
-        });
-      }
-      return LayoutWidget(
-        mobile: const MobileView(),
-        desktop: desktopView(context),
-      );
-    });
+    return Consumer<ActivityHandlerController>(
+      builder: (context, snapshot, _) {
+        if (snapshot.status) {
+          SchedulerBinding.instance.scheduleFrameCallback((_) {
+            context.read<AuthController>().logout(context);
+            context.pushReplacement(LoginPage.routeName);
+          });
+        }
+        return LayoutWidget(mobile: const MobileView(), desktop: desktopView(context));
+      },
+    );
   }
 
   Widget desktopView(BuildContext context) {
@@ -140,8 +180,10 @@ class _HomepageState extends State<Homepage> {
                   margin: const EdgeInsets.all(0),
                   decoration: const BoxDecoration(
                     color: sidebarColor,
-                    borderRadius:
-                        BorderRadius.only(topRight: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
                   ),
                   hoverColor: Colors.black.withOpacity(0.31),
                   textStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
@@ -150,14 +192,8 @@ class _HomepageState extends State<Homepage> {
                   itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                   selectedItemDecoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: primary.withOpacity(0.7),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.28),
-                      ),
-                    ],
+                    border: Border.all(color: primary.withOpacity(0.7)),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.28))],
                   ),
                   // selectedItemMargin: const EdgeInsets.symmetric(horizontal: 10),
                   selectedTextStyle: const TextStyle(color: Colors.white),
@@ -168,8 +204,10 @@ class _HomepageState extends State<Homepage> {
                   width: screenWidth(15),
                   decoration: const BoxDecoration(
                     color: sidebarColor,
-                    borderRadius:
-                        BorderRadius.only(topRight: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
                   ),
                   // textStyle: titlesBold!.apply(color: DSH_SHADOW_COLOR),
                   // selectedTextStyle: titlesBold!.apply(color: Colors.white),
@@ -186,9 +224,7 @@ class _HomepageState extends State<Homepage> {
                         if (extended)
                           SlideInLeft(
                             child: Image(
-                              image: const AssetImage(
-                                'assets/icons/logo/klinik-aurora.png',
-                              ),
+                              image: const AssetImage('assets/icons/logo/klinik-aurora.png'),
                               width: extended ? 100 : 50,
                               height: extended ? 100 : 50,
                             ),
@@ -196,9 +232,7 @@ class _HomepageState extends State<Homepage> {
                         if (!extended)
                           SlideInRight(
                             child: Image(
-                              image: const AssetImage(
-                                'assets/icons/logo/klinik-aurora.png',
-                              ),
+                              image: const AssetImage('assets/icons/logo/klinik-aurora.png'),
                               width: extended ? 100 : 50,
                               height: extended ? 100 : 50,
                             ),
@@ -237,10 +271,7 @@ class _HomepageState extends State<Homepage> {
                             mainAxisAlignment: (extended) ? MainAxisAlignment.start : MainAxisAlignment.center,
                             children: [
                               AppPadding.horizontal(denominator: 4),
-                              const Icon(
-                                Icons.logout,
-                                color: Colors.white,
-                              ),
+                              const Icon(Icons.logout, color: Colors.white),
                               if (extended) ...[
                                 AppPadding.horizontal(denominator: 2),
                                 ElasticIn(
@@ -262,12 +293,13 @@ class _HomepageState extends State<Homepage> {
                 items: [
                   for (int index = 0; index < sideBarAttribute.length; index++)
                     SidebarXItem(
-                        icon: sideBarAttribute[index].icon,
-                        label: sideBarAttribute[index].label,
-                        iconWidget: sideBarAttribute[index].iconWidget,
-                        onTap: () {
-                          action(sideBarAttribute[index].label);
-                        }),
+                      icon: sideBarAttribute[index].icon,
+                      label: sideBarAttribute[index].label,
+                      iconBuilder: sideBarAttribute[index].iconBuilder,
+                      onTap: () {
+                        action(sideBarAttribute[index].label);
+                      },
+                    ),
                 ],
               );
             },
@@ -296,14 +328,8 @@ class _HomepageState extends State<Homepage> {
                             AppPadding.horizontal(denominator: 2),
                             Container(
                               padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: secondaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.person,
-                                color: tertiaryColor,
-                              ),
+                              decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
+                              child: const Icon(Icons.person, color: tertiaryColor),
                             ),
                           ],
                         ),
@@ -348,12 +374,13 @@ class _HomepageState extends State<Homepage> {
 
   Widget version() {
     return ValueListenableBuilder<AppVersionAttribute>(
-        valueListenable: appVersionAttribute,
-        builder: (context, snapshot, child) {
-          return Text(
-            'v${snapshot.version}',
-            style: Theme.of(context).textTheme.bodyMedium!.apply(color: textSecondaryColor),
-          );
-        });
+      valueListenable: appVersionAttribute,
+      builder: (context, snapshot, child) {
+        return Text(
+          'v${snapshot.version}',
+          style: Theme.of(context).textTheme.bodyMedium!.apply(color: textSecondaryColor),
+        );
+      },
+    );
   }
 }

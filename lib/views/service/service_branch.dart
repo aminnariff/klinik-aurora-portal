@@ -20,10 +20,7 @@ import 'package:provider/provider.dart';
 
 class ServiceBranch extends StatefulWidget {
   final service_model.Data service;
-  const ServiceBranch({
-    super.key,
-    required this.service,
-  });
+  const ServiceBranch({super.key, required this.service});
 
   @override
   State<ServiceBranch> createState() => _ServiceBranchState();
@@ -35,16 +32,14 @@ class _ServiceBranchState extends State<ServiceBranch> {
   @override
   void initState() {
     if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context, 1, 100).then(
-        (value) {
-          if (responseCode(value.code)) {
-            context.read<BranchController>().branchAllResponse = value;
-            setState(() {});
-          } else {
-            //TODO: show error to retry
-          }
-        },
-      );
+      BranchController.getAll(context, 1, 100).then((value) {
+        if (responseCode(value.code)) {
+          context.read<BranchController>().branchAllResponse = value;
+          setState(() {});
+        } else {
+          //TODO: show error to retry
+        }
+      });
     }
     super.initState();
   }
@@ -66,10 +61,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                     Column(
                       children: [
                         AppPadding.vertical(),
-                        Text(
-                          'List of branches',
-                          style: AppTypography.bodyLarge(context).apply(),
-                        ),
+                        Text('List of branches', style: AppTypography.bodyLarge(context).apply()),
                         AppPadding.vertical(denominator: 2),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -96,80 +88,90 @@ class _ServiceBranchState extends State<ServiceBranch> {
                         ),
                         Expanded(
                           child: StreamBuilder<DateTime>(
-                              stream: rebuild.stream,
-                              builder: (context, snapshot) {
-                                return SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      AppPadding.vertical(denominator: 2),
-                                      for (branch_model.Data? item
-                                          in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
-                                        ListTile(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return TimeListManager(
-                                                  serviceBranch: serviceBranch(
-                                                      item?.branchId ?? ' ', widget.service.serviceId ?? ''),
-                                                );
-                                              },
-                                            );
-                                          },
-                                          title: Text(
-                                            '${item?.branchName}',
-                                            style: AppTypography.bodyMedium(context),
-                                          ),
-                                          trailing: CupertinoSwitch(
-                                            value: doesServiceBranchExistAndActive(item?.branchId ?? ''),
-                                            onChanged: (value) async {
-                                              try {
-                                                service_branch_model.Data? data = serviceBranch(
-                                                    item?.branchId ?? ' ', widget.service.serviceId ?? '');
-                                                if (await showConfirmDialog(
-                                                    context,
-                                                    data.serviceBranchStatus == 1
-                                                        ? 'Are you certain you wish to deactivate ${widget.service.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.'
-                                                        : 'Are you certain you wish to activate ${widget.service.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.')) {
-                                                  Future.delayed(Duration.zero, () {
-                                                    ServiceBranchController.update(
-                                                      context,
-                                                      UpdateServiceBranchRequest(
-                                                        serviceBranchId: data.serviceBranchId,
-                                                        serviceBranchAvailableTime: data.serviceBranchAvailableTime,
-                                                        serviceBranchStatus: data.serviceBranchStatus == 1 ? 0 : 1,
-                                                      ),
-                                                    ).then((value) {
-                                                      if (responseCode(value.code)) {
-                                                        showLoading();
-                                                        ServiceBranchController.getAll(context, 1, 100,
-                                                                serviceId: widget.service.serviceId,
-                                                                serviceBranchStatus: 1)
-                                                            .then((value) {
-                                                          dismissLoading();
-                                                          context
-                                                              .read<ServiceBranchController>()
-                                                              .serviceBranchResponse = value.data;
-                                                          rebuild.add(DateTime.now());
-                                                          showDialogSuccess(context,
-                                                              '${widget.service.serviceName} has been successfully ${data.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${item?.branchName}.');
-                                                        });
-                                                      } else {
-                                                        showDialogError(context, value.data?.message ?? '');
-                                                      }
-                                                    });
-                                                  });
-                                                }
-                                              } catch (e) {
-                                                debugPrint(e.toString());
-                                              }
+                            stream: rebuild.stream,
+                            builder: (context, snapshot) {
+                              return SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    AppPadding.vertical(denominator: 2),
+                                    for (branch_model.Data? item
+                                        in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
+                                      ListTile(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return TimeListManager(
+                                                onChanged: () {
+                                                  rebuild.add(DateTime.now());
+                                                },
+                                                serviceBranch: serviceBranch(
+                                                  item?.branchId ?? ' ',
+                                                  widget.service.serviceId ?? '',
+                                                ),
+                                              );
                                             },
-                                          ),
+                                          );
+                                        },
+                                        title: Text('${item?.branchName}', style: AppTypography.bodyMedium(context)),
+                                        trailing: CupertinoSwitch(
+                                          value: doesServiceBranchExistAndActive(item?.branchId ?? ''),
+                                          onChanged: (value) async {
+                                            try {
+                                              service_branch_model.Data? data = serviceBranch(
+                                                item?.branchId ?? ' ',
+                                                widget.service.serviceId ?? '',
+                                              );
+                                              if (await showConfirmDialog(
+                                                context,
+                                                data.serviceBranchStatus == 1
+                                                    ? 'Are you certain you wish to deactivate ${widget.service.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.'
+                                                    : 'Are you certain you wish to activate ${widget.service.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.',
+                                              )) {
+                                                Future.delayed(Duration.zero, () {
+                                                  ServiceBranchController.update(
+                                                    context,
+                                                    UpdateServiceBranchRequest(
+                                                      serviceBranchId: data.serviceBranchId,
+                                                      serviceBranchAvailableTime: data.serviceBranchAvailableTime,
+                                                      serviceBranchStatus: data.serviceBranchStatus == 1 ? 0 : 1,
+                                                    ),
+                                                  ).then((value) {
+                                                    if (responseCode(value.code)) {
+                                                      showLoading();
+                                                      ServiceBranchController.getAll(
+                                                        context,
+                                                        1,
+                                                        100,
+                                                        serviceId: widget.service.serviceId,
+                                                        serviceBranchStatus: 1,
+                                                      ).then((value) {
+                                                        dismissLoading();
+                                                        context.read<ServiceBranchController>().serviceBranchResponse =
+                                                            value.data;
+                                                        rebuild.add(DateTime.now());
+                                                        showDialogSuccess(
+                                                          context,
+                                                          '${widget.service.serviceName} has been successfully ${data.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${item?.branchName}.',
+                                                        );
+                                                      });
+                                                    } else {
+                                                      showDialogError(context, value.data?.message ?? '');
+                                                    }
+                                                  });
+                                                });
+                                              }
+                                            } catch (e) {
+                                              debugPrint(e.toString());
+                                            }
+                                          },
                                         ),
-                                    ],
-                                  ),
-                                );
-                              }),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -184,18 +186,18 @@ class _ServiceBranchState extends State<ServiceBranch> {
   }
 
   service_branch_model.Data serviceBranch(String branchId, String serviceId) {
-    return context
-        .read<ServiceBranchController>()
-        .serviceBranchResponse!
-        .data!
-        .firstWhere((serviceBranch) => serviceBranch.branchId == branchId && serviceBranch.serviceId == serviceId);
+    return context.read<ServiceBranchController>().serviceBranchResponse!.data!.firstWhere(
+      (serviceBranch) => serviceBranch.branchId == branchId && serviceBranch.serviceId == serviceId,
+    );
   }
 
   bool doesServiceBranchExistAndActive(String branchId) {
-    return context.read<ServiceBranchController>().serviceBranchResponse!.data!.any((serviceBranch) =>
-        serviceBranch.branchId == branchId &&
-        serviceBranch.serviceBranchStatus == 1 &&
-        serviceBranch.branchStatus == 1 &&
-        serviceBranch.serviceStatus == 1);
+    return context.read<ServiceBranchController>().serviceBranchResponse!.data!.any(
+      (serviceBranch) =>
+          serviceBranch.branchId == branchId &&
+          serviceBranch.serviceBranchStatus == 1 &&
+          serviceBranch.branchStatus == 1 &&
+          serviceBranch.serviceStatus == 1,
+    );
   }
 }

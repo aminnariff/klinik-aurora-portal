@@ -70,6 +70,24 @@ bool checkEndDate(String? endDate) {
   }
 }
 
+String convert24HourToAmPmFormat(String time) {
+  final format = RegExp(r'^(\d{2}):(\d{2}):(\d{2})$');
+  final match = format.firstMatch(time);
+
+  if (match != null) {
+    int hour = int.parse(match.group(1)!);
+    int minute = int.parse(match.group(2)!);
+
+    final period = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12;
+    if (hour == 0) hour = 12;
+
+    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period';
+  } else {
+    throw FormatException('Invalid 24-hour format: $time');
+  }
+}
+
 int calculateCustomerPoints(String amount) {
   double paidAmount = double.tryParse(amount) ?? 0.0;
   int points = (paidAmount / 10).floor();
