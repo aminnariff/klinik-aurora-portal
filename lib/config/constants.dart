@@ -47,6 +47,16 @@ List<DropdownAttribute> states = [
   DropdownAttribute('Terengganu', 'Terengganu'),
 ];
 
+List<DropdownAttribute> appointmentStatus = [
+  DropdownAttribute('1', 'Booked'),
+  DropdownAttribute('2', 'Cancelled'),
+  DropdownAttribute('3', 'Rescheduled'),
+  DropdownAttribute('4', 'Pending Payment'),
+  DropdownAttribute('5', 'Completed'),
+  DropdownAttribute('6', 'Refunded'),
+  DropdownAttribute('7', 'No Show'),
+];
+
 double fileSizeLimit = 10.0;
 
 

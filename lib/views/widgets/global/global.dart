@@ -8,6 +8,10 @@ bool notNullOrEmptyString(String? value) {
   return true;
 }
 
+int opacityCalculation(double value) {
+  return (value * 255).toInt();
+}
+
 String statusTranslate(int? value) {
   if (value == 1) {
     return 'ACTIVE';

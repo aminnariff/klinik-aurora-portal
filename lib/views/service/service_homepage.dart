@@ -58,30 +58,15 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(
-      attribute: 'serviceName',
-      label: 'Name',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'servicePrice',
-      label: 'Price',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+    TableHeaderAttribute(attribute: 'serviceName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'servicePrice', label: 'Price', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'serviceBookingFee',
       label: 'Booking Fee',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
-    TableHeaderAttribute(
-      attribute: 'doctorType',
-      label: 'Type',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+    TableHeaderAttribute(attribute: 'doctorType', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'serviceStatus',
       label: 'Status',
@@ -117,10 +102,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: mobileView(),
-      desktop: desktopView(),
-    );
+    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -130,7 +112,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     return Column(
       children: [
         searchField(
-          InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Admin Name'),
+          InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Service Name'),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -148,8 +130,10 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                             children: [
                               CardContainer(
                                 Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: screenPadding * 1.5, horizontal: screenPadding),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenPadding * 1.5,
+                                    horizontal: screenPadding,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -172,11 +156,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           children: [
                             Text('N/A'),
                             Text('N/A'),
-                            Row(
-                              children: [
-                                Text('N/A'),
-                              ],
-                            ),
+                            Row(children: [Text('N/A')]),
                             Text('aaaaa'),
                           ],
                         ),
@@ -188,10 +168,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        )
+        Padding(padding: EdgeInsets.symmetric(vertical: screenPadding), child: pagination()),
       ],
     );
     // },
@@ -203,25 +180,18 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$title:',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
         AppPadding.horizontal(denominator: 2),
-        Expanded(
-          child: AppSelectableText(
-            value,
-          ),
-        ),
+        Expanded(child: AppSelectableText(value)),
       ],
     );
   }
 
   Widget desktopView() {
     return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    // (widget.orderReference == null)
+    //     ?
+    Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +201,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             children: [
               AppPadding.horizontal(),
               searchField(
-                InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Admin Name'),
+                InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Service Name'),
               ),
               // AppPadding.horizontal(),
               // searchField(
@@ -245,17 +215,14 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               children: [
                 Expanded(
                   child: CardContainer(
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: orderTable(),
-                    ),
+                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -278,10 +245,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               onPressed: () {
                 filtering(page: 1);
               },
-              child: const Icon(
-                Icons.search,
-                color: Colors.blue,
-              ),
+              child: const Icon(Icons.search, color: Colors.blue),
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
@@ -300,249 +264,236 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         if (snapshot.servicesResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  ),
-                ),
-              ),
-            ],
+            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
           );
         } else {
           return snapshot.servicesResponse?.data == null || snapshot.servicesResponse!.data!.isEmpty
               ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    const Expanded(
-                      child: Center(
-                        child: NoRecordsWidget(),
-                      ),
-                    ),
-                  ],
-                )
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
+              )
               : Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  tableButton(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                            padding: const EdgeInsets.all(5),
+                            child: DataTable2(
+                              columnSpacing: 12,
+                              horizontalMargin: 12,
+                              minWidth: 1300,
+                              isHorizontalScrollBarVisible: true,
+                              isVerticalScrollBarVisible: true,
+                              columns: columns(),
+                              headingRowColor: WidgetStateProperty.all(Colors.white),
+                              headingRowHeight: 51,
+                              decoration: const BoxDecoration(),
+                              border: TableBorder(
+                                left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
                               ),
-                              padding: const EdgeInsets.all(5),
-                              child: DataTable2(
-                                columnSpacing: 12,
-                                horizontalMargin: 12,
-                                minWidth: 1300,
-                                isHorizontalScrollBarVisible: true,
-                                isVerticalScrollBarVisible: true,
-                                columns: columns(),
-                                headingRowColor: WidgetStateProperty.all(Colors.white),
-                                headingRowHeight: 51,
-                                decoration: const BoxDecoration(),
-                                border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                ),
-                                rows: [
-                                  for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
-                                    DataRow(
-                                      color: WidgetStateProperty.all(
-                                          index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
-                                      cells: [
-                                        DataCell(
-                                          TextButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return ServiceDetails(
-                                                      service: snapshot.servicesResponse!.data![index],
-                                                      type: 'update',
-                                                    );
-                                                  });
-                                            },
-                                            child: Text(
-                                              snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
-                                              style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                            ),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(snapshot.servicesResponse?.data?[index].servicePrice != null
-                                              ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
-                                              : 'N/A'),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                              snapshot.servicesResponse?.data?[index].serviceBookingFee != null
-                                                  ? 'RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}'
-                                                  : 'N/A'),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(snapshot.servicesResponse?.data?[index].doctorType == 2
-                                              ? 'Sonographer'
-                                              : 'Doctor'),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                ? 'Active'
-                                                : 'Inactive',
-                                            style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(
-                                                    snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                        ? 'active'
-                                                        : 'inactive'),
-                                                fontWeightDelta: 1),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                              dateConverter(snapshot.servicesResponse?.data?[index].createdDate) ??
-                                                  'N/A'),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  ServiceBranchController.getAll(context, 1, 100,
-                                                          serviceId:
-                                                              snapshot.servicesResponse!.data![index].serviceId ?? '',
-                                                          serviceBranchStatus: 1)
-                                                      .then((value) {
-                                                    if (responseCode(value.code)) {
-                                                      context.read<ServiceBranchController>().serviceBranchResponse =
-                                                          value.data;
-                                                      showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext context) {
-                                                            return ServiceBranch(
-                                                              service: snapshot.servicesResponse!.data![index],
-                                                            );
-                                                          });
-                                                    }
-                                                  });
-                                                },
-                                                icon: const Icon(
-                                                  Icons.list,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  try {
-                                                    Data? data = snapshot.servicesResponse?.data?[index];
-                                                    if (await showConfirmDialog(
-                                                        context,
-                                                        data?.serviceStatus == 1
-                                                            ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
-                                                            : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.')) {
-                                                      Future.delayed(Duration.zero, () {
-                                                        ServiceController.update(
-                                                          context,
-                                                          UpdateServiceRequest(
-                                                            serviceId: data?.serviceId,
-                                                            serviceName: data?.serviceDescription,
-                                                            serviceDescription: data?.serviceDescription,
-                                                            servicePrice: data?.servicePrice != null
-                                                                ? double.parse(data?.servicePrice ?? '0')
-                                                                : null,
-                                                            serviceBookingFee: data?.serviceBookingFee != null
-                                                                ? double.parse(data?.serviceBookingFee ?? '0')
-                                                                : null,
-                                                            doctorType: data?.doctorType,
-                                                            serviceTime: data?.serviceTime,
-                                                            serviceCategory: data?.serviceCategory,
-                                                            serviceStatus: data?.serviceStatus == 1 ? 0 : 1,
-                                                          ),
-                                                        ).then((value) {
-                                                          if (responseCode(value.code)) {
-                                                            filtering();
-                                                            showDialogSuccess(context,
-                                                                'The Services has been successfully ${data?.serviceStatus == 1 ? 'deactivated' : 'activated'}.');
-                                                          } else {
-                                                            showDialogError(context, value.data?.message ?? '');
-                                                          }
-                                                        });
-                                                      });
-                                                    }
-                                                  } catch (e) {
-                                                    debugPrint(e.toString());
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                      ? Icons.pause_circle
-                                                      : Icons.play_arrow,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                              rows: [
+                                for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
+                                  DataRow(
+                                    color: WidgetStateProperty.all(
+                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
                                     ),
-                                ],
-                              ),
+                                    cells: [
+                                      DataCell(
+                                        TextButton(
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return ServiceDetails(
+                                                  service: snapshot.servicesResponse!.data![index],
+                                                  type: 'update',
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Text(
+                                            snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
+                                            style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                          ),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.servicesResponse?.data?[index].servicePrice != null
+                                              ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
+                                              : 'N/A',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.servicesResponse?.data?[index].serviceBookingFee != null
+                                              ? 'RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}'
+                                              : 'N/A',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.servicesResponse?.data?[index].doctorType == 2
+                                              ? 'Sonographer'
+                                              : 'Doctor',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                              ? 'Active'
+                                              : 'Inactive',
+                                          style: AppTypography.bodyMedium(context).apply(
+                                            color: statusColor(
+                                              snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                                  ? 'active'
+                                                  : 'inactive',
+                                            ),
+                                            fontWeightDelta: 1,
+                                          ),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          dateConverter(snapshot.servicesResponse?.data?[index].createdDate) ?? 'N/A',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                ServiceBranchController.getAll(
+                                                  context,
+                                                  1,
+                                                  100,
+                                                  serviceId: snapshot.servicesResponse!.data![index].serviceId ?? '',
+                                                  serviceBranchStatus: 1,
+                                                ).then((value) {
+                                                  if (responseCode(value.code)) {
+                                                    context.read<ServiceBranchController>().serviceBranchResponse =
+                                                        value.data;
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return ServiceBranch(
+                                                          service: snapshot.servicesResponse!.data![index],
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+                                                });
+                                              },
+                                              icon: const Icon(Icons.list, color: Colors.grey),
+                                            ),
+                                            IconButton(
+                                              onPressed: () async {
+                                                try {
+                                                  Data? data = snapshot.servicesResponse?.data?[index];
+                                                  if (await showConfirmDialog(
+                                                    context,
+                                                    data?.serviceStatus == 1
+                                                        ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
+                                                        : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
+                                                  )) {
+                                                    Future.delayed(Duration.zero, () {
+                                                      ServiceController.update(
+                                                        context,
+                                                        UpdateServiceRequest(
+                                                          serviceId: data?.serviceId,
+                                                          serviceName: data?.serviceDescription,
+                                                          serviceDescription: data?.serviceDescription,
+                                                          servicePrice:
+                                                              data?.servicePrice != null
+                                                                  ? double.parse(data?.servicePrice ?? '0')
+                                                                  : null,
+                                                          serviceBookingFee:
+                                                              data?.serviceBookingFee != null
+                                                                  ? double.parse(data?.serviceBookingFee ?? '0')
+                                                                  : null,
+                                                          doctorType: data?.doctorType,
+                                                          serviceTime: data?.serviceTime,
+                                                          serviceCategory: data?.serviceCategory,
+                                                          serviceStatus: data?.serviceStatus == 1 ? 0 : 1,
+                                                        ),
+                                                      ).then((value) {
+                                                        if (responseCode(value.code)) {
+                                                          filtering();
+                                                          showDialogSuccess(
+                                                            context,
+                                                            'The Services has been successfully ${data?.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
+                                                          );
+                                                        } else {
+                                                          showDialogError(context, value.data?.message ?? '');
+                                                        }
+                                                      });
+                                                    });
+                                                  }
+                                                } catch (e) {
+                                                  debugPrint(e.toString());
+                                                }
+                                              },
+                                              icon: Icon(
+                                                snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                                    ? Icons.pause_circle
+                                                    : Icons.play_arrow,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
                             ),
-                            if (isNoRecords.value)
-                              const AppSelectableText(
-                                'No Records Found',
-                              ),
-                          ],
-                        ),
+                          ),
+                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                        ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: pagination(),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isMobile && !isTablet)
-                                    const Flexible(
-                                      child: Text(
-                                        'Items per page: ',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  perPage(),
-                                ],
-                              ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(child: pagination()),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (!isMobile && !isTablet)
+                                  const Flexible(
+                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                  ),
+                                perPage(),
+                              ],
                             ),
-                            if (!isMobile && !isTablet)
-                              Text(
-                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                );
+                          ),
+                          if (!isMobile && !isTablet)
+                            Text(
+                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              );
         }
       },
     );
@@ -551,8 +502,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-            runFiltering(page: page);
-          })
+          runFiltering(page: page);
+        })
         : runFiltering(page: page);
   }
 
@@ -566,13 +517,14 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       _page,
       _pageSize,
       serviceName: _serviceNameController.text,
-      serviceStatus: _selectedServiceStatus != null
-          ? _selectedServiceStatus?.key == '1'
-              ? 1
-              : _selectedServiceStatus?.key == '0'
+      serviceStatus:
+          _selectedServiceStatus != null
+              ? _selectedServiceStatus?.key == '1'
+                  ? 1
+                  : _selectedServiceStatus?.key == '0'
                   ? 0
                   : null
-          : null,
+              : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -689,10 +641,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(
-                angle: -math.pi,
-                child: child,
-              )
+            ? Transform.rotate(angle: -math.pi, child: child)
             : child
         : child;
   }
@@ -705,129 +654,115 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const ServiceDetails(
-                    type: 'create',
-                  );
-                });
+              context: context,
+              builder: (BuildContext context) {
+                return const ServiceDetails(type: 'create');
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.add,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.add, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Add new service',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Add new service', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Card(
-                          surfaceTintColor: Colors.white,
-                          elevation: 5.0,
-                          color: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                                child: Column(
-                                  children: [
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _serviceNameController,
-                                        hintText: 'Search',
-                                        labelText: 'Service Name',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Column(
-                                                children: [
-                                                  AppDropdown(
-                                                    attributeList: DropdownAttributeList(
-                                                      [
-                                                        DropdownAttribute('1', 'Active'),
-                                                        DropdownAttribute('0', 'Inactive'),
-                                                      ],
-                                                      labelText: 'information'.tr(gender: 'userStatus'),
-                                                      value: _selectedServiceStatus?.name,
-                                                      onChanged: (p0) {
-                                                        _selectedServiceStatus = p0;
-                                                        rebuildDropdown.add(DateTime.now());
-                                                        filtering(page: 1);
-                                                      },
-                                                      width: screenWidthByBreakpoint(90, 70, 26),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          );
-                                        }),
-                                    AppPadding.vertical(denominator: 1 / 3),
-                                    AppOutlinedButton(
-                                      () {
-                                        resetAllFilter();
-                                        filtering(enableDebounce: true, page: 1);
-                                      },
-                                      backgroundColor: Colors.white,
-                                      borderRadius: 15,
-                                      width: 131,
-                                      height: 45,
-                                      text: 'Clear',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CloseButton(),
-                              ),
-                            ],
+              context: context,
+              builder: (BuildContext context) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Card(
+                        surfaceTintColor: Colors.white,
+                        elevation: 5.0,
+                        color: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            bottomLeft: Radius.circular(15),
                           ),
                         ),
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                              child: Column(
+                                children: [
+                                  searchField(
+                                    InputFieldAttribute(
+                                      controller: _serviceNameController,
+                                      hintText: 'Search',
+                                      labelText: 'Service Name',
+                                    ),
+                                  ),
+                                  AppPadding.vertical(),
+                                  StreamBuilder<DateTime>(
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'userStatus'),
+                                                  value: _selectedServiceStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedServiceStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                  AppPadding.vertical(denominator: 1 / 3),
+                                  AppOutlinedButton(
+                                    () {
+                                      resetAllFilter();
+                                      filtering(enableDebounce: true, page: 1);
+                                    },
+                                    backgroundColor: Colors.white,
+                                    borderRadius: 15,
+                                    width: 131,
+                                    height: 45,
+                                    text: 'Clear',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
+                          ],
+                        ),
                       ),
-                    ],
-                  );
-                });
+                    ),
+                  ],
+                );
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.filter_list,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.filter_list, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Filter',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -838,15 +773,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.refresh,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.refresh, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Reset',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -862,9 +791,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         onChanged: (selected) {
           DropdownAttribute item = selected as DropdownAttribute;
           _pageSize = int.parse(item.key);
-          filtering(
-            enableDebounce: false,
-          );
+          filtering(enableDebounce: false);
         },
       ),
     );

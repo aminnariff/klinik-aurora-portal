@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/privacy/privacy_policy.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
+import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/delete_account/delete_account.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
@@ -30,9 +31,7 @@ final router = GoRouter(
       path: AdminPasswordRecoveryPage.routeName,
       builder: (BuildContext context, GoRouterState state) {
         final String? token = state.extra as String?;
-        return AdminPasswordRecoveryPage(
-          token: token,
-        );
+        return AdminPasswordRecoveryPage(token: token);
       },
     ),
     GoRoute(
@@ -54,19 +53,13 @@ final router = GoRouter(
       path: LoginPage.routeName,
       builder: (BuildContext context, GoRouterState state) {
         bool? resetUser = state.extra as bool?;
-        return LoginPage(
-          resetUser: resetUser,
-        );
+        return LoginPage(resetUser: resetUser);
       },
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       pageBuilder: (context, state, child) {
-        return NoTransitionPage(
-            child: Homepage(
-          location: state.uri.toString(),
-          child: child,
-        ));
+        return NoTransitionPage(child: Homepage(location: state.uri.toString(), child: child));
       },
       routes: [
         GoRoute(
@@ -75,11 +68,7 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             // final orderReference = state.uri.queryParameters['orderReference'];
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: MainDashboard(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: MainDashboard()));
           },
         ),
         GoRoute(
@@ -87,11 +76,7 @@ final router = GoRouter(
           path: PointHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: PointHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: PointHomepage()));
           },
         ),
         GoRoute(
@@ -99,11 +84,7 @@ final router = GoRouter(
           path: UserHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: UserHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: UserHomepage()));
           },
         ),
         GoRoute(
@@ -111,11 +92,7 @@ final router = GoRouter(
           path: RewardHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: RewardHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: RewardHomepage()));
           },
         ),
         GoRoute(
@@ -123,11 +100,7 @@ final router = GoRouter(
           path: RewardHistoryHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: RewardHistoryHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: RewardHistoryHomepage()));
           },
         ),
         GoRoute(
@@ -135,11 +108,15 @@ final router = GoRouter(
           path: BranchHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: BranchHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: BranchHomepage()));
+          },
+        ),
+        GoRoute(
+          name: AppointmentHomepage.routeName,
+          path: AppointmentHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(child: Scaffold(body: AppointmentHomepage()));
           },
         ),
         GoRoute(
@@ -147,11 +124,7 @@ final router = GoRouter(
           path: ServiceHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: ServiceHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: ServiceHomepage()));
           },
         ),
         GoRoute(
@@ -159,11 +132,7 @@ final router = GoRouter(
           path: AdminHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: AdminHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: AdminHomepage()));
           },
         ),
         GoRoute(
@@ -171,11 +140,7 @@ final router = GoRouter(
           path: PromotionHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: PromotionHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: PromotionHomepage()));
           },
         ),
         GoRoute(
@@ -184,13 +149,7 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             final String? branchId = state.extra as String?;
-            return NoTransitionPage(
-              child: Scaffold(
-                body: DoctorHomepage(
-                  branchId: branchId,
-                ),
-              ),
-            );
+            return NoTransitionPage(child: Scaffold(body: DoctorHomepage(branchId: branchId)));
           },
         ),
         GoRoute(
@@ -198,11 +157,7 @@ final router = GoRouter(
           path: VoucherHomepage.routeName,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: Scaffold(
-                body: VoucherHomepage(),
-              ),
-            );
+            return const NoTransitionPage(child: Scaffold(body: VoucherHomepage()));
           },
         ),
       ],

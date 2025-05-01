@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controlle
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
+import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
@@ -63,6 +64,12 @@ class _HomepageState extends State<Homepage> {
           return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
         },
         label: PointHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.date_range, color: Colors.white);
+        },
+        label: AppointmentHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
@@ -351,6 +358,8 @@ class _HomepageState extends State<Homepage> {
         context.go(Homepage.routeName);
       case PointHomepage.displayName:
         context.go(PointHomepage.routeName);
+      case AppointmentHomepage.displayName:
+        context.go(AppointmentHomepage.routeName);
       case ServiceHomepage.displayName:
         context.go(ServiceHomepage.routeName);
       case UserHomepage.displayName:

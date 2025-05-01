@@ -2,19 +2,25 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
-import 'package:klinik_aurora_portal/controllers/reward/reward_history_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/models/service/services_response.dart';
+import 'package:klinik_aurora_portal/models/service/update_service_request.dart';
+import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/reward_history/reward_history_detail.dart';
+import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -31,51 +37,58 @@ import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
-class RewardHistoryHomepage extends StatefulWidget {
-  static const routeName = '/reward-history';
-  static const displayName = 'Manage Rewards';
-  const RewardHistoryHomepage({super.key});
+class AppointmentHomepage extends StatefulWidget {
+  static const routeName = '/appointment';
+  static const displayName = 'Appointments';
+  final String? orderReference;
+  const AppointmentHomepage({super.key, this.orderReference});
 
   @override
-  State<RewardHistoryHomepage> createState() => _RewardHistoryHomepageState();
+  State<AppointmentHomepage> createState() => _AppointmentHomepageState();
 }
 
-class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
+class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final List<String> _tabs = [
+    'Upcoming',
+    'Completed',
+    'No-Show',
+    'Cancelled',
+    'To Be Scheduled',
+    'Appointment Request',
+  ];
+
   int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
   int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
+  final TextEditingController _serviceNameController = TextEditingController();
+  DropdownAttribute? _selectedServiceStatus;
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    // TableHeaderAttribute(
-    //   attribute: 'transactionId',
-    //   label: 'Transaction Id',
-    //   allowSorting: false,
-    //   columnSize: ColumnSize.S,
-    // ),
+    TableHeaderAttribute(attribute: 'serviceName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'servicePrice', label: 'Price', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
-      attribute: 'userFullName',
-      label: 'Patient Name',
+      attribute: 'serviceBookingFee',
+      label: 'Booking Fee',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
-    TableHeaderAttribute(attribute: 'rewardName', label: 'Reward', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'doctorType', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
-      attribute: 'status',
+      attribute: 'serviceStatus',
       label: 'Status',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 110,
+      width: 70,
     ),
-    TableHeaderAttribute(attribute: 'description', label: 'Remark', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
-      attribute: 'updatedDate',
-      label: 'Last Update',
+      attribute: 'createdDate',
+      label: 'Created Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 120,
     ),
     TableHeaderAttribute(
       attribute: 'action',
@@ -85,12 +98,6 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       width: 100,
     ),
   ];
-  final TextEditingController _customerNameController = TextEditingController();
-  final TextEditingController _customerUserNameController = TextEditingController();
-  final TextEditingController _rewardNameController = TextEditingController();
-  final TextEditingController _customerPhoneController = TextEditingController();
-  DropdownAttribute? _rewardHistoryStatus;
-  DropdownAttribute? _rewardStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -98,9 +105,10 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(
-        RewardHistoryHomepage.displayName,
+        AppointmentHomepage.displayName,
       );
     });
+    _tabController = TabController(length: _tabs.length, vsync: this);
     filtering();
     super.initState();
   }
@@ -117,7 +125,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     return Column(
       children: [
         searchField(
-          InputFieldAttribute(controller: _customerNameController, hintText: 'Search', labelText: 'Patient Name'),
+          InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Patient Name'),
         ),
         Expanded(
           child: SingleChildScrollView(
@@ -193,31 +201,53 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   }
 
   Widget desktopView() {
-    return Scaffold(
+    return
+    // (widget.orderReference == null)
+    //     ?
+    Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
-          Row(
-            children: [
-              AppPadding.horizontal(),
-              searchField(
-                InputFieldAttribute(controller: _customerNameController, hintText: 'Search', labelText: 'Patient Name'),
-              ),
-              // AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
-              // ),
-            ],
+          TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
+            dividerColor: Colors.transparent,
           ),
+          // Row(
+          //   children: [
+          //     AppPadding.horizontal(),
+          //     searchField(
+          //       InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Patient Name'),
+          //     ),
+          //     // AppPadding.horizontal(),
+          //     // searchField(
+          //     //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
+          //     // ),
+          //   ],
+          // ),
           Expanded(
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
                 Expanded(
                   child: CardContainer(
-                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          orderTable(),
+                          Center(child: Text('Completed Appointments')),
+                          Center(child: Text('No-Show Appointments')),
+                          Center(child: Text('Cancelled Appointments')),
+                          Center(child: Text('To Be Scheduled')),
+                          Center(child: Text('Appointment Requests')),
+                        ],
+                      ),
+                    ),
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
                   ),
@@ -228,6 +258,10 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
         ],
       ),
     );
+    // : OrderDetailHomepage(
+    //     orderReference: widget.orderReference!,
+    //     previousPage: AppointmentHomepage.routeName,
+    //   );
   }
 
   Widget searchField(InputFieldAttribute attribute) {
@@ -257,15 +291,15 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   }
 
   Widget orderTable() {
-    return Consumer<RewardHistoryController>(
+    return Consumer<ServiceController>(
       builder: (context, snapshot, child) {
-        if (snapshot.rewardHistoryResponse == null) {
+        if (snapshot.servicesResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
           );
         } else {
-          return snapshot.rewardHistoryResponse == null || snapshot.rewardHistoryResponse!.data!.data!.isEmpty
+          return snapshot.servicesResponse?.data == null || snapshot.servicesResponse!.data!.isEmpty
               ? Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
@@ -286,7 +320,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                             child: DataTable2(
                               columnSpacing: 12,
                               horizontalMargin: 12,
-                              minWidth: 900,
+                              minWidth: 1300,
                               isHorizontalScrollBarVisible: true,
                               isVerticalScrollBarVisible: true,
                               columns: columns(),
@@ -301,54 +335,62 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                 verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
                               ),
                               rows: [
-                                for (
-                                  int index = 0;
-                                  index < (snapshot.rewardHistoryResponse?.data?.data?.length ?? 0);
-                                  index++
-                                )
+                                for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
                                   DataRow(
                                     color: WidgetStateProperty.all(
                                       index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
                                     ),
                                     cells: [
-                                      // DataCell(
-                                      //   TextButton(
-                                      //     onPressed: () {
-                                      //       // showDialog(
-                                      //       //     context: context,
-                                      //       //     builder: (BuildContext context) {
-                                      //       //       return RewardDetail(
-                                      //       //           type: 'update',
-                                      //       //           reward: snapshot.rewardHistoryResponse?.data?.data?[index]);
-                                      //       //     });
-                                      //     },
-                                      //     child: Text(
-                                      //       snapshot.rewardHistoryResponse?.data?.data?[index].rewardId ?? 'N/A',
-                                      //       style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                      //     ),
-                                      //   ),
-                                      // ),
                                       DataCell(
-                                        AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].userFullname ?? 'N/A',
+                                        TextButton(
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AppointmentDetails(
+                                                  service: snapshot.servicesResponse!.data![index],
+                                                  type: 'update',
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Text(
+                                            snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
+                                            style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                          ),
                                         ),
                                       ),
                                       DataCell(
                                         AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].rewardName ?? 'N/A',
+                                          snapshot.servicesResponse?.data?[index].servicePrice != null
+                                              ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
+                                              : 'N/A',
                                         ),
                                       ),
                                       DataCell(
                                         AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryStatus == 1
-                                              ? 'In-Progress'
-                                              : 'Completed',
+                                          snapshot.servicesResponse?.data?[index].serviceBookingFee != null
+                                              ? 'RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}'
+                                              : 'N/A',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.servicesResponse?.data?[index].doctorType == 2
+                                              ? 'Sonographer'
+                                              : 'Doctor',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                              ? 'Active'
+                                              : 'Inactive',
                                           style: AppTypography.bodyMedium(context).apply(
                                             color: statusColor(
-                                              snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryStatus ==
-                                                      1
-                                                  ? 'in-progress'
-                                                  : 'completed',
+                                              snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                                  ? 'active'
+                                                  : 'inactive',
                                             ),
                                             fontWeightDelta: 1,
                                           ),
@@ -356,27 +398,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                       ),
                                       DataCell(
                                         AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryDescription ??
-                                              'N/A',
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          dateConverter(
-                                                snapshot
-                                                    .rewardHistoryResponse
-                                                    ?.data
-                                                    ?.data?[index]
-                                                    .rewardHistoryModifiedDate,
-                                              ) ??
-                                              dateConverter(
-                                                snapshot
-                                                    .rewardHistoryResponse
-                                                    ?.data
-                                                    ?.data?[index]
-                                                    .rewardHistoryCreatedDate,
-                                              ) ??
-                                              'N/A',
+                                          dateConverter(snapshot.servicesResponse?.data?[index].createdDate) ?? 'N/A',
                                         ),
                                       ),
                                       DataCell(
@@ -385,64 +407,83 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                           children: [
                                             IconButton(
                                               onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return RewardHistoryDetail(
-                                                      data: snapshot.rewardHistoryResponse!.data!.data![index],
-                                                      type: 'update',
+                                                ServiceBranchController.getAll(
+                                                  context,
+                                                  1,
+                                                  100,
+                                                  serviceId: snapshot.servicesResponse!.data![index].serviceId ?? '',
+                                                  serviceBranchStatus: 1,
+                                                ).then((value) {
+                                                  if (responseCode(value.code)) {
+                                                    context.read<ServiceBranchController>().serviceBranchResponse =
+                                                        value.data;
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return ServiceBranch(
+                                                          service: snapshot.servicesResponse!.data![index],
+                                                        );
+                                                      },
                                                     );
-                                                  },
-                                                );
+                                                  }
+                                                });
                                               },
-                                              icon: const Icon(Icons.edit, color: Colors.grey),
+                                              icon: const Icon(Icons.list, color: Colors.grey),
                                             ),
-                                            // IconButton(
-                                            //   onPressed: () async {
-                                            //     try {
-                                            //       Data? data = snapshot.rewardHistoryResponse?.data?.data?[index];
-                                            //       if (await showConfirmDialog(
-                                            //           context,
-                                            //           data?.rewardStatus == 1
-                                            //               ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
-                                            //               : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
-                                            //         Future.delayed(Duration.zero, () {
-                                            //           RewardController.update(
-                                            //             context,
-                                            //             UpdateRewardRequest(
-                                            //               rewardId: data?.rewardId ?? '',
-                                            //               rewardName: data?.rewardName ?? '',
-                                            //               rewardDescription: data?.rewardDescription ?? '',
-                                            //               rewardPoint: data?.rewardPoint ?? 0,
-                                            //               totalReward: data?.totalReward ?? 0,
-                                            //               rewardStartDate: data?.rewardStartDate ?? '',
-                                            //               rewardEndDate: data?.rewardEndDate ?? '',
-                                            //               rewardStatus: data?.rewardStatus == 1 ? 0 : 1,
-                                            //             ),
-                                            //           ).then((value) {
-                                            //             if (responseCode(value.code)) {
-                                            //               filtering();
-                                            //               showDialogSuccess(context,
-                                            //                   'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
-                                            //             } else {
-                                            //               showDialogError(context, value.data?.message ?? '');
-                                            //             }
-                                            //           });
-                                            //         });
-                                            //       }
-                                            //     } catch (e) {
-                                            //       debugPrint(e.toString());
-                                            //     }
-                                            //   },
-                                            //   icon: Icon(
-                                            //     snapshot.rewardHistoryResponse?.data?.data?[index]
-                                            //                 .rewardHistoryStatus ==
-                                            //             1
-                                            //         ? Icons.delete
-                                            //         : Icons.play_arrow,
-                                            //     color: Colors.grey,
-                                            //   ),
-                                            // ),
+                                            IconButton(
+                                              onPressed: () async {
+                                                try {
+                                                  Data? data = snapshot.servicesResponse?.data?[index];
+                                                  if (await showConfirmDialog(
+                                                    context,
+                                                    data?.serviceStatus == 1
+                                                        ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
+                                                        : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
+                                                  )) {
+                                                    Future.delayed(Duration.zero, () {
+                                                      ServiceController.update(
+                                                        context,
+                                                        UpdateServiceRequest(
+                                                          serviceId: data?.serviceId,
+                                                          serviceName: data?.serviceDescription,
+                                                          serviceDescription: data?.serviceDescription,
+                                                          servicePrice:
+                                                              data?.servicePrice != null
+                                                                  ? double.parse(data?.servicePrice ?? '0')
+                                                                  : null,
+                                                          serviceBookingFee:
+                                                              data?.serviceBookingFee != null
+                                                                  ? double.parse(data?.serviceBookingFee ?? '0')
+                                                                  : null,
+                                                          doctorType: data?.doctorType,
+                                                          serviceTime: data?.serviceTime,
+                                                          serviceCategory: data?.serviceCategory,
+                                                          serviceStatus: data?.serviceStatus == 1 ? 0 : 1,
+                                                        ),
+                                                      ).then((value) {
+                                                        if (responseCode(value.code)) {
+                                                          filtering();
+                                                          showDialogSuccess(
+                                                            context,
+                                                            'The Services has been successfully ${data?.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
+                                                          );
+                                                        } else {
+                                                          showDialogError(context, value.data?.message ?? '');
+                                                        }
+                                                      });
+                                                    });
+                                                  }
+                                                } catch (e) {
+                                                  debugPrint(e.toString());
+                                                }
+                                              },
+                                              icon: Icon(
+                                                snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                                    ? Icons.pause_circle
+                                                    : Icons.play_arrow,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -503,27 +544,16 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     if (page != null) {
       _page = page;
     }
-    RewardHistoryController.getAll(
+    ServiceController.getAll(
       context,
       _page,
       _pageSize,
-      customerName: _customerNameController.text != '' ? _customerNameController.text : null,
-      customerUsername: _customerUserNameController.text != '' ? _customerUserNameController.text : null,
-      userPhone: _customerPhoneController.text != '' ? _customerPhoneController.text : null,
-      rewardName: _rewardNameController.text != '' ? _rewardNameController.text : null,
-      rewardHistoryStatus:
-          _rewardHistoryStatus != null
-              ? _rewardHistoryStatus?.key == '1'
+      serviceName: _serviceNameController.text,
+      serviceStatus:
+          _selectedServiceStatus != null
+              ? _selectedServiceStatus?.key == '1'
                   ? 1
-                  : _rewardHistoryStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
-      rewardStatus:
-          _rewardStatus != null
-              ? _rewardStatus?.key == '1'
-                  ? 1
-                  : _rewardStatus?.key == '0'
+                  : _selectedServiceStatus?.key == '0'
                   ? 0
                   : null
               : null,
@@ -532,7 +562,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       if (responseCode(value.code)) {
         _totalCount = value.data?.totalCount ?? 0;
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
-        context.read<RewardHistoryController>().rewardHistoryResponse = value;
+        context.read<ServiceController>().servicesResponse = value.data;
         // _page = 0;
       } else if (value.code == 404) {}
       return null;
@@ -625,12 +655,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   }
 
   resetAllFilter() {
-    _customerNameController.text = '';
-    _customerUserNameController.text = '';
-    _rewardNameController.text = '';
-    _customerPhoneController.text = '';
-    _rewardHistoryStatus = null;
-    _rewardStatus = null;
+    _serviceNameController.text = '';
+    _selectedServiceStatus = null;
     rebuildDropdown.add(DateTime.now());
 
     for (TableHeaderAttribute item in headers) {
@@ -662,8 +688,26 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             showDialog(
               context: context,
               builder: (BuildContext context) {
+                return const AppointmentDetails(type: 'create');
+              },
+            );
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.add, color: Colors.blue),
+              AppPadding.horizontal(denominator: 2),
+              Text('Add new appointment', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
+            ],
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Flexible(
                       child: Card(
@@ -685,69 +729,37 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                 children: [
                                   searchField(
                                     InputFieldAttribute(
-                                      controller: _customerNameController,
+                                      controller: _serviceNameController,
                                       hintText: 'Search',
-                                      labelText: 'Patient Name',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _customerUserNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Patient Username',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _customerPhoneController,
-                                      hintText: 'Search',
-                                      labelText: 'Patient Contact No.',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _rewardNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Reward Name',
+                                      labelText: 'Service Name',
                                     ),
                                   ),
                                   AppPadding.vertical(),
                                   StreamBuilder<DateTime>(
                                     stream: rebuildDropdown.stream,
                                     builder: (context, snapshot) {
-                                      return Column(
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                DropdownAttribute('1', 'In-Progress'),
-                                                DropdownAttribute('0', 'Completed'),
-                                              ],
-                                              labelText: 'Reward History Status',
-                                              value: _rewardHistoryStatus?.name,
-                                              onChanged: (p0) {
-                                                _rewardHistoryStatus = p0;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 1);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
-                                          ),
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
-                                              labelText: 'Reward Status',
-                                              value: _rewardStatus?.name,
-                                              onChanged: (p0) {
-                                                _rewardStatus = p0;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 1);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
+                                          Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'userStatus'),
+                                                  value: _selectedServiceStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedServiceStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       );

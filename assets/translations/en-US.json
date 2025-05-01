@@ -92,6 +92,13 @@
         "email": "Email",
         "description": "Please enter your email address below to request the deletion of your account. A confirmation email will be sent to the provided address."
     },
+    "appointmentPage": {
+        "patientName": "Patient Name",
+        "patientEmail": "Patient Email",
+        "patientContactNo": "Patient Contact No",
+        "appointmentNote": "Note",
+        "status": "Appointment Status"
+    },
     "promotionPage": {
         "startDate": "Start Date",
         "endDate": "End Date",
