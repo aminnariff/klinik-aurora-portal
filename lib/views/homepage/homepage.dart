@@ -27,6 +27,8 @@ import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
+import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';
 
@@ -320,26 +322,34 @@ class _HomepageState extends State<Homepage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 10, screenPadding, 0),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Consumer<AuthController>(
-                              builder: (context, authController, _) {
-                                return Text(authController.authenticationResponse?.data?.user?.userFullname ?? 'N/A');
-                              },
-                            ),
-                            AppPadding.horizontal(denominator: 2),
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
-                              child: const Icon(Icons.person, color: tertiaryColor),
-                            ),
+                    PopupMenuButton<String>(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      offset: const Offset(8, 35),
+                      color: Colors.white,
+                      tooltip: '',
+                      onSelected: _handleMenuSelection,
+                      itemBuilder:
+                          (BuildContext context) => <PopupMenuEntry<String>>[
+                            const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
                           ],
-                        ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Consumer<AuthController>(
+                            builder: (context, authController, _) {
+                              return Text(
+                                authController.authenticationResponse?.data?.user?.userFullname ?? 'N/A',
+                                style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                              );
+                            },
+                          ),
+                          AppPadding.horizontal(denominator: 2),
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
+                            child: const Icon(Icons.person, color: tertiaryColor),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -350,6 +360,19 @@ class _HomepageState extends State<Homepage> {
         ],
       ),
     );
+  }
+
+  void _handleMenuSelection(String value) {
+    if (value == 'logout') {
+      try {
+        context.read<AuthController>().logout(context);
+        context.pushReplacementNamed(LoginPage.routeName, extra: true);
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    } else if (value == 'relocate') {
+      AppToast.snackbar(context, 'We\'re actively developing this feature and it\'s on its way.');
+    }
   }
 
   void action(String? label) {

@@ -4,13 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
-import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
-import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
-import 'package:klinik_aurora_portal/models/service/services_response.dart' as service_model;
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
-import 'package:klinik_aurora_portal/views/service/service_detail_timing.dart';
+import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -19,8 +17,8 @@ import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class ServiceBranch extends StatefulWidget {
-  final service_model.Data service;
-  const ServiceBranch({super.key, required this.service});
+  final service_branch_model.ServiceBranchResponse? serviceBranch;
+  const ServiceBranch({super.key, required this.serviceBranch});
 
   @override
   State<ServiceBranch> createState() => _ServiceBranchState();
@@ -31,16 +29,21 @@ class _ServiceBranchState extends State<ServiceBranch> {
 
   @override
   void initState() {
-    if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context, 1, 100).then((value) {
-        if (responseCode(value.code)) {
-          context.read<BranchController>().branchAllResponse = value;
-          setState(() {});
-        } else {
-          //TODO: show error to retry
-        }
-      });
-    }
+    // if (context.read<BranchController>().branchAllResponse == null) {
+    //   BranchController.getAll(context, 1, 100).then((value) {
+    //     if (responseCode(value.code)) {
+    //       context.read<BranchController>().branchAllResponse = value;
+    //       setState(() {});
+    //     } else {
+    //       //TODO: show error to retry
+    //     }
+    //   });
+    // }
+    widget.serviceBranch?.data?.sort((a, b) {
+      final nameA = a.branchName?.toLowerCase() ?? '';
+      final nameB = b.branchName?.toLowerCase() ?? '';
+      return nameA.compareTo(nameB);
+    });
     super.initState();
   }
 
@@ -68,7 +71,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                           child: Row(
                             children: [
                               Text(
-                                'Service: ${widget.service.serviceName}',
+                                'Service: ${widget.serviceBranch?.data?.first.serviceName}',
                                 style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                               ),
                             ],
@@ -80,7 +83,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                'Total: ${context.read<BranchController>().branchAllResponse?.data?.totalCount ?? '0'} branch(es)',
+                                'Total: ${widget.serviceBranch?.totalCount ?? '0'} branch(es)',
                                 style: AppTypography.bodyMedium(context).apply(),
                               ),
                             ],
@@ -94,47 +97,101 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                 child: Column(
                                   children: [
                                     AppPadding.vertical(denominator: 2),
-                                    for (branch_model.Data? item
-                                        in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
+                                    for (service_branch_model.Data? item in widget.serviceBranch?.data ?? [])
                                       ListTile(
                                         onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return TimeListManager(
-                                                onChanged: () {
-                                                  rebuild.add(DateTime.now());
+                                          showLoading();
+                                          ServiceBranchAvailableDtController.get(
+                                            context,
+                                            1,
+                                            100,
+                                            serviceBranchId: item?.serviceBranchId,
+                                          ).then((value) {
+                                            dismissLoading();
+                                            if (responseCode(value.code)) {
+                                              DateTime now = DateTime.now();
+                                              String? updateId;
+                                              bool haveElements = false;
+                                              try {
+                                                updateId =
+                                                    value.data?.data
+                                                        ?.firstWhere(
+                                                          (element) => element.serviceBranchId == item?.serviceBranchId,
+                                                        )
+                                                        .serviceBranchAvailableDatetimeId;
+                                              } catch (e) {
+                                                debugPrint(e.toString());
+                                              }
+                                              try {
+                                                if ((value.data?.data?.first.availableDatetimes?.length ?? 0) > 0) {
+                                                  haveElements = true;
+                                                }
+                                              } catch (e) {
+                                                debugPrint(e.toString());
+                                              }
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: CardContainer(
+                                                          Stack(
+                                                            alignment: Alignment.topRight,
+                                                            children: [
+                                                              Container(
+                                                                padding: EdgeInsets.all(screenPadding),
+                                                                child: MultiTimeCalendarPage(
+                                                                  serviceBranchId: item?.serviceBranchId ?? '',
+                                                                  serviceBranchAvailableDatetimeId: updateId,
+                                                                  startMonth: now.month,
+                                                                  year: now.year,
+                                                                  totalMonths: 2,
+                                                                  initialDateTimes:
+                                                                      haveElements
+                                                                          ? value.data?.data?.first.availableDatetimes
+                                                                          : null,
+                                                                ),
+                                                              ),
+                                                              CloseButton(),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                  // return TimeListManager(
+                                                  //   onChanged: () {
+                                                  //     rebuild.add(DateTime.now());
+                                                  //   },
+                                                  //   serviceBranch: serviceBranch(
+                                                  //     item?.branchId ?? ' ',
+                                                  //     item?.serviceId ?? '',
+                                                  //   ),
+                                                  // );
                                                 },
-                                                serviceBranch: serviceBranch(
-                                                  item?.branchId ?? ' ',
-                                                  widget.service.serviceId ?? '',
-                                                ),
                                               );
-                                            },
-                                          );
+                                            }
+                                          });
                                         },
                                         title: Text('${item?.branchName}', style: AppTypography.bodyMedium(context)),
                                         trailing: CupertinoSwitch(
-                                          value: doesServiceBranchExistAndActive(item?.branchId ?? ''),
+                                          value: item?.serviceBranchStatus == 1,
                                           onChanged: (value) async {
                                             try {
-                                              service_branch_model.Data? data = serviceBranch(
-                                                item?.branchId ?? ' ',
-                                                widget.service.serviceId ?? '',
-                                              );
                                               if (await showConfirmDialog(
                                                 context,
-                                                data.serviceBranchStatus == 1
-                                                    ? 'Are you certain you wish to deactivate ${widget.service.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.'
-                                                    : 'Are you certain you wish to activate ${widget.service.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.',
+                                                item?.serviceBranchStatus == 1
+                                                    ? 'Are you certain you wish to deactivate ${item?.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.'
+                                                    : 'Are you certain you wish to activate ${item?.serviceName} for ${item?.branchName}? Please note, this action can be reversed at a later time.',
                                               )) {
                                                 Future.delayed(Duration.zero, () {
                                                   ServiceBranchController.update(
                                                     context,
                                                     UpdateServiceBranchRequest(
-                                                      serviceBranchId: data.serviceBranchId,
-                                                      serviceBranchAvailableTime: data.serviceBranchAvailableTime,
-                                                      serviceBranchStatus: data.serviceBranchStatus == 1 ? 0 : 1,
+                                                      serviceBranchId: item?.serviceBranchId,
+                                                      serviceBranchAvailableTime: item?.serviceBranchAvailableTime,
+                                                      serviceBranchStatus: item?.serviceBranchStatus == 1 ? 0 : 1,
                                                     ),
                                                   ).then((value) {
                                                     if (responseCode(value.code)) {
@@ -143,8 +200,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                         context,
                                                         1,
                                                         100,
-                                                        serviceId: widget.service.serviceId,
-                                                        serviceBranchStatus: 1,
+                                                        serviceId: item?.serviceId,
                                                       ).then((value) {
                                                         dismissLoading();
                                                         context.read<ServiceBranchController>().serviceBranchResponse =
@@ -152,7 +208,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                         rebuild.add(DateTime.now());
                                                         showDialogSuccess(
                                                           context,
-                                                          '${widget.service.serviceName} has been successfully ${data.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${item?.branchName}.',
+                                                          '${item?.serviceName} has been successfully ${item?.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${item?.branchName}.',
                                                         );
                                                       });
                                                     } else {

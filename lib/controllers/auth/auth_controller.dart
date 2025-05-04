@@ -16,9 +16,16 @@ class AuthController extends ChangeNotifier {
   String? get passwordError => _passwordError;
   bool _rememberMe = false;
   bool get remember => _rememberMe;
+  bool _isSuperAdmin = false;
+  bool get isSuperAdmin => _isSuperAdmin;
 
   set authenticationResponse(AuthResponse? value) {
     _authenticationResponse = value;
+    notifyListeners();
+  }
+
+  set isSuperAdmin(bool value) {
+    _isSuperAdmin = value;
     notifyListeners();
   }
 
@@ -117,10 +124,7 @@ class AuthController extends ChangeNotifier {
       //   prefs.remove(username);
       //   prefs.remove(password);
       // }
-      prefs.setString(
-        authResponse,
-        json.encode(value),
-      );
+      prefs.setString(authResponse, json.encode(value));
       prefs.setString(token, value.data?.accessToken ?? '');
     } else if (value == null) {
       prefs.remove(authResponse);
@@ -147,80 +151,55 @@ class AuthController extends ChangeNotifier {
 
     return ApiController()
         .call(
-      context,
-      method: Method.post,
-      endpoint: 'admin/authentication/login',
-      data: {
-        "userEmail": request.username,
-        "userPassword": request.password,
-      },
-      isAuthenticated: false,
-    )
+          context,
+          method: Method.post,
+          endpoint: 'admin/authentication/login',
+          data: {"userEmail": request.username, "userPassword": request.password},
+          isAuthenticated: false,
+        )
         .then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: AuthResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: AuthResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<AuthResponse>> forgotPassword(BuildContext context, String email) async {
     return ApiController()
         .call(
-      context,
-      method: Method.post,
-      endpoint: 'admin/authentication/forgot-password',
-      data: {
-        "userEmail": email,
-      },
-      isAuthenticated: false,
-    )
+          context,
+          method: Method.post,
+          endpoint: 'admin/authentication/forgot-password',
+          data: {"userEmail": email},
+          isAuthenticated: false,
+        )
         .then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: AuthResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: AuthResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<AuthResponse>> changePassword(BuildContext context, String email) async {
     return ApiController()
         .call(
-      context,
-      method: Method.post,
-      endpoint: 'admin/authentication/forgot-password',
-      data: {
-        "userEmail": "admin@auroramembership.com",
-      },
-      isAuthenticated: false,
-    )
+          context,
+          method: Method.post,
+          endpoint: 'admin/authentication/forgot-password',
+          data: {"userEmail": "admin@auroramembership.com"},
+          isAuthenticated: false,
+        )
         .then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: AuthResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: AuthResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   void logout(BuildContext context) {

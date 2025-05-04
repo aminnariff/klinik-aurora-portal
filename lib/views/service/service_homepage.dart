@@ -26,6 +26,7 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/search_toggle.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -34,6 +35,7 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
@@ -58,14 +60,10 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(attribute: 'serviceName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'serviceName', label: 'Service', allowSorting: false, columnSize: ColumnSize.M),
+    TableHeaderAttribute(attribute: 'category', label: 'Category', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(attribute: 'servicePrice', label: 'Price', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(
-      attribute: 'serviceBookingFee',
-      label: 'Booking Fee',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+
     TableHeaderAttribute(attribute: 'doctorType', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'serviceStatus',
@@ -200,9 +198,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           Row(
             children: [
               AppPadding.horizontal(),
-              searchField(
-                InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Service Name'),
-              ),
+              // searchField(
+              //   InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Service Name'),
+              // ),
               // AppPadding.horizontal(),
               // searchField(
               //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
@@ -330,16 +328,18 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                       ),
                                       DataCell(
                                         AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].servicePrice != null
-                                              ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
-                                              : 'N/A',
+                                          snapshot.servicesResponse?.data?[index].serviceCategory ?? 'N/A',
                                         ),
                                       ),
                                       DataCell(
-                                        AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].serviceBookingFee != null
-                                              ? 'RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}'
-                                              : 'N/A',
+                                        AppTooltip(
+                                          message:
+                                              'Booking Fee: RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}',
+                                          child: Text(
+                                            snapshot.servicesResponse?.data?[index].servicePrice != null
+                                                ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
+                                                : 'N/A',
+                                          ),
                                         ),
                                       ),
                                       DataCell(
@@ -388,9 +388,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                                     showDialog(
                                                       context: context,
                                                       builder: (BuildContext context) {
-                                                        return ServiceBranch(
-                                                          service: snapshot.servicesResponse!.data![index],
-                                                        );
+                                                        return ServiceBranch(serviceBranch: value.data);
                                                       },
                                                     );
                                                   }
@@ -405,8 +403,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                                   if (await showConfirmDialog(
                                                     context,
                                                     data?.serviceStatus == 1
-                                                        ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
-                                                        : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
+                                                        ? 'Are you certain you wish to deactivate this service? Please note, this action can be reversed at a later time.'
+                                                        : 'Are you certain you wish to activate this service? Please note, this action can be reversed at a later time.',
                                                   )) {
                                                     Future.delayed(Duration.zero, () {
                                                       ServiceController.update(
@@ -651,6 +649,14 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
+        SizedBox(
+          child: SearchToggle(
+            hintText: 'Service Name',
+            action: (value) {
+              print(value);
+            },
+          ),
+        ),
         TextButton(
           onPressed: () {
             showDialog(

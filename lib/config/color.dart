@@ -52,17 +52,11 @@ List<Color> colorOptions(color) {
   switch (color) {
     case 'primary':
       {
-        return [
-          const Color(0XFF23286C),
-          const Color(0XFF52B3E0),
-        ];
+        return [const Color(0XFF23286C), const Color(0XFF52B3E0)];
       }
 
     default:
-      return [
-        const Color(0XFF23286C),
-        const Color(0XFF52B3E0),
-      ];
+      return [const Color(0XFF23286C), const Color(0XFF52B3E0)];
   }
 }
 
@@ -100,3 +94,13 @@ Color statusColor(status) {
     }
   }
 }
+
+final Map<int, Color> appointmentStatusColors = {
+  1: Colors.blue, // Booked
+  2: Colors.red, // Cancelled
+  3: Colors.orange, // Rescheduled
+  4: const Color(0xFFCD9B05), // Pending Payment
+  5: Colors.green, // Completed
+  6: Colors.grey, // Refunded
+  7: Colors.purple, // No Show
+};

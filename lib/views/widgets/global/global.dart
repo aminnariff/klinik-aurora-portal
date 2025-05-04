@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 
 bool notNullOrEmptyString(String? value) {
   if (value == null || value == '' || value == 'null') {
@@ -101,4 +104,51 @@ int calculateCustomerPoints(String amount) {
   }
 
   return points;
+}
+
+String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
+  try {
+    if (utcString == null || utcString.isEmpty) return null;
+
+    final utcDateTime = DateTime.parse(utcString).toUtc();
+    final malaysiaDateTime = utcDateTime.add(const Duration(hours: 8)).toLocal();
+
+    return formatAppointmentDate(malaysiaDateTime, showTime);
+  } catch (e) {
+    debugPrint('Invalid date format: $e');
+    return null;
+  }
+}
+
+String formatAppointmentDate(DateTime dateTime, bool time) {
+  final now = DateTime.now();
+  final malaysiaDateTime = dateTime.toLocal().add(const Duration(hours: 8));
+  final today = DateTime(now.year, now.month, now.day);
+  final tomorrow = today.add(const Duration(days: 1));
+  final appointmentDay = DateTime(malaysiaDateTime.year, malaysiaDateTime.month, malaysiaDateTime.day);
+
+  String dayLabel;
+  if (appointmentDay == today) {
+    dayLabel = 'Today';
+  } else if (appointmentDay == tomorrow) {
+    dayLabel = 'Tomorrow';
+  } else {
+    dayLabel = DateFormat('EEE, d MMM yyyy').format(malaysiaDateTime); // e.g. Mon, 6 May 2025
+  }
+
+  String timeLabel = DateFormat('h:mm a').format(malaysiaDateTime);
+  if (time == false) {
+    return dayLabel;
+  }
+  return '$dayLabel\n$timeLabel';
+}
+
+String getAppointmentStatusLabel(int? statusId) {
+  if (statusId == null) return 'Unknown';
+
+  final match = appointmentStatus.firstWhere(
+    (item) => item.key == statusId.toString(),
+    orElse: () => DropdownAttribute('', 'Unknown'),
+  );
+  return match.name;
 }

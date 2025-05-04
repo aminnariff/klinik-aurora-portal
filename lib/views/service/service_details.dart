@@ -21,6 +21,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -85,7 +86,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       serviceCategoryController.controller.text = widget.service?.serviceCategory ?? '';
       selectedFile = FileAttribute(path: widget.service?.serviceImage, name: widget.service?.serviceImage);
       if (widget.service?.doctorType == 1) {
-        _doctorType = DropdownAttribute('1', 'General');
+        _doctorType = DropdownAttribute('1', 'Doctor');
       } else if (widget.service?.doctorType == 2) {
         _doctorType = DropdownAttribute('2', 'Sonographer');
       }
@@ -120,15 +121,12 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Service Details',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Service Details', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
@@ -139,41 +137,40 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                               width: screenWidth1728(26),
                               child: Column(
                                 children: [
-                                  InputField(
-                                    field: serviceNameController,
+                                  InputField(field: serviceNameController),
+                                  AppPadding.vertical(denominator: 2),
+                                  TextField(
+                                    maxLines: null,
+                                    style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                                    controller: serviceDescriptionController.controller,
+                                    decoration: appInputDecoration(context, 'Description'),
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: serviceDescriptionController,
-                                  ),
+                                  InputField(field: servicePriceController),
                                   AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: servicePriceController,
-                                  ),
+                                  InputField(field: serviceBookingFeeController),
                                   AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: serviceBookingFeeController,
-                                  ),
+                                  InputField(field: serviceTimeController),
+                                  AppPadding.vertical(denominator: 2),
+                                  InputField(field: serviceCategoryController),
                                   AppPadding.vertical(denominator: 2),
                                   StreamBuilder<DateTime>(
-                                      stream: rebuildDropdown.stream,
-                                      builder: (context, snapshot) {
-                                        return AppDropdown(
-                                          attributeList: DropdownAttributeList(
-                                            [
-                                              DropdownAttribute('1', 'General'),
-                                              DropdownAttribute('2', 'Sonographer'),
-                                            ],
-                                            labelText: 'servicesHomepage'.tr(gender: 'doctorType'),
-                                            value: _doctorType?.name,
-                                            onChanged: (p0) {
-                                              _doctorType = p0;
-                                              rebuildDropdown.add(DateTime.now());
-                                            },
-                                            width: screenWidthByBreakpoint(90, 70, 26),
-                                          ),
-                                        );
-                                      }),
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return AppDropdown(
+                                        attributeList: DropdownAttributeList(
+                                          [DropdownAttribute('1', 'Doctor'), DropdownAttribute('2', 'Sonographer')],
+                                          labelText: 'servicesHomepage'.tr(gender: 'doctorType'),
+                                          value: _doctorType?.name,
+                                          onChanged: (p0) {
+                                            _doctorType = p0;
+                                            rebuildDropdown.add(DateTime.now());
+                                          },
+                                          width: screenWidthByBreakpoint(90, 70, 26),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                   AppPadding.vertical(denominator: 2),
                                 ],
                               ),
@@ -182,125 +179,146 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                             SizedBox(
                               width: screenWidth1728(30),
                               child: StreamBuilder<DateTime>(
-                                  stream: fileRebuild.stream,
-                                  builder: (context, snapshot) {
-                                    return Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        if (widget.type == 'create') ...[
-                                          selectedFile.value == null
-                                              ? UploadDocumentsField(
-                                                  title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                                  fieldTitle: 'servicesHomepage'.tr(gender: 'doctorImage'),
-                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                  action: () {
+                                stream: fileRebuild.stream,
+                                builder: (context, snapshot) {
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      if (widget.type == 'create') ...[
+                                        selectedFile.value == null
+                                            ? UploadDocumentsField(
+                                              title: 'servicesHomepage'.tr(gender: 'browseFile'),
+                                              fieldTitle: 'servicesHomepage'.tr(gender: 'doctorImage'),
+                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                              action: () {
+                                                addPicture();
+                                              },
+                                              cancelAction: () {},
+                                            )
+                                            : Stack(
+                                              alignment: Alignment.topRight,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
                                                     addPicture();
                                                   },
-                                                  cancelAction: () {},
-                                                )
-                                              : Stack(
+                                                  child: Image.memory(selectedFile.value as Uint8List, height: 410),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    selectedFile = FileAttribute();
+                                                    fileRebuild.add(DateTime.now());
+                                                  },
+                                                  icon: const Icon(Icons.close),
+                                                ),
+                                              ],
+                                            ),
+                                      ],
+                                      if (widget.type == 'update') ...[
+                                        widget.service?.serviceImage == null
+                                            ? selectedFile.name != null
+                                                ? Stack(
                                                   alignment: Alignment.topRight,
                                                   children: [
                                                     GestureDetector(
                                                       onTap: () {
                                                         addPicture();
                                                       },
-                                                      child: Image.memory(
-                                                        selectedFile.value as Uint8List,
-                                                        height: 410,
-                                                      ),
+                                                      child: Image.memory(selectedFile.value as Uint8List, height: 410),
                                                     ),
                                                     IconButton(
                                                       onPressed: () {
                                                         selectedFile = FileAttribute();
                                                         fileRebuild.add(DateTime.now());
                                                       },
-                                                      icon: const Icon(
-                                                        Icons.close,
-                                                      ),
-                                                    )
+                                                      icon: const Icon(Icons.close),
+                                                    ),
                                                   ],
-                                                ),
-                                        ],
-                                        if (widget.type == 'update')
-                                          widget.service?.serviceImage == null
-                                              ? selectedFile.name != null
-                                                  ? Stack(
-                                                      alignment: Alignment.topRight,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            addPicture();
-                                                          },
-                                                          child: Image.memory(
-                                                            selectedFile.value as Uint8List,
-                                                            height: 410,
-                                                          ),
-                                                        ),
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            selectedFile = FileAttribute();
-                                                            fileRebuild.add(DateTime.now());
-                                                          },
-                                                          icon: const Icon(
-                                                            Icons.close,
-                                                          ),
-                                                        )
-                                                      ],
-                                                    )
-                                                  : UploadDocumentsField(
-                                                      title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                                      fieldTitle: 'bservicesHomepage'.tr(gender: 'doctorImage'),
-                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                      action: () {
-                                                        addPicture();
-                                                      },
-                                                      cancelAction: () {},
-                                                    )
-                                              : GestureDetector(
-                                                  onTap: () {
+                                                )
+                                                : UploadDocumentsField(
+                                                  title: 'servicesHomepage'.tr(gender: 'browseFile'),
+                                                  fieldTitle: 'bservicesHomepage'.tr(gender: 'doctorImage'),
+                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                  action: () {
                                                     addPicture();
                                                   },
-                                                  child: Image.network(
-                                                    '${Environment.imageUrl}${widget.service?.serviceImage}',
-                                                    height: 410,
-                                                    loadingBuilder: (BuildContext context, Widget child,
-                                                        ImageChunkEvent? loadingProgress) {
-                                                      if (loadingProgress == null) {
-                                                        return child; // The image is fully loaded
-                                                      }
-                                                      return Center(
-                                                        child: CircularProgressIndicator(
-                                                          // You can use any loading indicator
-                                                          value: loadingProgress.expectedTotalBytes != null
+                                                  cancelAction: () {},
+                                                )
+                                            : GestureDetector(
+                                              onTap: () {
+                                                addPicture();
+                                              },
+                                              child: Image.network(
+                                                '${Environment.imageUrl}${widget.service?.serviceImage}',
+                                                height: 410,
+                                                loadingBuilder: (
+                                                  BuildContext context,
+                                                  Widget child,
+                                                  ImageChunkEvent? loadingProgress,
+                                                ) {
+                                                  if (loadingProgress == null) {
+                                                    return child; // The image is fully loaded
+                                                  }
+                                                  return Center(
+                                                    child: CircularProgressIndicator(
+                                                      // You can use any loading indicator
+                                                      value:
+                                                          loadingProgress.expectedTotalBytes != null
                                                               ? loadingProgress.cumulativeBytesLoaded /
                                                                   (loadingProgress.expectedTotalBytes ?? 1)
                                                               : null,
-                                                        ),
-                                                      );
-                                                    },
-                                                    errorBuilder:
-                                                        (BuildContext context, Object error, StackTrace? stackTrace) {
-                                                      return Container(
-                                                        padding: EdgeInsets.all(screenPadding),
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(12),
-                                                          color: disabledColor,
-                                                        ),
-                                                        child: const Center(
-                                                          child: Icon(
-                                                            Icons.error,
-                                                            color: errorColor,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
+                                                    ),
+                                                  );
+                                                },
+                                                errorBuilder: (
+                                                  BuildContext context,
+                                                  Object error,
+                                                  StackTrace? stackTrace,
+                                                ) {
+                                                  return Container(
+                                                    padding: EdgeInsets.all(screenPadding),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                      color: disabledColor,
+                                                    ),
+                                                    child: const Center(child: Icon(Icons.error, color: errorColor)),
+                                                  );
+                                                },
+                                              ),
+                                            ),
                                         AppPadding.vertical(denominator: 2),
+                                        Row(
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Created Date',
+                                                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                                ),
+                                                Text(
+                                                  '${dateConverter(widget.service?.createdDate)}',
+                                                  style: AppTypography.bodyMedium(context).apply(),
+                                                ),
+                                                AppPadding.vertical(denominator: 2),
+                                                Text(
+                                                  'Last Updated Date',
+                                                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                                ),
+                                                Text(
+                                                  '${dateConverter(widget.service?.modifiedDate)}',
+                                                  style: AppTypography.bodyMedium(context).apply(),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ],
-                                    );
-                                  }),
+                                      AppPadding.vertical(denominator: 2),
+                                    ],
+                                  );
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -331,31 +349,70 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Button(
-          () {
-            if (validate()) {
-              showLoading();
-              if (widget.type == 'create') {
-                ServiceController.create(
-                  context,
-                  CreateServiceRequest(
-                    serviceName: serviceNameController.controller.text,
-                    serviceDescription: serviceDescriptionController.controller.text,
-                    servicePrice: servicePriceController.controller.text == ''
-                        ? null
-                        : double.parse(servicePriceController.controller.text),
-                    serviceBookingFee: serviceBookingFeeController.controller.text == ''
-                        ? null
-                        : double.parse(serviceBookingFeeController.controller.text),
-                    serviceTime: serviceTimeController.controller.text,
-                    serviceCategory: serviceCategoryController.controller.text,
-                    doctorType: int.parse(_doctorType?.key ?? "1"),
-                  ),
-                ).then((value) {
-                  dismissLoading();
-                  if (responseCode(value.code)) {
-                    showLoading();
-                    ServiceController.upload(context, value.data!.id!, selectedFile).then((value) {
+        Button(() {
+          if (validate()) {
+            showLoading();
+            if (widget.type == 'create') {
+              ServiceController.create(
+                context,
+                CreateServiceRequest(
+                  serviceName: serviceNameController.controller.text,
+                  serviceDescription: serviceDescriptionController.controller.text,
+                  servicePrice:
+                      servicePriceController.controller.text == ''
+                          ? null
+                          : double.parse(servicePriceController.controller.text),
+                  serviceBookingFee:
+                      serviceBookingFeeController.controller.text == ''
+                          ? null
+                          : double.parse(serviceBookingFeeController.controller.text),
+                  serviceTime: serviceTimeController.controller.text,
+                  serviceCategory: serviceCategoryController.controller.text,
+                  serviceStatus: 1,
+                  doctorType: int.parse(_doctorType?.key ?? "1"),
+                ),
+              ).then((value) {
+                dismissLoading();
+                if (responseCode(value.code)) {
+                  showLoading();
+                  ServiceController.upload(context, value.data!.id!, selectedFile).then((value) {
+                    dismissLoading();
+                    if (responseCode(value.code)) {
+                      getLatestData();
+                    } else {
+                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    }
+                  });
+                } else {
+                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                }
+              });
+            } else {
+              ServiceController.update(
+                context,
+                UpdateServiceRequest(
+                  serviceId: widget.service?.serviceId,
+                  serviceStatus: widget.service?.serviceStatus,
+                  serviceName: serviceNameController.controller.text,
+                  serviceDescription: serviceDescriptionController.controller.text,
+                  servicePrice:
+                      servicePriceController.controller.text == ''
+                          ? null
+                          : double.parse(servicePriceController.controller.text),
+                  serviceBookingFee:
+                      serviceBookingFeeController.controller.text == ''
+                          ? null
+                          : double.parse(serviceBookingFeeController.controller.text),
+                  serviceTime: serviceTimeController.controller.text,
+                  serviceCategory: serviceCategoryController.controller.text,
+                  doctorType: int.parse(_doctorType?.key ?? "1"),
+                ),
+              ).then((value) {
+                dismissLoading();
+                if (responseCode(value.code)) {
+                  showLoading();
+                  if (selectedFile.value != null) {
+                    ServiceController.upload(context, widget.service!.serviceId!, selectedFile).then((value) {
                       dismissLoading();
                       if (responseCode(value.code)) {
                         getLatestData();
@@ -364,52 +421,15 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                       }
                     });
                   } else {
-                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    getLatestData();
                   }
-                });
-              } else {
-                ServiceController.update(
-                  context,
-                  UpdateServiceRequest(
-                    serviceId: widget.service?.serviceId,
-                    serviceStatus: widget.service?.serviceStatus,
-                    serviceName: serviceNameController.controller.text,
-                    serviceDescription: serviceDescriptionController.controller.text,
-                    servicePrice: servicePriceController.controller.text == ''
-                        ? null
-                        : double.parse(servicePriceController.controller.text),
-                    serviceBookingFee: serviceBookingFeeController.controller.text == ''
-                        ? null
-                        : double.parse(serviceBookingFeeController.controller.text),
-                    serviceTime: serviceTimeController.controller.text,
-                    serviceCategory: serviceCategoryController.controller.text,
-                    doctorType: int.parse(_doctorType?.key ?? "1"),
-                  ),
-                ).then((value) {
-                  dismissLoading();
-                  if (responseCode(value.code)) {
-                    showLoading();
-                    if (selectedFile.value != null) {
-                      ServiceController.upload(context, widget.service!.serviceId!, selectedFile).then((value) {
-                        dismissLoading();
-                        if (responseCode(value.code)) {
-                          getLatestData();
-                        } else {
-                          showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                        }
-                      });
-                    } else {
-                      getLatestData();
-                    }
-                  } else {
-                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                  }
-                });
-              }
+                } else {
+                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                }
+              });
             }
-          },
-          actionText: 'button'.tr(gender: widget.type),
-        ),
+          }
+        }, actionText: 'button'.tr(gender: widget.type)),
       ],
     );
   }
@@ -478,10 +498,10 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       temp = false;
       serviceDescriptionController.errorMessage = ErrorMessage.required(field: serviceDescriptionController.labelText);
     }
-    if (servicePriceController.controller.text == '') {
-      temp = false;
-      servicePriceController.errorMessage = ErrorMessage.required(field: servicePriceController.labelText);
-    }
+    // if (servicePriceController.controller.text == '') {
+    //   temp = false;
+    //   servicePriceController.errorMessage = ErrorMessage.required(field: servicePriceController.labelText);
+    // }
     if (serviceTimeController.controller.text == '') {
       temp = false;
       serviceTimeController.errorMessage = ErrorMessage.required(field: serviceTimeController.labelText);

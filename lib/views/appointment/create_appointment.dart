@@ -7,9 +7,8 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
-import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
+import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
-import 'package:klinik_aurora_portal/models/service/services_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -25,9 +24,9 @@ import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class AppointmentDetails extends StatefulWidget {
-  final Data? service;
+  final Data? appointment;
   final String type;
-  const AppointmentDetails({super.key, this.service, required this.type});
+  const AppointmentDetails({super.key, this.appointment, required this.type});
 
   @override
   State<AppointmentDetails> createState() => _AppointmentDetailsState();
@@ -60,7 +59,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     isNumber: true,
   );
   String? _userId;
-  String? _serviceBranchId;
+  String? _appointmentBranchId;
   String? _selectedDate;
   String? _selectedTime;
   DropdownAttribute? _status;
@@ -69,15 +68,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   @override
   void initState() {
     if (widget.type == 'update') {
-      // serviceNameController.controller.text = widget.service?.serviceName ?? '';
-      // serviceDescriptionController.controller.text = widget.service?.serviceDescription ?? '';
-      // servicePriceController.controller.text = widget.service?.servicePrice ?? '';
-      // serviceBookingFeeController.controller.text = widget.service?.serviceBookingFee ?? '';
-      // serviceTimeController.controller.text = widget.service?.serviceTime ?? '';
-      // serviceCategoryController.controller.text = widget.service?.serviceCategory ?? '';
-      // if (widget.service?.doctorType == 1) {
+      // appointmentNameController.controller.text = widget.appointment?.appointmentName ?? '';
+      // appointmentDescriptionController.controller.text = widget.appointment?.appointmentDescription ?? '';
+      // appointmentPriceController.controller.text = widget.appointment?.appointmentPrice ?? '';
+      // appointmentBookingFeeController.controller.text = widget.appointment?.appointmentBookingFee ?? '';
+      // appointmentTimeController.controller.text = widget.appointment?.appointmentTime ?? '';
+      // appointmentCategoryController.controller.text = widget.appointment?.appointmentCategory ?? '';
+      // if (widget.appointment?.doctorType == 1) {
       //   _status = DropdownAttribute('1', 'General');
-      // } else if (widget.service?.doctorType == 2) {
+      // } else if (widget.appointment?.doctorType == 2) {
       //   _status = DropdownAttribute('2', 'Sonographer');
       // }
     }
@@ -111,7 +110,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText('Service Details', style: AppTypography.bodyLarge(context)),
+                            AppSelectableText('appointment Details', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
@@ -201,7 +200,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 context,
                 CreateAppointmentRequest(
                   userId: _userId,
-                  serviceBranchId: _serviceBranchId,
+                  // appointmentBranchId: _appointmentBranchId,
                   appointmentDateTime: '$_selectedDate $_selectedTime',
                   appointmentNote: appointmentNoteController.controller.text,
                   customerDueDate: dueDateController.controller.text,
@@ -220,21 +219,21 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             // else {
             //   AppointmentController.update(
             //     context,
-            //     UpdateServiceRequest(
-            //       serviceId: widget.service?.serviceId,
-            //       serviceStatus: widget.service?.serviceStatus,
-            //       serviceName: serviceNameController.controller.text,
-            //       serviceDescription: serviceDescriptionController.controller.text,
-            //       servicePrice:
-            //           servicePriceController.controller.text == ''
+            //     UpdateappointmentRequest(
+            //       appointmentId: widget.appointment?.appointmentId,
+            //       appointmentStatus: widget.appointment?.appointmentStatus,
+            //       appointmentName: appointmentNameController.controller.text,
+            //       appointmentDescription: appointmentDescriptionController.controller.text,
+            //       appointmentPrice:
+            //           appointmentPriceController.controller.text == ''
             //               ? null
-            //               : double.parse(servicePriceController.controller.text),
-            //       serviceBookingFee:
-            //           serviceBookingFeeController.controller.text == ''
+            //               : double.parse(appointmentPriceController.controller.text),
+            //       appointmentBookingFee:
+            //           appointmentBookingFeeController.controller.text == ''
             //               ? null
-            //               : double.parse(serviceBookingFeeController.controller.text),
-            //       serviceTime: serviceTimeController.controller.text,
-            //       serviceCategory: serviceCategoryController.controller.text,
+            //               : double.parse(appointmentBookingFeeController.controller.text),
+            //       appointmentTime: appointmentTimeController.controller.text,
+            //       appointmentCategory: appointmentCategoryController.controller.text,
             //       doctorType: int.parse(_doctorType?.key ?? "1"),
             //     ),
             //   ).then((value) {
@@ -242,7 +241,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             //     if (responseCode(value.code)) {
             //       showLoading();
             //       if (selectedFile.value != null) {
-            //         ServiceController.upload(context, widget.service!.serviceId!, selectedFile).then((value) {
+            //         appointmentController.upload(context, widget.appointment!.appointmentId!, selectedFile).then((value) {
             //           dismissLoading();
             //           if (responseCode(value.code)) {
             //             getLatestData();
@@ -265,22 +264,22 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   getLatestData() {
-    ServiceController.getAll(context, 1, 100).then((value) {
+    AppointmentController().get(context, 1, 100).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
-        context.read<ServiceController>().servicesResponse = value.data;
+        context.read<AppointmentController>().appointmentResponse = value;
         context.pop();
         if (widget.type == 'update') {
-          showDialogSuccess(context, 'Successfully updated Service');
+          showDialogSuccess(context, 'Successfully updated appointment');
         } else {
-          showDialogSuccess(context, 'Successfully created new Service');
+          showDialogSuccess(context, 'Successfully created new appointment');
         }
       } else {
         context.pop();
         if (widget.type == 'update') {
-          showDialogSuccess(context, 'Successfully updated Service');
+          showDialogSuccess(context, 'Successfully updated appointment');
         } else {
-          showDialogSuccess(context, 'Successfully created new Service');
+          showDialogSuccess(context, 'Successfully created new appointment');
         }
       }
     });
@@ -292,7 +291,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       temp = false;
       patientNameController.errorMessage = ErrorMessage.required(field: patientNameController.labelText);
     }
-    if (_serviceBranchId == null) {
+    if (_appointmentBranchId == null) {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'Branch'));
     } else if (_selectedDate == null) {

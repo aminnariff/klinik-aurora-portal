@@ -8,19 +8,15 @@ import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
-import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
-import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
-import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
+import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
+import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/models/service/services_response.dart';
-import 'package:klinik_aurora_portal/models/service/update_service_request.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
-import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -49,44 +45,36 @@ class AppointmentHomepage extends StatefulWidget {
 
 class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _tabs = [
-    'Upcoming',
-    'Completed',
-    'No-Show',
-    'Cancelled',
-    'To Be Scheduled',
-    'Appointment Request',
-  ];
+  final List<String> _tabs = ['Upcoming', 'Completed', 'No-Show', 'Cancelled'];
 
   int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
-  int _totalPage = 0;
+  final int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(attribute: 'serviceName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(attribute: 'servicePrice', label: 'Price', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'userFullName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'userPhone', label: 'Contact No', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
-      attribute: 'serviceBookingFee',
-      label: 'Booking Fee',
+      attribute: 'serviceName',
+      label: 'Service Name',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
-    TableHeaderAttribute(attribute: 'doctorType', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'branchName', label: 'Branch Name', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
-      attribute: 'serviceStatus',
+      attribute: 'appointmentStatus',
       label: 'Status',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 70,
     ),
     TableHeaderAttribute(
-      attribute: 'createdDate',
-      label: 'Created Date',
+      attribute: 'appointmentDatetime',
+      label: 'Appointment Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
@@ -99,6 +87,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     ),
   ];
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
+  int _selectedTabIndex = 0;
 
   @override
   void initState() {
@@ -110,7 +99,26 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     });
     _tabController = TabController(length: _tabs.length, vsync: this);
     filtering();
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) return;
+      _selectedTabIndex = _tabController.index;
+      debugPrint('Active Tab Index: $_selectedTabIndex (${_tabs[_selectedTabIndex]})');
+    });
     super.initState();
+  }
+
+  List<String>? getAppointmentStatus() {
+    if (_tabs[_selectedTabIndex] == 'Upcoming') {
+      return ['1', '3', '4'];
+    } else if (_tabs[_selectedTabIndex] == 'Completed') {
+      return ['5'];
+    } else if (_tabs[_selectedTabIndex] == 'No-Show') {
+      return ['7'];
+    } else if (_tabs[_selectedTabIndex] == 'Cancelled') {
+      return ['2', '6'];
+    }
+    return null;
   }
 
   @override
@@ -243,8 +251,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           Center(child: Text('Completed Appointments')),
                           Center(child: Text('No-Show Appointments')),
                           Center(child: Text('Cancelled Appointments')),
-                          Center(child: Text('To Be Scheduled')),
-                          Center(child: Text('Appointment Requests')),
                         ],
                       ),
                     ),
@@ -291,15 +297,15 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   Widget orderTable() {
-    return Consumer<ServiceController>(
+    return Consumer<AppointmentController>(
       builder: (context, snapshot, child) {
-        if (snapshot.servicesResponse == null) {
+        if (snapshot.appointmentResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
           );
         } else {
-          return snapshot.servicesResponse?.data == null || snapshot.servicesResponse!.data!.isEmpty
+          return snapshot.appointmentResponse?.data == null || snapshot.appointmentResponse!.data!.data!.isEmpty
               ? Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
@@ -335,7 +341,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                 verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
                               ),
                               rows: [
-                                for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
+                                for (
+                                  int index = 0;
+                                  index < (snapshot.appointmentResponse?.data?.data?.length ?? 0);
+                                  index++
+                                )
                                   DataRow(
                                     color: WidgetStateProperty.all(
                                       index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
@@ -348,142 +358,143 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                               context: context,
                                               builder: (BuildContext context) {
                                                 return AppointmentDetails(
-                                                  service: snapshot.servicesResponse!.data![index],
+                                                  appointment: snapshot.appointmentResponse!.data!.data![index],
                                                   type: 'update',
                                                 );
                                               },
                                             );
                                           },
                                           child: Text(
-                                            snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
+                                            snapshot.appointmentResponse?.data?.data?[index].user?.userFullName ??
+                                                'N/A',
                                             style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
                                           ),
                                         ),
                                       ),
                                       DataCell(
                                         AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].servicePrice != null
-                                              ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
-                                              : 'N/A',
+                                          snapshot.appointmentResponse?.data?.data?[index].user?.userPhone ?? 'N/A',
                                         ),
                                       ),
                                       DataCell(
                                         AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].serviceBookingFee != null
-                                              ? 'RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}'
-                                              : 'N/A',
+                                          snapshot.appointmentResponse?.data?.data?[index].service?.serviceName ??
+                                              'N/A',
                                         ),
                                       ),
                                       DataCell(
                                         AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].doctorType == 2
-                                              ? 'Sonographer'
-                                              : 'Doctor',
+                                          snapshot.appointmentResponse?.data?.data?[index].branch?.branchName ?? 'N/A',
                                         ),
                                       ),
                                       DataCell(
-                                        AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                              ? 'Active'
-                                              : 'Inactive',
+                                        Text(
+                                          getAppointmentStatusLabel(
+                                            snapshot.appointmentResponse?.data?.data?[index].appointmentStatus,
+                                          ),
                                           style: AppTypography.bodyMedium(context).apply(
-                                            color: statusColor(
-                                              snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                  ? 'active'
-                                                  : 'inactive',
-                                            ),
                                             fontWeightDelta: 1,
+                                            color:
+                                                appointmentStatusColors[snapshot
+                                                    .appointmentResponse
+                                                    ?.data
+                                                    ?.data?[index]
+                                                    .appointmentStatus],
                                           ),
                                         ),
                                       ),
                                       DataCell(
-                                        AppSelectableText(
-                                          dateConverter(snapshot.servicesResponse?.data?[index].createdDate) ?? 'N/A',
+                                        Text(
+                                          convertUtcToMalaysiaTime(
+                                                snapshot.appointmentResponse?.data?.data?[index].appointmentDatetime,
+                                              ) ??
+                                              'N/A',
+                                          style: AppTypography.bodyMedium(context).apply(),
                                         ),
                                       ),
                                       DataCell(
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                ServiceBranchController.getAll(
-                                                  context,
-                                                  1,
-                                                  100,
-                                                  serviceId: snapshot.servicesResponse!.data![index].serviceId ?? '',
-                                                  serviceBranchStatus: 1,
-                                                ).then((value) {
-                                                  if (responseCode(value.code)) {
-                                                    context.read<ServiceBranchController>().serviceBranchResponse =
-                                                        value.data;
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return ServiceBranch(
-                                                          service: snapshot.servicesResponse!.data![index],
-                                                        );
-                                                      },
-                                                    );
-                                                  }
-                                                });
-                                              },
-                                              icon: const Icon(Icons.list, color: Colors.grey),
-                                            ),
-                                            IconButton(
-                                              onPressed: () async {
-                                                try {
-                                                  Data? data = snapshot.servicesResponse?.data?[index];
-                                                  if (await showConfirmDialog(
-                                                    context,
-                                                    data?.serviceStatus == 1
-                                                        ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
-                                                        : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
-                                                  )) {
-                                                    Future.delayed(Duration.zero, () {
-                                                      ServiceController.update(
-                                                        context,
-                                                        UpdateServiceRequest(
-                                                          serviceId: data?.serviceId,
-                                                          serviceName: data?.serviceDescription,
-                                                          serviceDescription: data?.serviceDescription,
-                                                          servicePrice:
-                                                              data?.servicePrice != null
-                                                                  ? double.parse(data?.servicePrice ?? '0')
-                                                                  : null,
-                                                          serviceBookingFee:
-                                                              data?.serviceBookingFee != null
-                                                                  ? double.parse(data?.serviceBookingFee ?? '0')
-                                                                  : null,
-                                                          doctorType: data?.doctorType,
-                                                          serviceTime: data?.serviceTime,
-                                                          serviceCategory: data?.serviceCategory,
-                                                          serviceStatus: data?.serviceStatus == 1 ? 0 : 1,
-                                                        ),
-                                                      ).then((value) {
-                                                        if (responseCode(value.code)) {
-                                                          filtering();
-                                                          showDialogSuccess(
-                                                            context,
-                                                            'The Services has been successfully ${data?.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
-                                                          );
-                                                        } else {
-                                                          showDialogError(context, value.data?.message ?? '');
-                                                        }
-                                                      });
-                                                    });
-                                                  }
-                                                } catch (e) {
-                                                  debugPrint(e.toString());
-                                                }
-                                              },
-                                              icon: Icon(
-                                                snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                    ? Icons.pause_circle
-                                                    : Icons.play_arrow,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
+                                            // IconButton(
+                                            //   onPressed: () {
+                                            //     ServiceBranchController.getAll(
+                                            //       context,
+                                            //       1,
+                                            //       100,
+                                            //       serviceId: snapshot.servicesResponse!.data![index].serviceId ?? '',
+                                            //       serviceBranchStatus: 1,
+                                            //     ).then((value) {
+                                            //       if (responseCode(value.code)) {
+                                            //         context.read<ServiceBranchController>().serviceBranchResponse =
+                                            //             value.data;
+                                            //         showDialog(
+                                            //           context: context,
+                                            //           builder: (BuildContext context) {
+                                            //             return ServiceBranch(
+                                            //               service: snapshot.servicesResponse!.data![index],
+                                            //             );
+                                            //           },
+                                            //         );
+                                            //       }
+                                            //     });
+                                            //   },
+                                            //   icon: const Icon(Icons.list, color: Colors.grey),
+                                            // ),
+                                            // IconButton(
+                                            //   onPressed: () async {
+                                            //     try {
+                                            //       Data? data = snapshot.servicesResponse?.data?[index];
+                                            //       if (await showConfirmDialog(
+                                            //         context,
+                                            //         data.serviceStatus == 1
+                                            //             ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
+                                            //             : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
+                                            //       )) {
+                                            //         Future.delayed(Duration.zero, () {
+                                            //           ServiceController.update(
+                                            //             context,
+                                            //             UpdateServiceRequest(
+                                            //               serviceId: data.serviceId,
+                                            //               serviceName: data.serviceDescription,
+                                            //               serviceDescription: data.serviceDescription,
+                                            //               servicePrice:
+                                            //                   data.servicePrice != null
+                                            //                       ? double.parse(data.servicePrice ?? '0')
+                                            //                       : null,
+                                            //               serviceBookingFee:
+                                            //                   data.serviceBookingFee != null
+                                            //                       ? double.parse(data.serviceBookingFee ?? '0')
+                                            //                       : null,
+                                            //               doctorType: data.doctorType,
+                                            //               serviceTime: data.serviceTime,
+                                            //               serviceCategory: data.serviceCategory,
+                                            //               serviceStatus: data.serviceStatus == 1 ? 0 : 1,
+                                            //             ),
+                                            //           ).then((value) {
+                                            //             if (responseCode(value.code)) {
+                                            //               filtering();
+                                            //               showDialogSuccess(
+                                            //                 context,
+                                            //                 'The Services has been successfully ${data.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
+                                            //               );
+                                            //             } else {
+                                            //               showDialogError(context, value.data?.message ?? '');
+                                            //             }
+                                            //           });
+                                            //         });
+                                            //       }
+                                            //     } catch (e) {
+                                            //       debugPrint(e.toString());
+                                            //     }
+                                            //   },
+                                            //   icon: Icon(
+                                            //     snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                            //         ? Icons.pause_circle
+                                            //         : Icons.play_arrow,
+                                            //     color: Colors.grey,
+                                            //   ),
+                                            // ),
                                           ],
                                         ),
                                       ),
@@ -544,29 +555,23 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     if (page != null) {
       _page = page;
     }
-    ServiceController.getAll(
-      context,
-      _page,
-      _pageSize,
-      serviceName: _serviceNameController.text,
-      serviceStatus:
-          _selectedServiceStatus != null
-              ? _selectedServiceStatus?.key == '1'
-                  ? 1
-                  : _selectedServiceStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
-    ).then((value) {
-      dismissLoading();
-      if (responseCode(value.code)) {
-        _totalCount = value.data?.totalCount ?? 0;
-        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
-        context.read<ServiceController>().servicesResponse = value.data;
-        // _page = 0;
-      } else if (value.code == 404) {}
-      return null;
-    });
+    context.read<AppointmentController>().appointmentResponse = null;
+    AppointmentController()
+        .get(
+          context,
+          _page,
+          _pageSize,
+          status: getAppointmentStatus(),
+          branchId:
+              context.read<AuthController>().authenticationResponse?.data?.user?.isSuperadmin == true
+                  ? null
+                  : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+        )
+        .then((value) {
+          dismissLoading();
+          context.read<AppointmentController>().appointmentResponse = value;
+          _totalCount = value.data?.totalCount ?? 0;
+        });
   }
 
   String? getOrderBy() {
@@ -688,9 +693,44 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return const AppointmentDetails(type: 'create');
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        CardContainer(
+                          Padding(
+                            padding: EdgeInsets.all(screenPadding),
+                            child: const SelectionCalendarView(
+                              startMonth: 5,
+                              year: 2025,
+                              totalMonths: 2,
+                              initialDateTimes: [
+                                "2025-05-06T02:43:00.000Z",
+                                "2025-05-21T02:43:00.000Z",
+                                "2025-05-25T02:43:00.000Z",
+                                "2025-05-23T02:43:00.000Z",
+                                "2025-05-16T02:43:00.000Z",
+                                "2025-05-10T10:00:00.000Z",
+                                "2025-05-16T10:00:00.000Z",
+                                "2025-05-31T10:00:00.000Z",
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
               },
             );
+            // showDialog(
+            //   context: context,
+            //   builder: (BuildContext context) {
+            //     return const AppointmentDetails(type: 'create');
+            //   },
+            // );
           },
           child: Row(
             children: [

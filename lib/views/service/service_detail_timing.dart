@@ -195,13 +195,7 @@ class _TimeListManagerState extends State<TimeListManager> {
 
   getLatestData() {
     showLoading();
-    ServiceBranchController.getAll(
-      context,
-      1,
-      100,
-      serviceId: widget.serviceBranch?.serviceId,
-      serviceBranchStatus: 1,
-    ).then((value) {
+    ServiceBranchController.getAll(context, 1, 100, serviceId: widget.serviceBranch?.serviceId).then((value) {
       dismissLoading();
       context.read<ServiceBranchController>().serviceBranchResponse = value.data;
       showDialogSuccess(context, 'Timing for ${widget.serviceBranch?.branchName} has been successfully updated.');

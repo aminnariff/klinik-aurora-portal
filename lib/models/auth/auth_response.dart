@@ -54,16 +54,26 @@ class User {
   String? userEmail;
   String? userName;
   String? userFullname;
+  String? branchId;
   bool? isSuperadmin;
   List<String>? permissions;
 
-  User({this.userId, this.userEmail, this.userName, this.userFullname, this.isSuperadmin, this.permissions});
+  User({
+    this.userId,
+    this.userEmail,
+    this.userName,
+    this.userFullname,
+    this.branchId,
+    this.isSuperadmin,
+    this.permissions,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     userEmail = json['userEmail'];
     userName = json['userName'];
     userFullname = json['userFullname'];
+    branchId = json['branchId'];
     isSuperadmin = json['isSuperadmin'];
     permissions = json['permissions'].cast<String>();
   }
@@ -74,6 +84,7 @@ class User {
     data['userEmail'] = userEmail;
     data['userName'] = userName;
     data['userFullname'] = userFullname;
+    data['branchId'] = branchId;
     data['isSuperadmin'] = isSuperadmin;
     data['permissions'] = permissions;
     return data;
