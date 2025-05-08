@@ -109,11 +109,9 @@ int calculateCustomerPoints(String amount) {
 String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
   try {
     if (utcString == null || utcString.isEmpty) return null;
-
     final utcDateTime = DateTime.parse(utcString).toUtc();
-    final malaysiaDateTime = utcDateTime.add(const Duration(hours: 8)).toLocal();
 
-    return formatAppointmentDate(malaysiaDateTime, showTime);
+    return formatAppointmentDate(utcDateTime, showTime);
   } catch (e) {
     debugPrint('Invalid date format: $e');
     return null;
@@ -122,7 +120,7 @@ String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
 
 String formatAppointmentDate(DateTime dateTime, bool time) {
   final now = DateTime.now();
-  final malaysiaDateTime = dateTime.toLocal().add(const Duration(hours: 8));
+  final malaysiaDateTime = dateTime.toLocal().subtract(const Duration(hours: 8));
   final today = DateTime(now.year, now.month, now.day);
   final tomorrow = today.add(const Duration(days: 1));
   final appointmentDay = DateTime(malaysiaDateTime.year, malaysiaDateTime.month, malaysiaDateTime.day);

@@ -72,6 +72,7 @@ class AppointmentController extends ChangeNotifier {
       try {
         return ApiResponse(code: value.code, data: AppointmentResponse.fromJson(value.data));
       } catch (e) {
+        debugPrint(e.toString());
         return ApiResponse(code: 400, message: e.toString());
       }
     });

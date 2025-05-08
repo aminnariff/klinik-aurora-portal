@@ -39,7 +39,8 @@ import 'package:provider/provider.dart';
 class AppointmentDetails extends StatefulWidget {
   final Data? appointment;
   final String type;
-  const AppointmentDetails({super.key, this.appointment, required this.type});
+  final List<String>? tabs;
+  const AppointmentDetails({super.key, this.appointment, required this.type, this.tabs});
 
   @override
   State<AppointmentDetails> createState() => _AppointmentDetailsState();
@@ -531,25 +532,36 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   getLatestData() {
-    AppointmentController().get(context, 1, 100).then((value) {
-      dismissLoading();
-      if (responseCode(value.code)) {
-        context.read<AppointmentController>().appointmentResponse = value;
-        context.pop();
-        if (widget.type == 'update') {
-          showDialogSuccess(context, 'Successfully updated appointment');
-        } else {
-          showDialogSuccess(context, 'Successfully created new appointment');
-        }
-      } else {
-        context.pop();
-        if (widget.type == 'update') {
-          showDialogSuccess(context, 'Successfully updated appointment');
-        } else {
-          showDialogSuccess(context, 'Successfully created new appointment');
-        }
-      }
-    });
+    AppointmentController()
+        .get(
+          context,
+          1,
+          100,
+          status: widget.tabs,
+          branchId:
+              context.read<AuthController>().isSuperAdmin == true
+                  ? null
+                  : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+        )
+        .then((value) {
+          dismissLoading();
+          if (responseCode(value.code)) {
+            context.read<AppointmentController>().appointmentResponse = value;
+            context.pop();
+            if (widget.type == 'update') {
+              showDialogSuccess(context, 'Successfully updated appointment');
+            } else {
+              showDialogSuccess(context, 'Successfully created new appointment');
+            }
+          } else {
+            context.pop();
+            if (widget.type == 'update') {
+              showDialogSuccess(context, 'Successfully updated appointment');
+            } else {
+              showDialogSuccess(context, 'Successfully created new appointment');
+            }
+          }
+        });
   }
 
   bool validate() {

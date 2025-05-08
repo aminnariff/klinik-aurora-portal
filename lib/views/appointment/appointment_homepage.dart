@@ -76,6 +76,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       if (_tabController.indexIsChanging) return;
       _selectedTabIndex = _tabController.index;
       debugPrint('Active Tab Index: $_selectedTabIndex (${_tabs[_selectedTabIndex]})');
+      filtering(enableDebounce: false);
     });
     super.initState();
   }
@@ -220,9 +221,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         controller: _tabController,
                         children: [
                           orderTable(),
-                          Center(child: Text('Completed Appointments')),
-                          Center(child: Text('No-Show Appointments')),
-                          Center(child: Text('Cancelled Appointments')),
+                          orderTable(),
+                          orderTable(),
+                          orderTable(),
+                          // Center(child: Text('Completed Appointments')),
+                          // Center(child: Text('No-Show Appointments')),
+                          // Center(child: Text('Cancelled Appointments')),
                         ],
                       ),
                     ),
@@ -465,7 +469,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AppointmentDetails(type: 'update', appointment: appointment);
+          return AppointmentDetails(type: 'update', appointment: appointment, tabs: getAppointmentStatus());
         },
       );
     }
