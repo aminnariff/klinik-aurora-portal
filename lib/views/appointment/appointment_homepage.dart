@@ -5,12 +5,14 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
@@ -56,36 +58,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   DropdownAttribute? _selectedServiceStatus;
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
-  List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(attribute: 'userFullName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(attribute: 'userPhone', label: 'Contact No', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(
-      attribute: 'serviceName',
-      label: 'Service Name',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(attribute: 'branchName', label: 'Branch Name', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(
-      attribute: 'appointmentStatus',
-      label: 'Status',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'appointmentDatetime',
-      label: 'Appointment Date',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'action',
-      label: 'Action',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 100,
-    ),
-  ];
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   int _selectedTabIndex = 0;
 
@@ -352,41 +324,33 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                     ),
                                     cells: [
                                       DataCell(
-                                        TextButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AppointmentDetails(
-                                                  appointment: snapshot.appointmentResponse!.data!.data![index],
-                                                  type: 'update',
-                                                );
-                                              },
-                                            );
-                                          },
+                                        Tooltip(
+                                          message:
+                                              'Contact No : ${snapshot.appointmentResponse?.data?.data?[index].user?.userPhone ?? 'N/A'}\nEmail : ${snapshot.appointmentResponse?.data?.data?[index].user?.userEmail ?? 'N/A'}',
                                           child: Text(
                                             snapshot.appointmentResponse?.data?.data?[index].user?.userFullName ??
                                                 'N/A',
-                                            style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                            style: AppTypography.bodyMedium(context).apply(),
                                           ),
                                         ),
                                       ),
                                       DataCell(
-                                        AppSelectableText(
-                                          snapshot.appointmentResponse?.data?.data?[index].user?.userPhone ?? 'N/A',
+                                        Tooltip(
+                                          message:
+                                              '${snapshot.appointmentResponse?.data?.data?[index].service?.serviceDescription ?? 'N/A'}\n\nBooking Fee : RM ${snapshot.appointmentResponse?.data?.data?[index].service?.serviceBookingFee ?? 'N/A'}',
+                                          child: Text(
+                                            snapshot.appointmentResponse?.data?.data?[index].service?.serviceName ??
+                                                'N/A',
+                                          ),
                                         ),
                                       ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.appointmentResponse?.data?.data?[index].service?.serviceName ??
-                                              'N/A',
+                                      if (context.read<AuthController>().isSuperAdmin)
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.appointmentResponse?.data?.data?[index].branch?.branchName ??
+                                                'N/A',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.appointmentResponse?.data?.data?[index].branch?.branchName ?? 'N/A',
-                                        ),
-                                      ),
                                       DataCell(
                                         Text(
                                           getAppointmentStatusLabel(
@@ -416,85 +380,39 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            // IconButton(
-                                            //   onPressed: () {
-                                            //     ServiceBranchController.getAll(
-                                            //       context,
-                                            //       1,
-                                            //       100,
-                                            //       serviceId: snapshot.servicesResponse!.data![index].serviceId ?? '',
-                                            //       serviceBranchStatus: 1,
-                                            //     ).then((value) {
-                                            //       if (responseCode(value.code)) {
-                                            //         context.read<ServiceBranchController>().serviceBranchResponse =
-                                            //             value.data;
-                                            //         showDialog(
-                                            //           context: context,
-                                            //           builder: (BuildContext context) {
-                                            //             return ServiceBranch(
-                                            //               service: snapshot.servicesResponse!.data![index],
-                                            //             );
-                                            //           },
-                                            //         );
-                                            //       }
-                                            //     });
-                                            //   },
-                                            //   icon: const Icon(Icons.list, color: Colors.grey),
-                                            // ),
-                                            // IconButton(
-                                            //   onPressed: () async {
-                                            //     try {
-                                            //       Data? data = snapshot.servicesResponse?.data?[index];
-                                            //       if (await showConfirmDialog(
-                                            //         context,
-                                            //         data.serviceStatus == 1
-                                            //             ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
-                                            //             : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
-                                            //       )) {
-                                            //         Future.delayed(Duration.zero, () {
-                                            //           ServiceController.update(
-                                            //             context,
-                                            //             UpdateServiceRequest(
-                                            //               serviceId: data.serviceId,
-                                            //               serviceName: data.serviceDescription,
-                                            //               serviceDescription: data.serviceDescription,
-                                            //               servicePrice:
-                                            //                   data.servicePrice != null
-                                            //                       ? double.parse(data.servicePrice ?? '0')
-                                            //                       : null,
-                                            //               serviceBookingFee:
-                                            //                   data.serviceBookingFee != null
-                                            //                       ? double.parse(data.serviceBookingFee ?? '0')
-                                            //                       : null,
-                                            //               doctorType: data.doctorType,
-                                            //               serviceTime: data.serviceTime,
-                                            //               serviceCategory: data.serviceCategory,
-                                            //               serviceStatus: data.serviceStatus == 1 ? 0 : 1,
-                                            //             ),
-                                            //           ).then((value) {
-                                            //             if (responseCode(value.code)) {
-                                            //               filtering();
-                                            //               showDialogSuccess(
-                                            //                 context,
-                                            //                 'The Services has been successfully ${data.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
-                                            //               );
-                                            //             } else {
-                                            //               showDialogError(context, value.data?.message ?? '');
-                                            //             }
-                                            //           });
-                                            //         });
-                                            //       }
-                                            //     } catch (e) {
-                                            //       debugPrint(e.toString());
-                                            //     }
-                                            //   },
-                                            //   icon: Icon(
-                                            //     snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                            //         ? Icons.pause_circle
-                                            //         : Icons.play_arrow,
-                                            //     color: Colors.grey,
-                                            //   ),
-                                            // ),
+                                            IconButton(
+                                              onPressed: () {},
+                                              icon: Icon(FontAwesomeIcons.whatsapp),
+                                              color: Colors.green,
+                                            ),
+                                            PopupMenuButton<String>(
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                              offset: const Offset(8, 35),
+                                              color: Colors.white,
+                                              tooltip: '',
+                                              onSelected:
+                                                  (value) => _handleMenuSelection(
+                                                    value,
+                                                    snapshot.appointmentResponse?.data?.data?[index] ?? Data(),
+                                                  ),
+                                              itemBuilder:
+                                                  (BuildContext context) => <PopupMenuEntry<String>>[
+                                                    const PopupMenuItem<String>(value: 'update', child: Text('Update')),
+                                                  ],
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets.all(4),
+                                                    // decoration: const BoxDecoration(
+                                                    //   color: Colors.white,
+                                                    //   shape: BoxShape.circle,
+                                                    // ),
+                                                    child: Icon(Icons.more_vert, color: Colors.grey),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -542,6 +460,17 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     );
   }
 
+  void _handleMenuSelection(String value, Data appointment) async {
+    if (value == 'update') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AppointmentDetails(type: 'update', appointment: appointment);
+        },
+      );
+    }
+  }
+
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
@@ -574,31 +503,46 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         });
   }
 
-  String? getOrderBy() {
-    try {
-      return headers.firstWhere((element) => element.isSort).attribute;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  String? getSortType() {
-    if (getOrderBy() != null) {
-      if (headers.firstWhere((element) => element.isSort).sort == SortType.asc) {
-        return 'asc';
-      } else {
-        return 'desc';
-      }
-    } else {
-      return null;
-    }
-  }
-
   void getData({int? page}) async {
     showLoading();
   }
 
   List<DataColumn2> columns() {
+    List<TableHeaderAttribute> headers = [
+      TableHeaderAttribute(attribute: 'userFullName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
+      TableHeaderAttribute(
+        attribute: 'serviceName',
+        label: 'Service Name',
+        allowSorting: false,
+        columnSize: ColumnSize.S,
+      ),
+      if (context.read<AuthController>().isSuperAdmin)
+        TableHeaderAttribute(
+          attribute: 'branchName',
+          label: 'Branch Name',
+          allowSorting: false,
+          columnSize: ColumnSize.S,
+        ),
+      TableHeaderAttribute(
+        attribute: 'appointmentStatus',
+        label: 'Status',
+        allowSorting: false,
+        columnSize: ColumnSize.S,
+      ),
+      TableHeaderAttribute(
+        attribute: 'appointmentDatetime',
+        label: 'Appointment Date',
+        allowSorting: false,
+        columnSize: ColumnSize.S,
+      ),
+      TableHeaderAttribute(
+        attribute: 'action',
+        label: 'Action',
+        allowSorting: false,
+        columnSize: ColumnSize.S,
+        width: 100,
+      ),
+    ];
     return [
       for (TableHeaderAttribute item in headers)
         DataColumn2(
@@ -628,28 +572,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   ],
                 ),
               ),
-              if (item.allowSorting)
-                TextButton(
-                  onPressed: () {
-                    if (getOrderBy() != item.attribute) {
-                      resetAllFilter();
-                    }
-                    if (item.isSort) {
-                      if (item.sort == SortType.asc) {
-                        item.sort = SortType.desc;
-                        filtering(enableDebounce: false);
-                      } else {
-                        item.sort = SortType.asc;
-                        item.isSort = false;
-                        filtering(enableDebounce: false);
-                      }
-                    } else {
-                      item.isSort = true;
-                      filtering(enableDebounce: false);
-                    }
-                  },
-                  child: sortingIcon(item),
-                ),
             ],
           ),
           numeric: item.numeric,
@@ -663,11 +585,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     _serviceNameController.text = '';
     _selectedServiceStatus = null;
     rebuildDropdown.add(DateTime.now());
-
-    for (TableHeaderAttribute item in headers) {
-      item.isSort = false;
-      item.sort = SortType.asc;
-    }
   }
 
   Widget sortingIcon(TableHeaderAttribute header) {
@@ -688,58 +605,59 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        CardContainer(
-                          Padding(
-                            padding: EdgeInsets.all(screenPadding),
-                            child: const SelectionCalendarView(
-                              startMonth: 5,
-                              year: 2025,
-                              totalMonths: 2,
-                              initialDateTimes: [
-                                "2025-05-06T02:43:00.000Z",
-                                "2025-05-21T02:43:00.000Z",
-                                "2025-05-25T02:43:00.000Z",
-                                "2025-05-23T02:43:00.000Z",
-                                "2025-05-16T02:43:00.000Z",
-                                "2025-05-10T10:00:00.000Z",
-                                "2025-05-16T10:00:00.000Z",
-                                "2025-05-31T10:00:00.000Z",
-                              ],
+        if (false)
+          TextButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          CardContainer(
+                            Padding(
+                              padding: EdgeInsets.all(screenPadding),
+                              child: const SelectionCalendarView(
+                                startMonth: 5,
+                                year: 2025,
+                                totalMonths: 2,
+                                initialDateTimes: [
+                                  "2025-05-06T02:43:00.000Z",
+                                  "2025-05-21T02:43:00.000Z",
+                                  "2025-05-25T02:43:00.000Z",
+                                  "2025-05-23T02:43:00.000Z",
+                                  "2025-05-16T02:43:00.000Z",
+                                  "2025-05-10T10:00:00.000Z",
+                                  "2025-05-16T10:00:00.000Z",
+                                  "2025-05-31T10:00:00.000Z",
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
-            );
-            // showDialog(
-            //   context: context,
-            //   builder: (BuildContext context) {
-            //     return const AppointmentDetails(type: 'create');
-            //   },
-            // );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.add, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Add new appointment', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              );
+              // showDialog(
+              //   context: context,
+              //   builder: (BuildContext context) {
+              //     return const AppointmentDetails(type: 'create');
+              //   },
+              // );
+            },
+            child: Row(
+              children: [
+                const Icon(Icons.add, color: Colors.blue),
+                AppPadding.horizontal(denominator: 2),
+                Text('Add new appointment', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
+              ],
+            ),
           ),
-        ),
         TextButton(
           onPressed: () {
             showDialog(

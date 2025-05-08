@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
 class SelectionCalendarView extends StatefulWidget {
   final int startMonth;
@@ -49,15 +51,16 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
       final dt = DateTime(parts[0], parts[1], parts[2], selectedTime!.hour, selectedTime!.minute);
       final formatted = DateFormat('yyyy-MM-dd HH:mm').format(dt);
 
-      showDialog(
-        context: context,
-        builder:
-            (_) => AlertDialog(
-              title: const Text('Selected Slot'),
-              content: Text(formatted),
-              actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
-            ),
-      );
+      Navigator.pop(context, formatted);
+      // showDialog(
+      //   context: context,
+      //   builder:
+      //       (_) => AlertDialog(
+      //         title: const Text('Selected Slot'),
+      //         content: Text(formatted),
+      //         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+      //       ),
+      // );
     }
   }
 
@@ -206,11 +209,28 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
                     .toList(),
           ),
         ],
+        AppPadding.vertical(),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
             onPressed: selectedDate != null && selectedTime != null ? _onContinue : null,
-            child: const Text("Continue"),
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return Colors.grey.shade300;
+                }
+                return Colors.blue;
+              }),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+              child: Text(
+                "Continue",
+                style: AppTypography.bodyMedium(
+                  context,
+                ).apply(fontWeightDelta: 1, color: selectedDate != null && selectedTime != null ? Colors.white : null),
+              ),
+            ),
           ),
         ),
       ],

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
+import 'package:klinik_aurora_portal/models/appointment/create_appointment_response.dart';
+import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/service/create_service_response.dart';
 
 class AppointmentController extends ChangeNotifier {
@@ -24,6 +26,21 @@ class AppointmentController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: CreateServiceResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  static Future<ApiResponse<UpdateAppointmentResponse>> update(
+    BuildContext context,
+    UpdateAppointmentRequest request,
+  ) async {
+    return ApiController()
+        .call(context, method: Method.put, endpoint: 'admin/appointment/update', data: request.toJson())
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UpdateAppointmentResponse.fromJson(value.data));
           } catch (e) {
             return ApiResponse(code: 400, message: e.toString());
           }

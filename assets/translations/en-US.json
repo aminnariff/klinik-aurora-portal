@@ -97,7 +97,11 @@
         "patientEmail": "Patient Email",
         "patientContactNo": "Patient Contact No",
         "appointmentNote": "Note",
-        "status": "Appointment Status"
+        "branch": "Branch",
+        "dueDate": "Estimated Due Date (EDD)",
+        "service": "Service",
+        "appointmentDateTime": "Slots",
+        "status": "Status"
     },
     "promotionPage": {
         "startDate": "Start Date",

@@ -27,6 +27,7 @@ import 'package:klinik_aurora_portal/controllers/point_management/point_manageme
 import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
 import 'package:klinik_aurora_portal/controllers/reward/reward_controller.dart';
 import 'package:klinik_aurora_portal/controllers/reward/reward_history_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
@@ -137,6 +138,9 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<RewardHistoryController>(create: (_) => RewardHistoryController()),
             ChangeNotifierProvider<ServiceController>(create: (_) => ServiceController()),
             ChangeNotifierProvider<ServiceBranchController>(create: (_) => ServiceBranchController()),
+            ChangeNotifierProvider<ServiceBranchAvailableDtController>(
+              create: (_) => ServiceBranchAvailableDtController(),
+            ),
             ChangeNotifierProvider<UserController>(create: (_) => UserController()),
             ChangeNotifierProvider<VoucherController>(create: (_) => VoucherController()),
             ChangeNotifierProvider<TopBarController>(create: (_) => TopBarController()),

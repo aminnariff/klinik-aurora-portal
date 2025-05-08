@@ -37,7 +37,8 @@ class AuthController extends ChangeNotifier {
 
   Future<String> checkDateTime() async {
     try {
-      _authenticationResponse = AuthResponse.fromJson(json.decode(prefs.getString(authResponse).toString()));
+      authenticationResponse = AuthResponse.fromJson(json.decode(prefs.getString(authResponse).toString()));
+      isSuperAdmin = _authenticationResponse?.data?.user?.isSuperadmin ?? false;
       if (_authenticationResponse?.data?.expiryDt != null) {
         DateTime now = DateTime.now();
         DateTime targetTime = DateTime.parse(_authenticationResponse!.data!.expiryDt!);
@@ -124,6 +125,7 @@ class AuthController extends ChangeNotifier {
       //   prefs.remove(username);
       //   prefs.remove(password);
       // }
+      isSuperAdmin = value.data?.user?.isSuperadmin ?? false;
       prefs.setString(authResponse, json.encode(value));
       prefs.setString(token, value.data?.accessToken ?? '');
     } else if (value == null) {
