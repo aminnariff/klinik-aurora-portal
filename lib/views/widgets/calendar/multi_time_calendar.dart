@@ -131,30 +131,37 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
               itemCount: timeSlots.length,
               itemBuilder: (context, index) {
                 final slot = timeSlots[index];
-                return Card(
-                  margin: const EdgeInsets.all(12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${index + 1}.'),
+                    Card(
+                      margin: const EdgeInsets.all(12),
+                      color: Colors.grey.shade100,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Time: ${slot.time.format(context)}",
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Time: ${slot.time.format(context)}",
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () => setState(() => timeSlots.removeAt(index)),
+                                ),
+                              ],
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () => setState(() => timeSlots.removeAt(index)),
-                            ),
+                            _buildCalendar(slot.selectedDates, displayMonth, displayYear),
                           ],
                         ),
-                        _buildCalendar(slot.selectedDates, displayMonth, displayYear),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 );
               },
             ),

@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
@@ -21,6 +22,7 @@ import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/service/service_details.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -564,6 +566,10 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                               itemBuilder:
                                                   (BuildContext context) => <PopupMenuEntry<String>>[
                                                     PopupMenuItem<String>(
+                                                      value: 'update',
+                                                      child: Text('Update Timing'),
+                                                    ),
+                                                    PopupMenuItem<String>(
                                                       value: 'enableDisable',
                                                       child: Text(
                                                         snapshot
@@ -702,7 +708,62 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   void _handleAdminMenuSelection(String value, service_branch_model.Data serviceBranch) async {
-    if (value == 'enableDisable') {
+    if (value == 'update') {
+      showLoading();
+      ServiceBranchAvailableDtController.get(context, 1, 100, serviceBranchId: serviceBranch.serviceBranchId).then((
+        value,
+      ) {
+        dismissLoading();
+        DateTime now = DateTime.now();
+        String? updateId;
+        bool haveElements = false;
+        try {
+          updateId =
+              value.data?.data
+                  ?.firstWhere((element) => element.serviceBranchId == serviceBranch.serviceBranchId)
+                  .serviceBranchAvailableDatetimeId;
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+        try {
+          if ((value.data?.data?.first.availableDatetimes?.length ?? 0) > 0) {
+            haveElements = true;
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Row(
+              children: [
+                Expanded(
+                  child: CardContainer(
+                    Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(screenPadding),
+                          child: MultiTimeCalendarPage(
+                            serviceBranchId: serviceBranch.serviceBranchId ?? '',
+                            serviceBranchAvailableDatetimeId: updateId,
+                            startMonth: now.month,
+                            year: now.year,
+                            totalMonths: 2,
+                            initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
+                          ),
+                        ),
+                        CloseButton(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      });
+    } else if (value == 'enableDisable') {
       try {
         if (await showConfirmDialog(
           context,
