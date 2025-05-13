@@ -26,85 +26,78 @@ class ServiceController extends ChangeNotifier {
 
   static Future<ApiResponse<CreateServiceResponse>> create(BuildContext context, CreateServiceRequest request) async {
     return ApiController()
-        .call(
-      context,
-      method: Method.post,
-      endpoint: 'admin/service/create',
-      data: request.toJson(),
-    )
+        .call(context, method: Method.post, endpoint: 'admin/service/create', data: request.toJson())
         .then((value) {
-      try {
-        return ApiResponse(code: value.code, data: CreateServiceResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: CreateServiceResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
-  static Future<ApiResponse<ServicesResponse>> getAll(BuildContext context, int page, int pageSize,
-      {String? serviceName, String? serviceId, int? serviceStatus}) async {
-    return ApiController().call(
-      context,
-      method: Method.get,
-      endpoint: 'admin/service',
-      queryParameters: {
-        if (notNullOrEmptyString(serviceId)) "serviceId": serviceId,
-        if (notNullOrEmptyString(serviceName)) "serviceName": serviceName,
-        if (serviceStatus != null) "serviceStatus": serviceStatus,
-        'page': page,
-        'pageSize': pageSize,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: ServicesResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+  static Future<ApiResponse<ServicesResponse>> getAll(
+    BuildContext context,
+    int page,
+    int pageSize, {
+    String? serviceName,
+    String? serviceId,
+    int? serviceStatus,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/service',
+          queryParameters: {
+            if (notNullOrEmptyString(serviceId)) "serviceId": serviceId,
+            if (notNullOrEmptyString(serviceName)) "serviceName": serviceName,
+            if (serviceStatus != null) "serviceStatus": serviceStatus,
+            'page': page,
+            'pageSize': pageSize,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: ServicesResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdateServiceResponse>> update(BuildContext context, UpdateServiceRequest request) async {
-    return ApiController().call(
-      context,
-      method: Method.put,
-      endpoint: 'admin/service/update',
-      data: {
-        "serviceId": request.serviceId,
-        "serviceName": request.serviceName,
-        "serviceDescription": request.serviceDescription, // optional
-        "servicePrice": request.servicePrice,
-        "serviceBookingFee": request.serviceBookingFee, // optional
-        "doctorType": request.doctorType, // 1 = General, 2 = sonographer,
-        "serviceTime": request.serviceTime,
-        "serviceCategory": request.serviceCategory,
-        "serviceStatus": request.serviceStatus, // 1 = active, 2 = inactive
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: UpdateServiceResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    return ApiController()
+        .call(
+          context,
+          method: Method.put,
+          endpoint: 'admin/service/update',
+          data: {
+            "serviceId": request.serviceId,
+            "serviceName": request.serviceName,
+            "serviceDescription": request.serviceDescription, // optional
+            "servicePrice": request.servicePrice,
+            "serviceBookingFee": request.serviceBookingFee, // optional
+            "doctorType": request.doctorType, // 1 = General, 2 = sonographer,
+            "serviceTime": request.serviceTime,
+            "serviceCategory": request.serviceCategory,
+            "serviceStatus": request.serviceStatus, // 1 = active, 2 = inactive
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UpdateServiceResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdateServiceResponse>> upload(
-      BuildContext context, String serviceId, FileAttribute document) async {
+    BuildContext context,
+    String serviceId,
+    FileAttribute document,
+  ) async {
     Dio dio = Dio();
     FormData formData = FormData();
 
@@ -115,11 +108,12 @@ class ServiceController extends ChangeNotifier {
           MultipartFile.fromBytes(
             item.value!,
             filename: item.name,
-            contentType: item.name != null
-                ? item.name!.contains(".pdf")
-                    ? MediaType("application", "pdf")
-                    : MediaType("image", item.name.toString().split(".").last)
-                : MediaType("image", item.name.toString().split(".").last),
+            contentType:
+                item.name != null
+                    ? item.name!.contains(".pdf")
+                        ? MediaType("application", "pdf")
+                        : MediaType("image", item.name.toString().split(".").last)
+                    : MediaType("image", item.name.toString().split(".").last),
           ),
         ),
       );
@@ -129,37 +123,28 @@ class ServiceController extends ChangeNotifier {
     try {
       return dio
           .put(
-        '${Environment.appUrl}admin/service/upload',
-        options: Options(
-          method: 'PUT',
-          headers: {
-            Headers.acceptHeader: "*/*",
-            Headers.contentTypeHeader: "multipart/form-data",
-            'Authorization': 'Bearer ${prefs.getString(token)}',
-          },
-          contentType: "multipart/form-data",
-          responseType: ResponseType.json,
-        ),
-        data: formData,
-      )
+            '${Environment.appUrl}admin/service/upload',
+            options: Options(
+              method: 'PUT',
+              headers: {
+                Headers.acceptHeader: "*/*",
+                Headers.contentTypeHeader: "multipart/form-data",
+                'Authorization': 'Bearer ${prefs.getString(token)}',
+              },
+              contentType: "multipart/form-data",
+              responseType: ResponseType.json,
+            ),
+            data: formData,
+          )
           .then((value) {
-        try {
-          return ApiResponse(
-            code: value.statusCode,
-            data: UpdateServiceResponse.fromJson(value.data),
-          );
-        } catch (e) {
-          return ApiResponse(
-            code: 400,
-            message: e.toString(),
-          );
-        }
-      });
+            try {
+              return ApiResponse(code: value.statusCode, data: UpdateServiceResponse.fromJson(value.data));
+            } catch (e) {
+              return ApiResponse(code: 400, message: e.toString());
+            }
+          });
     } catch (e) {
-      return ApiResponse(
-        code: 400,
-        message: e.toString(),
-      );
+      return ApiResponse(code: 400, message: e.toString());
     }
   }
 }

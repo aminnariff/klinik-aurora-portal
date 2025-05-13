@@ -28,6 +28,7 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.d
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -38,7 +39,7 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
 import 'package:provider/provider.dart';
 
 class UserHomepage extends StatefulWidget {
@@ -60,13 +61,19 @@ class _UserHomepageState extends State<UserHomepage> {
 
   List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(attribute: 'userFullname', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(attribute: 'userEmail', label: 'Email', allowSorting: false, columnSize: ColumnSize.S),
+
     TableHeaderAttribute(
-      attribute: 'userPhone',
-      label: 'Contact No.',
+      attribute: 'totalPoints',
+      label: 'Points',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 130,
+      width: 90,
+    ),
+    TableHeaderAttribute(
+      attribute: 'branchId',
+      label: 'Registered Branch',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
       attribute: 'userStatus',
@@ -76,26 +83,13 @@ class _UserHomepageState extends State<UserHomepage> {
       width: 70,
     ),
     TableHeaderAttribute(
-      attribute: 'totalPoints',
-      label: 'Points',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 70,
-    ),
-    TableHeaderAttribute(
-      attribute: 'branchId',
-      label: 'Registered Branch',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
       attribute: 'createdDate',
       label: 'Created Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'action',
+      attribute: 'actions',
       label: 'Actions',
       allowSorting: false,
       columnSize: ColumnSize.S,
@@ -311,7 +305,6 @@ class _UserHomepageState extends State<UserHomepage> {
                             child: DataTable2(
                               columnSpacing: 12,
                               horizontalMargin: 12,
-                              minWidth: 1300,
                               isHorizontalScrollBarVisible: true,
                               isVerticalScrollBarVisible: true,
                               columns: columns(),
@@ -333,27 +326,13 @@ class _UserHomepageState extends State<UserHomepage> {
                                     ),
                                     cells: [
                                       DataCell(
-                                        AppSelectableText(
-                                          snapshot.userAllResponse?[index].userFullname?.titleCase() ??
-                                              snapshot.userAllResponse?[index].userName ??
-                                              'N/A',
-                                        ),
-                                      ),
-                                      DataCell(AppSelectableText(snapshot.userAllResponse?[index].userEmail ?? 'N/A')),
-                                      DataCell(
-                                        InkWell(
-                                          onTap: () {},
-                                          child: Text(snapshot.userAllResponse?[index].userPhone ?? 'N/A'),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.userAllResponse?[index].userStatus == 1 ? 'Active' : 'Inactive',
-                                          style: AppTypography.bodyMedium(context).apply(
-                                            color: statusColor(
-                                              snapshot.userAllResponse?[index].userStatus == 1 ? 'active' : 'inactive',
-                                            ),
-                                            fontWeightDelta: 1,
+                                        AppTooltip(
+                                          message:
+                                              'Email:\n${snapshot.userAllResponse?[index].userEmail}\n\nContact No:\n${snapshot.userAllResponse?[index].userPhone}',
+                                          child: Text(
+                                            snapshot.userAllResponse?[index].userFullname?.titleCase() ??
+                                                snapshot.userAllResponse?[index].userName ??
+                                                'N/A',
                                           ),
                                         ),
                                       ),
@@ -371,6 +350,12 @@ class _UserHomepageState extends State<UserHomepage> {
                                         AppSelectableText(
                                           translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
                                               'N/A',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [showStatus(snapshot.userAllResponse?[index].userStatus == 1)],
                                         ),
                                       ),
                                       DataCell(

@@ -66,7 +66,7 @@ Color statusColor(status) {
   } else {
     switch (status) {
       case 'active' || 'completed':
-        return Colors.green.shade900;
+        return Colors.green;
 
       case 'inactive':
         return const Color(0XFFDF184A);

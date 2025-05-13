@@ -39,6 +39,10 @@ class Data {
   String? serviceName;
   String? serviceDescription;
   String? serviceImage;
+  String? serviceBookingFee;
+  String? servicePrice;
+  int? doctorType;
+  String? serviceCategory;
   List<String>? serviceBranchAvailableTime;
   int? serviceStatus;
   String? branchId;
@@ -47,22 +51,27 @@ class Data {
   String? branchImage;
   int? branchStatus;
 
-  Data(
-      {this.serviceBranchId,
-      this.serviceBranchStatus,
-      this.createdDate,
-      this.modifiedDate,
-      this.serviceId,
-      this.serviceName,
-      this.serviceDescription,
-      this.serviceImage,
-      this.serviceBranchAvailableTime,
-      this.serviceStatus,
-      this.branchId,
-      this.branchCode,
-      this.branchName,
-      this.branchImage,
-      this.branchStatus});
+  Data({
+    this.serviceBranchId,
+    this.serviceBranchStatus,
+    this.createdDate,
+    this.modifiedDate,
+    this.serviceId,
+    this.serviceName,
+    this.serviceDescription,
+    this.serviceImage,
+    this.servicePrice,
+    this.serviceBookingFee,
+    this.doctorType,
+    this.serviceCategory,
+    this.serviceBranchAvailableTime,
+    this.serviceStatus,
+    this.branchId,
+    this.branchCode,
+    this.branchName,
+    this.branchImage,
+    this.branchStatus,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     serviceBranchId = json['serviceBranchId'];
@@ -73,6 +82,10 @@ class Data {
     serviceName = json['serviceName'];
     serviceDescription = json['serviceDescription'];
     serviceImage = json['serviceImage'];
+    servicePrice = json['servicePrice'];
+    serviceBookingFee = json['serviceBookingFee'];
+    doctorType = json['doctorType'];
+    serviceCategory = json['serviceCategory'];
     serviceBranchAvailableTime = json['serviceBranchAvailableTime'].cast<String>();
     serviceStatus = json['serviceStatus'];
     branchId = json['branchId'];
@@ -92,6 +105,10 @@ class Data {
     data['serviceName'] = serviceName;
     data['serviceDescription'] = serviceDescription;
     data['serviceImage'] = serviceImage;
+    data['servicePrice'] = servicePrice;
+    data['serviceBookingFee'] = serviceBookingFee;
+    data['doctorType'] = doctorType;
+    data['serviceCategory'] = serviceCategory;
     data['serviceBranchAvailableTime'] = serviceBranchAvailableTime;
     data['serviceStatus'] = serviceStatus;
     data['branchId'] = branchId;

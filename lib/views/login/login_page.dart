@@ -37,10 +37,7 @@ class LoginPage extends StatefulWidget {
   final bool? resetUser;
   static const routeName = '/login';
 
-  const LoginPage({
-    super.key,
-    this.resetUser,
-  });
+  const LoginPage({super.key, this.resetUser});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -74,6 +71,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     if (kDebugMode) {
       usernameController.text = 'superadmin';
+      usernameController.text = 'auroramedicare@gmail.com';
       passwordController.text = 'Admin12345!';
     }
     super.initState();
@@ -95,18 +93,15 @@ class _LoginPageState extends State<LoginPage> {
           return Consumer<AuthController>(
             builder: (context, controller, _) {
               if (controller.authenticationResponse != null &&
-                  !DateTime.parse(controller.authenticationResponse!.data!.expiryDt!)
-                      .difference(DateTime.now())
-                      .isNegative) {
+                  !DateTime.parse(
+                    controller.authenticationResponse!.data!.expiryDt!,
+                  ).difference(DateTime.now()).isNegative) {
                 Future.delayed(const Duration(milliseconds: 500), () {
                   context.replaceNamed(Homepage.routeName);
                 });
                 return loadingScreen();
               } else {
-                return LayoutWidget(
-                  mobile: authPage(),
-                  desktop: authPage(),
-                );
+                return LayoutWidget(mobile: authPage(), desktop: authPage());
               }
             },
           );
@@ -125,11 +120,7 @@ class _LoginPageState extends State<LoginPage> {
             width: screenWidth(100),
             height: screenHeight(100),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: primaryColors,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
               // image: DecorationImage(
               //   image: AssetImage("assets/images/bg.png"),
               //   fit: BoxFit.cover,
@@ -187,111 +178,104 @@ class _LoginPageState extends State<LoginPage> {
                             //   ),
                             // ),
                             AppPadding.vertical(denominator: 1 / 3),
-                            Consumer<AuthController>(builder: (context, snapshot, _) {
-                              return Column(
-                                children: [
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      attribute: 'email',
-                                      controller: usernameController,
-                                      hintText: 'loginPage'.tr(gender: 'username'),
-                                      isEmail: true,
-                                      isEditableColor: const Color(0xFFEAF2FA),
-                                      errorMessage: snapshot.usernameError,
-                                      prefixIcon: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(
-                                            width: 12,
-                                          ),
-                                          const FaIcon(
-                                            Icons.person,
-                                            color: primary,
-                                          ),
-                                          AppPadding.horizontal(denominator: 2),
-                                        ],
-                                      ),
-                                    ),
-                                    width: screenHeightByBreakpoint(80, 50, 24),
-                                  ),
-                                  AppPadding.vertical(),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          attribute: 'password',
-                                          controller: passwordController,
-                                          hintText: 'loginPage'.tr(gender: 'password'),
-                                          obscureText: true,
-                                          isPassword: true,
-                                          isEditableColor: const Color(0xFFEAF2FA),
-                                          errorMessage: snapshot.passwordError,
-                                          prefixIcon: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              const SizedBox(
-                                                width: 12,
-                                              ),
-                                              const FaIcon(
-                                                Icons.lock,
-                                                color: primary,
-                                              ),
-                                              AppPadding.horizontal(denominator: 2),
-                                            ],
-                                          ),
-                                          obsecureAction: () {
-                                            isObscure.value = !isObscure.value;
-                                            return null;
-                                          },
+                            Consumer<AuthController>(
+                              builder: (context, snapshot, _) {
+                                return Column(
+                                  children: [
+                                    InputField(
+                                      field: InputFieldAttribute(
+                                        attribute: 'email',
+                                        controller: usernameController,
+                                        hintText: 'loginPage'.tr(gender: 'username'),
+                                        isEmail: true,
+                                        isEditableColor: const Color(0xFFEAF2FA),
+                                        errorMessage: snapshot.usernameError,
+                                        prefixIcon: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(width: 12),
+                                            const FaIcon(Icons.person, color: primary),
+                                            AppPadding.horizontal(denominator: 2),
+                                          ],
                                         ),
-                                        width: screenHeightByBreakpoint(80, 50, 24),
                                       ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () {
-                                              forgotPassword();
-                                              // context.pushNamed(AdminPasswordRecoveryPage.routeName, extra: '');
-                                            },
-                                            child: Text(
-                                              'loginPage'.tr(gender: 'forgotPassword'),
-                                              style: AppTypography.bodyMedium(context)
-                                                  .apply(fontWeightDelta: 1, color: Colors.grey),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            }),
-                            Consumer<AuthController>(builder: (context, snapshot, _) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Checkbox(
-                                    value: snapshot.remember,
-                                    onChanged: (value) {
-                                      snapshot.remember = value ?? false;
-                                    },
-                                    activeColor: CupertinoColors.activeBlue,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      snapshot.remember = !snapshot.remember;
-                                    },
-                                    child: Text(
-                                      'loginPage'.tr(gender: 'rememberMe'),
+                                      width: screenHeightByBreakpoint(80, 50, 24),
                                     ),
-                                  ),
-                                ],
-                              );
-                            }),
+                                    AppPadding.vertical(),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            attribute: 'password',
+                                            controller: passwordController,
+                                            hintText: 'loginPage'.tr(gender: 'password'),
+                                            obscureText: true,
+                                            isPassword: true,
+                                            isEditableColor: const Color(0xFFEAF2FA),
+                                            errorMessage: snapshot.passwordError,
+                                            prefixIcon: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                const SizedBox(width: 12),
+                                                const FaIcon(Icons.lock, color: primary),
+                                                AppPadding.horizontal(denominator: 2),
+                                              ],
+                                            ),
+                                            obsecureAction: () {
+                                              isObscure.value = !isObscure.value;
+                                              return null;
+                                            },
+                                          ),
+                                          width: screenHeightByBreakpoint(80, 50, 24),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () {
+                                                forgotPassword();
+                                                // context.pushNamed(AdminPasswordRecoveryPage.routeName, extra: '');
+                                              },
+                                              child: Text(
+                                                'loginPage'.tr(gender: 'forgotPassword'),
+                                                style: AppTypography.bodyMedium(
+                                                  context,
+                                                ).apply(fontWeightDelta: 1, color: Colors.grey),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            Consumer<AuthController>(
+                              builder: (context, snapshot, _) {
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Checkbox(
+                                      value: snapshot.remember,
+                                      onChanged: (value) {
+                                        snapshot.remember = value ?? false;
+                                      },
+                                      activeColor: CupertinoColors.activeBlue,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        snapshot.remember = !snapshot.remember;
+                                      },
+                                      child: Text('loginPage'.tr(gender: 'rememberMe')),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                             AppPadding.vertical(denominator: 1 / 2),
                             Button(
                               () async {
@@ -299,15 +283,16 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value == true) {
                                     showLoading();
                                     AuthController.logIn(
-                                            context,
-                                            AuthRequest(
-                                                username: usernameController.text, password: passwordController.text))
-                                        .then((value) {
+                                      context,
+                                      AuthRequest(username: usernameController.text, password: passwordController.text),
+                                    ).then((value) {
                                       dismissLoading();
                                       if (responseCode(value.code)) {
-                                        context.read<AuthController>().setAuthenticationResponse(value.data,
-                                            usernameValue: usernameController.text,
-                                            passwordValue: passwordController.text);
+                                        context.read<AuthController>().setAuthenticationResponse(
+                                          value.data,
+                                          usernameValue: usernameController.text,
+                                          passwordValue: passwordController.text,
+                                        );
                                       }
                                     });
                                   }
@@ -323,7 +308,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   elevation: 10,
-                )
+                ),
               ],
             ),
           ),
@@ -348,103 +333,94 @@ class _LoginPageState extends State<LoginPage> {
   forgotPassword() {
     StreamController<DateTime> rebuild = StreamController.broadcast();
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return StreamBuilder<DateTime>(
-              stream: rebuild.stream,
-              builder: (context, snapshot) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              FocusScope.of(context).unfocus();
-                            },
-                            child: CardContainer(
-                              Padding(
-                                padding: EdgeInsets.all(screenPadding),
-                                child: Column(
+      context: context,
+      builder: (BuildContext context) {
+        return StreamBuilder<DateTime>(
+          stream: rebuild.stream,
+          builder: (context, snapshot) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                        },
+                        child: CardContainer(
+                          Padding(
+                            padding: EdgeInsets.all(screenPadding),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'loginPage'.tr(gender: 'forgotPassword'),
+                                  style: AppTypography.displayMedium(context),
+                                ),
+                                AppPadding.vertical(),
+                                Text(
+                                  'loginPage'.tr(gender: 'enterEmailAddress'),
+                                  style: AppTypography.bodyMedium(context),
+                                ),
+                                AppPadding.vertical(),
+                                SizedBox(width: screenWidth1728(20), child: InputField(field: emailAttribute)),
+                                AppPadding.vertical(),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
-                                      'loginPage'.tr(gender: 'forgotPassword'),
-                                      style: AppTypography.displayMedium(context),
-                                    ),
-                                    AppPadding.vertical(),
-                                    Text(
-                                      'loginPage'.tr(gender: 'enterEmailAddress'),
-                                      style: AppTypography.bodyMedium(context),
-                                    ),
-                                    AppPadding.vertical(),
-                                    SizedBox(
-                                      width: screenWidth1728(20),
-                                      child: InputField(
-                                        field: emailAttribute,
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Flexible(
-                                          child: Button(
-                                            () {
-                                              if (emailAttribute.controller.text == '') {
-                                                emailAttribute.errorMessage =
-                                                    ErrorMessage.required(field: emailAttribute.hintText);
-                                                rebuild.add(DateTime.now());
-                                              } else if (!RegExp(
-                                                      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
-                                                  .hasMatch(emailAttribute.controller.text)) {
-                                                emailAttribute.errorMessage = 'Invalid ${emailAttribute.hintText}';
-                                                rebuild.add(DateTime.now());
-                                              } else {
-                                                showLoading();
-                                                PasswordRecoveryController.forgotPassword(
-                                                        context, emailAttribute.controller.text)
-                                                    .then((value) {
-                                                  if (responseCode(value.code)) {
-                                                    dismissLoading();
-                                                    context.pop();
-                                                    context.pushNamed(AdminPasswordRecoveryPage.routeName,
-                                                        extra: value.data?.data?.token ?? '');
-                                                  } else {
-                                                    showDialogError(context, value.data?.message ?? '');
-                                                  }
-                                                });
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ],
+                                    Flexible(
+                                      child: Button(() {
+                                        if (emailAttribute.controller.text == '') {
+                                          emailAttribute.errorMessage = ErrorMessage.required(
+                                            field: emailAttribute.hintText,
+                                          );
+                                          rebuild.add(DateTime.now());
+                                        } else if (!RegExp(
+                                          r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
+                                        ).hasMatch(emailAttribute.controller.text)) {
+                                          emailAttribute.errorMessage = 'Invalid ${emailAttribute.hintText}';
+                                          rebuild.add(DateTime.now());
+                                        } else {
+                                          showLoading();
+                                          PasswordRecoveryController.forgotPassword(
+                                            context,
+                                            emailAttribute.controller.text,
+                                          ).then((value) {
+                                            if (responseCode(value.code)) {
+                                              dismissLoading();
+                                              context.pop();
+                                              context.pushNamed(
+                                                AdminPasswordRecoveryPage.routeName,
+                                                extra: value.data?.data?.token ?? '',
+                                              );
+                                            } else {
+                                              showDialogError(context, value.data?.message ?? '');
+                                            }
+                                          });
+                                        }
+                                      }),
                                     ),
                                   ],
                                 ),
-                              ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              });
-        });
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget loadingScreen() {
-    return Center(
-      child: SizedBox(
-        width: 140,
-        child: Lottie.asset(
-          'assets/lottie/simple-loading.json',
-          width: 140,
-        ),
-      ),
-    );
+    return Center(child: SizedBox(width: 140, child: Lottie.asset('assets/lottie/simple-loading.json', width: 140)));
   }
 }

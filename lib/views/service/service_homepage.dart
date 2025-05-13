@@ -9,11 +9,14 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/service/services_response.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_request.dart';
+import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
+import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/service/service_details.dart';
@@ -24,6 +27,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/search_toggle.dart';
@@ -63,7 +67,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     TableHeaderAttribute(attribute: 'serviceName', label: 'Service', allowSorting: false, columnSize: ColumnSize.M),
     TableHeaderAttribute(attribute: 'category', label: 'Category', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(attribute: 'servicePrice', label: 'Price', allowSorting: false, columnSize: ColumnSize.S),
-
     TableHeaderAttribute(attribute: 'doctorType', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'serviceStatus',
@@ -79,11 +82,11 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'action',
-      label: 'Action',
+      attribute: 'actions',
+      label: 'Actions',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 100,
+      width: 80,
     ),
   ];
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
@@ -213,9 +216,12 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               children: [
                 Expanded(
                   child: CardContainer(
-                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
+                      child: context.read<AuthController>().isSuperAdmin ? superadminTable() : adminTable(),
+                    ),
                     color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
+                    margin: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, screenPadding),
                   ),
                 ),
               ],
@@ -256,7 +262,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  Widget orderTable() {
+  Widget superadminTable() {
     return Consumer<ServiceController>(
       builder: (context, snapshot, child) {
         if (snapshot.servicesResponse == null) {
@@ -286,7 +292,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                             child: DataTable2(
                               columnSpacing: 12,
                               horizontalMargin: 12,
-                              minWidth: 1300,
                               isHorizontalScrollBarVisible: true,
                               isVerticalScrollBarVisible: true,
                               columns: columns(),
@@ -308,22 +313,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                     ),
                                     cells: [
                                       DataCell(
-                                        TextButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return ServiceDetails(
-                                                  service: snapshot.servicesResponse!.data![index],
-                                                  type: 'update',
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: Text(
-                                            snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
-                                            style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                          ),
+                                        Text(
+                                          snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
+                                          style: AppTypography.bodyMedium(context).apply(),
                                         ),
                                       ),
                                       DataCell(
@@ -350,18 +342,11 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                         ),
                                       ),
                                       DataCell(
-                                        AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                              ? 'Active'
-                                              : 'Inactive',
-                                          style: AppTypography.bodyMedium(context).apply(
-                                            color: statusColor(
-                                              snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                  ? 'active'
-                                                  : 'inactive',
-                                            ),
-                                            fontWeightDelta: 1,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            showStatus(snapshot.servicesResponse?.data?[index].serviceStatus == 1),
+                                          ],
                                         ),
                                       ),
                                       DataCell(
@@ -373,81 +358,46 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                ServiceBranchController.getAll(
-                                                  context,
-                                                  1,
-                                                  100,
-                                                  serviceId: snapshot.servicesResponse!.data![index].serviceId ?? '',
-                                                  serviceBranchStatus: 1,
-                                                ).then((value) {
-                                                  if (responseCode(value.code)) {
-                                                    context.read<ServiceBranchController>().serviceBranchResponse =
-                                                        value.data;
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return ServiceBranch(serviceBranch: value.data);
-                                                      },
-                                                    );
-                                                  }
-                                                });
-                                              },
-                                              icon: const Icon(Icons.list, color: Colors.grey),
-                                            ),
-                                            IconButton(
-                                              onPressed: () async {
-                                                try {
-                                                  Data? data = snapshot.servicesResponse?.data?[index];
-                                                  if (await showConfirmDialog(
-                                                    context,
-                                                    data?.serviceStatus == 1
-                                                        ? 'Are you certain you wish to deactivate this service? Please note, this action can be reversed at a later time.'
-                                                        : 'Are you certain you wish to activate this service? Please note, this action can be reversed at a later time.',
-                                                  )) {
-                                                    Future.delayed(Duration.zero, () {
-                                                      ServiceController.update(
-                                                        context,
-                                                        UpdateServiceRequest(
-                                                          serviceId: data?.serviceId,
-                                                          serviceName: data?.serviceDescription,
-                                                          serviceDescription: data?.serviceDescription,
-                                                          servicePrice:
-                                                              data?.servicePrice != null
-                                                                  ? double.parse(data?.servicePrice ?? '0')
-                                                                  : null,
-                                                          serviceBookingFee:
-                                                              data?.serviceBookingFee != null
-                                                                  ? double.parse(data?.serviceBookingFee ?? '0')
-                                                                  : null,
-                                                          doctorType: data?.doctorType,
-                                                          serviceTime: data?.serviceTime,
-                                                          serviceCategory: data?.serviceCategory,
-                                                          serviceStatus: data?.serviceStatus == 1 ? 0 : 1,
-                                                        ),
-                                                      ).then((value) {
-                                                        if (responseCode(value.code)) {
-                                                          filtering();
-                                                          showDialogSuccess(
-                                                            context,
-                                                            'The Services has been successfully ${data?.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
-                                                          );
-                                                        } else {
-                                                          showDialogError(context, value.data?.message ?? '');
-                                                        }
-                                                      });
-                                                    });
-                                                  }
-                                                } catch (e) {
-                                                  debugPrint(e.toString());
-                                                }
-                                              },
-                                              icon: Icon(
-                                                snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                    ? Icons.pause_circle
-                                                    : Icons.play_arrow,
-                                                color: Colors.grey,
+                                            PopupMenuButton<String>(
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                              offset: const Offset(8, 35),
+                                              color: Colors.white,
+                                              tooltip: '',
+                                              onSelected:
+                                                  (value) => _handleMenuSelection(
+                                                    value,
+                                                    snapshot.servicesResponse?.data?[index] ?? Data(),
+                                                  ),
+                                              itemBuilder:
+                                                  (BuildContext context) => <PopupMenuEntry<String>>[
+                                                    if (context.read<AuthController>().isSuperAdmin)
+                                                      PopupMenuItem<String>(value: 'update', child: Text('Update')),
+                                                    if (context.read<AuthController>().isSuperAdmin)
+                                                      PopupMenuItem<String>(
+                                                        value: 'updateBranchesStatus',
+                                                        child: Text('Update Branch Service'),
+                                                      ),
+                                                    PopupMenuItem<String>(
+                                                      value: 'enableDisable',
+                                                      child: Text(
+                                                        snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                                            ? 'Deactivate'
+                                                            : 'Re-Activate',
+                                                      ),
+                                                    ),
+                                                  ],
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets.all(4),
+                                                    // decoration: const BoxDecoration(
+                                                    //   color: Colors.white,
+                                                    //   shape: BoxShape.circle,
+                                                    // ),
+                                                    child: Icon(Icons.more_vert, color: Colors.grey),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
@@ -497,6 +447,305 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
+  Widget adminTable() {
+    return Consumer<ServiceBranchController>(
+      builder: (context, snapshot, child) {
+        if (snapshot.serviceBranchResponse == null) {
+          return const Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+          );
+        } else {
+          return snapshot.serviceBranchResponse?.data == null || snapshot.serviceBranchResponse!.data!.isEmpty
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
+              )
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  tableButton(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                            padding: const EdgeInsets.all(5),
+                            child: DataTable2(
+                              columnSpacing: 12,
+                              horizontalMargin: 12,
+                              isHorizontalScrollBarVisible: true,
+                              isVerticalScrollBarVisible: true,
+                              columns: columns(),
+                              headingRowColor: WidgetStateProperty.all(Colors.white),
+                              headingRowHeight: 51,
+                              decoration: const BoxDecoration(),
+                              border: TableBorder(
+                                left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                              ),
+                              rows: [
+                                for (
+                                  int index = 0;
+                                  index < (snapshot.serviceBranchResponse?.data?.length ?? 0);
+                                  index++
+                                )
+                                  DataRow(
+                                    color: WidgetStateProperty.all(
+                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                    ),
+                                    cells: [
+                                      DataCell(
+                                        Text(
+                                          snapshot.serviceBranchResponse?.data?[index].serviceName ?? 'N/A',
+                                          style: AppTypography.bodyMedium(context).apply(),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.serviceBranchResponse?.data?[index].serviceCategory ?? 'N/A',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppTooltip(
+                                          message:
+                                              'Booking Fee: RM ${snapshot.serviceBranchResponse?.data?[index].serviceBookingFee ?? '0.00'}',
+                                          child: Text(
+                                            snapshot.serviceBranchResponse?.data?[index].servicePrice != null
+                                                ? 'RM ${snapshot.serviceBranchResponse?.data?[index].servicePrice}'
+                                                : 'N/A',
+                                          ),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          snapshot.serviceBranchResponse?.data?[index].doctorType == 2
+                                              ? 'Sonographer'
+                                              : 'Doctor',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            showStatus(
+                                              snapshot.serviceBranchResponse?.data?[index].serviceBranchStatus == 1,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      DataCell(
+                                        AppSelectableText(
+                                          dateConverter(snapshot.serviceBranchResponse?.data?[index].createdDate) ??
+                                              'N/A',
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            PopupMenuButton<String>(
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                              offset: const Offset(8, 35),
+                                              color: Colors.white,
+                                              tooltip: '',
+                                              onSelected:
+                                                  (value) => _handleAdminMenuSelection(
+                                                    value,
+                                                    snapshot.serviceBranchResponse?.data?[index] ??
+                                                        service_branch_model.Data(),
+                                                  ),
+                                              itemBuilder:
+                                                  (BuildContext context) => <PopupMenuEntry<String>>[
+                                                    PopupMenuItem<String>(
+                                                      value: 'enableDisable',
+                                                      child: Text(
+                                                        snapshot
+                                                                    .serviceBranchResponse
+                                                                    ?.data?[index]
+                                                                    .serviceBranchStatus ==
+                                                                1
+                                                            ? 'Deactivate'
+                                                            : 'Re-Activate',
+                                                      ),
+                                                    ),
+                                                  ],
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets.all(4),
+                                                    // decoration: const BoxDecoration(
+                                                    //   color: Colors.white,
+                                                    //   shape: BoxShape.circle,
+                                                    // ),
+                                                    child: Icon(Icons.more_vert, color: Colors.grey),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          ),
+                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(child: pagination()),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (!isMobile && !isTablet)
+                                  const Flexible(
+                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                  ),
+                                perPage(),
+                              ],
+                            ),
+                          ),
+                          if (!isMobile && !isTablet)
+                            Text(
+                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              );
+        }
+      },
+    );
+  }
+
+  void _handleMenuSelection(String value, Data service) async {
+    if (value == 'update') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ServiceDetails(service: service, type: 'update');
+        },
+      );
+    } else if (value == 'updateBranchesStatus') {
+      ServiceBranchController.getAll(context, 1, 100, serviceId: service.serviceId ?? '', serviceBranchStatus: 1).then((
+        value,
+      ) {
+        if (responseCode(value.code)) {
+          context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return ServiceBranch(serviceBranch: value.data);
+            },
+          );
+        }
+      });
+    } else if (value == 'enableDisable') {
+      try {
+        if (await showConfirmDialog(
+          context,
+          service.serviceStatus == 1
+              ? 'Are you certain you wish to deactivate this service for all branch? Please note, this action can be reversed at a later time.'
+              : 'Are you certain you wish to activate this service for all branch? Please note, this action can be reversed at a later time.',
+        )) {
+          Future.delayed(Duration.zero, () {
+            ServiceController.update(
+              context,
+              UpdateServiceRequest(
+                serviceId: service.serviceId,
+                serviceName: service.serviceDescription,
+                serviceDescription: service.serviceDescription,
+                servicePrice: service.servicePrice != null ? double.parse(service.servicePrice ?? '0') : null,
+                serviceBookingFee:
+                    service.serviceBookingFee != null ? double.parse(service.serviceBookingFee ?? '0') : null,
+                doctorType: service.doctorType,
+                serviceTime: service.serviceTime,
+                serviceCategory: service.serviceCategory,
+                serviceStatus: service.serviceStatus == 1 ? 0 : 1,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
+                filtering();
+                showDialogSuccess(
+                  context,
+                  'The Services has been successfully ${service.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
+                );
+              } else {
+                showDialogError(context, value.data?.message ?? '');
+              }
+            });
+          });
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    }
+  }
+
+  void _handleAdminMenuSelection(String value, service_branch_model.Data serviceBranch) async {
+    if (value == 'enableDisable') {
+      try {
+        if (await showConfirmDialog(
+          context,
+          serviceBranch.serviceBranchStatus == 1
+              ? 'Are you certain you wish to deactivate ${serviceBranch.serviceName} for ${serviceBranch.branchName}? Please note, this action can be reversed at a later time.'
+              : 'Are you certain you wish to activate ${serviceBranch.serviceName} for ${serviceBranch.branchName}? Please note, this action can be reversed at a later time.',
+        )) {
+          Future.delayed(Duration.zero, () {
+            ServiceBranchController.update(
+              context,
+              UpdateServiceBranchRequest(
+                serviceBranchId: serviceBranch.serviceBranchId,
+                serviceBranchAvailableTime: serviceBranch.serviceBranchAvailableTime,
+                serviceBranchStatus: serviceBranch.serviceBranchStatus == 1 ? 0 : 1,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
+                showLoading();
+                ServiceBranchController.getAll(
+                  context,
+                  1,
+                  100,
+                  branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+                ).then((value) {
+                  dismissLoading();
+                  context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+                  showDialogSuccess(
+                    context,
+                    '${serviceBranch.serviceName} has been successfully ${serviceBranch.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${serviceBranch.branchName}.',
+                  );
+                });
+              } else {
+                showDialogError(context, value.data?.message ?? '');
+              }
+            });
+          });
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    }
+  }
+
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
@@ -510,29 +759,44 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     if (page != null) {
       _page = page;
     }
-    ServiceController.getAll(
-      context,
-      _page,
-      _pageSize,
-      serviceName: _serviceNameController.text,
-      serviceStatus:
-          _selectedServiceStatus != null
-              ? _selectedServiceStatus?.key == '1'
-                  ? 1
-                  : _selectedServiceStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
-    ).then((value) {
-      dismissLoading();
-      if (responseCode(value.code)) {
-        _totalCount = value.data?.totalCount ?? 0;
-        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
-        context.read<ServiceController>().servicesResponse = value.data;
-        // _page = 0;
-      } else if (value.code == 404) {}
-      return null;
-    });
+    if (context.read<AuthController>().isSuperAdmin == false) {
+      ServiceBranchController.getAll(
+        context,
+        1,
+        100,
+        branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+        // branchId: "62743240-006d-11ef-a129-6677d190faa2",
+      ).then((value) {
+        dismissLoading();
+        if (responseCode(value.code)) {
+          context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+        }
+      });
+    } else {
+      ServiceController.getAll(
+        context,
+        _page,
+        _pageSize,
+        serviceName: _serviceNameController.text,
+        serviceStatus:
+            _selectedServiceStatus != null
+                ? _selectedServiceStatus?.key == '1'
+                    ? 1
+                    : _selectedServiceStatus?.key == '0'
+                    ? 0
+                    : null
+                : null,
+      ).then((value) {
+        dismissLoading();
+        if (responseCode(value.code)) {
+          _totalCount = value.data?.totalCount ?? 0;
+          _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+          context.read<ServiceController>().servicesResponse = value.data;
+          // _page = 0;
+        } else if (value.code == 404) {}
+        return null;
+      });
+    }
   }
 
   String? getOrderBy() {
@@ -657,23 +921,24 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             },
           ),
         ),
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const ServiceDetails(type: 'create');
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.add, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Add new service', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
+        if (context.read<AuthController>().isSuperAdmin)
+          TextButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const ServiceDetails(type: 'create');
+                },
+              );
+            },
+            child: Row(
+              children: [
+                const Icon(Icons.add, color: Colors.blue),
+                AppPadding.horizontal(denominator: 2),
+                Text('Add new service', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
+              ],
+            ),
           ),
-        ),
         TextButton(
           onPressed: () {
             showDialog(

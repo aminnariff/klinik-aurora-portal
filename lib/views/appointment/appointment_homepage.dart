@@ -540,8 +540,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         columnSize: ColumnSize.S,
       ),
       TableHeaderAttribute(
-        attribute: 'action',
-        label: 'Action',
+        attribute: 'actions',
+        label: 'Actions',
         allowSorting: false,
         columnSize: ColumnSize.S,
         width: 100,

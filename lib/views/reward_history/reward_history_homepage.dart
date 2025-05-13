@@ -18,6 +18,7 @@ import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -78,8 +79,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       width: 120,
     ),
     TableHeaderAttribute(
-      attribute: 'action',
-      label: 'Action',
+      attribute: 'actions',
+      label: 'Actions',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 100,
@@ -339,19 +340,34 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                         ),
                                       ),
                                       DataCell(
-                                        AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryStatus == 1
-                                              ? 'In-Progress'
-                                              : 'Completed',
-                                          style: AppTypography.bodyMedium(context).apply(
-                                            color: statusColor(
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            showStatus(
                                               snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryStatus ==
-                                                      1
-                                                  ? 'in-progress'
-                                                  : 'completed',
+                                                  1,
+                                              valueText:
+                                                  snapshot
+                                                              .rewardHistoryResponse
+                                                              ?.data
+                                                              ?.data?[index]
+                                                              .rewardHistoryStatus ==
+                                                          1
+                                                      ? 'In-Progress'
+                                                      : 'Completed',
+
+                                              valueColor: statusColor(
+                                                snapshot
+                                                            .rewardHistoryResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .rewardHistoryStatus ==
+                                                        1
+                                                    ? 'in-progress'
+                                                    : 'completed',
+                                              ),
                                             ),
-                                            fontWeightDelta: 1,
-                                          ),
+                                          ],
                                         ),
                                       ),
                                       DataCell(

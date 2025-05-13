@@ -73,6 +73,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     labelText: 'appointmentPage'.tr(gender: 'dueDate'),
     isNumber: true,
   );
+  List<DropdownAttribute> branches = [];
   final TextEditingController dateTimeController = TextEditingController();
   DropdownAttribute? _appointmentBranch;
   DropdownAttribute? _status;
@@ -93,7 +94,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           dateConverter(widget.appointment?.appointmentDatetime, format: 'yyyy-MM-dd HH:mm') ?? '';
     }
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      print(context.read<AuthController>().authenticationResponse?.data?.user?.branchId);
       if (context.read<AuthController>().isSuperAdmin == false && widget.type == 'create') {
         ServiceBranchController.getAll(
           context,
@@ -159,12 +159,29 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       // } else if (widget.appointment?.doctorType == 2) {
       //   _status = DropdownAttribute('2', 'Sonographer');
       // }
-
-      context.read<BranchController>().branchAllResponse?.data?.data?.sort((a, b) {
-        final nameA = a.branchName?.toLowerCase() ?? '';
-        final nameB = b.branchName?.toLowerCase() ?? '';
-        return nameA.compareTo(nameB);
-      });
+      if (widget.type == 'create') {
+        branches = [];
+        if (context.read<BranchController>().branchAllResponse?.data?.data == null) {
+          BranchController.getAll(context, 1, 100).then((value) {
+            if (responseCode(value.code)) {
+              context.read<BranchController>().branchAllResponse = value;
+              for (branch_model.Data item in value.data?.data ?? []) {
+                branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+              }
+            }
+          });
+        } else {
+          for (branch_model.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? []) {
+            branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+          }
+        }
+        branches.sort((a, b) {
+          final nameA = a.name.toLowerCase();
+          final nameB = b.name.toLowerCase();
+          return nameA.compareTo(nameB);
+        });
+        rebuildDropdown.add(DateTime.now());
+      }
       if (widget.type == 'update') {}
     });
     super.initState();
@@ -274,38 +291,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 StreamBuilder<DateTime>(
                                   stream: rebuildDropdown.stream,
                                   builder: (context, snapshot) {
-                                    return Row(
-                                      children: [
-                                        AppDropdown(
-                                          attributeList: DropdownAttributeList(
-                                            appointmentStatus,
-                                            labelText: 'appointmentPage'.tr(gender: 'status'),
-                                            value: _status?.name,
-                                            onChanged: (p0) {
-                                              _status = p0;
-                                              rebuildDropdown.add(DateTime.now());
-                                            },
-                                            width: screenWidthByBreakpoint(90, 70, 30),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                AppPadding.vertical(denominator: 2),
-                                StreamBuilder<DateTime>(
-                                  stream: rebuildDropdown.stream,
-                                  builder: (context, snapshot) {
                                     return AppDropdown(
                                       attributeList: DropdownAttributeList(
-                                        [
-                                          if (context.read<BranchController>().branchAllResponse?.data?.data != null)
-                                            for (branch_model.Data item
-                                                in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
-                                              DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                        ],
+                                        branches,
                                         labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                        isEditable: context.read<AuthController>().isSuperAdmin,
+                                        isEditable:
+                                            context.read<AuthController>().isSuperAdmin && widget.type == 'create',
+                                        fieldColor:
+                                            context.read<AuthController>().isSuperAdmin && widget.type == 'create'
+                                                ? null
+                                                : textFormFieldUneditableColor,
                                         value: _appointmentBranch?.name,
                                         onChanged: (p0) {
                                           _appointmentBranch = p0;
@@ -349,9 +344,25 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         ],
                                         labelText: 'appointmentPage'.tr(gender: 'service'),
                                         value: _service?.name,
+                                        fieldColor: widget.type == 'update' ? textFormFieldUneditableColor : null,
                                         isEditable: widget.type == 'create',
                                         onChanged: (p0) {
                                           _service = p0;
+                                          try {
+                                            if (context
+                                                    .read<ServiceBranchController>()
+                                                    .serviceBranchResponse
+                                                    ?.data
+                                                    ?.firstWhere((element) => element.serviceBranchId == p0?.key)
+                                                    .serviceBookingFee !=
+                                                null) {
+                                              _status = appointmentStatus.firstWhere((element) => element.key == '1');
+                                            } else {
+                                              _status = appointmentStatus.firstWhere((element) => element.key == '4');
+                                            }
+                                          } catch (e) {
+                                            debugPrint(e.toString());
+                                          }
                                           ServiceBranchAvailableDtController.get(
                                             context,
                                             1,
@@ -373,16 +384,42 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     );
                                   },
                                 ),
+                                AppPadding.vertical(denominator: 2),
+                                StreamBuilder<DateTime>(
+                                  stream: rebuildDropdown.stream,
+                                  builder: (context, snapshot) {
+                                    return Row(
+                                      children: [
+                                        AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            widget.type == 'update' ? appointmentStatus : [],
+                                            isEditable: widget.type == 'update',
+                                            fieldColor: widget.type == 'update' ? null : textFormFieldUneditableColor,
+                                            labelText: 'appointmentPage'.tr(gender: 'status'),
+                                            value: _status?.name,
+                                            onChanged: (p0) {
+                                              _status = p0;
+                                              rebuildDropdown.add(DateTime.now());
+                                            },
+                                            width: screenWidthByBreakpoint(90, 70, 30),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
                                 AppPadding.vertical(),
-                                GestureDetector(
-                                  onTap: () async {
-                                    if (_appointmentBranch != null) {
-                                      DateTime now = DateTime.now();
-                                      String? selectedDateTime = await showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return Consumer<ServiceBranchAvailableDtController>(
-                                            builder: (context, snapshot, _) {
+                                Consumer<ServiceBranchAvailableDtController>(
+                                  builder: (context, snapshot, _) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        if (_appointmentBranch != null &&
+                                            (snapshot.serviceBranchAvailableDtResponse?.data != null &&
+                                                (snapshot.serviceBranchAvailableDtResponse?.data?.length ?? 0) > 0)) {
+                                          DateTime now = DateTime.now();
+                                          String? selectedDateTime = await showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
                                               return Row(
                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
@@ -411,43 +448,46 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               );
                                             },
                                           );
-                                        },
-                                      );
-                                      dateTimeController.text =
-                                          selectedDateTime ??
-                                          dateConverter(
-                                            widget.appointment?.appointmentDatetime,
-                                            format: 'yyyy-MM-dd HH:mm',
-                                          ) ??
-                                          '';
-                                    } else if (_service == null) {
-                                      showDialogError(
-                                        context,
-                                        ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'service')),
-                                      );
-                                    } else {
-                                      showDialogError(
-                                        context,
-                                        ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'branch')),
-                                      );
-                                    }
-                                  },
-                                  child: ReadOnly(
-                                    isEditable: false,
-                                    InputField(
-                                      field: InputFieldAttribute(
-                                        controller: dateTimeController,
-                                        labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                          dateTimeController.text =
+                                              selectedDateTime ??
+                                              dateConverter(
+                                                widget.appointment?.appointmentDatetime,
+                                                format: 'yyyy-MM-dd HH:mm',
+                                              ) ??
+                                              '';
+                                        } else if (_service == null) {
+                                          showDialogError(
+                                            context,
+                                            ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'service')),
+                                          );
+                                        } else if ((snapshot.serviceBranchAvailableDtResponse?.data?.length ?? 0) ==
+                                            0) {
+                                          showDialogError(context, 'No available slots');
+                                        } else {
+                                          showDialogError(
+                                            context,
+                                            ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'branch')),
+                                          );
+                                        }
+                                      },
+                                      child: ReadOnly(
                                         isEditable: false,
-                                        uneditableColor: textFormFieldEditableColor,
-                                        suffixWidget: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [Icon(Icons.date_range)],
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: dateTimeController,
+                                            labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                            isEditable: false,
+                                            uneditableColor: textFormFieldEditableColor,
+                                            suffixWidget: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [Icon(Icons.date_range)],
+                                            ),
+                                          ),
+                                          width: screenWidthByBreakpoint(90, 70, 30),
                                         ),
                                       ),
-                                      width: screenWidthByBreakpoint(90, 70, 30),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
                                 AppPadding.vertical(denominator: 2),
                               ],

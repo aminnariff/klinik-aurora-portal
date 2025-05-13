@@ -54,91 +54,98 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   void initState() {
-    sideBarAttribute = [
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
-        },
-        label: 'Dashboard',
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
-        },
-        label: PointHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.date_range, color: Colors.white);
-        },
-        label: AppointmentHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.medical_services, color: Colors.white);
-        },
-        label: ServiceHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.person, color: Colors.white);
-        },
-        label: UserHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.admin_panel_settings, color: Colors.white);
-        },
-        label: AdminHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.codeBranch, color: Colors.white);
-        },
-        label: BranchHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white);
-        },
-        label: DoctorHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.solidImage, color: Colors.white);
-        },
-        label: PromotionHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.ticketSimple, color: Colors.white);
-        },
-        label: VoucherHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.gifts, color: Colors.white);
-        },
-        label: RewardHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.local_shipping, color: Colors.white);
-        },
-        label: RewardHistoryHomepage.displayName,
-      ),
-    ];
     super.initState();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      context.read<TopBarController>().pageValue = 0;
-      if (context.read<AuthController>().authenticationResponse != null) {
+      sideBarAttribute = [
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+          },
+          label: 'Dashboard',
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+          },
+          label: PointHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(Icons.date_range, color: Colors.white);
+          },
+          label: AppointmentHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(Icons.medical_services, color: Colors.white);
+          },
+          label: ServiceHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(Icons.person, color: Colors.white);
+          },
+          label: UserHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(Icons.admin_panel_settings, color: Colors.white);
+          },
+          label: AdminHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(FontAwesomeIcons.codeBranch, color: Colors.white);
+          },
+          label: BranchHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white);
+          },
+          label: DoctorHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(FontAwesomeIcons.solidImage, color: Colors.white);
+          },
+          label: PromotionHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(FontAwesomeIcons.ticketSimple, color: Colors.white);
+          },
+          label: VoucherHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(FontAwesomeIcons.gifts, color: Colors.white);
+          },
+          label: RewardHomepage.displayName,
+        ),
+        SidebarXItem(
+          iconBuilder: (selected, hovered) {
+            return Icon(Icons.local_shipping, color: Colors.white);
+          },
+          label: RewardHistoryHomepage.displayName,
+        ),
+      ];
+      getAuthController();
+    });
+  }
+
+  getAuthController() {
+    context.read<AuthController>().init(context).then((value) {
+      if (value != null) {
         if (!context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
           sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
         }
-        if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f')) {
+        if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') ||
+            context.read<AuthController>().isSuperAdmin == false) {
           sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
         }
-        if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f')) {
+        if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') ||
+            context.read<AuthController>().isSuperAdmin == false) {
           sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
         }
         if (!context.read<AuthController>().hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
@@ -147,15 +154,18 @@ class _HomepageState extends State<Homepage> {
         if (!context.read<AuthController>().hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
           sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
         }
-        if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f')) {
+        if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f') ||
+            context.read<AuthController>().isSuperAdmin == false) {
           sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
         }
         if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
           sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
         }
-        if (!context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2')) {
+        if (!context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2') ||
+            context.read<AuthController>().isSuperAdmin == false) {
           sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
         }
+        context.read<TopBarController>().pageValue = 0;
       }
     });
   }
