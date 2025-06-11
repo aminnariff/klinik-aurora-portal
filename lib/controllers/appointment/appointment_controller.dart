@@ -55,12 +55,16 @@ class AppointmentController extends ChangeNotifier {
     String? userId,
     String? branchId,
     String? serviceBranchId,
+    String? startDate,
+    String? endDate,
   }) async {
     final queryParams = {
       'appointmentStatus': status,
       if (userId != null) 'userId': userId,
       if (branchId != null) 'branchId': branchId,
       if (serviceBranchId != null) 'serviceBranchId': serviceBranchId,
+      if (startDate != null) 'startDate': startDate,
+      if (endDate != null) 'endDate': endDate,
       'page': page,
       'pageSize': pageSize,
     };

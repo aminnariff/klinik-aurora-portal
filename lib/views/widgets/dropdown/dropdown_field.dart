@@ -99,7 +99,7 @@ class _AppDropdownState extends State<AppDropdown> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         // border: Border.all(
-                        //   color: widget.attributeList.borderColor ?? secondaryColor.withOpacity(0.3),
+                        //   color: widget.attributeList.borderColor ?? secondaryColor.withAlpha(opacityCalculation(.3)),
                         // ),
                         color: widget.attributeList.fieldColor ?? textFormFieldEditableColor,
                       ),

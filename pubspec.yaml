@@ -24,6 +24,7 @@ dependencies:
   fluttertoast: ^8.2.4
   flutter_animate: ^4.5.0
   flutter_easyloading: ^3.0.5
+  flutter_rating_stars: ^1.1.0
   flutter_screenutil: ^5.9.3
   flutter_secure_storage: ^9.0.0
   flutter_svg: ^2.0.10+1

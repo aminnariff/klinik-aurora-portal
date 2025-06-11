@@ -225,7 +225,9 @@ class _Graph2WidgetState extends State<Graph2Widget> {
           dotData: const FlDotData(show: true),
           belowBarData: BarAreaData(
             show: true,
-            gradient: LinearGradient(colors: gradientColors.map((color) => color.withOpacity(0.3)).toList()),
+            gradient: LinearGradient(
+              colors: gradientColors.map((color) => color.withAlpha(opacityCalculation(.3))).toList(),
+            ),
           ),
         ),
       ],
@@ -288,8 +290,14 @@ class _Graph2WidgetState extends State<Graph2Widget> {
             show: true,
             gradient: LinearGradient(
               colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
+                ColorTween(
+                  begin: gradientColors[0],
+                  end: gradientColors[1],
+                ).lerp(0.2)!.withAlpha(opacityCalculation(.1)),
+                ColorTween(
+                  begin: gradientColors[0],
+                  end: gradientColors[1],
+                ).lerp(0.2)!.withAlpha(opacityCalculation(.1)),
               ],
             ),
           ),

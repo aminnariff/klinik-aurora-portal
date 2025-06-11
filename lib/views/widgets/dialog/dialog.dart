@@ -7,6 +7,7 @@ import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_type.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -35,7 +36,7 @@ class AppDialog extends StatelessWidget {
                     offset: const Offset(12, 26),
                     blurRadius: 30,
                     spreadRadius: 0,
-                    color: Colors.grey.withOpacity(.1),
+                    color: Colors.grey.withAlpha(opacityCalculation(.1)),
                   ),
                 ],
               ),

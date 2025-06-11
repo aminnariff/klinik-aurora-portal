@@ -109,8 +109,8 @@ int calculateCustomerPoints(String amount) {
 String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
   try {
     if (utcString == null || utcString.isEmpty) return null;
-    final utcDateTime = DateTime.parse(utcString).toUtc();
 
+    final utcDateTime = DateTime.parse(utcString); // already UTC from the "Z"
     return formatAppointmentDate(utcDateTime, showTime);
   } catch (e) {
     debugPrint('Invalid date format: $e');
@@ -119,8 +119,9 @@ String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
 }
 
 String formatAppointmentDate(DateTime dateTime, bool time) {
-  final now = DateTime.now();
-  final malaysiaDateTime = dateTime.toLocal().subtract(const Duration(hours: 8));
+  final malaysiaDateTime = dateTime.add(const Duration(hours: 8)); // force +8
+
+  final now = DateTime.now().add(const Duration(hours: 8));
   final today = DateTime(now.year, now.month, now.day);
   final tomorrow = today.add(const Duration(days: 1));
   final appointmentDay = DateTime(malaysiaDateTime.year, malaysiaDateTime.month, malaysiaDateTime.day);
@@ -131,14 +132,12 @@ String formatAppointmentDate(DateTime dateTime, bool time) {
   } else if (appointmentDay == tomorrow) {
     dayLabel = 'Tomorrow';
   } else {
-    dayLabel = DateFormat('EEE, d MMM yyyy').format(malaysiaDateTime); // e.g. Mon, 6 May 2025
+    dayLabel = DateFormat('EEE, d MMM yyyy').format(malaysiaDateTime);
   }
 
   String timeLabel = DateFormat('h:mm a').format(malaysiaDateTime);
-  if (time == false) {
-    return dayLabel;
-  }
-  return '$dayLabel\n$timeLabel';
+
+  return time ? '$dayLabel\n$timeLabel' : dayLabel;
 }
 
 String getAppointmentStatusLabel(int? statusId) {

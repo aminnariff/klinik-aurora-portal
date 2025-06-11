@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/charts/line_chart_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class LineChartWidget extends StatelessWidget {
   final LineChartAttribute attribute;
@@ -101,7 +102,7 @@ class LineChartWidget extends StatelessWidget {
   FlBorderData get borderData => FlBorderData(
     show: true,
     border: Border(
-      bottom: BorderSide(color: primary.withOpacity(0.2), width: 4),
+      bottom: BorderSide(color: primary.withAlpha(opacityCalculation(.2)), width: 4),
       left: const BorderSide(color: Colors.transparent),
       right: const BorderSide(color: Colors.transparent),
       top: const BorderSide(color: Colors.transparent),
@@ -140,7 +141,7 @@ class LineChartWidget extends StatelessWidget {
     barWidth: 5,
     isStrokeCapRound: true,
     dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false, color: Colors.blue.withOpacity(0)),
+    belowBarData: BarAreaData(show: false, color: Colors.blue.withAlpha(opacityCalculation(.0))),
     spots: const [
       FlSpot(1, 1),
       FlSpot(2, 2.8),

@@ -38,23 +38,28 @@ class AuthController extends ChangeNotifier {
   Future<String> checkDateTime() async {
     try {
       authenticationResponse = AuthResponse.fromJson(json.decode(prefs.getString(authResponse).toString()));
-      isSuperAdmin = _authenticationResponse?.data?.user?.isSuperadmin ?? false;
-      if (_authenticationResponse?.data?.expiryDt != null) {
-        DateTime now = DateTime.now();
-        DateTime targetTime = DateTime.parse(_authenticationResponse!.data!.expiryDt!);
-        Duration difference = targetTime.difference(now);
-        if (difference.isNegative) {
-          return 'expired';
-        } else if (difference <= const Duration(minutes: 5)) {
-          return 'refresh';
+      if (_authenticationResponse != null) {
+        isSuperAdmin = _authenticationResponse?.data?.user?.isSuperadmin ?? false;
+        if (_authenticationResponse?.data?.expiryDt != null) {
+          DateTime now = DateTime.now();
+          DateTime targetTime = DateTime.parse(_authenticationResponse!.data!.expiryDt!);
+          Duration difference = targetTime.difference(now);
+          if (difference.isNegative) {
+            return 'expired';
+          } else if (difference <= const Duration(minutes: 5)) {
+            return 'refresh';
+          } else {
+            return 'continue';
+          }
         } else {
-          return 'continue';
+          return 'expired';
         }
       } else {
-        return 'expired';
+        return 'nothing';
       }
     } catch (e) {
-      return 'expired';
+      debugPrint('ERROR CHECK DATE TIME\n$e');
+      return 'error';
     }
   }
 

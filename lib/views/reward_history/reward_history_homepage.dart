@@ -29,7 +29,6 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class RewardHistoryHomepage extends StatefulWidget {
@@ -295,11 +294,14 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                               headingRowHeight: 51,
                               decoration: const BoxDecoration(),
                               border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                verticalInside: BorderSide(
+                                  width: 1,
+                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                ),
                               ),
                               rows: [
                                 for (

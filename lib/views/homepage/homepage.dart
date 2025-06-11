@@ -23,6 +23,7 @@ import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepag
 import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
@@ -54,125 +55,125 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   void initState() {
+    sideBarAttribute = [
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+        },
+        label: 'Dashboard',
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+        },
+        label: PointHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.date_range, color: Colors.white);
+        },
+        label: AppointmentHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.medical_services, color: Colors.white);
+        },
+        label: ServiceHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.person, color: Colors.white);
+        },
+        label: UserHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.admin_panel_settings, color: Colors.white);
+        },
+        label: AdminHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.codeBranch, color: Colors.white);
+        },
+        label: BranchHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white);
+        },
+        label: DoctorHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.solidImage, color: Colors.white);
+        },
+        label: PromotionHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.ticketSimple, color: Colors.white);
+        },
+        label: VoucherHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.gifts, color: Colors.white);
+        },
+        label: RewardHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.local_shipping, color: Colors.white);
+        },
+        label: RewardHistoryHomepage.displayName,
+      ),
+    ];
+    getAuthController();
     super.initState();
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      sideBarAttribute = [
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
-          },
-          label: 'Dashboard',
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
-          },
-          label: PointHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(Icons.date_range, color: Colors.white);
-          },
-          label: AppointmentHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(Icons.medical_services, color: Colors.white);
-          },
-          label: ServiceHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(Icons.person, color: Colors.white);
-          },
-          label: UserHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(Icons.admin_panel_settings, color: Colors.white);
-          },
-          label: AdminHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(FontAwesomeIcons.codeBranch, color: Colors.white);
-          },
-          label: BranchHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white);
-          },
-          label: DoctorHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(FontAwesomeIcons.solidImage, color: Colors.white);
-          },
-          label: PromotionHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(FontAwesomeIcons.ticketSimple, color: Colors.white);
-          },
-          label: VoucherHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(FontAwesomeIcons.gifts, color: Colors.white);
-          },
-          label: RewardHomepage.displayName,
-        ),
-        SidebarXItem(
-          iconBuilder: (selected, hovered) {
-            return Icon(Icons.local_shipping, color: Colors.white);
-          },
-          label: RewardHistoryHomepage.displayName,
-        ),
-      ];
-      getAuthController();
-    });
   }
 
   getAuthController() {
-    context.read<AuthController>().init(context).then((value) {
-      if (value != null) {
-        if (!context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
-          sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      context.read<AuthController>().init(context).then((value) {
+        if (value != null) {
+          if (!context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
+            sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
+            sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
+            sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
+            sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
+          }
+          context.read<TopBarController>().pageValue = 0;
         }
-        if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') ||
-            context.read<AuthController>().isSuperAdmin == false) {
-          sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') ||
-            context.read<AuthController>().isSuperAdmin == false) {
-          sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
-          sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
-          sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f') ||
-            context.read<AuthController>().isSuperAdmin == false) {
-          sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
-          sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2') ||
-            context.read<AuthController>().isSuperAdmin == false) {
-          sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
-        }
-        context.read<TopBarController>().pageValue = 0;
-      }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ActivityHandlerController>(
+    return Consumer<ActivityHandlerController>(   
       builder: (context, snapshot, _) {
         if (snapshot.status) {
           SchedulerBinding.instance.scheduleFrameCallback((_) {
@@ -204,15 +205,15 @@ class _HomepageState extends State<Homepage> {
                       bottomRight: Radius.circular(20.0),
                     ),
                   ),
-                  hoverColor: Colors.black.withOpacity(0.31),
-                  textStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                  hoverColor: Colors.black.withAlpha(opacityCalculation(.3)),
+                  textStyle: TextStyle(color: Colors.white.withAlpha(opacityCalculation(.5))),
                   itemTextPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  iconTheme: IconThemeData(color: Colors.white.withOpacity(0.7), size: 20),
+                  iconTheme: IconThemeData(color: Colors.white.withAlpha(opacityCalculation(.7)), size: 20),
                   itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                   selectedItemDecoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: primary.withOpacity(0.7)),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.28))],
+                    border: Border.all(color: primary.withAlpha(opacityCalculation(.7))),
+                    boxShadow: [BoxShadow(color: Colors.black.withAlpha(opacityCalculation(.3)))],
                   ),
                   // selectedItemMargin: const EdgeInsets.symmetric(horizontal: 10),
                   selectedTextStyle: const TextStyle(color: Colors.white),
@@ -234,7 +235,7 @@ class _HomepageState extends State<Homepage> {
                   // itemPadding: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, screenWidth(1)),
                   // selectedItemPadding: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, 0, screenPadding / 2),
                 ),
-                footerDivider: Divider(color: Colors.white.withOpacity(0.3), height: 1),
+                footerDivider: Divider(color: (Colors.white).withAlpha(opacityCalculation(.3)), height: 1),
                 headerBuilder: (context, extended) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 8),
@@ -327,8 +328,7 @@ class _HomepageState extends State<Homepage> {
             child: Stack(
               alignment: Alignment.topRight,
               children: [
-                if (sideBarAttribute.isEmpty) const NoPermission(),
-                widget.child,
+                sideBarAttribute.isEmpty ? const NoPermission() : widget.child,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

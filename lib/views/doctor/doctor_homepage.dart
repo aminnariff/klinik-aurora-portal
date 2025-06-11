@@ -305,11 +305,14 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                               headingRowHeight: 51,
                               decoration: const BoxDecoration(),
                               border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                verticalInside: BorderSide(
+                                  width: 1,
+                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                ),
                               ),
                               rows: [
                                 for (int index = 0; index < (snapshot.doctorBranchResponse?.data?.length ?? 0); index++)

@@ -20,15 +20,18 @@ import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controlle
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dashboard/appointment_dashboard_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/permission/permission_controller.dart';
 import 'package:klinik_aurora_portal/controllers/point_management/point_management_controller.dart';
 import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
+import 'package:klinik_aurora_portal/controllers/refresh_token/refresh_token_controller.dart';
 import 'package:klinik_aurora_portal/controllers/reward/reward_controller.dart';
 import 'package:klinik_aurora_portal/controllers/reward/reward_history_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_exception_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
@@ -126,6 +129,7 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<ActivityHandlerController>(create: (_) => ActivityHandlerController()),
             ChangeNotifierProvider<AdminController>(create: (_) => AdminController()),
             ChangeNotifierProvider<AppointmentController>(create: (_) => AppointmentController()),
+            ChangeNotifierProvider<AppointmentDashboardController>(create: (_) => AppointmentDashboardController()),
             ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
             ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),
             ChangeNotifierProvider<DashboardController>(create: (_) => DashboardController()),
@@ -134,10 +138,12 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<PermissionController>(create: (_) => PermissionController()),
             ChangeNotifierProvider<PointManagementController>(create: (_) => PointManagementController()),
             ChangeNotifierProvider<PromotionController>(create: (_) => PromotionController()),
+            ChangeNotifierProvider<RefreshTokenController>(create: (_) => RefreshTokenController()),
             ChangeNotifierProvider<RewardController>(create: (_) => RewardController()),
             ChangeNotifierProvider<RewardHistoryController>(create: (_) => RewardHistoryController()),
             ChangeNotifierProvider<ServiceController>(create: (_) => ServiceController()),
             ChangeNotifierProvider<ServiceBranchController>(create: (_) => ServiceBranchController()),
+            ChangeNotifierProvider<ServiceBranchExceptionController>(create: (_) => ServiceBranchExceptionController()),
             ChangeNotifierProvider<ServiceBranchAvailableDtController>(
               create: (_) => ServiceBranchAvailableDtController(),
             ),

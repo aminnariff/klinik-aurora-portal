@@ -4,6 +4,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
@@ -14,11 +15,13 @@ import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_exception_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
+import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
@@ -40,7 +43,8 @@ class AppointmentDetails extends StatefulWidget {
   final Data? appointment;
   final String type;
   final List<String>? tabs;
-  const AppointmentDetails({super.key, this.appointment, required this.type, this.tabs});
+  final Function? refreshData;
+  const AppointmentDetails({super.key, this.appointment, required this.type, this.tabs, this.refreshData});
 
   @override
   State<AppointmentDetails> createState() => _AppointmentDetailsState();
@@ -103,6 +107,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ).then((value) {
           if (responseCode(value.code)) {
             context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+            rebuildDropdown.add(DateTime.now());
           }
         });
       }
@@ -148,8 +153,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ).then((value) {
           if (responseCode(value.code)) {
             context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableDtResponse = value.data;
-            //TODO: service exception
-            rebuildDropdown.add(DateTime.now());
+            ServiceBranchExceptionController.get(
+              context,
+              1,
+              999,
+              serviceBranchId: widget.appointment?.serviceBranchId,
+            ).then((value) {
+              if (responseCode(value.code)) {
+                context.read<ServiceBranchExceptionController>().serviceBranchExceptionResponse = value.data;
+                rebuildDropdown.add(DateTime.now());
+              }
+            });
           }
         });
       }
@@ -278,6 +292,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         },
                                         child: ReadOnly(InputField(field: dueDateController), isEditable: false),
                                       ),
+
                                       AppPadding.vertical(denominator: 2),
                                     ],
                                   ),
@@ -291,37 +306,40 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 StreamBuilder<DateTime>(
                                   stream: rebuildDropdown.stream,
                                   builder: (context, snapshot) {
-                                    return AppDropdown(
-                                      attributeList: DropdownAttributeList(
-                                        branches,
-                                        labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                        isEditable:
-                                            context.read<AuthController>().isSuperAdmin && widget.type == 'create',
-                                        fieldColor:
-                                            context.read<AuthController>().isSuperAdmin && widget.type == 'create'
-                                                ? null
-                                                : textFormFieldUneditableColor,
-                                        value: _appointmentBranch?.name,
-                                        onChanged: (p0) {
-                                          _appointmentBranch = p0;
-                                          if (_appointmentBranch != null) {
-                                            ServiceBranchController.getAll(
-                                              context,
-                                              1,
-                                              100,
-                                              branchId: _appointmentBranch?.key,
-                                              serviceBranchStatus: 1,
-                                            ).then((value) {
-                                              if (responseCode(value.code)) {
-                                                context.read<ServiceBranchController>().serviceBranchResponse =
-                                                    value.data;
-                                                rebuildDropdown.add(DateTime.now());
+                                    return Consumer<AuthController>(
+                                      builder: (context, authController, _) {
+                                        return AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            authController.isSuperAdmin && widget.type == 'create' ? branches : [],
+                                            labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                            isEditable: authController.isSuperAdmin && widget.type == 'create',
+                                            fieldColor:
+                                                authController.isSuperAdmin && widget.type == 'create'
+                                                    ? null
+                                                    : textFormFieldUneditableColor,
+                                            value: _appointmentBranch?.name,
+                                            onChanged: (p0) {
+                                              _appointmentBranch = p0;
+                                              if (_appointmentBranch != null) {
+                                                ServiceBranchController.getAll(
+                                                  context,
+                                                  1,
+                                                  100,
+                                                  branchId: _appointmentBranch?.key,
+                                                  serviceBranchStatus: 1,
+                                                ).then((value) {
+                                                  if (responseCode(value.code)) {
+                                                    context.read<ServiceBranchController>().serviceBranchResponse =
+                                                        value.data;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                  }
+                                                });
                                               }
-                                            });
-                                          }
-                                        },
-                                        width: screenWidthByBreakpoint(90, 70, 30),
-                                      ),
+                                            },
+                                            width: screenWidthByBreakpoint(90, 70, 30),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
                                 ),
@@ -329,58 +347,71 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 StreamBuilder<DateTime>(
                                   stream: rebuildDropdown.stream,
                                   builder: (context, snapshot) {
-                                    return AppDropdown(
-                                      attributeList: DropdownAttributeList(
-                                        [
-                                          if (context.read<ServiceBranchController>().serviceBranchResponse?.data !=
-                                              null)
-                                            for (service_branch_model.Data item
-                                                in context
-                                                        .read<ServiceBranchController>()
-                                                        .serviceBranchResponse
-                                                        ?.data ??
-                                                    [])
-                                              DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''),
-                                        ],
-                                        labelText: 'appointmentPage'.tr(gender: 'service'),
-                                        value: _service?.name,
-                                        fieldColor: widget.type == 'update' ? textFormFieldUneditableColor : null,
-                                        isEditable: widget.type == 'create',
-                                        onChanged: (p0) {
-                                          _service = p0;
-                                          try {
-                                            if (context
-                                                    .read<ServiceBranchController>()
-                                                    .serviceBranchResponse
-                                                    ?.data
-                                                    ?.firstWhere((element) => element.serviceBranchId == p0?.key)
-                                                    .serviceBookingFee !=
-                                                null) {
-                                              _status = appointmentStatus.firstWhere((element) => element.key == '1');
-                                            } else {
-                                              _status = appointmentStatus.firstWhere((element) => element.key == '4');
-                                            }
-                                          } catch (e) {
-                                            debugPrint(e.toString());
-                                          }
-                                          ServiceBranchAvailableDtController.get(
-                                            context,
-                                            1,
-                                            100,
-                                            branchId: _appointmentBranch?.key,
-                                            serviceBranchId: _service?.key,
-                                          ).then((value) {
-                                            if (responseCode(value.code)) {
-                                              context
-                                                  .read<ServiceBranchAvailableDtController>()
-                                                  .serviceBranchAvailableDtResponse = value.data;
-                                              rebuildDropdown.add(DateTime.now());
-                                              //TODO: service exception
-                                            }
-                                          });
-                                        },
-                                        width: screenWidthByBreakpoint(90, 70, 30),
-                                      ),
+                                    return Consumer<ServiceBranchController>(
+                                      builder: (context, serviceBranchController, _) {
+                                        return AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            [
+                                              if (serviceBranchController.serviceBranchResponse?.data != null)
+                                                for (service_branch_model.Data item
+                                                    in serviceBranchController.serviceBranchResponse?.data ?? [])
+                                                  DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''),
+                                            ],
+                                            labelText: 'appointmentPage'.tr(gender: 'service'),
+                                            value: _service?.name,
+                                            fieldColor: widget.type == 'update' ? textFormFieldUneditableColor : null,
+                                            isEditable: widget.type == 'create',
+                                            onChanged: (p0) {
+                                              _service = p0;
+                                              try {
+                                                if (notNullOrEmptyString(
+                                                  serviceBranchController.serviceBranchResponse?.data
+                                                      ?.firstWhere((element) => element.serviceBranchId == p0?.key)
+                                                      .serviceBookingFee,
+                                                )) {
+                                                  _status = appointmentStatus.firstWhere(
+                                                    (element) => element.key == '4',
+                                                  );
+                                                } else {
+                                                  _status = appointmentStatus.firstWhere(
+                                                    (element) => element.key == '1',
+                                                  );
+                                                }
+                                              } catch (e) {
+                                                debugPrint(e.toString());
+                                              }
+                                              ServiceBranchAvailableDtController.get(
+                                                context,
+                                                1,
+                                                200,
+                                                branchId: _appointmentBranch?.key,
+                                                serviceBranchId: _service?.key,
+                                              ).then((value) {
+                                                if (responseCode(value.code)) {
+                                                  context
+                                                      .read<ServiceBranchAvailableDtController>()
+                                                      .serviceBranchAvailableDtResponse = value.data;
+                                                  rebuildDropdown.add(DateTime.now());
+                                                  ServiceBranchExceptionController.get(
+                                                    context,
+                                                    1,
+                                                    999,
+                                                    serviceBranchId:
+                                                        widget.appointment?.serviceBranchId ?? _service?.key,
+                                                  ).then((value) {
+                                                    if (responseCode(value.code)) {
+                                                      context
+                                                          .read<ServiceBranchExceptionController>()
+                                                          .serviceBranchExceptionResponse = value.data;
+                                                    }
+                                                  });
+                                                }
+                                              });
+                                            },
+                                            width: screenWidthByBreakpoint(90, 70, 30),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
                                 ),
@@ -417,6 +448,49 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             (snapshot.serviceBranchAvailableDtResponse?.data != null &&
                                                 (snapshot.serviceBranchAvailableDtResponse?.data?.length ?? 0) > 0)) {
                                           DateTime now = DateTime.now();
+                                          List<String> availableDateTime =
+                                              snapshot
+                                                  .serviceBranchAvailableDtResponse
+                                                  ?.data
+                                                  ?.first
+                                                  .availableDatetimes ??
+                                              [];
+                                          List<String> exceptionDateTime = [];
+                                          for (
+                                            int index = 0;
+                                            index <
+                                                (context
+                                                        .read<ServiceBranchExceptionController>()
+                                                        .serviceBranchExceptionResponse
+                                                        ?.data
+                                                        ?.length ??
+                                                    0);
+                                            index++
+                                          ) {
+                                            exceptionDateTime.add(
+                                              ServiceBranchExceptionController.convertToUtcIsoString(
+                                                context
+                                                        .read<ServiceBranchExceptionController>()
+                                                        .serviceBranchExceptionResponse
+                                                        ?.data?[index]
+                                                        .exceptionDate ??
+                                                    '',
+                                                context
+                                                        .read<ServiceBranchExceptionController>()
+                                                        .serviceBranchExceptionResponse
+                                                        ?.data?[index]
+                                                        .exceptionTime ??
+                                                    '',
+                                              ),
+                                            );
+                                          }
+
+                                          for (int index = 0; index < exceptionDateTime.length; index++) {
+                                            availableDateTime.removeWhere(
+                                              (element) => element == exceptionDateTime[index],
+                                            );
+                                          }
+                                          availableDateTime = removePastDates(availableDateTime);
                                           String? selectedDateTime = await showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
@@ -432,13 +506,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           child: SelectionCalendarView(
                                                             startMonth: now.month,
                                                             year: now.year,
-                                                            initialDateTimes:
-                                                                snapshot
-                                                                    .serviceBranchAvailableDtResponse
-                                                                    ?.data
-                                                                    ?.first
-                                                                    .availableDatetimes ??
-                                                                [],
+                                                            initialDateTimes: availableDateTime,
                                                           ),
                                                         ),
                                                       ),
@@ -494,6 +562,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             ),
                           ],
                         ),
+                        Divider(),
+                        if (widget.type == 'update') extraInformation(),
                         AppPadding.vertical(denominator: 1 / 1.5),
                         button(),
                       ],
@@ -506,6 +576,118 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ),
       ],
     );
+  }
+
+  Widget extraInformation() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.type == 'update')
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 4),
+                Text('Booking Fee', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+                showPaymentStatus(
+                  context,
+                  (widget.appointment?.appointmentStatus == 5)
+                      ? 1
+                      : (widget.appointment?.payment?.length ?? 0) > 0
+                      ? widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
+                          ? 1
+                          : 0
+                      : 0,
+                ),
+                SizedBox(height: 4),
+                if (widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true) ...[
+                  labelValue(
+                    'Payment ID',
+                    widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
+                        ? '${widget.appointment?.payment?.firstWhere((element) => element.paymentStatus == 1).paymentId}'
+                        : '',
+                    alignStart: true,
+                  ),
+                  SizedBox(height: 4),
+                  //TODO: get from the paid ID, wait for Rahman to add in the response
+                  labelValue(
+                    'Paid Amount',
+                    widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
+                        ? 'RM ${widget.appointment?.service?.serviceBookingFee}'
+                        : '',
+                    alignStart: true,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.appointment?.appointmentStatus == 5) ...[
+                labelValue('Feedback', dateConverter(widget.appointment?.appointmentFeedback) ?? 'Pending Feedback'),
+                SizedBox(height: 4),
+                AbsorbPointer(
+                  child: RatingStars(
+                    value: double.parse('${widget.appointment?.appointmentRating ?? 0}'),
+                    onValueChanged: (v) {},
+                    starBuilder: (index, color) => Icon(Icons.star, color: color),
+                    starCount: 5,
+                    starSize: 20,
+                    valueLabelColor: const Color(0xff9b9b9b),
+                    valueLabelTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.normal,
+                      fontSize: 12.0,
+                    ),
+                    valueLabelRadius: 10,
+                    maxValue: 5,
+                    starSpacing: 2,
+                    maxValueVisibility: true,
+                    valueLabelVisibility: true,
+                    animationDuration: Duration(milliseconds: 1000),
+                    valueLabelPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+                    valueLabelMargin: const EdgeInsets.only(right: 8),
+                    starOffColor: const Color(0xffe7e8ea),
+                    starColor: Colors.amber,
+                  ),
+                ),
+              ],
+              SizedBox(height: 4),
+              labelValue('Created Date', dateConverter(widget.appointment?.createdDate) ?? ''),
+              if (widget.appointment?.modifiedDate != null)
+                labelValue('Updated Date', dateConverter(widget.appointment?.modifiedDate) ?? ''),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget labelValue(String label, String value, {bool alignStart = true}) {
+    return Column(
+      crossAxisAlignment: alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      children: [
+        Text(label, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+        SizedBox(height: 2),
+        Text(value, style: AppTypography.bodyMedium(context)),
+      ],
+    );
+  }
+
+  List<String> removePastDates(List<String> dateList) {
+    return dateList.where((dateStr) {
+      try {
+        final dateTime = DateTime.parse(dateStr);
+        return dateTime.isAfter(DateTime.now().toUtc());
+      } catch (e) {
+        debugPrint('Invalid date format: $dateStr');
+        return false; // Or keep it if preferred
+      }
+    }).toList();
   }
 
   String checkTime(String value) {
@@ -539,7 +721,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 dismissLoading();
                 if (responseCode(value.code)) {
                   showLoading();
-                  getLatestData();
+                  if (widget.refreshData != null) {
+                    widget.refreshData!();
+                  }
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -559,7 +743,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  getLatestData();
+                  if (widget.refreshData != null) {
+                    widget.refreshData!();
+                  }
+                  context.pop();
+                  if (widget.type == 'update') {
+                    showDialogSuccess(context, 'Successfully updated appointment');
+                  } else {
+                    showDialogSuccess(context, 'Successfully created new appointment');
+                  }
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }

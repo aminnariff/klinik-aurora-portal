@@ -9,11 +9,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dashboard/appointment_dashboard_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
+import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
+import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
+import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
@@ -52,12 +57,18 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
+  String? startDate;
+  String? endDate;
   final int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
-
+  final currencyFormatter = NumberFormat.currency(
+    locale: 'en_MY', // or 'ms_MY' for Malay
+    symbol: 'RM ',
+    decimalDigits: 2,
+  );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   int _selectedTabIndex = 0;
 
@@ -68,9 +79,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(
         AppointmentHomepage.displayName,
       );
+      _defaultThisMonth();
+      getDashboard();
+      filtering();
     });
     _tabController = TabController(length: _tabs.length, vsync: this);
-    filtering();
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) return;
@@ -78,7 +91,45 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       debugPrint('Active Tab Index: $_selectedTabIndex (${_tabs[_selectedTabIndex]})');
       filtering(enableDebounce: false);
     });
+
     super.initState();
+  }
+
+  void getDashboard() {
+    AppointmentDashboardController.get(
+      context,
+      branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+      startDate: startDate,
+      endDate: endDate,
+    ).then((value) {
+      if (responseCode(value.code)) {
+        context.read<AppointmentDashboardController>().appointmentDashboardResponse = value.data;
+      }
+    });
+  }
+
+  DateRange _defaultThisMonth() {
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1);
+    final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+    startDate = getDateOnly(startOfMonth.toString());
+    endDate = getDateOnly(endOfMonth.toString());
+
+    print(startDate);
+    print(endDate);
+
+    return DateRange(
+      label: 'This month (${DateFormat('MMMM yyyy').format(now)})',
+      start: startOfMonth,
+      end: endOfMonth,
+    );
+  }
+
+  String getDateOnly(String value) {
+    final dt = DateTime.parse(value);
+    final dateOnly = DateFormat('yyyy-MM-dd').format(dt);
+    return dateOnly;
   }
 
   List<String>? getAppointmentStatus() {
@@ -191,6 +242,56 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
+          // if (context.read<AuthController>().authenticationResponse?.data?.user?.branchId != null)
+          Consumer<AppointmentDashboardController>(
+            builder: (context, dashboardController, _) {
+              //TODO: next month not updated idk why
+              print(dashboardController.appointmentDashboardResponse?.data?.totalUpcoming);
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: screenPadding),
+                height: 80,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Time filter title with dropdown indicator
+                    DateFilterDropdown(
+                      onSelected: (range) {
+                        // Now trigger API call based on selected range
+                        startDate = getDateOnly('${range.start}');
+                        endDate = getDateOnly('${range.end}');
+                        getDashboard();
+                        filtering();
+                      },
+                    ),
+                    _buildStatItem(
+                      dashboardController.appointmentDashboardResponse?.data?.totalUpcoming.toString() ?? '',
+                      'Upcoming',
+                    ),
+                    _buildStatItem(
+                      dashboardController.appointmentDashboardResponse?.data?.totalCompleted.toString() ?? '',
+                      'Completed',
+                    ),
+                    _buildStatItem(
+                      dashboardController.appointmentDashboardResponse?.data?.totalNoShow.toString() ?? '',
+                      'No-show',
+                    ),
+                    _buildStatItem(
+                      dashboardController.appointmentDashboardResponse?.data?.totalCanceled.toString() ?? '',
+                      'Cancelled',
+                    ),
+                    _buildStatItem(
+                      currencyFormatter.format(
+                        dashboardController.appointmentDashboardResponse?.data?.potentialSales ?? 0,
+                      ),
+                      'Potential sales',
+                    ),
+                    SizedBox(width: screenWidth(15)),
+                  ],
+                ),
+              );
+            },
+          ),
           TabBar(
             controller: _tabController,
             isScrollable: true,
@@ -310,11 +411,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                               headingRowHeight: 51,
                               decoration: const BoxDecoration(),
                               border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                verticalInside: BorderSide(
+                                  width: 1,
+                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                ),
                               ),
                               rows: [
                                 for (
@@ -372,6 +476,26 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                         ),
                                       ),
                                       DataCell(
+                                        (snapshot.appointmentResponse?.data?.data?[index].service?.serviceBookingFee !=
+                                                null)
+                                            ? showPaymentStatus(
+                                              context,
+                                              snapshot.appointmentResponse?.data?.data?[index].appointmentStatus == 5
+                                                  ? 1
+                                                  : (snapshot.appointmentResponse?.data?.data?[index].payment?.length ??
+                                                          0) >
+                                                      0
+                                                  ? (snapshot.appointmentResponse?.data?.data?[index].payment?.any(
+                                                            (element) => element.paymentStatus == 1,
+                                                          ) ==
+                                                          true
+                                                      ? 1
+                                                      : 0)
+                                                  : 0,
+                                            )
+                                            : Text('-'),
+                                      ),
+                                      DataCell(
                                         Text(
                                           convertUtcToMalaysiaTime(
                                                 snapshot.appointmentResponse?.data?.data?[index].appointmentDatetime,
@@ -385,7 +509,51 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             IconButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                showWhatsAppTemplateDialog(
+                                                  context: context,
+                                                  name:
+                                                      snapshot
+                                                          .appointmentResponse
+                                                          ?.data
+                                                          ?.data?[index]
+                                                          .user
+                                                          ?.userFullName ??
+                                                      '',
+                                                  phone:
+                                                      snapshot
+                                                          .appointmentResponse
+                                                          ?.data
+                                                          ?.data?[index]
+                                                          .user
+                                                          ?.userFullName ??
+                                                      '',
+                                                  service:
+                                                      snapshot
+                                                          .appointmentResponse
+                                                          ?.data
+                                                          ?.data?[index]
+                                                          .service
+                                                          ?.serviceName ??
+                                                      '',
+                                                  branchName:
+                                                      snapshot
+                                                          .appointmentResponse
+                                                          ?.data
+                                                          ?.data?[index]
+                                                          .branch
+                                                          ?.branchName ??
+                                                      '',
+                                                  dateTime: DateTime.parse(
+                                                    snapshot
+                                                            .appointmentResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .appointmentDatetime ??
+                                                        '',
+                                                  ),
+                                                );
+                                              },
                                               icon: Icon(FontAwesomeIcons.whatsapp),
                                               color: Colors.green,
                                             ),
@@ -469,10 +637,30 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AppointmentDetails(type: 'update', appointment: appointment, tabs: getAppointmentStatus());
+          return AppointmentDetails(
+            type: 'update',
+            appointment: appointment,
+            tabs: getAppointmentStatus(),
+            refreshData: () {
+              getDashboard();
+              filtering();
+            },
+          );
         },
       );
     }
+  }
+
+  Widget _buildStatItem(String value, String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 2),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
+    );
   }
 
   void filtering({bool enableDebounce = true, int? page}) {
@@ -499,6 +687,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               context.read<AuthController>().authenticationResponse?.data?.user?.isSuperadmin == true
                   ? null
                   : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+          startDate: startDate,
+          endDate: endDate,
         )
         .then((value) {
           dismissLoading();
@@ -532,6 +722,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         label: 'Status',
         allowSorting: false,
         columnSize: ColumnSize.S,
+      ),
+      TableHeaderAttribute(
+        attribute: 'paymentStatus',
+        label: 'Payment Status',
+        allowSorting: false,
+        columnSize: ColumnSize.S,
+        width: 140,
       ),
       TableHeaderAttribute(
         attribute: 'appointmentDatetime',

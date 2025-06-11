@@ -43,6 +43,7 @@ class Data {
   String? modifiedDate;
   User? user;
   Service? service;
+  List<Payment>? payment;
   Branch? branch;
 
   Data({
@@ -58,6 +59,7 @@ class Data {
     this.modifiedDate,
     this.user,
     this.service,
+    this.payment,
     this.branch,
   });
 
@@ -74,6 +76,12 @@ class Data {
     modifiedDate = json['modifiedDate'];
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     service = json['service'] != null ? Service.fromJson(json['service']) : null;
+    if (json['payment'] != null) {
+      payment = <Payment>[];
+      json['payment'].forEach((v) {
+        payment!.add(Payment.fromJson(v));
+      });
+    }
     branch = json['branch'] != null ? Branch.fromJson(json['branch']) : null;
   }
 
@@ -94,6 +102,9 @@ class Data {
     }
     if (service != null) {
       data['service'] = service!.toJson();
+    }
+    if (payment != null) {
+      data['payment'] = payment!.map((v) => v.toJson()).toList();
     }
     if (branch != null) {
       data['branch'] = branch!.toJson();
@@ -154,6 +165,44 @@ class Service {
     data['serviceDescription'] = serviceDescription;
     data['doctorType'] = doctorType;
     data['serviceBookingFee'] = serviceBookingFee;
+    return data;
+  }
+}
+
+class Payment {
+  String? paymentId;
+  int? paymentType;
+  String? paymentAsset;
+  int? paymentStatus;
+  String? createdDate;
+  String? modifiedDate;
+
+  Payment({
+    this.paymentId,
+    this.paymentType,
+    this.paymentAsset,
+    this.paymentStatus,
+    this.createdDate,
+    this.modifiedDate,
+  });
+
+  Payment.fromJson(Map<String, dynamic> json) {
+    paymentId = json['paymentId'];
+    paymentType = json['paymentType'];
+    paymentAsset = json['paymentAsset'];
+    paymentStatus = json['paymentStatus'];
+    createdDate = json['createdDate'];
+    modifiedDate = json['modifiedDate'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['paymentId'] = paymentId;
+    data['paymentType'] = paymentType;
+    data['paymentAsset'] = paymentAsset;
+    data['paymentStatus'] = paymentStatus;
+    data['createdDate'] = createdDate;
+    data['modifiedDate'] = modifiedDate;
     return data;
   }
 }

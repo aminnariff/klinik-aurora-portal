@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class LineChartWidget extends StatelessWidget {
   const LineChartWidget({super.key, required this.isShowingMainData});
@@ -39,7 +40,7 @@ class LineChartWidget extends StatelessWidget {
   LineTouchData get lineTouchData1 => LineTouchData(
     handleBuiltInTouches: true,
     touchTooltipData: LineTouchTooltipData(
-      // tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+      // tooltipBgColor: Colors.blueGrey.withAlpha(opacityCalculation(.8)),
     ),
   );
 
@@ -121,7 +122,7 @@ class LineChartWidget extends StatelessWidget {
   FlBorderData get borderData => FlBorderData(
     show: true,
     border: Border(
-      bottom: BorderSide(color: primary.withOpacity(0.2), width: 4),
+      bottom: BorderSide(color: primary.withAlpha(opacityCalculation(.2)), width: 4),
       left: const BorderSide(color: Colors.transparent),
       right: const BorderSide(color: Colors.transparent),
       top: const BorderSide(color: Colors.transparent),
@@ -152,7 +153,7 @@ class LineChartWidget extends StatelessWidget {
     barWidth: 8,
     isStrokeCapRound: true,
     dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false, color: Colors.redAccent.withOpacity(0)),
+    belowBarData: BarAreaData(show: false, color: Colors.redAccent.withAlpha(opacityCalculation(.0))),
     spots: const [FlSpot(1, 1), FlSpot(3, 2.8), FlSpot(7, 1.2), FlSpot(10, 2.8), FlSpot(12, 2.6), FlSpot(13, 3.9)],
   );
 
@@ -169,7 +170,7 @@ class LineChartWidget extends StatelessWidget {
   LineChartBarData get lineChartBarData2_1 => LineChartBarData(
     isCurved: true,
     curveSmoothness: 0,
-    color: Colors.green.withOpacity(0.5),
+    color: Colors.green.withAlpha(opacityCalculation(.5)),
     barWidth: 4,
     isStrokeCapRound: true,
     dotData: const FlDotData(show: false),
@@ -187,18 +188,18 @@ class LineChartWidget extends StatelessWidget {
 
   LineChartBarData get lineChartBarData2_2 => LineChartBarData(
     isCurved: true,
-    color: Colors.redAccent.withOpacity(0.5),
+    color: Colors.redAccent.withAlpha(opacityCalculation(.5)),
     barWidth: 4,
     isStrokeCapRound: true,
     dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: true, color: Colors.redAccent.withOpacity(0.2)),
+    belowBarData: BarAreaData(show: true, color: Colors.redAccent.withAlpha(opacityCalculation(.2))),
     spots: const [FlSpot(1, 1), FlSpot(3, 2.8), FlSpot(7, 1.2), FlSpot(10, 2.8), FlSpot(12, 2.6), FlSpot(13, 3.9)],
   );
 
   LineChartBarData get lineChartBarData2_3 => LineChartBarData(
     isCurved: true,
     curveSmoothness: 0,
-    color: Colors.cyan.withOpacity(0.5),
+    color: Colors.cyan.withAlpha(opacityCalculation(.5)),
     barWidth: 2,
     isStrokeCapRound: true,
     dotData: const FlDotData(show: true),
@@ -249,7 +250,7 @@ class LineChartSample1State extends State<LineChartSample1> {
             ],
           ),
           IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white.withOpacity(isShowingMainData ? 1.0 : 0.5)),
+            icon: Icon(Icons.refresh, color: Colors.white.withAlpha(opacityCalculation(isShowingMainData ? 1.0 : 0.5))),
             onPressed: () {
               setState(() {
                 isShowingMainData = !isShowingMainData;

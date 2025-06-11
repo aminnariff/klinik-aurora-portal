@@ -8,6 +8,7 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -54,11 +55,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
               width: screenWidth(100),
               height: screenHeight(100),
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: primaryColors,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
                 // image: DecorationImage(
                 //   image: AssetImage("assets/images/bg.png"),
                 //   fit: BoxFit.cover,
@@ -71,19 +68,10 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                   CardContainer(
                     Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: [
-                        LayoutWidget(
-                          mobile: Expanded(
-                            child: content(),
-                          ),
-                          desktop: Flexible(
-                            child: content(),
-                          ),
-                        ),
-                      ],
+                      children: [LayoutWidget(mobile: Expanded(child: content()), desktop: Flexible(child: content()))],
                     ),
                     elevation: 10,
-                  )
+                  ),
                 ],
               ),
             ),
@@ -97,62 +85,52 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
       child: ValueListenableBuilder<bool?>(
-          valueListenable: isSuccess,
-          builder: (context, snapshot, _) {
-            if (snapshot != null) {
-              return Padding(
-                padding: EdgeInsets.all(screenPadding),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      snapshot ? 'assets/icons/success/tick-square.svg' : 'assets/icons/failed/warning.svg',
-                      height: screenHeight(13),
-                      colorFilter: ColorFilter.mode(
-                          snapshot ? const Color(0XFF50D142) : const Color(0XFFDF184A), BlendMode.srcIn),
+        valueListenable: isSuccess,
+        builder: (context, snapshot, _) {
+          if (snapshot != null) {
+            return Padding(
+              padding: EdgeInsets.all(screenPadding),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    snapshot ? 'assets/icons/success/tick-square.svg' : 'assets/icons/failed/warning.svg',
+                    height: screenHeight(13),
+                    colorFilter: ColorFilter.mode(
+                      snapshot ? const Color(0XFF50D142) : const Color(0XFFDF184A),
+                      BlendMode.srcIn,
                     ),
-                    AppPadding.vertical(),
-                    Text(snapshot
+                  ),
+                  AppPadding.vertical(),
+                  Text(
+                    snapshot
                         ? 'Account deletion request sent for ${emailAttribute.controller.text}'
-                        : 'Oops! Something went wrong on our end. Please give it another moment and then retry requesting account deletion.'),
-                  ],
-                ),
-              );
-            }
-            return Column(
-              children: [
-                LayoutWidget(
-                  mobile: auroraImage(),
-                  desktop: const SizedBox(),
-                ),
-                AppPadding.vertical(denominator: 1 / 2),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    LayoutWidget(
-                      mobile: const SizedBox(),
-                      desktop: Row(
-                        children: [
-                          auroraImage(),
-                          AppPadding.horizontal(),
-                        ],
-                      ),
-                    ),
-                    LayoutWidget(
-                      mobile: Expanded(
-                        child: fields(),
-                      ),
-                      desktop: Flexible(
-                        child: fields(),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                        : 'Oops! Something went wrong on our end. Please give it another moment and then retry requesting account deletion.',
+                  ),
+                ],
+              ),
             );
-          }),
+          }
+          return Column(
+            children: [
+              LayoutWidget(mobile: auroraImage(), desktop: const SizedBox()),
+              AppPadding.vertical(denominator: 1 / 2),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutWidget(
+                    mobile: const SizedBox(),
+                    desktop: Row(children: [auroraImage(), AppPadding.horizontal()]),
+                  ),
+                  LayoutWidget(mobile: Expanded(child: fields()), desktop: Flexible(child: fields())),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -174,17 +152,11 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
         ),
         AppPadding.vertical(denominator: 1 / 2),
         StreamBuilder<DateTime>(
-            stream: rebuild.stream,
-            builder: (context, snapshot) {
-              return Column(
-                children: [
-                  InputField(
-                    field: emailAttribute,
-                    width: screenHeightByBreakpoint(80, 50, 24),
-                  ),
-                ],
-              );
-            }),
+          stream: rebuild.stream,
+          builder: (context, snapshot) {
+            return Column(children: [InputField(field: emailAttribute, width: screenHeightByBreakpoint(80, 50, 24))]);
+          },
+        ),
         AppPadding.vertical(denominator: 1 / 2),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -224,7 +196,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey.withAlpha(opacityCalculation(.5)),
             spreadRadius: 5,
             blurRadius: 7,
             offset: const Offset(0, 2), // changes position of shadow

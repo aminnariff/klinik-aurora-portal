@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/charts/line_chart_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
@@ -49,7 +50,7 @@ class LineChartWidget extends StatelessWidget {
   LineTouchData get lineTouchData => LineTouchData(
     handleBuiltInTouches: true,
     touchTooltipData: LineTouchTooltipData(
-      // tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+      // tooltipBgColor: Colors.blueGrey.withAlpha(opacityCalculation(.8)),
     ),
   );
 
@@ -110,7 +111,7 @@ class LineChartWidget extends StatelessWidget {
   FlBorderData get borderData => FlBorderData(
     show: true,
     border: Border(
-      bottom: BorderSide(color: primary.withOpacity(0.2), width: 4),
+      bottom: BorderSide(color: primary.withAlpha(opacityCalculation(.2)), width: 4),
       left: const BorderSide(color: Colors.transparent),
       right: const BorderSide(color: Colors.transparent),
       top: const BorderSide(color: Colors.transparent),
@@ -125,7 +126,9 @@ class LineChartWidget extends StatelessWidget {
       isStrokeCapRound: true,
       dotData: const FlDotData(show: false),
       belowBarData:
-          line == 0 ? BarAreaData(show: false) : BarAreaData(show: false, color: Colors.redAccent.withOpacity(0)),
+          line == 0
+              ? BarAreaData(show: false)
+              : BarAreaData(show: false, color: Colors.redAccent.withAlpha(opacityCalculation(.0))),
       spots: [
         for (int index = 0; index < attribute.items[line].length; index++)
           FlSpot(index.toDouble(), attribute.items[line][index].value!),
