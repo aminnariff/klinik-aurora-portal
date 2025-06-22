@@ -7,16 +7,19 @@ class CreateServiceRequest {
   String? serviceTime;
   String? serviceCategory;
   int? serviceStatus;
+  List<String>? serviceTemplate;
 
-  CreateServiceRequest(
-      {this.serviceName,
-      this.serviceDescription,
-      this.servicePrice,
-      this.serviceBookingFee,
-      this.doctorType,
-      this.serviceTime,
-      this.serviceCategory,
-      this.serviceStatus});
+  CreateServiceRequest({
+    this.serviceName,
+    this.serviceDescription,
+    this.servicePrice,
+    this.serviceBookingFee,
+    this.doctorType,
+    this.serviceTime,
+    this.serviceCategory,
+    this.serviceStatus,
+    this.serviceTemplate,
+  });
 
   CreateServiceRequest.fromJson(Map<String, dynamic> json) {
     serviceName = json['serviceName'];
@@ -27,6 +30,7 @@ class CreateServiceRequest {
     serviceTime = json['serviceTime'];
     serviceCategory = json['serviceCategory'];
     serviceStatus = json['serviceStatus'];
+    serviceTemplate = json['serviceTemplate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +43,7 @@ class CreateServiceRequest {
     data['serviceTime'] = serviceTime;
     data['serviceCategory'] = serviceCategory;
     data['serviceStatus'] = serviceStatus;
+    data['serviceTemplate'] = serviceTemplate;
     return data;
   }
 }

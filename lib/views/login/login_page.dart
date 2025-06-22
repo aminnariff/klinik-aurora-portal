@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     if (kDebugMode) {
       usernameController.text = 'superadmin';
-      usernameController.text = 'auroramedicare@gmail.com';
+      // usernameController.text = 'auroramedicare@gmail.com';
       passwordController.text = 'Admin12345!';
     }
     super.initState();
@@ -84,6 +84,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget view() {
+    prefs.remove(authResponse);
+    prefs.remove(jwtResponse);
+    prefs.remove(token);
     return FutureBuilder<AuthResponse?>(
       future: context.read<AuthController>().init(context),
       builder: (context, snapshot) {
@@ -95,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
             builder: (context, controller, _) {
               if (controller.authenticationResponse != null &&
                   !DateTime.parse(
-                    controller.authenticationResponse!.data!.expiryDt!,
+                    controller.authenticationResponse?.data?.expiryDt ?? '',
                   ).difference(DateTime.now()).isNegative) {
                 Future.delayed(const Duration(milliseconds: 500), () {
                   context.replaceNamed(Homepage.routeName);

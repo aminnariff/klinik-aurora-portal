@@ -5,6 +5,7 @@ const String token = "token";
 const String singpassId = "singpassId";
 const String productCode = "productCode";
 const String postalCode = "postalCode";
+const String loginDateTime = "loginDateTime";
 const String unitNo = "unitNo";
 const String orderReference = "orderReference";
 const String registerUrl = "https://simba.sg/broadband";

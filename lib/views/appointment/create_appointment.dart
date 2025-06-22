@@ -246,13 +246,22 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 return SizedBox(
                                   width: screenWidth(26),
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      InputField(field: patientNameController),
-                                      AppPadding.vertical(denominator: 2),
-                                      InputField(field: patientContactNoController),
-                                      AppPadding.vertical(denominator: 2),
-                                      InputField(field: patientEmailController),
-                                      AppPadding.vertical(denominator: 2),
+                                      labelValue(
+                                        'Patient Details',
+                                        patientNameController.controller.text,
+                                        alignStart: true,
+                                      ),
+                                      Text(
+                                        patientContactNoController.controller.text,
+                                        style: AppTypography.bodyMedium(context),
+                                      ),
+                                      Text(
+                                        patientEmailController.controller.text,
+                                        style: AppTypography.bodyMedium(context),
+                                      ),
+                                      AppPadding.vertical(denominator: 1),
                                       InputField(field: appointmentNoteController),
                                       AppPadding.vertical(denominator: 2),
                                       GestureDetector(
@@ -714,7 +723,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   serviceBranchId: _service?.key,
                   appointmentDateTime: dateTimeController.text,
                   appointmentNote: appointmentNoteController.controller.text,
-                  customerDueDate: dueDateController.controller.text,
+                  customerDueDate:
+                      (() {
+                        try {
+                          return DateFormat(
+                            'yyyy-MM-dd',
+                          ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
+                        } catch (_) {
+                          return dueDateController.controller.text;
+                        }
+                      })(),
                   appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
                 ),
               ).then((value) {
@@ -723,6 +741,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   showLoading();
                   if (widget.refreshData != null) {
                     widget.refreshData!();
+                  } else {
+                    dismissLoading;
+                    context.pop();
+                    showDialogSuccess(context, 'Appointment successfully created for the user');
                   }
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');

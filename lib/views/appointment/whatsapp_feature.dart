@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 void showWhatsAppTemplateDialog({
   required BuildContext context,
+  required List<String> templates,
   required String name,
   required String phone,
   required String service,
@@ -17,11 +18,21 @@ void showWhatsAppTemplateDialog({
   final String formattedDate = DateFormat('dd MMM yyyy').format(gmt8DateTime);
   final String formattedTime = DateFormat('h:mm a').format(gmt8DateTime);
 
-  final List<String> templates = [
-    "Hi $name, this is a reminder about your *$service* appointment at $branchName on *$formattedDate* at *$formattedTime*.",
-    "Hello $name, your *$service* is confirmed for *$formattedDate* at *$formattedTime*. See you at $branchName!",
-    "Hi $name, thank you for booking *$service*. Your appointment is on *$formattedDate* at *$formattedTime* at $branchName.",
-  ];
+  final values = {
+    "name": name,
+    "service": service,
+    "branchName": branchName,
+    "formattedDate": formattedDate,
+    "formattedTime": formattedTime,
+  };
+
+  templates = templates.map((t) => renderTemplate(t, values)).toList();
+
+  // final List<String> templates = [
+  //   "Hi $name, this is a reminder about your *$service* appointment at $branchName on *$formattedDate* at *$formattedTime*.",
+  //   "Hello $name, your *$service* is confirmed for *$formattedDate* at *$formattedTime*. See you at $branchName!",
+  //   "Hi $name, thank you for booking *$service*. Your appointment is on *$formattedDate* at *$formattedTime* at $branchName.",
+  // ];
 
   String? customMessage;
 
@@ -74,6 +85,13 @@ void showWhatsAppTemplateDialog({
       );
     },
   );
+}
+
+String renderTemplate(String template, Map<String, String> values) {
+  return template.replaceAllMapped(RegExp(r'\{\{(\w+)\}\}'), (match) {
+    final key = match.group(1); // gets the placeholder name like 'name'
+    return values[key] ?? match.group(0)!; // fallback to the original {{key}} if missing
+  });
 }
 
 void _launchWhatsApp(String phone, String message) async {

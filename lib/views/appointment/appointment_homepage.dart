@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/appointment_dashboard_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
@@ -509,9 +510,31 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             IconButton(
-                                              onPressed: () {
+                                              onPressed: () async {
+                                                if (context.read<ServiceController>().servicesResponse == null) {
+                                                  await ServiceController.getAll(context, 1, 100).then((value) {
+                                                    context.read<ServiceController>().servicesResponse = value.data;
+                                                  });
+                                                }
+                                                List<String>? templates =
+                                                    context
+                                                        .read<ServiceController>()
+                                                        .servicesResponse
+                                                        ?.data
+                                                        ?.firstWhere(
+                                                          (element) =>
+                                                              element.serviceId ==
+                                                              snapshot
+                                                                  .appointmentResponse
+                                                                  ?.data
+                                                                  ?.data?[index]
+                                                                  .service
+                                                                  ?.serviceId,
+                                                        )
+                                                        .serviceTemplate;
                                                 showWhatsAppTemplateDialog(
                                                   context: context,
+                                                  templates: templates ?? [],
                                                   name:
                                                       snapshot
                                                           .appointmentResponse

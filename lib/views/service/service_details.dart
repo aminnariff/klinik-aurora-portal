@@ -74,7 +74,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
   FileAttribute selectedFile = FileAttribute();
-
+  final List<TextEditingController> whatsappTemplateControllers = List.generate(3, (_) => TextEditingController());
   @override
   void initState() {
     if (widget.type == 'update') {
@@ -85,6 +85,11 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       serviceTimeController.controller.text = widget.service?.serviceTime ?? '';
       serviceCategoryController.controller.text = widget.service?.serviceCategory ?? '';
       selectedFile = FileAttribute(path: widget.service?.serviceImage, name: widget.service?.serviceImage);
+      if (widget.service?.serviceTemplate != null) {
+        for (int i = 0; i < widget.service!.serviceTemplate!.length && i < 3; i++) {
+          whatsappTemplateControllers[i].text = widget.service!.serviceTemplate![i];
+        }
+      }
       if (widget.service?.doctorType == 1) {
         _doctorType = DropdownAttribute('1', 'Doctor');
       } else if (widget.service?.doctorType == 2) {
@@ -170,6 +175,45 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                         ),
                                       );
                                     },
+                                  ),
+                                  AppPadding.vertical(denominator: 2),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "WhatsApp Templates (max 3)",
+                                        style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          style: AppTypography.bodyMedium(context).apply(),
+                                          children: [
+                                            const TextSpan(text: "Tip: Use "),
+                                            TextSpan(
+                                              text:
+                                                  "{{name}}, {{service}}, {{branchName}}, {{formattedDate}}, {{formattedTime}}",
+                                              style: AppTypography.bodyMedium(
+                                                context,
+                                              ).apply(color: primary, fontWeightDelta: 1),
+                                            ),
+                                            const TextSpan(
+                                              text: " to auto-fill appointment info. Click a tag below to insert.",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ...List.generate(3, (index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8.0),
+                                          child: TextFormField(
+                                            controller: whatsappTemplateControllers[index],
+                                            maxLines: 3,
+                                            style: AppTypography.bodyMedium(context),
+                                            decoration: appInputDecoration(context, "Template ${index + 1}"),
+                                          ),
+                                        );
+                                      }),
+                                    ],
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                 ],
@@ -370,6 +414,8 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                   serviceCategory: serviceCategoryController.controller.text,
                   serviceStatus: 1,
                   doctorType: int.parse(_doctorType?.key ?? "1"),
+                  serviceTemplate:
+                      whatsappTemplateControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList(),
                 ),
               ).then((value) {
                 dismissLoading();
@@ -406,6 +452,8 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                   serviceTime: serviceTimeController.controller.text,
                   serviceCategory: serviceCategoryController.controller.text,
                   doctorType: int.parse(_doctorType?.key ?? "1"),
+                  serviceTemplate:
+                      whatsappTemplateControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList(),
                 ),
               ).then((value) {
                 dismissLoading();

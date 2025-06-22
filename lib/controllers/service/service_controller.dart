@@ -61,6 +61,7 @@ class ServiceController extends ChangeNotifier {
           try {
             return ApiResponse(code: value.code, data: ServicesResponse.fromJson(value.data));
           } catch (e) {
+            print(e.toString());
             return ApiResponse(code: 400, message: e.toString());
           }
         });
@@ -82,6 +83,7 @@ class ServiceController extends ChangeNotifier {
             "serviceTime": request.serviceTime,
             "serviceCategory": request.serviceCategory,
             "serviceStatus": request.serviceStatus, // 1 = active, 2 = inactive
+            "serviceTemplate": request.serviceTemplate,
           },
         )
         .then((value) {

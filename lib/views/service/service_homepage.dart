@@ -220,7 +220,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   child: CardContainer(
                     Padding(
                       padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: context.read<AuthController>().isSuperAdmin ? superadminTable() : adminTable(),
+                      child: context.read<AuthController>().isSuperAdmin == true ? superadminTable() : adminTable(),
                     ),
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, screenPadding),
@@ -658,9 +658,13 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         },
       );
     } else if (value == 'updateBranchesStatus') {
-      ServiceBranchController.getAll(context, 1, 100, serviceId: service.serviceId ?? '', serviceBranchStatus: 1).then((
-        value,
-      ) {
+      ServiceBranchController.getAll(
+        context,
+        1,
+        100,
+        serviceId: service.serviceId ?? '',
+        serviceBranchStatus: null,
+      ).then((value) {
         if (responseCode(value.code)) {
           context.read<ServiceBranchController>().serviceBranchResponse = value.data;
           showDialog(

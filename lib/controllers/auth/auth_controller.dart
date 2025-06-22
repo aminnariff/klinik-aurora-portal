@@ -16,16 +16,13 @@ class AuthController extends ChangeNotifier {
   String? get passwordError => _passwordError;
   bool _rememberMe = false;
   bool get remember => _rememberMe;
-  bool _isSuperAdmin = false;
-  bool get isSuperAdmin => _isSuperAdmin;
+
+  bool get isSuperAdmin {
+    return prefs.getBool('isSuperAdmin') ?? false;
+  }
 
   set authenticationResponse(AuthResponse? value) {
     _authenticationResponse = value;
-    notifyListeners();
-  }
-
-  set isSuperAdmin(bool value) {
-    _isSuperAdmin = value;
     notifyListeners();
   }
 
@@ -36,30 +33,24 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<String> checkDateTime() async {
+    String? loginDt = _authenticationResponse?.data?.expiryDt;
+    loginDt ??= prefs.getString(loginDateTime);
+
+    if (loginDt == null || loginDt.isEmpty) {
+      debugPrint("Missing or empty login date.");
+      return "invalid_format";
+    }
+
     try {
-      authenticationResponse = AuthResponse.fromJson(json.decode(prefs.getString(authResponse).toString()));
-      if (_authenticationResponse != null) {
-        isSuperAdmin = _authenticationResponse?.data?.user?.isSuperadmin ?? false;
-        if (_authenticationResponse?.data?.expiryDt != null) {
-          DateTime now = DateTime.now();
-          DateTime targetTime = DateTime.parse(_authenticationResponse!.data!.expiryDt!);
-          Duration difference = targetTime.difference(now);
-          if (difference.isNegative) {
-            return 'expired';
-          } else if (difference <= const Duration(minutes: 5)) {
-            return 'refresh';
-          } else {
-            return 'continue';
-          }
-        } else {
-          return 'expired';
-        }
-      } else {
-        return 'nothing';
-      }
+      final loginTime = DateTime.parse(loginDt);
+      final now = DateTime.now();
+
+      return (loginTime.year == now.year && loginTime.month == now.month && loginTime.day == now.day)
+          ? "valid"
+          : "expired";
     } catch (e) {
-      debugPrint('ERROR CHECK DATE TIME\n$e');
-      return 'error';
+      debugPrint("Invalid loginDateTime format: $loginDt");
+      return "invalid_format";
     }
   }
 
@@ -82,14 +73,57 @@ class AuthController extends ChangeNotifier {
 
   Future<AuthResponse?> init(BuildContext context) async {
     try {
-      String? auth = prefs.getString(authResponse);
+      final rawAuth = prefs.getString(authResponse);
       _rememberMe = prefs.getBool(rememberMe) ?? false;
-      Map<String, dynamic> dataMap = json.decode(auth.toString());
-      _authenticationResponse = AuthResponse.fromJson(dataMap);
+
+      if (rawAuth == null || rawAuth.trim().isEmpty) {
+        debugPrint("No saved authResponse found.");
+        _authenticationResponse = null;
+        return null;
+      }
+
+      final decoded = json.decode(rawAuth);
+
+      if (decoded is! Map<String, dynamic>) {
+        debugPrint("Decoded authResponse is not a valid JSON object.");
+        _authenticationResponse = null;
+        prefs.remove(authResponse);
+        return null;
+      }
+
+      final parsed = AuthResponse.fromJson(decoded);
+      _authenticationResponse = parsed;
+
+      final expiryDtString = _authenticationResponse?.data?.expiryDt;
+      if (expiryDtString == null || expiryDtString.trim().isEmpty) {
+        debugPrint("AuthResponse expiryDt is null or empty.");
+        _authenticationResponse = null;
+        prefs.remove(authResponse);
+        return null;
+      }
+
+      final expiry = DateTime.tryParse(expiryDtString);
+      if (expiry == null) {
+        debugPrint("Failed to parse expiryDt: $expiryDtString");
+        _authenticationResponse = null;
+        prefs.remove(authResponse);
+        return null;
+      }
+
+      if (expiry.isBefore(DateTime.now())) {
+        debugPrint("Token expired on init: $expiry");
+        _authenticationResponse = null;
+        prefs.remove(authResponse);
+        return null;
+      }
+
+      debugPrint("Auth loaded and valid. Expires at: $expiry");
       return _authenticationResponse;
     } catch (e) {
+      debugPrint("Exception while loading authResponse: $e");
       _authenticationResponse = null;
-      return _authenticationResponse;
+      prefs.remove(authResponse);
+      return null;
     }
   }
 
@@ -112,34 +146,38 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  setAuthenticationResponse(AuthResponse? value, {String? usernameValue, String? passwordValue}) async {
-    if (value != null) {
-      value = AuthResponse(
+  Future<void> setAuthenticationResponse(AuthResponse? response, {String? usernameValue, String? passwordValue}) async {
+    try {
+      AuthResponse? data = response;
+      data = AuthResponse(
         data: Data(
-          user: value.data?.user,
-          accessToken: value.data?.accessToken,
-          refreshToken: value.data?.refreshToken,
+          user: response?.data?.user,
+          accessToken: response?.data?.accessToken,
+          refreshToken: response?.data?.refreshToken,
           issuedDt: DateTime.now().toString(),
-          expiryDt: DateTime.now().add(const Duration(minutes: 30)).toString(),
+          expiryDt: DateTime.now().add(const Duration(minutes: 60)).toString(),
         ),
       );
-      // if (_rememberMe) {
-      prefs.setString(username, usernameValue ?? "");
-      prefs.setString(password, passwordValue ?? "");
-      // } else {
-      //   prefs.remove(username);
-      //   prefs.remove(password);
-      // }
-      isSuperAdmin = value.data?.user?.isSuperadmin ?? false;
-      prefs.setString(authResponse, json.encode(value));
-      prefs.setString(token, value.data?.accessToken ?? '');
-    } else if (value == null) {
+
+      if (data.data?.accessToken == null) {
+        debugPrint("Invalid auth response, forcing re-login.");
+        return;
+      }
+
+      final loginDt = DateTime.now().toIso8601String();
+
+      await prefs.setString(authResponse, jsonEncode(data));
+      await prefs.setString(loginDateTime, loginDt);
+      await prefs.setString(token, data.data?.accessToken ?? '');
+      await prefs.setBool('isSuperAdmin', data.data?.user?.isSuperadmin ?? false);
+      _authenticationResponse = data;
+      notifyListeners();
+    } catch (e) {
       prefs.remove(authResponse);
       prefs.remove(jwtResponse);
       prefs.remove(token);
+      debugPrint("Auth save error: $e");
     }
-    _authenticationResponse = value;
-    notifyListeners();
   }
 
   static Future<ApiResponse<AuthResponse>> logIn(BuildContext context, AuthRequest request) async {
