@@ -12,10 +12,12 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/appointment_dashboard_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
+import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
@@ -72,6 +74,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   int _selectedTabIndex = 0;
+  DropdownAttribute? _appointmentBranch;
+  List<DropdownAttribute> branches = [];
 
   @override
   void initState() {
@@ -80,6 +84,23 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(
         AppointmentHomepage.displayName,
       );
+
+      if (context.read<AuthController>().isSuperAdmin == true) {
+        BranchController.getAll(context, 1, 100).then((value) {
+          if (responseCode(value.code)) {
+            context.read<BranchController>().branchAllResponse = value;
+            for (branch_model.Data item in value.data?.data ?? []) {
+              branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+            }
+            branches.sort((a, b) {
+              final nameA = a.name.toLowerCase();
+              final nameB = b.name.toLowerCase();
+              return nameA.compareTo(nameB);
+            });
+            rebuildDropdown.add(DateTime.now());
+          }
+        });
+      }
       _defaultThisMonth();
       getDashboard();
       filtering();
@@ -97,16 +118,21 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   void getDashboard() {
-    AppointmentDashboardController.get(
-      context,
-      branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-      startDate: startDate,
-      endDate: endDate,
-    ).then((value) {
-      if (responseCode(value.code)) {
-        context.read<AppointmentDashboardController>().appointmentDashboardResponse = value.data;
-      }
-    });
+    if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
+      AppointmentDashboardController.get(
+        context,
+        branchId:
+            context.read<AuthController>().isSuperAdmin == true
+                ? _appointmentBranch?.key
+                : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+        startDate: startDate,
+        endDate: endDate,
+      ).then((value) {
+        if (responseCode(value.code)) {
+          context.read<AppointmentDashboardController>().appointmentDashboardResponse = value.data;
+        }
+      });
+    }
   }
 
   DateRange _defaultThisMonth() {
@@ -237,110 +263,147 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return
     // (widget.orderReference == null)
     //     ?
-    Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          // if (context.read<AuthController>().authenticationResponse?.data?.user?.branchId != null)
-          Consumer<AppointmentDashboardController>(
-            builder: (context, dashboardController, _) {
-              //TODO: next month not updated idk why
-              print(dashboardController.appointmentDashboardResponse?.data?.totalUpcoming);
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: screenPadding),
-                height: 80,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+    Consumer<AuthController>(
+      builder: (context, authController, _) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              if (authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
+                Row(
                   children: [
-                    // Time filter title with dropdown indicator
-                    DateFilterDropdown(
-                      onSelected: (range) {
-                        // Now trigger API call based on selected range
-                        startDate = getDateOnly('${range.start}');
-                        endDate = getDateOnly('${range.end}');
-                        getDashboard();
-                        filtering();
+                    Expanded(
+                      child: Consumer<AppointmentDashboardController>(
+                        builder: (context, dashboardController, _) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(horizontal: screenPadding),
+                            height: 80,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                DateFilterDropdown(
+                                  onSelected: (range) {
+                                    // Now trigger API call based on selected range
+                                    startDate = getDateOnly('${range.start}');
+                                    endDate = getDateOnly('${range.end}');
+                                    getDashboard();
+                                    filtering();
+                                  },
+                                ),
+                                _buildStatItem(
+                                  dashboardController.appointmentDashboardResponse?.data?.totalUpcoming.toString() ??
+                                      '',
+                                  'Upcoming',
+                                ),
+                                _buildStatItem(
+                                  dashboardController.appointmentDashboardResponse?.data?.totalCompleted.toString() ??
+                                      '',
+                                  'Completed',
+                                ),
+                                _buildStatItem(
+                                  dashboardController.appointmentDashboardResponse?.data?.totalNoShow.toString() ?? '',
+                                  'No-show',
+                                ),
+                                _buildStatItem(
+                                  dashboardController.appointmentDashboardResponse?.data?.totalCanceled.toString() ??
+                                      '',
+                                  'Cancelled',
+                                ),
+                                _buildStatItem(
+                                  currencyFormatter.format(
+                                    dashboardController.appointmentDashboardResponse?.data?.potentialSales ?? 0,
+                                  ),
+                                  'Potential sales',
+                                ),
+                                if (authController.isSuperAdmin == false) SizedBox(width: screenWidth(15)),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    StreamBuilder<DateTime>(
+                      stream: rebuildDropdown.stream,
+                      builder: (context, snapshot) {
+                        return Consumer<AuthController>(
+                          builder: (context, authController, _) {
+                            return authController.isSuperAdmin == false
+                                ? SizedBox()
+                                : AppDropdown(
+                                  attributeList: DropdownAttributeList(
+                                    authController.isSuperAdmin ? branches : [],
+                                    labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                    isEditable: authController.isSuperAdmin,
+                                    fieldColor: authController.isSuperAdmin ? null : textFormFieldUneditableColor,
+                                    value: _appointmentBranch?.name,
+                                    onChanged: (p0) {
+                                      _appointmentBranch = p0;
+                                      rebuildDropdown.add(DateTime.now());
+                                      getDashboard();
+                                      filtering();
+                                    },
+                                    width: screenWidthByBreakpoint(90, 70, 250, useAbsoluteValueDesktop: true),
+                                  ),
+                                );
+                          },
+                        );
                       },
                     ),
-                    _buildStatItem(
-                      dashboardController.appointmentDashboardResponse?.data?.totalUpcoming.toString() ?? '',
-                      'Upcoming',
-                    ),
-                    _buildStatItem(
-                      dashboardController.appointmentDashboardResponse?.data?.totalCompleted.toString() ?? '',
-                      'Completed',
-                    ),
-                    _buildStatItem(
-                      dashboardController.appointmentDashboardResponse?.data?.totalNoShow.toString() ?? '',
-                      'No-show',
-                    ),
-                    _buildStatItem(
-                      dashboardController.appointmentDashboardResponse?.data?.totalCanceled.toString() ?? '',
-                      'Cancelled',
-                    ),
-                    _buildStatItem(
-                      currencyFormatter.format(
-                        dashboardController.appointmentDashboardResponse?.data?.potentialSales ?? 0,
-                      ),
-                      'Potential sales',
-                    ),
-                    SizedBox(width: screenWidth(15)),
                   ],
                 ),
-              );
-            },
-          ),
-          TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
-            dividerColor: Colors.transparent,
-          ),
-          // Row(
-          //   children: [
-          //     AppPadding.horizontal(),
-          //     searchField(
-          //       InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Patient Name'),
-          //     ),
-          //     // AppPadding.horizontal(),
-          //     // searchField(
-          //     //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
-          //     // ),
-          //   ],
-          // ),
-          Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: CardContainer(
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          orderTable(),
-                          orderTable(),
-                          orderTable(),
-                          orderTable(),
-                          // Center(child: Text('Completed Appointments')),
-                          // Center(child: Text('No-Show Appointments')),
-                          // Center(child: Text('Cancelled Appointments')),
-                        ],
+              TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
+                dividerColor: Colors.transparent,
+              ),
+              // Row(
+              //   children: [
+              //     AppPadding.horizontal(),
+              //     searchField(
+              //       InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Patient Name'),
+              //     ),
+              //     // AppPadding.horizontal(),
+              //     // searchField(
+              //     //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
+              //     // ),
+              //   ],
+              // ),
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      child: CardContainer(
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: [
+                              orderTable(),
+                              orderTable(),
+                              orderTable(),
+                              orderTable(),
+                              // Center(child: Text('Completed Appointments')),
+                              // Center(child: Text('No-Show Appointments')),
+                              // Center(child: Text('Cancelled Appointments')),
+                            ],
+                          ),
+                        ),
+                        color: Colors.white,
+                        margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
                       ),
                     ),
-                    color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
     // : OrderDetailHomepage(
     //     orderReference: widget.orderReference!,
@@ -375,8 +438,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   Widget orderTable() {
-    return Consumer<AppointmentController>(
-      builder: (context, snapshot, child) {
+    return Consumer2<AppointmentController, AuthController>(
+      builder: (context, snapshot, authController, child) {
         if (snapshot.appointmentResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -453,7 +516,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                           ),
                                         ),
                                       ),
-                                      if (context.read<AuthController>().isSuperAdmin)
+                                      if (authController.isSuperAdmin)
                                         DataCell(
                                           AppSelectableText(
                                             snapshot.appointmentResponse?.data?.data?[index].branch?.branchName ??
@@ -707,7 +770,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           _pageSize,
           status: getAppointmentStatus(),
           branchId:
-              context.read<AuthController>().authenticationResponse?.data?.user?.isSuperadmin == true
+              context.read<AuthController>().isSuperAdmin
+                  ? _appointmentBranch?.key
+                  : context.read<AuthController>().authenticationResponse?.data?.user?.isSuperadmin == true
                   ? null
                   : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
           startDate: startDate,

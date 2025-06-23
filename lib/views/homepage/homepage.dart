@@ -144,6 +144,14 @@ class _HomepageState extends State<Homepage> {
               context.read<AuthController>().isSuperAdmin == false) {
             sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
           }
+          if (!context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
+          }
           if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') ||
               context.read<AuthController>().isSuperAdmin == false) {
             sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
@@ -165,7 +173,15 @@ class _HomepageState extends State<Homepage> {
               context.read<AuthController>().isSuperAdmin == false) {
             sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
           }
+          if (!context.read<AuthController>().hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == ServiceHomepage.displayName);
+          }
           context.read<TopBarController>().pageValue = 0;
+          if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')) {
+            sideBarAttribute.removeWhere((element) => element.label == 'Dashboard');
+            context.goNamed(AppointmentHomepage.routeName);
+          }
         }
       });
     });
@@ -173,12 +189,12 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ActivityHandlerController>(   
+    return Consumer<ActivityHandlerController>(
       builder: (context, snapshot, _) {
         if (snapshot.status) {
           SchedulerBinding.instance.scheduleFrameCallback((_) {
             context.read<AuthController>().logout(context);
-            context.pushReplacement(LoginPage.routeName);
+            context.goNamed(LoginPage.routeName);
           });
         }
         return LayoutWidget(mobile: const MobileView(), desktop: desktopView(context));

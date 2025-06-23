@@ -98,7 +98,7 @@ class ApiController {
         } else if (tokenStatus == 'expired') {
           if (isSessionExpiredDialogOpen == false) {
             context.read<AuthController>().logout(context);
-            context.goNamed(LoginPage.routeName, extra: true);
+            context.goNamed(LoginPage.routeName);
             // isSessionExpiredDialogOpen = true;
             // promptDialog(context, action: () {
             //   context.pop(context);
@@ -220,7 +220,7 @@ class ApiController {
                     context.pop(context);
                     isSessionExpiredDialogOpen = false;
                     context.read<AuthController>().logout(context);
-                    context.goNamed(LoginPage.routeName, extra: true);
+                    context.goNamed(LoginPage.routeName);
                   },
                   text: 'error'.tr(gender: 'sessionExpired'),
                   buttonColor: errorColor,
@@ -264,9 +264,7 @@ class ApiController {
             } else if (e.response?.statusCode == 409) {
               try {
                 Future.delayed(Duration.zero, () {
-                  while (context.canPop()) {
-                    context.pop();
-                  }
+                  context.goNamed(LoginPage.routeName);
                   return promptDialog(
                     context,
                     action: () {
@@ -322,7 +320,7 @@ class ApiController {
               text: text,
               buttonAttributes: [
                 if (buttonText != null)
-                  DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
+                  DialogButtonAttribute(action(), text: buttonText, color: buttonColor ?? errorColor),
               ],
             ),
           );

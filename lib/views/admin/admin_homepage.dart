@@ -103,14 +103,15 @@ class _AdminHomepageState extends State<AdminHomepage> {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(AdminHomepage.displayName);
+      if (context.read<BranchController>().branchAllResponse == null) {
+        BranchController.getAll(context, 1, 100).then((value) {
+          if (responseCode(value.code)) {
+            context.read<BranchController>().branchAllResponse = value;
+          }
+        });
+      }
     });
-    if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context, 1, 100).then((value) {
-        if (responseCode(value.code)) {
-          context.read<BranchController>().branchAllResponse = value;
-        }
-      });
-    }
+
     PermissionController.get(context).then((value) {
       if (responseCode(value.code)) {
         context.read<PermissionController>().permissionAllResponse = value.data;

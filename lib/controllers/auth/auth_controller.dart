@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
+import 'package:provider/provider.dart';
 
 class AuthController extends ChangeNotifier {
   AuthResponse? _authenticationResponse;
@@ -33,7 +34,7 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<String> checkDateTime() async {
-    String? loginDt = _authenticationResponse?.data?.expiryDt;
+    String? loginDt = _authenticationResponse?.data?.issuedDt;
     loginDt ??= prefs.getString(loginDateTime);
 
     if (loginDt == null || loginDt.isEmpty) {
@@ -92,6 +93,7 @@ class AuthController extends ChangeNotifier {
       }
 
       final parsed = AuthResponse.fromJson(decoded);
+      context.read<AuthController>().authenticationResponse = parsed;
       _authenticationResponse = parsed;
 
       final expiryDtString = _authenticationResponse?.data?.expiryDt;
@@ -148,52 +150,47 @@ class AuthController extends ChangeNotifier {
 
   Future<void> setAuthenticationResponse(AuthResponse? response, {String? usernameValue, String? passwordValue}) async {
     try {
-      AuthResponse? data = response;
-      data = AuthResponse(
-        data: Data(
-          user: response?.data?.user,
-          accessToken: response?.data?.accessToken,
-          refreshToken: response?.data?.refreshToken,
-          issuedDt: DateTime.now().toString(),
-          expiryDt: DateTime.now().add(const Duration(minutes: 60)).toString(),
-        ),
-      );
+      if (response != null) {
+        AuthResponse? data = response;
+        data = AuthResponse(
+          data: Data(
+            user: response.data?.user,
+            accessToken: response.data?.accessToken,
+            refreshToken: response.data?.refreshToken,
+            issuedDt: DateTime.now().toString(),
+            expiryDt: DateTime.now().add(const Duration(minutes: 60)).toString(),
+          ),
+        );
 
-      if (data.data?.accessToken == null) {
-        debugPrint("Invalid auth response, forcing re-login.");
-        return;
+        if (data.data?.accessToken == null) {
+          debugPrint("Invalid auth response, forcing re-login.");
+          return;
+        }
+
+        final loginDt = DateTime.now().toIso8601String();
+
+        await prefs.setString(authResponse, jsonEncode(data));
+        await prefs.setString(loginDateTime, loginDt);
+        await prefs.setString(token, data.data?.accessToken ?? '');
+        await prefs.setBool('isSuperAdmin', data.data?.user?.isSuperadmin ?? false);
+        _authenticationResponse = data;
+        notifyListeners();
+      } else {
+        prefs.remove(authResponse);
+        prefs.remove(loginDateTime);
+        prefs.remove(token);
+        notifyListeners();
       }
-
-      final loginDt = DateTime.now().toIso8601String();
-
-      await prefs.setString(authResponse, jsonEncode(data));
-      await prefs.setString(loginDateTime, loginDt);
-      await prefs.setString(token, data.data?.accessToken ?? '');
-      await prefs.setBool('isSuperAdmin', data.data?.user?.isSuperadmin ?? false);
-      _authenticationResponse = data;
-      notifyListeners();
     } catch (e) {
       prefs.remove(authResponse);
-      prefs.remove(jwtResponse);
+      prefs.remove(loginDateTime);
       prefs.remove(token);
       debugPrint("Auth save error: $e");
+      notifyListeners();
     }
   }
 
   static Future<ApiResponse<AuthResponse>> logIn(BuildContext context, AuthRequest request) async {
-    // return ApiResponse(
-    //   code: 200,
-    //   data: AuthResponse.fromJson(
-    //     {
-    //       "jwtResponseModel": {
-    //         "token": "kahjkjhajkhaa",
-    //         "issuedDt": DateTime.now().toString(),
-    //         "expiryDt": DateTime.now().add(const Duration(minutes: 30)).toString(),
-    //       },
-    //     },
-    //   ),
-    // );
-
     return ApiController()
         .call(
           context,

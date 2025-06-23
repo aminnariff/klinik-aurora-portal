@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -14,6 +15,7 @@ import 'package:klinik_aurora_portal/models/admin/create_admin_request.dart';
 import 'package:klinik_aurora_portal/models/admin/permission_admin_response.dart' as admin_permission;
 import 'package:klinik_aurora_portal/models/admin/update_admin_request.dart';
 import 'package:klinik_aurora_portal/models/admin/update_permission_admin_request.dart';
+import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
@@ -51,22 +53,21 @@ class _AdminDetailState extends State<AdminDetail> {
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
   List<admin_permission.Data> currentPermissionList = [];
   List<String> selectedPermission = [];
+  List<DropdownAttribute> branches = [];
 
   @override
   void initState() {
     if (widget.type == 'update') {
-      AdminController.getPermission(context, widget.user!.userId!).then(
-        (value) {
-          if (responseCode(value.code)) {
-            setState(() {
-              currentPermissionList = value.data?.data ?? [];
-              for (admin_permission.Data item in value.data?.data ?? []) {
-                selectedPermission.add(item.permissionId!);
-              }
-            });
-          }
-        },
-      );
+      AdminController.getPermission(context, widget.user!.userId!).then((value) {
+        if (responseCode(value.code)) {
+          setState(() {
+            currentPermissionList = value.data?.data ?? [];
+            for (admin_permission.Data item in value.data?.data ?? []) {
+              selectedPermission.add(item.permissionId!);
+            }
+          });
+        }
+      });
       setState(() {
         allowEditableField = false;
       });
@@ -77,18 +78,27 @@ class _AdminDetailState extends State<AdminDetail> {
       _userEmail.text = widget.user?.userEmail ?? '';
       _userStatus.value = widget.user?.userStatus == 1;
     }
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      if (context.read<BranchController>().branchAllResponse != null) {
+        for (branch_model.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? []) {
+          branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+        }
+        branches.sort((a, b) {
+          final nameA = a.name.toLowerCase();
+          final nameB = b.name.toLowerCase();
+          return nameA.compareTo(nameB);
+        });
+        rebuildDropdown.add(DateTime.now());
+      }
+    });
     try {
       if (widget.user?.branchId != null) {
-        Data? branch = context
-            .read<BranchController>()
-            .branchAllResponse
-            ?.data
-            ?.data
-            ?.firstWhere((element) => element.branchId == widget.user!.branchId);
+        Data? branch = context.read<BranchController>().branchAllResponse?.data?.data?.firstWhere(
+          (element) => element.branchId == widget.user!.branchId,
+        );
         if (branch != null) {
-          setState(() {
-            _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
-          });
+          _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
+          rebuildDropdown.add(DateTime.now());
         }
       }
     } catch (e) {
@@ -124,15 +134,12 @@ class _AdminDetailState extends State<AdminDetail> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Admin Details',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Admin Details', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
@@ -208,28 +215,27 @@ class _AdminDetailState extends State<AdminDetail> {
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  Row(
-                                    children: [
-                                      AppDropdown(
-                                        attributeList: DropdownAttributeList(
-                                          [
-                                            if (context.read<BranchController>().branchAllResponse?.data?.data != null)
-                                              for (Data item
-                                                  in context.read<BranchController>().branchAllResponse?.data?.data ??
-                                                      [])
-                                                DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                          ],
-                                          onChanged: (selected) {
-                                            setState(() {
-                                              _selectedBranch = selected;
-                                              _branchId.text = selected!.name;
-                                            });
-                                          },
-                                          value: _selectedBranch?.name,
-                                          width: screenWidth1728(30),
-                                        ),
-                                      ),
-                                    ],
+                                  StreamBuilder<DateTime>(
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return Row(
+                                        children: [
+                                          AppDropdown(
+                                            attributeList: DropdownAttributeList(
+                                              branches,
+                                              isEditable: true,
+                                              onChanged: (selected) {
+                                                _selectedBranch = selected;
+                                                _branchId.text = selected!.name;
+                                                rebuildDropdown.add(DateTime.now());
+                                              },
+                                              value: _selectedBranch?.name,
+                                              width: screenWidth1728(30),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                 ],
@@ -251,41 +257,48 @@ class _AdminDetailState extends State<AdminDetail> {
                               child: Wrap(
                                 direction: Axis.horizontal,
                                 children: [
-                                  for (int index = 0;
-                                      index <
-                                          (context.read<PermissionController>().permissionAllResponse?.data?.length ??
-                                              0);
-                                      index++)
+                                  for (
+                                    int index = 0;
+                                    index <
+                                        (context.read<PermissionController>().permissionAllResponse?.data?.length ?? 0);
+                                    index++
+                                  )
                                     Container(
                                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Checkbox(
-                                            value: selectedPermission.contains(context
-                                                .read<PermissionController>()
-                                                .permissionAllResponse
-                                                ?.data?[index]
-                                                .permissionId),
+                                            value: selectedPermission.contains(
+                                              context
+                                                  .read<PermissionController>()
+                                                  .permissionAllResponse
+                                                  ?.data?[index]
+                                                  .permissionId,
+                                            ),
                                             onChanged: (value) {
                                               try {
                                                 setState(() {
                                                   if (value == true) {
-                                                    selectedPermission.add(context
-                                                        .read<PermissionController>()
-                                                        .permissionAllResponse!
-                                                        .data![index]
-                                                        .permissionId
-                                                        .toString());
+                                                    selectedPermission.add(
+                                                      context
+                                                          .read<PermissionController>()
+                                                          .permissionAllResponse!
+                                                          .data![index]
+                                                          .permissionId
+                                                          .toString(),
+                                                    );
                                                   } else {
-                                                    selectedPermission.removeWhere((element) =>
-                                                        element ==
-                                                        context
-                                                            .read<PermissionController>()
-                                                            .permissionAllResponse!
-                                                            .data![index]
-                                                            .permissionId
-                                                            .toString());
+                                                    selectedPermission.removeWhere(
+                                                      (element) =>
+                                                          element ==
+                                                          context
+                                                              .read<PermissionController>()
+                                                              .permissionAllResponse!
+                                                              .data![index]
+                                                              .permissionId
+                                                              .toString(),
+                                                    );
                                                   }
                                                 });
                                               } catch (e) {
@@ -293,11 +306,10 @@ class _AdminDetailState extends State<AdminDetail> {
                                               }
                                             },
                                           ),
-                                          const SizedBox(
-                                            width: 8,
-                                          ),
+                                          const SizedBox(width: 8),
                                           Text(
-                                              '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}'),
+                                            '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}',
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -306,11 +318,12 @@ class _AdminDetailState extends State<AdminDetail> {
                             ),
                             AppPadding.vertical(denominator: 2),
                             const Text(
-                                'Note: Choose User Management, Point Management, and Reward Management for branch use in the Staff App.'),
+                              'Note: Choose User Management, Point Management, and Reward Management for branch use in the Staff App.',
+                            ),
                             AppPadding.vertical(denominator: 3 / 2),
                           ],
                         ),
-                        button()
+                        button(),
                       ],
                     ),
                   ),
@@ -328,105 +341,88 @@ class _AdminDetailState extends State<AdminDetail> {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Button(
-          () {
-            showLoading();
-            if (widget.type == 'update') {
-              AdminController.update(
-                context,
-                UpdateAdminRequest(
-                  userId: widget.user?.userId,
-                  userFullname: _userFullname.text,
-                  branchId: _selectedBranch?.key,
-                  userPhone: '0${_userPhone.text}',
-                  userStatus: _userStatus.value ? 1 : 0,
-                ),
-              ).then((value) {
+        Button(() {
+          showLoading();
+          if (widget.type == 'update') {
+            AdminController.update(
+              context,
+              UpdateAdminRequest(
+                userId: widget.user?.userId,
+                userFullname: _userFullname.text,
+                branchId: _selectedBranch?.key,
+                userPhone: '0${_userPhone.text}',
+                userStatus: _userStatus.value ? 1 : 0,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
+                AdminController.updatePermission(
+                  context,
+                  UpdatePermissionAdminRequest(userId: widget.user!.userId, permissionIds: selectedPermission),
+                ).then((value) {
+                  if (responseCode(value.code)) {
+                    AdminController.getAll(context, 1, pageSize).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        context.read<AdminController>().adminAllResponse = value.data;
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully updated admin information');
+                      } else {
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully updated admin information');
+                      }
+                    });
+                  } else {
+                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  }
+                });
+              } else {
+                showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+              }
+            });
+          } else {
+            AdminController.create(
+              context,
+              CreateAdminRequest(
+                userName: _userName.text,
+                userFullname: _userFullname.text,
+                userPhone: '0${_userPhone.text}',
+                userEmail: _userEmail.text,
+                userPassword: _password.text,
+                userRetypePassword: _password.text,
+                branchId: _selectedBranch?.key,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
                 if (responseCode(value.code)) {
                   AdminController.updatePermission(
                     context,
-                    UpdatePermissionAdminRequest(
-                      userId: widget.user!.userId,
-                      permissionIds: selectedPermission,
-                    ),
-                  ).then((value) {
-                    if (responseCode(value.code)) {
-                      AdminController.getAll(
-                        context,
-                        1,
-                        pageSize,
-                      ).then((value) {
+                    UpdatePermissionAdminRequest(userId: widget.user!.userId, permissionIds: selectedPermission),
+                  ).then((updateResponse) {
+                    dismissLoading();
+                    if (responseCode(updateResponse.code)) {
+                      showLoading();
+                      AdminController.getAll(context, 1, pageSize).then((adminResponse) {
                         dismissLoading();
-                        if (responseCode(value.code)) {
-                          context.read<AdminController>().adminAllResponse = value.data;
+                        if (responseCode(adminResponse.code)) {
+                          context.read<AdminController>().adminAllResponse = adminResponse.data;
                           context.pop();
-                          showDialogSuccess(context, 'Successfully updated admin information');
+                          showDialogSuccess(context, 'Successfully created admin');
                         } else {
                           context.pop();
-                          showDialogSuccess(context, 'Successfully updated admin information');
+                          showDialogSuccess(context, 'Successfully created admin');
                         }
                       });
                     } else {
-                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                      showDialogError(context, updateResponse.data?.message ?? 'ERROR : ${updateResponse.code}');
                     }
                   });
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }
-              });
-            } else {
-              AdminController.create(
-                context,
-                CreateAdminRequest(
-                  userName: _userName.text,
-                  userFullname: _userFullname.text,
-                  userPhone: '0${_userPhone.text}',
-                  userEmail: _userEmail.text,
-                  userPassword: _password.text,
-                  userRetypePassword: _password.text,
-                  branchId: _selectedBranch?.key,
-                ),
-              ).then((value) {
-                if (responseCode(value.code)) {
-                  if (responseCode(value.code)) {
-                    AdminController.updatePermission(
-                      context,
-                      UpdatePermissionAdminRequest(
-                        userId: widget.user!.userId,
-                        permissionIds: selectedPermission,
-                      ),
-                    ).then((updateResponse) {
-                      dismissLoading();
-                      if (responseCode(updateResponse.code)) {
-                        showLoading();
-                        AdminController.getAll(
-                          context,
-                          1,
-                          pageSize,
-                        ).then((adminResponse) {
-                          dismissLoading();
-                          if (responseCode(adminResponse.code)) {
-                            context.read<AdminController>().adminAllResponse = adminResponse.data;
-                            context.pop();
-                            showDialogSuccess(context, 'Successfully created admin');
-                          } else {
-                            context.pop();
-                            showDialogSuccess(context, 'Successfully created admin');
-                          }
-                        });
-                      } else {
-                        showDialogError(context, updateResponse.data?.message ?? 'ERROR : ${updateResponse.code}');
-                      }
-                    });
-                  }
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                }
-              });
-            }
-          },
-          actionText: 'button'.tr(gender: widget.type),
-        ),
+              } else {
+                showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+              }
+            });
+          }
+        }, actionText: 'button'.tr(gender: widget.type)),
       ],
     );
   }
