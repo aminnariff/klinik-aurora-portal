@@ -1,18 +1,22 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_exception_controller.dart';
@@ -20,6 +24,7 @@ import 'package:klinik_aurora_portal/models/appointment/appointment_response.dar
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
+import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
@@ -37,6 +42,7 @@ import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class AppointmentDetails extends StatefulWidget {
@@ -84,6 +90,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   DropdownAttribute? _service;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> rebuild = StreamController.broadcast();
+  StreamController<DateTime> fileRebuild = StreamController.broadcast();
+  List<FileAttribute> selectedFiles = [];
+  StreamController<String?> documentErrorMessage = StreamController.broadcast();
 
   @override
   void initState() {
@@ -240,71 +249,238 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            StreamBuilder<DateTime>(
-                              stream: rebuild.stream,
-                              builder: (context, snapshot) {
-                                return SizedBox(
-                                  width: screenWidth(26),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      labelValue(
-                                        'Patient Details',
-                                        patientNameController.controller.text,
-                                        alignStart: true,
-                                      ),
-                                      Text(
-                                        patientContactNoController.controller.text,
-                                        style: AppTypography.bodyMedium(context),
-                                      ),
-                                      Text(
-                                        patientEmailController.controller.text,
-                                        style: AppTypography.bodyMedium(context),
-                                      ),
-                                      AppPadding.vertical(denominator: 1),
-                                      InputField(field: appointmentNoteController),
-                                      AppPadding.vertical(denominator: 2),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          var results = await showCalendarDatePicker2Dialog(
-                                            context: context,
-                                            barrierDismissible: true,
-                                            dialogBackgroundColor: Colors.white,
-                                            config: CalendarDatePicker2WithActionButtonsConfig(
-                                              calendarType: CalendarDatePicker2Type.single,
-                                              firstDate: DateTime.now(),
-                                              lastDate: DateTime.now().add(Duration(days: 365)),
-                                              selectedDayHighlightColor: Colors.blue,
-                                              weekdayLabelTextStyle: TextStyle(color: Colors.grey.shade600),
-                                              controlsTextStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                                              selectedDayTextStyle: TextStyle(color: Colors.white),
-                                              dayTextStyle: TextStyle(color: Colors.black87),
-                                              disableModePicker: false,
-                                              // okButtonText: '', // hide default buttons
-                                              // cancelButtonText: '',
-                                              openedFromDialog: true,
-                                            ),
-                                            dialogSize: Size(
-                                              screenWidthByBreakpoint(90, 70, 50),
-                                              screenHeightByBreakpoint(90, 80, 50),
-                                            ),
-                                            borderRadius: BorderRadius.circular(20),
-                                          );
-                                          if (results != null) {
-                                            if (dueDateController.errorMessage != null) {
-                                              dueDateController.errorMessage = null;
-                                              rebuild.add(DateTime.now());
-                                            }
-                                            dueDateController.controller.text =
-                                                dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
-                                          }
-                                        },
-                                        child: ReadOnly(InputField(field: dueDateController), isEditable: false),
-                                      ),
+                            Consumer<ServiceBranchController>(
+                              builder: (context, serviceBranchController, _) {
+                                return StreamBuilder<DateTime>(
+                                  stream: rebuild.stream,
+                                  builder: (context, snapshot) {
+                                    return SizedBox(
+                                      width: screenWidth(26),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          labelValue(
+                                            'Patient Details',
+                                            patientNameController.controller.text,
+                                            alignStart: true,
+                                          ),
+                                          Text(
+                                            patientContactNoController.controller.text,
+                                            style: AppTypography.bodyMedium(context),
+                                          ),
+                                          Text(
+                                            patientEmailController.controller.text,
+                                            style: AppTypography.bodyMedium(context),
+                                          ),
+                                          AppPadding.vertical(denominator: 1),
+                                          InputField(field: appointmentNoteController),
+                                          AppPadding.vertical(denominator: 2),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              var results = await showCalendarDatePicker2Dialog(
+                                                context: context,
+                                                barrierDismissible: true,
+                                                dialogBackgroundColor: Colors.white,
+                                                config: CalendarDatePicker2WithActionButtonsConfig(
+                                                  calendarType: CalendarDatePicker2Type.single,
+                                                  firstDate: DateTime.now(),
+                                                  lastDate: DateTime.now().add(Duration(days: 365)),
+                                                  selectedDayHighlightColor: Colors.blue,
+                                                  weekdayLabelTextStyle: TextStyle(color: Colors.grey.shade600),
+                                                  controlsTextStyle: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  selectedDayTextStyle: TextStyle(color: Colors.white),
+                                                  dayTextStyle: TextStyle(color: Colors.black87),
+                                                  disableModePicker: false,
+                                                  // okButtonText: '', // hide default buttons
+                                                  // cancelButtonText: '',
+                                                  openedFromDialog: true,
+                                                ),
+                                                dialogSize: Size(
+                                                  screenWidthByBreakpoint(90, 70, 50),
+                                                  screenHeightByBreakpoint(90, 80, 50),
+                                                ),
+                                                borderRadius: BorderRadius.circular(20),
+                                              );
+                                              if (results != null) {
+                                                if (dueDateController.errorMessage != null) {
+                                                  dueDateController.errorMessage = null;
+                                                  rebuild.add(DateTime.now());
+                                                }
+                                                dueDateController.controller.text =
+                                                    dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
+                                              }
+                                            },
+                                            child: ReadOnly(InputField(field: dueDateController), isEditable: false),
+                                          ),
+                                          if (widget.appointment?.service?.serviceBookingFee != null ||
+                                              (_service != null &&
+                                                  notNullOrEmptyString(
+                                                        serviceBranchController.serviceBranchResponse?.data
+                                                            ?.firstWhere(
+                                                              (element) => element.serviceBranchId == _service?.key,
+                                                            )
+                                                            .serviceBookingFee,
+                                                      ) ==
+                                                      true) ||
+                                              (widget.type == 'update' && _status?.key == '6'))
+                                            Container(
+                                              padding: EdgeInsets.only(bottom: 8),
+                                              width: screenWidth1728(30),
+                                              child: StreamBuilder<DateTime>(
+                                                stream: fileRebuild.stream,
+                                                builder: (context, snapshot) {
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    children: [
+                                                      AppPadding.vertical(),
+                                                      if ((selectedFiles.isEmpty &&
+                                                              widget.type == 'create' &&
+                                                              (_service != null &&
+                                                                  notNullOrEmptyString(
+                                                                        serviceBranchController
+                                                                            .serviceBranchResponse
+                                                                            ?.data
+                                                                            ?.firstWhere(
+                                                                              (element) =>
+                                                                                  element.serviceBranchId ==
+                                                                                  _service?.key,
+                                                                            )
+                                                                            .serviceBookingFee,
+                                                                      ) ==
+                                                                      true)) ||
+                                                          (selectedFiles.isEmpty &&
+                                                              widget.type == 'update' &&
+                                                              _status?.key == '6' &&
+                                                              widget.appointment?.payment?.any(
+                                                                    (element) => element.paymentType == 4,
+                                                                  ) ==
+                                                                  false)) ...[
+                                                        UploadDocumentsField(
+                                                          title: 'promotionPage'.tr(gender: 'browseFile'),
+                                                          fieldTitle:
+                                                              _status?.key == '6'
+                                                                  ? 'appointmentPage'.tr(gender: 'refundProof')
+                                                                  : 'appointmentPage'.tr(gender: 'paymentProof'),
+                                                          // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                          action: () async {
+                                                            documentErrorMessage.add(null);
+                                                            FilePickerResult? result =
+                                                                await FilePicker.platform.pickFiles();
 
-                                      AppPadding.vertical(denominator: 2),
-                                    ],
-                                  ),
+                                                            if (result != null) {
+                                                              PlatformFile file = result.files.first;
+                                                              if (supportedExtensions.contains(file.extension)) {
+                                                                debugPrint(bytesToMB(file.size).toString());
+                                                                debugPrint(file.name);
+                                                                if (bytesToMB(file.size) < 5.0) {
+                                                                  Uint8List? fileBytes = result.files.first.bytes;
+                                                                  String fileName = result.files.first.name;
+
+                                                                  selectedFiles.add(
+                                                                    FileAttribute(name: fileName, value: fileBytes),
+                                                                  );
+                                                                  fileRebuild.add(DateTime.now());
+                                                                } else {
+                                                                  documentErrorMessage.add(
+                                                                    'error'.tr(
+                                                                      gender: 'err-21',
+                                                                      args: [fileSizeLimit.toStringAsFixed(0)],
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              } else {
+                                                                documentErrorMessage.add('error'.tr(gender: 'err-22'));
+                                                              }
+                                                            } else {
+                                                              // User canceled the picker
+                                                            }
+                                                          },
+                                                          cancelAction: () {},
+                                                        ),
+                                                      ],
+                                                      for (int index = 0; index < selectedFiles.length; index++)
+                                                        ListTile(
+                                                          title: GestureDetector(
+                                                            onTap: () {
+                                                              if (selectedFiles[index].path != null ||
+                                                                  selectedFiles[index].value != null) {
+                                                                showDialog(
+                                                                  context: context,
+                                                                  builder: (BuildContext context) {
+                                                                    return GestureDetector(
+                                                                      onTap: () {
+                                                                        context.pop();
+                                                                      },
+                                                                      child: Row(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Flexible(
+                                                                            child: CardContainer(
+                                                                              selectedFiles[index].value != null
+                                                                                  ? Image.memory(
+                                                                                    selectedFiles[index].value!,
+                                                                                  )
+                                                                                  : selectedFiles[index].path != null
+                                                                                  ? Padding(
+                                                                                    padding: EdgeInsets.all(
+                                                                                      screenPadding,
+                                                                                    ),
+                                                                                    child: Image.network(
+                                                                                      '${Environment.imageUrl}${selectedFiles[index].path}',
+                                                                                    ),
+                                                                                  )
+                                                                                  : const SizedBox(),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                );
+                                                              }
+                                                            },
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                  '${index + 1}. ',
+                                                                  style: AppTypography.bodyMedium(context),
+                                                                ),
+                                                                Flexible(
+                                                                  child: Text(
+                                                                    '  ${selectedFiles[index].name ?? ''}',
+                                                                    style: AppTypography.bodyMedium(
+                                                                      context,
+                                                                    ).apply(color: Colors.blue),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          enableFeedback: true,
+                                                          enabled: true,
+                                                          trailing: IconButton(
+                                                            icon: const Icon(Icons.close),
+                                                            tooltip: 'button'.tr(gender: 'remove'),
+                                                            onPressed: () {
+                                                              selectedFiles.removeAt(0);
+                                                              fileRebuild.add(DateTime.now());
+                                                            },
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 );
                               },
                             ),
@@ -384,20 +560,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               isEditable: widget.type == 'create',
                                               onChanged: (p0) {
                                                 _service = p0;
+                                                rebuild.add(DateTime.now());
                                                 try {
-                                                  if (notNullOrEmptyString(
-                                                    serviceBranchController.serviceBranchResponse?.data
-                                                        ?.firstWhere((element) => element.serviceBranchId == p0?.key)
-                                                        .serviceBookingFee,
-                                                  )) {
-                                                    _status = appointmentStatus.firstWhere(
-                                                      (element) => element.key == '4',
-                                                    );
-                                                  } else {
-                                                    _status = appointmentStatus.firstWhere(
-                                                      (element) => element.key == '1',
-                                                    );
-                                                  }
+                                                  _status = appointmentStatus.firstWhere(
+                                                    (element) => element.key == '1',
+                                                  );
                                                 } catch (e) {
                                                   debugPrint(e.toString());
                                                 }
@@ -436,6 +603,31 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       );
                                     },
                                   ),
+                                StreamBuilder(
+                                  stream: rebuild.stream,
+                                  builder: (context, _) {
+                                    return Consumer<ServiceBranchController>(
+                                      builder: (context, serviceBranchController, _) {
+                                        if (_service != null &&
+                                            notNullOrEmptyString(
+                                                  context
+                                                      .read<ServiceBranchController>()
+                                                      .serviceBranchResponse
+                                                      ?.data
+                                                      ?.firstWhere(
+                                                        (element) => element.serviceBranchId == _service?.key,
+                                                      )
+                                                      .serviceBookingFee,
+                                                ) ==
+                                                true) {
+                                          return Text('* Booking Fee is required for this service');
+                                        } else {
+                                          return SizedBox();
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
                                 AppPadding.vertical(denominator: 2),
                                 StreamBuilder<DateTime>(
                                   stream: rebuildDropdown.stream,
@@ -451,6 +643,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             value: _status?.name,
                                             onChanged: (p0) {
                                               _status = p0;
+                                              rebuild.add(DateTime.now());
                                               rebuildDropdown.add(DateTime.now());
                                             },
                                             width: screenWidthByBreakpoint(90, 70, 30),
@@ -631,18 +824,118 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     alignStart: true,
                   ),
                   SizedBox(height: 4),
-                  //TODO: get from the paid ID, wait for Rahman to add in the response
                   labelValue(
                     'Booking Fee Amount',
                     widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
-                        ? 'RM ${widget.appointment?.service?.serviceBookingFee}'
+                        ? 'RM ${widget.appointment?.payment?.firstWhere((element) => element.paymentStatus == 1).paymentAmount}'
                         : '',
                     alignStart: true,
+                  ),
+                ],
+                SizedBox(height: 4),
+                if (selectedFiles.isNotEmpty ||
+                    (widget.type == 'update' &&
+                        widget.appointment?.payment?.any(
+                              (element) => element.paymentType == 2 && element.paymentStatus == 1,
+                            ) ==
+                            true)) ...[
+                  Text(
+                    'appointmentPage'.tr(gender: 'paymentProof'),
+                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return GestureDetector(
+                            onTap: () {
+                              context.pop();
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CardContainer(
+                                      Padding(
+                                        padding: EdgeInsets.all(screenPadding),
+                                        child: Image.network(
+                                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((element) => element.paymentType == 2 && element.paymentStatus == 1).paymentAsset}',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      'View File',
+                      style: AppTypography.bodyMedium(context).apply(color: Colors.blue, fontWeightDelta: 1),
+                    ),
+                  ),
+                ],
+                if (widget.type == 'update' &&
+                    widget.appointment?.payment?.any(
+                          (element) => element.paymentType == 4 && element.paymentStatus == 1,
+                        ) ==
+                        true) ...[
+                  Text(
+                    'appointmentPage'.tr(gender: 'refundProof'),
+                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return GestureDetector(
+                            onTap: () {
+                              context.pop();
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CardContainer(
+                                      Padding(
+                                        padding: EdgeInsets.all(screenPadding),
+                                        child: Image.network(
+                                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((element) => element.paymentType == 4 && element.paymentStatus == 1).paymentAsset}',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      'View File',
+                      style: AppTypography.bodyMedium(context).apply(color: Colors.blue, fontWeightDelta: 1),
+                    ),
                   ),
                 ],
               ],
             ),
           ),
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -686,6 +979,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ),
       ],
     );
+  }
+
+  double bytesToMB(int bytes) {
+    double megabytes = bytes / 1048576.0;
+    // double sizeInGB = sizeInBytes / 1073741824.0;
+    return megabytes;
   }
 
   Widget labelValue(String label, String value, {bool alignStart = true}) {
@@ -733,7 +1032,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 CreateAppointmentRequest(
                   userId: widget.appointment?.user?.userId,
                   serviceBranchId: _service?.key,
-                  appointmentDateTime: dateTimeController.text,
+                  appointmentDateTime: convertMalaysiaTimeToUtcWithZ(dateTimeController.text),
                   appointmentNote: appointmentNoteController.controller.text,
                   customerDueDate:
                       (() {
@@ -750,13 +1049,48 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  showLoading();
-                  if (widget.refreshData != null) {
-                    widget.refreshData!();
+                  if (_service != null &&
+                      notNullOrEmptyString(
+                            context
+                                .read<ServiceBranchController>()
+                                .serviceBranchResponse
+                                ?.data
+                                ?.firstWhere((element) => element.serviceBranchId == _service?.key)
+                                .serviceBookingFee,
+                          ) ==
+                          true) {
+                    PaymentController.upload(
+                      context,
+                      value.data?.id ?? '',
+                      widget.appointment?.user?.userId ?? '',
+                      2,
+                      context
+                              .read<ServiceBranchController>()
+                              .serviceBranchResponse
+                              ?.data
+                              ?.firstWhere((element) => element.serviceBranchId == _service?.key)
+                              .serviceBookingFee ??
+                          '50.00',
+                      [selectedFiles[0]],
+                    ).then((documentUploadResponse) {
+                      showLoading();
+                      if (widget.refreshData != null) {
+                        widget.refreshData!();
+                      } else {
+                        dismissLoading;
+                        context.pop();
+                        showDialogSuccess(context, 'Appointment successfully created for the user');
+                      }
+                    });
                   } else {
-                    dismissLoading;
-                    context.pop();
-                    showDialogSuccess(context, 'Appointment successfully created for the user');
+                    showLoading();
+                    if (widget.refreshData != null) {
+                      widget.refreshData!();
+                    } else {
+                      dismissLoading;
+                      context.pop();
+                      showDialogSuccess(context, 'Appointment successfully created for the user');
+                    }
                   }
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
@@ -848,6 +1182,19 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     } else if (dateTimeController.text == "") {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'Slots'));
+    } else if (_service != null &&
+        notNullOrEmptyString(
+              context
+                  .read<ServiceBranchController>()
+                  .serviceBranchResponse
+                  ?.data
+                  ?.firstWhere((element) => element.serviceBranchId == _service?.key)
+                  .serviceBookingFee,
+            ) ==
+            true &&
+        selectedFiles.isEmpty) {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'paymentProof')));
     }
     setState(() {});
     return temp;

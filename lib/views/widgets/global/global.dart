@@ -106,6 +106,12 @@ int calculateCustomerPoints(String amount) {
   return points;
 }
 
+String convertMalaysiaTimeToUtc(String malaysiaTimeStr) {
+  final malaysiaTime = DateTime.parse(malaysiaTimeStr);
+  final utcTime = malaysiaTime.toUtc();
+  return utcTime.toIso8601String();
+}
+
 String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
   try {
     if (utcString == null || utcString.isEmpty) return null;

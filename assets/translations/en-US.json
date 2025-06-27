@@ -96,6 +96,8 @@
         "patientName": "Patient Name",
         "patientEmail": "Patient Email",
         "patientContactNo": "Patient Contact No",
+        "paymentProof": "Proof of Payment (Booking Fee)",
+        "refundProof": "Proof of Refund (Booking Fee)",
         "appointmentNote": "Note",
         "branch": "Branch",
         "dueDate": "Estimated Due Date (EDD)",

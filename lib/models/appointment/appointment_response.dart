@@ -173,6 +173,7 @@ class Payment {
   String? paymentId;
   int? paymentType;
   String? paymentAsset;
+  String? paymentAmount;
   int? paymentStatus;
   String? createdDate;
   String? modifiedDate;
@@ -181,6 +182,7 @@ class Payment {
     this.paymentId,
     this.paymentType,
     this.paymentAsset,
+    this.paymentAmount,
     this.paymentStatus,
     this.createdDate,
     this.modifiedDate,
@@ -190,6 +192,7 @@ class Payment {
     paymentId = json['paymentId'];
     paymentType = json['paymentType'];
     paymentAsset = json['paymentAsset'];
+    paymentAmount = json['paymentAmount'];
     paymentStatus = json['paymentStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
@@ -200,6 +203,7 @@ class Payment {
     data['paymentId'] = paymentId;
     data['paymentType'] = paymentType;
     data['paymentAsset'] = paymentAsset;
+    data['paymentAmount'] = paymentAmount;
     data['paymentStatus'] = paymentStatus;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;

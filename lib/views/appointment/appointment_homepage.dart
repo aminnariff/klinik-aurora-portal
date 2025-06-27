@@ -143,9 +143,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     startDate = getDateOnly(startOfMonth.toString());
     endDate = getDateOnly(endOfMonth.toString());
 
-    print(startDate);
-    print(endDate);
-
     return DateRange(
       label: 'This month (${DateFormat('MMMM yyyy').format(now)})',
       start: startOfMonth,
