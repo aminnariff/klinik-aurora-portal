@@ -421,14 +421,18 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                 dismissLoading();
                 if (responseCode(value.code)) {
                   showLoading();
-                  ServiceController.upload(context, value.data!.id!, selectedFile).then((value) {
-                    dismissLoading();
-                    if (responseCode(value.code)) {
-                      getLatestData();
-                    } else {
-                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                    }
-                  });
+                  if (selectedFile.name != null) {
+                    ServiceController.upload(context, value.data!.id!, selectedFile).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        getLatestData();
+                      } else {
+                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                      }
+                    });
+                  } else {
+                    getLatestData();
+                  }
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }

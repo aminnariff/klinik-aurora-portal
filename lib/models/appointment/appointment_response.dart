@@ -145,15 +145,24 @@ class Service {
   String? serviceId;
   String? serviceName;
   String? serviceDescription;
+  String? servicePrice;
   int? doctorType;
   String? serviceBookingFee;
 
-  Service({this.serviceId, this.serviceName, this.serviceDescription, this.doctorType, this.serviceBookingFee});
+  Service({
+    this.serviceId,
+    this.serviceName,
+    this.serviceDescription,
+    this.servicePrice,
+    this.doctorType,
+    this.serviceBookingFee,
+  });
 
   Service.fromJson(Map<String, dynamic> json) {
     serviceId = json['serviceId'];
     serviceName = json['serviceName'];
     serviceDescription = json['serviceDescription'];
+    servicePrice = json['servicePrice'];
     doctorType = json['doctorType'];
     serviceBookingFee = json['serviceBookingFee'];
   }
@@ -163,6 +172,7 @@ class Service {
     data['serviceId'] = serviceId;
     data['serviceName'] = serviceName;
     data['serviceDescription'] = serviceDescription;
+    data['servicePrice'] = servicePrice;
     data['doctorType'] = doctorType;
     data['serviceBookingFee'] = serviceBookingFee;
     return data;

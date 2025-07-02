@@ -106,10 +106,27 @@ int calculateCustomerPoints(String amount) {
   return points;
 }
 
-String convertMalaysiaTimeToUtc(String malaysiaTimeStr) {
-  final malaysiaTime = DateTime.parse(malaysiaTimeStr);
-  final utcTime = malaysiaTime.toUtc();
-  return utcTime.toIso8601String();
+String convertMalaysiaTimeToUtc(String malaysiaTimeStr, {bool plainFormat = false}) {
+  try {
+    final inputFormat = DateFormat('dd-MM-yyyy HH:mm');
+    final malaysiaTime = inputFormat.parseStrict(malaysiaTimeStr);
+
+    final utcTime = malaysiaTime.toUtc();
+
+    if (plainFormat) {
+      return "${utcTime.year.toString().padLeft(4, '0')}-"
+          "${utcTime.month.toString().padLeft(2, '0')}-"
+          "${utcTime.day.toString().padLeft(2, '0')} "
+          "${utcTime.hour.toString().padLeft(2, '0')}:"
+          "${utcTime.minute.toString().padLeft(2, '0')}:"
+          "${utcTime.second.toString().padLeft(2, '0')}";
+    }
+
+    return utcTime.toIso8601String();
+  } catch (e) {
+    debugPrint('Error: $e');
+    return '';
+  }
 }
 
 String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {

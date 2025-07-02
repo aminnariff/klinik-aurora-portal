@@ -73,9 +73,7 @@ class User {
     userEmail = json['userEmail'];
     userName = json['userName'];
     userFullname = json['userFullname'];
-    if (branchId != null) {
-      branchId = json['branchId'];
-    }
+    branchId = json['branchId'];
     isSuperadmin = json['isSuperadmin'];
     permissions = json['permissions'].cast<String>();
   }

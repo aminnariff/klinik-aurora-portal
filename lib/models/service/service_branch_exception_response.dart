@@ -35,8 +35,7 @@ class Data {
   String? serviceBranchId;
   String? branchId;
   String? serviceId;
-  String? exceptionDate;
-  String? exceptionTime;
+  String? exceptionDatetime;
   String? createdDate;
   String? modifiedDate;
 
@@ -45,8 +44,7 @@ class Data {
     this.serviceBranchId,
     this.branchId,
     this.serviceId,
-    this.exceptionDate,
-    this.exceptionTime,
+    this.exceptionDatetime,
     this.createdDate,
     this.modifiedDate,
   });
@@ -56,8 +54,7 @@ class Data {
     serviceBranchId = json['serviceBranchId'];
     branchId = json['branchId'];
     serviceId = json['serviceId'];
-    exceptionDate = json['exceptionDate'];
-    exceptionTime = json['exceptionTime'];
+    exceptionDatetime = json['exceptionDatetime'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
   }
@@ -68,8 +65,7 @@ class Data {
     data['serviceBranchId'] = serviceBranchId;
     data['branchId'] = branchId;
     data['serviceId'] = serviceId;
-    data['exceptionDate'] = exceptionDate;
-    data['exceptionTime'] = exceptionTime;
+    data['exceptionDatetime'] = exceptionDatetime;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
     return data;

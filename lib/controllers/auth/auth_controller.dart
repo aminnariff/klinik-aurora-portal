@@ -17,6 +17,13 @@ class AuthController extends ChangeNotifier {
   String? get passwordError => _passwordError;
   bool _rememberMe = false;
   bool get remember => _rememberMe;
+  String? _branchId;
+  String? get branchId => _branchId;
+
+  set branchId(String? value) {
+    _branchId = value;
+    notifyListeners();
+  }
 
   bool get isSuperAdmin {
     return prefs.getBool('isSuperAdmin') ?? false;
@@ -94,6 +101,8 @@ class AuthController extends ChangeNotifier {
 
       final parsed = AuthResponse.fromJson(decoded);
       context.read<AuthController>().authenticationResponse = parsed;
+
+      context.read<AuthController>().branchId = parsed.data?.user?.branchId;
       _authenticationResponse = parsed;
 
       final expiryDtString = _authenticationResponse?.data?.expiryDt;

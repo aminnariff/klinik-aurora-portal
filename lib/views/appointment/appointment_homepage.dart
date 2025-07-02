@@ -62,7 +62,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   int _totalCount = 0;
   String? startDate;
   String? endDate;
-  final int _totalPage = 0;
+  int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
@@ -119,19 +119,28 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   void getDashboard() {
     if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
-      AppointmentDashboardController.get(
-        context,
-        branchId:
-            context.read<AuthController>().isSuperAdmin == true
-                ? _appointmentBranch?.key
-                : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-        startDate: startDate,
-        endDate: endDate,
-      ).then((value) {
-        if (responseCode(value.code)) {
-          context.read<AppointmentDashboardController>().appointmentDashboardResponse = value.data;
-        }
-      });
+      bool temp = true;
+      if (context.read<AuthController>().isSuperAdmin == true && _appointmentBranch?.key != null) {
+        temp = true;
+      } else if (context.read<AuthController>().authenticationResponse?.data?.user?.branchId != null) {
+        temp = true;
+      }
+      if (temp) {
+        AppointmentDashboardController.get(
+          context,
+          branchId:
+              context.read<AuthController>().isSuperAdmin == true
+                  ? _appointmentBranch?.key
+                  : context.read<AuthController>().branchId ??
+                      context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+          startDate: startDate,
+          endDate: endDate,
+        ).then((value) {
+          if (responseCode(value.code)) {
+            context.read<AppointmentDashboardController>().appointmentDashboardResponse = value.data;
+          }
+        });
+      }
     }
   }
 
@@ -268,28 +277,28 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
             children: [
-              if (authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
-                Row(
-                  children: [
-                    Expanded(
-                      child: Consumer<AppointmentDashboardController>(
-                        builder: (context, dashboardController, _) {
-                          return Container(
-                            padding: EdgeInsets.symmetric(horizontal: screenPadding),
-                            height: 80,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                DateFilterDropdown(
-                                  onSelected: (range) {
-                                    // Now trigger API call based on selected range
-                                    startDate = getDateOnly('${range.start}');
-                                    endDate = getDateOnly('${range.end}');
-                                    getDashboard();
-                                    filtering();
-                                  },
-                                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Consumer<AppointmentDashboardController>(
+                      builder: (context, dashboardController, _) {
+                        return Container(
+                          padding: EdgeInsets.symmetric(horizontal: screenPadding),
+                          height: 80,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              DateFilterDropdown(
+                                onSelected: (range) {
+                                  // Now trigger API call based on selected range
+                                  startDate = getDateOnly('${range.start}');
+                                  endDate = getDateOnly('${range.end}');
+                                  getDashboard();
+                                  filtering();
+                                },
+                              ),
+                              if (authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) ...[
                                 _buildStatItem(
                                   dashboardController.appointmentDashboardResponse?.data?.totalUpcoming.toString() ??
                                       '',
@@ -317,40 +326,41 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                 ),
                                 if (authController.isSuperAdmin == false) SizedBox(width: screenWidth(15)),
                               ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    StreamBuilder<DateTime>(
-                      stream: rebuildDropdown.stream,
-                      builder: (context, snapshot) {
-                        return Consumer<AuthController>(
-                          builder: (context, authController, _) {
-                            return authController.isSuperAdmin == false
-                                ? SizedBox()
-                                : AppDropdown(
-                                  attributeList: DropdownAttributeList(
-                                    authController.isSuperAdmin ? branches : [],
-                                    labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                    isEditable: authController.isSuperAdmin,
-                                    fieldColor: authController.isSuperAdmin ? null : textFormFieldUneditableColor,
-                                    value: _appointmentBranch?.name,
-                                    onChanged: (p0) {
-                                      _appointmentBranch = p0;
-                                      rebuildDropdown.add(DateTime.now());
-                                      getDashboard();
-                                      filtering();
-                                    },
-                                    width: screenWidthByBreakpoint(90, 70, 250, useAbsoluteValueDesktop: true),
-                                  ),
-                                );
-                          },
+                            ],
+                          ),
                         );
                       },
                     ),
-                  ],
-                ),
+                  ),
+                  StreamBuilder<DateTime>(
+                    stream: rebuildDropdown.stream,
+                    builder: (context, snapshot) {
+                      return Consumer<AuthController>(
+                        builder: (context, authController, _) {
+                          return authController.isSuperAdmin == false
+                              ? SizedBox()
+                              : AppDropdown(
+                                attributeList: DropdownAttributeList(
+                                  authController.isSuperAdmin ? branches : [],
+                                  labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                  isEditable: authController.isSuperAdmin,
+                                  fieldColor: authController.isSuperAdmin ? null : textFormFieldUneditableColor,
+                                  value: _appointmentBranch?.name,
+                                  onChanged: (p0) {
+                                    _appointmentBranch = p0;
+                                    rebuildDropdown.add(DateTime.now());
+                                    getDashboard();
+                                    filtering();
+                                  },
+                                  width: screenWidthByBreakpoint(90, 70, 250, useAbsoluteValueDesktop: true),
+                                ),
+                              );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
@@ -778,6 +788,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         .then((value) {
           dismissLoading();
           context.read<AppointmentController>().appointmentResponse = value;
+          _totalPage = value.data?.totalPage ?? 0;
           _totalCount = value.data?.totalCount ?? 0;
         });
   }

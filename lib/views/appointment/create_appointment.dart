@@ -104,7 +104,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
     if (widget.appointment?.appointmentDatetime != null) {
       dateTimeController.text =
-          dateConverter(widget.appointment?.appointmentDatetime, format: 'yyyy-MM-dd HH:mm') ?? '';
+          dateConverter(widget.appointment?.appointmentDatetime, format: 'dd-MM-yyyy HH:mm') ?? '';
     }
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       if (context.read<AuthController>().isSuperAdmin == false && widget.type == 'create') {
@@ -531,12 +531,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     },
                                   ),
                                 AppPadding.vertical(denominator: 2),
-                                if (widget.type == 'update')
+                                if (widget.type == 'update') ...[
                                   labelValue(
                                     'Service',
                                     widget.appointment?.service?.serviceName ?? '',
                                     alignStart: true,
                                   ),
+                                  Text('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
+                                ],
                                 if (widget.type == 'create')
                                   StreamBuilder<DateTime>(
                                     stream: rebuildDropdown.stream,
@@ -636,7 +638,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       children: [
                                         AppDropdown(
                                           attributeList: DropdownAttributeList(
-                                            widget.type == 'update' ? appointmentStatus : [],
+                                            widget.type == 'update' ? getAppointmentStatus() : [],
                                             isEditable: widget.type == 'update',
                                             fieldColor: widget.type == 'update' ? null : textFormFieldUneditableColor,
                                             labelText: 'appointmentPage'.tr(gender: 'status'),
@@ -658,98 +660,95 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   builder: (context, snapshot, _) {
                                     return GestureDetector(
                                       onTap: () async {
-                                        if (_appointmentBranch != null &&
-                                            (snapshot.serviceBranchAvailableDtResponse?.data != null &&
-                                                (snapshot.serviceBranchAvailableDtResponse?.data?.length ?? 0) > 0)) {
-                                          DateTime now = DateTime.now();
-                                          List<String> availableDateTime =
-                                              snapshot
-                                                  .serviceBranchAvailableDtResponse
-                                                  ?.data
-                                                  ?.first
-                                                  .availableDatetimes ??
-                                              [];
-                                          List<String> exceptionDateTime = [];
-                                          for (
-                                            int index = 0;
-                                            index <
-                                                (context
-                                                        .read<ServiceBranchExceptionController>()
-                                                        .serviceBranchExceptionResponse
-                                                        ?.data
-                                                        ?.length ??
-                                                    0);
-                                            index++
-                                          ) {
-                                            exceptionDateTime.add(
-                                              ServiceBranchExceptionController.convertToUtcIsoString(
+                                        if (context.read<AuthController>().hasPermission(
+                                              'c54a2d91-499c-11f0-9169-bc24115a1342',
+                                            ) ==
+                                            false) {
+                                          if (_appointmentBranch != null &&
+                                              (snapshot.serviceBranchAvailableDtResponse?.data != null &&
+                                                  (snapshot.serviceBranchAvailableDtResponse?.data?.length ?? 0) > 0)) {
+                                            DateTime now = DateTime.now();
+                                            List<String> availableDateTime =
+                                                snapshot
+                                                    .serviceBranchAvailableDtResponse
+                                                    ?.data
+                                                    ?.first
+                                                    .availableDatetimes ??
+                                                [];
+                                            List<String> exceptionDateTime = [];
+                                            for (
+                                              int index = 0;
+                                              index <
+                                                  (context
+                                                          .read<ServiceBranchExceptionController>()
+                                                          .serviceBranchExceptionResponse
+                                                          ?.data
+                                                          ?.length ??
+                                                      0);
+                                              index++
+                                            ) {
+                                              exceptionDateTime.add(
                                                 context
                                                         .read<ServiceBranchExceptionController>()
                                                         .serviceBranchExceptionResponse
                                                         ?.data?[index]
-                                                        .exceptionDate ??
+                                                        .exceptionDatetime ??
                                                     '',
-                                                context
-                                                        .read<ServiceBranchExceptionController>()
-                                                        .serviceBranchExceptionResponse
-                                                        ?.data?[index]
-                                                        .exceptionTime ??
-                                                    '',
-                                              ),
-                                            );
-                                          }
+                                              );
+                                            }
 
-                                          for (int index = 0; index < exceptionDateTime.length; index++) {
-                                            availableDateTime.removeWhere(
-                                              (element) => element == exceptionDateTime[index],
-                                            );
-                                          }
-                                          availableDateTime = removePastDates(availableDateTime);
-                                          String? selectedDateTime = await showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      CardContainer(
-                                                        Padding(
-                                                          padding: EdgeInsets.all(screenPadding),
-                                                          child: SelectionCalendarView(
-                                                            startMonth: now.month,
-                                                            year: now.year,
-                                                            initialDateTimes: availableDateTime,
+                                            for (int index = 0; index < exceptionDateTime.length; index++) {
+                                              availableDateTime.removeWhere(
+                                                (element) => element == exceptionDateTime[index],
+                                              );
+                                            }
+                                            availableDateTime = removePastDates(availableDateTime);
+                                            String? selectedDateTime = await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        CardContainer(
+                                                          Padding(
+                                                            padding: EdgeInsets.all(screenPadding),
+                                                            child: SelectionCalendarView(
+                                                              startMonth: now.month,
+                                                              year: now.year,
+                                                              initialDateTimes: availableDateTime,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                          dateTimeController.text =
-                                              selectedDateTime ??
-                                              dateConverter(
-                                                widget.appointment?.appointmentDatetime,
-                                                format: 'yyyy-MM-dd HH:mm',
-                                              ) ??
-                                              '';
-                                        } else if (_service == null) {
-                                          showDialogError(
-                                            context,
-                                            ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'service')),
-                                          );
-                                        } else if ((snapshot.serviceBranchAvailableDtResponse?.data?.length ?? 0) ==
-                                            0) {
-                                          showDialogError(context, 'No available slots');
-                                        } else {
-                                          showDialogError(
-                                            context,
-                                            ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'branch')),
-                                          );
+                                                      ],
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                            dateTimeController.text =
+                                                formatDateTimeToDisplay(selectedDateTime) ??
+                                                dateConverter(
+                                                  widget.appointment?.appointmentDatetime,
+                                                  format: 'yyyy-MM-dd HH:mm',
+                                                ) ??
+                                                '';
+                                          } else if (_service == null) {
+                                            showDialogError(
+                                              context,
+                                              ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'service')),
+                                            );
+                                          } else if ((snapshot.serviceBranchAvailableDtResponse?.data?.length ?? 0) ==
+                                              0) {
+                                            showDialogError(context, 'No available slots');
+                                          } else {
+                                            showDialogError(
+                                              context,
+                                              ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'branch')),
+                                            );
+                                          }
                                         }
                                       },
                                       child: ReadOnly(
@@ -792,6 +791,31 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     );
   }
 
+  String? formatDateTimeToDisplay(String? input) {
+    final regex = RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$');
+
+    if (!regex.hasMatch(input ?? '')) {
+      return input;
+    }
+
+    try {
+      final inputFormat = DateFormat("yyyy-MM-dd HH:mm");
+      final outputFormat = DateFormat("dd-MM-yyyy HH:mm");
+      final dateTime = inputFormat.parse(input ?? '');
+      return outputFormat.format(dateTime);
+    } catch (e) {
+      return input;
+    }
+  }
+
+  List<DropdownAttribute> getAppointmentStatus() {
+    if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
+      return appointmentStatus;
+    } else {
+      return [DropdownAttribute('5', 'Completed')];
+    }
+  }
+
   Widget extraInformation() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -828,6 +852,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     'Booking Fee Amount',
                     widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
                         ? 'RM ${widget.appointment?.payment?.firstWhere((element) => element.paymentStatus == 1).paymentAmount}'
+                        : '',
+                    alignStart: true,
+                  ),
+                  SizedBox(height: 4),
+                  labelValue(
+                    'Balance',
+                    widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
+                        ? 'RM ${(double.parse('${widget.appointment?.service?.servicePrice ?? 0}') - double.parse(widget.appointment?.payment?.firstWhere((element) => element.paymentStatus == 1).paymentAmount ?? '0')).toStringAsFixed(2)}'
                         : '',
                     alignStart: true,
                   ),
@@ -1032,7 +1064,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 CreateAppointmentRequest(
                   userId: widget.appointment?.user?.userId,
                   serviceBranchId: _service?.key,
-                  appointmentDateTime: convertMalaysiaTimeToUtcWithZ(dateTimeController.text),
+                  appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
                   appointmentNote: appointmentNoteController.controller.text,
                   customerDueDate:
                       (() {
@@ -1059,6 +1091,44 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 .serviceBookingFee,
                           ) ==
                           true) {
+                    showLoading();
+                    if (widget.refreshData != null) {
+                      widget.refreshData!();
+                    } else {
+                      dismissLoading;
+                      context.pop();
+                      showDialogSuccess(context, 'Appointment successfully created for the user');
+                    }
+                  } else {
+                    showLoading();
+                    if (widget.refreshData != null) {
+                      widget.refreshData!();
+                    } else {
+                      dismissLoading;
+                      context.pop();
+                      showDialogSuccess(context, 'Appointment successfully created for the user');
+                    }
+                  }
+                } else {
+                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                }
+              });
+            } else {
+              AppointmentController.update(
+                context,
+                UpdateAppointmentRequest(
+                  appointmentId: widget.appointment?.appointmentId,
+                  userId: widget.appointment?.user?.userId,
+                  appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
+                  serviceBranchId: _service?.key,
+                  appointmentNote: appointmentNoteController.controller.text,
+                  customerDueDate: dueDateController.controller.text,
+                  appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
+                ),
+              ).then((value) {
+                dismissLoading();
+                if (responseCode(value.code)) {
+                  if (_status?.key == "6") {
                     PaymentController.upload(
                       context,
                       value.data?.id ?? '',
@@ -1083,42 +1153,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       }
                     });
                   } else {
-                    showLoading();
                     if (widget.refreshData != null) {
                       widget.refreshData!();
-                    } else {
-                      dismissLoading;
-                      context.pop();
-                      showDialogSuccess(context, 'Appointment successfully created for the user');
                     }
-                  }
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                }
-              });
-            } else {
-              AppointmentController.update(
-                context,
-                UpdateAppointmentRequest(
-                  appointmentId: widget.appointment?.appointmentId,
-                  userId: widget.appointment?.user?.userId,
-                  appointmentDateTime: dateTimeController.text,
-                  serviceBranchId: _service?.key,
-                  appointmentNote: appointmentNoteController.controller.text,
-                  customerDueDate: dueDateController.controller.text,
-                  appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
-                ),
-              ).then((value) {
-                dismissLoading();
-                if (responseCode(value.code)) {
-                  if (widget.refreshData != null) {
-                    widget.refreshData!();
-                  }
-                  context.pop();
-                  if (widget.type == 'update') {
-                    showDialogSuccess(context, 'Successfully updated appointment');
-                  } else {
-                    showDialogSuccess(context, 'Successfully created new appointment');
+                    context.pop();
+                    if (widget.type == 'update') {
+                      showDialogSuccess(context, 'Successfully updated appointment');
+                    } else {
+                      showDialogSuccess(context, 'Successfully created new appointment');
+                    }
                   }
                 } else {
                   showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');

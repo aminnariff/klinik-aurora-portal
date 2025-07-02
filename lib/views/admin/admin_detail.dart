@@ -318,7 +318,7 @@ class _AdminDetailState extends State<AdminDetail> {
                             ),
                             AppPadding.vertical(denominator: 2),
                             const Text(
-                              'Note: Choose User Management, Point Management, and Reward Management for branch use in the Staff App.',
+                              'Note: Choose User Management, Appointment, Point Management, Reward Management, and Payment for branch use in the Staff App.\nSonographer: If the user is assigned the Sonographer permission, they will only be able to view appointments.',
                             ),
                             AppPadding.vertical(denominator: 3 / 2),
                           ],
