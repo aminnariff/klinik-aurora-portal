@@ -441,17 +441,17 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
       if (supportedExtensions.contains(file.extension)) {
         debugPrint(bytesToMB(file.size).toString());
         debugPrint(file.name);
-        if (bytesToMB(file.size) < 5.0) {
+        if (bytesToMB(file.size) < 1.0) {
           Uint8List? fileBytes = result.files.first.bytes;
           String fileName = result.files.first.name;
 
           selectedFile = FileAttribute(name: fileName, value: fileBytes);
           fileRebuild.add(DateTime.now());
         } else {
-          documentErrorMessage.add('error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
+          showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
         }
       } else {
-        documentErrorMessage.add('error'.tr(gender: 'err-22'));
+        showDialogError(context, 'error'.tr(gender: 'err-22'));
       }
     } else {
       // User canceled the picker

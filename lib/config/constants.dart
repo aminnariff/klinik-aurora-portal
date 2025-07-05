@@ -58,7 +58,7 @@ List<DropdownAttribute> appointmentStatus = [
   DropdownAttribute('7', 'No Show'),
 ];
 
-double fileSizeLimit = 10.0;
+double fileSizeLimit = 1.0;
 
 
     // "permissionId": "1bda631e-ef17-11ee-bd1b-cc801b09db2f",

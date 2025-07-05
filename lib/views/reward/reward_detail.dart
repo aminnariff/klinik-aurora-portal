@@ -33,11 +33,7 @@ class RewardDetail extends StatefulWidget {
   final Data? reward;
   final String type;
 
-  const RewardDetail({
-    super.key,
-    required this.reward,
-    required this.type,
-  });
+  const RewardDetail({super.key, required this.reward, required this.type});
 
   @override
   State<RewardDetail> createState() => _RewardDetailState();
@@ -98,15 +94,12 @@ class _RewardDetailState extends State<RewardDetail> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Reward Information',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Reward Information', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
@@ -117,12 +110,7 @@ class _RewardDetailState extends State<RewardDetail> {
                               width: screenWidth1728(26),
                               child: Column(
                                 children: [
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _rewardName,
-                                      labelText: 'Name',
-                                    ),
-                                  ),
+                                  InputField(field: InputFieldAttribute(controller: _rewardName, labelText: 'Name')),
                                   AppPadding.vertical(denominator: 2),
                                   TextField(
                                     maxLines: null,
@@ -154,9 +142,7 @@ class _RewardDetailState extends State<RewardDetail> {
                                     onTap: () async {
                                       var results = await showCalendarDatePicker2Dialog(
                                         context: context,
-                                        config: CalendarDatePicker2WithActionButtonsConfig(
-                                          currentDate: DateTime.now(),
-                                        ),
+                                        config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now()),
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
                                       );
@@ -165,17 +151,14 @@ class _RewardDetailState extends State<RewardDetail> {
                                     child: ReadOnly(
                                       InputField(
                                         field: InputFieldAttribute(
-                                            controller: _startDate,
-                                            isEditable: false,
-                                            labelText: 'rewardPage'.tr(gender: 'startDate'),
-                                            suffixWidget: const Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons.calendar_month,
-                                                ),
-                                              ],
-                                            )),
+                                          controller: _startDate,
+                                          isEditable: false,
+                                          labelText: 'rewardPage'.tr(gender: 'startDate'),
+                                          suffixWidget: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [Icon(Icons.calendar_month)],
+                                          ),
+                                        ),
                                       ),
                                       isEditable: false,
                                     ),
@@ -201,11 +184,7 @@ class _RewardDetailState extends State<RewardDetail> {
                                           labelText: 'rewardPage'.tr(gender: 'endDate'),
                                           suffixWidget: const Row(
                                             mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_month,
-                                              ),
-                                            ],
+                                            children: [Icon(Icons.calendar_month)],
                                           ),
                                         ),
                                       ),
@@ -231,82 +210,75 @@ class _RewardDetailState extends State<RewardDetail> {
                                       if (widget.type == 'create') ...[
                                         selectedFile?.value == null
                                             ? UploadDocumentsField(
-                                                title: 'rewardPage'.tr(gender: 'browseFile'),
-                                                fieldTitle: 'rewardPage'.tr(gender: 'rewardImage'),
-                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                action: () {
-                                                  addPicture();
-                                                },
-                                                cancelAction: () {},
-                                              )
+                                              title: 'rewardPage'.tr(gender: 'browseFile'),
+                                              fieldTitle: 'rewardPage'.tr(gender: 'rewardImage'),
+                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                              action: () {
+                                                addPicture();
+                                              },
+                                              cancelAction: () {},
+                                            )
                                             : Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      addPicture();
-                                                    },
-                                                    child: Image.memory(
-                                                      selectedFile?.value as Uint8List,
-                                                      height: 410,
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      selectedFile = FileAttribute();
-                                                      fileRebuild.add(DateTime.now());
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons.close,
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
+                                              alignment: Alignment.topRight,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    addPicture();
+                                                  },
+                                                  child: Image.memory(selectedFile?.value as Uint8List, height: 410),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    selectedFile = FileAttribute();
+                                                    fileRebuild.add(DateTime.now());
+                                                  },
+                                                  icon: const Icon(Icons.close),
+                                                ),
+                                              ],
+                                            ),
                                       ],
                                       if (widget.type == 'update')
                                         widget.reward?.rewardImage == null
                                             ? selectedFile?.name != null
                                                 ? Stack(
-                                                    alignment: Alignment.topRight,
-                                                    children: [
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          addPicture();
-                                                        },
-                                                        child: Image.memory(
-                                                          selectedFile?.value as Uint8List,
-                                                          height: 410,
-                                                        ),
+                                                  alignment: Alignment.topRight,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        addPicture();
+                                                      },
+                                                      child: Image.memory(
+                                                        selectedFile?.value as Uint8List,
+                                                        height: 410,
                                                       ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          selectedFile = FileAttribute();
-                                                          fileRebuild.add(DateTime.now());
-                                                        },
-                                                        icon: const Icon(
-                                                          Icons.close,
-                                                        ),
-                                                      )
-                                                    ],
-                                                  )
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        selectedFile = FileAttribute();
+                                                        fileRebuild.add(DateTime.now());
+                                                      },
+                                                      icon: const Icon(Icons.close),
+                                                    ),
+                                                  ],
+                                                )
                                                 : UploadDocumentsField(
-                                                    title: 'branchImage'.tr(gender: 'browseFile'),
-                                                    fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                    // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                    action: () {
-                                                      addPicture();
-                                                    },
-                                                    cancelAction: () {},
-                                                  )
+                                                  title: 'branchImage'.tr(gender: 'browseFile'),
+                                                  fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                  action: () {
+                                                    addPicture();
+                                                  },
+                                                  cancelAction: () {},
+                                                )
                                             : GestureDetector(
-                                                onTap: () {
-                                                  addPicture();
-                                                },
-                                                child: Image.network(
-                                                  '${Environment.imageUrl}${widget.reward?.rewardImage}',
-                                                  height: 410,
-                                                ),
+                                              onTap: () {
+                                                addPicture();
+                                              },
+                                              child: Image.network(
+                                                '${Environment.imageUrl}${widget.reward?.rewardImage}',
+                                                height: 410,
                                               ),
+                                            ),
                                       AppPadding.vertical(denominator: 2),
                                     ],
                                   );
@@ -320,67 +292,65 @@ class _RewardDetailState extends State<RewardDetail> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Button(
-                              () {
-                                if (widget.type == 'update') {
-                                  RewardController.update(
-                                    context,
-                                    UpdateRewardRequest(
-                                      rewardId: widget.reward?.rewardId ?? '',
-                                      rewardName: _rewardName.text,
-                                      rewardDescription: _rewardDescription.text,
-                                      rewardPoint: int.parse(_rewardPoint.text),
-                                      rewardStartDate: convertStringToDate(_startDate.text),
-                                      rewardEndDate: convertStringToDate(_endDate.text),
-                                      totalReward: int.parse(_rewardTotal.text),
-                                      rewardStatus: widget.reward?.rewardStatus,
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      if (selectedFile?.value != null) {
-                                        RewardController.upload(context, widget.reward!.rewardId!, selectedFile!)
-                                            .then((value) {
-                                          if (responseCode(value.code)) {
-                                            getLatestData();
-                                          } else {
-                                            showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                          }
-                                        });
-                                      } else {
-                                        context.pop();
-                                        getLatestData();
-                                      }
-                                    } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                    }
-                                  });
-                                } else if (widget.type == 'create') {
-                                  RewardController.create(
-                                    context,
-                                    CreateRewardRequest(
-                                      rewardName: _rewardName.text,
-                                      rewardDescription: _rewardDescription.text,
-                                      rewardPoint: int.parse(_rewardPoint.text),
-                                      rewardStartDate: convertStringToDate(_startDate.text),
-                                      rewardEndDate: convertStringToDate(_endDate.text),
-                                      totalReward: _rewardTotal.text != '' ? int.parse(_rewardTotal.text) : null,
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      context.pop();
-                                      RewardController.upload(context, value.data!.id!, selectedFile!).then((value) {
+                            Button(() {
+                              if (widget.type == 'update') {
+                                RewardController.update(
+                                  context,
+                                  UpdateRewardRequest(
+                                    rewardId: widget.reward?.rewardId ?? '',
+                                    rewardName: _rewardName.text,
+                                    rewardDescription: _rewardDescription.text,
+                                    rewardPoint: int.parse(_rewardPoint.text),
+                                    rewardStartDate: convertStringToDate(_startDate.text),
+                                    rewardEndDate: convertStringToDate(_endDate.text),
+                                    totalReward: int.parse(_rewardTotal.text),
+                                    rewardStatus: widget.reward?.rewardStatus,
+                                  ),
+                                ).then((value) {
+                                  if (responseCode(value.code)) {
+                                    if (selectedFile?.value != null) {
+                                      RewardController.upload(context, widget.reward!.rewardId!, selectedFile!).then((
+                                        value,
+                                      ) {
                                         if (responseCode(value.code)) {
                                           getLatestData();
+                                        } else {
+                                          showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                                         }
                                       });
                                     } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                      context.pop();
+                                      getLatestData();
                                     }
-                                  });
-                                }
-                              },
-                              actionText: 'button'.tr(gender: 'update'),
-                            ),
+                                  } else {
+                                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                  }
+                                });
+                              } else if (widget.type == 'create') {
+                                RewardController.create(
+                                  context,
+                                  CreateRewardRequest(
+                                    rewardName: _rewardName.text,
+                                    rewardDescription: _rewardDescription.text,
+                                    rewardPoint: int.parse(_rewardPoint.text),
+                                    rewardStartDate: convertStringToDate(_startDate.text),
+                                    rewardEndDate: convertStringToDate(_endDate.text),
+                                    totalReward: _rewardTotal.text != '' ? int.parse(_rewardTotal.text) : null,
+                                  ),
+                                ).then((value) {
+                                  if (responseCode(value.code)) {
+                                    context.pop();
+                                    RewardController.upload(context, value.data!.id!, selectedFile!).then((value) {
+                                      if (responseCode(value.code)) {
+                                        getLatestData();
+                                      }
+                                    });
+                                  } else {
+                                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                  }
+                                });
+                              }
+                            }, actionText: 'button'.tr(gender: 'update')),
                           ],
                         ),
                       ],
@@ -401,15 +371,19 @@ class _RewardDetailState extends State<RewardDetail> {
       if (responseCode(value.code)) {
         context.read<RewardController>().rewardAllResponse = value;
         if (widget.type == 'update') {
-          showDialogSuccess(context,
-              'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉');
+          showDialogSuccess(
+            context,
+            'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉',
+          );
         } else {
           showDialogSuccess(context, 'Successfully created a new reward');
         }
       } else {
         if (widget.type == 'update') {
-          showDialogSuccess(context,
-              'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉');
+          showDialogSuccess(
+            context,
+            'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉',
+          );
         } else {
           showDialogSuccess(context, 'Successfully created a new reward');
         }
@@ -426,17 +400,17 @@ class _RewardDetailState extends State<RewardDetail> {
       if (supportedExtensions.contains(file.extension)) {
         debugPrint(bytesToMB(file.size).toString());
         debugPrint(file.name);
-        if (bytesToMB(file.size) < 5.0) {
+        if (bytesToMB(file.size) < 1.0) {
           Uint8List? fileBytes = result.files.first.bytes;
           String fileName = result.files.first.name;
 
           selectedFile = FileAttribute(name: fileName, value: fileBytes);
           fileRebuild.add(DateTime.now());
         } else {
-          documentErrorMessage.add('error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
+          showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
         }
       } else {
-        documentErrorMessage.add('error'.tr(gender: 'err-22'));
+        showDialogError(context, 'error'.tr(gender: 'err-22'));
       }
     } else {
       // User canceled the picker

@@ -359,47 +359,69 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     (element) => element.paymentType == 4,
                                                                   ) ==
                                                                   false)) ...[
-                                                        UploadDocumentsField(
-                                                          title: 'promotionPage'.tr(gender: 'browseFile'),
-                                                          fieldTitle:
-                                                              _status?.key == '6'
-                                                                  ? 'appointmentPage'.tr(gender: 'refundProof')
-                                                                  : 'appointmentPage'.tr(gender: 'paymentProof'),
-                                                          // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                          action: () async {
-                                                            documentErrorMessage.add(null);
-                                                            FilePickerResult? result =
-                                                                await FilePicker.platform.pickFiles();
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            UploadDocumentsField(
+                                                              title: 'promotionPage'.tr(gender: 'browseFile'),
+                                                              fieldTitle:
+                                                                  _status?.key == '6'
+                                                                      ? 'appointmentPage'.tr(gender: 'refundProof')
+                                                                      : 'appointmentPage'.tr(gender: 'paymentProof'),
+                                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                              action: () async {
+                                                                documentErrorMessage.add(null);
+                                                                FilePickerResult? result =
+                                                                    await FilePicker.platform.pickFiles();
 
-                                                            if (result != null) {
-                                                              PlatformFile file = result.files.first;
-                                                              if (supportedExtensions.contains(file.extension)) {
-                                                                debugPrint(bytesToMB(file.size).toString());
-                                                                debugPrint(file.name);
-                                                                if (bytesToMB(file.size) < 5.0) {
-                                                                  Uint8List? fileBytes = result.files.first.bytes;
-                                                                  String fileName = result.files.first.name;
+                                                                if (result != null) {
+                                                                  PlatformFile file = result.files.first;
+                                                                  if (supportedExtensions.contains(file.extension)) {
+                                                                    debugPrint(bytesToMB(file.size).toString());
+                                                                    debugPrint(file.name);
+                                                                    if (bytesToMB(file.size) < 1.0) {
+                                                                      Uint8List? fileBytes = result.files.first.bytes;
+                                                                      String fileName = result.files.first.name;
 
-                                                                  selectedFiles.add(
-                                                                    FileAttribute(name: fileName, value: fileBytes),
-                                                                  );
-                                                                  fileRebuild.add(DateTime.now());
+                                                                      selectedFiles.add(
+                                                                        FileAttribute(name: fileName, value: fileBytes),
+                                                                      );
+                                                                      fileRebuild.add(DateTime.now());
+                                                                    } else {
+                                                                      showDialogError(
+                                                                        context,
+                                                                        'error'.tr(
+                                                                          gender: 'err-21',
+                                                                          args: [fileSizeLimit.toStringAsFixed(0)],
+                                                                        ),
+                                                                      );
+                                                                    }
+                                                                  } else {
+                                                                    showDialogError(
+                                                                      context,
+                                                                      'error'.tr(gender: 'err-22'),
+                                                                    );
+                                                                  }
                                                                 } else {
-                                                                  documentErrorMessage.add(
-                                                                    'error'.tr(
-                                                                      gender: 'err-21',
-                                                                      args: [fileSizeLimit.toStringAsFixed(0)],
-                                                                    ),
-                                                                  );
+                                                                  // User canceled the picker
                                                                 }
-                                                              } else {
-                                                                documentErrorMessage.add('error'.tr(gender: 'err-22'));
-                                                              }
-                                                            } else {
-                                                              // User canceled the picker
-                                                            }
-                                                          },
-                                                          cancelAction: () {},
+                                                              },
+                                                              cancelAction: () {},
+                                                            ),
+                                                            StreamBuilder<String?>(
+                                                              stream: documentErrorMessage.stream,
+                                                              builder: (context, snapshot) {
+                                                                return snapshot.data == null
+                                                                    ? SizedBox()
+                                                                    : Text(
+                                                                      snapshot.data ?? '',
+                                                                      style: AppTypography.bodyMedium(
+                                                                        context,
+                                                                      ).apply(color: errorColor, fontSizeDelta: -1),
+                                                                    );
+                                                              },
+                                                            ),
+                                                          ],
                                                         ),
                                                       ],
                                                       for (int index = 0; index < selectedFiles.length; index++)
@@ -1092,19 +1114,37 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           ) ==
                           true) {
                     showLoading();
-                    if (widget.refreshData != null) {
-                      widget.refreshData!();
-                    } else {
-                      dismissLoading;
-                      context.pop();
-                      showDialogSuccess(context, 'Appointment successfully created for the user');
-                    }
+                    PaymentController.upload(
+                      context,
+                      value.data?.id ?? '',
+                      widget.appointment?.user?.userId ?? '',
+                      2,
+                      context
+                              .read<ServiceBranchController>()
+                              .serviceBranchResponse
+                              ?.data
+                              ?.firstWhere((element) => element.serviceBranchId == _service?.key)
+                              .serviceBookingFee ??
+                          '50.00',
+                      [selectedFiles[0]],
+                    ).then((documentUploadResponse) {
+                      showLoading();
+                      if (widget.refreshData != null) {
+                        dismissLoading();
+                        widget.refreshData!();
+                      } else {
+                        dismissLoading();
+                        context.pop();
+                        showDialogSuccess(context, 'Appointment successfully created for the user');
+                      }
+                    });
                   } else {
                     showLoading();
                     if (widget.refreshData != null) {
+                      dismissLoading();
                       widget.refreshData!();
                     } else {
-                      dismissLoading;
+                      dismissLoading();
                       context.pop();
                       showDialogSuccess(context, 'Appointment successfully created for the user');
                     }
@@ -1137,7 +1177,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       context,
                       value.data?.id ?? '',
                       widget.appointment?.user?.userId ?? '',
-                      2,
+                      4,
                       context
                               .read<ServiceBranchController>()
                               .serviceBranchResponse
@@ -1149,15 +1189,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     ).then((documentUploadResponse) {
                       showLoading();
                       if (widget.refreshData != null) {
+                        dismissLoading();
                         widget.refreshData!();
                       } else {
-                        dismissLoading;
+                        dismissLoading();
                         context.pop();
                         showDialogSuccess(context, 'Appointment successfully created for the user');
                       }
                     });
                   } else {
                     if (widget.refreshData != null) {
+                      dismissLoading();
                       widget.refreshData!();
                     }
                     context.pop();

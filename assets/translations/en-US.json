@@ -49,7 +49,7 @@
         "phoneNo": "Contact No.",
         "password": "Password",
         "branchImage": "Branch Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "email": "Email",
         "userStatus": "Status"
     },
@@ -66,7 +66,7 @@
         "doctorName": "PIC Name",
         "phoneNo": "PIC Contact No.",
         "doctorImage": "PIC Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "voucherStatus": "Status"
     },
     "passwordRecoveryPage": {
@@ -110,7 +110,7 @@
         "endDate": "End Date",
         "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "promotionImage": "Promotion Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "forgotPassword": "Forgot password?"
     },
     "rewardPage": {
@@ -118,7 +118,7 @@
         "endDate": "End Date",
         "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "rewardImage": "Promotion Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "forgotPassword": "Forgot password?"
     },
     "rewardHistoryPage": {
@@ -126,7 +126,7 @@
         "endDate": "End Date",
         "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "rewardImage": "Promotion Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "forgotPassword": "Forgot password?"
     },
     "servicesHomepage": {
@@ -137,7 +137,7 @@
         "doctorType": "Type",
         "serviceTime": "Service Time",
         "serviceImage": "Service Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "serviceCategory": "Category"
     },
     "version": {
