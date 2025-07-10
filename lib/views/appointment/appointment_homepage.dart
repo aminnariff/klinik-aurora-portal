@@ -24,7 +24,6 @@ import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
-import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -909,150 +908,98 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 context: context,
                 builder: (BuildContext context) {
                   return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          CardContainer(
-                            Padding(
-                              padding: EdgeInsets.all(screenPadding),
-                              child: const SelectionCalendarView(
-                                startMonth: 5,
-                                year: 2025,
-                                totalMonths: 2,
-                                initialDateTimes: [
-                                  "2025-05-06T02:43:00.000Z",
-                                  "2025-05-21T02:43:00.000Z",
-                                  "2025-05-25T02:43:00.000Z",
-                                  "2025-05-23T02:43:00.000Z",
-                                  "2025-05-16T02:43:00.000Z",
-                                  "2025-05-10T10:00:00.000Z",
-                                  "2025-05-16T10:00:00.000Z",
-                                  "2025-05-31T10:00:00.000Z",
-                                ],
-                              ),
+                      Flexible(
+                        child: Card(
+                          surfaceTintColor: Colors.white,
+                          elevation: 5.0,
+                          color: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              bottomLeft: Radius.circular(15),
                             ),
                           ),
-                        ],
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                                child: Column(
+                                  children: [
+                                    searchField(
+                                      InputFieldAttribute(
+                                        controller: _serviceNameController,
+                                        hintText: 'Search',
+                                        labelText: 'Service Name',
+                                      ),
+                                    ),
+                                    AppPadding.vertical(),
+                                    StreamBuilder<DateTime>(
+                                      stream: rebuildDropdown.stream,
+                                      builder: (context, snapshot) {
+                                        return Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                AppDropdown(
+                                                  attributeList: DropdownAttributeList(
+                                                    [
+                                                      DropdownAttribute('1', 'Active'),
+                                                      DropdownAttribute('0', 'Inactive'),
+                                                    ],
+                                                    labelText: 'information'.tr(gender: 'userStatus'),
+                                                    value: _selectedServiceStatus?.name,
+                                                    onChanged: (p0) {
+                                                      _selectedServiceStatus = p0;
+                                                      rebuildDropdown.add(DateTime.now());
+                                                      filtering(page: 1);
+                                                    },
+                                                    width: screenWidthByBreakpoint(90, 70, 26),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                    AppPadding.vertical(denominator: 1 / 3),
+                                    AppOutlinedButton(
+                                      () {
+                                        resetAllFilter();
+                                        filtering(enableDebounce: true, page: 1);
+                                      },
+                                      backgroundColor: Colors.white,
+                                      borderRadius: 15,
+                                      width: 131,
+                                      height: 45,
+                                      text: 'Clear',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   );
                 },
               );
-              // showDialog(
-              //   context: context,
-              //   builder: (BuildContext context) {
-              //     return const AppointmentDetails(type: 'create');
-              //   },
-              // );
             },
             child: Row(
               children: [
-                const Icon(Icons.add, color: Colors.blue),
+                const Icon(Icons.filter_list, color: Colors.blue),
                 AppPadding.horizontal(denominator: 2),
-                Text('Add new appointment', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
+                Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
               ],
             ),
           ),
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Card(
-                        surfaceTintColor: Colors.white,
-                        elevation: 5.0,
-                        color: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            bottomLeft: Radius.circular(15),
-                          ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                              child: Column(
-                                children: [
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _serviceNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Service Name',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  StreamBuilder<DateTime>(
-                                    stream: rebuildDropdown.stream,
-                                    builder: (context, snapshot) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    DropdownAttribute('1', 'Active'),
-                                                    DropdownAttribute('0', 'Inactive'),
-                                                  ],
-                                                  labelText: 'information'.tr(gender: 'userStatus'),
-                                                  value: _selectedServiceStatus?.name,
-                                                  onChanged: (p0) {
-                                                    _selectedServiceStatus = p0;
-                                                    rebuildDropdown.add(DateTime.now());
-                                                    filtering(page: 1);
-                                                  },
-                                                  width: screenWidthByBreakpoint(90, 70, 26),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  AppPadding.vertical(denominator: 1 / 3),
-                                  AppOutlinedButton(
-                                    () {
-                                      resetAllFilter();
-                                      filtering(enableDebounce: true, page: 1);
-                                    },
-                                    backgroundColor: Colors.white,
-                                    borderRadius: 15,
-                                    width: 131,
-                                    height: 45,
-                                    text: 'Clear',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.filter_list, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
         TextButton(
           onPressed: () {
             resetAllFilter();

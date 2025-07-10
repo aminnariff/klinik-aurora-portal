@@ -137,15 +137,14 @@ class _HomepageState extends State<Homepage> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       context.read<AuthController>().init(context).then((value) {
         if (value != null) {
-          if (!context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
+          if (context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f') == false) {
             sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
           }
           if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') ||
               context.read<AuthController>().isSuperAdmin == false) {
             sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
           }
-          if (!context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') ||
-              context.read<AuthController>().isSuperAdmin == false) {
+          if (context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') == false) {
             sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
           }
           if (!context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') ||
@@ -169,12 +168,10 @@ class _HomepageState extends State<Homepage> {
           if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
             sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
           }
-          if (!context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2') ||
-              context.read<AuthController>().isSuperAdmin == false) {
+          if (context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2') == false) {
             sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
           }
-          if (!context.read<AuthController>().hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342') ||
-              context.read<AuthController>().isSuperAdmin == false) {
+          if (context.read<AuthController>().hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342') == false) {
             sideBarAttribute.removeWhere((element) => element.label == ServiceHomepage.displayName);
           }
           context.read<TopBarController>().pageValue = 0;

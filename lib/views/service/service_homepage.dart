@@ -841,6 +841,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         dismissLoading();
         if (responseCode(value.code)) {
           context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+          _totalCount = value.data?.totalCount ?? 0;
+          _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         }
       });
     } else {
@@ -864,7 +866,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
           context.read<ServiceController>().servicesResponse = value.data;
           // _page = 0;
-        } else if (value.code == 404) {}
+        }
         return null;
       });
     }

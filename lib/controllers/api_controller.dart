@@ -199,13 +199,16 @@ class ApiController {
                 });
         }
       } catch (e) {
-        debugPrint('ERROR: $e');
         if (e is DioException) {
+          debugPrint(
+            'ERROR: url -> $url | data -> $data | code -> ${e.response?.statusCode}  | message -> ${e.response?.data['message']} | ${e.error}',
+          );
           if (e.isNoConnectionError) {
             debugPrint('Internet connection is now offline');
           } else {
             dismissLoading();
             if (e.response?.statusCode == 401 && isAuthenticated == false) {
+              dismissLoading();
               Future.delayed(Duration.zero, () {
                 showDialogError(context, e.response?.data?['message'] ?? '');
               });
@@ -213,6 +216,7 @@ class ApiController {
                 e.response?.statusCode == 403 ||
                 e.response?.statusCode == 410) {
               if (isSessionExpiredDialogOpen == false) {
+                dismissLoading();
                 isSessionExpiredDialogOpen = true;
                 await promptDialog(
                   context,
@@ -320,7 +324,7 @@ class ApiController {
               text: text,
               buttonAttributes: [
                 if (buttonText != null)
-                  DialogButtonAttribute(action(), text: buttonText, color: buttonColor ?? errorColor),
+                  DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
               ],
             ),
           );

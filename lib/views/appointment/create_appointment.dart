@@ -152,31 +152,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         debugPrint(e.toString());
       }
 
-      if (widget.type == 'update') {
-        ServiceBranchAvailableDtController.get(
-          context,
-          1,
-          100,
-          serviceBranchId: widget.appointment?.serviceBranchId,
-          serviceBranchStatus: 1,
-        ).then((value) {
-          if (responseCode(value.code)) {
-            context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableDtResponse = value.data;
-            ServiceBranchExceptionController.get(
-              context,
-              1,
-              999,
-              serviceBranchId: widget.appointment?.serviceBranchId,
-            ).then((value) {
-              if (responseCode(value.code)) {
-                context.read<ServiceBranchExceptionController>().serviceBranchExceptionResponse = value.data;
-                rebuildDropdown.add(DateTime.now());
-              }
-            });
-          }
-        });
-      }
-
       // if (widget.appointment?.doctorType == 1) {
       //   _status = DropdownAttribute('1', 'General');
       // } else if (widget.appointment?.doctorType == 2) {
@@ -277,41 +252,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           AppPadding.vertical(denominator: 2),
                                           GestureDetector(
                                             onTap: () async {
-                                              var results = await showCalendarDatePicker2Dialog(
-                                                context: context,
-                                                barrierDismissible: true,
-                                                dialogBackgroundColor: Colors.white,
-                                                config: CalendarDatePicker2WithActionButtonsConfig(
-                                                  calendarType: CalendarDatePicker2Type.single,
-                                                  firstDate: DateTime.now(),
-                                                  lastDate: DateTime.now().add(Duration(days: 365)),
-                                                  selectedDayHighlightColor: Colors.blue,
-                                                  weekdayLabelTextStyle: TextStyle(color: Colors.grey.shade600),
-                                                  controlsTextStyle: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                  selectedDayTextStyle: TextStyle(color: Colors.white),
-                                                  dayTextStyle: TextStyle(color: Colors.black87),
-                                                  disableModePicker: false,
-                                                  // okButtonText: '', // hide default buttons
-                                                  // cancelButtonText: '',
-                                                  openedFromDialog: true,
-                                                ),
-                                                dialogSize: Size(
-                                                  screenWidthByBreakpoint(90, 70, 50),
-                                                  screenHeightByBreakpoint(90, 80, 50),
-                                                ),
-                                                borderRadius: BorderRadius.circular(20),
-                                              );
-                                              if (results != null) {
-                                                if (dueDateController.errorMessage != null) {
-                                                  dueDateController.errorMessage = null;
-                                                  rebuild.add(DateTime.now());
-                                                }
-                                                dueDateController.controller.text =
-                                                    dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
-                                              }
+                                              dueDateCalendar();
                                             },
                                             child: ReadOnly(InputField(field: dueDateController), isEditable: false),
                                           ),
@@ -757,6 +698,105 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   format: 'yyyy-MM-dd HH:mm',
                                                 ) ??
                                                 '';
+                                          } else if (widget.type == 'update' &&
+                                              context
+                                                      .read<ServiceBranchAvailableDtController>()
+                                                      .serviceBranchAvailableDtResponse ==
+                                                  null) {
+                                            ServiceBranchAvailableDtController.get(
+                                              context,
+                                              1,
+                                              100,
+                                              serviceBranchId: widget.appointment?.serviceBranchId,
+                                              serviceBranchStatus: 1,
+                                            ).then((value) {
+                                              if (responseCode(value.code)) {
+                                                context
+                                                    .read<ServiceBranchAvailableDtController>()
+                                                    .serviceBranchAvailableDtResponse = value.data;
+                                                ServiceBranchExceptionController.get(
+                                                  context,
+                                                  1,
+                                                  999,
+                                                  serviceBranchId: widget.appointment?.serviceBranchId,
+                                                ).then((value) async {
+                                                  if (responseCode(value.code)) {
+                                                    context
+                                                        .read<ServiceBranchExceptionController>()
+                                                        .serviceBranchExceptionResponse = value.data;
+                                                    DateTime now = DateTime.now();
+                                                    List<String> availableDateTime =
+                                                        snapshot
+                                                            .serviceBranchAvailableDtResponse
+                                                            ?.data
+                                                            ?.first
+                                                            .availableDatetimes ??
+                                                        [];
+                                                    List<String> exceptionDateTime = [];
+                                                    for (
+                                                      int index = 0;
+                                                      index <
+                                                          (context
+                                                                  .read<ServiceBranchExceptionController>()
+                                                                  .serviceBranchExceptionResponse
+                                                                  ?.data
+                                                                  ?.length ??
+                                                              0);
+                                                      index++
+                                                    ) {
+                                                      exceptionDateTime.add(
+                                                        context
+                                                                .read<ServiceBranchExceptionController>()
+                                                                .serviceBranchExceptionResponse
+                                                                ?.data?[index]
+                                                                .exceptionDatetime ??
+                                                            '',
+                                                      );
+                                                    }
+
+                                                    for (int index = 0; index < exceptionDateTime.length; index++) {
+                                                      availableDateTime.removeWhere(
+                                                        (element) => element == exceptionDateTime[index],
+                                                      );
+                                                    }
+                                                    availableDateTime = removePastDates(availableDateTime);
+                                                    String? selectedDateTime = await showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Column(
+                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                              children: [
+                                                                CardContainer(
+                                                                  Padding(
+                                                                    padding: EdgeInsets.all(screenPadding),
+                                                                    child: SelectionCalendarView(
+                                                                      startMonth: now.month,
+                                                                      year: now.year,
+                                                                      initialDateTimes: availableDateTime,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                    dateTimeController.text =
+                                                        formatDateTimeToDisplay(selectedDateTime) ??
+                                                        dateConverter(
+                                                          widget.appointment?.appointmentDatetime,
+                                                          format: 'yyyy-MM-dd HH:mm',
+                                                        ) ??
+                                                        '';
+                                                    rebuildDropdown.add(DateTime.now());
+                                                  }
+                                                });
+                                              }
+                                            });
                                           } else if (_service == null) {
                                             showDialogError(
                                               context,
@@ -811,6 +851,37 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ),
       ],
     );
+  }
+
+  void dueDateCalendar() async {
+    var results = await showCalendarDatePicker2Dialog(
+      context: context,
+      barrierDismissible: true,
+      dialogBackgroundColor: Colors.white,
+      config: CalendarDatePicker2WithActionButtonsConfig(
+        calendarType: CalendarDatePicker2Type.single,
+        firstDate: DateTime.now(),
+        lastDate: DateTime.now().add(Duration(days: 365)),
+        selectedDayHighlightColor: Colors.blue,
+        weekdayLabelTextStyle: TextStyle(color: Colors.grey.shade600),
+        controlsTextStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        selectedDayTextStyle: TextStyle(color: Colors.white),
+        dayTextStyle: TextStyle(color: Colors.black87),
+        disableModePicker: false,
+        // okButtonText: '', // hide default buttons
+        // cancelButtonText: '',
+        openedFromDialog: true,
+      ),
+      dialogSize: Size(screenWidthByBreakpoint(90, 70, 50), screenHeightByBreakpoint(90, 80, 50)),
+      borderRadius: BorderRadius.circular(20),
+    );
+    if (results != null) {
+      if (dueDateController.errorMessage != null) {
+        dueDateController.errorMessage = null;
+        rebuild.add(DateTime.now());
+      }
+      dueDateController.controller.text = dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
+    }
   }
 
   String? formatDateTimeToDisplay(String? input) {
@@ -1128,29 +1199,28 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           '50.00',
                       [selectedFiles[0]],
                     ).then((documentUploadResponse) {
-                      showLoading();
+                      dismissLoading();
                       if (widget.refreshData != null) {
-                        dismissLoading();
                         widget.refreshData!();
                       } else {
-                        dismissLoading();
                         context.pop();
                         showDialogSuccess(context, 'Appointment successfully created for the user');
                       }
                     });
                   } else {
-                    showLoading();
+                    dismissLoading();
                     if (widget.refreshData != null) {
-                      dismissLoading();
                       widget.refreshData!();
                     } else {
-                      dismissLoading();
                       context.pop();
                       showDialogSuccess(context, 'Appointment successfully created for the user');
                     }
                   }
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  dismissLoading();
+                  if (value.code != 500) {
+                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  }
                 }
               });
             } else {
@@ -1173,6 +1243,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 dismissLoading();
                 if (responseCode(value.code)) {
                   if (_status?.key == "6") {
+                    showLoading();
                     PaymentController.upload(
                       context,
                       value.data?.id ?? '',
@@ -1187,12 +1258,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           '50.00',
                       [selectedFiles[0]],
                     ).then((documentUploadResponse) {
-                      showLoading();
+                      dismissLoading();
                       if (widget.refreshData != null) {
-                        dismissLoading();
                         widget.refreshData!();
+                        context.pop();
+                        showDialogSuccess(context, 'Appointment successfully created for the user');
                       } else {
-                        dismissLoading();
                         context.pop();
                         showDialogSuccess(context, 'Appointment successfully created for the user');
                       }
@@ -1210,7 +1281,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     }
                   }
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  if (value.code != 500) {
+                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  }
                 }
               });
             }
@@ -1271,7 +1344,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     } else if (dateTimeController.text == "") {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'Slots'));
-    } else if (_service != null &&
+    } else if (widget.type == 'create' &&
+        _service != null &&
         notNullOrEmptyString(
               context
                   .read<ServiceBranchController>()
