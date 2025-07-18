@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -48,9 +49,14 @@ void showWhatsAppTemplateDialog({
             mainAxisSize: MainAxisSize.min,
             children: [
               for (String template in templates)
-                ListTile(
-                  title: Text(template, style: AppTypography.bodyMedium(context)),
-                  onTap: () => _launchWhatsApp(phone, template),
+                Column(
+                  children: [
+                    ListTile(
+                      title: Text(template, style: AppTypography.bodyMedium(context)),
+                      onTap: () => _launchWhatsApp(phone, template),
+                    ),
+                    Divider(indent: screenPadding, endIndent: screenPadding, color: Colors.grey),
+                  ],
                 ),
               const Divider(),
               TextField(

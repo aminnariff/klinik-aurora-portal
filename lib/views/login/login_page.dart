@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     if (kDebugMode) {
       usernameController.text = 'superadmin';
-      usernameController.text = 'auroramedicare@gmail.com';
+      // usernameController.text = 'auroramedicare@gmail.com';
       // usernameController.text = 'amin.ariff@klinikauroramembership.com';
       passwordController.text = 'Admin12345!';
     }

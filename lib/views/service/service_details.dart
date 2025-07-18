@@ -74,7 +74,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
   FileAttribute selectedFile = FileAttribute();
-  final List<TextEditingController> whatsappTemplateControllers = List.generate(3, (_) => TextEditingController());
+  final List<TextEditingController> whatsappTemplateControllers = List.generate(6, (_) => TextEditingController());
   @override
   void initState() {
     if (widget.type == 'update') {
@@ -181,7 +181,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "WhatsApp Templates (max 3)",
+                                        "WhatsApp Templates (max 6)",
                                         style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                                       ),
                                       RichText(
@@ -202,7 +202,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                           ],
                                         ),
                                       ),
-                                      ...List.generate(3, (index) {
+                                      ...List.generate(6, (index) {
                                         return Padding(
                                           padding: const EdgeInsets.only(top: 8.0),
                                           child: TextFormField(
