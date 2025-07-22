@@ -1,5 +1,5 @@
-import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 ThemeData theme(BuildContext context) {
   return ThemeData(
@@ -11,12 +11,13 @@ ThemeData theme(BuildContext context) {
     visualDensity: VisualDensity.adaptivePlatformDensity,
     fontFamily: 'Proxima',
     elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-      textStyle: const TextStyle(color: Colors.white),
-      padding: EdgeInsets.zero,
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-    )),
+      style: ElevatedButton.styleFrom(
+        textStyle: const TextStyle(color: Colors.white),
+        padding: EdgeInsets.zero,
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      ),
+    ),
     textTheme: TextTheme(
       displayLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.w700, color: textPrimaryColor),
       displayMedium: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textPrimaryColor),
@@ -25,10 +26,7 @@ ThemeData theme(BuildContext context) {
         fontWeight: FontWeight.bold,
         foreground: Paint()
           ..shader = const LinearGradient(
-            colors: <Color>[
-              Color(0XFFAD1F61),
-              Color(0XFF46006A),
-            ],
+            colors: <Color>[Color(0XFFAD1F61), Color(0XFF46006A)],
           ).createShader(const Rect.fromLTWH(0.0, 0.0, 500.0, 70.0)),
       ),
       bodyLarge: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: textPrimaryColor),
@@ -51,11 +49,9 @@ ThemeData darkThemeData(BuildContext context) {
     scaffoldBackgroundColor: Colors.white,
     // canvasColor: const Color(0xFF141d26),
     // scaffoldBackgroundColor: const Color(0xFF141d26),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFF141d26),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),
     iconTheme: const IconThemeData(color: Colors.white),
     textTheme: TextTheme(
@@ -66,10 +62,7 @@ ThemeData darkThemeData(BuildContext context) {
         fontWeight: FontWeight.bold,
         foreground: Paint()
           ..shader = const LinearGradient(
-            colors: <Color>[
-              Color(0XFFAD1F61),
-              Color(0XFF46006A),
-            ],
+            colors: <Color>[Color(0XFFAD1F61), Color(0XFF46006A)],
           ).createShader(const Rect.fromLTWH(0.0, 0.0, 500.0, 70.0)),
       ),
       bodyLarge: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),

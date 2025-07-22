@@ -127,11 +127,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       if (temp) {
         AppointmentDashboardController.get(
           context,
-          branchId:
-              context.read<AuthController>().isSuperAdmin == true
-                  ? _appointmentBranch?.key
-                  : context.read<AuthController>().branchId ??
-                      context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+          branchId: context.read<AuthController>().isSuperAdmin == true
+              ? _appointmentBranch?.key
+              : context.read<AuthController>().branchId ??
+                    context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
           startDate: startDate,
           endDate: endDate,
         ).then((value) {
@@ -245,7 +244,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             ),
           ),
         ),
-        Padding(padding: EdgeInsets.symmetric(vertical: screenPadding), child: pagination()),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: screenPadding),
+          child: pagination(),
+        ),
       ],
     );
     // },
@@ -339,21 +341,21 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           return authController.isSuperAdmin == false
                               ? SizedBox()
                               : AppDropdown(
-                                attributeList: DropdownAttributeList(
-                                  authController.isSuperAdmin ? branches : [],
-                                  labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                  isEditable: authController.isSuperAdmin,
-                                  fieldColor: authController.isSuperAdmin ? null : textFormFieldUneditableColor,
-                                  value: _appointmentBranch?.name,
-                                  onChanged: (p0) {
-                                    _appointmentBranch = p0;
-                                    rebuildDropdown.add(DateTime.now());
-                                    getDashboard();
-                                    filtering();
-                                  },
-                                  width: screenWidthByBreakpoint(90, 70, 250, useAbsoluteValueDesktop: true),
-                                ),
-                              );
+                                  attributeList: DropdownAttributeList(
+                                    authController.isSuperAdmin ? branches : [],
+                                    labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                    isEditable: authController.isSuperAdmin,
+                                    fieldColor: authController.isSuperAdmin ? null : textFormFieldUneditableColor,
+                                    value: _appointmentBranch?.name,
+                                    onChanged: (p0) {
+                                      _appointmentBranch = p0;
+                                      rebuildDropdown.add(DateTime.now());
+                                      getDashboard();
+                                      filtering();
+                                    },
+                                    width: screenWidthByBreakpoint(90, 70, 250, useAbsoluteValueDesktop: true),
+                                  ),
+                                );
                         },
                       );
                     },
@@ -449,276 +451,290 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         if (snapshot.appointmentResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.appointmentResponse?.data == null || snapshot.appointmentResponse!.data!.data!.isEmpty
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
+                  ],
+                )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  tableButton(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                            padding: const EdgeInsets.all(5),
-                            child: DataTable2(
-                              columnSpacing: 12,
-                              horizontalMargin: 12,
-                              minWidth: 1300,
-                              isHorizontalScrollBarVisible: true,
-                              isVerticalScrollBarVisible: true,
-                              columns: columns(),
-                              headingRowColor: WidgetStateProperty.all(Colors.white),
-                              headingRowHeight: 51,
-                              decoration: const BoxDecoration(),
-                              border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                verticalInside: BorderSide(
-                                  width: 1,
-                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                              padding: const EdgeInsets.all(5),
+                              child: DataTable2(
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                isHorizontalScrollBarVisible: true,
+                                isVerticalScrollBarVisible: true,
+                                columns: columns(),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
+                                headingRowHeight: 51,
+                                decoration: const BoxDecoration(),
+                                border: TableBorder(
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
-                              ),
-                              rows: [
-                                for (
-                                  int index = 0;
-                                  index < (snapshot.appointmentResponse?.data?.data?.length ?? 0);
-                                  index++
-                                )
-                                  DataRow(
-                                    color: WidgetStateProperty.all(
-                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                    ),
-                                    cells: [
-                                      DataCell(
-                                        Tooltip(
-                                          message:
-                                              'Contact No : ${snapshot.appointmentResponse?.data?.data?[index].user?.userPhone ?? 'N/A'}\nEmail : ${snapshot.appointmentResponse?.data?.data?[index].user?.userEmail ?? 'N/A'}',
-                                          child: Text(
-                                            snapshot.appointmentResponse?.data?.data?[index].user?.userFullName ??
+                                rows: [
+                                  for (
+                                    int index = 0;
+                                    index < (snapshot.appointmentResponse?.data?.data?.length ?? 0);
+                                    index++
+                                  )
+                                    DataRow(
+                                      color: WidgetStateProperty.all(
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                      ),
+                                      cells: [
+                                        DataCell(
+                                          Tooltip(
+                                            message:
+                                                'Contact No : ${snapshot.appointmentResponse?.data?.data?[index].user?.userPhone ?? 'N/A'}\nEmail : ${snapshot.appointmentResponse?.data?.data?[index].user?.userEmail ?? 'N/A'}',
+                                            child: Text(
+                                              snapshot.appointmentResponse?.data?.data?[index].user?.userFullName ??
+                                                  'N/A',
+                                              style: AppTypography.bodyMedium(context).apply(),
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Tooltip(
+                                            message:
+                                                '${snapshot.appointmentResponse?.data?.data?[index].service?.serviceDescription ?? 'N/A'}\n\nBooking Fee : RM ${snapshot.appointmentResponse?.data?.data?[index].service?.serviceBookingFee ?? 'N/A'}',
+                                            child: Text(
+                                              snapshot.appointmentResponse?.data?.data?[index].service?.serviceName ??
+                                                  'N/A',
+                                            ),
+                                          ),
+                                        ),
+                                        if (authController.isSuperAdmin)
+                                          DataCell(
+                                            AppSelectableText(
+                                              snapshot.appointmentResponse?.data?.data?[index].branch?.branchName ??
+                                                  'N/A',
+                                            ),
+                                          ),
+                                        DataCell(
+                                          Text(
+                                            getAppointmentStatusLabel(
+                                              snapshot.appointmentResponse?.data?.data?[index].appointmentStatus,
+                                            ),
+                                            style: AppTypography.bodyMedium(context).apply(
+                                              fontWeightDelta: 1,
+                                              color:
+                                                  appointmentStatusColors[snapshot
+                                                      .appointmentResponse
+                                                      ?.data
+                                                      ?.data?[index]
+                                                      .appointmentStatus],
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          (snapshot
+                                                      .appointmentResponse
+                                                      ?.data
+                                                      ?.data?[index]
+                                                      .service
+                                                      ?.serviceBookingFee !=
+                                                  null)
+                                              ? showPaymentStatus(
+                                                  context,
+                                                  snapshot.appointmentResponse?.data?.data?[index].appointmentStatus ==
+                                                          5
+                                                      ? 1
+                                                      : (snapshot
+                                                                    .appointmentResponse
+                                                                    ?.data
+                                                                    ?.data?[index]
+                                                                    .payment
+                                                                    ?.length ??
+                                                                0) >
+                                                            0
+                                                      ? (snapshot.appointmentResponse?.data?.data?[index].payment?.any(
+                                                                  (element) => element.paymentStatus == 1,
+                                                                ) ==
+                                                                true
+                                                            ? 1
+                                                            : 0)
+                                                      : 0,
+                                                )
+                                              : Text('-'),
+                                        ),
+                                        DataCell(
+                                          Text(
+                                            convertUtcToMalaysiaTime(
+                                                  snapshot.appointmentResponse?.data?.data?[index].appointmentDatetime,
+                                                ) ??
                                                 'N/A',
                                             style: AppTypography.bodyMedium(context).apply(),
                                           ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Tooltip(
-                                          message:
-                                              '${snapshot.appointmentResponse?.data?.data?[index].service?.serviceDescription ?? 'N/A'}\n\nBooking Fee : RM ${snapshot.appointmentResponse?.data?.data?[index].service?.serviceBookingFee ?? 'N/A'}',
-                                          child: Text(
-                                            snapshot.appointmentResponse?.data?.data?[index].service?.serviceName ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                      ),
-                                      if (authController.isSuperAdmin)
                                         DataCell(
-                                          AppSelectableText(
-                                            snapshot.appointmentResponse?.data?.data?[index].branch?.branchName ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                      DataCell(
-                                        Text(
-                                          getAppointmentStatusLabel(
-                                            snapshot.appointmentResponse?.data?.data?[index].appointmentStatus,
-                                          ),
-                                          style: AppTypography.bodyMedium(context).apply(
-                                            fontWeightDelta: 1,
-                                            color:
-                                                appointmentStatusColors[snapshot
-                                                    .appointmentResponse
-                                                    ?.data
-                                                    ?.data?[index]
-                                                    .appointmentStatus],
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        (snapshot.appointmentResponse?.data?.data?[index].service?.serviceBookingFee !=
-                                                null)
-                                            ? showPaymentStatus(
-                                              context,
-                                              snapshot.appointmentResponse?.data?.data?[index].appointmentStatus == 5
-                                                  ? 1
-                                                  : (snapshot.appointmentResponse?.data?.data?[index].payment?.length ??
-                                                          0) >
-                                                      0
-                                                  ? (snapshot.appointmentResponse?.data?.data?[index].payment?.any(
-                                                            (element) => element.paymentStatus == 1,
-                                                          ) ==
-                                                          true
-                                                      ? 1
-                                                      : 0)
-                                                  : 0,
-                                            )
-                                            : Text('-'),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          convertUtcToMalaysiaTime(
-                                                snapshot.appointmentResponse?.data?.data?[index].appointmentDatetime,
-                                              ) ??
-                                              'N/A',
-                                          style: AppTypography.bodyMedium(context).apply(),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            IconButton(
-                                              onPressed: () async {
-                                                if (context.read<ServiceController>().servicesResponse == null) {
-                                                  await ServiceController.getAll(context, 1, 100).then((value) {
-                                                    context.read<ServiceController>().servicesResponse = value.data;
-                                                  });
-                                                }
-                                                List<String>? templates =
-                                                    context
-                                                        .read<ServiceController>()
-                                                        .servicesResponse
-                                                        ?.data
-                                                        ?.firstWhere(
-                                                          (element) =>
-                                                              element.serviceId ==
-                                                              snapshot
-                                                                  .appointmentResponse
-                                                                  ?.data
-                                                                  ?.data?[index]
-                                                                  .service
-                                                                  ?.serviceId,
-                                                        )
-                                                        .serviceTemplate;
-                                                showWhatsAppTemplateDialog(
-                                                  context: context,
-                                                  templates: templates ?? [],
-                                                  name:
-                                                      snapshot
-                                                          .appointmentResponse
-                                                          ?.data
-                                                          ?.data?[index]
-                                                          .user
-                                                          ?.userFullName ??
-                                                      '',
-                                                  phone:
-                                                      snapshot
-                                                          .appointmentResponse
-                                                          ?.data
-                                                          ?.data?[index]
-                                                          .user
-                                                          ?.userFullName ??
-                                                      '',
-                                                  service:
-                                                      snapshot
-                                                          .appointmentResponse
-                                                          ?.data
-                                                          ?.data?[index]
-                                                          .service
-                                                          ?.serviceName ??
-                                                      '',
-                                                  branchName:
-                                                      snapshot
-                                                          .appointmentResponse
-                                                          ?.data
-                                                          ?.data?[index]
-                                                          .branch
-                                                          ?.branchName ??
-                                                      '',
-                                                  dateTime: DateTime.parse(
-                                                    snapshot
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () async {
+                                                  if (context.read<ServiceController>().servicesResponse == null) {
+                                                    await ServiceController.getAll(context, 1, 100).then((value) {
+                                                      context.read<ServiceController>().servicesResponse = value.data;
+                                                    });
+                                                  }
+                                                  List<String>? templates = context
+                                                      .read<ServiceController>()
+                                                      .servicesResponse
+                                                      ?.data
+                                                      ?.firstWhere(
+                                                        (element) =>
+                                                            element.serviceId ==
+                                                            snapshot
+                                                                .appointmentResponse
+                                                                ?.data
+                                                                ?.data?[index]
+                                                                .service
+                                                                ?.serviceId,
+                                                      )
+                                                      .serviceTemplate;
+                                                  showWhatsAppTemplateDialog(
+                                                    context: context,
+                                                    templates: templates ?? [],
+                                                    name:
+                                                        snapshot
                                                             .appointmentResponse
                                                             ?.data
                                                             ?.data?[index]
-                                                            .appointmentDatetime ??
+                                                            .user
+                                                            ?.userFullName ??
                                                         '',
-                                                  ),
-                                                );
-                                              },
-                                              icon: Icon(FontAwesomeIcons.whatsapp),
-                                              color: Colors.green,
-                                            ),
-                                            PopupMenuButton<String>(
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                              offset: const Offset(8, 35),
-                                              color: Colors.white,
-                                              tooltip: '',
-                                              onSelected:
-                                                  (value) => _handleMenuSelection(
-                                                    value,
-                                                    snapshot.appointmentResponse?.data?.data?[index] ?? Data(),
-                                                  ),
-                                              itemBuilder:
-                                                  (BuildContext context) => <PopupMenuEntry<String>>[
-                                                    const PopupMenuItem<String>(value: 'update', child: Text('Update')),
-                                                  ],
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets.all(4),
-                                                    // decoration: const BoxDecoration(
-                                                    //   color: Colors.white,
-                                                    //   shape: BoxShape.circle,
-                                                    // ),
-                                                    child: Icon(Icons.more_vert, color: Colors.grey),
-                                                  ),
-                                                ],
+                                                    phone:
+                                                        snapshot
+                                                            .appointmentResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .user
+                                                            ?.userFullName ??
+                                                        '',
+                                                    service:
+                                                        snapshot
+                                                            .appointmentResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .service
+                                                            ?.serviceName ??
+                                                        '',
+                                                    branchName:
+                                                        snapshot
+                                                            .appointmentResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .branch
+                                                            ?.branchName ??
+                                                        '',
+                                                    dateTime: DateTime.parse(
+                                                      snapshot
+                                                              .appointmentResponse
+                                                              ?.data
+                                                              ?.data?[index]
+                                                              .appointmentDatetime ??
+                                                          '',
+                                                    ),
+                                                  );
+                                                },
+                                                icon: Icon(FontAwesomeIcons.whatsapp),
+                                                color: Colors.green,
                                               ),
-                                            ),
-                                          ],
+                                              PopupMenuButton<String>(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                offset: const Offset(8, 35),
+                                                color: Colors.white,
+                                                tooltip: '',
+                                                onSelected: (value) => _handleMenuSelection(
+                                                  value,
+                                                  snapshot.appointmentResponse?.data?.data?[index] ?? Data(),
+                                                ),
+                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                                  const PopupMenuItem<String>(value: 'update', child: Text('Update')),
+                                                ],
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      // decoration: const BoxDecoration(
+                                                      //   color: Colors.white,
+                                                      //   shape: BoxShape.circle,
+                                                      // ),
+                                                      child: Icon(Icons.more_vert, color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                        ],
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: pagination()),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                  ),
-                                perPage(),
-                              ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: pagination()),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isMobile && !isTablet)
+                                    const Flexible(
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ),
+                                  perPage(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                            if (!isMobile && !isTablet)
+                              Text(
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -758,8 +774,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -775,12 +791,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           _page,
           _pageSize,
           status: getAppointmentStatus(),
-          branchId:
-              context.read<AuthController>().isSuperAdmin
-                  ? _appointmentBranch?.key
-                  : context.read<AuthController>().authenticationResponse?.data?.user?.isSuperadmin == true
-                  ? null
-                  : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+          branchId: context.read<AuthController>().isSuperAdmin
+              ? _appointmentBranch?.key
+              : context.read<AuthController>().authenticationResponse?.data?.user?.isSuperadmin == true
+              ? null
+              : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
           startDate: startDate,
           endDate: endDate,
         )
@@ -891,8 +906,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(angle: -math.pi, child: child)
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 
