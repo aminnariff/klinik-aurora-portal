@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
 class TimeSlotDates {
   final TimeOfDay time;
@@ -106,110 +106,132 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: currentMonthIndex > 0 ? () => setState(() => currentMonthIndex--) : null,
-              ),
-              Text(
-                DateFormat('MMMM yyyy').format(DateTime(displayYear, displayMonth)),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed:
-                    currentMonthIndex < widget.totalMonths - 1 ? () => setState(() => currentMonthIndex++) : null,
-              ),
-            ],
-          ),
           Expanded(
-            child: ListView.builder(
-              itemCount: timeSlots.length,
-              itemBuilder: (context, index) {
-                final slot = timeSlots[index];
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('${index + 1}.'),
-                    Card(
-                      margin: const EdgeInsets.all(12),
-                      color: Colors.grey.shade100,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Time: ${slot.time.format(context)}",
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () => setState(() => timeSlots.removeAt(index)),
-                                ),
-                              ],
-                            ),
-                            _buildCalendar(slot.selectedDates, displayMonth, displayYear),
-                          ],
-                        ),
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.chevron_left),
+                      onPressed: currentMonthIndex > 0 ? () => setState(() => currentMonthIndex--) : null,
+                    ),
+                    Text(
+                      DateFormat('MMMM yyyy').format(DateTime(displayYear, displayMonth)),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.chevron_right),
+                      onPressed: currentMonthIndex < widget.totalMonths - 1
+                          ? () => setState(() => currentMonthIndex++)
+                          : null,
                     ),
                   ],
-                );
-              },
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: timeSlots.length,
+                    itemBuilder: (context, index) {
+                      final slot = timeSlots[index];
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${index + 1}.'),
+                          Card(
+                            margin: const EdgeInsets.all(12),
+                            color: Colors.grey.shade100,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Time: ${slot.time.format(context)}",
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () => setState(() => timeSlots.removeAt(index)),
+                                      ),
+                                    ],
+                                  ),
+                                  _buildCalendar(slot.selectedDates, displayMonth, displayYear),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Button(() async {
+                      if (await showConfirmDialog(
+                        context,
+                        'Are you sure you want to ${widget.serviceBranchAvailableDatetimeId == null ? 'create' : 'update'} the available time slots?',
+                      )) {
+                        if (widget.serviceBranchAvailableDatetimeId == null) {
+                          ServiceBranchAvailableDtController.create(
+                            context,
+                            widget.serviceBranchId,
+                            _getAllDateTimeValues(),
+                          ).then((value) {
+                            if (responseCode(value.code)) {
+                              showDialogSuccess(context, 'Successfully Created the Available Appointment');
+                            } else {
+                              showDialogError(
+                                context,
+                                value.message ??
+                                    'Unable to create the available appointment slots. Please contact support if you still encounter this issue.',
+                              );
+                            }
+                          });
+                        } else {
+                          ServiceBranchAvailableDtController.update(
+                            context,
+                            widget.serviceBranchAvailableDatetimeId ?? '',
+                            widget.serviceBranchId,
+                            _getAllDateTimeValues(),
+                          ).then((value) {
+                            if (responseCode(value.code)) {
+                              showDialogSuccess(context, 'Successfully Updated the Available Appointment');
+                            } else {
+                              showDialogError(
+                                context,
+                                value.message ?? 'Unable to update the available appointment slots',
+                              );
+                            }
+                          });
+                        }
+                      }
+                    }, actionText: widget.serviceBranchAvailableDatetimeId == null ? 'Create' : 'Update'),
+                  ],
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 8),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Button(() async {
-                if (await showConfirmDialog(
-                  context,
-                  'Are you sure you want to ${widget.serviceBranchAvailableDatetimeId == null ? 'create' : 'update'} the available time slots?',
-                )) {
-                  if (widget.serviceBranchAvailableDatetimeId == null) {
-                    ServiceBranchAvailableDtController.create(
-                      context,
-                      widget.serviceBranchId,
-                      _getAllDateTimeValues(),
-                    ).then((value) {
-                      if (responseCode(value.code)) {
-                        context.pop();
-                        showDialogSuccess(context, 'Successfully Created the Available Appointment');
-                      } else {
-                        showDialogError(
-                          context,
-                          value.message ??
-                              'Unable to create the available appointment slots. Please contact support if you still encounter this issue.',
-                        );
-                      }
-                    });
-                  } else {
-                    ServiceBranchAvailableDtController.update(
-                      context,
-                      widget.serviceBranchAvailableDatetimeId ?? '',
-                      widget.serviceBranchId,
-                      _getAllDateTimeValues(),
-                    ).then((value) {
-                      if (responseCode(value.code)) {
-                        context.pop();
-                        showDialogSuccess(context, 'Successfully Updated the Available Appointment');
-                      } else {
-                        showDialogError(context, value.message ?? 'Unable to update the available appointment slots');
-                      }
-                    });
-                  }
-                }
-              }, actionText: widget.serviceBranchAvailableDatetimeId == null ? 'Create' : 'Update'),
-            ],
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Summary', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+                  const SizedBox(height: 12),
+                  Expanded(child: _buildDateGroupedSummary()),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -266,23 +288,21 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
             displayMonth,
             dayCounter,
           ).isBefore(DateTime(today.year, today.month, today.day));
-          final textColor =
-              isPast
-                  ? Colors.grey.shade400
-                  : (j == 0 || j == 6)
-                  ? Colors.grey
-                  : Colors.black;
+          final textColor = isPast
+              ? Colors.grey.shade400
+              : (j == 0 || j == 6)
+              ? Colors.grey
+              : Colors.black;
 
           weekRow.add(
             GestureDetector(
-              onTap:
-                  isPast
-                      ? null
-                      : () {
-                        setState(() {
-                          selectedDates[key] = !isSelected;
-                        });
-                      },
+              onTap: isPast
+                  ? null
+                  : () {
+                      setState(() {
+                        selectedDates[key] = !isSelected;
+                      });
+                    },
               child: Container(
                 margin: const EdgeInsets.all(4),
                 width: 36,
@@ -312,5 +332,92 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
     }
 
     return Table(defaultColumnWidth: const FixedColumnWidth(42), children: rows);
+  }
+
+  Widget _buildDateGroupedSummary() {
+    final Map<DateTime, List<TimeOfDay>> dateToTimes = {};
+
+    // Step 1: Group all selected time slots by exact date (DateTime)
+    for (final slot in timeSlots) {
+      slot.selectedDates.forEach((dateStr, selected) {
+        if (selected) {
+          final parts = dateStr.split('-').map(int.parse).toList();
+          final date = DateTime(parts[0], parts[1], parts[2]);
+          dateToTimes.putIfAbsent(date, () => []).add(slot.time);
+        }
+      });
+    }
+
+    if (dateToTimes.isEmpty) {
+      return const Text('No appointment slots selected.');
+    }
+
+    // Step 2: Group by (year, month)
+    final Map<String, List<DateTime>> monthToDates = {};
+    for (final date in dateToTimes.keys) {
+      final monthKey = DateFormat('MMMM yyyy').format(date);
+      monthToDates.putIfAbsent(monthKey, () => []).add(date);
+    }
+
+    final sortedMonthKeys = monthToDates.keys.toList()
+      ..sort((a, b) {
+        final aDate = DateFormat('MMMM yyyy').parse(a);
+        final bDate = DateFormat('MMMM yyyy').parse(b);
+        return aDate.compareTo(bDate);
+      });
+
+    return ListView.builder(
+      itemCount: sortedMonthKeys.length,
+      itemBuilder: (context, monthIndex) {
+        final monthKey = sortedMonthKeys[monthIndex];
+        final dates = monthToDates[monthKey]!..sort();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 6),
+              child: Text('📆 $monthKey', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+            ...dates.map((date) {
+              final times = dateToTimes[date]!
+                ..sort((a, b) {
+                  final aMin = a.hour * 60 + a.minute;
+                  final bMin = b.hour * 60 + b.minute;
+                  return aMin.compareTo(bMin);
+                });
+
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                color: Colors.grey.shade100,
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '📅 ${DateFormat('EEE, d MMM yyyy').format(date)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: times
+                            .map(
+                              (time) => Chip(label: Text(time.format(context), style: const TextStyle(fontSize: 12))),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ],
+        );
+      },
+    );
   }
 }
