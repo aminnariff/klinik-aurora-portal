@@ -102,11 +102,12 @@ String renderTemplate(String template, Map<String, String> values) {
 
 void _launchWhatsApp(String phone, String message) async {
   final encodedMessage = Uri.encodeComponent(message);
-  final url = "https://api.whatsapp.com/send?phone=6$phone&text=$encodedMessage&app_absent=1";
+  final url = 'https://web.whatsapp.com/send?phone=6$phone&text=$encodedMessage';
+  print(url);
 
   if (await canLaunchUrl(Uri.parse(url))) {
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    await launchUrl(Uri.parse(url), mode: LaunchMode.inAppWebView);
   } else {
-    debugPrint('Could not launch WhatsApp');
+    debugPrint('Could not launch WhatsApp Web');
   }
 }
