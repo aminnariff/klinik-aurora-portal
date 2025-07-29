@@ -305,15 +305,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           children: [
                                                             UploadDocumentsField(
                                                               title: 'promotionPage'.tr(gender: 'browseFile'),
-                                                              fieldTitle:
-                                                                  _status?.key == '6'
-                                                                      ? 'appointmentPage'.tr(gender: 'refundProof')
-                                                                      : 'appointmentPage'.tr(gender: 'paymentProof'),
+                                                              fieldTitle: _status?.key == '6'
+                                                                  ? 'appointmentPage'.tr(gender: 'refundProof')
+                                                                  : 'appointmentPage'.tr(gender: 'paymentProof'),
                                                               // tooltipText: 'promotionPage'.tr(gender: 'browse'),
                                                               action: () async {
                                                                 documentErrorMessage.add(null);
-                                                                FilePickerResult? result =
-                                                                    await FilePicker.platform.pickFiles();
+                                                                FilePickerResult? result = await FilePicker.platform
+                                                                    .pickFiles();
 
                                                                 if (result != null) {
                                                                   PlatformFile file = result.files.first;
@@ -355,11 +354,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 return snapshot.data == null
                                                                     ? SizedBox()
                                                                     : Text(
-                                                                      snapshot.data ?? '',
-                                                                      style: AppTypography.bodyMedium(
-                                                                        context,
-                                                                      ).apply(color: errorColor, fontSizeDelta: -1),
-                                                                    );
+                                                                        snapshot.data ?? '',
+                                                                        style: AppTypography.bodyMedium(
+                                                                          context,
+                                                                        ).apply(color: errorColor, fontSizeDelta: -1),
+                                                                      );
                                                               },
                                                             ),
                                                           ],
@@ -386,17 +385,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                             child: CardContainer(
                                                                               selectedFiles[index].value != null
                                                                                   ? Image.memory(
-                                                                                    selectedFiles[index].value!,
-                                                                                  )
+                                                                                      selectedFiles[index].value!,
+                                                                                    )
                                                                                   : selectedFiles[index].path != null
                                                                                   ? Padding(
-                                                                                    padding: EdgeInsets.all(
-                                                                                      screenPadding,
-                                                                                    ),
-                                                                                    child: Image.network(
-                                                                                      '${Environment.imageUrl}${selectedFiles[index].path}',
-                                                                                    ),
-                                                                                  )
+                                                                                      padding: EdgeInsets.all(
+                                                                                        screenPadding,
+                                                                                      ),
+                                                                                      child: Image.network(
+                                                                                        '${Environment.imageUrl}${selectedFiles[index].path}',
+                                                                                      ),
+                                                                                    )
                                                                                   : const SizedBox(),
                                                                             ),
                                                                           ),
@@ -465,8 +464,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               authController.isSuperAdmin ? branches : [],
                                               labelText: 'appointmentPage'.tr(gender: 'branch'),
                                               isEditable: authController.isSuperAdmin,
-                                              fieldColor:
-                                                  authController.isSuperAdmin ? null : textFormFieldUneditableColor,
+                                              fieldColor: authController.isSuperAdmin
+                                                  ? null
+                                                  : textFormFieldUneditableColor,
                                               value: _appointmentBranch?.name,
                                               onChanged: (p0) {
                                                 _appointmentBranch = p0;
@@ -542,8 +542,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 ).then((value) {
                                                   if (responseCode(value.code)) {
                                                     context
-                                                        .read<ServiceBranchAvailableDtController>()
-                                                        .serviceBranchAvailableDtResponse = value.data;
+                                                            .read<ServiceBranchAvailableDtController>()
+                                                            .serviceBranchAvailableDtResponse =
+                                                        value.data;
                                                     rebuildDropdown.add(DateTime.now());
                                                     ServiceBranchExceptionController.get(
                                                       context,
@@ -554,8 +555,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                     ).then((value) {
                                                       if (responseCode(value.code)) {
                                                         context
-                                                            .read<ServiceBranchExceptionController>()
-                                                            .serviceBranchExceptionResponse = value.data;
+                                                                .read<ServiceBranchExceptionController>()
+                                                                .serviceBranchExceptionResponse =
+                                                            value.data;
                                                       }
                                                     });
                                                   }
@@ -712,8 +714,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             ).then((value) {
                                               if (responseCode(value.code)) {
                                                 context
-                                                    .read<ServiceBranchAvailableDtController>()
-                                                    .serviceBranchAvailableDtResponse = value.data;
+                                                        .read<ServiceBranchAvailableDtController>()
+                                                        .serviceBranchAvailableDtResponse =
+                                                    value.data;
                                                 ServiceBranchExceptionController.get(
                                                   context,
                                                   1,
@@ -722,8 +725,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 ).then((value) async {
                                                   if (responseCode(value.code)) {
                                                     context
-                                                        .read<ServiceBranchExceptionController>()
-                                                        .serviceBranchExceptionResponse = value.data;
+                                                            .read<ServiceBranchExceptionController>()
+                                                            .serviceBranchExceptionResponse =
+                                                        value.data;
                                                     DateTime now = DateTime.now();
                                                     List<String> availableDateTime =
                                                         snapshot
@@ -927,8 +931,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       ? 1
                       : (widget.appointment?.payment?.length ?? 0) > 0
                       ? widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
-                          ? 1
-                          : 0
+                            ? 1
+                            : 0
                       : 0,
                 ),
                 SizedBox(height: 4),
@@ -1159,16 +1163,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   serviceBranchId: _service?.key,
                   appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
                   appointmentNote: appointmentNoteController.controller.text,
-                  customerDueDate:
-                      (() {
-                        try {
-                          return DateFormat(
-                            'yyyy-MM-dd',
-                          ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
-                        } catch (_) {
-                          return dueDateController.controller.text;
-                        }
-                      })(),
+                  customerDueDate: (() {
+                    try {
+                      return DateFormat(
+                        'yyyy-MM-dd',
+                      ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
+                    } catch (_) {
+                      return dueDateController.controller.text;
+                    }
+                  })(),
                   appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
                 ),
               ).then((value) {
@@ -1300,10 +1303,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           1,
           100,
           status: widget.tabs,
-          branchId:
-              context.read<AuthController>().isSuperAdmin == true
-                  ? null
-                  : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+          branchId: context.read<AuthController>().isSuperAdmin == true
+              ? null
+              : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
         )
         .then((value) {
           dismissLoading();

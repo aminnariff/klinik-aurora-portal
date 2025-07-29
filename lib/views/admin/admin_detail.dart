@@ -17,6 +17,7 @@ import 'package:klinik_aurora_portal/models/admin/update_admin_request.dart';
 import 'package:klinik_aurora_portal/models/admin/update_permission_admin_request.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
+import 'package:klinik_aurora_portal/models/permission/permission_all_response.dart' as model_permission;
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -54,6 +55,18 @@ class _AdminDetailState extends State<AdminDetail> {
   List<admin_permission.Data> currentPermissionList = [];
   List<String> selectedPermission = [];
   List<DropdownAttribute> branches = [];
+  final Map<String, List<String>> permissionBundles = {
+    'Branch': [
+      '1bda631e-ef17-11ee-bd1b-cc801b09db2f', //User Management
+      '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342', //Appointment
+      'dc4e7a5a-0e15-11ef-82b0-94653af51fb9', //Reward Management
+      '0699ac1c-ac52-11ef-a1b7-bc24115a1342', //Service
+      'f57576c4-4d15-11f0-b054-1ff6746392b2', //Payment
+      'a231db36-058d-11ef-943b-626efeb17d5e', //Point Management
+      'f90f9f18-057b-11ef-943b-626efeb17d5e', //Doctor
+    ],
+    'Sonographer': ['c54a2d91-499c-11f0-9169-bc24115a1342'], //Sonographer
+  };
 
   @override
   void initState() {
@@ -110,6 +123,53 @@ class _AdminDetailState extends State<AdminDetail> {
   @override
   Widget build(BuildContext context) {
     return editAdmin();
+  }
+
+  Widget buildPermissionBundles({
+    required Map<String, List<String>> permissionBundles,
+    required List<String> selectedPermission,
+    required Function(List<String>) onPermissionChanged,
+    required List<model_permission.Data> allPermissions,
+  }) {
+    final Map<String, String> permissionIdToName = {for (var p in allPermissions) p.permissionId!: p.permissionName!};
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: permissionBundles.entries.map((entry) {
+        final bundleName = entry.key;
+        final bundleIds = entry.value;
+
+        final permissionNames = bundleIds.map((id) => permissionIdToName[id] ?? 'Unknown').join(', ');
+
+        final isChecked = bundleIds.every((id) => selectedPermission.contains(id));
+
+        return Tooltip(
+          message: permissionNames,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: isChecked,
+                onChanged: (bool? value) {
+                  final newSelected = [...selectedPermission];
+                  if (value == true) {
+                    for (final id in bundleIds) {
+                      if (!newSelected.contains(id)) {
+                        newSelected.add(id);
+                      }
+                    }
+                  } else {
+                    newSelected.removeWhere((id) => bundleIds.contains(id));
+                  }
+                  onPermissionChanged(newSelected);
+                },
+              ),
+              Text(bundleName),
+            ],
+          ),
+        );
+      }).toList(),
+    );
   }
 
   editAdmin() {
@@ -252,75 +312,91 @@ class _AdminDetailState extends State<AdminDetail> {
                               style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                             ),
                             AppPadding.vertical(denominator: 3),
+                            buildPermissionBundles(
+                              permissionBundles: permissionBundles,
+                              selectedPermission: selectedPermission,
+                              allPermissions: context.read<PermissionController>().permissionAllResponse?.data ?? [],
+                              onPermissionChanged: (newList) {
+                                setState(() {
+                                  selectedPermission = newList;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            Container(
+                              width: screenWidth(80),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey, // Border color
+                                  width: 1.5, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(8), // Optional: rounded corners
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Wrap(
+                                  spacing: 24,
+                                  runSpacing: 12,
+                                  children: List.generate(
+                                    context.read<PermissionController>().permissionAllResponse?.data?.length ?? 0,
+                                    (index) {
+                                      final permission = context
+                                          .read<PermissionController>()
+                                          .permissionAllResponse!
+                                          .data![index];
+                                      final isChecked = selectedPermission.contains(permission.permissionId);
+
+                                      return SizedBox(
+                                        width: 180,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Checkbox(
+                                              value: isChecked,
+                                              onChanged: (value) {
+                                                try {
+                                                  setState(() {
+                                                    if (value == true) {
+                                                      selectedPermission.add(permission.permissionId!);
+                                                    } else {
+                                                      selectedPermission.remove(permission.permissionId!);
+                                                    }
+                                                  });
+                                                } catch (e) {
+                                                  showDialogError(context, e.toString());
+                                                }
+                                              },
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                permission.permissionName ?? '',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: Theme.of(context).textTheme.bodyMedium,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16),
                             SizedBox(
                               width: screenWidth(80),
-                              child: Wrap(
-                                direction: Axis.horizontal,
+                              child: Row(
                                 children: [
-                                  for (
-                                    int index = 0;
-                                    index <
-                                        (context.read<PermissionController>().permissionAllResponse?.data?.length ?? 0);
-                                    index++
-                                  )
-                                    Container(
-                                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Checkbox(
-                                            value: selectedPermission.contains(
-                                              context
-                                                  .read<PermissionController>()
-                                                  .permissionAllResponse
-                                                  ?.data?[index]
-                                                  .permissionId,
-                                            ),
-                                            onChanged: (value) {
-                                              try {
-                                                setState(() {
-                                                  if (value == true) {
-                                                    selectedPermission.add(
-                                                      context
-                                                          .read<PermissionController>()
-                                                          .permissionAllResponse!
-                                                          .data![index]
-                                                          .permissionId
-                                                          .toString(),
-                                                    );
-                                                  } else {
-                                                    selectedPermission.removeWhere(
-                                                      (element) =>
-                                                          element ==
-                                                          context
-                                                              .read<PermissionController>()
-                                                              .permissionAllResponse!
-                                                              .data![index]
-                                                              .permissionId
-                                                              .toString(),
-                                                    );
-                                                  }
-                                                });
-                                              } catch (e) {
-                                                showDialogError(context, e.toString());
-                                              }
-                                            },
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}',
-                                          ),
-                                        ],
-                                      ),
+                                  Flexible(
+                                    child: Text(
+                                      'Note:\nThe checkboxes labeled Branch and Sonographer are permission bundles — selecting them will automatically select a group of related permissions.\nYou can still manually customize individual permissions as needed.',
+                                      style: AppTypography.bodyMedium(context),
                                     ),
+                                  ),
                                 ],
                               ),
                             ),
-                            AppPadding.vertical(denominator: 2),
-                            const Text(
-                              'Note: Choose User Management, Appointment, Point Management, Reward Management, and Payment for branch use in the Staff App.\nSonographer: If the user is assigned the Sonographer permission, they will only be able to view appointments.',
-                            ),
-                            AppPadding.vertical(denominator: 3 / 2),
+                            SizedBox(height: 24),
                           ],
                         ),
                         button(),

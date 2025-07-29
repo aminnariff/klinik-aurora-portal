@@ -189,7 +189,10 @@ class _UserHomepageState extends State<UserHomepage> {
             ),
           ),
         ),
-        Padding(padding: EdgeInsets.symmetric(vertical: screenPadding), child: pagination()),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: screenPadding),
+          child: pagination(),
+        ),
       ],
     );
     // },
@@ -281,182 +284,187 @@ class _UserHomepageState extends State<UserHomepage> {
         if (snapshot.userAllResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.userAllResponse == null || snapshot.userAllResponse!.isEmpty
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
+                  ],
+                )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  tableButton(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                            padding: const EdgeInsets.all(5),
-                            child: DataTable2(
-                              columnSpacing: 12,
-                              horizontalMargin: 12,
-                              isHorizontalScrollBarVisible: true,
-                              isVerticalScrollBarVisible: true,
-                              columns: columns(),
-                              headingRowColor: WidgetStateProperty.all(Colors.white),
-                              headingRowHeight: 51,
-                              decoration: const BoxDecoration(),
-                              border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                verticalInside: BorderSide(
-                                  width: 1,
-                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                              padding: const EdgeInsets.all(5),
+                              child: DataTable2(
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                isHorizontalScrollBarVisible: true,
+                                isVerticalScrollBarVisible: true,
+                                columns: columns(),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
+                                headingRowHeight: 51,
+                                decoration: const BoxDecoration(),
+                                border: TableBorder(
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
-                              ),
-                              rows: [
-                                for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
-                                  DataRow(
-                                    color: WidgetStateProperty.all(
-                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                    ),
-                                    cells: [
-                                      DataCell(
-                                        AppTooltip(
-                                          message:
-                                              'Email:\n${snapshot.userAllResponse?[index].userEmail}\n\nContact No:\n${snapshot.userAllResponse?[index].userPhone}',
-                                          child: Text(
-                                            snapshot.userAllResponse?[index].userFullname?.titleCase() ??
-                                                snapshot.userAllResponse?[index].userName ??
+                                rows: [
+                                  for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
+                                    DataRow(
+                                      color: WidgetStateProperty.all(
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                      ),
+                                      cells: [
+                                        DataCell(
+                                          AppTooltip(
+                                            message:
+                                                'Email:\n${snapshot.userAllResponse?[index].userEmail}\n\nContact No:\n${snapshot.userAllResponse?[index].userPhone}',
+                                            child: Text(
+                                              snapshot.userAllResponse?[index].userFullname?.titleCase() ??
+                                                  snapshot.userAllResponse?[index].userName ??
+                                                  'N/A',
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              AppSelectableText(
+                                                '${snapshot.userAllResponse?[index].totalPoint ?? 'N/A'}',
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
                                                 'N/A',
                                           ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            AppSelectableText(
-                                              '${snapshot.userAllResponse?[index].totalPoint ?? 'N/A'}',
-                                            ),
-                                          ],
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [showStatus(snapshot.userAllResponse?[index].userStatus == 1)],
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
-                                              'N/A',
+                                        DataCell(
+                                          AppSelectableText(
+                                            dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [showStatus(snapshot.userAllResponse?[index].userStatus == 1)],
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A',
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            PopupMenuButton<String>(
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                              offset: const Offset(8, 35),
-                                              color: Colors.white,
-                                              tooltip: '',
-                                              onSelected:
-                                                  (value) =>
-                                                      _handleMenuSelection(value, snapshot.userAllResponse![index]),
-                                              itemBuilder:
-                                                  (BuildContext context) => <PopupMenuEntry<String>>[
-                                                    const PopupMenuItem<String>(
-                                                      value: 'update',
-                                                      child: Text('Update Info'),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              PopupMenuButton<String>(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                offset: const Offset(8, 35),
+                                                color: Colors.white,
+                                                tooltip: '',
+                                                onSelected: (value) =>
+                                                    _handleMenuSelection(value, snapshot.userAllResponse![index]),
+                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                                  const PopupMenuItem<String>(
+                                                    value: 'update',
+                                                    child: Text('Update Info'),
+                                                  ),
+                                                  const PopupMenuItem<String>(
+                                                    value: 'appointment',
+                                                    child: Text('Appointment'),
+                                                  ),
+                                                  const PopupMenuItem<String>(
+                                                    value: 'managePoints',
+                                                    child: Text('Manage Points'),
+                                                  ),
+                                                  PopupMenuItem<String>(
+                                                    value: 'enableDisable',
+                                                    child: Text(
+                                                      snapshot.userAllResponse?[index].userStatus == 1
+                                                          ? 'Deactivate'
+                                                          : 'Re-Activate',
                                                     ),
-                                                    const PopupMenuItem<String>(
-                                                      value: 'appointment',
-                                                      child: Text('Appointment'),
-                                                    ),
-                                                    const PopupMenuItem<String>(
-                                                      value: 'managePoints',
-                                                      child: Text('Manage Points'),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      value: 'enableDisable',
-                                                      child: Text(
-                                                        snapshot.userAllResponse?[index].userStatus == 1
-                                                            ? 'Deactivate'
-                                                            : 'Re-Activate',
-                                                      ),
-                                                    ),
-                                                  ],
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets.all(4),
-                                                    // decoration: const BoxDecoration(
-                                                    //   color: Colors.white,
-                                                    //   shape: BoxShape.circle,
-                                                    // ),
-                                                    child: Icon(Icons.more_vert, color: Colors.grey),
                                                   ),
                                                 ],
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      // decoration: const BoxDecoration(
+                                                      //   color: Colors.white,
+                                                      //   shape: BoxShape.circle,
+                                                      // ),
+                                                      child: Icon(Icons.more_vert, color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                        ],
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: pagination()),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                  ),
-                                perPage(),
-                              ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: pagination()),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isMobile && !isTablet)
+                                    const Flexible(
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ),
+                                  perPage(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                            if (!isMobile && !isTablet)
+                              Text(
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -555,8 +563,8 @@ class _UserHomepageState extends State<UserHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -574,14 +582,13 @@ class _UserHomepageState extends State<UserHomepage> {
       userPhone: _userPhoneController.text,
       userEmail: _userEmailController.text,
       branchId: _selectedBranch?.key,
-      userStatus:
-          _selectedUserStatus != null
-              ? _selectedUserStatus?.key == '1'
-                  ? 1
-                  : _selectedUserStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
+      userStatus: _selectedUserStatus != null
+          ? _selectedUserStatus?.key == '1'
+                ? 1
+                : _selectedUserStatus?.key == '0'
+                ? 0
+                : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -701,8 +708,8 @@ class _UserHomepageState extends State<UserHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(angle: -math.pi, child: child)
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 
@@ -736,121 +743,112 @@ class _UserHomepageState extends State<UserHomepage> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Flexible(
-                      child: Card(
-                        surfaceTintColor: Colors.white,
-                        elevation: 5.0,
-                        color: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            bottomLeft: Radius.circular(15),
-                          ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                              child: Column(
-                                children: [
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _userFullNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Full Name',
-                                    ),
+                    Card(
+                      surfaceTintColor: Colors.white,
+                      elevation: 5.0,
+                      color: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                      ),
+                      child: Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                            child: Column(
+                              children: [
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userFullNameController,
+                                    hintText: 'Search',
+                                    labelText: 'Full Name',
                                   ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _userNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Username',
-                                    ),
+                                ),
+                                AppPadding.vertical(denominator: 2),
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userNameController,
+                                    hintText: 'Search',
+                                    labelText: 'Username',
                                   ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _userPhoneController,
-                                      hintText: 'Search',
-                                      labelText: 'Contact Number',
-                                    ),
+                                ),
+                                AppPadding.vertical(denominator: 2),
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userPhoneController,
+                                    hintText: 'Search',
+                                    labelText: 'Contact Number',
                                   ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _userEmailController,
-                                      hintText: 'Search',
-                                      labelText: 'Email',
-                                    ),
+                                ),
+                                AppPadding.vertical(denominator: 2),
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userEmailController,
+                                    hintText: 'Search',
+                                    labelText: 'Email',
                                   ),
-                                  AppPadding.vertical(),
-                                  StreamBuilder<DateTime>(
-                                    stream: rebuildDropdown.stream,
-                                    builder: (context, snapshot) {
-                                      return Column(
-                                        children: [
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                if (context.read<BranchController>().branchAllResponse?.data?.data !=
-                                                    null)
-                                                  for (branch.Data item
-                                                      in context
-                                                              .read<BranchController>()
-                                                              .branchAllResponse
-                                                              ?.data
-                                                              ?.data ??
-                                                          [])
-                                                    DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                              ],
-                                              labelText: 'information'.tr(gender: 'registeredBranch'),
-                                              value: _selectedBranch?.name,
-                                              onChanged: (p0) {
-                                                _selectedBranch = p0;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 1);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
+                                ),
+                                AppPadding.vertical(),
+                                StreamBuilder<DateTime>(
+                                  stream: rebuildDropdown.stream,
+                                  builder: (context, snapshot) {
+                                    return Column(
+                                      children: [
+                                        AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            [
+                                              if (context.read<BranchController>().branchAllResponse?.data?.data !=
+                                                  null)
+                                                for (branch.Data item
+                                                    in context.read<BranchController>().branchAllResponse?.data?.data ??
+                                                        [])
+                                                  DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
+                                            ],
+                                            labelText: 'information'.tr(gender: 'registeredBranch'),
+                                            value: _selectedBranch?.name,
+                                            onChanged: (p0) {
+                                              _selectedBranch = p0;
+                                              rebuildDropdown.add(DateTime.now());
+                                              filtering(page: 1);
+                                            },
+                                            width: screenWidthByBreakpoint(90, 70, 26),
                                           ),
-                                          AppPadding.vertical(),
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
-                                              labelText: 'information'.tr(gender: 'userStatus'),
-                                              value: _selectedUserStatus?.name,
-                                              onChanged: (p0) {
-                                                _selectedUserStatus = p0;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 1);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
+                                        ),
+                                        AppPadding.vertical(),
+                                        AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                                            labelText: 'information'.tr(gender: 'userStatus'),
+                                            value: _selectedUserStatus?.name,
+                                            onChanged: (p0) {
+                                              _selectedUserStatus = p0;
+                                              rebuildDropdown.add(DateTime.now());
+                                              filtering(page: 1);
+                                            },
+                                            width: screenWidthByBreakpoint(90, 70, 26),
                                           ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  AppPadding.vertical(denominator: 1 / 3),
-                                  AppOutlinedButton(
-                                    () {
-                                      resetAllFilter();
-                                      filtering(enableDebounce: true, page: 1);
-                                    },
-                                    backgroundColor: Colors.white,
-                                    borderRadius: 15,
-                                    width: 131,
-                                    height: 45,
-                                    text: 'Clear',
-                                  ),
-                                ],
-                              ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                AppPadding.vertical(denominator: 1 / 3),
+                                AppOutlinedButton(
+                                  () {
+                                    resetAllFilter();
+                                    filtering(enableDebounce: true, page: 1);
+                                  },
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 15,
+                                  width: 131,
+                                  height: 45,
+                                  text: 'Clear',
+                                ),
+                              ],
                             ),
-                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
-                          ],
-                        ),
+                          ),
+                          const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
+                        ],
                       ),
                     ),
                   ],
