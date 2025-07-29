@@ -293,6 +293,11 @@ class _LoginPageState extends State<LoginPage> {
                                     ).then((value) {
                                       dismissLoading();
                                       if (responseCode(value.code)) {
+                                        if (prefs.getBool(rememberMe) == true) {
+                                          prefs.setBool(rememberMe, true);
+                                          prefs.setString(username, usernameController.text);
+                                          prefs.setString(password, passwordController.text);
+                                        }
                                         context.read<AuthController>().setAuthenticationResponse(
                                           value.data,
                                           usernameValue: usernameController.text,
@@ -370,7 +375,10 @@ class _LoginPageState extends State<LoginPage> {
                                   style: AppTypography.bodyMedium(context),
                                 ),
                                 AppPadding.vertical(),
-                                SizedBox(width: screenWidth1728(20), child: InputField(field: emailAttribute)),
+                                SizedBox(
+                                  width: screenWidth1728(20),
+                                  child: InputField(field: emailAttribute),
+                                ),
                                 AppPadding.vertical(),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,

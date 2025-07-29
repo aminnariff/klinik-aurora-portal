@@ -636,7 +636,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                                             ?.data
                                                             ?.data?[index]
                                                             .user
-                                                            ?.userFullName ??
+                                                            ?.userPhone ??
                                                         '',
                                                     service:
                                                         snapshot
