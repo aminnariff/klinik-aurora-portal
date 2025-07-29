@@ -57,6 +57,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
+      prefs.remove(authResponse);
+      prefs.remove(jwtResponse);
+      prefs.remove(token);
       context.read<AuthController>().checkDateTime().then((value) {
         String tokenStatus = value;
         if (tokenStatus == 'expired' || widget.resetUser == true) {
@@ -85,9 +88,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget view() {
-    prefs.remove(authResponse);
-    prefs.remove(jwtResponse);
-    prefs.remove(token);
     return FutureBuilder<AuthResponse?>(
       future: context.read<AuthController>().init(context),
       builder: (context, snapshot) {
@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                                           ],
                                         ),
                                       ),
-                                      width: screenHeightByBreakpoint(80, 50, 24),
+                                      width: screenHeightByBreakpoint(80, 50, 450, useAbsoluteValueDesktop: true),
                                     ),
                                     AppPadding.vertical(),
                                     Column(
@@ -234,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                                               return null;
                                             },
                                           ),
-                                          width: screenHeightByBreakpoint(80, 50, 24),
+                                          width: screenHeightByBreakpoint(80, 50, 450, useAbsoluteValueDesktop: true),
                                         ),
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.end,
