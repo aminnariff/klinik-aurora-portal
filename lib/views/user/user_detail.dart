@@ -103,9 +103,15 @@ class _UserDetailState extends State<UserDetail> {
       _userStatus.value = widget.user?.userStatus == 1;
     }
     try {
-      Data? branch = context.read<BranchController>().branchAllResponse?.data?.data?.firstWhere(
-        (element) => element.branchId == branchIdAttribute.controller.text,
-      );
+      print(context.read<BranchController>().branchAllResponse?.code);
+      print(context.read<BranchController>().branchAllResponse?.data?.data?.first.branchId);
+      if (context.read<BranchController>().branchAllResponse == null) {
+        BranchController.getAll(context, 1, 100).then((value) {
+          if (responseCode(value.code)) {
+            context.read<BranchController>().branchAllResponse = value;
+          }
+        });
+      }
       for (branch_model.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? []) {
         branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
       }
@@ -114,10 +120,18 @@ class _UserDetailState extends State<UserDetail> {
         final nameB = b.name.toLowerCase();
         return nameA.compareTo(nameB);
       });
-      if (branch != null) {
-        setState(() {
-          _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
-        });
+      rebuildDropdown.add(DateTime.now());
+      try {
+        Data? branch = context.read<BranchController>().branchAllResponse?.data?.data?.firstWhere(
+          (element) => element.branchId == branchIdAttribute.controller.text,
+        );
+        if (branch != null) {
+          setState(() {
+            _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
+          });
+        }
+      } catch (e) {
+        debugPrint(e.toString());
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -231,21 +245,26 @@ class _UserDetailState extends State<UserDetail> {
                                       SizedBox(height: 12),
                                       Row(
                                         children: [
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              branches,
-                                              onChanged: (selected) {
-                                                setState(() {
-                                                  _selectedBranch = selected;
-                                                  branchIdAttribute.errorMessage = null;
-                                                  branchIdAttribute.controller.text = selected!.name;
-                                                });
-                                              },
-                                              value: _selectedBranch?.name,
-                                              hintText: 'Branch',
-                                              width: screenWidth1728(30),
-                                              errorMessage: branchIdAttribute.errorMessage,
-                                            ),
+                                          StreamBuilder<DateTime>(
+                                            stream: rebuildDropdown.stream,
+                                            builder: (context, asyncSnapshot) {
+                                              return AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  branches,
+                                                  onChanged: (selected) {
+                                                    setState(() {
+                                                      _selectedBranch = selected;
+                                                      branchIdAttribute.errorMessage = null;
+                                                      branchIdAttribute.controller.text = selected!.name;
+                                                    });
+                                                  },
+                                                  value: _selectedBranch?.name,
+                                                  hintText: 'Branch',
+                                                  width: screenWidth1728(30),
+                                                  errorMessage: branchIdAttribute.errorMessage,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),
