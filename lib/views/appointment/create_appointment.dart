@@ -93,6 +93,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
   List<FileAttribute> selectedFiles = [];
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
+  List<DropdownAttribute> serviceList = [];
 
   @override
   void initState() {
@@ -106,6 +107,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       dateTimeController.text =
           dateConverter(widget.appointment?.appointmentDatetime, format: 'dd-MM-yyyy HH:mm') ?? '';
     }
+
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       if (context.read<AuthController>().isSuperAdmin == false && widget.type == 'create') {
         ServiceBranchController.getAll(
@@ -115,6 +117,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
         ).then((value) {
           if (responseCode(value.code)) {
+            if (value.data != null) {
+              for (service_branch_model.Data item in value.data?.data ?? []) {
+                serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
+              }
+            }
+            serviceList.sort((a, b) => a.name.compareTo(b.name));
             context.read<ServiceBranchController>().serviceBranchResponse = value.data;
             rebuildDropdown.add(DateTime.now());
           }
@@ -510,15 +518,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         builder: (context, serviceBranchController, _) {
                                           return AppDropdown(
                                             attributeList: DropdownAttributeList(
-                                              [
-                                                if (serviceBranchController.serviceBranchResponse?.data != null)
-                                                  for (service_branch_model.Data item
-                                                      in serviceBranchController.serviceBranchResponse?.data ?? [])
-                                                    DropdownAttribute(
-                                                      item.serviceBranchId ?? '',
-                                                      item.serviceName ?? '',
-                                                    ),
-                                              ],
+                                              serviceList,
                                               labelText: 'appointmentPage'.tr(gender: 'service'),
                                               value: _service?.name,
                                               fieldColor: widget.type == 'update' ? textFormFieldUneditableColor : null,

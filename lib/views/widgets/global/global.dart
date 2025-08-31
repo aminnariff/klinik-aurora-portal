@@ -143,8 +143,7 @@ String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
 
 String formatAppointmentDate(DateTime dateTime, bool time) {
   final malaysiaDateTime = dateTime.add(const Duration(hours: 8)); // force +8
-
-  final now = DateTime.now().add(const Duration(hours: 8));
+  final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   final tomorrow = today.add(const Duration(days: 1));
   final appointmentDay = DateTime(malaysiaDateTime.year, malaysiaDateTime.month, malaysiaDateTime.day);
