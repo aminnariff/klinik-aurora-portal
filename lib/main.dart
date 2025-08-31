@@ -63,7 +63,7 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await EasyLocalization.ensureInitialized();
-      environment = Flavor.production;
+      environment = Flavor.development;
       AppVersion.init();
       AppLoading.init();
       Storage.init();

@@ -1,11 +1,11 @@
 name: klinik_aurora_portal
 description: "Simplifying healthcare management from scheduling to inventory, ensuring efficient clinic operations and superior patient care."
-publish_to: 'none' 
+publish_to: "none"
 
 version: 1.0.4+4
 
 environment:
-  sdk: '>=3.8.1 <4.0.0'
+  sdk: ">=3.9.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -69,22 +69,22 @@ flutter:
     - assets/typography/proxima/
 
   fonts:
-      - family: Proxima
-        fonts:
-          - asset: assets/typography/proxima/Proxima-Nova-Regular.ttf
-          - asset: assets/typography/proxima/Proxima-Nova-Extrabold.ttf
-            weight: 900
-          - asset: assets/typography/proxima/Proxima-Nova-Black.ttf
-            weight: 800
-          - asset: assets/typography/proxima/Proxima-Nova-Bold.ttf
-            weight: 700
-          - asset: assets/typography/proxima/Proxima-Nova-Semibold.ttf
-            weight: 600
-          - asset: assets/typography/proxima/Proxima-Nova-Medium.ttf
-            weight: 500
-          - asset: assets/typography/proxima/Proxima-Nova-Regular.ttf
-            weight: 400
-          - asset: assets/typography/proxima/Proxima-Nova-Light.ttf
-            weight: 300
-          - asset: assets/typography/proxima/Proxima-Nova-Thin.ttf
-            weight: 200
+    - family: Proxima
+      fonts:
+        - asset: assets/typography/proxima/Proxima-Nova-Regular.ttf
+        - asset: assets/typography/proxima/Proxima-Nova-Extrabold.ttf
+          weight: 900
+        - asset: assets/typography/proxima/Proxima-Nova-Black.ttf
+          weight: 800
+        - asset: assets/typography/proxima/Proxima-Nova-Bold.ttf
+          weight: 700
+        - asset: assets/typography/proxima/Proxima-Nova-Semibold.ttf
+          weight: 600
+        - asset: assets/typography/proxima/Proxima-Nova-Medium.ttf
+          weight: 500
+        - asset: assets/typography/proxima/Proxima-Nova-Regular.ttf
+          weight: 400
+        - asset: assets/typography/proxima/Proxima-Nova-Light.ttf
+          weight: 300
+        - asset: assets/typography/proxima/Proxima-Nova-Thin.ttf
+          weight: 200

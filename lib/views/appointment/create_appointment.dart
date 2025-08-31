@@ -640,7 +640,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                     ?.first
                                                     .availableDatetimes ??
                                                 [];
-                                            List<String> exceptionDateTime = [];
+
+                                            List<String> tempExceptionDateTime = [];
                                             for (
                                               int index = 0;
                                               index <
@@ -652,7 +653,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                       0);
                                               index++
                                             ) {
-                                              exceptionDateTime.add(
+                                              tempExceptionDateTime.add(
                                                 context
                                                         .read<ServiceBranchExceptionController>()
                                                         .serviceBranchExceptionResponse
@@ -662,12 +663,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               );
                                             }
 
-                                            for (int index = 0; index < exceptionDateTime.length; index++) {
-                                              availableDateTime.removeWhere(
-                                                (element) => element == exceptionDateTime[index],
-                                              );
-                                            }
+                                            final result = availableDateTime
+                                                .toSet()
+                                                .difference(tempExceptionDateTime.toSet())
+                                                .toList();
+                                            availableDateTime = result;
                                             availableDateTime = removePastDates(availableDateTime);
+                                            availableDateTime.sort(
+                                              (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
+                                            );
                                             String? selectedDateTime = await showDialog(
                                               context: context,
                                               builder: (BuildContext context) {

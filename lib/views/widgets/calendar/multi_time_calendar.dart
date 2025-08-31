@@ -29,7 +29,7 @@ class MultiTimeCalendarPage extends StatefulWidget {
     this.serviceBranchAvailableDatetimeId,
     required this.startMonth,
     required this.year,
-    this.totalMonths = 1,
+    this.totalMonths = 2,
     this.initialDateTimes,
   });
 
@@ -337,13 +337,24 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
   Widget _buildDateGroupedSummary() {
     final Map<DateTime, List<TimeOfDay>> dateToTimes = {};
 
-    // Step 1: Group all selected time slots by exact date (DateTime)
+    // Helper: allow only current month + next 2 months
+    bool isInAllowedWindow(DateTime d) {
+      final now = DateTime.now();
+      final start = DateTime(now.year, now.month); // 1st of this month
+      final end = DateTime(start.year, start.month + 3); // exclusive upper bound
+      final day = DateTime(d.year, d.month, d.day);
+      return day.isAtSameMomentAs(start) || (day.isAfter(start) && day.isBefore(end));
+    }
+
+    // Step 1: Group selected time slots by exact date
     for (final slot in timeSlots) {
       slot.selectedDates.forEach((dateStr, selected) {
         if (selected) {
           final parts = dateStr.split('-').map(int.parse).toList();
           final date = DateTime(parts[0], parts[1], parts[2]);
-          dateToTimes.putIfAbsent(date, () => []).add(slot.time);
+          if (isInAllowedWindow(date)) {
+            dateToTimes.putIfAbsent(date, () => []).add(slot.time);
+          }
         }
       });
     }
@@ -352,7 +363,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
       return const Text('No appointment slots selected.');
     }
 
-    // Step 2: Group by (year, month)
+    // Step 2: Group by (year, month) for only-allowed dates
     final Map<String, List<DateTime>> monthToDates = {};
     for (final date in dateToTimes.keys) {
       final monthKey = DateFormat('MMMM yyyy').format(date);
@@ -381,11 +392,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
             ),
             ...dates.map((date) {
               final times = dateToTimes[date]!
-                ..sort((a, b) {
-                  final aMin = a.hour * 60 + a.minute;
-                  final bMin = b.hour * 60 + b.minute;
-                  return aMin.compareTo(bMin);
-                });
+                ..sort((a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
