@@ -33,6 +33,7 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
+import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
@@ -97,7 +98,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   @override
   void initState() {
-    patientNameController.controller.text = widget.appointment?.user?.userFullName ?? '';
+    patientNameController.controller.text = widget.appointment?.user?.userFullName?.titleCase() ?? '';
     patientContactNoController.controller.text = widget.appointment?.user?.userPhone ?? '';
     patientEmailController.controller.text = widget.appointment?.user?.userEmail ?? '';
     appointmentNoteController.controller.text = widget.appointment?.appointmentNote ?? '';
@@ -929,16 +930,19 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               children: [
                 SizedBox(height: 4),
                 Text('Booking Fee', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
-                showPaymentStatus(
-                  context,
-                  (widget.appointment?.appointmentStatus == 5)
-                      ? 1
-                      : (widget.appointment?.payment?.length ?? 0) > 0
-                      ? widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
+                (widget.appointment?.service?.serviceBookingFee != null ||
+                        (double.parse(widget.appointment?.service?.serviceBookingFee ?? '0') > 0))
+                    ? showPaymentStatus(
+                        context,
+                        (widget.appointment?.appointmentStatus == 5)
                             ? 1
-                            : 0
-                      : 0,
-                ),
+                            : (widget.appointment?.payment?.length ?? 0) > 0
+                            ? widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
+                                  ? 1
+                                  : 0
+                            : 0,
+                      )
+                    : Text('N/A'),
                 SizedBox(height: 4),
                 if (widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true) ...[
                   labelValue(

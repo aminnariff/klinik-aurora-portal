@@ -28,6 +28,7 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
+import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -514,7 +515,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                             message:
                                                 'Contact No : ${snapshot.appointmentResponse?.data?.data?[index].user?.userPhone ?? 'N/A'}\nEmail : ${snapshot.appointmentResponse?.data?.data?[index].user?.userEmail ?? 'N/A'}',
                                             child: Text(
-                                              snapshot.appointmentResponse?.data?.data?[index].user?.userFullName ??
+                                              snapshot.appointmentResponse?.data?.data?[index].user?.userFullName
+                                                      ?.titleCase() ??
                                                   'N/A',
                                               style: AppTypography.bodyMedium(context).apply(),
                                             ),
@@ -538,6 +540,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                             ),
                                           ),
                                         DataCell(
+                                          AppSelectableText(
+                                            snapshot.appointmentResponse?.data?.data?[index].service?.doctorType == 2
+                                                ? 'Sonographer'
+                                                : 'Doctor',
+                                          ),
+                                        ),
+                                        DataCell(
                                           Text(
                                             getAppointmentStatusLabel(
                                               snapshot.appointmentResponse?.data?.data?[index].appointmentStatus,
@@ -555,12 +564,22 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                         ),
                                         DataCell(
                                           (snapshot
-                                                      .appointmentResponse
-                                                      ?.data
-                                                      ?.data?[index]
-                                                      .service
-                                                      ?.serviceBookingFee !=
-                                                  null)
+                                                          .appointmentResponse
+                                                          ?.data
+                                                          ?.data?[index]
+                                                          .service
+                                                          ?.serviceBookingFee !=
+                                                      null ||
+                                                  (double.parse(
+                                                        snapshot
+                                                                .appointmentResponse
+                                                                ?.data
+                                                                ?.data?[index]
+                                                                .service
+                                                                ?.serviceBookingFee ??
+                                                            '0',
+                                                      ) >
+                                                      0))
                                               ? showPaymentStatus(
                                                   context,
                                                   snapshot.appointmentResponse?.data?.data?[index].appointmentStatus ==
@@ -827,6 +846,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           allowSorting: false,
           columnSize: ColumnSize.S,
         ),
+      TableHeaderAttribute(
+        attribute: 'doctorType',
+        label: 'Type',
+        allowSorting: false,
+        columnSize: ColumnSize.S,
+        width: 120,
+      ),
       TableHeaderAttribute(
         attribute: 'appointmentStatus',
         label: 'Status',

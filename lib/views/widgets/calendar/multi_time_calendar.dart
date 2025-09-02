@@ -98,6 +98,20 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
     return result;
   }
 
+  List<String> filterCurrentPrevAndFutureMonths(List<String> isoDates, {DateTime? nowOverride}) {
+    final nowLocal = (nowOverride ?? DateTime.now()).toLocal();
+    final prevMonthStart = DateTime(nowLocal.year, nowLocal.month - 1, 1);
+
+    return isoDates.where((s) {
+      try {
+        final dtLocal = DateTime.parse(s).toLocal();
+        return !dtLocal.isBefore(prevMonthStart);
+      } catch (_) {
+        return false;
+      }
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     int displayMonth = widget.startMonth + currentMonthIndex;
@@ -197,11 +211,13 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                             }
                           });
                         } else {
+                          List<String> updatedSlots = _getAllDateTimeValues();
+                          updatedSlots = filterCurrentPrevAndFutureMonths(updatedSlots);
                           ServiceBranchAvailableDtController.update(
                             context,
                             widget.serviceBranchAvailableDatetimeId ?? '',
                             widget.serviceBranchId,
-                            _getAllDateTimeValues(),
+                            updatedSlots,
                           ).then((value) {
                             if (responseCode(value.code)) {
                               showDialogSuccess(context, 'Successfully Updated the Available Appointment');

@@ -171,7 +171,10 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             ),
           ),
         ),
-        Padding(padding: EdgeInsets.symmetric(vertical: screenPadding), child: pagination()),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: screenPadding),
+          child: pagination(),
+        ),
       ],
     );
     // },
@@ -270,183 +273,188 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         if (snapshot.servicesResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.servicesResponse?.data == null || snapshot.servicesResponse!.data!.isEmpty
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
+                  ],
+                )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  tableButton(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                            padding: const EdgeInsets.all(5),
-                            child: DataTable2(
-                              columnSpacing: 12,
-                              horizontalMargin: 12,
-                              isHorizontalScrollBarVisible: true,
-                              isVerticalScrollBarVisible: true,
-                              columns: columns(),
-                              headingRowColor: WidgetStateProperty.all(Colors.white),
-                              headingRowHeight: 51,
-                              decoration: const BoxDecoration(),
-                              border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                verticalInside: BorderSide(
-                                  width: 1,
-                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                              padding: const EdgeInsets.all(5),
+                              child: DataTable2(
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                isHorizontalScrollBarVisible: true,
+                                isVerticalScrollBarVisible: true,
+                                columns: columns(),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
+                                headingRowHeight: 51,
+                                decoration: const BoxDecoration(),
+                                border: TableBorder(
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
-                              ),
-                              rows: [
-                                for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
-                                  DataRow(
-                                    color: WidgetStateProperty.all(
-                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                    ),
-                                    cells: [
-                                      DataCell(
-                                        Text(
-                                          snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
-                                          style: AppTypography.bodyMedium(context).apply(),
-                                        ),
+                                rows: [
+                                  for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
+                                    DataRow(
+                                      color: WidgetStateProperty.all(
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
                                       ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].serviceCategory ?? 'N/A',
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppTooltip(
-                                          message:
-                                              'Booking Fee: RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}',
-                                          child: Text(
-                                            snapshot.servicesResponse?.data?[index].servicePrice != null
-                                                ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
-                                                : 'N/A',
+                                      cells: [
+                                        DataCell(
+                                          Text(
+                                            snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
+                                            style: AppTypography.bodyMedium(context).apply(),
                                           ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.servicesResponse?.data?[index].doctorType == 2
-                                              ? 'Sonographer'
-                                              : 'Doctor',
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.servicesResponse?.data?[index].serviceCategory ?? 'N/A',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            showStatus(snapshot.servicesResponse?.data?[index].serviceStatus == 1),
-                                          ],
+                                        DataCell(
+                                          AppTooltip(
+                                            message:
+                                                'Booking Fee: RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}',
+                                            child: Text(
+                                              snapshot.servicesResponse?.data?[index].servicePrice != null
+                                                  ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
+                                                  : 'N/A',
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          dateConverter(snapshot.servicesResponse?.data?[index].createdDate) ?? 'N/A',
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.servicesResponse?.data?[index].doctorType == 2
+                                                ? 'Sonographer'
+                                                : 'Doctor',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            PopupMenuButton<String>(
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                              offset: const Offset(8, 35),
-                                              color: Colors.white,
-                                              tooltip: '',
-                                              onSelected:
-                                                  (value) => _handleMenuSelection(
-                                                    value,
-                                                    snapshot.servicesResponse?.data?[index] ?? Data(),
-                                                  ),
-                                              itemBuilder:
-                                                  (BuildContext context) => <PopupMenuEntry<String>>[
-                                                    if (context.read<AuthController>().isSuperAdmin)
-                                                      PopupMenuItem<String>(value: 'update', child: Text('Update')),
-                                                    if (context.read<AuthController>().isSuperAdmin)
-                                                      PopupMenuItem<String>(
-                                                        value: 'updateBranchesStatus',
-                                                        child: Text('Update Branch Service'),
-                                                      ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              showStatus(snapshot.servicesResponse?.data?[index].serviceStatus == 1),
+                                            ],
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            dateConverter(snapshot.servicesResponse?.data?[index].createdDate) ?? 'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              PopupMenuButton<String>(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                offset: const Offset(8, 35),
+                                                color: Colors.white,
+                                                tooltip: '',
+                                                onSelected: (value) => _handleMenuSelection(
+                                                  value,
+                                                  snapshot.servicesResponse?.data?[index] ?? Data(),
+                                                ),
+                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                                  if (context.read<AuthController>().isSuperAdmin)
+                                                    PopupMenuItem<String>(value: 'update', child: Text('Update')),
+                                                  if (context.read<AuthController>().isSuperAdmin)
                                                     PopupMenuItem<String>(
-                                                      value: 'enableDisable',
-                                                      child: Text(
-                                                        snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                            ? 'Deactivate'
-                                                            : 'Re-Activate',
-                                                      ),
+                                                      value: 'updateBranchesStatus',
+                                                      child: Text('Update Branch Service'),
                                                     ),
-                                                  ],
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets.all(4),
-                                                    // decoration: const BoxDecoration(
-                                                    //   color: Colors.white,
-                                                    //   shape: BoxShape.circle,
-                                                    // ),
-                                                    child: Icon(Icons.more_vert, color: Colors.grey),
+                                                  PopupMenuItem<String>(
+                                                    value: 'enableDisable',
+                                                    child: Text(
+                                                      snapshot.servicesResponse?.data?[index].serviceStatus == 1
+                                                          ? 'Deactivate'
+                                                          : 'Re-Activate',
+                                                    ),
                                                   ),
                                                 ],
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      // decoration: const BoxDecoration(
+                                                      //   color: Colors.white,
+                                                      //   shape: BoxShape.circle,
+                                                      // ),
+                                                      child: Icon(Icons.more_vert, color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                        ],
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: pagination()),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                  ),
-                                perPage(),
-                              ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: pagination()),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isMobile && !isTablet)
+                                    const Flexible(
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ),
+                                  perPage(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                            if (!isMobile && !isTablet)
+                              Text(
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -458,192 +466,194 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         if (snapshot.serviceBranchResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.serviceBranchResponse?.data == null || snapshot.serviceBranchResponse!.data!.isEmpty
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
+                  ],
+                )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  tableButton(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                            padding: const EdgeInsets.all(5),
-                            child: DataTable2(
-                              columnSpacing: 12,
-                              horizontalMargin: 12,
-                              isHorizontalScrollBarVisible: true,
-                              isVerticalScrollBarVisible: true,
-                              columns: columns(),
-                              headingRowColor: WidgetStateProperty.all(Colors.white),
-                              headingRowHeight: 51,
-                              decoration: const BoxDecoration(),
-                              border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                verticalInside: BorderSide(
-                                  width: 1,
-                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                              padding: const EdgeInsets.all(5),
+                              child: DataTable2(
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                isHorizontalScrollBarVisible: true,
+                                isVerticalScrollBarVisible: true,
+                                columns: columns(),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
+                                headingRowHeight: 51,
+                                decoration: const BoxDecoration(),
+                                border: TableBorder(
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
-                              ),
-                              rows: [
-                                for (
-                                  int index = 0;
-                                  index < (snapshot.serviceBranchResponse?.data?.length ?? 0);
-                                  index++
-                                )
-                                  DataRow(
-                                    color: WidgetStateProperty.all(
-                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                    ),
-                                    cells: [
-                                      DataCell(
-                                        Text(
-                                          snapshot.serviceBranchResponse?.data?[index].serviceName ?? 'N/A',
-                                          style: AppTypography.bodyMedium(context).apply(),
-                                        ),
+                                rows: [
+                                  for (
+                                    int index = 0;
+                                    index < (snapshot.serviceBranchResponse?.data?.length ?? 0);
+                                    index++
+                                  )
+                                    DataRow(
+                                      color: WidgetStateProperty.all(
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
                                       ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.serviceBranchResponse?.data?[index].serviceCategory ?? 'N/A',
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppTooltip(
-                                          message:
-                                              'Booking Fee: RM ${snapshot.serviceBranchResponse?.data?[index].serviceBookingFee ?? '0.00'}',
-                                          child: Text(
-                                            snapshot.serviceBranchResponse?.data?[index].servicePrice != null
-                                                ? 'RM ${snapshot.serviceBranchResponse?.data?[index].servicePrice}'
-                                                : 'N/A',
+                                      cells: [
+                                        DataCell(
+                                          Text(
+                                            snapshot.serviceBranchResponse?.data?[index].serviceName ?? 'N/A',
+                                            style: AppTypography.bodyMedium(context).apply(),
                                           ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.serviceBranchResponse?.data?[index].doctorType == 2
-                                              ? 'Sonographer'
-                                              : 'Doctor',
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.serviceBranchResponse?.data?[index].serviceCategory ?? 'N/A',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            showStatus(
-                                              snapshot.serviceBranchResponse?.data?[index].serviceBranchStatus == 1,
+                                        DataCell(
+                                          AppTooltip(
+                                            message:
+                                                'Booking Fee: RM ${snapshot.serviceBranchResponse?.data?[index].serviceBookingFee ?? '0.00'}',
+                                            child: Text(
+                                              snapshot.serviceBranchResponse?.data?[index].servicePrice != null
+                                                  ? 'RM ${snapshot.serviceBranchResponse?.data?[index].servicePrice}'
+                                                  : 'N/A',
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          dateConverter(snapshot.serviceBranchResponse?.data?[index].createdDate) ??
-                                              'N/A',
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.serviceBranchResponse?.data?[index].doctorType == 2
+                                                ? 'Sonographer'
+                                                : 'Doctor',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            PopupMenuButton<String>(
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                              offset: const Offset(8, 35),
-                                              color: Colors.white,
-                                              tooltip: '',
-                                              onSelected:
-                                                  (value) => _handleAdminMenuSelection(
-                                                    value,
-                                                    snapshot.serviceBranchResponse?.data?[index] ??
-                                                        service_branch_model.Data(),
-                                                  ),
-                                              itemBuilder:
-                                                  (BuildContext context) => <PopupMenuEntry<String>>[
-                                                    PopupMenuItem<String>(
-                                                      value: 'update',
-                                                      child: Text('Update Timing'),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              showStatus(
+                                                snapshot.serviceBranchResponse?.data?[index].serviceBranchStatus == 1,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            dateConverter(snapshot.serviceBranchResponse?.data?[index].createdDate) ??
+                                                'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              PopupMenuButton<String>(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                offset: const Offset(8, 35),
+                                                color: Colors.white,
+                                                tooltip: '',
+                                                onSelected: (value) => _handleAdminMenuSelection(
+                                                  value,
+                                                  snapshot.serviceBranchResponse?.data?[index] ??
+                                                      service_branch_model.Data(),
+                                                ),
+                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                                  PopupMenuItem<String>(value: 'update', child: Text('Update Timing')),
+                                                  PopupMenuItem<String>(
+                                                    value: 'enableDisable',
+                                                    child: Text(
+                                                      snapshot
+                                                                  .serviceBranchResponse
+                                                                  ?.data?[index]
+                                                                  .serviceBranchStatus ==
+                                                              1
+                                                          ? 'Deactivate'
+                                                          : 'Re-Activate',
                                                     ),
-                                                    PopupMenuItem<String>(
-                                                      value: 'enableDisable',
-                                                      child: Text(
-                                                        snapshot
-                                                                    .serviceBranchResponse
-                                                                    ?.data?[index]
-                                                                    .serviceBranchStatus ==
-                                                                1
-                                                            ? 'Deactivate'
-                                                            : 'Re-Activate',
-                                                      ),
-                                                    ),
-                                                  ],
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets.all(4),
-                                                    // decoration: const BoxDecoration(
-                                                    //   color: Colors.white,
-                                                    //   shape: BoxShape.circle,
-                                                    // ),
-                                                    child: Icon(Icons.more_vert, color: Colors.grey),
                                                   ),
                                                 ],
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      // decoration: const BoxDecoration(
+                                                      //   color: Colors.white,
+                                                      //   shape: BoxShape.circle,
+                                                      // ),
+                                                      child: Icon(Icons.more_vert, color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                        ],
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: pagination()),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                  ),
-                                perPage(),
-                              ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: pagination()),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isMobile && !isTablet)
+                                    const Flexible(
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ),
+                                  perPage(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                            if (!isMobile && !isTablet)
+                              Text(
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -691,8 +701,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 serviceName: service.serviceDescription,
                 serviceDescription: service.serviceDescription,
                 servicePrice: service.servicePrice != null ? double.parse(service.servicePrice ?? '0') : null,
-                serviceBookingFee:
-                    service.serviceBookingFee != null ? double.parse(service.serviceBookingFee ?? '0') : null,
+                serviceBookingFee: service.serviceBookingFee != null
+                    ? double.parse(service.serviceBookingFee ?? '0')
+                    : null,
                 doctorType: service.doctorType,
                 serviceTime: service.serviceTime,
                 serviceCategory: service.serviceCategory,
@@ -728,10 +739,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         String? updateId;
         bool haveElements = false;
         try {
-          updateId =
-              value.data?.data
-                  ?.firstWhere((element) => element.serviceBranchId == serviceBranch.serviceBranchId)
-                  .serviceBranchAvailableDatetimeId;
+          updateId = value.data?.data
+              ?.firstWhere((element) => element.serviceBranchId == serviceBranch.serviceBranchId)
+              .serviceBranchAvailableDatetimeId;
         } catch (e) {
           debugPrint(e.toString());
         }
@@ -820,8 +830,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -833,10 +843,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     if (context.read<AuthController>().isSuperAdmin == false) {
       ServiceBranchController.getAll(
         context,
-        1,
-        100,
+        _page,
+        _pageSize,
         branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-        // branchId: "62743240-006d-11ef-a129-6677d190faa2",
       ).then((value) {
         dismissLoading();
         if (responseCode(value.code)) {
@@ -851,23 +860,20 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         _page,
         _pageSize,
         serviceName: _serviceNameController.text,
-        serviceStatus:
-            _selectedServiceStatus != null
-                ? _selectedServiceStatus?.key == '1'
-                    ? 1
-                    : _selectedServiceStatus?.key == '0'
-                    ? 0
-                    : null
-                : null,
+        serviceStatus: _selectedServiceStatus != null
+            ? _selectedServiceStatus?.key == '1'
+                  ? 1
+                  : _selectedServiceStatus?.key == '0'
+                  ? 0
+                  : null
+            : null,
       ).then((value) {
         dismissLoading();
         if (responseCode(value.code)) {
           _totalCount = value.data?.totalCount ?? 0;
           _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
           context.read<ServiceController>().servicesResponse = value.data;
-          // _page = 0;
         }
-        return null;
       });
     }
   }
@@ -976,8 +982,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(angle: -math.pi, child: child)
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 
