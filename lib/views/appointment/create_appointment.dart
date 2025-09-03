@@ -763,11 +763,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                       );
                                                     }
 
-                                                    for (int index = 0; index < exceptionDateTime.length; index++) {
-                                                      availableDateTime.removeWhere(
-                                                        (element) => element == exceptionDateTime[index],
-                                                      );
-                                                    }
+                                                    final result = availableDateTime
+                                                        .toSet()
+                                                        .difference(exceptionDateTime.toSet())
+                                                        .toList();
+                                                    availableDateTime = result;
                                                     availableDateTime = removePastDates(availableDateTime);
                                                     String? selectedDateTime = await showDialog(
                                                       context: context,
