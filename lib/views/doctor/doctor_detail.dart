@@ -178,10 +178,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                     DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
                                               ],
                                               isEditable: context.read<AuthController>().isSuperAdmin,
-                                              fieldColor:
-                                                  context.read<AuthController>().isSuperAdmin
-                                                      ? textFormFieldEditableColor
-                                                      : textFormFieldUneditableColor,
+                                              fieldColor: context.read<AuthController>().isSuperAdmin
+                                                  ? textFormFieldEditableColor
+                                                  : textFormFieldUneditableColor,
                                               onChanged: (selected) {
                                                 if (_branchId.errorMessage != null) {
                                                   _branchId.errorMessage = null;
@@ -215,105 +214,107 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                       if (widget.type == 'create') ...[
                                         selectedFile.value == null
                                             ? UploadDocumentsField(
-                                              title: 'doctorPage'.tr(gender: 'browseFile'),
-                                              fieldTitle: 'doctorPage'.tr(gender: 'doctorImage'),
-                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                              action: () {
-                                                addPicture();
-                                              },
-                                              cancelAction: () {},
-                                            )
+                                                title: 'doctorPage'.tr(gender: 'browseFile'),
+                                                fieldTitle: 'doctorPage'.tr(gender: 'doctorImage'),
+                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                action: () {
+                                                  addPicture();
+                                                },
+                                                cancelAction: () {},
+                                              )
                                             : Stack(
-                                              alignment: Alignment.topRight,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    addPicture();
-                                                  },
-                                                  child: Image.memory(selectedFile.value as Uint8List, height: 410),
-                                                ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    selectedFile = FileAttribute();
-                                                    fileRebuild.add(DateTime.now());
-                                                  },
-                                                  icon: const Icon(Icons.close),
-                                                ),
-                                              ],
-                                            ),
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      addPicture();
+                                                    },
+                                                    child: Image.memory(selectedFile.value as Uint8List, height: 410),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      selectedFile = FileAttribute();
+                                                      fileRebuild.add(DateTime.now());
+                                                    },
+                                                    icon: const Icon(Icons.close),
+                                                  ),
+                                                ],
+                                              ),
                                       ],
                                       if (widget.type == 'update')
                                         widget.doctor?.doctorImage == null
                                             ? selectedFile.name != null
-                                                ? Stack(
-                                                  alignment: Alignment.topRight,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
+                                                  ? Stack(
+                                                      alignment: Alignment.topRight,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            addPicture();
+                                                          },
+                                                          child: Image.memory(
+                                                            selectedFile.value as Uint8List,
+                                                            height: 410,
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            selectedFile = FileAttribute();
+                                                            fileRebuild.add(DateTime.now());
+                                                          },
+                                                          icon: const Icon(Icons.close),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : UploadDocumentsField(
+                                                      title: 'doctorPage'.tr(gender: 'browseFile'),
+                                                      fieldTitle: 'bdoctorPage'.tr(gender: 'doctorImage'),
+                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                      action: () {
                                                         addPicture();
                                                       },
-                                                      child: Image.memory(selectedFile.value as Uint8List, height: 410),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        selectedFile = FileAttribute();
-                                                        fileRebuild.add(DateTime.now());
-                                                      },
-                                                      icon: const Icon(Icons.close),
-                                                    ),
-                                                  ],
-                                                )
-                                                : UploadDocumentsField(
-                                                  title: 'doctorPage'.tr(gender: 'browseFile'),
-                                                  fieldTitle: 'bdoctorPage'.tr(gender: 'doctorImage'),
-                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                  action: () {
-                                                    addPicture();
-                                                  },
-                                                  cancelAction: () {},
-                                                )
+                                                      cancelAction: () {},
+                                                    )
                                             : GestureDetector(
-                                              onTap: () {
-                                                addPicture();
-                                              },
-                                              child: Image.network(
-                                                '${Environment.imageUrl}${widget.doctor?.doctorImage}',
-                                                height: 410,
-                                                loadingBuilder: (
-                                                  BuildContext context,
-                                                  Widget child,
-                                                  ImageChunkEvent? loadingProgress,
-                                                ) {
-                                                  if (loadingProgress == null) {
-                                                    return child; // The image is fully loaded
-                                                  }
-                                                  return Center(
-                                                    child: CircularProgressIndicator(
-                                                      // You can use any loading indicator
-                                                      value:
-                                                          loadingProgress.expectedTotalBytes != null
-                                                              ? loadingProgress.cumulativeBytesLoaded /
-                                                                  (loadingProgress.expectedTotalBytes ?? 1)
-                                                              : null,
-                                                    ),
-                                                  );
+                                                onTap: () {
+                                                  addPicture();
                                                 },
-                                                errorBuilder: (
-                                                  BuildContext context,
-                                                  Object error,
-                                                  StackTrace? stackTrace,
-                                                ) {
-                                                  return Container(
-                                                    padding: EdgeInsets.all(screenPadding),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(12),
-                                                      color: disabledColor,
-                                                    ),
-                                                    child: const Center(child: Icon(Icons.error, color: errorColor)),
-                                                  );
-                                                },
+                                                child: Image.network(
+                                                  '${Environment.imageUrl}${widget.doctor?.doctorImage}',
+                                                  height: 410,
+                                                  loadingBuilder:
+                                                      (
+                                                        BuildContext context,
+                                                        Widget child,
+                                                        ImageChunkEvent? loadingProgress,
+                                                      ) {
+                                                        if (loadingProgress == null) {
+                                                          return child; // The image is fully loaded
+                                                        }
+                                                        return Center(
+                                                          child: CircularProgressIndicator(
+                                                            // You can use any loading indicator
+                                                            value: loadingProgress.expectedTotalBytes != null
+                                                                ? loadingProgress.cumulativeBytesLoaded /
+                                                                      (loadingProgress.expectedTotalBytes ?? 1)
+                                                                : null,
+                                                          ),
+                                                        );
+                                                      },
+                                                  errorBuilder:
+                                                      (BuildContext context, Object error, StackTrace? stackTrace) {
+                                                        return Container(
+                                                          padding: EdgeInsets.all(screenPadding),
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                            color: disabledColor,
+                                                          ),
+                                                          child: const Center(
+                                                            child: Icon(Icons.error, color: errorColor),
+                                                          ),
+                                                        );
+                                                      },
+                                                ),
                                               ),
-                                            ),
                                       AppPadding.vertical(denominator: 2),
                                     ],
                                   );
@@ -370,11 +371,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                     if (responseCode(value.code)) {
                       getLatestData();
                     } else {
-                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                      showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                     }
                   });
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
               });
             } else {
@@ -397,14 +398,14 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                       if (responseCode(value.code)) {
                         getLatestData();
                       } else {
-                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                       }
                     });
                   } else {
                     getLatestData();
                   }
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
               });
             }

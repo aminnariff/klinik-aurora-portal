@@ -231,105 +231,107 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                       if (widget.type == 'create') ...[
                                         selectedFile.value == null
                                             ? UploadDocumentsField(
-                                              title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                              fieldTitle: 'servicesHomepage'.tr(gender: 'doctorImage'),
-                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                              action: () {
-                                                addPicture();
-                                              },
-                                              cancelAction: () {},
-                                            )
+                                                title: 'servicesHomepage'.tr(gender: 'browseFile'),
+                                                fieldTitle: 'servicesHomepage'.tr(gender: 'doctorImage'),
+                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                action: () {
+                                                  addPicture();
+                                                },
+                                                cancelAction: () {},
+                                              )
                                             : Stack(
-                                              alignment: Alignment.topRight,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    addPicture();
-                                                  },
-                                                  child: Image.memory(selectedFile.value as Uint8List, height: 410),
-                                                ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    selectedFile = FileAttribute();
-                                                    fileRebuild.add(DateTime.now());
-                                                  },
-                                                  icon: const Icon(Icons.close),
-                                                ),
-                                              ],
-                                            ),
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      addPicture();
+                                                    },
+                                                    child: Image.memory(selectedFile.value as Uint8List, height: 410),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      selectedFile = FileAttribute();
+                                                      fileRebuild.add(DateTime.now());
+                                                    },
+                                                    icon: const Icon(Icons.close),
+                                                  ),
+                                                ],
+                                              ),
                                       ],
                                       if (widget.type == 'update') ...[
                                         widget.service?.serviceImage == null
                                             ? selectedFile.name != null
-                                                ? Stack(
-                                                  alignment: Alignment.topRight,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
+                                                  ? Stack(
+                                                      alignment: Alignment.topRight,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            addPicture();
+                                                          },
+                                                          child: Image.memory(
+                                                            selectedFile.value as Uint8List,
+                                                            height: 410,
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            selectedFile = FileAttribute();
+                                                            fileRebuild.add(DateTime.now());
+                                                          },
+                                                          icon: const Icon(Icons.close),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : UploadDocumentsField(
+                                                      title: 'servicesHomepage'.tr(gender: 'browseFile'),
+                                                      fieldTitle: 'bservicesHomepage'.tr(gender: 'doctorImage'),
+                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                      action: () {
                                                         addPicture();
                                                       },
-                                                      child: Image.memory(selectedFile.value as Uint8List, height: 410),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        selectedFile = FileAttribute();
-                                                        fileRebuild.add(DateTime.now());
-                                                      },
-                                                      icon: const Icon(Icons.close),
-                                                    ),
-                                                  ],
-                                                )
-                                                : UploadDocumentsField(
-                                                  title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                                  fieldTitle: 'bservicesHomepage'.tr(gender: 'doctorImage'),
-                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                  action: () {
-                                                    addPicture();
-                                                  },
-                                                  cancelAction: () {},
-                                                )
+                                                      cancelAction: () {},
+                                                    )
                                             : GestureDetector(
-                                              onTap: () {
-                                                addPicture();
-                                              },
-                                              child: Image.network(
-                                                '${Environment.imageUrl}${widget.service?.serviceImage}',
-                                                height: 410,
-                                                loadingBuilder: (
-                                                  BuildContext context,
-                                                  Widget child,
-                                                  ImageChunkEvent? loadingProgress,
-                                                ) {
-                                                  if (loadingProgress == null) {
-                                                    return child; // The image is fully loaded
-                                                  }
-                                                  return Center(
-                                                    child: CircularProgressIndicator(
-                                                      // You can use any loading indicator
-                                                      value:
-                                                          loadingProgress.expectedTotalBytes != null
-                                                              ? loadingProgress.cumulativeBytesLoaded /
-                                                                  (loadingProgress.expectedTotalBytes ?? 1)
-                                                              : null,
-                                                    ),
-                                                  );
+                                                onTap: () {
+                                                  addPicture();
                                                 },
-                                                errorBuilder: (
-                                                  BuildContext context,
-                                                  Object error,
-                                                  StackTrace? stackTrace,
-                                                ) {
-                                                  return Container(
-                                                    padding: EdgeInsets.all(screenPadding),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(12),
-                                                      color: disabledColor,
-                                                    ),
-                                                    child: const Center(child: Icon(Icons.error, color: errorColor)),
-                                                  );
-                                                },
+                                                child: Image.network(
+                                                  '${Environment.imageUrl}${widget.service?.serviceImage}',
+                                                  height: 410,
+                                                  loadingBuilder:
+                                                      (
+                                                        BuildContext context,
+                                                        Widget child,
+                                                        ImageChunkEvent? loadingProgress,
+                                                      ) {
+                                                        if (loadingProgress == null) {
+                                                          return child; // The image is fully loaded
+                                                        }
+                                                        return Center(
+                                                          child: CircularProgressIndicator(
+                                                            // You can use any loading indicator
+                                                            value: loadingProgress.expectedTotalBytes != null
+                                                                ? loadingProgress.cumulativeBytesLoaded /
+                                                                      (loadingProgress.expectedTotalBytes ?? 1)
+                                                                : null,
+                                                          ),
+                                                        );
+                                                      },
+                                                  errorBuilder:
+                                                      (BuildContext context, Object error, StackTrace? stackTrace) {
+                                                        return Container(
+                                                          padding: EdgeInsets.all(screenPadding),
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                            color: disabledColor,
+                                                          ),
+                                                          child: const Center(
+                                                            child: Icon(Icons.error, color: errorColor),
+                                                          ),
+                                                        );
+                                                      },
+                                                ),
                                               ),
-                                            ),
                                         AppPadding.vertical(denominator: 2),
                                         Row(
                                           children: [
@@ -402,20 +404,20 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                 CreateServiceRequest(
                   serviceName: serviceNameController.controller.text,
                   serviceDescription: serviceDescriptionController.controller.text,
-                  servicePrice:
-                      servicePriceController.controller.text == ''
-                          ? null
-                          : double.parse(servicePriceController.controller.text),
-                  serviceBookingFee:
-                      serviceBookingFeeController.controller.text == ''
-                          ? null
-                          : double.parse(serviceBookingFeeController.controller.text),
+                  servicePrice: servicePriceController.controller.text == ''
+                      ? null
+                      : double.parse(servicePriceController.controller.text),
+                  serviceBookingFee: serviceBookingFeeController.controller.text == ''
+                      ? null
+                      : double.parse(serviceBookingFeeController.controller.text),
                   serviceTime: serviceTimeController.controller.text,
                   serviceCategory: serviceCategoryController.controller.text,
                   serviceStatus: 1,
                   doctorType: int.parse(_doctorType?.key ?? "1"),
-                  serviceTemplate:
-                      whatsappTemplateControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList(),
+                  serviceTemplate: whatsappTemplateControllers
+                      .map((c) => c.text.trim())
+                      .where((s) => s.isNotEmpty)
+                      .toList(),
                 ),
               ).then((value) {
                 dismissLoading();
@@ -427,14 +429,14 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                       if (responseCode(value.code)) {
                         getLatestData();
                       } else {
-                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                       }
                     });
                   } else {
                     getLatestData();
                   }
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
               });
             } else {
@@ -445,19 +447,19 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                   serviceStatus: widget.service?.serviceStatus,
                   serviceName: serviceNameController.controller.text,
                   serviceDescription: serviceDescriptionController.controller.text,
-                  servicePrice:
-                      servicePriceController.controller.text == ''
-                          ? null
-                          : double.parse(servicePriceController.controller.text),
-                  serviceBookingFee:
-                      serviceBookingFeeController.controller.text == ''
-                          ? null
-                          : double.parse(serviceBookingFeeController.controller.text),
+                  servicePrice: servicePriceController.controller.text == ''
+                      ? null
+                      : double.parse(servicePriceController.controller.text),
+                  serviceBookingFee: serviceBookingFeeController.controller.text == ''
+                      ? null
+                      : double.parse(serviceBookingFeeController.controller.text),
                   serviceTime: serviceTimeController.controller.text,
                   serviceCategory: serviceCategoryController.controller.text,
                   doctorType: int.parse(_doctorType?.key ?? "1"),
-                  serviceTemplate:
-                      whatsappTemplateControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList(),
+                  serviceTemplate: whatsappTemplateControllers
+                      .map((c) => c.text.trim())
+                      .where((s) => s.isNotEmpty)
+                      .toList(),
                 ),
               ).then((value) {
                 dismissLoading();
@@ -469,14 +471,14 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                       if (responseCode(value.code)) {
                         getLatestData();
                       } else {
-                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                       }
                     });
                   } else {
                     getLatestData();
                   }
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
               });
             }

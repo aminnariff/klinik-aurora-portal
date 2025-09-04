@@ -411,7 +411,7 @@ class _LoginPageState extends State<LoginPage> {
                                                 extra: value.data?.data?.token ?? '',
                                               );
                                             } else {
-                                              showDialogError(context, value.data?.message ?? '');
+                                              showDialogError(context, value.message ?? value.data?.message ?? '');
                                             }
                                           });
                                         }

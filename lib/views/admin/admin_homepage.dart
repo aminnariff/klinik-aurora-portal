@@ -187,7 +187,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
             ),
           ),
         ),
-        Padding(padding: EdgeInsets.symmetric(vertical: screenPadding), child: pagination()),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: screenPadding),
+          child: pagination(),
+        ),
       ],
     );
     // },
@@ -283,215 +286,225 @@ class _AdminHomepageState extends State<AdminHomepage> {
         if (snapshot.adminAllResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.adminAllResponse?.data == null || snapshot.adminAllResponse!.data!.isEmpty
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
+                  ],
+                )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  tableButton(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                            padding: const EdgeInsets.all(5),
-                            child: DataTable2(
-                              columnSpacing: 12,
-                              horizontalMargin: 12,
-                              minWidth: 1300,
-                              isHorizontalScrollBarVisible: true,
-                              isVerticalScrollBarVisible: true,
-                              columns: columns(),
-                              headingRowColor: WidgetStateProperty.all(Colors.white),
-                              headingRowHeight: 51,
-                              decoration: const BoxDecoration(),
-                              border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                verticalInside: BorderSide(
-                                  width: 1,
-                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                ),
-                              ),
-                              rows: [
-                                for (int index = 0; index < (snapshot.adminAllResponse?.data?.length ?? 0); index++)
-                                  DataRow(
-                                    color: WidgetStateProperty.all(
-                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                    ),
-                                    cells: [
-                                      DataCell(
-                                        TextButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AdminDetail(
-                                                  user: snapshot.adminAllResponse!.data![index],
-                                                  type: 'update',
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: Text(
-                                            snapshot.adminAllResponse?.data?[index].userFullname ??
-                                                snapshot.adminAllResponse?.data?[index].userName ??
-                                                'N/A',
-                                            style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(snapshot.adminAllResponse?.data?[index].userEmail ?? 'N/A'),
-                                      ),
-                                      DataCell(
-                                        InkWell(
-                                          onTap: () {
-                                            //TODO copy item
-                                          },
-                                          child: Text(snapshot.adminAllResponse?.data?[index].userPhone ?? 'N/A'),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.adminAllResponse?.data?[index].userStatus == 1
-                                              ? 'Active'
-                                              : 'Inactive',
-                                          style: AppTypography.bodyMedium(context).apply(
-                                            color: statusColor(
-                                              snapshot.adminAllResponse?.data?[index].userStatus == 1
-                                                  ? 'active'
-                                                  : 'inactive',
-                                            ),
-                                            fontWeightDelta: 1,
-                                          ),
-                                        ),
-                                      ),
-                                      // DataCell(
-                                      //   AppSelectableText(snapshot.adminAllResponse?.data?[index].branchId ?? 'N/A'),
-                                      // ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          dateConverter(snapshot.adminAllResponse?.data?[index].createdDate) ?? 'N/A',
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return AdminDetail(
-                                                      user: snapshot.adminAllResponse!.data![index],
-                                                      type: 'update',
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              icon: const Icon(Icons.edit, color: Colors.grey),
-                                            ),
-                                            IconButton(
-                                              onPressed: () async {
-                                                try {
-                                                  Data? data = snapshot.adminAllResponse?.data?[index];
-                                                  if (await showConfirmDialog(
-                                                    context,
-                                                    data?.userStatus == 1
-                                                        ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
-                                                        : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
-                                                  )) {
-                                                    Future.delayed(Duration.zero, () {
-                                                      AdminController.update(
-                                                        context,
-                                                        UpdateAdminRequest(
-                                                          userId: data?.userId,
-                                                          userFullname: data?.userFullname,
-                                                          userName: data?.userName,
-                                                          userEmail: data?.userEmail,
-                                                          branchId: data?.branchId,
-                                                          userPhone: data?.userPhone,
-                                                          userStatus: data?.userStatus == 1 ? 0 : 1,
-                                                        ),
-                                                      ).then((value) {
-                                                        if (responseCode(value.code)) {
-                                                          filtering();
-                                                          showDialogSuccess(
-                                                            context,
-                                                            'The PIC has been successfully ${data?.userStatus == 1 ? 'deactivated' : 'activated'}.',
-                                                          );
-                                                        } else {
-                                                          showDialogError(context, value.data?.message ?? '');
-                                                        }
-                                                      });
-                                                    });
-                                                  }
-                                                } catch (e) {
-                                                  debugPrint(e.toString());
-                                                }
-                                              },
-                                              icon: Icon(
-                                                snapshot.adminAllResponse?.data?[index].userStatus == 1
-                                                    ? Icons.delete
-                                                    : Icons.play_arrow,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                              padding: const EdgeInsets.all(5),
+                              child: DataTable2(
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                minWidth: 1300,
+                                isHorizontalScrollBarVisible: true,
+                                isVerticalScrollBarVisible: true,
+                                columns: columns(),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
+                                headingRowHeight: 51,
+                                decoration: const BoxDecoration(),
+                                border: TableBorder(
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
                                   ),
-                              ],
+                                ),
+                                rows: [
+                                  for (int index = 0; index < (snapshot.adminAllResponse?.data?.length ?? 0); index++)
+                                    DataRow(
+                                      color: WidgetStateProperty.all(
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                      ),
+                                      cells: [
+                                        DataCell(
+                                          TextButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AdminDetail(
+                                                    user: snapshot.adminAllResponse!.data![index],
+                                                    type: 'update',
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Text(
+                                              snapshot.adminAllResponse?.data?[index].userFullname ??
+                                                  snapshot.adminAllResponse?.data?[index].userName ??
+                                                  'N/A',
+                                              style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(snapshot.adminAllResponse?.data?[index].userEmail ?? 'N/A'),
+                                        ),
+                                        DataCell(
+                                          InkWell(
+                                            onTap: () {
+                                              //TODO copy item
+                                            },
+                                            child: Text(snapshot.adminAllResponse?.data?[index].userPhone ?? 'N/A'),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.adminAllResponse?.data?[index].userStatus == 1
+                                                ? 'Active'
+                                                : 'Inactive',
+                                            style: AppTypography.bodyMedium(context).apply(
+                                              color: statusColor(
+                                                snapshot.adminAllResponse?.data?[index].userStatus == 1
+                                                    ? 'active'
+                                                    : 'inactive',
+                                              ),
+                                              fontWeightDelta: 1,
+                                            ),
+                                          ),
+                                        ),
+                                        // DataCell(
+                                        //   AppSelectableText(snapshot.adminAllResponse?.data?[index].branchId ?? 'N/A'),
+                                        // ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            dateConverter(snapshot.adminAllResponse?.data?[index].createdDate) ?? 'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return AdminDetail(
+                                                        user: snapshot.adminAllResponse!.data![index],
+                                                        type: 'update',
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                icon: const Icon(Icons.edit, color: Colors.grey),
+                                              ),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  try {
+                                                    Data? data = snapshot.adminAllResponse?.data?[index];
+                                                    if (await showConfirmDialog(
+                                                      context,
+                                                      data?.userStatus == 1
+                                                          ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
+                                                          : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
+                                                    )) {
+                                                      Future.delayed(Duration.zero, () {
+                                                        AdminController.update(
+                                                          context,
+                                                          UpdateAdminRequest(
+                                                            userId: data?.userId,
+                                                            userFullname: data?.userFullname,
+                                                            userName: data?.userName,
+                                                            userEmail: data?.userEmail,
+                                                            branchId: data?.branchId,
+                                                            userPhone: data?.userPhone,
+                                                            userStatus: data?.userStatus == 1 ? 0 : 1,
+                                                          ),
+                                                        ).then((value) {
+                                                          if (responseCode(value.code)) {
+                                                            filtering();
+                                                            showDialogSuccess(
+                                                              context,
+                                                              'The PIC has been successfully ${data?.userStatus == 1 ? 'deactivated' : 'activated'}.',
+                                                            );
+                                                          } else {
+                                                            showDialogError(
+                                                              context,
+                                                              value.message ?? value.data?.message ?? '',
+                                                            );
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(e.toString());
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  snapshot.adminAllResponse?.data?[index].userStatus == 1
+                                                      ? Icons.delete
+                                                      : Icons.play_arrow,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                        ],
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: pagination()),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                  ),
-                                perPage(),
-                              ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: pagination()),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isMobile && !isTablet)
+                                    const Flexible(
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ),
+                                  perPage(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                            if (!isMobile && !isTablet)
+                              Text(
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -500,8 +513,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -517,14 +530,13 @@ class _AdminHomepageState extends State<AdminHomepage> {
       userName: _userNameController.text,
       userPhone: _userPhoneController.text,
       userEmail: _userEmailController.text,
-      userStatus:
-          _selectedUserStatus != null
-              ? _selectedUserStatus?.key == '1'
-                  ? 1
-                  : _selectedUserStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
+      userStatus: _selectedUserStatus != null
+          ? _selectedUserStatus?.key == '1'
+                ? 1
+                : _selectedUserStatus?.key == '0'
+                ? 0
+                : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -643,8 +655,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(angle: -math.pi, child: child)
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 

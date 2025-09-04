@@ -531,7 +531,7 @@ class _UserHomepageState extends State<UserHomepage> {
                   'The user account has been successfully ${user.userStatus == 1 ? 'deactivated' : 'activated'}.',
                 );
               } else {
-                showDialogError(context, value.data?.message ?? '');
+                showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });

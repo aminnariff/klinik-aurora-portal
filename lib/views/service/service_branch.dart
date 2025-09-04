@@ -113,12 +113,11 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                               String? updateId;
                                               bool haveElements = false;
                                               try {
-                                                updateId =
-                                                    value.data?.data
-                                                        ?.firstWhere(
-                                                          (element) => element.serviceBranchId == item?.serviceBranchId,
-                                                        )
-                                                        .serviceBranchAvailableDatetimeId;
+                                                updateId = value.data?.data
+                                                    ?.firstWhere(
+                                                      (element) => element.serviceBranchId == item?.serviceBranchId,
+                                                    )
+                                                    .serviceBranchAvailableDatetimeId;
                                               } catch (e) {
                                                 debugPrint(e.toString());
                                               }
@@ -147,10 +146,9 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                                   startMonth: now.month,
                                                                   year: now.year,
                                                                   totalMonths: 2,
-                                                                  initialDateTimes:
-                                                                      haveElements
-                                                                          ? value.data?.data?.first.availableDatetimes
-                                                                          : null,
+                                                                  initialDateTimes: haveElements
+                                                                      ? value.data?.data?.first.availableDatetimes
+                                                                      : null,
                                                                 ),
                                                               ),
                                                               CloseButton(),
@@ -212,7 +210,10 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                         );
                                                       });
                                                     } else {
-                                                      showDialogError(context, value.data?.message ?? '');
+                                                      showDialogError(
+                                                        context,
+                                                        value.message ?? value.data?.message ?? '',
+                                                      );
                                                     }
                                                   });
                                                 });

@@ -60,7 +60,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
       if (responseCode(value.code)) {
         context.read<PointManagementController>().userPointsResponse = value.data;
       } else {
-        showDialogError(context, value.data?.message ?? 'error'.tr(gender: 'generic'));
+        showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
       }
     });
     super.initState();
@@ -101,81 +101,79 @@ class _UserPointDetailState extends State<UserPointDetail> {
                                   height: screenHeight829(55),
                                   child:
                                       (snapshot.userPointsResponse != null &&
-                                              snapshot.userPointsResponse!.data!.isEmpty)
-                                          ? const NoRecordsWidget()
-                                          : DataTable2(
-                                            columnSpacing: 12,
-                                            horizontalMargin: 12,
-                                            minWidth: screenWidth1728(50),
-                                            isHorizontalScrollBarVisible: true,
-                                            isVerticalScrollBarVisible: true,
-                                            columns: columns(),
-                                            headingRowColor: WidgetStateProperty.all(Colors.white),
-                                            headingRowHeight: 51,
-                                            decoration: const BoxDecoration(),
-                                            border: TableBorder(
-                                              left: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              top: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              bottom: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              right: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              verticalInside: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
+                                          snapshot.userPointsResponse!.data!.isEmpty)
+                                      ? const NoRecordsWidget()
+                                      : DataTable2(
+                                          columnSpacing: 12,
+                                          horizontalMargin: 12,
+                                          minWidth: screenWidth1728(50),
+                                          isHorizontalScrollBarVisible: true,
+                                          isVerticalScrollBarVisible: true,
+                                          columns: columns(),
+                                          headingRowColor: WidgetStateProperty.all(Colors.white),
+                                          headingRowHeight: 51,
+                                          decoration: const BoxDecoration(),
+                                          border: TableBorder(
+                                            left: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
                                             ),
-                                            rows: [
-                                              for (
-                                                int index = 0;
-                                                index < (snapshot.userPointsResponse?.data?.length ?? 0);
-                                                index++
-                                              )
-                                                DataRow(
-                                                  color: WidgetStateProperty.all(
-                                                    index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                                  ),
-                                                  cells: [
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        snapshot.userPointsResponse?.data?[index].transactionId ??
-                                                            'N/A',
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        snapshot.userPointsResponse?.data?[index].voucherName ?? 'N/A',
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        snapshot.userPointsResponse?.data?[index].totalPoint
-                                                                .toString() ??
-                                                            'N/A',
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        dateConverter(
-                                                              snapshot.userPointsResponse?.data?[index].createdDate,
-                                                            ) ??
-                                                            'N/A',
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                            ],
+                                            top: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
+                                            bottom: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
+                                            right: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
+                                            verticalInside: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
                                           ),
+                                          rows: [
+                                            for (
+                                              int index = 0;
+                                              index < (snapshot.userPointsResponse?.data?.length ?? 0);
+                                              index++
+                                            )
+                                              DataRow(
+                                                color: WidgetStateProperty.all(
+                                                  index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                                ),
+                                                cells: [
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      snapshot.userPointsResponse?.data?[index].transactionId ?? 'N/A',
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      snapshot.userPointsResponse?.data?[index].voucherName ?? 'N/A',
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      snapshot.userPointsResponse?.data?[index].totalPoint.toString() ??
+                                                          'N/A',
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      dateConverter(
+                                                            snapshot.userPointsResponse?.data?[index].createdDate,
+                                                          ) ??
+                                                          'N/A',
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        ),
                                 ),
                               ],
                             ),

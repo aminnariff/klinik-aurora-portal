@@ -60,12 +60,8 @@ class _VoucherDetailState extends State<VoucherDetail> {
     maxCharacter: 7,
     isNumber: true,
   );
-  final InputFieldAttribute _startDate = InputFieldAttribute(
-    controller: TextEditingController(),
-  );
-  final InputFieldAttribute _endDate = InputFieldAttribute(
-    controller: TextEditingController(),
-  );
+  final InputFieldAttribute _startDate = InputFieldAttribute(controller: TextEditingController());
+  final InputFieldAttribute _endDate = InputFieldAttribute(controller: TextEditingController());
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
   List<DropdownAttribute> rewards = [];
@@ -84,23 +80,21 @@ class _VoucherDetailState extends State<VoucherDetail> {
         selectedReward = DropdownAttribute(widget.voucher?.rewardId ?? '', widget.voucher?.rewardId ?? '');
       }
     }
-    RewardController.getAll(context, 1, pageSize).then(
-      (value) {
-        rewards = [];
-        if (responseCode(value.code)) {
-          context.read<RewardController>().rewardAllResponse = value;
-          for (reward_model.Data item in value.data?.data ?? []) {
-            if (item.rewardStatus == 1 && checkEndDate(item.rewardEndDate)) {
-              rewards.add(DropdownAttribute(item.rewardId ?? '', item.rewardName ?? ''));
-              if (selectedReward?.key == item.rewardId) {
-                selectedReward = DropdownAttribute(item.rewardId ?? '', item.rewardName ?? '');
-              }
+    RewardController.getAll(context, 1, pageSize).then((value) {
+      rewards = [];
+      if (responseCode(value.code)) {
+        context.read<RewardController>().rewardAllResponse = value;
+        for (reward_model.Data item in value.data?.data ?? []) {
+          if (item.rewardStatus == 1 && checkEndDate(item.rewardEndDate)) {
+            rewards.add(DropdownAttribute(item.rewardId ?? '', item.rewardName ?? ''));
+            if (selectedReward?.key == item.rewardId) {
+              selectedReward = DropdownAttribute(item.rewardId ?? '', item.rewardName ?? '');
             }
           }
-          rebuildDropdown.add(DateTime.now());
         }
-      },
-    );
+        rebuildDropdown.add(DateTime.now());
+      }
+    });
     super.initState();
   }
 
@@ -131,15 +125,12 @@ class _VoucherDetailState extends State<VoucherDetail> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Voucher Details',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Voucher Details', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
@@ -150,73 +141,69 @@ class _VoucherDetailState extends State<VoucherDetail> {
                               width: screenWidth1728(26),
                               child: Column(
                                 children: [
-                                  InputField(
-                                    field: _voucherName,
-                                  ),
+                                  InputField(field: _voucherName),
                                   AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: _voucherDescription,
-                                  ),
+                                  InputField(field: _voucherDescription),
                                   AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: _voucherCode,
-                                  ),
+                                  InputField(field: _voucherCode),
                                   AppPadding.vertical(denominator: 2),
-                                  Consumer<RewardController>(builder: (context, snapshot, _) {
-                                    return StreamBuilder<DateTime>(
+                                  Consumer<RewardController>(
+                                    builder: (context, snapshot, _) {
+                                      return StreamBuilder<DateTime>(
                                         stream: rebuildDropdown.stream,
                                         builder: (context, snapshot) {
                                           return widget.type == 'update'
                                               ? selectedReward?.name != null
-                                                  ? InputField(
-                                                      field: InputFieldAttribute(
-                                                        controller:
-                                                            TextEditingController(text: selectedReward?.name ?? ''),
-                                                        isEditable: false,
-                                                      ),
-                                                    )
-                                                  : const SizedBox()
+                                                    ? InputField(
+                                                        field: InputFieldAttribute(
+                                                          controller: TextEditingController(
+                                                            text: selectedReward?.name ?? '',
+                                                          ),
+                                                          isEditable: false,
+                                                        ),
+                                                      )
+                                                    : const SizedBox()
                                               : rewards.isEmpty
-                                                  ? Text(
-                                                      'No rewards available. Please add rewards to attach to this voucher if needed. When a staff member scans the customer\'s QR code, any voucher linked to a reward will be automatically redeemed by the customer, eliminating the need for them to redeem it manually in the rewards section.',
-                                                      style: AppTypography.bodyMedium(context),
-                                                      textAlign: TextAlign.justify,
-                                                    )
-                                                  : SizedBox(
-                                                      width: screenWidth1728(26),
-                                                      child: Row(
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        children: [
-                                                          AppDropdown(
-                                                            attributeList: DropdownAttributeList(
-                                                              rewards,
-                                                              hintText: 'Select Reward (Optional)',
-                                                              value: selectedReward?.name,
-                                                              onChanged: (a) {
-                                                                if (a != null) {
-                                                                  setState(() {
-                                                                    selectedReward = a;
-                                                                  });
-                                                                }
-                                                              },
-                                                              width: screenWidth1728(23),
-                                                            ),
-                                                          ),
-                                                          const Tooltip(
-                                                            message:
-                                                                'Note: Adding rewards to a voucher is optional. If a voucher is created without rewards, the customer will receive points only',
-                                                            child: Padding(
-                                                              padding: EdgeInsets.only(left: 12),
-                                                              child: Icon(
-                                                                Icons.info_outline,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
+                                              ? Text(
+                                                  'No rewards available. Please add rewards to attach to this voucher if needed. When a staff member scans the customer\'s QR code, any voucher linked to a reward will be automatically redeemed by the customer, eliminating the need for them to redeem it manually in the rewards section.',
+                                                  style: AppTypography.bodyMedium(context),
+                                                  textAlign: TextAlign.justify,
+                                                )
+                                              : SizedBox(
+                                                  width: screenWidth1728(26),
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      AppDropdown(
+                                                        attributeList: DropdownAttributeList(
+                                                          rewards,
+                                                          hintText: 'Select Reward (Optional)',
+                                                          value: selectedReward?.name,
+                                                          onChanged: (a) {
+                                                            if (a != null) {
+                                                              setState(() {
+                                                                selectedReward = a;
+                                                              });
+                                                            }
+                                                          },
+                                                          width: screenWidth1728(23),
+                                                        ),
                                                       ),
-                                                    );
-                                        });
-                                  }),
+                                                      const Tooltip(
+                                                        message:
+                                                            'Note: Adding rewards to a voucher is optional. If a voucher is created without rewards, the customer will receive points only',
+                                                        child: Padding(
+                                                          padding: EdgeInsets.only(left: 12),
+                                                          child: Icon(Icons.info_outline),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                        },
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ),
@@ -226,17 +213,13 @@ class _VoucherDetailState extends State<VoucherDetail> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  InputField(
-                                    field: _voucherPoint,
-                                  ),
+                                  InputField(field: _voucherPoint),
                                   AppPadding.vertical(denominator: 2),
                                   GestureDetector(
                                     onTap: () async {
                                       var results = await showCalendarDatePicker2Dialog(
                                         context: context,
-                                        config: CalendarDatePicker2WithActionButtonsConfig(
-                                          currentDate: DateTime.now(),
-                                        ),
+                                        config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now()),
                                         dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                         borderRadius: BorderRadius.circular(15),
                                       );
@@ -251,19 +234,16 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                     child: ReadOnly(
                                       InputField(
                                         field: InputFieldAttribute(
-                                            controller: _startDate.controller,
-                                            isEditable: false,
-                                            uneditableColor: textFormFieldEditableColor,
-                                            errorMessage: _startDate.errorMessage,
-                                            labelText: 'voucherPage'.tr(gender: 'startDate'),
-                                            suffixWidget: const Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons.calendar_month,
-                                                ),
-                                              ],
-                                            )),
+                                          controller: _startDate.controller,
+                                          isEditable: false,
+                                          uneditableColor: textFormFieldEditableColor,
+                                          errorMessage: _startDate.errorMessage,
+                                          labelText: 'voucherPage'.tr(gender: 'startDate'),
+                                          suffixWidget: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [Icon(Icons.calendar_month)],
+                                          ),
+                                        ),
                                       ),
                                       isEditable: false,
                                     ),
@@ -297,11 +277,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                           labelText: 'voucherPage'.tr(gender: 'endDate'),
                                           suffixWidget: const Row(
                                             mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_month,
-                                              ),
-                                            ],
+                                            children: [Icon(Icons.calendar_month)],
                                           ),
                                         ),
                                       ),
@@ -319,77 +295,80 @@ class _VoucherDetailState extends State<VoucherDetail> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Button(
-                              () {
-                                if (validate()) {
+                            Button(() {
+                              if (validate()) {
+                                showLoading();
+                                if (widget.type == 'update') {
+                                  VoucherController.update(
+                                    context,
+                                    UpdateVoucherRequest(
+                                      voucherId: widget.voucher?.voucherId,
+                                      voucherName: _voucherName.controller.text,
+                                      voucherDescription: _voucherDescription.controller.text,
+                                      voucherStartDate: convertStringToDate(_startDate.controller.text),
+                                      voucherEndDate: convertStringToDate(_endDate.controller.text),
+                                      voucherStatus: widget.voucher?.voucherStatus,
+                                      voucherCode: _voucherCode.controller.text,
+                                      voucherPoint: int.parse(_voucherPoint.controller.text),
+                                      rewardId: selectedReward?.key,
+                                    ),
+                                  ).then((value) {
+                                    if (responseCode(value.code)) {
+                                      VoucherController.getAll(context, 1, pageSize).then((value) {
+                                        dismissLoading();
+                                        if (responseCode(value.code)) {
+                                          context.read<VoucherController>().voucherAllResponse = value;
+                                          context.pop();
+                                          showDialogSuccess(context, 'Successfully updated voucher voucherPage');
+                                        } else {
+                                          context.pop();
+                                          showDialogSuccess(context, 'Successfully updated voucher voucherPage');
+                                        }
+                                      });
+                                    } else {
+                                      showDialogError(
+                                        context,
+                                        value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                      );
+                                    }
+                                  });
+                                } else {
                                   showLoading();
-                                  if (widget.type == 'update') {
-                                    VoucherController.update(
-                                      context,
-                                      UpdateVoucherRequest(
-                                        voucherId: widget.voucher?.voucherId,
-                                        voucherName: _voucherName.controller.text,
-                                        voucherDescription: _voucherDescription.controller.text,
-                                        voucherStartDate: convertStringToDate(_startDate.controller.text),
-                                        voucherEndDate: convertStringToDate(_endDate.controller.text),
-                                        voucherStatus: widget.voucher?.voucherStatus,
-                                        voucherCode: _voucherCode.controller.text,
-                                        voucherPoint: int.parse(_voucherPoint.controller.text),
-                                        rewardId: selectedReward?.key,
-                                      ),
-                                    ).then((value) {
-                                      if (responseCode(value.code)) {
-                                        VoucherController.getAll(context, 1, pageSize).then((value) {
-                                          dismissLoading();
-                                          if (responseCode(value.code)) {
-                                            context.read<VoucherController>().voucherAllResponse = value;
-                                            context.pop();
-                                            showDialogSuccess(context, 'Successfully updated voucher voucherPage');
-                                          } else {
-                                            context.pop();
-                                            showDialogSuccess(context, 'Successfully updated voucher voucherPage');
-                                          }
-                                        });
-                                      } else {
-                                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                      }
-                                    });
-                                  } else {
-                                    showLoading();
-                                    VoucherController.create(
-                                      context,
-                                      CreateVoucherRequest(
-                                        voucherName: _voucherName.controller.text,
-                                        voucherDescription: _voucherDescription.controller.text,
-                                        voucherStartDate: convertStringToDate(_startDate.controller.text),
-                                        voucherEndDate: convertStringToDate(_endDate.controller.text),
-                                        voucherCode: _voucherCode.controller.text,
-                                        voucherPoint: int.parse(_voucherPoint.controller.text),
-                                        rewardId: selectedReward?.key,
-                                      ),
-                                    ).then((value) {
-                                      dismissLoading();
-                                      if (responseCode(value.code)) {
-                                        VoucherController.getAll(context, 1, pageSize).then((value) {
-                                          dismissLoading();
-                                          if (responseCode(value.code)) {
-                                            context.read<VoucherController>().voucherAllResponse = value;
-                                            context.pop();
-                                            showDialogSuccess(context, 'Successfully created voucher');
-                                          } else {
-                                            context.pop();
-                                            showDialogSuccess(context, 'Successfully created customer voucherPage');
-                                          }
-                                        });
-                                      } else {
-                                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                      }
-                                    });
-                                  }
+                                  VoucherController.create(
+                                    context,
+                                    CreateVoucherRequest(
+                                      voucherName: _voucherName.controller.text,
+                                      voucherDescription: _voucherDescription.controller.text,
+                                      voucherStartDate: convertStringToDate(_startDate.controller.text),
+                                      voucherEndDate: convertStringToDate(_endDate.controller.text),
+                                      voucherCode: _voucherCode.controller.text,
+                                      voucherPoint: int.parse(_voucherPoint.controller.text),
+                                      rewardId: selectedReward?.key,
+                                    ),
+                                  ).then((value) {
+                                    dismissLoading();
+                                    if (responseCode(value.code)) {
+                                      VoucherController.getAll(context, 1, pageSize).then((value) {
+                                        dismissLoading();
+                                        if (responseCode(value.code)) {
+                                          context.read<VoucherController>().voucherAllResponse = value;
+                                          context.pop();
+                                          showDialogSuccess(context, 'Successfully created voucher');
+                                        } else {
+                                          context.pop();
+                                          showDialogSuccess(context, 'Successfully created customer voucherPage');
+                                        }
+                                      });
+                                    } else {
+                                      showDialogError(
+                                        context,
+                                        value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                      );
+                                    }
+                                  });
                                 }
-                              },
-                              actionText: 'button'.tr(gender: widget.type),
-                            ),
+                              }
+                            }, actionText: 'button'.tr(gender: widget.type)),
                           ],
                         ),
                       ],

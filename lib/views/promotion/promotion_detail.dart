@@ -110,7 +110,9 @@ class _PromotionDetailState extends State<PromotionDetail> {
                               width: screenWidth1728(26),
                               child: Column(
                                 children: [
-                                  InputField(field: InputFieldAttribute(controller: _promotionName, labelText: 'Name')),
+                                  InputField(
+                                    field: InputFieldAttribute(controller: _promotionName, labelText: 'Name'),
+                                  ),
                                   AppPadding.vertical(denominator: 2),
                                   TextField(
                                     maxLines: null,
@@ -205,11 +207,11 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                                                   ? Image.memory(selectedFiles[index].value!)
                                                                   : selectedFiles[index].path != null
                                                                   ? Padding(
-                                                                    padding: EdgeInsets.all(screenPadding),
-                                                                    child: Image.network(
-                                                                      '${Environment.imageUrl}${selectedFiles[index].path}',
-                                                                    ),
-                                                                  )
+                                                                      padding: EdgeInsets.all(screenPadding),
+                                                                      child: Image.network(
+                                                                        '${Environment.imageUrl}${selectedFiles[index].path}',
+                                                                      ),
+                                                                    )
                                                                   : const SizedBox(),
                                                             ),
                                                           ),
@@ -419,7 +421,10 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                       );
                                     }
                                   } else {
-                                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                    showDialogError(
+                                      context,
+                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                    );
                                   }
                                 });
                               }

@@ -1230,7 +1230,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 } else {
                   dismissLoading();
                   if (value.code != 500) {
-                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                   }
                 }
               });
@@ -1293,7 +1293,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   }
                 } else {
                   if (value.code != 500) {
-                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                   }
                 }
               });

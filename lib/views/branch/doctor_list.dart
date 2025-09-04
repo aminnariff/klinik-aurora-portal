@@ -59,7 +59,7 @@ class _DoctorListState extends State<DoctorList> {
       if (responseCode(value.code)) {
         context.read<DoctorController>().doctorBranchResponse = value.data;
       } else {
-        showDialogError(context, value.data?.message ?? 'error'.tr(gender: 'generic'));
+        showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
       }
     });
     super.initState();
@@ -100,196 +100,186 @@ class _DoctorListState extends State<DoctorList> {
                                   height: screenHeight829(55),
                                   child:
                                       (snapshot.doctorBranchResponse != null &&
-                                              snapshot.doctorBranchResponse!.data!.isEmpty)
-                                          ? const NoRecordsWidget()
-                                          : DataTable2(
-                                            columnSpacing: 12,
-                                            horizontalMargin: 12,
-                                            minWidth: screenWidth1728(50),
-                                            isHorizontalScrollBarVisible: true,
-                                            isVerticalScrollBarVisible: true,
-                                            columns: columns(),
-                                            headingRowColor: WidgetStateProperty.all(Colors.white),
-                                            headingRowHeight: 51,
-                                            decoration: const BoxDecoration(),
-                                            border: TableBorder(
-                                              left: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              top: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              bottom: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              right: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
-                                              verticalInside: BorderSide(
-                                                width: 1,
-                                                color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                              ),
+                                          snapshot.doctorBranchResponse!.data!.isEmpty)
+                                      ? const NoRecordsWidget()
+                                      : DataTable2(
+                                          columnSpacing: 12,
+                                          horizontalMargin: 12,
+                                          minWidth: screenWidth1728(50),
+                                          isHorizontalScrollBarVisible: true,
+                                          isVerticalScrollBarVisible: true,
+                                          columns: columns(),
+                                          headingRowColor: WidgetStateProperty.all(Colors.white),
+                                          headingRowHeight: 51,
+                                          decoration: const BoxDecoration(),
+                                          border: TableBorder(
+                                            left: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
                                             ),
-                                            rows: [
-                                              for (
-                                                int index = 0;
-                                                index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
-                                                index++
-                                              )
-                                                DataRow(
-                                                  color: WidgetStateProperty.all(
-                                                    index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                            top: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
+                                            bottom: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
+                                            right: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
+                                            verticalInside: BorderSide(
+                                              width: 1,
+                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                            ),
+                                          ),
+                                          rows: [
+                                            for (
+                                              int index = 0;
+                                              index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
+                                              index++
+                                            )
+                                              DataRow(
+                                                color: WidgetStateProperty.all(
+                                                  index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                                ),
+                                                cells: [
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
+                                                    ),
                                                   ),
-                                                  cells: [
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
-                                                      ),
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      snapshot.doctorBranchResponse?.data?[index].doctorPhone ?? 'N/A',
                                                     ),
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        snapshot.doctorBranchResponse?.data?[index].doctorPhone ??
-                                                            'N/A',
-                                                      ),
-                                                    ),
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
-                                                            ? 'Active'
-                                                            : 'Inactive',
-                                                        style: AppTypography.bodyMedium(context).apply(
-                                                          color: statusColor(
-                                                            snapshot.doctorBranchResponse?.data?[index].doctorStatus ==
-                                                                    1
-                                                                ? 'active'
-                                                                : 'inactive',
-                                                          ),
-                                                          fontWeightDelta: 1,
+                                                  ),
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
+                                                          ? 'Active'
+                                                          : 'Inactive',
+                                                      style: AppTypography.bodyMedium(context).apply(
+                                                        color: statusColor(
+                                                          snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
+                                                              ? 'active'
+                                                              : 'inactive',
                                                         ),
+                                                        fontWeightDelta: 1,
                                                       ),
                                                     ),
-                                                    DataCell(
-                                                      AppSelectableText(
-                                                        dateConverter(
-                                                              snapshot.doctorBranchResponse?.data?[index].createdDate,
-                                                            ) ??
-                                                            'N/A',
-                                                      ),
+                                                  ),
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      dateConverter(
+                                                            snapshot.doctorBranchResponse?.data?[index].createdDate,
+                                                          ) ??
+                                                          'N/A',
                                                     ),
-                                                    DataCell(
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: [
-                                                          IconButton(
-                                                            onPressed: () async {
-                                                              try {
-                                                                if (await showConfirmDialog(
-                                                                  context,
-                                                                  snapshot
-                                                                              .doctorBranchResponse
-                                                                              ?.data?[index]
-                                                                              .doctorStatus ==
-                                                                          1
-                                                                      ? 'Are you certain you wish to deactivate this PIC account? Please note, this action can be reversed at a later time.'
-                                                                      : 'Are you certain you wish to activate this PIC account? Please note, this action can be reversed at a later time.',
-                                                                )) {
-                                                                  Future.delayed(Duration.zero, () {
-                                                                    DoctorController.update(
-                                                                      context,
-                                                                      UpdateDoctorRequest(
-                                                                        doctorId:
-                                                                            snapshot
-                                                                                .doctorBranchResponse
-                                                                                ?.data?[index]
-                                                                                .doctorId,
-                                                                        branchId:
-                                                                            snapshot
-                                                                                .doctorBranchResponse
-                                                                                ?.data?[index]
-                                                                                .branchId,
-                                                                        doctorPhone:
-                                                                            snapshot
-                                                                                .doctorBranchResponse
-                                                                                ?.data?[index]
-                                                                                .doctorPhone,
-                                                                        doctorName:
-                                                                            snapshot
-                                                                                .doctorBranchResponse
-                                                                                ?.data?[index]
-                                                                                .doctorName,
-                                                                        doctorStatus:
-                                                                            snapshot
-                                                                                        .doctorBranchResponse
-                                                                                        ?.data?[index]
-                                                                                        .doctorStatus ==
-                                                                                    1
-                                                                                ? 0
-                                                                                : 1,
-                                                                      ),
-                                                                    ).then((value) {
-                                                                      if (responseCode(value.code)) {
-                                                                        DoctorController.get(
-                                                                          context,
-                                                                          1,
-                                                                          pageSize,
-                                                                          branchId:
-                                                                              snapshot
-                                                                                  .doctorBranchResponse
-                                                                                  ?.data?[index]
-                                                                                  .branchId,
-                                                                        ).then((value) {
-                                                                          dismissLoading();
-                                                                          if (responseCode(value.code)) {
-                                                                            context
-                                                                                .read<DoctorController>()
-                                                                                .doctorBranchResponse = value.data;
-                                                                            showDialogSuccess(
-                                                                              context,
-                                                                              'Successfully updated new PIC',
-                                                                            );
-                                                                          } else {
-                                                                            showDialogSuccess(
-                                                                              context,
-                                                                              'Successfully updated new PIC',
-                                                                            );
-                                                                          }
-                                                                        });
-                                                                      } else {
-                                                                        showDialogError(
-                                                                          context,
-                                                                          value.data?.message ??
-                                                                              'ERROR : ${value.code}',
-                                                                        );
-                                                                      }
-                                                                    });
-                                                                  });
-                                                                }
-                                                              } catch (e) {
-                                                                debugPrint(e.toString());
-                                                              }
-                                                            },
-                                                            icon: Icon(
-                                                              snapshot
+                                                  ),
+                                                  DataCell(
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        IconButton(
+                                                          onPressed: () async {
+                                                            try {
+                                                              if (await showConfirmDialog(
+                                                                context,
+                                                                snapshot
+                                                                            .doctorBranchResponse
+                                                                            ?.data?[index]
+                                                                            .doctorStatus ==
+                                                                        1
+                                                                    ? 'Are you certain you wish to deactivate this PIC account? Please note, this action can be reversed at a later time.'
+                                                                    : 'Are you certain you wish to activate this PIC account? Please note, this action can be reversed at a later time.',
+                                                              )) {
+                                                                Future.delayed(Duration.zero, () {
+                                                                  DoctorController.update(
+                                                                    context,
+                                                                    UpdateDoctorRequest(
+                                                                      doctorId: snapshot
                                                                           .doctorBranchResponse
                                                                           ?.data?[index]
-                                                                          .doctorStatus ==
-                                                                      1
-                                                                  ? Icons.delete
-                                                                  : Icons.play_arrow,
-                                                              color: Colors.grey,
-                                                            ),
+                                                                          .doctorId,
+                                                                      branchId: snapshot
+                                                                          .doctorBranchResponse
+                                                                          ?.data?[index]
+                                                                          .branchId,
+                                                                      doctorPhone: snapshot
+                                                                          .doctorBranchResponse
+                                                                          ?.data?[index]
+                                                                          .doctorPhone,
+                                                                      doctorName: snapshot
+                                                                          .doctorBranchResponse
+                                                                          ?.data?[index]
+                                                                          .doctorName,
+                                                                      doctorStatus:
+                                                                          snapshot
+                                                                                  .doctorBranchResponse
+                                                                                  ?.data?[index]
+                                                                                  .doctorStatus ==
+                                                                              1
+                                                                          ? 0
+                                                                          : 1,
+                                                                    ),
+                                                                  ).then((value) {
+                                                                    if (responseCode(value.code)) {
+                                                                      DoctorController.get(
+                                                                        context,
+                                                                        1,
+                                                                        pageSize,
+                                                                        branchId: snapshot
+                                                                            .doctorBranchResponse
+                                                                            ?.data?[index]
+                                                                            .branchId,
+                                                                      ).then((value) {
+                                                                        dismissLoading();
+                                                                        if (responseCode(value.code)) {
+                                                                          context
+                                                                                  .read<DoctorController>()
+                                                                                  .doctorBranchResponse =
+                                                                              value.data;
+                                                                          showDialogSuccess(
+                                                                            context,
+                                                                            'Successfully updated new PIC',
+                                                                          );
+                                                                        } else {
+                                                                          showDialogSuccess(
+                                                                            context,
+                                                                            'Successfully updated new PIC',
+                                                                          );
+                                                                        }
+                                                                      });
+                                                                    } else {
+                                                                      showDialogError(
+                                                                        context,
+                                                                        value.data?.message ?? 'ERROR : ${value.code}',
+                                                                      );
+                                                                    }
+                                                                  });
+                                                                });
+                                                              }
+                                                            } catch (e) {
+                                                              debugPrint(e.toString());
+                                                            }
+                                                          },
+                                                          icon: Icon(
+                                                            snapshot.doctorBranchResponse?.data?[index].doctorStatus ==
+                                                                    1
+                                                                ? Icons.delete
+                                                                : Icons.play_arrow,
+                                                            color: Colors.grey,
                                                           ),
-                                                        ],
-                                                      ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        ),
                                 ),
                               ],
                             ),

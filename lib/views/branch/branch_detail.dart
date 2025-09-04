@@ -206,71 +206,71 @@ class _BranchDetailState extends State<BranchDetail> {
                                       if (widget.type == 'create') ...[
                                         selectedFile.value == null
                                             ? UploadDocumentsField(
-                                              title: 'branchPage'.tr(gender: 'browseFile'),
-                                              fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                              action: () {
-                                                addPicture();
-                                              },
-                                              cancelAction: () {},
-                                            )
+                                                title: 'branchPage'.tr(gender: 'browseFile'),
+                                                fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                action: () {
+                                                  addPicture();
+                                                },
+                                                cancelAction: () {},
+                                              )
                                             : Stack(
-                                              alignment: Alignment.topRight,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    addPicture();
-                                                  },
-                                                  child: Image.memory(selectedFile.value as Uint8List),
-                                                ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    selectedFile = FileAttribute();
-                                                    fileRebuild.add(DateTime.now());
-                                                  },
-                                                  icon: const Icon(Icons.close),
-                                                ),
-                                              ],
-                                            ),
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      addPicture();
+                                                    },
+                                                    child: Image.memory(selectedFile.value as Uint8List),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      selectedFile = FileAttribute();
+                                                      fileRebuild.add(DateTime.now());
+                                                    },
+                                                    icon: const Icon(Icons.close),
+                                                  ),
+                                                ],
+                                              ),
                                       ],
                                       if (widget.type == 'update')
                                         widget.branch?.branchImage == null
                                             ? selectedFile.name != null
-                                                ? Stack(
-                                                  alignment: Alignment.topRight,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
+                                                  ? Stack(
+                                                      alignment: Alignment.topRight,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            addPicture();
+                                                          },
+                                                          child: Image.memory(selectedFile.value as Uint8List),
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            selectedFile = FileAttribute();
+                                                            fileRebuild.add(DateTime.now());
+                                                          },
+                                                          icon: const Icon(Icons.close),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : UploadDocumentsField(
+                                                      title: 'branchImage'.tr(gender: 'browseFile'),
+                                                      fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                      action: () {
                                                         addPicture();
                                                       },
-                                                      child: Image.memory(selectedFile.value as Uint8List),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        selectedFile = FileAttribute();
-                                                        fileRebuild.add(DateTime.now());
-                                                      },
-                                                      icon: const Icon(Icons.close),
-                                                    ),
-                                                  ],
-                                                )
-                                                : UploadDocumentsField(
-                                                  title: 'branchImage'.tr(gender: 'browseFile'),
-                                                  fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                  action: () {
-                                                    addPicture();
-                                                  },
-                                                  cancelAction: () {},
-                                                )
+                                                      cancelAction: () {},
+                                                    )
                                             : GestureDetector(
-                                              onTap: () {
-                                                addPicture();
-                                              },
-                                              child: Image.network(
-                                                '${Environment.imageUrl}${widget.branch?.branchImage}',
+                                                onTap: () {
+                                                  addPicture();
+                                                },
+                                                child: Image.network(
+                                                  '${Environment.imageUrl}${widget.branch?.branchImage}',
+                                                ),
                                               ),
-                                            ),
                                       AppPadding.vertical(denominator: 2),
                                       GestureDetector(
                                         onTap: () async {
@@ -509,7 +509,7 @@ class _BranchDetailState extends State<BranchDetail> {
                     }
                   });
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
               });
             } else {
@@ -543,7 +543,7 @@ class _BranchDetailState extends State<BranchDetail> {
                     }
                   });
                 } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
               });
             }

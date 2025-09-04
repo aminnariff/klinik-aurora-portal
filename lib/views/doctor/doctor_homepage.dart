@@ -180,7 +180,10 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             ),
           ),
         ),
-        Padding(padding: EdgeInsets.symmetric(vertical: screenPadding), child: pagination()),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: screenPadding),
+          child: pagination(),
+        ),
       ],
     );
     // },
@@ -274,170 +277,180 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         if (snapshot.doctorBranchResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.doctorBranchResponse == null || snapshot.doctorBranchResponse!.data!.isEmpty
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
+                  ],
+                )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  tableButton(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                            padding: const EdgeInsets.all(5),
-                            child: DataTable2(
-                              columnSpacing: 12,
-                              horizontalMargin: 12,
-                              isHorizontalScrollBarVisible: true,
-                              isVerticalScrollBarVisible: true,
-                              columns: columns(),
-                              headingRowColor: WidgetStateProperty.all(Colors.white),
-                              headingRowHeight: 51,
-                              decoration: const BoxDecoration(),
-                              border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                verticalInside: BorderSide(
-                                  width: 1,
-                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                              padding: const EdgeInsets.all(5),
+                              child: DataTable2(
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                isHorizontalScrollBarVisible: true,
+                                isVerticalScrollBarVisible: true,
+                                columns: columns(),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
+                                headingRowHeight: 51,
+                                decoration: const BoxDecoration(),
+                                border: TableBorder(
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
-                              ),
-                              rows: [
-                                for (int index = 0; index < (snapshot.doctorBranchResponse?.data?.length ?? 0); index++)
-                                  DataRow(
-                                    color: WidgetStateProperty.all(
-                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                    ),
-                                    cells: [
-                                      DataCell(
-                                        Text(
-                                          snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
-                                          style: AppTypography.bodyMedium(context).apply(),
-                                        ),
+                                rows: [
+                                  for (
+                                    int index = 0;
+                                    index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
+                                    index++
+                                  )
+                                    DataRow(
+                                      color: WidgetStateProperty.all(
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
                                       ),
-                                      DataCell(
-                                        InkWell(
-                                          child: Text(
-                                            snapshot.doctorBranchResponse?.data?[index].doctorPhone ?? '60 12 498 2969',
+                                      cells: [
+                                        DataCell(
+                                          Text(
+                                            snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
+                                            style: AppTypography.bodyMedium(context).apply(),
                                           ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            showStatus(snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1),
-                                          ],
+                                        DataCell(
+                                          InkWell(
+                                            child: Text(
+                                              snapshot.doctorBranchResponse?.data?[index].doctorPhone ??
+                                                  '60 12 498 2969',
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          translateToBranchName(
-                                                snapshot.doctorBranchResponse?.data?[index].branchId ?? '',
-                                              ) ??
-                                              'N/A',
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              showStatus(snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          dateConverter(snapshot.doctorBranchResponse?.data?[index].createdDate) ??
-                                              'N/A',
+                                        DataCell(
+                                          AppSelectableText(
+                                            translateToBranchName(
+                                                  snapshot.doctorBranchResponse?.data?[index].branchId ?? '',
+                                                ) ??
+                                                'N/A',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            PopupMenuButton<String>(
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                              offset: const Offset(8, 35),
-                                              color: Colors.white,
-                                              tooltip: '',
-                                              onSelected:
-                                                  (value) => _handleMenuSelection(
-                                                    value,
-                                                    snapshot.doctorBranchResponse?.data?[index] ?? Data(),
-                                                  ),
-                                              itemBuilder:
-                                                  (BuildContext context) => <PopupMenuEntry<String>>[
-                                                    const PopupMenuItem<String>(value: 'update', child: Text('Update')),
-                                                    PopupMenuItem<String>(
-                                                      value: 'enableDisable',
-                                                      child: Text(
-                                                        snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
-                                                            ? 'Deactivate'
-                                                            : 'Re-Activate',
-                                                      ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            dateConverter(snapshot.doctorBranchResponse?.data?[index].createdDate) ??
+                                                'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              PopupMenuButton<String>(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                offset: const Offset(8, 35),
+                                                color: Colors.white,
+                                                tooltip: '',
+                                                onSelected: (value) => _handleMenuSelection(
+                                                  value,
+                                                  snapshot.doctorBranchResponse?.data?[index] ?? Data(),
+                                                ),
+                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                                  const PopupMenuItem<String>(value: 'update', child: Text('Update')),
+                                                  PopupMenuItem<String>(
+                                                    value: 'enableDisable',
+                                                    child: Text(
+                                                      snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
+                                                          ? 'Deactivate'
+                                                          : 'Re-Activate',
                                                     ),
-                                                  ],
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets.all(4),
-                                                    // decoration: const BoxDecoration(
-                                                    //   color: Colors.white,
-                                                    //   shape: BoxShape.circle,
-                                                    // ),
-                                                    child: Icon(Icons.more_vert, color: Colors.grey),
                                                   ),
                                                 ],
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      // decoration: const BoxDecoration(
+                                                      //   color: Colors.white,
+                                                      //   shape: BoxShape.circle,
+                                                      // ),
+                                                      child: Icon(Icons.more_vert, color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                        ],
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: pagination()),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                  ),
-                                perPage(),
-                              ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: pagination()),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isMobile && !isTablet)
+                                    const Flexible(
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ),
+                                  perPage(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                            if (!isMobile && !isTablet)
+                              Text(
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -477,7 +490,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                   'The PIC has been successfully ${data.doctorStatus == 1 ? 'deactivated' : 'activated'}.',
                 );
               } else {
-                showDialogError(context, value.data?.message ?? '');
+                showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });
@@ -509,8 +522,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -523,20 +536,18 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       context,
       _page,
       _pageSize,
-      branchId:
-          context.read<AuthController>().isSuperAdmin
-              ? null
-              : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+      branchId: context.read<AuthController>().isSuperAdmin
+          ? null
+          : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
       doctorName: _userNameController.text,
       doctorPhone: _userPhoneController.text,
-      doctorStatus:
-          _selectedUserStatus != null
-              ? _selectedUserStatus?.key == '1'
-                  ? 1
-                  : _selectedUserStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
+      doctorStatus: _selectedUserStatus != null
+          ? _selectedUserStatus?.key == '1'
+                ? 1
+                : _selectedUserStatus?.key == '0'
+                ? 0
+                : null
+          : null,
       // branchId: '62743240-006d-11ef-a129-6677d190faa2',
     ).then((value) {
       dismissLoading();
@@ -655,8 +666,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(angle: -math.pi, child: child)
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 

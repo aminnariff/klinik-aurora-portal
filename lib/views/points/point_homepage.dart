@@ -185,82 +185,82 @@ class _PointHomepageState extends State<PointHomepage> {
                 return (snapshot.userAllResponse?.length ?? 0) == 0
                     ? const SizedBox()
                     : Expanded(
-                      child: CardContainer(
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  AppPadding.vertical(),
-                                  Text(
-                                    'Patient List (${snapshot.userAllResponse?.length})',
-                                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  Expanded(
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        children: [
-                                          for (UserResponse item in snapshot.userAllResponse ?? [])
-                                            ListTile(
-                                              title: Text(
-                                                '${item.userFullname}',
-                                                style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                                              ),
-                                              subtitle: Text(
-                                                '${item.userPhone} (${item.totalPoint} pts)',
-                                                style: AppTypography.bodyMedium(
-                                                  context,
-                                                ).apply(color: Colors.grey.shade600),
-                                              ),
-                                              onTap: () async {
-                                                int totalPoint = calculateCustomerPoints(_amount.controller.text);
-                                                if (await showConfirmDialog(
-                                                  context,
-                                                  'Patient -> ${item.userFullname}\nAre you sure you want to store $totalPoint point(s) for this patient for spending RM ${_amount.controller.text}?',
-                                                )) {
-                                                  PointManagementController.create(
+                        child: CardContainer(
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    AppPadding.vertical(),
+                                    Text(
+                                      'Patient List (${snapshot.userAllResponse?.length})',
+                                      style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                    ),
+                                    AppPadding.vertical(denominator: 2),
+                                    Expanded(
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          children: [
+                                            for (UserResponse item in snapshot.userAllResponse ?? [])
+                                              ListTile(
+                                                title: Text(
+                                                  '${item.userFullname}',
+                                                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                                ),
+                                                subtitle: Text(
+                                                  '${item.userPhone} (${item.totalPoint} pts)',
+                                                  style: AppTypography.bodyMedium(
                                                     context,
-                                                    CreatePointRequest(
-                                                      userId: item.userId,
-                                                      totalPoint: totalPoint,
-                                                      pointDescription:
-                                                          'You have earned $totalPoint point(s) for spending RM ${_amount.controller.text}',
-                                                    ),
-                                                  ).then((value) {
-                                                    dismissLoading();
-                                                    if (responseCode(value.code)) {
-                                                      showDialogSuccess(
-                                                        context,
-                                                        'Successfully added ${calculateCustomerPoints(_amount.controller.text)} point(s) for ${item.userFullname}.',
-                                                      );
-                                                      _amount.controller.text = '';
-                                                      _msisdn.controller.text = '';
-                                                      runFiltering();
-                                                    } else {
-                                                      showDialogError(
-                                                        context,
-                                                        value.data?.message ?? 'error'.tr(gender: 'err-7'),
-                                                      );
-                                                    }
-                                                  });
-                                                }
-                                              },
-                                            ),
-                                        ],
+                                                  ).apply(color: Colors.grey.shade600),
+                                                ),
+                                                onTap: () async {
+                                                  int totalPoint = calculateCustomerPoints(_amount.controller.text);
+                                                  if (await showConfirmDialog(
+                                                    context,
+                                                    'Patient -> ${item.userFullname}\nAre you sure you want to store $totalPoint point(s) for this patient for spending RM ${_amount.controller.text}?',
+                                                  )) {
+                                                    PointManagementController.create(
+                                                      context,
+                                                      CreatePointRequest(
+                                                        userId: item.userId,
+                                                        totalPoint: totalPoint,
+                                                        pointDescription:
+                                                            'You have earned $totalPoint point(s) for spending RM ${_amount.controller.text}',
+                                                      ),
+                                                    ).then((value) {
+                                                      dismissLoading();
+                                                      if (responseCode(value.code)) {
+                                                        showDialogSuccess(
+                                                          context,
+                                                          'Successfully added ${calculateCustomerPoints(_amount.controller.text)} point(s) for ${item.userFullname}.',
+                                                        );
+                                                        _amount.controller.text = '';
+                                                        _msisdn.controller.text = '';
+                                                        runFiltering();
+                                                      } else {
+                                                        showDialogError(
+                                                          context,
+                                                          value.data?.message ?? 'error'.tr(gender: 'err-7'),
+                                                        );
+                                                      }
+                                                    });
+                                                  }
+                                                },
+                                              ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  AppPadding.vertical(),
-                                ],
+                                    AppPadding.vertical(),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          margin: EdgeInsets.symmetric(vertical: screenPadding, horizontal: 0),
                         ),
-                        margin: EdgeInsets.symmetric(vertical: screenPadding, horizontal: 0),
-                      ),
-                    );
+                      );
               },
             ),
           ],
@@ -552,8 +552,8 @@ class _PointHomepageState extends State<PointHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -570,7 +570,7 @@ class _PointHomepageState extends State<PointHomepage> {
         _totalCount = value.data?.totalCount ?? 0;
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
       } else {
-        showDialogError(context, value.data?.message ?? 'error'.tr(gender: 'generic'));
+        showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
       }
     });
   }

@@ -717,7 +717,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   'The Services has been successfully ${service.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
                 );
               } else {
-                showDialogError(context, value.data?.message ?? '');
+                showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });
@@ -816,7 +816,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   );
                 });
               } else {
-                showDialogError(context, value.data?.message ?? '');
+                showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });

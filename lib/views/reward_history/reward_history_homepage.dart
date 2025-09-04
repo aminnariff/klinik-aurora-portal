@@ -173,7 +173,10 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             ),
           ),
         ),
-        Padding(padding: EdgeInsets.symmetric(vertical: screenPadding), child: pagination()),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: screenPadding),
+          child: pagination(),
+        ),
       ],
     );
     // },
@@ -262,247 +265,262 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
         if (snapshot.rewardHistoryResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.rewardHistoryResponse == null || snapshot.rewardHistoryResponse!.data!.data!.isEmpty
               ? Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [tableButton(), const Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
+                  ],
+                )
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  tableButton(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                            padding: const EdgeInsets.all(5),
-                            child: DataTable2(
-                              columnSpacing: 12,
-                              horizontalMargin: 12,
-                              minWidth: 900,
-                              isHorizontalScrollBarVisible: true,
-                              isVerticalScrollBarVisible: true,
-                              columns: columns(),
-                              headingRowColor: WidgetStateProperty.all(Colors.white),
-                              headingRowHeight: 51,
-                              decoration: const BoxDecoration(),
-                              border: TableBorder(
-                                left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                verticalInside: BorderSide(
-                                  width: 1,
-                                  color: Colors.black.withAlpha(opacityCalculation(.1)),
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    tableButton(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+                              padding: const EdgeInsets.all(5),
+                              child: DataTable2(
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                minWidth: 900,
+                                isHorizontalScrollBarVisible: true,
+                                isVerticalScrollBarVisible: true,
+                                columns: columns(),
+                                headingRowColor: WidgetStateProperty.all(Colors.white),
+                                headingRowHeight: 51,
+                                decoration: const BoxDecoration(),
+                                border: TableBorder(
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
-                              ),
-                              rows: [
-                                for (
-                                  int index = 0;
-                                  index < (snapshot.rewardHistoryResponse?.data?.data?.length ?? 0);
-                                  index++
-                                )
-                                  DataRow(
-                                    color: WidgetStateProperty.all(
-                                      index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                    ),
-                                    cells: [
-                                      // DataCell(
-                                      //   TextButton(
-                                      //     onPressed: () {
-                                      //       // showDialog(
-                                      //       //     context: context,
-                                      //       //     builder: (BuildContext context) {
-                                      //       //       return RewardDetail(
-                                      //       //           type: 'update',
-                                      //       //           reward: snapshot.rewardHistoryResponse?.data?.data?[index]);
-                                      //       //     });
-                                      //     },
-                                      //     child: Text(
-                                      //       snapshot.rewardHistoryResponse?.data?.data?[index].rewardId ?? 'N/A',
-                                      //       style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].userFullname ?? 'N/A',
-                                        ),
+                                rows: [
+                                  for (
+                                    int index = 0;
+                                    index < (snapshot.rewardHistoryResponse?.data?.data?.length ?? 0);
+                                    index++
+                                  )
+                                    DataRow(
+                                      color: WidgetStateProperty.all(
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
                                       ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].rewardName ?? 'N/A',
+                                      cells: [
+                                        // DataCell(
+                                        //   TextButton(
+                                        //     onPressed: () {
+                                        //       // showDialog(
+                                        //       //     context: context,
+                                        //       //     builder: (BuildContext context) {
+                                        //       //       return RewardDetail(
+                                        //       //           type: 'update',
+                                        //       //           reward: snapshot.rewardHistoryResponse?.data?.data?[index]);
+                                        //       //     });
+                                        //     },
+                                        //     child: Text(
+                                        //       snapshot.rewardHistoryResponse?.data?.data?[index].rewardId ?? 'N/A',
+                                        //       style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.rewardHistoryResponse?.data?.data?[index].userFullname ?? 'N/A',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            showStatus(
-                                              snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryStatus ==
-                                                  1,
-                                              valueText:
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.rewardHistoryResponse?.data?.data?[index].rewardName ?? 'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              showStatus(
+                                                snapshot
+                                                        .rewardHistoryResponse
+                                                        ?.data
+                                                        ?.data?[index]
+                                                        .rewardHistoryStatus ==
+                                                    1,
+                                                valueText:
+                                                    snapshot
+                                                            .rewardHistoryResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .rewardHistoryStatus ==
+                                                        1
+                                                    ? 'In-Progress'
+                                                    : 'Completed',
+
+                                                valueColor: statusColor(
                                                   snapshot
                                                               .rewardHistoryResponse
                                                               ?.data
                                                               ?.data?[index]
                                                               .rewardHistoryStatus ==
                                                           1
-                                                      ? 'In-Progress'
-                                                      : 'Completed',
-
-                                              valueColor: statusColor(
-                                                snapshot
-                                                            .rewardHistoryResponse
-                                                            ?.data
-                                                            ?.data?[index]
-                                                            .rewardHistoryStatus ==
-                                                        1
-                                                    ? 'in-progress'
-                                                    : 'completed',
+                                                      ? 'in-progress'
+                                                      : 'completed',
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          snapshot.rewardHistoryResponse?.data?.data?[index].rewardHistoryDescription ??
-                                              'N/A',
-                                        ),
-                                      ),
-                                      DataCell(
-                                        AppSelectableText(
-                                          dateConverter(
-                                                snapshot
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot
                                                     .rewardHistoryResponse
                                                     ?.data
                                                     ?.data?[index]
-                                                    .rewardHistoryModifiedDate,
-                                              ) ??
-                                              dateConverter(
-                                                snapshot
-                                                    .rewardHistoryResponse
-                                                    ?.data
-                                                    ?.data?[index]
-                                                    .rewardHistoryCreatedDate,
-                                              ) ??
-                                              'N/A',
+                                                    .rewardHistoryDescription ??
+                                                'N/A',
+                                          ),
                                         ),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return RewardHistoryDetail(
-                                                      data: snapshot.rewardHistoryResponse!.data!.data![index],
-                                                      type: 'update',
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              icon: const Icon(Icons.edit, color: Colors.grey),
-                                            ),
-                                            // IconButton(
-                                            //   onPressed: () async {
-                                            //     try {
-                                            //       Data? data = snapshot.rewardHistoryResponse?.data?.data?[index];
-                                            //       if (await showConfirmDialog(
-                                            //           context,
-                                            //           data?.rewardStatus == 1
-                                            //               ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
-                                            //               : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
-                                            //         Future.delayed(Duration.zero, () {
-                                            //           RewardController.update(
-                                            //             context,
-                                            //             UpdateRewardRequest(
-                                            //               rewardId: data?.rewardId ?? '',
-                                            //               rewardName: data?.rewardName ?? '',
-                                            //               rewardDescription: data?.rewardDescription ?? '',
-                                            //               rewardPoint: data?.rewardPoint ?? 0,
-                                            //               totalReward: data?.totalReward ?? 0,
-                                            //               rewardStartDate: data?.rewardStartDate ?? '',
-                                            //               rewardEndDate: data?.rewardEndDate ?? '',
-                                            //               rewardStatus: data?.rewardStatus == 1 ? 0 : 1,
-                                            //             ),
-                                            //           ).then((value) {
-                                            //             if (responseCode(value.code)) {
-                                            //               filtering();
-                                            //               showDialogSuccess(context,
-                                            //                   'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
-                                            //             } else {
-                                            //               showDialogError(context, value.data?.message ?? '');
-                                            //             }
-                                            //           });
-                                            //         });
-                                            //       }
-                                            //     } catch (e) {
-                                            //       debugPrint(e.toString());
-                                            //     }
-                                            //   },
-                                            //   icon: Icon(
-                                            //     snapshot.rewardHistoryResponse?.data?.data?[index]
-                                            //                 .rewardHistoryStatus ==
-                                            //             1
-                                            //         ? Icons.delete
-                                            //         : Icons.play_arrow,
-                                            //     color: Colors.grey,
-                                            //   ),
-                                            // ),
-                                          ],
+                                        DataCell(
+                                          AppSelectableText(
+                                            dateConverter(
+                                                  snapshot
+                                                      .rewardHistoryResponse
+                                                      ?.data
+                                                      ?.data?[index]
+                                                      .rewardHistoryModifiedDate,
+                                                ) ??
+                                                dateConverter(
+                                                  snapshot
+                                                      .rewardHistoryResponse
+                                                      ?.data
+                                                      ?.data?[index]
+                                                      .rewardHistoryCreatedDate,
+                                                ) ??
+                                                'N/A',
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return RewardHistoryDetail(
+                                                        data: snapshot.rewardHistoryResponse!.data!.data![index],
+                                                        type: 'update',
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                icon: const Icon(Icons.edit, color: Colors.grey),
+                                              ),
+                                              // IconButton(
+                                              //   onPressed: () async {
+                                              //     try {
+                                              //       Data? data = snapshot.rewardHistoryResponse?.data?.data?[index];
+                                              //       if (await showConfirmDialog(
+                                              //           context,
+                                              //           data?.rewardStatus == 1
+                                              //               ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
+                                              //               : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
+                                              //         Future.delayed(Duration.zero, () {
+                                              //           RewardController.update(
+                                              //             context,
+                                              //             UpdateRewardRequest(
+                                              //               rewardId: data?.rewardId ?? '',
+                                              //               rewardName: data?.rewardName ?? '',
+                                              //               rewardDescription: data?.rewardDescription ?? '',
+                                              //               rewardPoint: data?.rewardPoint ?? 0,
+                                              //               totalReward: data?.totalReward ?? 0,
+                                              //               rewardStartDate: data?.rewardStartDate ?? '',
+                                              //               rewardEndDate: data?.rewardEndDate ?? '',
+                                              //               rewardStatus: data?.rewardStatus == 1 ? 0 : 1,
+                                              //             ),
+                                              //           ).then((value) {
+                                              //             if (responseCode(value.code)) {
+                                              //               filtering();
+                                              //               showDialogSuccess(context,
+                                              //                   'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
+                                              //             } else {
+                                              //               showDialogError(context, value.message ?? value.data?.message ?? '');
+                                              //             }
+                                              //           });
+                                              //         });
+                                              //       }
+                                              //     } catch (e) {
+                                              //       debugPrint(e.toString());
+                                              //     }
+                                              //   },
+                                              //   icon: Icon(
+                                              //     snapshot.rewardHistoryResponse?.data?.data?[index]
+                                              //                 .rewardHistoryStatus ==
+                                              //             1
+                                              //         ? Icons.delete
+                                              //         : Icons.play_arrow,
+                                              //     color: Colors.grey,
+                                              //   ),
+                                              // ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                        ],
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: pagination()),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                  ),
-                                perPage(),
-                              ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: pagination()),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (!isMobile && !isTablet)
+                                    const Flexible(
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ),
+                                  perPage(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                            if (!isMobile && !isTablet)
+                              Text(
+                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -511,8 +529,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -529,22 +547,20 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       customerUsername: _customerUserNameController.text != '' ? _customerUserNameController.text : null,
       userPhone: _customerPhoneController.text != '' ? _customerPhoneController.text : null,
       rewardName: _rewardNameController.text != '' ? _rewardNameController.text : null,
-      rewardHistoryStatus:
-          _rewardHistoryStatus != null
-              ? _rewardHistoryStatus?.key == '1'
-                  ? 1
-                  : _rewardHistoryStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
-      rewardStatus:
-          _rewardStatus != null
-              ? _rewardStatus?.key == '1'
-                  ? 1
-                  : _rewardStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
+      rewardHistoryStatus: _rewardHistoryStatus != null
+          ? _rewardHistoryStatus?.key == '1'
+                ? 1
+                : _rewardHistoryStatus?.key == '0'
+                ? 0
+                : null
+          : null,
+      rewardStatus: _rewardStatus != null
+          ? _rewardStatus?.key == '1'
+                ? 1
+                : _rewardStatus?.key == '0'
+                ? 0
+                : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -665,8 +681,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(angle: -math.pi, child: child)
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 

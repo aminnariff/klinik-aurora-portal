@@ -498,12 +498,18 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                                                 'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
                                               );
                                             } else {
-                                              showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                              showDialogError(
+                                                context,
+                                                value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                              );
                                             }
                                           });
                                         }
                                       } else {
-                                        showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                        showDialogError(
+                                          context,
+                                          value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                        );
                                       }
                                     });
                                   }
@@ -582,116 +588,120 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
         if (snapshot.promotionAllResponse == null) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [Expanded(child: Center(child: CircularProgressIndicator(color: secondaryColor)))],
+            children: [
+              Expanded(
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              ),
+            ],
           );
         } else {
           return snapshot.promotionAllResponse == null || snapshot.promotionAllResponse!.data!.data!.isEmpty
               ? const Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [Expanded(child: Center(child: NoRecordsWidget()))],
-              )
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [Expanded(child: Center(child: NoRecordsWidget()))],
+                )
               : GridView.count(
-                padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding / 2),
-                childAspectRatio: 0.7,
-                shrinkWrap: true,
-                crossAxisCount: screenWidth(100) > 1280 ? 5 : 4,
-                crossAxisSpacing: screenPadding,
-                mainAxisSpacing: screenPadding,
-                primary: false,
-                children: [
-                  for (int index = 0; index < (snapshot.promotionAllResponse?.data?.data?.length ?? 0); index++)
-                    Consumer<DarkModeController>(
-                      builder: (context, darkMode, _) {
-                        return GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return PromotionDetail(promotion: snapshot.promotionAllResponse!.data!.data![index]);
-                              },
-                            );
-                          },
-                          child: CardContainer(
-                            elevation: 2.0,
-                            // color: snapshot.cardColorGlobal,
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding / 2),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  AppPadding.vertical(denominator: 2),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
-                                                checkEndDate(
-                                                  snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate,
+                  padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding / 2),
+                  childAspectRatio: 0.7,
+                  shrinkWrap: true,
+                  crossAxisCount: screenWidth(100) > 1280 ? 5 : 4,
+                  crossAxisSpacing: screenPadding,
+                  mainAxisSpacing: screenPadding,
+                  primary: false,
+                  children: [
+                    for (int index = 0; index < (snapshot.promotionAllResponse?.data?.data?.length ?? 0); index++)
+                      Consumer<DarkModeController>(
+                        builder: (context, darkMode, _) {
+                          return GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return PromotionDetail(promotion: snapshot.promotionAllResponse!.data!.data![index]);
+                                },
+                              );
+                            },
+                            child: CardContainer(
+                              elevation: 2.0,
+                              // color: snapshot.cardColorGlobal,
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: screenPadding / 2),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    AppPadding.vertical(denominator: 2),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
+                                                  checkEndDate(
+                                                    snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate,
+                                                  )
+                                              ? statusTranslate(
+                                                  snapshot.promotionAllResponse?.data?.data?[index].promotionStatus,
                                                 )
-                                            ? statusTranslate(
-                                              snapshot.promotionAllResponse?.data?.data?[index].promotionStatus,
-                                            )
-                                            : 'INACTIVE',
-                                        style: AppTypography.bodyMedium(context).apply(
-                                          fontWeightDelta: 1,
-                                          color: statusColor(
-                                            snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
-                                                    checkEndDate(
-                                                      snapshot
-                                                          .promotionAllResponse
-                                                          ?.data
-                                                          ?.data?[index]
-                                                          .promotionEndDate,
-                                                    )
-                                                ? 'active'
-                                                : 'inactive',
+                                              : 'INACTIVE',
+                                          style: AppTypography.bodyMedium(context).apply(
+                                            fontWeightDelta: 1,
+                                            color: statusColor(
+                                              snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
+                                                      checkEndDate(
+                                                        snapshot
+                                                            .promotionAllResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .promotionEndDate,
+                                                      )
+                                                  ? 'active'
+                                                  : 'inactive',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  if (snapshot.promotionAllResponse?.data?.data?[index].promotionImage != null)
-                                    if (snapshot.promotionAllResponse!.data!.data![index].promotionImage!.isNotEmpty)
-                                      Image.network(
-                                        '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage?.first.path}',
-                                      ),
-                                  AppPadding.vertical(denominator: 2),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          snapshot.promotionAllResponse?.data?.data?[index].promotionName ?? '',
-                                          maxLines: 2,
-                                          style: Theme.of(context).textTheme.bodyMedium!.apply(fontWeightDelta: 1),
+                                      ],
+                                    ),
+                                    AppPadding.vertical(denominator: 2),
+                                    if (snapshot.promotionAllResponse?.data?.data?[index].promotionImage != null)
+                                      if (snapshot.promotionAllResponse!.data!.data![index].promotionImage!.isNotEmpty)
+                                        Image.network(
+                                          '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage?.first.path}',
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          'End Date: ${dateConverter(snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate, format: 'dd-MM-yyyy')}',
-                                          maxLines: 2,
-                                          style: Theme.of(context).textTheme.bodyMedium,
+                                    AppPadding.vertical(denominator: 2),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            snapshot.promotionAllResponse?.data?.data?[index].promotionName ?? '',
+                                            maxLines: 2,
+                                            style: Theme.of(context).textTheme.bodyMedium!.apply(fontWeightDelta: 1),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  AppPadding.horizontal(),
-                                ],
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            'End Date: ${dateConverter(snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate, format: 'dd-MM-yyyy')}',
+                                            maxLines: 2,
+                                            style: Theme.of(context).textTheme.bodyMedium,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    AppPadding.horizontal(),
+                                  ],
+                                ),
                               ),
+                              margin: EdgeInsets.zero,
                             ),
-                            margin: EdgeInsets.zero,
-                          ),
-                        );
-                      },
-                    ),
-                ],
-              );
+                          );
+                        },
+                      ),
+                  ],
+                );
         }
       },
     );
@@ -700,8 +710,8 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
         ? _debouncer.run(() {
-          runFiltering(page: page);
-        })
+            runFiltering(page: page);
+          })
         : runFiltering(page: page);
   }
 
@@ -715,14 +725,13 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
       _page,
       _pageSize,
       promotionName: _promotionNameController.text,
-      promotionStatus:
-          _promotionStatus != null
-              ? _promotionStatus?.key == '1'
-                  ? 1
-                  : _promotionStatus?.key == '0'
-                  ? 0
-                  : null
-              : null,
+      promotionStatus: _promotionStatus != null
+          ? _promotionStatus?.key == '1'
+                ? 1
+                : _promotionStatus?.key == '0'
+                ? 0
+                : null
+          : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {

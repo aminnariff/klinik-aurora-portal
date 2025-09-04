@@ -448,7 +448,7 @@ class _AdminDetailState extends State<AdminDetail> {
                       }
                     });
                   } else {
-                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                   }
                 });
               } else {

@@ -110,7 +110,9 @@ class _RewardDetailState extends State<RewardDetail> {
                               width: screenWidth1728(26),
                               child: Column(
                                 children: [
-                                  InputField(field: InputFieldAttribute(controller: _rewardName, labelText: 'Name')),
+                                  InputField(
+                                    field: InputFieldAttribute(controller: _rewardName, labelText: 'Name'),
+                                  ),
                                   AppPadding.vertical(denominator: 2),
                                   TextField(
                                     maxLines: null,
@@ -210,75 +212,75 @@ class _RewardDetailState extends State<RewardDetail> {
                                       if (widget.type == 'create') ...[
                                         selectedFile?.value == null
                                             ? UploadDocumentsField(
-                                              title: 'rewardPage'.tr(gender: 'browseFile'),
-                                              fieldTitle: 'rewardPage'.tr(gender: 'rewardImage'),
-                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                              action: () {
-                                                addPicture();
-                                              },
-                                              cancelAction: () {},
-                                            )
+                                                title: 'rewardPage'.tr(gender: 'browseFile'),
+                                                fieldTitle: 'rewardPage'.tr(gender: 'rewardImage'),
+                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                action: () {
+                                                  addPicture();
+                                                },
+                                                cancelAction: () {},
+                                              )
                                             : Stack(
-                                              alignment: Alignment.topRight,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    addPicture();
-                                                  },
-                                                  child: Image.memory(selectedFile?.value as Uint8List, height: 410),
-                                                ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    selectedFile = FileAttribute();
-                                                    fileRebuild.add(DateTime.now());
-                                                  },
-                                                  icon: const Icon(Icons.close),
-                                                ),
-                                              ],
-                                            ),
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      addPicture();
+                                                    },
+                                                    child: Image.memory(selectedFile?.value as Uint8List, height: 410),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      selectedFile = FileAttribute();
+                                                      fileRebuild.add(DateTime.now());
+                                                    },
+                                                    icon: const Icon(Icons.close),
+                                                  ),
+                                                ],
+                                              ),
                                       ],
                                       if (widget.type == 'update')
                                         widget.reward?.rewardImage == null
                                             ? selectedFile?.name != null
-                                                ? Stack(
-                                                  alignment: Alignment.topRight,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
+                                                  ? Stack(
+                                                      alignment: Alignment.topRight,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            addPicture();
+                                                          },
+                                                          child: Image.memory(
+                                                            selectedFile?.value as Uint8List,
+                                                            height: 410,
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            selectedFile = FileAttribute();
+                                                            fileRebuild.add(DateTime.now());
+                                                          },
+                                                          icon: const Icon(Icons.close),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : UploadDocumentsField(
+                                                      title: 'branchImage'.tr(gender: 'browseFile'),
+                                                      fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                      action: () {
                                                         addPicture();
                                                       },
-                                                      child: Image.memory(
-                                                        selectedFile?.value as Uint8List,
-                                                        height: 410,
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        selectedFile = FileAttribute();
-                                                        fileRebuild.add(DateTime.now());
-                                                      },
-                                                      icon: const Icon(Icons.close),
-                                                    ),
-                                                  ],
-                                                )
-                                                : UploadDocumentsField(
-                                                  title: 'branchImage'.tr(gender: 'browseFile'),
-                                                  fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                  action: () {
-                                                    addPicture();
-                                                  },
-                                                  cancelAction: () {},
-                                                )
+                                                      cancelAction: () {},
+                                                    )
                                             : GestureDetector(
-                                              onTap: () {
-                                                addPicture();
-                                              },
-                                              child: Image.network(
-                                                '${Environment.imageUrl}${widget.reward?.rewardImage}',
-                                                height: 410,
+                                                onTap: () {
+                                                  addPicture();
+                                                },
+                                                child: Image.network(
+                                                  '${Environment.imageUrl}${widget.reward?.rewardImage}',
+                                                  height: 410,
+                                                ),
                                               ),
-                                            ),
                                       AppPadding.vertical(denominator: 2),
                                     ],
                                   );
@@ -315,7 +317,10 @@ class _RewardDetailState extends State<RewardDetail> {
                                         if (responseCode(value.code)) {
                                           getLatestData();
                                         } else {
-                                          showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                          showDialogError(
+                                            context,
+                                            value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                          );
                                         }
                                       });
                                     } else {
@@ -323,7 +328,10 @@ class _RewardDetailState extends State<RewardDetail> {
                                       getLatestData();
                                     }
                                   } else {
-                                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                    showDialogError(
+                                      context,
+                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                    );
                                   }
                                 });
                               } else if (widget.type == 'create') {
@@ -346,7 +354,10 @@ class _RewardDetailState extends State<RewardDetail> {
                                       }
                                     });
                                   } else {
-                                    showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                    showDialogError(
+                                      context,
+                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                    );
                                   }
                                 });
                               }
