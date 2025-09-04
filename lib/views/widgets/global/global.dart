@@ -29,7 +29,7 @@ String? dateConverter(String? value, {String? format}) {
       return null;
     } else {
       DateTime dateTime = DateTime.parse(value);
-      dateTime = dateTime.toUtc().add(const Duration(hours: 8));
+      dateTime = dateTime.add(const Duration(hours: 8));
 
       return DateFormat(format ?? 'dd-MM-yyyy HH:mm:ss').format(dateTime);
     }
@@ -112,6 +112,7 @@ String convertMalaysiaTimeToUtc(String malaysiaTimeStr, {bool plainFormat = fals
     final malaysiaTime = inputFormat.parseStrict(malaysiaTimeStr);
 
     final utcTime = malaysiaTime.toUtc();
+    print('UTC TIME - $utcTime');
 
     if (plainFormat) {
       return "${utcTime.year.toString().padLeft(4, '0')}-"
@@ -133,7 +134,7 @@ String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
   try {
     if (utcString == null || utcString.isEmpty) return null;
 
-    final utcDateTime = DateTime.parse(utcString); // already UTC from the "Z"
+    final utcDateTime = DateTime.parse(utcString);
     return formatAppointmentDate(utcDateTime, showTime);
   } catch (e) {
     debugPrint('Invalid date format: $e');

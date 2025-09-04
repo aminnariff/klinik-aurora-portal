@@ -1235,7 +1235,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 }
               });
             } else {
-              if (convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: false) !=
+              if (convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true) !=
                   widget.appointment?.appointmentDatetime) {
                 _status = DropdownAttribute('3', 'Rescheduled');
               }
