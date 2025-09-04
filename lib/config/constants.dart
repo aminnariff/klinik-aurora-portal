@@ -5,6 +5,7 @@ const String token = "token";
 const String singpassId = "singpassId";
 const String productCode = "productCode";
 const String postalCode = "postalCode";
+const String loginDateTime = "loginDateTime";
 const String unitNo = "unitNo";
 const String orderReference = "orderReference";
 const String registerUrl = "https://simba.sg/broadband";
@@ -47,7 +48,17 @@ List<DropdownAttribute> states = [
   DropdownAttribute('Terengganu', 'Terengganu'),
 ];
 
-double fileSizeLimit = 10.0;
+List<DropdownAttribute> appointmentStatus = [
+  DropdownAttribute('1', 'Booked'),
+  DropdownAttribute('2', 'Cancelled'),
+  DropdownAttribute('3', 'Rescheduled'),
+  DropdownAttribute('4', 'Pending Payment'),
+  DropdownAttribute('5', 'Completed'),
+  DropdownAttribute('6', 'Refunded'),
+  DropdownAttribute('7', 'No Show'),
+];
+
+double fileSizeLimit = 1.0;
 
 
     // "permissionId": "1bda631e-ef17-11ee-bd1b-cc801b09db2f",

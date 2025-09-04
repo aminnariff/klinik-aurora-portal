@@ -60,18 +60,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(
-      attribute: 'userFullname',
-      label: 'Name',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'userEmail',
-      label: 'Email',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+    TableHeaderAttribute(attribute: 'userFullname', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'userEmail', label: 'Email', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'userPhone',
       label: 'Contact No.',
@@ -99,8 +89,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'action',
-      label: 'Action',
+      attribute: 'actions',
+      label: 'Actions',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 100,
@@ -113,16 +103,15 @@ class _AdminHomepageState extends State<AdminHomepage> {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(AdminHomepage.displayName);
-    });
-    if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context, 1, 100).then(
-        (value) {
+      if (context.read<BranchController>().branchAllResponse == null) {
+        BranchController.getAll(context, 1, 100).then((value) {
           if (responseCode(value.code)) {
             context.read<BranchController>().branchAllResponse = value;
           }
-        },
-      );
-    }
+        });
+      }
+    });
+
     PermissionController.get(context).then((value) {
       if (responseCode(value.code)) {
         context.read<PermissionController>().permissionAllResponse = value.data;
@@ -134,10 +123,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: mobileView(),
-      desktop: desktopView(),
-    );
+    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -146,9 +132,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
     //   builder: (context, snapshot) {
     return Column(
       children: [
-        searchField(
-          InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'Admin Name'),
-        ),
+        searchField(InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'Admin Name')),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -165,8 +149,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             children: [
                               CardContainer(
                                 Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: screenPadding * 1.5, horizontal: screenPadding),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenPadding * 1.5,
+                                    horizontal: screenPadding,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -189,11 +175,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                           children: [
                             Text('N/A'),
                             Text('N/A'),
-                            Row(
-                              children: [
-                                Text('N/A'),
-                              ],
-                            ),
+                            Row(children: [Text('N/A')]),
                             Text('aaaaa'),
                           ],
                         ),
@@ -208,7 +190,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
         Padding(
           padding: EdgeInsets.symmetric(vertical: screenPadding),
           child: pagination(),
-        )
+        ),
       ],
     );
     // },
@@ -220,25 +202,18 @@ class _AdminHomepageState extends State<AdminHomepage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$title:',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
         AppPadding.horizontal(denominator: 2),
-        Expanded(
-          child: AppSelectableText(
-            value,
-          ),
-        ),
+        Expanded(child: AppSelectableText(value)),
       ],
     );
   }
 
   Widget desktopView() {
     return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    // (widget.orderReference == null)
+    //     ?
+    Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,17 +237,14 @@ class _AdminHomepageState extends State<AdminHomepage> {
               children: [
                 Expanded(
                   child: CardContainer(
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: orderTable(),
-                    ),
+                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -295,10 +267,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
               onPressed: () {
                 filtering(page: 1);
               },
-              child: const Icon(
-                Icons.search,
-                color: Colors.blue,
-              ),
+              child: const Icon(Icons.search, color: Colors.blue),
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
@@ -319,11 +288,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  ),
-                ),
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
               ),
             ],
           );
@@ -333,11 +298,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     tableButton(),
-                    const Expanded(
-                      child: Center(
-                        child: NoRecordsWidget(),
-                      ),
-                    ),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
                   ],
                 )
               : Column(
@@ -351,10 +312,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                           alignment: Alignment.center,
                           children: [
                             Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
-                              ),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
                               padding: const EdgeInsets.all(5),
                               child: DataTable2(
                                 columnSpacing: 12,
@@ -367,29 +325,34 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                 headingRowHeight: 51,
                                 decoration: const BoxDecoration(),
                                 border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
                                 rows: [
                                   for (int index = 0; index < (snapshot.adminAllResponse?.data?.length ?? 0); index++)
                                     DataRow(
                                       color: WidgetStateProperty.all(
-                                          index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                      ),
                                       cells: [
                                         DataCell(
                                           TextButton(
                                             onPressed: () {
                                               showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return AdminDetail(
-                                                      user: snapshot.adminAllResponse!.data![index],
-                                                      type: 'update',
-                                                    );
-                                                  });
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AdminDetail(
+                                                    user: snapshot.adminAllResponse!.data![index],
+                                                    type: 'update',
+                                                  );
+                                                },
+                                              );
                                             },
                                             child: Text(
                                               snapshot.adminAllResponse?.data?[index].userFullname ??
@@ -416,11 +379,13 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                                 ? 'Active'
                                                 : 'Inactive',
                                             style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(
-                                                    snapshot.adminAllResponse?.data?[index].userStatus == 1
-                                                        ? 'active'
-                                                        : 'inactive'),
-                                                fontWeightDelta: 1),
+                                              color: statusColor(
+                                                snapshot.adminAllResponse?.data?[index].userStatus == 1
+                                                    ? 'active'
+                                                    : 'inactive',
+                                              ),
+                                              fontWeightDelta: 1,
+                                            ),
                                           ),
                                         ),
                                         // DataCell(
@@ -428,8 +393,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                         // ),
                                         DataCell(
                                           AppSelectableText(
-                                              dateConverter(snapshot.adminAllResponse?.data?[index].createdDate) ??
-                                                  'N/A'),
+                                            dateConverter(snapshot.adminAllResponse?.data?[index].createdDate) ?? 'N/A',
+                                          ),
                                         ),
                                         DataCell(
                                           Row(
@@ -438,28 +403,27 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                               IconButton(
                                                 onPressed: () {
                                                   showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return AdminDetail(
-                                                          user: snapshot.adminAllResponse!.data![index],
-                                                          type: 'update',
-                                                        );
-                                                      });
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return AdminDetail(
+                                                        user: snapshot.adminAllResponse!.data![index],
+                                                        type: 'update',
+                                                      );
+                                                    },
+                                                  );
                                                 },
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.grey,
-                                                ),
+                                                icon: const Icon(Icons.edit, color: Colors.grey),
                                               ),
                                               IconButton(
                                                 onPressed: () async {
                                                   try {
                                                     Data? data = snapshot.adminAllResponse?.data?[index];
                                                     if (await showConfirmDialog(
-                                                        context,
-                                                        data?.userStatus == 1
-                                                            ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
-                                                            : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.')) {
+                                                      context,
+                                                      data?.userStatus == 1
+                                                          ? 'Are you certain you wish to deactivate this staff? Please note, this action can be reversed at a later time.'
+                                                          : 'Are you certain you wish to activate this staff? Please note, this action can be reversed at a later time.',
+                                                    )) {
                                                       Future.delayed(Duration.zero, () {
                                                         AdminController.update(
                                                           context,
@@ -475,10 +439,15 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                                         ).then((value) {
                                                           if (responseCode(value.code)) {
                                                             filtering();
-                                                            showDialogSuccess(context,
-                                                                'The PIC has been successfully ${data?.userStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                            showDialogSuccess(
+                                                              context,
+                                                              'The PIC has been successfully ${data?.userStatus == 1 ? 'deactivated' : 'activated'}.',
+                                                            );
                                                           } else {
-                                                            showDialogError(context, value.data?.message ?? '');
+                                                            showDialogError(
+                                                              context,
+                                                              value.message ?? value.data?.message ?? '',
+                                                            );
                                                           }
                                                         });
                                                       });
@@ -502,10 +471,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                 ],
                               ),
                             ),
-                            if (isNoRecords.value)
-                              const AppSelectableText(
-                                'No Records Found',
-                              ),
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
                           ],
                         ),
                       ),
@@ -513,9 +479,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: pagination(),
-                        ),
+                        Expanded(child: pagination()),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -525,11 +489,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                 children: [
                                   if (!isMobile && !isTablet)
                                     const Flexible(
-                                      child: Text(
-                                        'Items per page: ',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
                                     ),
                                   perPage(),
                                 ],
@@ -572,10 +532,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
       userEmail: _userEmailController.text,
       userStatus: _selectedUserStatus != null
           ? _selectedUserStatus?.key == '1'
-              ? 1
-              : _selectedUserStatus?.key == '0'
-                  ? 0
-                  : null
+                ? 1
+                : _selectedUserStatus?.key == '0'
+                ? 0
+                : null
           : null,
     ).then((value) {
       dismissLoading();
@@ -695,11 +655,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(
-                angle: -math.pi,
-                child: child,
-              )
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 
@@ -711,145 +668,131 @@ class _AdminHomepageState extends State<AdminHomepage> {
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const AdminDetail(
-                    type: 'create',
-                  );
-                });
+              context: context,
+              builder: (BuildContext context) {
+                return const AdminDetail(type: 'create');
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.add,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.add, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Add new admin',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Add new admin', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Card(
-                          surfaceTintColor: Colors.white,
-                          elevation: 5.0,
-                          color: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                                child: Column(
-                                  children: [
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userNameController,
-                                        hintText: 'Search',
-                                        labelText: 'Username',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userPhoneController,
-                                        hintText: 'Search',
-                                        labelText: 'Contact Number',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userEmailController,
-                                        hintText: 'Search',
-                                        labelText: 'Email',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Column(
-                                                children: [
-                                                  AppDropdown(
-                                                    attributeList: DropdownAttributeList(
-                                                      [
-                                                        DropdownAttribute('1', 'Active'),
-                                                        DropdownAttribute('0', 'Inactive'),
-                                                      ],
-                                                      labelText: 'information'.tr(gender: 'userStatus'),
-                                                      value: _selectedUserStatus?.name,
-                                                      onChanged: (p0) {
-                                                        _selectedUserStatus = p0;
-                                                        rebuildDropdown.add(DateTime.now());
-                                                        filtering(page: 1);
-                                                      },
-                                                      width: screenWidthByBreakpoint(90, 70, 26),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          );
-                                        }),
-                                    AppPadding.vertical(denominator: 1 / 3),
-                                    AppOutlinedButton(
-                                      () {
-                                        resetAllFilter();
-                                        filtering(enableDebounce: true, page: 1);
-                                      },
-                                      backgroundColor: Colors.white,
-                                      borderRadius: 15,
-                                      width: 131,
-                                      height: 45,
-                                      text: 'Clear',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CloseButton(),
-                              ),
-                            ],
+              context: context,
+              builder: (BuildContext context) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Card(
+                        surfaceTintColor: Colors.white,
+                        elevation: 5.0,
+                        color: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            bottomLeft: Radius.circular(15),
                           ),
                         ),
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                              child: Column(
+                                children: [
+                                  searchField(
+                                    InputFieldAttribute(
+                                      controller: _userNameController,
+                                      hintText: 'Search',
+                                      labelText: 'Username',
+                                    ),
+                                  ),
+                                  AppPadding.vertical(),
+                                  searchField(
+                                    InputFieldAttribute(
+                                      controller: _userPhoneController,
+                                      hintText: 'Search',
+                                      labelText: 'Contact Number',
+                                    ),
+                                  ),
+                                  AppPadding.vertical(),
+                                  searchField(
+                                    InputFieldAttribute(
+                                      controller: _userEmailController,
+                                      hintText: 'Search',
+                                      labelText: 'Email',
+                                    ),
+                                  ),
+                                  AppPadding.vertical(),
+                                  StreamBuilder<DateTime>(
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              AppDropdown(
+                                                attributeList: DropdownAttributeList(
+                                                  [
+                                                    DropdownAttribute('1', 'Active'),
+                                                    DropdownAttribute('0', 'Inactive'),
+                                                  ],
+                                                  labelText: 'information'.tr(gender: 'userStatus'),
+                                                  value: _selectedUserStatus?.name,
+                                                  onChanged: (p0) {
+                                                    _selectedUserStatus = p0;
+                                                    rebuildDropdown.add(DateTime.now());
+                                                    filtering(page: 1);
+                                                  },
+                                                  width: screenWidthByBreakpoint(90, 70, 26),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                  AppPadding.vertical(denominator: 1 / 3),
+                                  AppOutlinedButton(
+                                    () {
+                                      resetAllFilter();
+                                      filtering(enableDebounce: true, page: 1);
+                                    },
+                                    backgroundColor: Colors.white,
+                                    borderRadius: 15,
+                                    width: 131,
+                                    height: 45,
+                                    text: 'Clear',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
+                          ],
+                        ),
                       ),
-                    ],
-                  );
-                });
+                    ),
+                  ],
+                );
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.filter_list,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.filter_list, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Filter',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -860,15 +803,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.refresh,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.refresh, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Reset',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -884,9 +821,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
         onChanged: (selected) {
           DropdownAttribute item = selected as DropdownAttribute;
           _pageSize = int.parse(item.key);
-          filtering(
-            enableDebounce: false,
-          );
+          filtering(enableDebounce: false);
         },
       ),
     );

@@ -15,10 +15,7 @@ class GraphWidget extends StatefulWidget {
 }
 
 class _GraphWidgetState extends State<GraphWidget> {
-  List<Color> gradientColors = [
-    const Color(0xff23b6e6),
-    const Color(0xff02d39a),
-  ];
+  List<Color> gradientColors = [const Color(0xff23b6e6), const Color(0xff02d39a)];
 
   List<int> totalRegistrations = [];
   bool showAvg = false;
@@ -31,9 +28,7 @@ class _GraphWidgetState extends State<GraphWidget> {
           aspectRatio: 4.5,
           child: DecoratedBox(
             decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(18),
-              ),
+              borderRadius: BorderRadius.all(Radius.circular(18)),
               color: Color(0xff232d37),
             ),
             child: Padding(
@@ -43,11 +38,11 @@ class _GraphWidgetState extends State<GraphWidget> {
                 top: screenPadding * 1.5,
                 bottom: 12,
               ),
-              child: Consumer<DashboardController>(builder: (context, snapshot, _) {
-                return LineChart(
-                  showAvg ? avgData() : mainData(snapshot.dashboardResponse?.data),
-                );
-              }),
+              child: Consumer<DashboardController>(
+                builder: (context, snapshot, _) {
+                  return LineChart(showAvg ? avgData() : mainData(snapshot.dashboardResponse?.data));
+                },
+              ),
             ),
           ),
         ),
@@ -63,82 +58,99 @@ class _GraphWidgetState extends State<GraphWidget> {
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff68737d),
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
+    const style = TextStyle(color: Color(0xff68737d), fontWeight: FontWeight.bold, fontSize: 16);
     Widget text;
     Data? response = context.read<DashboardController>().dashboardResponse?.data;
     switch (value.toInt()) {
       case 0:
-        text = response == null
-            ? const SizedBox()
-            : Text(
-                convertToMonthYear(
-                    response.totalRegistrationByMonth?[0].month ?? 0, response.totalRegistrationByMonth?[0].year ?? 0),
-                style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(
+                  convertToMonthYear(
+                    response.totalRegistrationByMonth?[0].month ?? 0,
+                    response.totalRegistrationByMonth?[0].year ?? 0,
+                  ),
+                  style: style,
+                );
         break;
       case 1:
-        text = response == null
-            ? const SizedBox()
-            : Text(
-                convertToMonthYear(
-                    response.totalRegistrationByMonth?[1].month ?? 0, response.totalRegistrationByMonth?[1].year ?? 0),
-                style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(
+                  convertToMonthYear(
+                    response.totalRegistrationByMonth?[1].month ?? 0,
+                    response.totalRegistrationByMonth?[1].year ?? 0,
+                  ),
+                  style: style,
+                );
         break;
       case 2:
-        text = response == null
-            ? const SizedBox()
-            : Text(
-                convertToMonthYear(
-                    response.totalRegistrationByMonth?[2].month ?? 0, response.totalRegistrationByMonth?[2].year ?? 0),
-                style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(
+                  convertToMonthYear(
+                    response.totalRegistrationByMonth?[2].month ?? 0,
+                    response.totalRegistrationByMonth?[2].year ?? 0,
+                  ),
+                  style: style,
+                );
       case 3:
-        text = response == null
-            ? const SizedBox()
-            : Text(
-                convertToMonthYear(
-                    response.totalRegistrationByMonth?[3].month ?? 0, response.totalRegistrationByMonth?[3].year ?? 0),
-                style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(
+                  convertToMonthYear(
+                    response.totalRegistrationByMonth?[3].month ?? 0,
+                    response.totalRegistrationByMonth?[3].year ?? 0,
+                  ),
+                  style: style,
+                );
       case 4:
-        text = response == null
-            ? const SizedBox()
-            : Text(
-                convertToMonthYear(
-                    response.totalRegistrationByMonth?[4].month ?? 0, response.totalRegistrationByMonth?[4].year ?? 0),
-                style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(
+                  convertToMonthYear(
+                    response.totalRegistrationByMonth?[4].month ?? 0,
+                    response.totalRegistrationByMonth?[4].year ?? 0,
+                  ),
+                  style: style,
+                );
       case 5:
-        text = response == null
-            ? const SizedBox()
-            : Text(
-                convertToMonthYear(
-                    response.totalRegistrationByMonth?[5].month ?? 0, response.totalRegistrationByMonth?[5].year ?? 0),
-                style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(
+                  convertToMonthYear(
+                    response.totalRegistrationByMonth?[5].month ?? 0,
+                    response.totalRegistrationByMonth?[5].year ?? 0,
+                  ),
+                  style: style,
+                );
       case 6:
-        text = response == null
-            ? const SizedBox()
-            : Text(
-                convertToMonthYear(
-                    response.totalRegistrationByMonth?[6].month ?? 0, response.totalRegistrationByMonth?[6].year ?? 0),
-                style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(
+                  convertToMonthYear(
+                    response.totalRegistrationByMonth?[6].month ?? 0,
+                    response.totalRegistrationByMonth?[6].year ?? 0,
+                  ),
+                  style: style,
+                );
       default:
         text = const Text('', style: style);
         break;
     }
 
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: text,
-    );
+    return SideTitleWidget(meta: meta, child: text);
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff67727d),
-      fontWeight: FontWeight.bold,
-      fontSize: 15,
-    );
+    const style = TextStyle(color: Color(0xff67727d), fontWeight: FontWeight.bold, fontSize: 15);
     String text;
     switch (value.toInt()) {
       case 1:
@@ -207,47 +219,24 @@ class _GraphWidgetState extends State<GraphWidget> {
         drawVerticalLine: true,
         verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
         getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
       ),
       titlesData: FlTitlesData(
         show: true,
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
+        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            interval: 1,
-            getTitlesWidget: bottomTitleWidgets,
-          ),
+          sideTitles: SideTitles(showTitles: true, reservedSize: 30, interval: 1, getTitlesWidget: bottomTitleWidgets),
         ),
         leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false,
-            interval: 1,
-            getTitlesWidget: leftTitleWidgets,
-            reservedSize: 42,
-          ),
+          sideTitles: SideTitles(showTitles: false, interval: 1, getTitlesWidget: leftTitleWidgets, reservedSize: 42),
         ),
       ),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: const Color(0xff37434d)),
-      ),
+      borderData: FlBorderData(show: true, border: Border.all(color: const Color(0xff37434d))),
       minX: 0,
       maxX: ((response?.totalRegistrationByMonth?.length.toDouble()) ?? 0) - 1,
       minY: 0,
@@ -256,8 +245,10 @@ class _GraphWidgetState extends State<GraphWidget> {
         LineChartBarData(
           spots: [
             for (int index = 0; index < (response?.totalRegistrationByMonth?.length ?? 0); index++)
-              FlSpot(index.toDouble(),
-                  response?.totalRegistrationByMonth?[index].totalRegistrationByMonth?.toDouble() ?? 0),
+              FlSpot(
+                index.toDouble(),
+                response?.totalRegistrationByMonth?[index].totalRegistrationByMonth?.toDouble() ?? 0,
+              ),
             // FlSpot(0, first),
             // FlSpot(1, second),
             // FlSpot(2, third),
@@ -267,18 +258,14 @@ class _GraphWidgetState extends State<GraphWidget> {
             // FlSpot(6, seventh),
           ],
           isCurved: true,
-          gradient: LinearGradient(
-            colors: gradientColors,
-          ),
+          gradient: LinearGradient(colors: gradientColors),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
+          dotData: const FlDotData(show: false),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+              colors: gradientColors.map((color) => color.withAlpha(opacityCalculation(.3))).toList(),
             ),
           ),
         ),
@@ -295,47 +282,24 @@ class _GraphWidgetState extends State<GraphWidget> {
         verticalInterval: 1,
         horizontalInterval: 1,
         getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
         getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
       ),
       titlesData: FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: bottomTitleWidgets,
-            interval: 1,
-          ),
+          sideTitles: SideTitles(showTitles: true, reservedSize: 30, getTitlesWidget: bottomTitleWidgets, interval: 1),
         ),
         leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false,
-            getTitlesWidget: leftTitleWidgets,
-            reservedSize: 42,
-            interval: 1,
-          ),
+          sideTitles: SideTitles(showTitles: false, getTitlesWidget: leftTitleWidgets, reservedSize: 42, interval: 1),
         ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       ),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: const Color(0xff37434d)),
-      ),
+      borderData: FlBorderData(show: true, border: Border.all(color: const Color(0xff37434d))),
       minX: 0,
       maxX: 11,
       minY: 0,
@@ -360,15 +324,19 @@ class _GraphWidgetState extends State<GraphWidget> {
           ),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
+          dotData: const FlDotData(show: false),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
               colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
+                ColorTween(
+                  begin: gradientColors[0],
+                  end: gradientColors[1],
+                ).lerp(0.2)!.withAlpha(opacityCalculation(.1)),
+                ColorTween(
+                  begin: gradientColors[0],
+                  end: gradientColors[1],
+                ).lerp(0.2)!.withAlpha(opacityCalculation(.1)),
               ],
             ),
           ),

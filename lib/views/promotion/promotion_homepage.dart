@@ -80,8 +80,9 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      Provider.of<TopBarController>(context, listen: false).pageValue =
-          Homepage.getPageId(PromotionHomepage.displayName);
+      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(
+        PromotionHomepage.displayName,
+      );
     });
     filtering();
     super.initState();
@@ -89,10 +90,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: const MobileView(),
-      desktop: desktopView(),
-    );
+    return LayoutWidget(mobile: const MobileView(), desktop: desktopView());
   }
 
   Widget mobileText(String title, String value) {
@@ -100,25 +98,18 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$title:',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
         AppPadding.horizontal(denominator: 2),
-        Expanded(
-          child: AppSelectableText(
-            value,
-          ),
-        ),
+        Expanded(child: AppSelectableText(value)),
       ],
     );
   }
 
   Widget desktopView() {
     return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    // (widget.orderReference == null)
+    //     ?
+    Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,29 +125,27 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
               ),
               AppPadding.horizontal(),
               StreamBuilder<DateTime>(
-                  stream: rebuildDropdown.stream,
-                  builder: (context, snapshot) {
-                    return Column(
-                      children: [
-                        AppDropdown(
-                          attributeList: DropdownAttributeList(
-                            [
-                              DropdownAttribute('1', 'Active'),
-                              DropdownAttribute('0', 'Inactive'),
-                            ],
-                            labelText: 'information'.tr(gender: 'status'),
-                            value: _promotionStatus?.name,
-                            onChanged: (p0) {
-                              _promotionStatus = p0;
-                              rebuildDropdown.add(DateTime.now());
-                              filtering(page: 1);
-                            },
-                            width: screenWidthByBreakpoint(90, 70, 26),
-                          ),
+                stream: rebuildDropdown.stream,
+                builder: (context, snapshot) {
+                  return Column(
+                    children: [
+                      AppDropdown(
+                        attributeList: DropdownAttributeList(
+                          [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                          labelText: 'information'.tr(gender: 'status'),
+                          value: _promotionStatus?.name,
+                          onChanged: (p0) {
+                            _promotionStatus = p0;
+                            rebuildDropdown.add(DateTime.now());
+                            filtering(page: 1);
+                          },
+                          width: screenWidthByBreakpoint(90, 70, 26),
                         ),
-                      ],
-                    );
-                  }),
+                      ),
+                    ],
+                  );
+                },
+              ),
               AppPadding.horizontal(),
               AppOutlinedButton(
                 () {
@@ -177,54 +166,46 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(15, screenPadding / 2, 15, 0),
-                    child: orderTable(),
-                  ),
+                  child: Padding(padding: EdgeInsets.fromLTRB(15, screenPadding / 2, 15, 0), child: orderTable()),
                 ),
               ],
             ),
           ),
           StreamBuilder<DateTime>(
-              stream: rebuild.stream,
-              builder: (context, snapshot) {
-                return SizedBox(
-                  width: 500,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: pagination(),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (!isMobile && !isTablet)
-                                  const Flexible(
-                                    child: Text(
-                                      'Items per page: ',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                perPage(),
-                              ],
-                            ),
+            stream: rebuild.stream,
+            builder: (context, snapshot) {
+              return SizedBox(
+                width: 500,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(child: pagination()),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (!isMobile && !isTablet)
+                                const Flexible(
+                                  child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                ),
+                              perPage(),
+                            ],
                           ),
-                          if (!isMobile && !isTablet)
-                            Text(
-                              '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              }),
+                        ),
+                        if (!isMobile && !isTablet)
+                          Text(
+                            '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -232,9 +213,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
           createNewPromotion();
         },
         backgroundColor: secondaryColor,
-        child: const Icon(
-          Icons.add,
-        ),
+        child: const Icon(Icons.add),
       ),
     );
     // : OrderDetailHomepage(
@@ -251,9 +230,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
         onChanged: (selected) {
           DropdownAttribute item = selected as DropdownAttribute;
           _pageSize = int.parse(item.key);
-          filtering(
-            enableDebounce: false,
-          );
+          filtering(enableDebounce: false);
         },
       ),
     );
@@ -277,275 +254,280 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
 
   createNewPromotion() {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CardContainer(
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                        child: IntrinsicWidth(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  AppSelectableText(
-                                    'Promotion',
-                                    style: AppTypography.bodyLarge(context),
+      context: context,
+      builder: (BuildContext context) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CardContainer(
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
+                      child: IntrinsicWidth(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppSelectableText('Promotion', style: AppTypography.bodyLarge(context)),
+                                CloseButton(
+                                  onPressed: () {
+                                    context.pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                            AppPadding.vertical(denominator: 2),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: screenWidth1728(26),
+                                  child: Column(
+                                    children: [
+                                      InputField(
+                                        field: InputFieldAttribute(controller: _promotionName, labelText: 'Name'),
+                                      ),
+                                      AppPadding.vertical(denominator: 2),
+                                      TextField(
+                                        maxLines: null,
+                                        style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                                        controller: _promotionDescription,
+                                        decoration: appInputDecoration(context, 'Description'),
+                                      ),
+                                      AppPadding.vertical(denominator: 2),
+                                      TextField(
+                                        maxLines: null,
+                                        style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                                        controller: _promotionTnc,
+                                        decoration: appInputDecoration(context, "Terms and Conditions"),
+                                      ),
+                                    ],
                                   ),
-                                  CloseButton(
-                                    onPressed: () {
-                                      context.pop();
-                                    },
-                                  )
-                                ],
-                              ),
-                              AppPadding.vertical(denominator: 2),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: screenWidth1728(26),
-                                    child: Column(
-                                      children: [
-                                        InputField(
-                                          field: InputFieldAttribute(
-                                            controller: _promotionName,
-                                            labelText: 'Name',
-                                          ),
-                                        ),
-                                        AppPadding.vertical(denominator: 2),
-                                        TextField(
-                                          maxLines: null,
-                                          style: Theme.of(context).textTheme.bodyMedium!.apply(),
-                                          controller: _promotionDescription,
-                                          decoration: appInputDecoration(context, 'Description'),
-                                        ),
-                                        AppPadding.vertical(denominator: 2),
-                                        TextField(
-                                          maxLines: null,
-                                          style: Theme.of(context).textTheme.bodyMedium!.apply(),
-                                          controller: _promotionTnc,
-                                          decoration: appInputDecoration(context, "Terms and Conditions"),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  AppPadding.horizontal(),
-                                  SizedBox(
-                                    width: screenWidth1728(30),
-                                    child: StreamBuilder<DateTime>(
-                                      stream: fileRebuild.stream,
-                                      builder: (context, snapshot) {
-                                        return Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            if (selectedFiles.length < 3) ...[
-                                              UploadDocumentsField(
-                                                title: 'promotionPage'.tr(gender: 'browseFile'),
-                                                fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
-                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                action: () async {
-                                                  documentErrorMessage.add(null);
-                                                  FilePickerResult? result = await FilePicker.platform.pickFiles();
+                                ),
+                                AppPadding.horizontal(),
+                                SizedBox(
+                                  width: screenWidth1728(30),
+                                  child: StreamBuilder<DateTime>(
+                                    stream: fileRebuild.stream,
+                                    builder: (context, snapshot) {
+                                      return Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          if (selectedFiles.length < 3) ...[
+                                            UploadDocumentsField(
+                                              title: 'promotionPage'.tr(gender: 'browseFile'),
+                                              fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
+                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                              action: () async {
+                                                documentErrorMessage.add(null);
+                                                FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-                                                  if (result != null) {
-                                                    PlatformFile file = result.files.first;
-                                                    if (supportedExtensions.contains(file.extension)) {
-                                                      debugPrint(bytesToMB(file.size).toString());
-                                                      debugPrint(file.name);
-                                                      if (bytesToMB(file.size) < 5.0) {
-                                                        Uint8List? fileBytes = result.files.first.bytes;
-                                                        String fileName = result.files.first.name;
+                                                if (result != null) {
+                                                  PlatformFile file = result.files.first;
+                                                  if (supportedExtensions.contains(file.extension)) {
+                                                    debugPrint(bytesToMB(file.size).toString());
+                                                    debugPrint(file.name);
+                                                    if (bytesToMB(file.size) < 1.0) {
+                                                      Uint8List? fileBytes = result.files.first.bytes;
+                                                      String fileName = result.files.first.name;
 
-                                                        selectedFiles
-                                                            .add(FileAttribute(name: fileName, value: fileBytes));
-                                                        fileRebuild.add(DateTime.now());
-                                                      } else {
-                                                        documentErrorMessage.add('error'.tr(
-                                                            gender: 'err-21',
-                                                            args: [fileSizeLimit.toStringAsFixed(0)]));
-                                                      }
+                                                      selectedFiles.add(
+                                                        FileAttribute(name: fileName, value: fileBytes),
+                                                      );
+                                                      fileRebuild.add(DateTime.now());
                                                     } else {
-                                                      documentErrorMessage.add('error'.tr(gender: 'err-22'));
+                                                      showDialogError(
+                                                        context,
+                                                        'error'.tr(
+                                                          gender: 'err-21',
+                                                          args: [fileSizeLimit.toStringAsFixed(0)],
+                                                        ),
+                                                      );
                                                     }
                                                   } else {
-                                                    // User canceled the picker
+                                                    showDialogError(
+                                                      context,
+                                                      'error'.tr(
+                                                        gender: 'err-22',
+                                                        args: [fileSizeLimit.toStringAsFixed(0)],
+                                                      ),
+                                                    );
                                                   }
-                                                },
-                                                cancelAction: () {},
-                                              ),
-                                            ],
-                                            for (int index = 0; index < selectedFiles.length; index++)
-                                              ListTile(
-                                                title: Text(
-                                                  '${index + 1}.  ${selectedFiles[index].name ?? ''}',
-                                                  style: AppTypography.bodyMedium(context),
-                                                ),
-                                                enableFeedback: true,
-                                                enabled: true,
-                                                trailing: IconButton(
-                                                  icon: const Icon(
-                                                    Icons.close,
-                                                  ),
-                                                  tooltip: 'button'.tr(gender: 'remove'),
-                                                  onPressed: () {
-                                                    selectedFiles.removeAt(index);
-                                                    fileRebuild.add(DateTime.now());
-                                                  },
-                                                ),
-                                              ),
-                                            AppPadding.vertical(),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                var results = await showCalendarDatePicker2Dialog(
-                                                  context: context,
-                                                  config: CalendarDatePicker2WithActionButtonsConfig(),
-                                                  dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                                  borderRadius: BorderRadius.circular(15),
-                                                );
-                                                _startDate.text =
-                                                    dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                              },
-                                              child: ReadOnly(
-                                                InputField(
-                                                  field: InputFieldAttribute(
-                                                    controller: _startDate,
-                                                    isEditable: false,
-                                                    labelText: 'promotionPage'.tr(gender: 'startDate'),
-                                                  ),
-                                                ),
-                                                isEditable: false,
-                                              ),
-                                            ),
-                                            AppPadding.vertical(denominator: 2),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                var results = await showCalendarDatePicker2Dialog(
-                                                  context: context,
-                                                  config: CalendarDatePicker2WithActionButtonsConfig(
-                                                    firstDate: DateTime.now(),
-                                                  ),
-                                                  dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                                  borderRadius: BorderRadius.circular(15),
-                                                );
-                                                _endDate.text =
-                                                    dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                              },
-                                              child: ReadOnly(
-                                                InputField(
-                                                  field: InputFieldAttribute(
-                                                    controller: _endDate,
-                                                    isEditable: false,
-                                                    labelText: 'promotionPage'.tr(gender: 'endDate'),
-                                                  ),
-                                                ),
-                                                isEditable: false,
-                                              ),
-                                            ),
-                                            AppPadding.vertical(denominator: 2),
-                                            ValueListenableBuilder<bool>(
-                                                valueListenable: _showOnStart,
-                                                builder: (context, snapshot, _) {
-                                                  return Row(
-                                                    children: [
-                                                      CheckBoxWidget(
-                                                        (p0) {
-                                                          _showOnStart.value = !snapshot;
-                                                        },
-                                                        value: snapshot,
-                                                      ),
-                                                      AppPadding.horizontal(denominator: 2),
-                                                      Flexible(
-                                                        child: GestureDetector(
-                                                          onTap: () {
-                                                            _showOnStart.value = !snapshot;
-                                                          },
-                                                          child: Text(
-                                                            'promotionPage'.tr(gender: 'showOnStart'),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                }),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              AppPadding.vertical(denominator: 1 / 1.5),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Button(
-                                    () {
-                                      if (validate()) {
-                                        showLoading();
-                                        PromotionController.create(
-                                          context,
-                                          CreatePromotionRequest(
-                                            promotionName: _promotionName.text,
-                                            promotionDescription: _promotionDescription.text,
-                                            promotionTnc: _promotionTnc.text,
-                                            promotionStartDate: convertStringToDate(_startDate.text),
-                                            promotionEndDate: convertStringToDate(_endDate.text),
-                                            showOnStart: _showOnStart.value,
-                                          ),
-                                        ).then((value) {
-                                          dismissLoading();
-                                          if (responseCode(value.code)) {
-                                            if (value.data?.id != null) {
-                                              showLoading();
-                                              PromotionController.upload(context, value.data!.id!, selectedFiles)
-                                                  .then((value) {
-                                                dismissLoading();
-                                                if (responseCode(value.code)) {
-                                                  filtering();
-                                                  context.pop();
-                                                  showDialogSuccess(context,
-                                                      'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
                                                 } else {
-                                                  showDialogError(
-                                                      context, value.data?.message ?? 'ERROR : ${value.code}');
+                                                  // User canceled the picker
                                                 }
-                                              });
-                                            }
-                                          } else {
-                                            showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                          }
-                                        });
-                                      }
+                                              },
+                                              cancelAction: () {},
+                                            ),
+                                          ],
+                                          for (int index = 0; index < selectedFiles.length; index++)
+                                            ListTile(
+                                              title: Text(
+                                                '${index + 1}.  ${selectedFiles[index].name ?? ''}',
+                                                style: AppTypography.bodyMedium(context),
+                                              ),
+                                              enableFeedback: true,
+                                              enabled: true,
+                                              trailing: IconButton(
+                                                icon: const Icon(Icons.close),
+                                                tooltip: 'button'.tr(gender: 'remove'),
+                                                onPressed: () {
+                                                  selectedFiles.removeAt(index);
+                                                  fileRebuild.add(DateTime.now());
+                                                },
+                                              ),
+                                            ),
+                                          AppPadding.vertical(),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              var results = await showCalendarDatePicker2Dialog(
+                                                context: context,
+                                                config: CalendarDatePicker2WithActionButtonsConfig(),
+                                                dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                                borderRadius: BorderRadius.circular(15),
+                                              );
+                                              _startDate.text =
+                                                  dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                            },
+                                            child: ReadOnly(
+                                              InputField(
+                                                field: InputFieldAttribute(
+                                                  controller: _startDate,
+                                                  isEditable: false,
+                                                  labelText: 'promotionPage'.tr(gender: 'startDate'),
+                                                ),
+                                              ),
+                                              isEditable: false,
+                                            ),
+                                          ),
+                                          AppPadding.vertical(denominator: 2),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              var results = await showCalendarDatePicker2Dialog(
+                                                context: context,
+                                                config: CalendarDatePicker2WithActionButtonsConfig(
+                                                  firstDate: DateTime.now(),
+                                                ),
+                                                dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                                borderRadius: BorderRadius.circular(15),
+                                              );
+                                              _endDate.text =
+                                                  dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                            },
+                                            child: ReadOnly(
+                                              InputField(
+                                                field: InputFieldAttribute(
+                                                  controller: _endDate,
+                                                  isEditable: false,
+                                                  labelText: 'promotionPage'.tr(gender: 'endDate'),
+                                                ),
+                                              ),
+                                              isEditable: false,
+                                            ),
+                                          ),
+                                          AppPadding.vertical(denominator: 2),
+                                          ValueListenableBuilder<bool>(
+                                            valueListenable: _showOnStart,
+                                            builder: (context, snapshot, _) {
+                                              return Row(
+                                                children: [
+                                                  CheckBoxWidget((p0) {
+                                                    _showOnStart.value = !snapshot;
+                                                  }, value: snapshot),
+                                                  AppPadding.horizontal(denominator: 2),
+                                                  Flexible(
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        _showOnStart.value = !snapshot;
+                                                      },
+                                                      child: Text('promotionPage'.tr(gender: 'showOnStart')),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      );
                                     },
-                                    actionText: 'button'.tr(gender: 'create'),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                            AppPadding.vertical(denominator: 1 / 1.5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Button(() {
+                                  if (validate()) {
+                                    showLoading();
+                                    PromotionController.create(
+                                      context,
+                                      CreatePromotionRequest(
+                                        promotionName: _promotionName.text,
+                                        promotionDescription: _promotionDescription.text,
+                                        promotionTnc: _promotionTnc.text,
+                                        promotionStartDate: convertStringToDate(_startDate.text),
+                                        promotionEndDate: convertStringToDate(_endDate.text),
+                                        showOnStart: _showOnStart.value,
+                                      ),
+                                    ).then((value) {
+                                      dismissLoading();
+                                      if (responseCode(value.code)) {
+                                        if (value.data?.id != null) {
+                                          showLoading();
+                                          PromotionController.upload(context, value.data!.id!, selectedFiles).then((
+                                            value,
+                                          ) {
+                                            dismissLoading();
+                                            if (responseCode(value.code)) {
+                                              filtering();
+                                              context.pop();
+                                              showDialogSuccess(
+                                                context,
+                                                'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
+                                              );
+                                            } else {
+                                              showDialogError(
+                                                context,
+                                                value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                              );
+                                            }
+                                          });
+                                        }
+                                      } else {
+                                        showDialogError(
+                                          context,
+                                          value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                        );
+                                      }
+                                    });
+                                  }
+                                }, actionText: 'button'.tr(gender: 'create')),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      },
+    );
   }
 
   bool validate() {
@@ -587,10 +569,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
               onPressed: () {
                 filtering(page: 1);
               },
-              child: const Icon(
-                Icons.search,
-                color: Colors.blue,
-              ),
+              child: const Icon(Icons.search, color: Colors.blue),
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
@@ -611,11 +590,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  ),
-                ),
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
               ),
             ],
           );
@@ -623,13 +598,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
           return snapshot.promotionAllResponse == null || snapshot.promotionAllResponse!.data!.data!.isEmpty
               ? const Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: NoRecordsWidget(),
-                      ),
-                    ),
-                  ],
+                  children: [Expanded(child: Center(child: NoRecordsWidget()))],
                 )
               : GridView.count(
                   padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding / 2),
@@ -641,87 +610,96 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                   primary: false,
                   children: [
                     for (int index = 0; index < (snapshot.promotionAllResponse?.data?.data?.length ?? 0); index++)
-                      Consumer<DarkModeController>(builder: (context, darkMode, _) {
-                        return GestureDetector(
-                          onTap: () {
-                            showDialog(
+                      Consumer<DarkModeController>(
+                        builder: (context, darkMode, _) {
+                          return GestureDetector(
+                            onTap: () {
+                              showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
-                                  return PromotionDetail(
-                                    promotion: snapshot.promotionAllResponse!.data!.data![index],
-                                  );
-                                });
-                          },
-                          child: CardContainer(
-                            elevation: 2.0,
-                            // color: snapshot.cardColorGlobal,
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding / 2),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  AppPadding.vertical(denominator: 2),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
-                                                checkEndDate(
-                                                    snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate)
-                                            ? statusTranslate(
-                                                snapshot.promotionAllResponse?.data?.data?[index].promotionStatus)
-                                            : 'INACTIVE',
-                                        style: AppTypography.bodyMedium(context).apply(
-                                          fontWeightDelta: 1,
-                                          color: statusColor(
-                                            snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
-                                                    checkEndDate(snapshot
-                                                        .promotionAllResponse?.data?.data?[index].promotionEndDate)
-                                                ? 'active'
-                                                : 'inactive',
+                                  return PromotionDetail(promotion: snapshot.promotionAllResponse!.data!.data![index]);
+                                },
+                              );
+                            },
+                            child: CardContainer(
+                              elevation: 2.0,
+                              // color: snapshot.cardColorGlobal,
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: screenPadding / 2),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    AppPadding.vertical(denominator: 2),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
+                                                  checkEndDate(
+                                                    snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate,
+                                                  )
+                                              ? statusTranslate(
+                                                  snapshot.promotionAllResponse?.data?.data?[index].promotionStatus,
+                                                )
+                                              : 'INACTIVE',
+                                          style: AppTypography.bodyMedium(context).apply(
+                                            fontWeightDelta: 1,
+                                            color: statusColor(
+                                              snapshot.promotionAllResponse?.data?.data?[index].promotionStatus == 1 &&
+                                                      checkEndDate(
+                                                        snapshot
+                                                            .promotionAllResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .promotionEndDate,
+                                                      )
+                                                  ? 'active'
+                                                  : 'inactive',
+                                            ),
                                           ),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  if (snapshot.promotionAllResponse?.data?.data?[index].promotionImage != null)
-                                    if (snapshot.promotionAllResponse!.data!.data![index].promotionImage!.isNotEmpty)
-                                      Image.network(
-                                        '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage?.first.path}',
-                                      ),
-                                  AppPadding.vertical(denominator: 2),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          snapshot.promotionAllResponse?.data?.data?[index].promotionName ?? '',
-                                          maxLines: 2,
-                                          style: Theme.of(context).textTheme.bodyMedium!.apply(fontWeightDelta: 1),
+                                      ],
+                                    ),
+                                    AppPadding.vertical(denominator: 2),
+                                    if (snapshot.promotionAllResponse?.data?.data?[index].promotionImage != null)
+                                      if (snapshot.promotionAllResponse!.data!.data![index].promotionImage!.isNotEmpty)
+                                        Image.network(
+                                          '${Environment.imageUrl}${snapshot.promotionAllResponse?.data?.data?[index].promotionImage?.first.path}',
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
+                                    AppPadding.vertical(denominator: 2),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            snapshot.promotionAllResponse?.data?.data?[index].promotionName ?? '',
+                                            maxLines: 2,
+                                            style: Theme.of(context).textTheme.bodyMedium!.apply(fontWeightDelta: 1),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
                                             'End Date: ${dateConverter(snapshot.promotionAllResponse?.data?.data?[index].promotionEndDate, format: 'dd-MM-yyyy')}',
                                             maxLines: 2,
-                                            style: Theme.of(context).textTheme.bodyMedium),
-                                      ),
-                                    ],
-                                  ),
-                                  AppPadding.horizontal(),
-                                ],
+                                            style: Theme.of(context).textTheme.bodyMedium,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    AppPadding.horizontal(),
+                                  ],
+                                ),
                               ),
+                              margin: EdgeInsets.zero,
                             ),
-                            margin: EdgeInsets.zero,
-                          ),
-                        );
-                      }),
+                          );
+                        },
+                      ),
                   ],
                 );
         }
@@ -749,10 +727,10 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
       promotionName: _promotionNameController.text,
       promotionStatus: _promotionStatus != null
           ? _promotionStatus?.key == '1'
-              ? 1
-              : _promotionStatus?.key == '0'
-                  ? 0
-                  : null
+                ? 1
+                : _promotionStatus?.key == '0'
+                ? 0
+                : null
           : null,
     ).then((value) {
       dismissLoading();

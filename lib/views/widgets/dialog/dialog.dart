@@ -7,6 +7,7 @@ import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_type.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -14,10 +15,7 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 class AppDialog extends StatelessWidget {
   final DialogAttribute attribute;
 
-  const AppDialog(
-    this.attribute, {
-    super.key,
-  });
+  const AppDialog(this.attribute, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +28,18 @@ class AppDialog extends StatelessWidget {
             elevation: 10,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15.0), boxShadow: [
-                BoxShadow(
-                  offset: const Offset(12, 26),
-                  blurRadius: 30,
-                  spreadRadius: 0,
-                  color: Colors.grey.withOpacity(.1),
-                ),
-              ]),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.0),
+                boxShadow: [
+                  BoxShadow(
+                    offset: const Offset(12, 26),
+                    blurRadius: 30,
+                    spreadRadius: 0,
+                    color: Colors.grey.withAlpha(opacityCalculation(.1)),
+                  ),
+                ],
+              ),
               width: attribute.width,
               height: attribute.height,
               padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
@@ -47,7 +49,8 @@ class AppDialog extends StatelessWidget {
                 children: [
                   Flexible(
                     child: ElasticIn(
-                      child: attribute.logo ??
+                      child:
+                          attribute.logo ??
                           Container(
                             constraints: BoxConstraints(maxHeight: screenHeight(20)),
                             padding: EdgeInsets.symmetric(vertical: screenPadding / 2),
@@ -90,9 +93,7 @@ class AppDialog extends StatelessWidget {
                       ],
                     ),
                   ],
-                  if (attribute.textWidget != null) ...[
-                    attribute.textWidget!,
-                  ],
+                  if (attribute.textWidget != null) ...[attribute.textWidget!],
                   AppPadding.vertical(denominator: 1 / 1.5),
                   if (attribute.buttonAttributes != null)
                     IntrinsicHeight(
@@ -103,9 +104,7 @@ class AppDialog extends StatelessWidget {
                         children: [
                           for (int index = 0; index < attribute.buttonAttributes!.length; index++) ...[
                             isMobile || attribute.buttonAttributes!.length > 1
-                                ? Flexible(
-                                    child: button(attribute.buttonAttributes![index]),
-                                  )
+                                ? Flexible(child: button(attribute.buttonAttributes![index]))
                                 : button(attribute.buttonAttributes![index]),
                             if (index % 2 == 0 && attribute.buttonAttributes!.length > 1) AppPadding.horizontal(),
                           ],
@@ -140,9 +139,10 @@ class AppDialog extends StatelessWidget {
       textColor: item.textColor,
       borderRadius: 8,
       containerVerticalPadding: 5,
-      padding: breakpoint() == Breakpoint.mobile
-          ? EdgeInsets.symmetric(horizontal: screenPadding / 1.2, vertical: 15)
-          : EdgeInsets.symmetric(horizontal: screenPadding, vertical: 25),
+      padding:
+          breakpoint() == Breakpoint.mobile
+              ? EdgeInsets.symmetric(horizontal: screenPadding / 1.2, vertical: 15)
+              : EdgeInsets.symmetric(horizontal: screenPadding, vertical: 25),
       isFlexible: item.text?.contains(' ') ?? false,
     );
   }
@@ -155,8 +155,6 @@ class AppDialog extends StatelessWidget {
         return 'assets/icons/failed/warning.svg';
       case DialogType.info:
         return 'assets/icons/failed/warning.svg';
-      default:
-        return 'assets/icons/failed/warning.svg';
     }
   }
 
@@ -168,8 +166,6 @@ class AppDialog extends StatelessWidget {
         return const Color(0XFFDF184A);
       case DialogType.info:
         return secondaryColor;
-      default:
-        return const Color(0XFFDF184A);
     }
   }
 }

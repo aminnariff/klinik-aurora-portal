@@ -22,6 +22,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -54,18 +55,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(
-      attribute: 'rewardCode',
-      label: 'Code',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'rewardName',
-      label: 'Name',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+    TableHeaderAttribute(attribute: 'rewardCode', label: 'Code', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'rewardName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'rewardPoint',
       label: 'Points',
@@ -87,8 +78,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'action',
-      label: 'Action',
+      attribute: 'actions',
+      label: 'Actions',
       allowSorting: false,
       columnSize: ColumnSize.S,
       width: 100,
@@ -110,10 +101,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: mobileView(),
-      desktop: desktopView(),
-    );
+    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -138,8 +126,10 @@ class _RewardHomepageState extends State<RewardHomepage> {
                             children: [
                               CardContainer(
                                 Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: screenPadding * 1.5, horizontal: screenPadding),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenPadding * 1.5,
+                                    horizontal: screenPadding,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -162,11 +152,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                           children: [
                             Text('N/A'),
                             Text('N/A'),
-                            Row(
-                              children: [
-                                Text('N/A'),
-                              ],
-                            ),
+                            Row(children: [Text('N/A')]),
                             Text('aaaaa'),
                           ],
                         ),
@@ -181,7 +167,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         Padding(
           padding: EdgeInsets.symmetric(vertical: screenPadding),
           child: pagination(),
-        )
+        ),
       ],
     );
     // },
@@ -193,25 +179,18 @@ class _RewardHomepageState extends State<RewardHomepage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$title:',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
         AppPadding.horizontal(denominator: 2),
-        Expanded(
-          child: AppSelectableText(
-            value,
-          ),
-        ),
+        Expanded(child: AppSelectableText(value)),
       ],
     );
   }
 
   Widget desktopView() {
     return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    // (widget.orderReference == null)
+    //     ?
+    Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,17 +216,14 @@ class _RewardHomepageState extends State<RewardHomepage> {
               children: [
                 Expanded(
                   child: CardContainer(
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: orderTable(),
-                    ),
+                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -270,10 +246,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
               onPressed: () {
                 filtering(page: 1);
               },
-              child: const Icon(
-                Icons.search,
-                color: Colors.blue,
-              ),
+              child: const Icon(Icons.search, color: Colors.blue),
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
@@ -294,11 +267,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  ),
-                ),
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
               ),
             ],
           );
@@ -308,11 +277,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     tableButton(),
-                    const Expanded(
-                      child: Center(
-                        child: NoRecordsWidget(),
-                      ),
-                    ),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
                   ],
                 )
               : Column(
@@ -326,10 +291,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                           alignment: Alignment.center,
                           children: [
                             Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
-                              ),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
                               padding: const EdgeInsets.all(5),
                               child: DataTable2(
                                 columnSpacing: 12,
@@ -342,19 +304,25 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                 headingRowHeight: 51,
                                 decoration: const BoxDecoration(),
                                 border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
                                 rows: [
-                                  for (int index = 0;
-                                      index < (snapshot.rewardAllResponse?.data?.data?.length ?? 0);
-                                      index++)
+                                  for (
+                                    int index = 0;
+                                    index < (snapshot.rewardAllResponse?.data?.data?.length ?? 0);
+                                    index++
+                                  )
                                     DataRow(
                                       color: WidgetStateProperty.all(
-                                          index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                      ),
                                       cells: [
                                         DataCell(
                                           TextButton(
@@ -375,35 +343,34 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                              snapshot.rewardAllResponse?.data?.data?[index].rewardName ?? 'N/A'),
+                                            snapshot.rewardAllResponse?.data?.data?[index].rewardName ?? 'N/A',
+                                          ),
                                         ),
                                         DataCell(
                                           InkWell(
                                             child: Text(
-                                                '${snapshot.rewardAllResponse?.data?.data?[index].rewardPoint ?? 'N/A'}'),
+                                              '${snapshot.rewardAllResponse?.data?.data?[index].rewardPoint ?? 'N/A'}',
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              showStatus(
+                                                snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1 &&
+                                                    checkEndDate(
+                                                      snapshot.rewardAllResponse?.data?.data?[index].rewardEndDate,
+                                                    ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1 &&
-                                                    checkEndDate(
-                                                        snapshot.rewardAllResponse?.data?.data?[index].rewardEndDate)
-                                                ? 'Active'
-                                                : 'Inactive',
-                                            style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(
-                                                    snapshot.rewardAllResponse?.data?.data?[index].rewardStatus == 1 &&
-                                                            checkEndDate(snapshot
-                                                                .rewardAllResponse?.data?.data?[index].rewardEndDate)
-                                                        ? 'active'
-                                                        : 'inactive'),
-                                                fontWeightDelta: 1),
+                                            dateConverter(snapshot.rewardAllResponse?.data?.data?[index].createdDate) ??
+                                                'N/A',
                                           ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(dateConverter(
-                                                  snapshot.rewardAllResponse?.data?.data?[index].createdDate) ??
-                                              'N/A'),
                                         ),
                                         DataCell(
                                           Row(
@@ -412,28 +379,27 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                               IconButton(
                                                 onPressed: () {
                                                   showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return RewardDetail(
-                                                          reward: snapshot.rewardAllResponse!.data!.data![index],
-                                                          type: 'update',
-                                                        );
-                                                      });
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return RewardDetail(
+                                                        reward: snapshot.rewardAllResponse!.data!.data![index],
+                                                        type: 'update',
+                                                      );
+                                                    },
+                                                  );
                                                 },
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.grey,
-                                                ),
+                                                icon: const Icon(Icons.edit, color: Colors.grey),
                                               ),
                                               IconButton(
                                                 onPressed: () async {
                                                   try {
                                                     Data? data = snapshot.rewardAllResponse?.data?.data?[index];
                                                     if (await showConfirmDialog(
-                                                        context,
-                                                        data?.rewardStatus == 1
-                                                            ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
-                                                            : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
+                                                      context,
+                                                      data?.rewardStatus == 1
+                                                          ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
+                                                          : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.',
+                                                    )) {
                                                       Future.delayed(Duration.zero, () {
                                                         RewardController.update(
                                                           context,
@@ -450,10 +416,15 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                                         ).then((value) {
                                                           if (responseCode(value.code)) {
                                                             filtering();
-                                                            showDialogSuccess(context,
-                                                                'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
+                                                            showDialogSuccess(
+                                                              context,
+                                                              'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.',
+                                                            );
                                                           } else {
-                                                            showDialogError(context, value.data?.message ?? '');
+                                                            showDialogError(
+                                                              context,
+                                                              value.message ?? value.data?.message ?? '',
+                                                            );
                                                           }
                                                         });
                                                       });
@@ -477,10 +448,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                 ],
                               ),
                             ),
-                            if (isNoRecords.value)
-                              const AppSelectableText(
-                                'No Records Found',
-                              ),
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
                           ],
                         ),
                       ),
@@ -488,9 +456,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: pagination(),
-                        ),
+                        Expanded(child: pagination()),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -500,11 +466,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                 children: [
                                   if (!isMobile && !isTablet)
                                     const Flexible(
-                                      child: Text(
-                                        'Items per page: ',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
                                     ),
                                   perPage(),
                                 ],
@@ -545,10 +507,10 @@ class _RewardHomepageState extends State<RewardHomepage> {
       rewardName: _rewardNameController.text,
       rewardStatus: _rewardStatus != null
           ? _rewardStatus?.key == '1'
-              ? 1
-              : _rewardStatus?.key == '0'
-                  ? 0
-                  : null
+                ? 1
+                : _rewardStatus?.key == '0'
+                ? 0
+                : null
           : null,
     ).then((value) {
       dismissLoading();
@@ -666,11 +628,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(
-                angle: -math.pi,
-                child: child,
-              )
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 
@@ -682,123 +641,106 @@ class _RewardHomepageState extends State<RewardHomepage> {
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const RewardDetail(
-                    reward: null,
-                    type: 'create',
-                  );
-                });
+              context: context,
+              builder: (BuildContext context) {
+                return const RewardDetail(reward: null, type: 'create');
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.add,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.add, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Add new reward',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Add new reward', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: Card(
-                          surfaceTintColor: Colors.white,
-                          elevation: 5.0,
-                          color: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                                child: Column(
-                                  children: [
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _rewardNameController,
-                                          hintText: 'Search',
-                                          labelText: 'Reward Name'),
-                                    ),
-                                    AppPadding.vertical(),
-                                    StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return Column(
-                                            children: [
-                                              AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    DropdownAttribute('1', 'Active'),
-                                                    DropdownAttribute('0', 'Inactive'),
-                                                  ],
-                                                  labelText: 'information'.tr(gender: 'status'),
-                                                  value: _rewardStatus?.name,
-                                                  onChanged: (p0) {
-                                                    _rewardStatus = p0;
-                                                    rebuildDropdown.add(DateTime.now());
-                                                    filtering(page: 1);
-                                                  },
-                                                  width: screenWidthByBreakpoint(90, 70, 26),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }),
-                                    AppPadding.vertical(denominator: 1 / 3),
-                                    AppOutlinedButton(
-                                      () {
-                                        resetAllFilter();
-                                        filtering(enableDebounce: true, page: 1);
-                                      },
-                                      backgroundColor: Colors.white,
-                                      borderRadius: 15,
-                                      width: 131,
-                                      height: 45,
-                                      text: 'Clear',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CloseButton(),
-                              ),
-                            ],
+              context: context,
+              builder: (BuildContext context) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      child: Card(
+                        surfaceTintColor: Colors.white,
+                        elevation: 5.0,
+                        color: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            bottomLeft: Radius.circular(15),
                           ),
                         ),
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                              child: Column(
+                                children: [
+                                  searchField(
+                                    InputFieldAttribute(
+                                      controller: _rewardNameController,
+                                      hintText: 'Search',
+                                      labelText: 'Reward Name',
+                                    ),
+                                  ),
+                                  AppPadding.vertical(),
+                                  StreamBuilder<DateTime>(
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return Column(
+                                        children: [
+                                          AppDropdown(
+                                            attributeList: DropdownAttributeList(
+                                              [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                                              labelText: 'information'.tr(gender: 'status'),
+                                              value: _rewardStatus?.name,
+                                              onChanged: (p0) {
+                                                _rewardStatus = p0;
+                                                rebuildDropdown.add(DateTime.now());
+                                                filtering(page: 1);
+                                              },
+                                              width: screenWidthByBreakpoint(90, 70, 26),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                  AppPadding.vertical(denominator: 1 / 3),
+                                  AppOutlinedButton(
+                                    () {
+                                      resetAllFilter();
+                                      filtering(enableDebounce: true, page: 1);
+                                    },
+                                    backgroundColor: Colors.white,
+                                    borderRadius: 15,
+                                    width: 131,
+                                    height: 45,
+                                    text: 'Clear',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
+                          ],
+                        ),
                       ),
-                    ],
-                  );
-                });
+                    ),
+                  ],
+                );
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.filter_list,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.filter_list, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Filter',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -809,15 +751,9 @@ class _RewardHomepageState extends State<RewardHomepage> {
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.refresh,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.refresh, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Reset',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -833,9 +769,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         onChanged: (selected) {
           DropdownAttribute item = selected as DropdownAttribute;
           _pageSize = int.parse(item.key);
-          filtering(
-            enableDebounce: false,
-          );
+          filtering(enableDebounce: false);
         },
       ),
     );

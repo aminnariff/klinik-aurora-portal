@@ -12,8 +12,11 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
+import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart' as appointment_model;
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch;
 import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
+import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
+import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_detail.dart';
 import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
@@ -25,6 +28,7 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.d
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -35,7 +39,7 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
 import 'package:provider/provider.dart';
 
 class UserHomepage extends StatefulWidget {
@@ -56,24 +60,20 @@ class _UserHomepageState extends State<UserHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
+    TableHeaderAttribute(attribute: 'userFullname', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
+
     TableHeaderAttribute(
-      attribute: 'userFullname',
-      label: 'Name',
+      attribute: 'totalPoints',
+      label: 'Points',
       allowSorting: false,
       columnSize: ColumnSize.S,
+      width: 90,
     ),
     TableHeaderAttribute(
-      attribute: 'userEmail',
-      label: 'Email',
+      attribute: 'branchId',
+      label: 'Registered Branch',
       allowSorting: false,
       columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'userPhone',
-      label: 'Contact No.',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 130,
     ),
     TableHeaderAttribute(
       attribute: 'userStatus',
@@ -83,30 +83,17 @@ class _UserHomepageState extends State<UserHomepage> {
       width: 70,
     ),
     TableHeaderAttribute(
-      attribute: 'totalPoints',
-      label: 'Points',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 70,
-    ),
-    TableHeaderAttribute(
-      attribute: 'branchId',
-      label: 'Registered Branch',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
       attribute: 'createdDate',
       label: 'Created Date',
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'action',
-      label: 'Action',
+      attribute: 'actions',
+      label: 'Actions',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 131,
+      width: 80,
     ),
   ];
   final TextEditingController _userFullNameController = TextEditingController();
@@ -124,13 +111,11 @@ class _UserHomepageState extends State<UserHomepage> {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(UserHomepage.displayName);
     });
     if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context, 1, 100).then(
-        (value) {
-          if (responseCode(value.code)) {
-            context.read<BranchController>().branchAllResponse = value;
-          }
-        },
-      );
+      BranchController.getAll(context, 1, 100).then((value) {
+        if (responseCode(value.code)) {
+          context.read<BranchController>().branchAllResponse = value;
+        }
+      });
     }
     filtering();
     super.initState();
@@ -138,10 +123,7 @@ class _UserHomepageState extends State<UserHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: mobileView(),
-      desktop: desktopView(),
-    );
+    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -169,8 +151,10 @@ class _UserHomepageState extends State<UserHomepage> {
                             children: [
                               CardContainer(
                                 Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: screenPadding * 1.5, horizontal: screenPadding),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenPadding * 1.5,
+                                    horizontal: screenPadding,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -193,11 +177,7 @@ class _UserHomepageState extends State<UserHomepage> {
                           children: [
                             Text('N/A'),
                             Text('N/A'),
-                            Row(
-                              children: [
-                                Text('N/A'),
-                              ],
-                            ),
+                            Row(children: [Text('N/A')]),
                             Text('aaaaa'),
                           ],
                         ),
@@ -212,7 +192,7 @@ class _UserHomepageState extends State<UserHomepage> {
         Padding(
           padding: EdgeInsets.symmetric(vertical: screenPadding),
           child: pagination(),
-        )
+        ),
       ],
     );
     // },
@@ -224,16 +204,9 @@ class _UserHomepageState extends State<UserHomepage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$title:',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
         AppPadding.horizontal(denominator: 2),
-        Expanded(
-          child: AppSelectableText(
-            value,
-          ),
-        ),
+        Expanded(child: AppSelectableText(value)),
       ],
     );
   }
@@ -263,17 +236,14 @@ class _UserHomepageState extends State<UserHomepage> {
               children: [
                 Expanded(
                   child: CardContainer(
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: orderTable(),
-                    ),
+                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -292,10 +262,7 @@ class _UserHomepageState extends State<UserHomepage> {
               onPressed: () {
                 filtering(page: 1);
               },
-              child: const Icon(
-                Icons.search,
-                color: Colors.blue,
-              ),
+              child: const Icon(Icons.search, color: Colors.blue),
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
@@ -319,11 +286,7 @@ class _UserHomepageState extends State<UserHomepage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  ),
-                ),
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
               ),
             ],
           );
@@ -333,11 +296,7 @@ class _UserHomepageState extends State<UserHomepage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     tableButton(),
-                    const Expanded(
-                      child: Center(
-                        child: NoRecordsWidget(),
-                      ),
-                    ),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
                   ],
                 )
               : Column(
@@ -351,15 +310,11 @@ class _UserHomepageState extends State<UserHomepage> {
                           alignment: Alignment.center,
                           children: [
                             Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
-                              ),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
                               padding: const EdgeInsets.all(5),
                               child: DataTable2(
                                 columnSpacing: 12,
                                 horizontalMargin: 12,
-                                minWidth: 1300,
                                 isHorizontalScrollBarVisible: true,
                                 isVerticalScrollBarVisible: true,
                                 columns: columns(),
@@ -367,42 +322,31 @@ class _UserHomepageState extends State<UserHomepage> {
                                 headingRowHeight: 51,
                                 decoration: const BoxDecoration(),
                                 border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
                                 rows: [
                                   for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
                                     DataRow(
                                       color: WidgetStateProperty.all(
-                                          index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                      ),
                                       cells: [
                                         DataCell(
-                                          AppSelectableText(
-                                            snapshot.userAllResponse?[index].userFullname?.titleCase() ??
-                                                snapshot.userAllResponse?[index].userName ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(snapshot.userAllResponse?[index].userEmail ?? 'N/A'),
-                                        ),
-                                        DataCell(
-                                          InkWell(
-                                            onTap: () {},
-                                            child: Text(snapshot.userAllResponse?[index].userPhone ?? 'N/A'),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.userAllResponse?[index].userStatus == 1 ? 'Active' : 'Inactive',
-                                            style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(snapshot.userAllResponse?[index].userStatus == 1
-                                                    ? 'active'
-                                                    : 'inactive'),
-                                                fontWeightDelta: 1),
+                                          AppTooltip(
+                                            message:
+                                                'Email:\n${snapshot.userAllResponse?[index].userEmail}\n\nContact No:\n${snapshot.userAllResponse?[index].userPhone}',
+                                            child: Text(
+                                              snapshot.userAllResponse?[index].userFullname?.titleCase() ??
+                                                  snapshot.userAllResponse?[index].userName ??
+                                                  'N/A',
+                                            ),
                                           ),
                                         ),
                                         DataCell(
@@ -410,98 +354,73 @@ class _UserHomepageState extends State<UserHomepage> {
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
                                               AppSelectableText(
-                                                  '${snapshot.userAllResponse?[index].totalPoint ?? 'N/A'}'),
+                                                '${snapshot.userAllResponse?[index].totalPoint ?? 'N/A'}',
+                                              ),
                                             ],
                                           ),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                              translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
-                                                  'N/A'),
+                                            translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
+                                                'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [showStatus(snapshot.userAllResponse?[index].userStatus == 1)],
+                                          ),
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                              dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A'),
+                                            dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A',
+                                          ),
                                         ),
                                         DataCell(
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              IconButton(
-                                                onPressed: () async {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return UserDetail(
-                                                          user: snapshot.userAllResponse![index],
-                                                          type: 'update',
-                                                        );
-                                                      });
-                                                },
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return UserPointDetail(
-                                                          user: snapshot.userAllResponse![index],
-                                                        );
-                                                      });
-                                                },
-                                                icon: const Icon(
-                                                  Icons.manage_accounts,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  try {
-                                                    if (await showConfirmDialog(
-                                                        context,
-                                                        snapshot.userAllResponse?[index].userStatus == 1
-                                                            ? 'Are you certain you wish to deactivate this user account? Please note, this action can be reversed at a later time.'
-                                                            : 'Are you certain you wish to activate this user account? Please note, this action can be reversed at a later time.')) {
-                                                      Future.delayed(Duration.zero, () {
-                                                        UserController.update(
-                                                          context,
-                                                          UpdateUserRequest(
-                                                            userId: snapshot.userAllResponse?[index].userId,
-                                                            userName: snapshot.userAllResponse?[index].userName,
-                                                            userFullname: snapshot.userAllResponse?[index].userFullname,
-                                                            userDob: dateConverter(
-                                                                snapshot.userAllResponse?[index].userDob,
-                                                                format: 'yyyy-MM-dd'),
-                                                            userPhone: snapshot.userAllResponse?[index].userPhone,
-                                                            branchId: snapshot.userAllResponse?[index].branchId,
-                                                            userStatus: snapshot.userAllResponse?[index].userStatus == 1
-                                                                ? 0
-                                                                : 1,
-                                                          ),
-                                                        ).then((value) {
-                                                          if (responseCode(value.code)) {
-                                                            filtering();
-                                                            showDialogSuccess(context,
-                                                                'The user account has been successfully ${snapshot.userAllResponse?[index].userStatus == 1 ? 'deactivated' : 'activated'}.');
-                                                          } else {
-                                                            showDialogError(context, value.data?.message ?? '');
-                                                          }
-                                                        });
-                                                      });
-                                                    }
-                                                  } catch (e) {
-                                                    debugPrint(e.toString());
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  snapshot.userAllResponse?[index].userStatus == 1
-                                                      ? Icons.delete
-                                                      : Icons.play_arrow,
-                                                  color: Colors.grey,
+                                              PopupMenuButton<String>(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                offset: const Offset(8, 35),
+                                                color: Colors.white,
+                                                tooltip: '',
+                                                onSelected: (value) =>
+                                                    _handleMenuSelection(value, snapshot.userAllResponse![index]),
+                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                                  const PopupMenuItem<String>(
+                                                    value: 'update',
+                                                    child: Text('Update Info'),
+                                                  ),
+                                                  const PopupMenuItem<String>(
+                                                    value: 'appointment',
+                                                    child: Text('Appointment'),
+                                                  ),
+                                                  const PopupMenuItem<String>(
+                                                    value: 'managePoints',
+                                                    child: Text('Manage Points'),
+                                                  ),
+                                                  PopupMenuItem<String>(
+                                                    value: 'enableDisable',
+                                                    child: Text(
+                                                      snapshot.userAllResponse?[index].userStatus == 1
+                                                          ? 'Deactivate'
+                                                          : 'Re-Activate',
+                                                    ),
+                                                  ),
+                                                ],
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      // decoration: const BoxDecoration(
+                                                      //   color: Colors.white,
+                                                      //   shape: BoxShape.circle,
+                                                      // ),
+                                                      child: Icon(Icons.more_vert, color: Colors.grey),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
@@ -512,10 +431,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                 ],
                               ),
                             ),
-                            if (isNoRecords.value)
-                              const AppSelectableText(
-                                'No Records Found',
-                              ),
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
                           ],
                         ),
                       ),
@@ -523,9 +439,7 @@ class _UserHomepageState extends State<UserHomepage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: pagination(),
-                        ),
+                        Expanded(child: pagination()),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -535,11 +449,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                 children: [
                                   if (!isMobile && !isTablet)
                                     const Flexible(
-                                      child: Text(
-                                        'Items per page: ',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
                                     ),
                                   perPage(),
                                 ],
@@ -558,6 +468,78 @@ class _UserHomepageState extends State<UserHomepage> {
         }
       },
     );
+  }
+
+  void _handleMenuSelection(String value, UserResponse user) async {
+    if (value == 'appointment') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AppointmentDetails(
+            type: 'create',
+            appointment: appointment_model.Data(
+              user: appointment_model.User(
+                userId: user.userId,
+                userName: user.userName,
+                userEmail: user.userEmail,
+                userFullName: user.userFullname,
+                userPhone: user.userPhone,
+              ),
+            ),
+          );
+        },
+      );
+    } else if (value == 'managePoints') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return UserPointDetail(user: user);
+        },
+      );
+    } else if (value == 'update') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return UserDetail(user: user, type: 'update');
+        },
+      );
+    } else if (value == 'enableDisable') {
+      try {
+        if (await showConfirmDialog(
+          context,
+          user.userStatus == 1
+              ? 'Are you certain you wish to deactivate this user account? Please note, this action can be reversed at a later time.'
+              : 'Are you certain you wish to activate this user account? Please note, this action can be reversed at a later time.',
+        )) {
+          Future.delayed(Duration.zero, () {
+            UserController.update(
+              context,
+              UpdateUserRequest(
+                userId: user.userId,
+                userName: user.userName,
+                userFullname: user.userFullname,
+                userDob: dateConverter(user.userDob, format: 'yyyy-MM-dd'),
+                userPhone: user.userPhone,
+                branchId: user.branchId,
+                userStatus: user.userStatus == 1 ? 0 : 1,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
+                filtering();
+                showDialogSuccess(
+                  context,
+                  'The user account has been successfully ${user.userStatus == 1 ? 'deactivated' : 'activated'}.',
+                );
+              } else {
+                showDialogError(context, value.message ?? value.data?.message ?? '');
+              }
+            });
+          });
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    }
   }
 
   String? translateToBranchName(String branchId) {
@@ -602,10 +584,10 @@ class _UserHomepageState extends State<UserHomepage> {
       branchId: _selectedBranch?.key,
       userStatus: _selectedUserStatus != null
           ? _selectedUserStatus?.key == '1'
-              ? 1
-              : _selectedUserStatus?.key == '0'
-                  ? 0
-                  : null
+                ? 1
+                : _selectedUserStatus?.key == '0'
+                ? 0
+                : null
           : null,
     ).then((value) {
       dismissLoading();
@@ -726,11 +708,8 @@ class _UserHomepageState extends State<UserHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(
-                angle: -math.pi,
-                child: child,
-              )
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 
@@ -742,174 +721,146 @@ class _UserHomepageState extends State<UserHomepage> {
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const UserDetail(
-                    type: 'create',
-                  );
-                });
+              context: context,
+              builder: (BuildContext context) {
+                return const UserDetail(type: 'create');
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.add,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.add, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Add new user',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Add new user', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: Card(
-                          surfaceTintColor: Colors.white,
-                          elevation: 5.0,
-                          color: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
+              context: context,
+              builder: (BuildContext context) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Card(
+                      surfaceTintColor: Colors.white,
+                      elevation: 5.0,
+                      color: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                      ),
+                      child: Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                            child: Column(
+                              children: [
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userFullNameController,
+                                    hintText: 'Search',
+                                    labelText: 'Full Name',
+                                  ),
+                                ),
+                                AppPadding.vertical(denominator: 2),
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userNameController,
+                                    hintText: 'Search',
+                                    labelText: 'Username',
+                                  ),
+                                ),
+                                AppPadding.vertical(denominator: 2),
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userPhoneController,
+                                    hintText: 'Search',
+                                    labelText: 'Contact Number',
+                                  ),
+                                ),
+                                AppPadding.vertical(denominator: 2),
+                                searchField(
+                                  InputFieldAttribute(
+                                    controller: _userEmailController,
+                                    hintText: 'Search',
+                                    labelText: 'Email',
+                                  ),
+                                ),
+                                AppPadding.vertical(),
+                                StreamBuilder<DateTime>(
+                                  stream: rebuildDropdown.stream,
+                                  builder: (context, snapshot) {
+                                    return Column(
+                                      children: [
+                                        AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            [
+                                              if (context.read<BranchController>().branchAllResponse?.data?.data !=
+                                                  null)
+                                                for (branch.Data item
+                                                    in context.read<BranchController>().branchAllResponse?.data?.data ??
+                                                        [])
+                                                  DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
+                                            ],
+                                            labelText: 'information'.tr(gender: 'registeredBranch'),
+                                            value: _selectedBranch?.name,
+                                            onChanged: (p0) {
+                                              _selectedBranch = p0;
+                                              rebuildDropdown.add(DateTime.now());
+                                              filtering(page: 1);
+                                            },
+                                            width: screenWidthByBreakpoint(90, 70, 26),
+                                          ),
+                                        ),
+                                        AppPadding.vertical(),
+                                        AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                                            labelText: 'information'.tr(gender: 'userStatus'),
+                                            value: _selectedUserStatus?.name,
+                                            onChanged: (p0) {
+                                              _selectedUserStatus = p0;
+                                              rebuildDropdown.add(DateTime.now());
+                                              filtering(page: 1);
+                                            },
+                                            width: screenWidthByBreakpoint(90, 70, 26),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                AppPadding.vertical(denominator: 1 / 3),
+                                AppOutlinedButton(
+                                  () {
+                                    resetAllFilter();
+                                    filtering(enableDebounce: true, page: 1);
+                                  },
+                                  backgroundColor: Colors.white,
+                                  borderRadius: 15,
+                                  width: 131,
+                                  height: 45,
+                                  text: 'Clear',
+                                ),
+                              ],
                             ),
                           ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                                child: Column(
-                                  children: [
-                                    searchField(
-                                      InputFieldAttribute(
-                                          controller: _userFullNameController,
-                                          hintText: 'Search',
-                                          labelText: 'Full Name'),
-                                    ),
-                                    AppPadding.vertical(),
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userNameController,
-                                        hintText: 'Search',
-                                        labelText: 'Username',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userPhoneController,
-                                        hintText: 'Search',
-                                        labelText: 'Contact Number',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userEmailController,
-                                        hintText: 'Search',
-                                        labelText: 'Email',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return Column(
-                                            children: [
-                                              AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    if (context
-                                                            .read<BranchController>()
-                                                            .branchAllResponse
-                                                            ?.data
-                                                            ?.data !=
-                                                        null)
-                                                      for (branch.Data item in context
-                                                              .read<BranchController>()
-                                                              .branchAllResponse
-                                                              ?.data
-                                                              ?.data ??
-                                                          [])
-                                                        DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                                  ],
-                                                  labelText: 'information'.tr(gender: 'registeredBranch'),
-                                                  value: _selectedBranch?.name,
-                                                  onChanged: (p0) {
-                                                    _selectedBranch = p0;
-                                                    rebuildDropdown.add(DateTime.now());
-                                                    filtering(page: 1);
-                                                  },
-                                                  width: screenWidthByBreakpoint(90, 70, 26),
-                                                ),
-                                              ),
-                                              AppPadding.vertical(),
-                                              AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    DropdownAttribute('1', 'Active'),
-                                                    DropdownAttribute('0', 'Inactive'),
-                                                  ],
-                                                  labelText: 'information'.tr(gender: 'userStatus'),
-                                                  value: _selectedUserStatus?.name,
-                                                  onChanged: (p0) {
-                                                    _selectedUserStatus = p0;
-                                                    rebuildDropdown.add(DateTime.now());
-                                                    filtering(page: 1);
-                                                  },
-                                                  width: screenWidthByBreakpoint(90, 70, 26),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }),
-                                    AppPadding.vertical(denominator: 1 / 3),
-                                    AppOutlinedButton(
-                                      () {
-                                        resetAllFilter();
-                                        filtering(enableDebounce: true, page: 1);
-                                      },
-                                      backgroundColor: Colors.white,
-                                      borderRadius: 15,
-                                      width: 131,
-                                      height: 45,
-                                      text: 'Clear',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CloseButton(),
-                              ),
-                            ],
-                          ),
-                        ),
+                          const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
+                        ],
                       ),
-                    ],
-                  );
-                });
+                    ),
+                  ],
+                );
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.filter_list,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.filter_list, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Filter',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -920,15 +871,9 @@ class _UserHomepageState extends State<UserHomepage> {
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.refresh,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.refresh, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Reset',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -944,9 +889,7 @@ class _UserHomepageState extends State<UserHomepage> {
         onChanged: (selected) {
           DropdownAttribute item = selected as DropdownAttribute;
           _pageSize = int.parse(item.key);
-          filtering(
-            enableDebounce: false,
-          );
+          filtering(enableDebounce: false);
         },
       ),
     );

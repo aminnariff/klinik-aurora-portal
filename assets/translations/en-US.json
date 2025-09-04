@@ -49,7 +49,7 @@
         "phoneNo": "Contact No.",
         "password": "Password",
         "branchImage": "Branch Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "email": "Email",
         "userStatus": "Status"
     },
@@ -64,9 +64,9 @@
     },
     "doctorPage": {
         "doctorName": "PIC Name",
-        "doctorPhone": "PIC Contact No.",
+        "phoneNo": "PIC Contact No.",
         "doctorImage": "PIC Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "voucherStatus": "Status"
     },
     "passwordRecoveryPage": {
@@ -92,12 +92,25 @@
         "email": "Email",
         "description": "Please enter your email address below to request the deletion of your account. A confirmation email will be sent to the provided address."
     },
+    "appointmentPage": {
+        "patientName": "Patient Name",
+        "patientEmail": "Patient Email",
+        "patientContactNo": "Patient Contact No",
+        "paymentProof": "Proof of Payment (Booking Fee)",
+        "refundProof": "Proof of Refund (Booking Fee)",
+        "appointmentNote": "Note",
+        "branch": "Branch",
+        "dueDate": "Estimated Due Date (EDD)",
+        "service": "Service",
+        "appointmentDateTime": "Slots",
+        "status": "Status"
+    },
     "promotionPage": {
         "startDate": "Start Date",
         "endDate": "End Date",
         "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "promotionImage": "Promotion Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "forgotPassword": "Forgot password?"
     },
     "rewardPage": {
@@ -105,7 +118,7 @@
         "endDate": "End Date",
         "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "rewardImage": "Promotion Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "forgotPassword": "Forgot password?"
     },
     "rewardHistoryPage": {
@@ -113,8 +126,19 @@
         "endDate": "End Date",
         "showOnStart": "Display prominently the promotion after user login or when the app is first opened.",
         "rewardImage": "Promotion Image",
-        "browseFile": "Browse your files here (max 10MB)",
+        "browseFile": "Browse your files here (max 1MB)",
         "forgotPassword": "Forgot password?"
+    },
+    "servicesHomepage": {
+        "serviceName": "Name",
+        "serviceDescription": "ServiceDescription",
+        "servicePrice": "Price",
+        "serviceBookingFee": "Booking Fee",
+        "doctorType": "Type",
+        "serviceTime": "Service Time",
+        "serviceImage": "Service Image",
+        "browseFile": "Browse your files here (max 1MB)",
+        "serviceCategory": "Category"
     },
     "version": {
         "updateAvailable": "New Version Available",

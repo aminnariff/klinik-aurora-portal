@@ -62,12 +62,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
     _promotionName.text = widget.promotion.promotionName ?? '';
     _showOnStart.value = widget.promotion.showOnStart == 1;
     for (PromotionImage item in widget.promotion.promotionImage ?? []) {
-      selectedFiles.add(
-        FileAttribute(
-          path: item.path,
-          name: item.id,
-        ),
-      );
+      selectedFiles.add(FileAttribute(path: item.path, name: item.id));
     }
     super.initState();
   }
@@ -99,15 +94,12 @@ class _PromotionDetailState extends State<PromotionDetail> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Promotion',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Promotion', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
@@ -119,10 +111,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                               child: Column(
                                 children: [
                                   InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _promotionName,
-                                      labelText: 'Name',
-                                    ),
+                                    field: InputFieldAttribute(controller: _promotionName, labelText: 'Name'),
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                   TextField(
@@ -164,18 +153,29 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                               if (supportedExtensions.contains(file.extension)) {
                                                 debugPrint(bytesToMB(file.size).toString());
                                                 debugPrint(file.name);
-                                                if (bytesToMB(file.size) < 5.0) {
+                                                if (bytesToMB(file.size) < 1.0) {
                                                   Uint8List? fileBytes = result.files.first.bytes;
                                                   String fileName = result.files.first.name;
 
                                                   selectedFiles.add(FileAttribute(name: fileName, value: fileBytes));
                                                   fileRebuild.add(DateTime.now());
                                                 } else {
-                                                  documentErrorMessage.add('error'
-                                                      .tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
+                                                  showDialogError(
+                                                    context,
+                                                    'error'.tr(
+                                                      gender: 'err-21',
+                                                      args: [fileSizeLimit.toStringAsFixed(0)],
+                                                    ),
+                                                  );
                                                 }
                                               } else {
-                                                documentErrorMessage.add('error'.tr(gender: 'err-22'));
+                                                showDialogError(
+                                                  context,
+                                                  'error'.tr(
+                                                    gender: 'err-22',
+                                                    args: [fileSizeLimit.toStringAsFixed(0)],
+                                                  ),
+                                                );
                                               }
                                             } else {
                                               // User canceled the picker
@@ -191,41 +191,40 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                               if (selectedFiles[index].path != null ||
                                                   selectedFiles[index].value != null) {
                                                 showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext context) {
-                                                      return GestureDetector(
-                                                        onTap: () {
-                                                          context.pop();
-                                                        },
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            Flexible(
-                                                              child: CardContainer(
-                                                                selectedFiles[index].value != null
-                                                                    ? Image.memory(selectedFiles[index].value!)
-                                                                    : selectedFiles[index].path != null
-                                                                        ? Padding(
-                                                                            padding: EdgeInsets.all(screenPadding),
-                                                                            child: Image.network(
-                                                                                '${Environment.imageUrl}${selectedFiles[index].path}'),
-                                                                          )
-                                                                        : const SizedBox(),
-                                                              ),
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        context.pop();
+                                                      },
+                                                      child: Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Flexible(
+                                                            child: CardContainer(
+                                                              selectedFiles[index].value != null
+                                                                  ? Image.memory(selectedFiles[index].value!)
+                                                                  : selectedFiles[index].path != null
+                                                                  ? Padding(
+                                                                      padding: EdgeInsets.all(screenPadding),
+                                                                      child: Image.network(
+                                                                        '${Environment.imageUrl}${selectedFiles[index].path}',
+                                                                      ),
+                                                                    )
+                                                                  : const SizedBox(),
                                                             ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    });
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                );
                                               }
                                             },
                                             child: Row(
                                               children: [
-                                                Text(
-                                                  '${index + 1}. ',
-                                                  style: AppTypography.bodyMedium(context),
-                                                ),
+                                                Text('${index + 1}. ', style: AppTypography.bodyMedium(context)),
                                                 Flexible(
                                                   child: Text(
                                                     '  ${selectedFiles[index].name ?? ''}',
@@ -238,9 +237,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                           enableFeedback: true,
                                           enabled: true,
                                           trailing: IconButton(
-                                            icon: const Icon(
-                                              Icons.close,
-                                            ),
+                                            icon: const Icon(Icons.close),
                                             tooltip: 'button'.tr(gender: 'remove'),
                                             onPressed: () {
                                               PromotionController.remove(context, selectedFiles[index].name ?? "").then(
@@ -261,8 +258,9 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                         onTap: () async {
                                           var results = await showCalendarDatePicker2Dialog(
                                             context: context,
-                                            config:
-                                                CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now()),
+                                            config: CalendarDatePicker2WithActionButtonsConfig(
+                                              currentDate: DateTime.now(),
+                                            ),
                                             dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
                                             borderRadius: BorderRadius.circular(15),
                                           );
@@ -272,17 +270,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                         child: ReadOnly(
                                           InputField(
                                             field: InputFieldAttribute(
-                                                controller: _startDate,
-                                                isEditable: false,
-                                                labelText: 'promotionPage'.tr(gender: 'startDate'),
-                                                suffixWidget: const Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.calendar_month,
-                                                    ),
-                                                  ],
-                                                )),
+                                              controller: _startDate,
+                                              isEditable: false,
+                                              labelText: 'promotionPage'.tr(gender: 'startDate'),
+                                              suffixWidget: const Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [Icon(Icons.calendar_month)],
+                                              ),
+                                            ),
                                           ),
                                           isEditable: false,
                                         ),
@@ -314,30 +309,26 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                       ),
                                       AppPadding.vertical(denominator: 2),
                                       ValueListenableBuilder<bool>(
-                                          valueListenable: _showOnStart,
-                                          builder: (context, snapshot, _) {
-                                            return Row(
-                                              children: [
-                                                CheckBoxWidget(
-                                                  (p0) {
+                                        valueListenable: _showOnStart,
+                                        builder: (context, snapshot, _) {
+                                          return Row(
+                                            children: [
+                                              CheckBoxWidget((p0) {
+                                                _showOnStart.value = !snapshot;
+                                              }, value: snapshot),
+                                              AppPadding.horizontal(denominator: 2),
+                                              Flexible(
+                                                child: GestureDetector(
+                                                  onTap: () {
                                                     _showOnStart.value = !snapshot;
                                                   },
-                                                  value: snapshot,
+                                                  child: Text('promotionPage'.tr(gender: 'showOnStart')),
                                                 ),
-                                                AppPadding.horizontal(denominator: 2),
-                                                Flexible(
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      _showOnStart.value = !snapshot;
-                                                    },
-                                                    child: Text(
-                                                      'promotionPage'.tr(gender: 'showOnStart'),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
                                     ],
                                   );
                                 },
@@ -350,80 +341,94 @@ class _PromotionDetailState extends State<PromotionDetail> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Button(
-                              () {
-                                if (validate()) {
-                                  showLoading();
-                                  PromotionController.update(
-                                    context,
-                                    UpdatePromotionRequest(
-                                      promotionId: widget.promotion.promotionId ?? '',
-                                      promotionName: _promotionName.text,
-                                      promotionDescription: _promotionDescription.text,
-                                      promotionTnc: _promotionTnc.text,
-                                      promotionStartDate: convertStringToDate(_startDate.text),
-                                      promotionEndDate: convertStringToDate(_endDate.text),
-                                      showOnStart: _showOnStart.value,
-                                      promotionStatus: widget.promotion.promotionStatus == 1 ? true : false,
-                                    ),
-                                  ).then((value) {
-                                    dismissLoading();
-                                    if (responseCode(value.code)) {
-                                      if (isAnyFileChange()) {
-                                        bool showError = false;
-                                        for (FileAttribute item in selectedFiles) {
-                                          if (item.name!.contains('images/promotion')) {
-                                            showError = true;
-                                            break;
-                                          }
+                            Button(() {
+                              if (validate()) {
+                                showLoading();
+                                PromotionController.update(
+                                  context,
+                                  UpdatePromotionRequest(
+                                    promotionId: widget.promotion.promotionId ?? '',
+                                    promotionName: _promotionName.text,
+                                    promotionDescription: _promotionDescription.text,
+                                    promotionTnc: _promotionTnc.text,
+                                    promotionStartDate: convertStringToDate(_startDate.text),
+                                    promotionEndDate: convertStringToDate(_endDate.text),
+                                    showOnStart: _showOnStart.value,
+                                    promotionStatus: widget.promotion.promotionStatus == 1 ? true : false,
+                                  ),
+                                ).then((value) {
+                                  dismissLoading();
+                                  if (responseCode(value.code)) {
+                                    if (isAnyFileChange()) {
+                                      bool showError = false;
+                                      for (FileAttribute item in selectedFiles) {
+                                        if (item.name!.contains('images/promotion')) {
+                                          showError = true;
+                                          break;
                                         }
-                                        if (showError) {
-                                          showDialogError(context,
-                                              'Please delete the outdated images and upload the updated versions.');
-                                        } else {
-                                          showLoading();
-                                          for (int i = 0; i < selectedFiles.length; i++) {
-                                            if (selectedFiles[i].value != null) {
-                                              PromotionController.upload(
-                                                      context, widget.promotion.promotionId!, [selectedFiles[i]])
-                                                  .then((value) {
-                                                dismissLoading();
-                                                if (responseCode(value.code)) {
-                                                  if (i == selectedFiles.length - 1) {
-                                                    context.pop();
-                                                    PromotionController.getAll(context, 1, pageSize).then((value) =>
-                                                        context.read<PromotionController>().promotionAllResponse =
-                                                            value);
-                                                    showDialogSuccess(context,
-                                                        'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
-                                                  }
-                                                } else {
-                                                  showDialogError(
-                                                      context, value.data?.message ?? 'ERROR : ${value.code}');
-                                                }
-                                              });
-                                            } else if (i == selectedFiles.length - 1) {
-                                              context.pop();
-                                              PromotionController.getAll(context, 1, pageSize).then((value) =>
-                                                  context.read<PromotionController>().promotionAllResponse = value);
-                                              showDialogSuccess(context,
-                                                  'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
-                                            }
-                                          }
-                                        }
+                                      }
+                                      if (showError) {
+                                        showDialogError(
+                                          context,
+                                          'Please delete the outdated images and upload the updated versions.',
+                                        );
                                       } else {
-                                        context.pop();
-                                        showDialogSuccess(context,
-                                            'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉');
+                                        showLoading();
+                                        for (int i = 0; i < selectedFiles.length; i++) {
+                                          if (selectedFiles[i].value != null) {
+                                            PromotionController.upload(context, widget.promotion.promotionId!, [
+                                              selectedFiles[i],
+                                            ]).then((value) {
+                                              dismissLoading();
+                                              if (responseCode(value.code)) {
+                                                if (i == selectedFiles.length - 1) {
+                                                  context.pop();
+                                                  PromotionController.getAll(context, 1, pageSize).then(
+                                                    (value) =>
+                                                        context.read<PromotionController>().promotionAllResponse =
+                                                            value,
+                                                  );
+                                                  showDialogSuccess(
+                                                    context,
+                                                    'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
+                                                  );
+                                                }
+                                              } else {
+                                                showDialogError(
+                                                  context,
+                                                  value.data?.message ?? 'ERROR : ${value.code}',
+                                                );
+                                              }
+                                            });
+                                          } else if (i == selectedFiles.length - 1) {
+                                            context.pop();
+                                            PromotionController.getAll(context, 1, pageSize).then(
+                                              (value) =>
+                                                  context.read<PromotionController>().promotionAllResponse = value,
+                                            );
+                                            showDialogSuccess(
+                                              context,
+                                              'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
+                                            );
+                                          }
+                                        }
                                       }
                                     } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                      context.pop();
+                                      showDialogSuccess(
+                                        context,
+                                        'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
+                                      );
                                     }
-                                  });
-                                }
-                              },
-                              actionText: 'button'.tr(gender: 'update'),
-                            ),
+                                  } else {
+                                    showDialogError(
+                                      context,
+                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                    );
+                                  }
+                                });
+                              }
+                            }, actionText: 'button'.tr(gender: 'update')),
                           ],
                         ),
                       ],

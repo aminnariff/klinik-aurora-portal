@@ -1,6 +1,3 @@
 class DevelopmentEnvironment {
-  Map<String, dynamic> data = {
-    "appUrl": "https://vps.klinikauroramembership.com/",
-    "imageUrl": "https://vps.klinikauroramembership.com/",
-  };
+  Map<String, dynamic> data = {"appUrl": "http://localhost:3001/", "imageUrl": "http://localhost:3001/"};
 }

@@ -1,11 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 
 bool notNullOrEmptyString(String? value) {
   if (value == null || value == '' || value == 'null') {
     return false;
   }
   return true;
+}
+
+int opacityCalculation(double value) {
+  return (value * 255).toInt();
 }
 
 String statusTranslate(int? value) {
@@ -22,7 +29,7 @@ String? dateConverter(String? value, {String? format}) {
       return null;
     } else {
       DateTime dateTime = DateTime.parse(value);
-      dateTime = dateTime.toUtc().add(const Duration(hours: 8));
+      dateTime = dateTime.add(const Duration(hours: 8));
 
       return DateFormat(format ?? 'dd-MM-yyyy HH:mm:ss').format(dateTime);
     }
@@ -70,6 +77,24 @@ bool checkEndDate(String? endDate) {
   }
 }
 
+String convert24HourToAmPmFormat(String time) {
+  final format = RegExp(r'^(\d{2}):(\d{2}):(\d{2})$');
+  final match = format.firstMatch(time);
+
+  if (match != null) {
+    int hour = int.parse(match.group(1)!);
+    int minute = int.parse(match.group(2)!);
+
+    final period = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12;
+    if (hour == 0) hour = 12;
+
+    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period';
+  } else {
+    throw FormatException('Invalid 24-hour format: $time');
+  }
+}
+
 int calculateCustomerPoints(String amount) {
   double paidAmount = double.tryParse(amount) ?? 0.0;
   int points = (paidAmount / 10).floor();
@@ -79,4 +104,71 @@ int calculateCustomerPoints(String amount) {
   }
 
   return points;
+}
+
+String convertMalaysiaTimeToUtc(String malaysiaTimeStr, {bool plainFormat = false}) {
+  try {
+    final inputFormat = DateFormat('dd-MM-yyyy HH:mm');
+    final malaysiaTime = inputFormat.parseStrict(malaysiaTimeStr);
+
+    final utcTime = malaysiaTime.toUtc();
+    print('UTC TIME - $utcTime');
+
+    if (plainFormat) {
+      return "${utcTime.year.toString().padLeft(4, '0')}-"
+          "${utcTime.month.toString().padLeft(2, '0')}-"
+          "${utcTime.day.toString().padLeft(2, '0')} "
+          "${utcTime.hour.toString().padLeft(2, '0')}:"
+          "${utcTime.minute.toString().padLeft(2, '0')}:"
+          "${utcTime.second.toString().padLeft(2, '0')}";
+    }
+
+    return utcTime.toIso8601String();
+  } catch (e) {
+    debugPrint('Error: $e');
+    return '';
+  }
+}
+
+String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
+  try {
+    if (utcString == null || utcString.isEmpty) return null;
+
+    final utcDateTime = DateTime.parse(utcString);
+    return formatAppointmentDate(utcDateTime, showTime);
+  } catch (e) {
+    debugPrint('Invalid date format: $e');
+    return null;
+  }
+}
+
+String formatAppointmentDate(DateTime dateTime, bool time) {
+  final malaysiaDateTime = dateTime.add(const Duration(hours: 8)); // force +8
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final tomorrow = today.add(const Duration(days: 1));
+  final appointmentDay = DateTime(malaysiaDateTime.year, malaysiaDateTime.month, malaysiaDateTime.day);
+
+  String dayLabel;
+  if (appointmentDay == today) {
+    dayLabel = 'Today';
+  } else if (appointmentDay == tomorrow) {
+    dayLabel = 'Tomorrow';
+  } else {
+    dayLabel = DateFormat('EEE, d MMM yyyy').format(malaysiaDateTime);
+  }
+
+  String timeLabel = DateFormat('h:mm a').format(malaysiaDateTime);
+
+  return time ? '$dayLabel\n$timeLabel' : dayLabel;
+}
+
+String getAppointmentStatusLabel(int? statusId) {
+  if (statusId == null) return 'Unknown';
+
+  final match = appointmentStatus.firstWhere(
+    (item) => item.key == statusId.toString(),
+    orElse: () => DropdownAttribute('', 'Unknown'),
+  );
+  return match.name;
 }

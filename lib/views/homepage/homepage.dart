@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controlle
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
+import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
@@ -19,12 +20,16 @@ import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
+import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
+import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';
 
@@ -41,11 +46,7 @@ class Homepage extends StatefulWidget {
     return sideBarAttribute.indexWhere((element) => element.label == label);
   }
 
-  const Homepage({
-    super.key,
-    this.location,
-    required this.child,
-  });
+  const Homepage({super.key, this.location, required this.child});
 
   @override
   State<Homepage> createState() => _HomepageState();
@@ -55,72 +56,147 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     sideBarAttribute = [
-      const SidebarXItem(iconWidget: Icon(Icons.dashboard_rounded, color: Colors.white), label: 'Dashboard'),
-      const SidebarXItem(
-          iconWidget: Icon(Icons.add_circle_outline_rounded, color: Colors.white), label: PointHomepage.displayName),
-      const SidebarXItem(iconWidget: Icon(Icons.person, color: Colors.white), label: UserHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(Icons.admin_panel_settings, color: Colors.white), label: AdminHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.codeBranch, color: Colors.white), label: BranchHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white),
-          label: DoctorHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.solidImage, color: Colors.white), label: PromotionHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.ticketSimple, color: Colors.white), label: VoucherHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(FontAwesomeIcons.gifts, color: Colors.white), label: RewardHomepage.displayName),
-      const SidebarXItem(
-          iconWidget: Icon(Icons.local_shipping, color: Colors.white), label: RewardHistoryHomepage.displayName),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+        },
+        label: 'Dashboard',
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+        },
+        label: PointHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.date_range, color: Colors.white);
+        },
+        label: AppointmentHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.medical_services, color: Colors.white);
+        },
+        label: ServiceHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.person, color: Colors.white);
+        },
+        label: UserHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.admin_panel_settings, color: Colors.white);
+        },
+        label: AdminHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.codeBranch, color: Colors.white);
+        },
+        label: BranchHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white);
+        },
+        label: DoctorHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.solidImage, color: Colors.white);
+        },
+        label: PromotionHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.ticketSimple, color: Colors.white);
+        },
+        label: VoucherHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(FontAwesomeIcons.gifts, color: Colors.white);
+        },
+        label: RewardHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.local_shipping, color: Colors.white);
+        },
+        label: RewardHistoryHomepage.displayName,
+      ),
     ];
+    getAuthController();
     super.initState();
+  }
+
+  getAuthController() {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      context.read<TopBarController>().pageValue = 0;
-      if (context.read<AuthController>().authenticationResponse != null) {
-        if (!context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
-          sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
+      context.read<AuthController>().init(context).then((value) {
+        if (value != null) {
+          if (context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f') == false) {
+            sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
+          }
+          if (context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') == false) {
+            sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
+            sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
+            sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f') ||
+              context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
+          }
+          if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
+            sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
+          }
+          if (context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2') == false) {
+            sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
+          }
+          if (context.read<AuthController>().hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342') == false) {
+            sideBarAttribute.removeWhere((element) => element.label == ServiceHomepage.displayName);
+          }
+          context.read<TopBarController>().pageValue = 0;
+          if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')) {
+            sideBarAttribute.removeWhere((element) => element.label == 'Dashboard');
+            context.goNamed(AppointmentHomepage.routeName);
+          }
         }
-        if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f')) {
-          sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f')) {
-          sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
-          sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
-          sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f')) {
-          sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
-          sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
-        }
-        if (!context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2')) {
-          sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
-        }
-      }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ActivityHandlerController>(builder: (context, snapshot, _) {
-      if (snapshot.status) {
-        SchedulerBinding.instance.scheduleFrameCallback((_) {
-          context.read<AuthController>().logout(context);
-          context.pushReplacement(LoginPage.routeName);
-        });
-      }
-      return LayoutWidget(
-        mobile: const MobileView(),
-        desktop: desktopView(context),
-      );
-    });
+    return Consumer<ActivityHandlerController>(
+      builder: (context, snapshot, _) {
+        if (snapshot.status) {
+          SchedulerBinding.instance.scheduleFrameCallback((_) {
+            context.read<AuthController>().logout(context);
+            context.goNamed(LoginPage.routeName);
+          });
+        }
+        return LayoutWidget(mobile: const MobileView(), desktop: desktopView(context));
+      },
+    );
   }
 
   Widget desktopView(BuildContext context) {
@@ -137,24 +213,20 @@ class _HomepageState extends State<Homepage> {
                   margin: const EdgeInsets.all(0),
                   decoration: const BoxDecoration(
                     color: sidebarColor,
-                    borderRadius:
-                        BorderRadius.only(topRight: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
                   ),
-                  hoverColor: Colors.black.withOpacity(0.31),
-                  textStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                  hoverColor: Colors.black.withAlpha(opacityCalculation(.3)),
+                  textStyle: TextStyle(color: Colors.white.withAlpha(opacityCalculation(.5))),
                   itemTextPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  iconTheme: IconThemeData(color: Colors.white.withOpacity(0.7), size: 20),
+                  iconTheme: IconThemeData(color: Colors.white.withAlpha(opacityCalculation(.7)), size: 20),
                   itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                   selectedItemDecoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: primary.withOpacity(0.7),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.28),
-                      ),
-                    ],
+                    border: Border.all(color: primary.withAlpha(opacityCalculation(.7))),
+                    boxShadow: [BoxShadow(color: Colors.black.withAlpha(opacityCalculation(.3)))],
                   ),
                   // selectedItemMargin: const EdgeInsets.symmetric(horizontal: 10),
                   selectedTextStyle: const TextStyle(color: Colors.white),
@@ -165,8 +237,10 @@ class _HomepageState extends State<Homepage> {
                   width: screenWidth(15),
                   decoration: const BoxDecoration(
                     color: sidebarColor,
-                    borderRadius:
-                        BorderRadius.only(topRight: Radius.circular(20.0), bottomRight: Radius.circular(20.0)),
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
                   ),
                   // textStyle: titlesBold!.apply(color: DSH_SHADOW_COLOR),
                   // selectedTextStyle: titlesBold!.apply(color: Colors.white),
@@ -174,7 +248,7 @@ class _HomepageState extends State<Homepage> {
                   // itemPadding: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, screenWidth(1)),
                   // selectedItemPadding: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, 0, screenPadding / 2),
                 ),
-                footerDivider: Divider(color: Colors.white.withOpacity(0.3), height: 1),
+                footerDivider: Divider(color: (Colors.white).withAlpha(opacityCalculation(.3)), height: 1),
                 headerBuilder: (context, extended) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 8),
@@ -183,9 +257,7 @@ class _HomepageState extends State<Homepage> {
                         if (extended)
                           SlideInLeft(
                             child: Image(
-                              image: const AssetImage(
-                                'assets/icons/logo/klinik-aurora.png',
-                              ),
+                              image: const AssetImage('assets/icons/logo/klinik-aurora.png'),
                               width: extended ? 100 : 50,
                               height: extended ? 100 : 50,
                             ),
@@ -193,9 +265,7 @@ class _HomepageState extends State<Homepage> {
                         if (!extended)
                           SlideInRight(
                             child: Image(
-                              image: const AssetImage(
-                                'assets/icons/logo/klinik-aurora.png',
-                              ),
+                              image: const AssetImage('assets/icons/logo/klinik-aurora.png'),
                               width: extended ? 100 : 50,
                               height: extended ? 100 : 50,
                             ),
@@ -234,10 +304,7 @@ class _HomepageState extends State<Homepage> {
                             mainAxisAlignment: (extended) ? MainAxisAlignment.start : MainAxisAlignment.center,
                             children: [
                               AppPadding.horizontal(denominator: 4),
-                              const Icon(
-                                Icons.logout,
-                                color: Colors.white,
-                              ),
+                              const Icon(Icons.logout, color: Colors.white),
                               if (extended) ...[
                                 AppPadding.horizontal(denominator: 2),
                                 ElasticIn(
@@ -259,12 +326,13 @@ class _HomepageState extends State<Homepage> {
                 items: [
                   for (int index = 0; index < sideBarAttribute.length; index++)
                     SidebarXItem(
-                        icon: sideBarAttribute[index].icon,
-                        label: sideBarAttribute[index].label,
-                        iconWidget: sideBarAttribute[index].iconWidget,
-                        onTap: () {
-                          action(sideBarAttribute[index].label);
-                        }),
+                      icon: sideBarAttribute[index].icon,
+                      label: sideBarAttribute[index].label,
+                      iconBuilder: sideBarAttribute[index].iconBuilder,
+                      onTap: () {
+                        action(sideBarAttribute[index].label);
+                      },
+                    ),
                 ],
               );
             },
@@ -273,37 +341,38 @@ class _HomepageState extends State<Homepage> {
             child: Stack(
               alignment: Alignment.topRight,
               children: [
-                if (sideBarAttribute.isEmpty) const NoPermission(),
-                widget.child,
+                sideBarAttribute.isEmpty ? const NoPermission() : widget.child,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 10, screenPadding, 0),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Consumer<AuthController>(
-                              builder: (context, authController, _) {
-                                return Text(authController.authenticationResponse?.data?.user?.userFullname ?? 'N/A');
-                              },
-                            ),
-                            AppPadding.horizontal(denominator: 2),
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: secondaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.person,
-                                color: tertiaryColor,
-                              ),
-                            ),
+                    PopupMenuButton<String>(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      offset: const Offset(8, 35),
+                      color: Colors.white,
+                      tooltip: '',
+                      onSelected: _handleMenuSelection,
+                      itemBuilder:
+                          (BuildContext context) => <PopupMenuEntry<String>>[
+                            const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
                           ],
-                        ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Consumer<AuthController>(
+                            builder: (context, authController, _) {
+                              return Text(
+                                authController.authenticationResponse?.data?.user?.userFullname ?? 'N/A',
+                                style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                              );
+                            },
+                          ),
+                          AppPadding.horizontal(denominator: 2),
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
+                            child: const Icon(Icons.person, color: tertiaryColor),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -316,12 +385,29 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+  void _handleMenuSelection(String value) {
+    if (value == 'logout') {
+      try {
+        context.read<AuthController>().logout(context);
+        context.pushReplacementNamed(LoginPage.routeName, extra: true);
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    } else if (value == 'relocate') {
+      AppToast.snackbar(context, 'We\'re actively developing this feature and it\'s on its way.');
+    }
+  }
+
   void action(String? label) {
     switch (label) {
       case 'Dashboard':
         context.go(Homepage.routeName);
       case PointHomepage.displayName:
         context.go(PointHomepage.routeName);
+      case AppointmentHomepage.displayName:
+        context.go(AppointmentHomepage.routeName);
+      case ServiceHomepage.displayName:
+        context.go(ServiceHomepage.routeName);
       case UserHomepage.displayName:
         context.go(UserHomepage.routeName);
       case AdminHomepage.displayName:
@@ -343,12 +429,13 @@ class _HomepageState extends State<Homepage> {
 
   Widget version() {
     return ValueListenableBuilder<AppVersionAttribute>(
-        valueListenable: appVersionAttribute,
-        builder: (context, snapshot, child) {
-          return Text(
-            'v${snapshot.version}',
-            style: Theme.of(context).textTheme.bodyMedium!.apply(color: textSecondaryColor),
-          );
-        });
+      valueListenable: appVersionAttribute,
+      builder: (context, snapshot, child) {
+        return Text(
+          'v${snapshot.version}',
+          style: Theme.of(context).textTheme.bodyMedium!.apply(color: textSecondaryColor),
+        );
+      },
+    );
   }
 }

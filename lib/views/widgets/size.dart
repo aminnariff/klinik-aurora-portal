@@ -27,8 +27,6 @@ double textSizeCalculate() {
       return 0;
     case Breakpoint.ultra:
       return 0;
-    default:
-      return 0;
   }
 }
 
@@ -43,24 +41,20 @@ double screenPaddingCalculate({double? value}) {
       return width * 0.02;
     case Breakpoint.ultra:
       return width * 0.01;
-    default:
-      return width * 0.05;
   }
 }
 
 double screenPaddingVertical({double? value}) {
   double width = ScreenUtil().screenWidth;
   switch (breakpoint()) {
-    case Breakpoint.mobile:
-      return width * 0.03;
     case Breakpoint.tablet:
       return width * 0.02;
     case Breakpoint.desktop:
       return width * 0.01;
     case Breakpoint.ultra:
       return width * 0.01;
-    default:
-      return width * 0.05;
+    case Breakpoint.mobile:
+      return width * 0.03;
   }
 }
 
@@ -75,8 +69,6 @@ double screenWidthByBreakpoint(double mobile, double? tablet, double desktop, {b
       return (useAbsoluteValueDesktop) ? desktop : width * (desktop / 100);
     case Breakpoint.ultra:
       return width * (desktop / 100);
-    default:
-      return width * (desktop / 100);
   }
 }
 
@@ -90,8 +82,6 @@ double screenHeightByBreakpoint(double mobile, double? tablet, double desktop, {
     case Breakpoint.desktop:
       return (useAbsoluteValueDesktop) ? desktop : height * (desktop / 100);
     case Breakpoint.ultra:
-      return height * (desktop / 100);
-    default:
       return height * (desktop / 100);
   }
 }
@@ -140,9 +130,4 @@ double screenHeight829(double height) {
   return 829 * (height / 100);
 }
 
-enum Breakpoint {
-  mobile,
-  tablet,
-  desktop,
-  ultra,
-}
+enum Breakpoint { mobile, tablet, desktop, ultra }

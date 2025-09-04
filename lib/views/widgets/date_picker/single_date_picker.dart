@@ -126,7 +126,7 @@
 //                         weekendTextStyle:
 //                             const TextStyle(fontSize: 16, color: tertiaryColor, fontWeight: FontWeight.w500),
 //                         disabledDatesTextStyle:
-//                             TextStyle(fontSize: 16, color: Colors.grey.withOpacity(0.5), fontWeight: FontWeight.w500),
+//                             TextStyle(fontSize: 16, color: Colors.grey.withAlpha(opacityCalculation(.5)), fontWeight: FontWeight.w500),
 //                         textStyle: const TextStyle(fontSize: 16, color: textPrimaryColor, fontWeight: FontWeight.w500),
 //                       ),
 //                       monthViewSettings: const DateRangePickerMonthViewSettings(

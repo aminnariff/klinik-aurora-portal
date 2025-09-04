@@ -92,15 +92,12 @@ class _PointDetailState extends State<PointDetail> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Points Management',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Points Management', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
@@ -147,32 +144,33 @@ class _PointDetailState extends State<PointDetail> {
                                   Row(
                                     children: [
                                       StreamBuilder<DateTime>(
-                                          stream: rebuildDropdown.stream,
-                                          builder: (context, snapshot) {
-                                            return AppDropdown(
-                                              attributeList: DropdownAttributeList(
-                                                [
-                                                  DropdownAttribute('', 'Points'),
-                                                  // DropdownAttribute('1', 'REFERRAL'),
-                                                  DropdownAttribute('2', 'Voucher'),
-                                                  DropdownAttribute('3', 'Reward'),
-                                                ],
-                                                onChanged: (selected) {
-                                                  setState(() {
-                                                    _selectedType = selected;
-                                                    print('_selectedType?.key ${_selectedType?.key}');
-                                                    selectedReward;
-                                                    _selectedVoucher = null;
-                                                    selectedVoucher = null;
-                                                    selectedReward = null;
-                                                  });
-                                                },
-                                                hintText: 'Select an action',
-                                                value: _selectedType?.name,
-                                                width: screenWidth1728(30),
-                                              ),
-                                            );
-                                          }),
+                                        stream: rebuildDropdown.stream,
+                                        builder: (context, snapshot) {
+                                          return AppDropdown(
+                                            attributeList: DropdownAttributeList(
+                                              [
+                                                DropdownAttribute('', 'Points'),
+                                                // DropdownAttribute('1', 'REFERRAL'),
+                                                DropdownAttribute('2', 'Voucher'),
+                                                DropdownAttribute('3', 'Reward'),
+                                              ],
+                                              onChanged: (selected) {
+                                                setState(() {
+                                                  _selectedType = selected;
+                                                  print('_selectedType?.key ${_selectedType?.key}');
+                                                  selectedReward;
+                                                  _selectedVoucher = null;
+                                                  selectedVoucher = null;
+                                                  selectedReward = null;
+                                                });
+                                              },
+                                              hintText: 'Select an action',
+                                              value: _selectedType?.name,
+                                              width: screenWidth1728(30),
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ],
                                   ),
                                   if (_selectedType?.key == '2' || _selectedType?.key == '3')
@@ -181,97 +179,100 @@ class _PointDetailState extends State<PointDetail> {
                                     Row(
                                       children: [
                                         StreamBuilder<DateTime>(
-                                            stream: rebuildDropdown.stream,
-                                            builder: (context, snapshot) {
-                                              return AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    if (context
-                                                            .read<VoucherController>()
-                                                            .voucherAllResponse
-                                                            ?.data
-                                                            ?.data !=
-                                                        null)
-                                                      for (voucher.Data item in context
-                                                              .read<VoucherController>()
-                                                              .voucherAllResponse
-                                                              ?.data
-                                                              ?.data ??
-                                                          [])
-                                                        DropdownAttribute(item.voucherId ?? '',
-                                                            '${item.voucherName} (${item.voucherCode})'),
-                                                  ],
-                                                  onChanged: (selected) {
-                                                    setState(() {
-                                                      try {
-                                                        selectedVoucher = context
-                                                            .read<VoucherController>()
-                                                            .voucherAllResponse
-                                                            ?.data
-                                                            ?.data!
-                                                            .firstWhere(
-                                                                (element) => element.voucherId == selected?.key);
-                                                        _points.text = selectedVoucher?.voucherPoint?.toString() ?? '';
-                                                      } catch (e) {
-                                                        debugPrint(e.toString());
-                                                      }
-                                                      _selectedVoucher = selected;
-                                                    });
-                                                  },
-                                                  hintText: 'Select a voucher',
-                                                  value: _selectedVoucher?.name,
-                                                  width: screenWidth1728(30),
-                                                ),
-                                              );
-                                            }),
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return AppDropdown(
+                                              attributeList: DropdownAttributeList(
+                                                [
+                                                  if (context
+                                                          .read<VoucherController>()
+                                                          .voucherAllResponse
+                                                          ?.data
+                                                          ?.data !=
+                                                      null)
+                                                    for (voucher.Data item
+                                                        in context
+                                                                .read<VoucherController>()
+                                                                .voucherAllResponse
+                                                                ?.data
+                                                                ?.data ??
+                                                            [])
+                                                      DropdownAttribute(
+                                                        item.voucherId ?? '',
+                                                        '${item.voucherName} (${item.voucherCode})',
+                                                      ),
+                                                ],
+                                                onChanged: (selected) {
+                                                  setState(() {
+                                                    try {
+                                                      selectedVoucher = context
+                                                          .read<VoucherController>()
+                                                          .voucherAllResponse
+                                                          ?.data
+                                                          ?.data!
+                                                          .firstWhere((element) => element.voucherId == selected?.key);
+                                                      _points.text = selectedVoucher?.voucherPoint?.toString() ?? '';
+                                                    } catch (e) {
+                                                      debugPrint(e.toString());
+                                                    }
+                                                    _selectedVoucher = selected;
+                                                  });
+                                                },
+                                                hintText: 'Select a voucher',
+                                                value: _selectedVoucher?.name,
+                                                width: screenWidth1728(30),
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ],
                                     ),
                                   if (_selectedType?.key == '3')
                                     Row(
                                       children: [
                                         StreamBuilder<DateTime>(
-                                            stream: rebuildDropdown.stream,
-                                            builder: (context, snapshot) {
-                                              return AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    if (context
-                                                            .read<RewardController>()
-                                                            .rewardAllResponse
-                                                            ?.data
-                                                            ?.data !=
-                                                        null)
-                                                      for (reward.Data item in context
-                                                              .read<RewardController>()
-                                                              .rewardAllResponse
-                                                              ?.data
-                                                              ?.data ??
-                                                          [])
-                                                        DropdownAttribute(item.rewardId ?? '',
-                                                            '${item.rewardName} (${item.rewardPoint}pts)'),
-                                                  ],
-                                                  onChanged: (selected) {
-                                                    setState(() {
-                                                      try {
-                                                        selectedReward = context
-                                                            .read<RewardController>()
-                                                            .rewardAllResponse
-                                                            ?.data
-                                                            ?.data!
-                                                            .firstWhere((element) => element.rewardId == selected?.key);
-                                                        _points.text = selectedReward?.rewardPoint?.toString() ?? '';
-                                                      } catch (e) {
-                                                        debugPrint(e.toString());
-                                                      }
-                                                      _selectedVoucher = selected;
-                                                    });
-                                                  },
-                                                  hintText: 'Select a reward',
-                                                  value: _selectedReward?.name,
-                                                  width: screenWidth1728(30),
-                                                ),
-                                              );
-                                            }),
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return AppDropdown(
+                                              attributeList: DropdownAttributeList(
+                                                [
+                                                  if (context.read<RewardController>().rewardAllResponse?.data?.data !=
+                                                      null)
+                                                    for (reward.Data item
+                                                        in context
+                                                                .read<RewardController>()
+                                                                .rewardAllResponse
+                                                                ?.data
+                                                                ?.data ??
+                                                            [])
+                                                      DropdownAttribute(
+                                                        item.rewardId ?? '',
+                                                        '${item.rewardName} (${item.rewardPoint}pts)',
+                                                      ),
+                                                ],
+                                                onChanged: (selected) {
+                                                  setState(() {
+                                                    try {
+                                                      selectedReward = context
+                                                          .read<RewardController>()
+                                                          .rewardAllResponse
+                                                          ?.data
+                                                          ?.data!
+                                                          .firstWhere((element) => element.rewardId == selected?.key);
+                                                      _points.text = selectedReward?.rewardPoint?.toString() ?? '';
+                                                    } catch (e) {
+                                                      debugPrint(e.toString());
+                                                    }
+                                                    _selectedVoucher = selected;
+                                                  });
+                                                },
+                                                hintText: 'Select a reward',
+                                                value: _selectedReward?.name,
+                                                width: screenWidth1728(30),
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ],
                                     ),
                                   AppPadding.vertical(denominator: 2),
@@ -295,33 +296,33 @@ class _PointDetailState extends State<PointDetail> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Button(
-                              () {
-                                if (validate()) {
-                                  showLoading();
-                                  PointManagementController.create(
-                                    context,
-                                    CreatePointRequest(
-                                      userId: widget.user?.userId,
-                                      pointType: _selectedType?.key != null && _selectedType?.key != ''
-                                          ? int.parse(_selectedType!.key)
-                                          : null,
-                                      totalPoint: _selectedType?.key == '' ? int.parse(_points.text) : null,
-                                      voucherId: _selectedVoucher?.key,
-                                      rewardId: _selectedReward?.key,
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      if (_selectedType?.key == '3') {}
-                                      postAction();
-                                    } else {
-                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                                    }
-                                  });
-                                }
-                              },
-                              actionText: 'button'.tr(gender: 'create'),
-                            ),
+                            Button(() {
+                              if (validate()) {
+                                showLoading();
+                                PointManagementController.create(
+                                  context,
+                                  CreatePointRequest(
+                                    userId: widget.user?.userId,
+                                    pointType: _selectedType?.key != null && _selectedType?.key != ''
+                                        ? int.parse(_selectedType!.key)
+                                        : null,
+                                    totalPoint: _selectedType?.key == '' ? int.parse(_points.text) : null,
+                                    voucherId: _selectedVoucher?.key,
+                                    rewardId: _selectedReward?.key,
+                                  ),
+                                ).then((value) {
+                                  if (responseCode(value.code)) {
+                                    if (_selectedType?.key == '3') {}
+                                    postAction();
+                                  } else {
+                                    showDialogError(
+                                      context,
+                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                    );
+                                  }
+                                });
+                              }
+                            }, actionText: 'button'.tr(gender: 'create')),
                           ],
                         ),
                       ],

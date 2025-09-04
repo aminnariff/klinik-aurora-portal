@@ -6,16 +6,14 @@ import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/confirmation_dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_type.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class ConfirmationDialog extends StatelessWidget {
   final ConfirmationDialogAttribute attribute;
 
-  const ConfirmationDialog(
-    this.attribute, {
-    super.key,
-  });
+  const ConfirmationDialog(this.attribute, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +26,18 @@ class ConfirmationDialog extends StatelessWidget {
             elevation: 10,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
             child: Container(
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(25.0), boxShadow: [
-                BoxShadow(
-                  offset: const Offset(12, 26),
-                  blurRadius: 30,
-                  spreadRadius: 0,
-                  color: Colors.grey.withOpacity(.1),
-                ),
-              ]),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25.0),
+                boxShadow: [
+                  BoxShadow(
+                    offset: const Offset(12, 26),
+                    blurRadius: 30,
+                    spreadRadius: 0,
+                    color: Colors.grey.withAlpha(opacityCalculation(.1)),
+                  ),
+                ],
+              ),
               width: attribute.width,
               height: attribute.height,
               padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
@@ -45,14 +47,11 @@ class ConfirmationDialog extends StatelessWidget {
                 children: [
                   Flexible(
                     child: ElasticIn(
-                      child: attribute.logo ??
+                      child:
+                          attribute.logo ??
                           Container(
                             constraints: BoxConstraints(maxHeight: screenHeight(20)),
-                            child: Image(
-                              image: AssetImage(
-                                getImage(),
-                              ),
-                            ),
+                            child: Image(image: AssetImage(getImage())),
                           ),
                     ),
                   ),
@@ -93,17 +92,9 @@ class ConfirmationDialog extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      isMobile
-                          ? Flexible(
-                              child: confirm(context),
-                            )
-                          : cancel(context),
+                      isMobile ? Flexible(child: confirm(context)) : cancel(context),
                       AppPadding.horizontal(),
-                      isMobile
-                          ? Flexible(
-                              child: cancel(context),
-                            )
-                          : confirm(context),
+                      isMobile ? Flexible(child: cancel(context)) : confirm(context),
                     ],
                   ),
                   AppPadding.vertical(denominator: 2),

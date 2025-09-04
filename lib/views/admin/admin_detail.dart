@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -14,7 +15,9 @@ import 'package:klinik_aurora_portal/models/admin/create_admin_request.dart';
 import 'package:klinik_aurora_portal/models/admin/permission_admin_response.dart' as admin_permission;
 import 'package:klinik_aurora_portal/models/admin/update_admin_request.dart';
 import 'package:klinik_aurora_portal/models/admin/update_permission_admin_request.dart';
+import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
+import 'package:klinik_aurora_portal/models/permission/permission_all_response.dart' as model_permission;
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -51,22 +54,33 @@ class _AdminDetailState extends State<AdminDetail> {
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
   List<admin_permission.Data> currentPermissionList = [];
   List<String> selectedPermission = [];
+  List<DropdownAttribute> branches = [];
+  final Map<String, List<String>> permissionBundles = {
+    'Branch': [
+      '1bda631e-ef17-11ee-bd1b-cc801b09db2f', //User Management
+      '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342', //Appointment
+      'dc4e7a5a-0e15-11ef-82b0-94653af51fb9', //Reward Management
+      '0699ac1c-ac52-11ef-a1b7-bc24115a1342', //Service
+      'f57576c4-4d15-11f0-b054-1ff6746392b2', //Payment
+      'a231db36-058d-11ef-943b-626efeb17d5e', //Point Management
+      'f90f9f18-057b-11ef-943b-626efeb17d5e', //Doctor
+    ],
+    'Sonographer': ['c54a2d91-499c-11f0-9169-bc24115a1342'], //Sonographer
+  };
 
   @override
   void initState() {
     if (widget.type == 'update') {
-      AdminController.getPermission(context, widget.user!.userId!).then(
-        (value) {
-          if (responseCode(value.code)) {
-            setState(() {
-              currentPermissionList = value.data?.data ?? [];
-              for (admin_permission.Data item in value.data?.data ?? []) {
-                selectedPermission.add(item.permissionId!);
-              }
-            });
-          }
-        },
-      );
+      AdminController.getPermission(context, widget.user!.userId!).then((value) {
+        if (responseCode(value.code)) {
+          setState(() {
+            currentPermissionList = value.data?.data ?? [];
+            for (admin_permission.Data item in value.data?.data ?? []) {
+              selectedPermission.add(item.permissionId!);
+            }
+          });
+        }
+      });
       setState(() {
         allowEditableField = false;
       });
@@ -77,18 +91,27 @@ class _AdminDetailState extends State<AdminDetail> {
       _userEmail.text = widget.user?.userEmail ?? '';
       _userStatus.value = widget.user?.userStatus == 1;
     }
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      if (context.read<BranchController>().branchAllResponse != null) {
+        for (branch_model.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? []) {
+          branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+        }
+        branches.sort((a, b) {
+          final nameA = a.name.toLowerCase();
+          final nameB = b.name.toLowerCase();
+          return nameA.compareTo(nameB);
+        });
+        rebuildDropdown.add(DateTime.now());
+      }
+    });
     try {
       if (widget.user?.branchId != null) {
-        Data? branch = context
-            .read<BranchController>()
-            .branchAllResponse
-            ?.data
-            ?.data
-            ?.firstWhere((element) => element.branchId == widget.user!.branchId);
+        Data? branch = context.read<BranchController>().branchAllResponse?.data?.data?.firstWhere(
+          (element) => element.branchId == widget.user!.branchId,
+        );
         if (branch != null) {
-          setState(() {
-            _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
-          });
+          _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
+          rebuildDropdown.add(DateTime.now());
         }
       }
     } catch (e) {
@@ -100,6 +123,53 @@ class _AdminDetailState extends State<AdminDetail> {
   @override
   Widget build(BuildContext context) {
     return editAdmin();
+  }
+
+  Widget buildPermissionBundles({
+    required Map<String, List<String>> permissionBundles,
+    required List<String> selectedPermission,
+    required Function(List<String>) onPermissionChanged,
+    required List<model_permission.Data> allPermissions,
+  }) {
+    final Map<String, String> permissionIdToName = {for (var p in allPermissions) p.permissionId!: p.permissionName!};
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: permissionBundles.entries.map((entry) {
+        final bundleName = entry.key;
+        final bundleIds = entry.value;
+
+        final permissionNames = bundleIds.map((id) => permissionIdToName[id] ?? 'Unknown').join(', ');
+
+        final isChecked = bundleIds.every((id) => selectedPermission.contains(id));
+
+        return Tooltip(
+          message: permissionNames,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: isChecked,
+                onChanged: (bool? value) {
+                  final newSelected = [...selectedPermission];
+                  if (value == true) {
+                    for (final id in bundleIds) {
+                      if (!newSelected.contains(id)) {
+                        newSelected.add(id);
+                      }
+                    }
+                  } else {
+                    newSelected.removeWhere((id) => bundleIds.contains(id));
+                  }
+                  onPermissionChanged(newSelected);
+                },
+              ),
+              Text(bundleName),
+            ],
+          ),
+        );
+      }).toList(),
+    );
   }
 
   editAdmin() {
@@ -124,15 +194,12 @@ class _AdminDetailState extends State<AdminDetail> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Admin Details',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Admin Details', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
@@ -208,28 +275,27 @@ class _AdminDetailState extends State<AdminDetail> {
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 2),
-                                  Row(
-                                    children: [
-                                      AppDropdown(
-                                        attributeList: DropdownAttributeList(
-                                          [
-                                            if (context.read<BranchController>().branchAllResponse?.data?.data != null)
-                                              for (Data item
-                                                  in context.read<BranchController>().branchAllResponse?.data?.data ??
-                                                      [])
-                                                DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                          ],
-                                          onChanged: (selected) {
-                                            setState(() {
-                                              _selectedBranch = selected;
-                                              _branchId.text = selected!.name;
-                                            });
-                                          },
-                                          value: _selectedBranch?.name,
-                                          width: screenWidth1728(30),
-                                        ),
-                                      ),
-                                    ],
+                                  StreamBuilder<DateTime>(
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return Row(
+                                        children: [
+                                          AppDropdown(
+                                            attributeList: DropdownAttributeList(
+                                              branches,
+                                              isEditable: true,
+                                              onChanged: (selected) {
+                                                _selectedBranch = selected;
+                                                _branchId.text = selected!.name;
+                                                rebuildDropdown.add(DateTime.now());
+                                              },
+                                              value: _selectedBranch?.name,
+                                              width: screenWidth1728(30),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   ),
                                   AppPadding.vertical(denominator: 2),
                                 ],
@@ -246,71 +312,94 @@ class _AdminDetailState extends State<AdminDetail> {
                               style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                             ),
                             AppPadding.vertical(denominator: 3),
+                            buildPermissionBundles(
+                              permissionBundles: permissionBundles,
+                              selectedPermission: selectedPermission,
+                              allPermissions: context.read<PermissionController>().permissionAllResponse?.data ?? [],
+                              onPermissionChanged: (newList) {
+                                setState(() {
+                                  selectedPermission = newList;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            Container(
+                              width: screenWidth(80),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey, // Border color
+                                  width: 1.5, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(8), // Optional: rounded corners
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Wrap(
+                                  spacing: 24,
+                                  runSpacing: 12,
+                                  children: List.generate(
+                                    context.read<PermissionController>().permissionAllResponse?.data?.length ?? 0,
+                                    (index) {
+                                      final permission = context
+                                          .read<PermissionController>()
+                                          .permissionAllResponse!
+                                          .data![index];
+                                      final isChecked = selectedPermission.contains(permission.permissionId);
+
+                                      return SizedBox(
+                                        width: 180,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Checkbox(
+                                              value: isChecked,
+                                              onChanged: (value) {
+                                                try {
+                                                  setState(() {
+                                                    if (value == true) {
+                                                      selectedPermission.add(permission.permissionId!);
+                                                    } else {
+                                                      selectedPermission.remove(permission.permissionId!);
+                                                    }
+                                                  });
+                                                } catch (e) {
+                                                  showDialogError(context, e.toString());
+                                                }
+                                              },
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                permission.permissionName ?? '',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: Theme.of(context).textTheme.bodyMedium,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16),
                             SizedBox(
                               width: screenWidth(80),
-                              child: Wrap(
-                                direction: Axis.horizontal,
+                              child: Row(
                                 children: [
-                                  for (int index = 0;
-                                      index <
-                                          (context.read<PermissionController>().permissionAllResponse?.data?.length ??
-                                              0);
-                                      index++)
-                                    Container(
-                                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Checkbox(
-                                            value: selectedPermission.contains(context
-                                                .read<PermissionController>()
-                                                .permissionAllResponse
-                                                ?.data?[index]
-                                                .permissionId),
-                                            onChanged: (value) {
-                                              try {
-                                                setState(() {
-                                                  if (value == true) {
-                                                    selectedPermission.add(context
-                                                        .read<PermissionController>()
-                                                        .permissionAllResponse!
-                                                        .data![index]
-                                                        .permissionId
-                                                        .toString());
-                                                  } else {
-                                                    selectedPermission.removeWhere((element) =>
-                                                        element ==
-                                                        context
-                                                            .read<PermissionController>()
-                                                            .permissionAllResponse!
-                                                            .data![index]
-                                                            .permissionId
-                                                            .toString());
-                                                  }
-                                                });
-                                              } catch (e) {
-                                                showDialogError(context, e.toString());
-                                              }
-                                            },
-                                          ),
-                                          const SizedBox(
-                                            width: 8,
-                                          ),
-                                          Text(
-                                              '${context.read<PermissionController>().permissionAllResponse!.data![index].permissionName}'),
-                                        ],
-                                      ),
+                                  Flexible(
+                                    child: Text(
+                                      'Note:\nThe checkboxes labeled Branch and Sonographer are permission bundles — selecting them will automatically select a group of related permissions.\nYou can still manually customize individual permissions as needed.',
+                                      style: AppTypography.bodyMedium(context),
                                     ),
+                                  ),
                                 ],
                               ),
                             ),
-                            AppPadding.vertical(denominator: 2),
-                            const Text(
-                                'Note: Choose User Management, Point Management, and Reward Management for branch use in the Staff App.'),
-                            AppPadding.vertical(denominator: 3 / 2),
+                            SizedBox(height: 24),
                           ],
                         ),
-                        button()
+                        button(),
                       ],
                     ),
                   ),
@@ -328,105 +417,88 @@ class _AdminDetailState extends State<AdminDetail> {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Button(
-          () {
-            showLoading();
-            if (widget.type == 'update') {
-              AdminController.update(
-                context,
-                UpdateAdminRequest(
-                  userId: widget.user?.userId,
-                  userFullname: _userFullname.text,
-                  branchId: _selectedBranch?.key,
-                  userPhone: '0${_userPhone.text}',
-                  userStatus: _userStatus.value ? 1 : 0,
-                ),
-              ).then((value) {
+        Button(() {
+          showLoading();
+          if (widget.type == 'update') {
+            AdminController.update(
+              context,
+              UpdateAdminRequest(
+                userId: widget.user?.userId,
+                userFullname: _userFullname.text,
+                branchId: _selectedBranch?.key,
+                userPhone: '0${_userPhone.text}',
+                userStatus: _userStatus.value ? 1 : 0,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
+                AdminController.updatePermission(
+                  context,
+                  UpdatePermissionAdminRequest(userId: widget.user!.userId, permissionIds: selectedPermission),
+                ).then((value) {
+                  if (responseCode(value.code)) {
+                    AdminController.getAll(context, 1, pageSize).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        context.read<AdminController>().adminAllResponse = value.data;
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully updated admin information');
+                      } else {
+                        context.pop();
+                        showDialogSuccess(context, 'Successfully updated admin information');
+                      }
+                    });
+                  } else {
+                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                  }
+                });
+              } else {
+                showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+              }
+            });
+          } else {
+            AdminController.create(
+              context,
+              CreateAdminRequest(
+                userName: _userName.text,
+                userFullname: _userFullname.text,
+                userPhone: '0${_userPhone.text}',
+                userEmail: _userEmail.text,
+                userPassword: _password.text,
+                userRetypePassword: _password.text,
+                branchId: _selectedBranch?.key,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
                 if (responseCode(value.code)) {
                   AdminController.updatePermission(
                     context,
-                    UpdatePermissionAdminRequest(
-                      userId: widget.user!.userId,
-                      permissionIds: selectedPermission,
-                    ),
-                  ).then((value) {
-                    if (responseCode(value.code)) {
-                      AdminController.getAll(
-                        context,
-                        1,
-                        pageSize,
-                      ).then((value) {
+                    UpdatePermissionAdminRequest(userId: widget.user!.userId, permissionIds: selectedPermission),
+                  ).then((updateResponse) {
+                    dismissLoading();
+                    if (responseCode(updateResponse.code)) {
+                      showLoading();
+                      AdminController.getAll(context, 1, pageSize).then((adminResponse) {
                         dismissLoading();
-                        if (responseCode(value.code)) {
-                          context.read<AdminController>().adminAllResponse = value.data;
+                        if (responseCode(adminResponse.code)) {
+                          context.read<AdminController>().adminAllResponse = adminResponse.data;
                           context.pop();
-                          showDialogSuccess(context, 'Successfully updated admin information');
+                          showDialogSuccess(context, 'Successfully created admin');
                         } else {
                           context.pop();
-                          showDialogSuccess(context, 'Successfully updated admin information');
+                          showDialogSuccess(context, 'Successfully created admin');
                         }
                       });
                     } else {
-                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                      showDialogError(context, updateResponse.data?.message ?? 'ERROR : ${updateResponse.code}');
                     }
                   });
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
                 }
-              });
-            } else {
-              AdminController.create(
-                context,
-                CreateAdminRequest(
-                  userName: _userName.text,
-                  userFullname: _userFullname.text,
-                  userPhone: '0${_userPhone.text}',
-                  userEmail: _userEmail.text,
-                  userPassword: _password.text,
-                  userRetypePassword: _password.text,
-                  branchId: _selectedBranch?.key,
-                ),
-              ).then((value) {
-                if (responseCode(value.code)) {
-                  if (responseCode(value.code)) {
-                    AdminController.updatePermission(
-                      context,
-                      UpdatePermissionAdminRequest(
-                        userId: widget.user!.userId,
-                        permissionIds: selectedPermission,
-                      ),
-                    ).then((updateResponse) {
-                      dismissLoading();
-                      if (responseCode(updateResponse.code)) {
-                        showLoading();
-                        AdminController.getAll(
-                          context,
-                          1,
-                          pageSize,
-                        ).then((adminResponse) {
-                          dismissLoading();
-                          if (responseCode(adminResponse.code)) {
-                            context.read<AdminController>().adminAllResponse = adminResponse.data;
-                            context.pop();
-                            showDialogSuccess(context, 'Successfully created admin');
-                          } else {
-                            context.pop();
-                            showDialogSuccess(context, 'Successfully created admin');
-                          }
-                        });
-                      } else {
-                        showDialogError(context, updateResponse.data?.message ?? 'ERROR : ${updateResponse.code}');
-                      }
-                    });
-                  }
-                } else {
-                  showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
-                }
-              });
-            }
-          },
-          actionText: 'button'.tr(gender: widget.type),
-        ),
+              } else {
+                showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+              }
+            });
+          }
+        }, actionText: 'button'.tr(gender: widget.type)),
       ],
     );
   }

@@ -21,17 +21,9 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribut
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:provider/provider.dart';
 
-enum Method {
-  get,
-  post,
-  put,
-  delete,
-  patch,
-}
+enum Method { get, post, put, delete, patch }
 
-enum BaseUrl {
-  portal,
-}
+enum BaseUrl { portal }
 
 class ApiController {
   final Dio _dio = Dio();
@@ -80,17 +72,12 @@ class ApiController {
   }
 
   Options unauthenticatedHeaders() {
-    return Options(
-      headers: {
-        Headers.acceptHeader: '*/*',
-        Headers.contentTypeHeader: 'application/json',
-      },
-    );
+    return Options(headers: {Headers.acceptHeader: '*/*', Headers.contentTypeHeader: 'application/json'});
   }
 
   Future<bool> checkToken(BuildContext context, bool isAuthenticated) async {
     if (isAuthenticated) {
-      return context.read<AuthController>().checkDateTime().then((value) async {
+      return await context.read<AuthController>().checkDateTime().then((value) async {
         String tokenStatus = value;
         debugPrint('tokenStatus : $tokenStatus');
         debugPrint('expiredAt : ${context.read<AuthController>().authenticationResponse?.data?.expiryDt}');
@@ -111,7 +98,7 @@ class ApiController {
         } else if (tokenStatus == 'expired') {
           if (isSessionExpiredDialogOpen == false) {
             context.read<AuthController>().logout(context);
-            context.goNamed(LoginPage.routeName, extra: true);
+            context.goNamed(LoginPage.routeName);
             // isSessionExpiredDialogOpen = true;
             // promptDialog(context, action: () {
             //   context.pop(context);
@@ -154,86 +141,74 @@ class ApiController {
           case Method.get:
             return await _dio
                 .get(
-              url,
-              queryParameters: queryParameters,
-              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
-            )
+                  url,
+                  queryParameters: queryParameters,
+                  options: headers ?? await getHeaders(baseUrl, isAuthenticated),
+                )
                 .then((response) {
-              printData(response);
-              return ApiResponse(
-                code: response.statusCode,
-                data: response.data,
-              );
-            });
+                  printData(response);
+                  return ApiResponse(code: response.statusCode, data: response.data);
+                });
           case Method.post:
             return await Dio()
                 .post(
-              url,
-              data: data,
-              queryParameters: queryParameters,
-              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
-            )
+                  url,
+                  data: data,
+                  queryParameters: queryParameters,
+                  options: headers ?? await getHeaders(baseUrl, isAuthenticated),
+                )
                 .then((response) {
-              printData(response);
-              return ApiResponse(
-                code: response.statusCode,
-                data: response.data,
-              );
-            });
+                  printData(response);
+                  return ApiResponse(code: response.statusCode, data: response.data);
+                });
           case Method.put:
             return await _dio
                 .put(
-              url,
-              data: data,
-              queryParameters: queryParameters,
-              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
-            )
+                  url,
+                  data: data,
+                  queryParameters: queryParameters,
+                  options: headers ?? await getHeaders(baseUrl, isAuthenticated),
+                )
                 .then((response) {
-              printData(response);
-              return ApiResponse(
-                code: response.statusCode,
-                data: response.data,
-              );
-            });
+                  printData(response);
+                  return ApiResponse(code: response.statusCode, data: response.data);
+                });
           case Method.patch:
             return await _dio
                 .patch(
-              url,
-              data: data,
-              queryParameters: queryParameters,
-              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
-            )
+                  url,
+                  data: data,
+                  queryParameters: queryParameters,
+                  options: headers ?? await getHeaders(baseUrl, isAuthenticated),
+                )
                 .then((response) {
-              printData(response);
-              return ApiResponse(
-                code: response.statusCode,
-                data: response.data,
-              );
-            });
+                  printData(response);
+                  return ApiResponse(code: response.statusCode, data: response.data);
+                });
           case Method.delete:
             return await _dio
                 .delete(
-              url,
-              data: data,
-              queryParameters: queryParameters,
-              options: headers ?? await getHeaders(baseUrl, isAuthenticated),
-            )
+                  url,
+                  data: data,
+                  queryParameters: queryParameters,
+                  options: headers ?? await getHeaders(baseUrl, isAuthenticated),
+                )
                 .then((response) {
-              printData(response);
-              return ApiResponse(
-                code: response.statusCode,
-                data: response.data,
-              );
-            });
+                  printData(response);
+                  return ApiResponse(code: response.statusCode, data: response.data);
+                });
         }
       } catch (e) {
-        debugPrint('ERROR: $e');
         if (e is DioException) {
+          debugPrint(
+            'ERROR: url -> $url | data -> $data | code -> ${e.response?.statusCode}  | message -> ${e.response?.data['message']} | ${e.error}',
+          );
           if (e.isNoConnectionError) {
             debugPrint('Internet connection is now offline');
           } else {
             dismissLoading();
             if (e.response?.statusCode == 401 && isAuthenticated == false) {
+              dismissLoading();
               Future.delayed(Duration.zero, () {
                 showDialogError(context, e.response?.data?['message'] ?? '');
               });
@@ -241,16 +216,20 @@ class ApiController {
                 e.response?.statusCode == 403 ||
                 e.response?.statusCode == 410) {
               if (isSessionExpiredDialogOpen == false) {
+                dismissLoading();
                 isSessionExpiredDialogOpen = true;
-                await promptDialog(context, action: () {
-                  context.pop(context);
-                  isSessionExpiredDialogOpen = false;
-                  context.read<AuthController>().logout(context);
-                  context.goNamed(LoginPage.routeName, extra: true);
-                },
-                    text: 'error'.tr(gender: 'sessionExpired'),
-                    buttonColor: errorColor,
-                    buttonText: 'button'.tr(gender: 'reLogin'));
+                await promptDialog(
+                  context,
+                  action: () {
+                    context.pop(context);
+                    isSessionExpiredDialogOpen = false;
+                    context.read<AuthController>().logout(context);
+                    context.goNamed(LoginPage.routeName);
+                  },
+                  text: 'error'.tr(gender: 'sessionExpired'),
+                  buttonColor: errorColor,
+                  buttonText: 'button'.tr(gender: 'reLogin'),
+                );
               }
             } else if (e.response?.statusCode == 500 || e.response?.statusCode == 503) {
               try {
@@ -259,23 +238,27 @@ class ApiController {
                     context,
                     action: () {
                       context.pop(context);
-                      return call(context,
-                          baseUrl: baseUrl,
-                          method: method,
-                          queryParameters: queryParameters,
-                          data: data,
-                          isAuthenticated: isAuthenticated,
-                          endpoint: endpoint);
+                      return call(
+                        context,
+                        baseUrl: baseUrl,
+                        method: method,
+                        queryParameters: queryParameters,
+                        data: data,
+                        isAuthenticated: isAuthenticated,
+                        endpoint: endpoint,
+                      );
                     },
-                    text: e.response?.data?['message'] ==
-                            'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
-                        ? 'error'.tr(gender: 'err-6')
-                        : 'error'.tr(gender: e.response?.statusCode == 500 ? 'generic' : 'internal'),
+                    text:
+                        e.response?.data?['message'] ==
+                                'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
+                            ? 'error'.tr(gender: 'err-6')
+                            : 'error'.tr(gender: e.response?.statusCode == 500 ? 'generic' : 'internal'),
                     buttonColor: errorColor,
-                    buttonText: e.response?.data?['message'] ==
-                            'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
-                        ? null
-                        : 'button'.tr(gender: 'retry'),
+                    buttonText:
+                        e.response?.data?['message'] ==
+                                'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
+                            ? null
+                            : 'button'.tr(gender: 'retry'),
                     barrierDismissible: true,
                   );
                 });
@@ -285,20 +268,20 @@ class ApiController {
             } else if (e.response?.statusCode == 409) {
               try {
                 Future.delayed(Duration.zero, () {
-                  while (context.canPop()) {
-                    context.pop();
-                  }
+                  context.goNamed(LoginPage.routeName);
                   return promptDialog(
                     context,
                     action: () {
                       context.pop(context);
-                      return call(context,
-                          baseUrl: baseUrl,
-                          method: method,
-                          queryParameters: queryParameters,
-                          data: data,
-                          isAuthenticated: isAuthenticated,
-                          endpoint: endpoint);
+                      return call(
+                        context,
+                        baseUrl: baseUrl,
+                        method: method,
+                        queryParameters: queryParameters,
+                        data: data,
+                        isAuthenticated: isAuthenticated,
+                        endpoint: endpoint,
+                      );
                     },
                     text: 'error'.tr(gender: 'suspendedUser'),
                     buttonColor: errorColor,
@@ -323,12 +306,14 @@ class ApiController {
     });
   }
 
-  promptDialog(BuildContext context,
-      {required Function() action,
-      required String text,
-      required String? buttonText,
-      Color? buttonColor,
-      bool barrierDismissible = false}) async {
+  promptDialog(
+    BuildContext context, {
+    required Function() action,
+    required String text,
+    required String? buttonText,
+    Color? buttonColor,
+    bool barrierDismissible = false,
+  }) async {
     Future.delayed(Duration.zero, () {
       return showDialog(
         context: context,
@@ -339,11 +324,7 @@ class ApiController {
               text: text,
               buttonAttributes: [
                 if (buttonText != null)
-                  DialogButtonAttribute(
-                    action,
-                    text: buttonText,
-                    color: buttonColor ?? errorColor,
-                  ),
+                  DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
               ],
             ),
           );
@@ -368,31 +349,17 @@ class ApiResponse<T> {
   String? message;
   T? data;
 
-  ApiResponse({
-    this.code,
-    this.message,
-    this.data,
-  });
+  ApiResponse({this.code, this.message, this.data});
 
   factory ApiResponse.fromJson(Map<String, dynamic> json, {Function(dynamic)? parse}) {
     try {
-      return ApiResponse(
-        message: json['message'],
-        code: json['code'],
-        data: parse?.call(json['data']),
-      );
+      return ApiResponse(message: json['message'], code: json['code'], data: parse?.call(json['data']));
     } catch (e) {
-      return ApiResponse(
-        data: parse?.call(json['data']),
-      );
+      return ApiResponse(data: parse?.call(json['data']));
     }
   }
 
-  Map<String, dynamic> toJson() => {
-        "code": code,
-        "message": message,
-        "data": data,
-      };
+  Map<String, dynamic> toJson() => {"code": code, "message": message, "data": data};
 }
 
 class MyHttpOverrides extends HttpOverrides {

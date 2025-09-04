@@ -70,17 +70,14 @@ class _PointHomepageState extends State<PointHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: const MobileView(),
-      desktop: desktopView(),
-    );
+    return LayoutWidget(mobile: const MobileView(), desktop: desktopView());
   }
 
   Widget desktopView() {
     return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    // (widget.orderReference == null)
+    //     ?
+    Scaffold(
       backgroundColor: Colors.white,
       body: SizedBox(
         height: screenHeight(100),
@@ -92,21 +89,13 @@ class _PointHomepageState extends State<PointHomepage> {
             Expanded(
               child: Row(
                 children: [
-                  Expanded(
-                    flex: 3,
-                    child: SizedBox(
-                      child: customerPoints(),
-                    ),
-                  ),
+                  Expanded(flex: 3, child: SizedBox(child: customerPoints())),
                   // const CardContainer(
                   //   Column(
                   //     children: [Text('data')],
                   //   ),
                   // ),
-                  Expanded(
-                    flex: 2,
-                    child: history(),
-                  ),
+                  Expanded(flex: 2, child: history()),
                 ],
               ),
             ),
@@ -116,9 +105,7 @@ class _PointHomepageState extends State<PointHomepage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: secondaryColor,
-        child: const Icon(
-          Icons.add,
-        ),
+        child: const Icon(Icons.add),
       ),
     );
     // : OrderDetailHomepage(
@@ -133,29 +120,27 @@ class _PointHomepageState extends State<PointHomepage> {
         padding: EdgeInsets.all(screenPadding),
         child: Column(
           children: [
-            Text(
-              'Customer Payment',
-              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-            ),
+            Text('Patient Payment', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
             AppPadding.vertical(),
             pointDetails(),
             AppPadding.vertical(),
             InputField(
               field: InputFieldAttribute(
-                  controller: _amount.controller,
-                  labelText: _amount.labelText,
-                  prefixText: _amount.prefixText,
-                  errorMessage: _amount.errorMessage,
-                  isCurrency: true,
-                  maxCharacter: 9,
-                  isEditable: true,
-                  onChanged: (value) {
-                    if (_amount.errorMessage != null) {
-                      setState(() {
-                        _amount.errorMessage = null;
-                      });
-                    }
-                  }),
+                controller: _amount.controller,
+                labelText: _amount.labelText,
+                prefixText: _amount.prefixText,
+                errorMessage: _amount.errorMessage,
+                isCurrency: true,
+                maxCharacter: 9,
+                isEditable: true,
+                onChanged: (value) {
+                  if (_amount.errorMessage != null) {
+                    setState(() {
+                      _amount.errorMessage = null;
+                    });
+                  }
+                },
+              ),
             ),
             AppPadding.vertical(),
             InputField(
@@ -167,10 +152,7 @@ class _PointHomepageState extends State<PointHomepage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        color: Colors.blue,
-                      ),
+                      icon: const Icon(Icons.search, color: Colors.blue),
                       color: secondaryColor,
                       onPressed: () {
                         if (_amount.controller.text == '') {
@@ -193,7 +175,7 @@ class _PointHomepageState extends State<PointHomepage> {
                           });
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -228,31 +210,39 @@ class _PointHomepageState extends State<PointHomepage> {
                                                 ),
                                                 subtitle: Text(
                                                   '${item.userPhone} (${item.totalPoint} pts)',
-                                                  style: AppTypography.bodyMedium(context)
-                                                      .apply(color: Colors.grey.shade600),
+                                                  style: AppTypography.bodyMedium(
+                                                    context,
+                                                  ).apply(color: Colors.grey.shade600),
                                                 ),
                                                 onTap: () async {
                                                   int totalPoint = calculateCustomerPoints(_amount.controller.text);
-                                                  if (await showConfirmDialog(context,
-                                                      'Patient -> ${item.userFullname}\nAre you sure you want to store $totalPoint point(s) for this patient for spending RM ${_amount.controller.text}?')) {
+                                                  if (await showConfirmDialog(
+                                                    context,
+                                                    'Patient -> ${item.userFullname}\nAre you sure you want to store $totalPoint point(s) for this patient for spending RM ${_amount.controller.text}?',
+                                                  )) {
                                                     PointManagementController.create(
                                                       context,
                                                       CreatePointRequest(
-                                                          userId: item.userId,
-                                                          totalPoint: totalPoint,
-                                                          pointDescription:
-                                                              'You have earned $totalPoint point(s) for spending RM ${_amount.controller.text}'),
+                                                        userId: item.userId,
+                                                        totalPoint: totalPoint,
+                                                        pointDescription:
+                                                            'You have earned $totalPoint point(s) for spending RM ${_amount.controller.text}',
+                                                      ),
                                                     ).then((value) {
                                                       dismissLoading();
                                                       if (responseCode(value.code)) {
-                                                        showDialogSuccess(context,
-                                                            'Successfully added ${calculateCustomerPoints(_amount.controller.text)} point(s) for ${item.userFullname}.');
+                                                        showDialogSuccess(
+                                                          context,
+                                                          'Successfully added ${calculateCustomerPoints(_amount.controller.text)} point(s) for ${item.userFullname}.',
+                                                        );
                                                         _amount.controller.text = '';
                                                         _msisdn.controller.text = '';
                                                         runFiltering();
                                                       } else {
-                                                        showDialogError(context,
-                                                            value.data?.message ?? 'error'.tr(gender: 'err-7'));
+                                                        showDialogError(
+                                                          context,
+                                                          value.data?.message ?? 'error'.tr(gender: 'err-7'),
+                                                        );
                                                       }
                                                     });
                                                   }
@@ -330,10 +320,7 @@ class _PointHomepageState extends State<PointHomepage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.amber,
-                            border: Border.all(
-                              color: Colors.yellow,
-                              width: 3.4,
-                            ),
+                            border: Border.all(color: Colors.yellow, width: 3.4),
                           ),
                           child: Center(
                             child: Text(
@@ -356,10 +343,7 @@ class _PointHomepageState extends State<PointHomepage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.amber,
-                            border: Border.all(
-                              color: Colors.yellow,
-                              width: 3.4,
-                            ),
+                            border: Border.all(color: Colors.yellow, width: 3.4),
                           ),
                           child: Center(
                             child: Text(
@@ -382,63 +366,59 @@ class _PointHomepageState extends State<PointHomepage> {
               ElevatedButton(
                 onPressed: () {
                   showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: screenHeightByBreakpoint(90, 70, 50),
-                                  child: CardContainer(
-                                    Padding(
-                                      padding: EdgeInsets.all(screenPadding),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            'Terms and Conditions',
-                                            style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                                          ),
-                                          AppPadding.vertical(),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Flexible(
-                                                child: Text(
-                                                  // •	Refer a friend and earn an extra points when they make their first payment!\n
-                                                  '•	Earn extra points on special occasions and during promotional events!\n•	Points expire after 12 months.\n•	For every RM 10, you earn 1 point.\n•	Each transaction gives you a minimum of 1 point and a maximum of 1,000 points.\n• Points can be redeemed for discounts or exclusive rewards at Klinik Aurora',
-                                                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 0),
-                                                ),
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: screenHeightByBreakpoint(90, 70, 50),
+                                child: CardContainer(
+                                  Padding(
+                                    padding: EdgeInsets.all(screenPadding),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Terms and Conditions',
+                                          style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                        ),
+                                        AppPadding.vertical(),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                // •	Refer a friend and earn an extra points when they make their first payment!\n
+                                                '•	Earn extra points on special occasions and during promotional events!\n•	Points expire after 12 months.\n•	For every RM 10, you earn 1 point.\n•	Each transaction gives you a minimum of 1 point and a maximum of 1,000 points.\n• Points can be redeemed for discounts or exclusive rewards at Klinik Aurora',
+                                                style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 0),
                                               ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        );
-                      });
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   side: const BorderSide(color: Colors.blue),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Text(
-                    "Learn more",
-                    style: TextStyle(color: Colors.blue),
-                  ),
+                  child: Text("Learn more", style: TextStyle(color: Colors.blue)),
                 ),
               ),
             ],
@@ -465,52 +445,49 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget history() {
     return CardContainer(
-      Consumer<PointManagementController>(builder: (context, snapshot, _) {
-        return Column(
-          children: [
-            AppPadding.vertical(),
-            Text(
-              'Point History',
-              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    for (user_model.Data item in snapshot.userPointsResponse?.data ?? [])
-                      SizedBox(
-                        child: ListTile(
-                          onTap: () {},
-                          title: Text(
-                            item.username ?? ' N/A',
-                            style: AppTypography.bodyMedium(context),
-                          ),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${item.pointDescription != null ? '${item.pointDescription}\n' : ''}by ${item.createdByFullname ?? 'N/A'}\n${dateConverter(item.createdDate)}',
-                                style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -2),
-                              ),
-                              Text(
-                                ((item.totalPoint ?? 0) > 0) ? '+ ${item.totalPoint}' : '${item.totalPoint}',
-                                style: AppTypography.bodyMedium(context).apply(
+      Consumer<PointManagementController>(
+        builder: (context, snapshot, _) {
+          return Column(
+            children: [
+              AppPadding.vertical(),
+              Text('Point History', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (user_model.Data item in snapshot.userPointsResponse?.data ?? [])
+                        SizedBox(
+                          child: ListTile(
+                            onTap: () {},
+                            title: Text(item.username ?? ' N/A', style: AppTypography.bodyMedium(context)),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${item.pointDescription != null ? '${item.pointDescription}\n' : ''}by ${item.createdByFullname ?? 'N/A'}\n${dateConverter(item.createdDate)}',
+                                  style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -2),
+                                ),
+                                Text(
+                                  ((item.totalPoint ?? 0) > 0) ? '+ ${item.totalPoint}' : '${item.totalPoint}',
+                                  style: AppTypography.bodyMedium(context).apply(
                                     fontWeightDelta: 2,
                                     fontSizeDelta: 5,
-                                    color: ((item.totalPoint ?? 0) < 0) ? errorColor : Colors.green),
-                              ),
-                            ],
+                                    color: ((item.totalPoint ?? 0) < 0) ? errorColor : Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            paginationWidget(),
-          ],
-        );
-      }),
+              paginationWidget(),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -518,13 +495,7 @@ class _PointHomepageState extends State<PointHomepage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: pagination(),
-            ),
-          ],
-        ),
+        Row(children: [Expanded(child: pagination())]),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -533,13 +504,7 @@ class _PointHomepageState extends State<PointHomepage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (!isMobile && !isTablet)
-                    const Flexible(
-                      child: Text(
-                        'Items per page: ',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
+                    const Flexible(child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1)),
                   perPage(),
                 ],
               ),
@@ -562,9 +527,7 @@ class _PointHomepageState extends State<PointHomepage> {
         onChanged: (selected) {
           DropdownAttribute item = selected as DropdownAttribute;
           _pageSize = int.parse(item.key);
-          filtering(
-            enableDebounce: false,
-          );
+          filtering(enableDebounce: false);
         },
       ),
     );
@@ -607,7 +570,7 @@ class _PointHomepageState extends State<PointHomepage> {
         _totalCount = value.data?.totalCount ?? 0;
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
       } else {
-        showDialogError(context, value.data?.message ?? 'error'.tr(gender: 'generic'));
+        showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
       }
     });
   }

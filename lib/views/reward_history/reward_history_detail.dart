@@ -34,11 +34,7 @@ class RewardHistoryDetail extends StatefulWidget {
   final String type;
   final reward_history.Data data;
 
-  const RewardHistoryDetail({
-    super.key,
-    required this.type,
-    required this.data,
-  });
+  const RewardHistoryDetail({super.key, required this.type, required this.data});
 
   @override
   State<RewardHistoryDetail> createState() => _RewardHistoryDetailState();
@@ -65,8 +61,10 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
   @override
   void initState() {
     if (widget.type == 'update') {
-      _status = DropdownAttribute(widget.data.rewardHistoryStatus == 1 ? '1' : '0',
-          widget.data.rewardHistoryStatus == 1 ? 'In-Progress' : 'Completed');
+      _status = DropdownAttribute(
+        widget.data.rewardHistoryStatus == 1 ? '1' : '0',
+        widget.data.rewardHistoryStatus == 1 ? 'In-Progress' : 'Completed',
+      );
       historyDescription.controller.text = widget.data.rewardHistoryDescription ?? '';
       // selectedFile = FileAttribute(path: widget.reward?.rewardImage, name: widget.reward?.rewardImage);
     }
@@ -100,15 +98,12 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText(
-                              'Reward History Information',
-                              style: AppTypography.bodyLarge(context),
-                            ),
+                            AppSelectableText('Reward History Information', style: AppTypography.bodyLarge(context)),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
                               },
-                            )
+                            ),
                           ],
                         ),
                         AppPadding.vertical(denominator: 1),
@@ -138,52 +133,54 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: TextEditingController(text: widget.data.userFullname),
-                                      labelText: 'Customer Name *',
+                                      labelText: 'Patient Name *',
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 1),
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: TextEditingController(text: widget.data.userPhone),
-                                      labelText: 'Customer Contact No *',
+                                      labelText: 'Patient Contact No *',
                                     ),
                                   ),
                                   AppPadding.vertical(denominator: 1),
                                   InputField(
                                     field: InputFieldAttribute(
-                                        controller: historyDescription.controller,
-                                        errorMessage: historyDescription.errorMessage,
-                                        lineNumber: 3,
-                                        maxCharacter: 120,
-                                        labelText: 'Comments/Notes *',
-                                        onChanged: (value) {
-                                          if (historyDescription.errorMessage != null) {
-                                            historyDescription.errorMessage = null;
-                                          }
-                                          enableButton.value = true;
-                                        }),
+                                      controller: historyDescription.controller,
+                                      errorMessage: historyDescription.errorMessage,
+                                      lineNumber: 3,
+                                      maxCharacter: 120,
+                                      labelText: 'Comments/Notes *',
+                                      onChanged: (value) {
+                                        if (historyDescription.errorMessage != null) {
+                                          historyDescription.errorMessage = null;
+                                        }
+                                        enableButton.value = true;
+                                      },
+                                    ),
                                   ),
                                   AppPadding.vertical(denominator: 1),
                                   StreamBuilder<DateTime>(
-                                      stream: rebuildDropdown.stream,
-                                      builder: (context, snapshot) {
-                                        return AppDropdown(
-                                          attributeList: DropdownAttributeList(
-                                            [
-                                              for (DropdownAttribute item in rewardHistoryStatus)
-                                                DropdownAttribute(item.key, item.name),
-                                            ],
-                                            onChanged: (selected) {
-                                              _status = selected;
-                                              enableButton.value = true;
-                                              rebuildDropdown.add(DateTime.now());
-                                            },
-                                            // errorMessage: _branchId.errorMessage,
-                                            value: _status?.name,
-                                            width: screenWidth1728(26),
-                                          ),
-                                        );
-                                      }),
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return AppDropdown(
+                                        attributeList: DropdownAttributeList(
+                                          [
+                                            for (DropdownAttribute item in rewardHistoryStatus)
+                                              DropdownAttribute(item.key, item.name),
+                                          ],
+                                          onChanged: (selected) {
+                                            _status = selected;
+                                            enableButton.value = true;
+                                            rebuildDropdown.add(DateTime.now());
+                                          },
+                                          // errorMessage: _branchId.errorMessage,
+                                          value: _status?.name,
+                                          width: screenWidth1728(26),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                   AppPadding.vertical(denominator: 1),
                                   Text(
                                     'Note: If an item needs to be shipped, please enter the address in the comment section. Update the status once it has been completed.',
@@ -204,82 +201,75 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                                       if (widget.type == 'create') ...[
                                         selectedFile?.value == null
                                             ? UploadDocumentsField(
-                                                title: 'rewardHistoryPage'.tr(gender: 'browseFile'),
-                                                fieldTitle: 'rewardHistoryPage'.tr(gender: 'rewardImage'),
-                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                action: () {
-                                                  addPicture();
-                                                },
-                                                cancelAction: () {},
-                                              )
+                                              title: 'rewardHistoryPage'.tr(gender: 'browseFile'),
+                                              fieldTitle: 'rewardHistoryPage'.tr(gender: 'rewardImage'),
+                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                              action: () {
+                                                addPicture();
+                                              },
+                                              cancelAction: () {},
+                                            )
                                             : Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      addPicture();
-                                                    },
-                                                    child: Image.memory(
-                                                      selectedFile?.value as Uint8List,
-                                                      height: 410,
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      selectedFile = FileAttribute();
-                                                      fileRebuild.add(DateTime.now());
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons.close,
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
+                                              alignment: Alignment.topRight,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    addPicture();
+                                                  },
+                                                  child: Image.memory(selectedFile?.value as Uint8List, height: 410),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    selectedFile = FileAttribute();
+                                                    fileRebuild.add(DateTime.now());
+                                                  },
+                                                  icon: const Icon(Icons.close),
+                                                ),
+                                              ],
+                                            ),
                                       ],
                                       if (widget.type == 'update')
                                         widget.data.rewardHistoryImage == null
                                             ? selectedFile?.name != null
                                                 ? Stack(
-                                                    alignment: Alignment.topRight,
-                                                    children: [
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          addPicture();
-                                                        },
-                                                        child: Image.memory(
-                                                          selectedFile?.value as Uint8List,
-                                                          height: 410,
-                                                        ),
+                                                  alignment: Alignment.topRight,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        addPicture();
+                                                      },
+                                                      child: Image.memory(
+                                                        selectedFile?.value as Uint8List,
+                                                        height: 410,
                                                       ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          selectedFile = FileAttribute();
-                                                          fileRebuild.add(DateTime.now());
-                                                        },
-                                                        icon: const Icon(
-                                                          Icons.close,
-                                                        ),
-                                                      )
-                                                    ],
-                                                  )
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        selectedFile = FileAttribute();
+                                                        fileRebuild.add(DateTime.now());
+                                                      },
+                                                      icon: const Icon(Icons.close),
+                                                    ),
+                                                  ],
+                                                )
                                                 : UploadDocumentsField(
-                                                    title: 'branchImage'.tr(gender: 'browseFile'),
-                                                    fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                    // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                    action: () {
-                                                      addPicture();
-                                                    },
-                                                    cancelAction: () {},
-                                                  )
+                                                  title: 'branchImage'.tr(gender: 'browseFile'),
+                                                  fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                  action: () {
+                                                    addPicture();
+                                                  },
+                                                  cancelAction: () {},
+                                                )
                                             : GestureDetector(
-                                                onTap: () {
-                                                  addPicture();
-                                                },
-                                                child: Image.network(
-                                                  '${Environment.imageUrl}${widget.data.rewardHistoryImage}',
-                                                  height: 410,
-                                                ),
+                                              onTap: () {
+                                                addPicture();
+                                              },
+                                              child: Image.network(
+                                                '${Environment.imageUrl}${widget.data.rewardHistoryImage}',
+                                                height: 410,
                                               ),
+                                            ),
                                       if (widget.data.createdByFullname != null) ...[
                                         AppPadding.vertical(denominator: 1),
                                         InputField(
@@ -294,7 +284,8 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                                       InputField(
                                         field: InputFieldAttribute(
                                           controller: TextEditingController(
-                                              text: dateConverter(widget.data.rewardHistoryModifiedDate)),
+                                            text: dateConverter(widget.data.rewardHistoryModifiedDate),
+                                          ),
                                           isEditable: false,
                                           labelText: 'Updated At',
                                         ),
@@ -313,77 +304,82 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             StreamBuilder<DateTime>(
-                                stream: rebuild.stream,
-                                builder: (context, snapshot) {
-                                  return ValueListenableBuilder<bool>(
-                                      valueListenable: enableButton,
-                                      builder: (context, snapshot, _) {
-                                        return Button(
-                                          () {
-                                            if (historyDescription.controller.text.isNotEmpty &&
-                                                _status != null &&
-                                                snapshot) {
-                                              showConfirmDialog(context, 'Are you sure you want to update this order?')
-                                                  .then((updating) {
-                                                if (updating == true) {
-                                                  RewardHistoryController.update(
-                                                    context,
-                                                    UpdateRewardHistoryRequest(
-                                                      rewardId: widget.data.rewardId,
-                                                      rewardHistoryId: widget.data.rewardHistoryId,
-                                                      pointTransactionId: widget.data.pointTransactionId,
-                                                      rewardHistoryStatus: int.parse(_status?.key ?? '0'),
-                                                      rewardHistoryDescription: historyDescription.controller.text,
-                                                      // userAddress: userAddress.text,
-                                                      // userAddressPostcode: userAddressPostcode.text,
-                                                      // userAddressCity: userAddressCity.text,
-                                                      // userAddressState: userAddressState.text,
-                                                      // userAddressCountry: 'Malaysia',
-                                                    ),
-                                                  ).then((value) {
-                                                    if (responseCode(value.code)) {
-                                                      if (document?.value != null) {
-                                                        RewardHistoryController.upload(
-                                                                context,
-                                                                widget.data.rewardHistoryId ?? '',
-                                                                FileAttribute(
-                                                                    name: document?.name, value: document?.value))
-                                                            .then((uploadResponse) {
-                                                          if (responseCode(uploadResponse.code)) {
-                                                            _onRefresh();
-                                                          } else {
-                                                            showDialogError(
-                                                                context,
-                                                                value.data?.message ??
-                                                                    value.message ??
-                                                                    'Order successfully updated but unable to update the image:\n${widget.data.rewardId}');
-                                                          }
-                                                        });
-                                                      } else {
+                              stream: rebuild.stream,
+                              builder: (context, snapshot) {
+                                return ValueListenableBuilder<bool>(
+                                  valueListenable: enableButton,
+                                  builder: (context, snapshot, _) {
+                                    return Button(
+                                      () {
+                                        if (historyDescription.controller.text.isNotEmpty &&
+                                            _status != null &&
+                                            snapshot) {
+                                          showConfirmDialog(
+                                            context,
+                                            'Are you sure you want to update this order?',
+                                          ).then((updating) {
+                                            if (updating == true) {
+                                              RewardHistoryController.update(
+                                                context,
+                                                UpdateRewardHistoryRequest(
+                                                  rewardId: widget.data.rewardId,
+                                                  rewardHistoryId: widget.data.rewardHistoryId,
+                                                  pointTransactionId: widget.data.pointTransactionId,
+                                                  rewardHistoryStatus: int.parse(_status?.key ?? '0'),
+                                                  rewardHistoryDescription: historyDescription.controller.text,
+                                                  // userAddress: userAddress.text,
+                                                  // userAddressPostcode: userAddressPostcode.text,
+                                                  // userAddressCity: userAddressCity.text,
+                                                  // userAddressState: userAddressState.text,
+                                                  // userAddressCountry: 'Malaysia',
+                                                ),
+                                              ).then((value) {
+                                                if (responseCode(value.code)) {
+                                                  if (document?.value != null) {
+                                                    RewardHistoryController.upload(
+                                                      context,
+                                                      widget.data.rewardHistoryId ?? '',
+                                                      FileAttribute(name: document?.name, value: document?.value),
+                                                    ).then((uploadResponse) {
+                                                      if (responseCode(uploadResponse.code)) {
                                                         _onRefresh();
-                                                      }
-                                                    } else {
-                                                      showDialogError(
+                                                      } else {
+                                                        showDialogError(
                                                           context,
                                                           value.data?.message ??
                                                               value.message ??
-                                                              'Unable to update the order:\n${widget.data.rewardId}');
-                                                    }
-                                                  });
+                                                              'Order successfully updated but unable to update the image:\n${widget.data.rewardId}',
+                                                        );
+                                                      }
+                                                    });
+                                                  } else {
+                                                    _onRefresh();
+                                                  }
+                                                } else {
+                                                  showDialogError(
+                                                    context,
+                                                    value.data?.message ??
+                                                        value.message ??
+                                                        'Unable to update the order:\n${widget.data.rewardId}',
+                                                  );
                                                 }
                                               });
-                                            } else {
-                                              setState(() {
-                                                historyDescription.errorMessage =
-                                                    'Please update the comments for reference and tracking purposes.';
-                                              });
                                             }
-                                          },
-                                          color: snapshot ? null : disabledColor,
-                                          actionText: 'button'.tr(gender: 'update'),
-                                        );
-                                      });
-                                }),
+                                          });
+                                        } else {
+                                          setState(() {
+                                            historyDescription.errorMessage =
+                                                'Please update the comments for reference and tracking purposes.';
+                                          });
+                                        }
+                                      },
+                                      color: snapshot ? null : disabledColor,
+                                      actionText: 'button'.tr(gender: 'update'),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ],
@@ -415,16 +411,20 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
         context.read<RewardController>().rewardAllResponse = value;
         context.pop();
         if (widget.type == 'update') {
-          showDialogSuccess(context,
-              'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉');
+          showDialogSuccess(
+            context,
+            'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉',
+          );
         } else {
           showDialogSuccess(context, 'Successfully created a new reward');
         }
       } else {
         context.pop();
         if (widget.type == 'update') {
-          showDialogSuccess(context,
-              'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉');
+          showDialogSuccess(
+            context,
+            'We\'ve just whipped up an amazing new reward that\'s sure to bring endless joy to our customers! 🎉',
+          );
         } else {
           showDialogSuccess(context, 'Successfully created a new reward');
         }
@@ -441,17 +441,17 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
       if (supportedExtensions.contains(file.extension)) {
         debugPrint(bytesToMB(file.size).toString());
         debugPrint(file.name);
-        if (bytesToMB(file.size) < 5.0) {
+        if (bytesToMB(file.size) < 1.0) {
           Uint8List? fileBytes = result.files.first.bytes;
           String fileName = result.files.first.name;
 
           selectedFile = FileAttribute(name: fileName, value: fileBytes);
           fileRebuild.add(DateTime.now());
         } else {
-          documentErrorMessage.add('error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
+          showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
         }
       } else {
-        documentErrorMessage.add('error'.tr(gender: 'err-22'));
+        showDialogError(context, 'error'.tr(gender: 'err-22'));
       }
     } else {
       // User canceled the picker

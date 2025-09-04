@@ -11,6 +11,7 @@ import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -58,125 +59,105 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
     return widget.token == null
         ? const ErrorPage()
         : GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: Scaffold(
-              body: Column(
-                children: [
-                  Container(
-                    width: screenWidth(100),
-                    height: screenHeight(100),
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: primaryColors,
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      // image: DecorationImage(
-                      //   image: AssetImage("assets/images/bg.png"),
-                      //   fit: BoxFit.cover,
-                      // ),
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Scaffold(
+            body: Column(
+              children: [
+                Container(
+                  width: screenWidth(100),
+                  height: screenHeight(100),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: primaryColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CardContainer(
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LayoutWidget(
-                                mobile: Expanded(
-                                  child: content(),
-                                ),
-                                desktop: Flexible(
-                                  child: content(),
-                                ),
-                              ),
-                            ],
-                          ),
-                          elevation: 10,
-                        )
-                      ],
-                    ),
+                    // image: DecorationImage(
+                    //   image: AssetImage("assets/images/bg.png"),
+                    //   fit: BoxFit.cover,
+                    // ),
                   ),
-                ],
-              ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CardContainer(
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            LayoutWidget(mobile: Expanded(child: content()), desktop: Flexible(child: content())),
+                          ],
+                        ),
+                        elevation: 10,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          );
+          ),
+        );
   }
 
   Widget content() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
       child: ValueListenableBuilder<bool?>(
-          valueListenable: isSuccess,
-          builder: (context, snapshot, _) {
-            if (snapshot != null) {
-              return Padding(
-                padding: EdgeInsets.all(screenPadding),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      snapshot ? 'assets/icons/success/tick-square.svg' : 'assets/icons/failed/warning.svg',
-                      height: screenHeight(13),
-                      colorFilter: ColorFilter.mode(
-                          snapshot ? const Color(0XFF50D142) : const Color(0XFFDF184A), BlendMode.srcIn),
+        valueListenable: isSuccess,
+        builder: (context, snapshot, _) {
+          if (snapshot != null) {
+            return Padding(
+              padding: EdgeInsets.all(screenPadding),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    snapshot ? 'assets/icons/success/tick-square.svg' : 'assets/icons/failed/warning.svg',
+                    height: screenHeight(13),
+                    colorFilter: ColorFilter.mode(
+                      snapshot ? const Color(0XFF50D142) : const Color(0XFFDF184A),
+                      BlendMode.srcIn,
                     ),
-                    AppPadding.vertical(),
-                    Text(snapshot
+                  ),
+                  AppPadding.vertical(),
+                  Text(
+                    snapshot
                         ? 'You\'ve successfully updated your password. Keep your new password secure to protect your account.'
-                        : 'Oops! Something went wrong on our end. Please give it another moment and then retry changing your password.'),
-                  ],
-                ),
-              );
-            }
-            return Column(
-              children: [
-                LayoutWidget(
-                  mobile: auroraImage(),
-                  desktop: const SizedBox(),
-                ),
-                AppPadding.vertical(denominator: 1 / 2),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    LayoutWidget(
-                      mobile: const SizedBox(),
-                      desktop: Row(
-                        children: [
-                          auroraImage(),
-                          AppPadding.horizontal(),
-                        ],
-                      ),
-                    ),
-                    LayoutWidget(
-                      mobile: Expanded(
-                        child: fields(),
-                      ),
-                      desktop: Flexible(
-                        child: fields(),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                        : 'Oops! Something went wrong on our end. Please give it another moment and then retry changing your password.',
+                  ),
+                ],
+              ),
             );
-          }),
+          }
+          return Column(
+            children: [
+              LayoutWidget(mobile: auroraImage(), desktop: const SizedBox()),
+              AppPadding.vertical(denominator: 1 / 2),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutWidget(
+                    mobile: const SizedBox(),
+                    desktop: Row(children: [auroraImage(), AppPadding.horizontal()]),
+                  ),
+                  LayoutWidget(mobile: Expanded(child: fields()), desktop: Flexible(child: fields())),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
   Widget fields() {
     return Column(
       children: [
-        Text(
-          'Change Password',
-          style: AppTypography.displayLarge(context).apply(fontSizeDelta: 4),
-        ),
+        Text('Change Password', style: AppTypography.displayLarge(context).apply(fontSizeDelta: 4)),
         AppPadding.vertical(),
         Text(
           'passwordRecoveryPage'.tr(gender: 'enterYourNewPassword'),
@@ -185,46 +166,49 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
         ),
         AppPadding.vertical(denominator: 1 / 2),
         StreamBuilder<DateTime>(
-            stream: rebuild.stream,
-            builder: (context, snapshot) {
-              return Column(
-                children: [
-                  InputField(
-                    field: InputFieldAttribute(
-                        controller: passwordAttribute.controller,
-                        labelText: passwordAttribute.labelText,
-                        errorMessage: passwordAttribute.errorMessage,
-                        obscureText: passwordAttribute.obscureText,
-                        isPassword: passwordAttribute.isPassword,
-                        onChanged: (value) {
-                          if (passwordAttribute.errorMessage != null || retypePasswordAttribute.errorMessage != null) {
-                            passwordAttribute.errorMessage = null;
-                            retypePasswordAttribute.errorMessage = null;
-                            rebuild.add(DateTime.now());
-                          }
-                        }),
-                    width: screenHeightByBreakpoint(80, 50, 24),
+          stream: rebuild.stream,
+          builder: (context, snapshot) {
+            return Column(
+              children: [
+                InputField(
+                  field: InputFieldAttribute(
+                    controller: passwordAttribute.controller,
+                    labelText: passwordAttribute.labelText,
+                    errorMessage: passwordAttribute.errorMessage,
+                    obscureText: passwordAttribute.obscureText,
+                    isPassword: passwordAttribute.isPassword,
+                    onChanged: (value) {
+                      if (passwordAttribute.errorMessage != null || retypePasswordAttribute.errorMessage != null) {
+                        passwordAttribute.errorMessage = null;
+                        retypePasswordAttribute.errorMessage = null;
+                        rebuild.add(DateTime.now());
+                      }
+                    },
                   ),
-                  AppPadding.vertical(),
-                  InputField(
-                    field: InputFieldAttribute(
-                        controller: retypePasswordAttribute.controller,
-                        labelText: retypePasswordAttribute.labelText,
-                        errorMessage: retypePasswordAttribute.errorMessage,
-                        obscureText: retypePasswordAttribute.obscureText,
-                        isPassword: retypePasswordAttribute.isPassword,
-                        onChanged: (value) {
-                          if (passwordAttribute.errorMessage != null || retypePasswordAttribute.errorMessage != null) {
-                            passwordAttribute.errorMessage = null;
-                            retypePasswordAttribute.errorMessage = null;
-                            rebuild.add(DateTime.now());
-                          }
-                        }),
-                    width: screenHeightByBreakpoint(80, 50, 24),
+                  width: screenHeightByBreakpoint(80, 50, 24),
+                ),
+                AppPadding.vertical(),
+                InputField(
+                  field: InputFieldAttribute(
+                    controller: retypePasswordAttribute.controller,
+                    labelText: retypePasswordAttribute.labelText,
+                    errorMessage: retypePasswordAttribute.errorMessage,
+                    obscureText: retypePasswordAttribute.obscureText,
+                    isPassword: retypePasswordAttribute.isPassword,
+                    onChanged: (value) {
+                      if (passwordAttribute.errorMessage != null || retypePasswordAttribute.errorMessage != null) {
+                        passwordAttribute.errorMessage = null;
+                        retypePasswordAttribute.errorMessage = null;
+                        rebuild.add(DateTime.now());
+                      }
+                    },
                   ),
-                ],
-              );
-            }),
+                  width: screenHeightByBreakpoint(80, 50, 24),
+                ),
+              ],
+            );
+          },
+        ),
         AppPadding.vertical(denominator: 1 / 2),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -267,7 +251,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey.withAlpha(opacityCalculation(.5)),
             spreadRadius: 5,
             blurRadius: 7,
             offset: const Offset(0, 2), // changes position of shadow
@@ -298,8 +282,9 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
       if (passwordAttribute.controller.text != retypePasswordAttribute.controller.text) {
         temp = false;
         retypePasswordAttribute.errorMessage = 'passwordRecoveryPage'.tr(gender: 'passwordNotMatch');
-      } else if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$')
-          .hasMatch(passwordAttribute.controller.text)) {
+      } else if (!RegExp(
+        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$',
+      ).hasMatch(passwordAttribute.controller.text)) {
         temp = false;
         passwordAttribute.errorMessage = 'passwordRecoveryPage'.tr(gender: 'passwordRequirement');
       }

@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/charts/line_chart_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
@@ -24,60 +25,45 @@ class LineChartWidget extends StatelessWidget {
                 attribute.label!,
                 style: AppTypography.bodyLarge(context).apply(color: attribute.darkMode ? Colors.white : null),
               ),
-              legends(
-                attribute.legends,
-              )
+              legends(attribute.legends),
             ],
           ),
           AppPadding.vertical(),
         ],
-        Expanded(
-          child: LineChart(
-            sampleData1,
-            duration: const Duration(milliseconds: 150),
-          ),
-        ),
+        Expanded(child: LineChart(sampleData1, duration: const Duration(milliseconds: 150))),
       ],
     );
   }
 
   LineChartData get sampleData1 => LineChartData(
-        lineTouchData: lineTouchData,
-        gridData: gridData,
-        titlesData: titlesData,
-        borderData: borderData,
-        lineBarsData: lineBarsData,
-        minX: 0,
-        maxX: 14,
-        maxY: attribute.maxY?.toDouble(),
-        minY: 0,
-      );
+    lineTouchData: lineTouchData,
+    gridData: gridData,
+    titlesData: titlesData,
+    borderData: borderData,
+    lineBarsData: lineBarsData,
+    minX: 0,
+    maxX: 14,
+    maxY: attribute.maxY?.toDouble(),
+    minY: 0,
+  );
 
   LineTouchData get lineTouchData => LineTouchData(
-        handleBuiltInTouches: true,
-        touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-        ),
-      );
+    handleBuiltInTouches: true,
+    touchTooltipData: LineTouchTooltipData(
+      // tooltipBgColor: Colors.blueGrey.withAlpha(opacityCalculation(.8)),
+    ),
+  );
 
   FlTitlesData get titlesData => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles(),
-        ),
-      );
+    bottomTitles: AxisTitles(sideTitles: bottomTitles),
+    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    leftTitles: AxisTitles(sideTitles: leftTitles()),
+  );
 
   List<LineChartBarData> get lineBarsData => [
-        for (int index = 0; index < attribute.items.length; index++) lineChartBarData(index),
-      ];
+    for (int index = 0; index < attribute.items.length; index++) lineChartBarData(index),
+  ];
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     TextStyle style = TextStyle(
@@ -97,16 +83,15 @@ class LineChartWidget extends StatelessWidget {
     }
   }
 
-  SideTitles leftTitles() => SideTitles(
-        getTitlesWidget: leftTitleWidgets,
-        showTitles: true,
-        interval: 1,
-        reservedSize: 40,
-      );
+  SideTitles leftTitles() =>
+      SideTitles(getTitlesWidget: leftTitleWidgets, showTitles: true, interval: 1, reservedSize: 40);
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     TextStyle style = TextStyle(
-        fontSize: 15.0, fontWeight: FontWeight.w500, color: attribute.darkMode ? Colors.white : textPrimaryColor);
+      fontSize: 15.0,
+      fontWeight: FontWeight.w500,
+      color: attribute.darkMode ? Colors.white : textPrimaryColor,
+    );
 
     if (attribute.labels.isNotEmpty) {
       return Padding(
@@ -118,24 +103,20 @@ class LineChartWidget extends StatelessWidget {
     }
   }
 
-  SideTitles get bottomTitles => SideTitles(
-        showTitles: true,
-        reservedSize: 32,
-        interval: 1,
-        getTitlesWidget: bottomTitleWidgets,
-      );
+  SideTitles get bottomTitles =>
+      SideTitles(showTitles: true, reservedSize: 32, interval: 1, getTitlesWidget: bottomTitleWidgets);
 
   FlGridData get gridData => const FlGridData(show: false);
 
   FlBorderData get borderData => FlBorderData(
-        show: true,
-        border: Border(
-          bottom: BorderSide(color: primary.withOpacity(0.2), width: 4),
-          left: const BorderSide(color: Colors.transparent),
-          right: const BorderSide(color: Colors.transparent),
-          top: const BorderSide(color: Colors.transparent),
-        ),
-      );
+    show: true,
+    border: Border(
+      bottom: BorderSide(color: primary.withAlpha(opacityCalculation(.2)), width: 4),
+      left: const BorderSide(color: Colors.transparent),
+      right: const BorderSide(color: Colors.transparent),
+      top: const BorderSide(color: Colors.transparent),
+    ),
+  );
 
   LineChartBarData lineChartBarData(int line) {
     return LineChartBarData(
@@ -144,12 +125,10 @@ class LineChartWidget extends StatelessWidget {
       barWidth: 4,
       isStrokeCapRound: true,
       dotData: const FlDotData(show: false),
-      belowBarData: line == 0
-          ? BarAreaData(show: false)
-          : BarAreaData(
-              show: false,
-              color: Colors.redAccent.withOpacity(0),
-            ),
+      belowBarData:
+          line == 0
+              ? BarAreaData(show: false)
+              : BarAreaData(show: false, color: Colors.redAccent.withAlpha(opacityCalculation(.0))),
       spots: [
         for (int index = 0; index < attribute.items[line].length; index++)
           FlSpot(index.toDouble(), attribute.items[line][index].value!),
@@ -179,10 +158,7 @@ class LineChartWidget extends StatelessWidget {
       children: [
         for (int index = 0; index < items.length; index++) ...[
           Container(
-            color: lineColor(
-              index,
-              item: items[index],
-            ),
+            color: lineColor(index, item: items[index]),
             height: 15,
             width: 15,
             margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -190,9 +166,10 @@ class LineChartWidget extends StatelessWidget {
           AppSelectableText(
             items[index],
             style: TextStyle(
-                fontSize: 15.0,
-                fontWeight: FontWeight.w500,
-                color: attribute.darkMode ? Colors.white : textPrimaryColor),
+              fontSize: 15.0,
+              fontWeight: FontWeight.w500,
+              color: attribute.darkMode ? Colors.white : textPrimaryColor,
+            ),
           ),
         ],
       ],

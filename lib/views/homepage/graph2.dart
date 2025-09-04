@@ -15,10 +15,7 @@ class Graph2Widget extends StatefulWidget {
 }
 
 class _Graph2WidgetState extends State<Graph2Widget> {
-  List<Color> gradientColors = [
-    const Color(0xFFDF6E98),
-    const Color(0XFF6ad1e3),
-  ];
+  List<Color> gradientColors = [const Color(0xFFDF6E98), const Color(0XFF6ad1e3)];
 
   bool showAvg = false;
 
@@ -30,9 +27,7 @@ class _Graph2WidgetState extends State<Graph2Widget> {
           aspectRatio: 4.5,
           child: DecoratedBox(
             decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(18),
-              ),
+              borderRadius: BorderRadius.all(Radius.circular(18)),
               color: Color(0xff232d37),
             ),
             child: Padding(
@@ -42,11 +37,11 @@ class _Graph2WidgetState extends State<Graph2Widget> {
                 top: screenPadding * 1.5,
                 bottom: 12,
               ),
-              child: Consumer<DashboardController>(builder: (context, snapshot, _) {
-                return LineChart(
-                  mainData(context.read<DashboardController>().dashboardResponse?.data),
-                );
-              }),
+              child: Consumer<DashboardController>(
+                builder: (context, snapshot, _) {
+                  return LineChart(mainData(context.read<DashboardController>().dashboardResponse?.data));
+                },
+              ),
             ),
           ),
         ),
@@ -62,66 +57,62 @@ class _Graph2WidgetState extends State<Graph2Widget> {
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff68737d),
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
+    const style = TextStyle(color: Color(0xff68737d), fontWeight: FontWeight.bold, fontSize: 16);
     Widget text;
     Data? response = context.read<DashboardController>().dashboardResponse?.data;
     switch (value.toInt()) {
       case 0:
-        text = response == null
-            ? const SizedBox()
-            : Text(convertToDayMonth(response.totalRegistrationByDay?[0].date ?? ""), style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(convertToDayMonth(response.totalRegistrationByDay?[0].date ?? ""), style: style);
         break;
       case 1:
-        text = response == null
-            ? const SizedBox()
-            : Text(convertToDayMonth(response.totalRegistrationByDay?[1].date ?? ""), style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(convertToDayMonth(response.totalRegistrationByDay?[1].date ?? ""), style: style);
         break;
       case 2:
-        text = response == null
-            ? const SizedBox()
-            : Text(convertToDayMonth(response.totalRegistrationByDay?[2].date ?? ""), style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(convertToDayMonth(response.totalRegistrationByDay?[2].date ?? ""), style: style);
         break;
       case 3:
-        text = response == null
-            ? const SizedBox()
-            : Text(convertToDayMonth(response.totalRegistrationByDay?[3].date ?? ""), style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(convertToDayMonth(response.totalRegistrationByDay?[3].date ?? ""), style: style);
         break;
       case 4:
-        text = response == null
-            ? const SizedBox()
-            : Text(convertToDayMonth(response.totalRegistrationByDay?[4].date ?? ""), style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(convertToDayMonth(response.totalRegistrationByDay?[4].date ?? ""), style: style);
         break;
       case 5:
-        text = response == null
-            ? const SizedBox()
-            : Text(convertToDayMonth(response.totalRegistrationByDay?[5].date ?? ""), style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(convertToDayMonth(response.totalRegistrationByDay?[5].date ?? ""), style: style);
         break;
       case 6:
-        text = response == null
-            ? const SizedBox()
-            : Text(convertToDayMonth(response.totalRegistrationByDay?[6].date ?? ""), style: style);
+        text =
+            response == null
+                ? const SizedBox()
+                : Text(convertToDayMonth(response.totalRegistrationByDay?[6].date ?? ""), style: style);
         break;
       default:
         text = const Text('', style: style);
         break;
     }
 
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: text,
-    );
+    return SideTitleWidget(meta: meta, child: text);
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Color(0xff67727d),
-      fontWeight: FontWeight.bold,
-      fontSize: 15,
-    );
+    const style = TextStyle(color: Color(0xff67727d), fontWeight: FontWeight.bold, fontSize: 15);
     String text;
     List<int> totalRegistrations = [];
     switch (value.toInt()) {
@@ -189,47 +180,24 @@ class _Graph2WidgetState extends State<Graph2Widget> {
         drawVerticalLine: true,
         verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
         getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
       ),
       titlesData: FlTitlesData(
         show: true,
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
+        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            interval: 1,
-            getTitlesWidget: bottomTitleWidgets,
-          ),
+          sideTitles: SideTitles(showTitles: true, reservedSize: 30, interval: 1, getTitlesWidget: bottomTitleWidgets),
         ),
         leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false,
-            interval: 1,
-            getTitlesWidget: leftTitleWidgets,
-            reservedSize: 42,
-          ),
+          sideTitles: SideTitles(showTitles: false, interval: 1, getTitlesWidget: leftTitleWidgets, reservedSize: 42),
         ),
       ),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: const Color(0xff37434d)),
-      ),
+      borderData: FlBorderData(show: true, border: Border.all(color: const Color(0xff37434d))),
       minX: 0,
       maxX: ((response?.totalRegistrationByDay?.length.toDouble()) ?? 0) - 1,
       minY: 0,
@@ -239,7 +207,9 @@ class _Graph2WidgetState extends State<Graph2Widget> {
           spots: [
             for (int index = 0; index < (response?.totalRegistrationByDay?.length ?? 0); index++)
               FlSpot(
-                  index.toDouble(), response?.totalRegistrationByDay?[index].totalRegistrationByDay?.toDouble() ?? 0),
+                index.toDouble(),
+                response?.totalRegistrationByDay?[index].totalRegistrationByDay?.toDouble() ?? 0,
+              ),
             // FlSpot(0, first),
             // FlSpot(1, second),
             // FlSpot(2, third),
@@ -249,18 +219,14 @@ class _Graph2WidgetState extends State<Graph2Widget> {
             // FlSpot(6, seventh),
           ],
           isCurved: true,
-          gradient: LinearGradient(
-            colors: gradientColors,
-          ),
+          gradient: LinearGradient(colors: gradientColors),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: true,
-          ),
+          dotData: const FlDotData(show: true),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+              colors: gradientColors.map((color) => color.withAlpha(opacityCalculation(.3))).toList(),
             ),
           ),
         ),
@@ -277,47 +243,24 @@ class _Graph2WidgetState extends State<Graph2Widget> {
         verticalInterval: 1,
         horizontalInterval: 1,
         getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
         getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
+          return const FlLine(color: Color(0xff37434d), strokeWidth: 1);
         },
       ),
       titlesData: FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: bottomTitleWidgets,
-            interval: 1,
-          ),
+          sideTitles: SideTitles(showTitles: true, reservedSize: 30, getTitlesWidget: bottomTitleWidgets, interval: 1),
         ),
         leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: false,
-            getTitlesWidget: leftTitleWidgets,
-            reservedSize: 42,
-            interval: 1,
-          ),
+          sideTitles: SideTitles(showTitles: false, getTitlesWidget: leftTitleWidgets, reservedSize: 42, interval: 1),
         ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       ),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: const Color(0xff37434d)),
-      ),
+      borderData: FlBorderData(show: true, border: Border.all(color: const Color(0xff37434d))),
       minX: 0,
       maxX: 11,
       minY: 0,
@@ -342,15 +285,19 @@ class _Graph2WidgetState extends State<Graph2Widget> {
           ),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
+          dotData: const FlDotData(show: false),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
               colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
+                ColorTween(
+                  begin: gradientColors[0],
+                  end: gradientColors[1],
+                ).lerp(0.2)!.withAlpha(opacityCalculation(.1)),
+                ColorTween(
+                  begin: gradientColors[0],
+                  end: gradientColors[1],
+                ).lerp(0.2)!.withAlpha(opacityCalculation(.1)),
               ],
             ),
           ),

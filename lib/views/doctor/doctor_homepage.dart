@@ -9,6 +9,7 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
@@ -23,6 +24,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -55,12 +57,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(
-      attribute: 'doctorName',
-      label: 'Name',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+    TableHeaderAttribute(attribute: 'doctorName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'doctorPhone',
       label: 'Contact No.',
@@ -88,11 +85,11 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       columnSize: ColumnSize.S,
     ),
     TableHeaderAttribute(
-      attribute: 'action',
-      label: 'Action',
+      attribute: 'actions',
+      label: 'Actions',
       allowSorting: false,
       columnSize: ColumnSize.S,
-      width: 100,
+      width: 80,
     ),
   ];
   final TextEditingController _userNameController = TextEditingController();
@@ -105,26 +102,21 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(DoctorHomepage.displayName);
-    });
-    if (context.read<BranchController>().branchAllResponse == null) {
-      BranchController.getAll(context, 1, 1000).then(
-        (value) {
+      if (context.read<BranchController>().branchAllResponse == null) {
+        BranchController.getAll(context, 1, 1000).then((value) {
           if (responseCode(value.code)) {
             context.read<BranchController>().branchAllResponse = value;
           }
-        },
-      );
-    }
-    filtering();
+        });
+      }
+      filtering();
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(
-      mobile: mobileView(),
-      desktop: desktopView(),
-    );
+    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -133,9 +125,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     //   builder: (context, snapshot) {
     return Column(
       children: [
-        searchField(
-          InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'PIC Name'),
-        ),
+        searchField(InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'PIC Name')),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -152,8 +142,10 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                             children: [
                               CardContainer(
                                 Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: screenPadding * 1.5, horizontal: screenPadding),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenPadding * 1.5,
+                                    horizontal: screenPadding,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -176,11 +168,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                           children: [
                             Text('N/A'),
                             Text('N/A'),
-                            Row(
-                              children: [
-                                Text('N/A'),
-                              ],
-                            ),
+                            Row(children: [Text('N/A')]),
                             Text('aaaaa'),
                           ],
                         ),
@@ -195,7 +183,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         Padding(
           padding: EdgeInsets.symmetric(vertical: screenPadding),
           child: pagination(),
-        )
+        ),
       ],
     );
     // },
@@ -207,25 +195,18 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$title:',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
         AppPadding.horizontal(denominator: 2),
-        Expanded(
-          child: AppSelectableText(
-            value,
-          ),
-        ),
+        Expanded(child: AppSelectableText(value)),
       ],
     );
   }
 
   Widget desktopView() {
     return
-        // (widget.orderReference == null)
-        //     ?
-        Scaffold(
+    // (widget.orderReference == null)
+    //     ?
+    Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,17 +228,14 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               children: [
                 Expanded(
                   child: CardContainer(
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: orderTable(),
-                    ),
+                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
                     color: Colors.white,
                     margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -280,10 +258,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               onPressed: () {
                 filtering(page: 1);
               },
-              child: const Icon(
-                Icons.search,
-                color: Colors.blue,
-              ),
+              child: const Icon(Icons.search, color: Colors.blue),
             ),
             isEditableColor: const Color(0xFFEEF3F7),
             onFieldSubmitted: (value) {
@@ -304,11 +279,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  ),
-                ),
+                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
               ),
             ],
           );
@@ -318,11 +289,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     tableButton(),
-                    const Expanded(
-                      child: Center(
-                        child: NoRecordsWidget(),
-                      ),
-                    ),
+                    const Expanded(child: Center(child: NoRecordsWidget())),
                   ],
                 )
               : Column(
@@ -336,15 +303,11 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                           alignment: Alignment.center,
                           children: [
                             Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
-                              ),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
                               padding: const EdgeInsets.all(5),
                               child: DataTable2(
                                 columnSpacing: 12,
                                 horizontalMargin: 12,
-                                minWidth: 1300,
                                 isHorizontalScrollBarVisible: true,
                                 isVerticalScrollBarVisible: true,
                                 columns: columns(),
@@ -352,129 +315,98 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 headingRowHeight: 51,
                                 decoration: const BoxDecoration(),
                                 border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  top: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  right: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
-                                  verticalInside: BorderSide(width: 1, color: Colors.black.withOpacity(0.1)),
+                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
+                                  verticalInside: BorderSide(
+                                    width: 1,
+                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
+                                  ),
                                 ),
                                 rows: [
-                                  for (int index = 0;
-                                      index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
-                                      index++)
+                                  for (
+                                    int index = 0;
+                                    index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
+                                    index++
+                                  )
                                     DataRow(
                                       color: WidgetStateProperty.all(
-                                          index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7)),
+                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                      ),
                                       cells: [
                                         DataCell(
-                                          TextButton(
-                                            onPressed: () {
-                                              // showDialog(
-                                              //     context: context,
-                                              //     builder: (BuildContext context) {
-                                              //       return UserDetail(
-                                              //         user: snapshot.doctorBranchResponse!.data![index],
-                                              //         type: 'update',
-                                              //       );
-                                              //     });
-                                            },
-                                            child: Text(
-                                              snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
-                                              style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                            ),
+                                          Text(
+                                            snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
+                                            style: AppTypography.bodyMedium(context).apply(),
                                           ),
                                         ),
                                         DataCell(
                                           InkWell(
-                                            onTap: () {
-                                              //TODO copy item
-                                            },
-                                            child: Text(snapshot.doctorBranchResponse?.data?[index].doctorPhone ??
-                                                '60 12 498 2969'),
+                                            child: Text(
+                                              snapshot.doctorBranchResponse?.data?[index].doctorPhone ??
+                                                  '60 12 498 2969',
+                                            ),
                                           ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
-                                                ? 'Active'
-                                                : 'Inactive',
-                                            style: AppTypography.bodyMedium(context).apply(
-                                                color: statusColor(
-                                                    snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
-                                                        ? 'active'
-                                                        : 'inactive'),
-                                                fontWeightDelta: 1),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(translateToBranchName(
-                                                  snapshot.doctorBranchResponse?.data?[index].branchId ?? '') ??
-                                              'N/A'),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                              dateConverter(snapshot.doctorBranchResponse?.data?[index].createdDate) ??
-                                                  'N/A'),
                                         ),
                                         DataCell(
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return DoctorDetails(
-                                                          doctor: snapshot.doctorBranchResponse!.data![index],
-                                                          type: 'update',
-                                                        );
-                                                      });
-                                                },
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.grey,
+                                              showStatus(snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1),
+                                            ],
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            translateToBranchName(
+                                                  snapshot.doctorBranchResponse?.data?[index].branchId ?? '',
+                                                ) ??
+                                                'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            dateConverter(snapshot.doctorBranchResponse?.data?[index].createdDate) ??
+                                                'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              PopupMenuButton<String>(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                offset: const Offset(8, 35),
+                                                color: Colors.white,
+                                                tooltip: '',
+                                                onSelected: (value) => _handleMenuSelection(
+                                                  value,
+                                                  snapshot.doctorBranchResponse?.data?[index] ?? Data(),
                                                 ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  try {
-                                                    Data? data = snapshot.doctorBranchResponse?.data?[index];
-                                                    if (await showConfirmDialog(
-                                                        context,
-                                                        data?.doctorStatus == 1
-                                                            ? 'Are you certain you wish to deactivate this PIC? Please note, this action can be reversed at a later time.'
-                                                            : 'Are you certain you wish to activate this PIC? Please note, this action can be reversed at a later time.')) {
-                                                      Future.delayed(Duration.zero, () {
-                                                        DoctorController.update(
-                                                          context,
-                                                          UpdateDoctorRequest(
-                                                            doctorId: data?.doctorId,
-                                                            doctorName: data?.doctorName,
-                                                            branchId: data?.branchId,
-                                                            doctorPhone: data?.doctorPhone,
-                                                            doctorStatus: data?.doctorStatus == 1 ? 0 : 1,
-                                                          ),
-                                                        ).then((value) {
-                                                          if (responseCode(value.code)) {
-                                                            filtering();
-                                                            showDialogSuccess(context,
-                                                                'The PIC has been successfully ${data?.doctorStatus == 1 ? 'deactivated' : 'activated'}.');
-                                                          } else {
-                                                            showDialogError(context, value.data?.message ?? '');
-                                                          }
-                                                        });
-                                                      });
-                                                    }
-                                                  } catch (e) {
-                                                    debugPrint(e.toString());
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
-                                                      ? Icons.delete
-                                                      : Icons.play_arrow,
-                                                  color: Colors.grey,
+                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                                  const PopupMenuItem<String>(value: 'update', child: Text('Update')),
+                                                  PopupMenuItem<String>(
+                                                    value: 'enableDisable',
+                                                    child: Text(
+                                                      snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
+                                                          ? 'Deactivate'
+                                                          : 'Re-Activate',
+                                                    ),
+                                                  ),
+                                                ],
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      // decoration: const BoxDecoration(
+                                                      //   color: Colors.white,
+                                                      //   shape: BoxShape.circle,
+                                                      // ),
+                                                      child: Icon(Icons.more_vert, color: Colors.grey),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
@@ -485,10 +417,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 ],
                               ),
                             ),
-                            if (isNoRecords.value)
-                              const AppSelectableText(
-                                'No Records Found',
-                              ),
+                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
                           ],
                         ),
                       ),
@@ -496,9 +425,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: pagination(),
-                        ),
+                        Expanded(child: pagination()),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -508,11 +435,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 children: [
                                   if (!isMobile && !isTablet)
                                     const Flexible(
-                                      child: Text(
-                                        'Items per page: ',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
+                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
                                     ),
                                   perPage(),
                                 ],
@@ -531,6 +454,51 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         }
       },
     );
+  }
+
+  void _handleMenuSelection(String value, Data data) async {
+    if (value == 'update') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return DoctorDetails(doctor: data, type: 'update');
+        },
+      );
+    } else if (value == 'enableDisable') {
+      try {
+        if (await showConfirmDialog(
+          context,
+          data.doctorStatus == 1
+              ? 'Are you certain you wish to deactivate this PIC? Please note, this action can be reversed at a later time.'
+              : 'Are you certain you wish to activate this PIC? Please note, this action can be reversed at a later time.',
+        )) {
+          Future.delayed(Duration.zero, () {
+            DoctorController.update(
+              context,
+              UpdateDoctorRequest(
+                doctorId: data.doctorId,
+                doctorName: data.doctorName,
+                branchId: data.branchId,
+                doctorPhone: data.doctorPhone,
+                doctorStatus: data.doctorStatus == 1 ? 0 : 1,
+              ),
+            ).then((value) {
+              if (responseCode(value.code)) {
+                filtering();
+                showDialogSuccess(
+                  context,
+                  'The PIC has been successfully ${data.doctorStatus == 1 ? 'deactivated' : 'activated'}.',
+                );
+              } else {
+                showDialogError(context, value.message ?? value.data?.message ?? '');
+              }
+            });
+          });
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    }
   }
 
   String? translateToBranchName(String branchId) {
@@ -565,15 +533,20 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       _page = page;
     }
     DoctorController.get(
-      context, _page, _pageSize,
+      context,
+      _page,
+      _pageSize,
+      branchId: context.read<AuthController>().isSuperAdmin
+          ? null
+          : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
       doctorName: _userNameController.text,
       doctorPhone: _userPhoneController.text,
       doctorStatus: _selectedUserStatus != null
           ? _selectedUserStatus?.key == '1'
-              ? 1
-              : _selectedUserStatus?.key == '0'
-                  ? 0
-                  : null
+                ? 1
+                : _selectedUserStatus?.key == '0'
+                ? 0
+                : null
           : null,
       // branchId: '62743240-006d-11ef-a129-6677d190faa2',
     ).then((value) {
@@ -693,11 +666,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
 
     return header.isSort
         ? header.sort == SortType.desc
-            ? Transform.rotate(
-                angle: -math.pi,
-                child: child,
-              )
-            : child
+              ? Transform.rotate(angle: -math.pi, child: child)
+              : child
         : child;
   }
 
@@ -709,131 +679,114 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const DoctorDetails(
-                    type: 'create',
-                  );
-                });
+              context: context,
+              builder: (BuildContext context) {
+                return const DoctorDetails(type: 'create');
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.add,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.add, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Add new PIC',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Add new PIC', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
         TextButton(
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: Card(
-                          surfaceTintColor: Colors.white,
-                          elevation: 5.0,
-                          color: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15),
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                                child: Column(
-                                  children: [
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userNameController,
-                                        hintText: 'Search',
-                                        labelText: 'PIC Name',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    searchField(
-                                      InputFieldAttribute(
-                                        controller: _userPhoneController,
-                                        hintText: 'Search',
-                                        labelText: 'PIC Contact Number',
-                                      ),
-                                    ),
-                                    AppPadding.vertical(),
-                                    StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return Column(
-                                            children: [
-                                              AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    DropdownAttribute('1', 'Active'),
-                                                    DropdownAttribute('0', 'Inactive'),
-                                                  ],
-                                                  labelText: 'information'.tr(gender: 'userStatus'),
-                                                  value: _selectedUserStatus?.name,
-                                                  onChanged: (p0) {
-                                                    _selectedUserStatus = p0;
-                                                    rebuildDropdown.add(DateTime.now());
-                                                    filtering(page: 1);
-                                                  },
-                                                  width: screenWidthByBreakpoint(90, 70, 26),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }),
-                                    AppPadding.vertical(denominator: 1 / 3),
-                                    AppOutlinedButton(
-                                      () {
-                                        resetAllFilter();
-                                        filtering(enableDebounce: true, page: 1);
-                                      },
-                                      backgroundColor: Colors.white,
-                                      borderRadius: 15,
-                                      width: 131,
-                                      height: 45,
-                                      text: 'Clear',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CloseButton(),
-                              ),
-                            ],
+              context: context,
+              builder: (BuildContext context) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      child: Card(
+                        surfaceTintColor: Colors.white,
+                        elevation: 5.0,
+                        color: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            bottomLeft: Radius.circular(15),
                           ),
                         ),
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
+                              child: Column(
+                                children: [
+                                  searchField(
+                                    InputFieldAttribute(
+                                      controller: _userNameController,
+                                      hintText: 'Search',
+                                      labelText: 'PIC Name',
+                                    ),
+                                  ),
+                                  AppPadding.vertical(),
+                                  searchField(
+                                    InputFieldAttribute(
+                                      controller: _userPhoneController,
+                                      hintText: 'Search',
+                                      labelText: 'PIC Contact Number',
+                                    ),
+                                  ),
+                                  AppPadding.vertical(),
+                                  StreamBuilder<DateTime>(
+                                    stream: rebuildDropdown.stream,
+                                    builder: (context, snapshot) {
+                                      return Column(
+                                        children: [
+                                          AppDropdown(
+                                            attributeList: DropdownAttributeList(
+                                              [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                                              labelText: 'information'.tr(gender: 'userStatus'),
+                                              value: _selectedUserStatus?.name,
+                                              onChanged: (p0) {
+                                                _selectedUserStatus = p0;
+                                                rebuildDropdown.add(DateTime.now());
+                                                filtering(page: 1);
+                                              },
+                                              width: screenWidthByBreakpoint(90, 70, 26),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                  AppPadding.vertical(denominator: 1 / 3),
+                                  AppOutlinedButton(
+                                    () {
+                                      resetAllFilter();
+                                      filtering(enableDebounce: true, page: 1);
+                                    },
+                                    backgroundColor: Colors.white,
+                                    borderRadius: 15,
+                                    width: 131,
+                                    height: 45,
+                                    text: 'Clear',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
+                          ],
+                        ),
                       ),
-                    ],
-                  );
-                });
+                    ),
+                  ],
+                );
+              },
+            );
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.filter_list,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.filter_list, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Filter',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -844,15 +797,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
           },
           child: Row(
             children: [
-              const Icon(
-                Icons.refresh,
-                color: Colors.blue,
-              ),
+              const Icon(Icons.refresh, color: Colors.blue),
               AppPadding.horizontal(denominator: 2),
-              Text(
-                'Reset',
-                style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue),
-              ),
+              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
             ],
           ),
         ),
@@ -868,9 +815,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         onChanged: (selected) {
           DropdownAttribute item = selected as DropdownAttribute;
           _pageSize = int.parse(item.key);
-          filtering(
-            enableDebounce: false,
-          );
+          filtering(enableDebounce: false);
         },
       ),
     );

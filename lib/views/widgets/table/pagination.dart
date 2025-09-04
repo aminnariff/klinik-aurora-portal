@@ -1,32 +1,33 @@
-library pagination;
+library;
 
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 
 class Pagination extends StatefulWidget {
-  const Pagination(
-      {super.key,
+  const Pagination({
+    super.key,
 
-      /// Total number of pages
-      required this.numOfPages,
+    /// Total number of pages
+    required this.numOfPages,
 
-      /// Current selected page
-      required this.selectedPage,
+    /// Current selected page
+    required this.selectedPage,
 
-      /// Number of pages visible in the widget between the previous and next buttons
-      required this.pagesVisible,
+    /// Number of pages visible in the widget between the previous and next buttons
+    required this.pagesVisible,
 
-      /// Callback function when a page is selected
-      required this.onPageChanged,
+    /// Callback function when a page is selected
+    required this.onPageChanged,
 
-      /// Icon for the previous button
-      this.previousIcon,
+    /// Icon for the previous button
+    this.previousIcon,
 
-      /// Icon for the next button
-      this.nextIcon,
+    /// Icon for the next button
+    this.nextIcon,
 
-      /// Spacing between the individual page buttons
-      this.spacing});
+    /// Spacing between the individual page buttons
+    this.spacing,
+  });
 
   final int numOfPages;
   final int selectedPage;
@@ -83,7 +84,8 @@ class _PaginationState extends State<Pagination> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
-          icon: widget.previousIcon ??
+          icon:
+              widget.previousIcon ??
               Icon(
                 Icons.arrow_circle_left_outlined,
                 color: widget.selectedPage > 1 ? secondaryColor : Colors.grey,
@@ -91,43 +93,32 @@ class _PaginationState extends State<Pagination> {
               ),
           onPressed: widget.selectedPage > 1 ? () => widget.onPageChanged(widget.selectedPage - 1) : null,
         ),
-        SizedBox(
-          width: widget.spacing ?? 0,
-        ),
+        SizedBox(width: widget.spacing ?? 0),
         for (int i = _startPage; i <= _endPage; i++)
           AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             child: TextButton(
-              style: i == widget.selectedPage
-                  ? ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(secondaryColor),
-                      elevation: WidgetStateProperty.all(15),
-                    )
-                  : ButtonStyle(
-                      elevation: WidgetStateProperty.all(0),
-                    ),
+              style:
+                  i == widget.selectedPage
+                      ? ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(secondaryColor),
+                        elevation: WidgetStateProperty.all(15),
+                      )
+                      : ButtonStyle(elevation: WidgetStateProperty.all(0)),
               onPressed: () => widget.onPageChanged(i),
               child: Text(
                 '$i',
-                style: i == widget.selectedPage
-                    ? const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      )
-                    : const TextStyle(
-                        fontSize: 14,
-                        color: secondaryColor,
-                        fontWeight: FontWeight.w700,
-                      ),
+                style:
+                    i == widget.selectedPage
+                        ? const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)
+                        : const TextStyle(fontSize: 14, color: secondaryColor, fontWeight: FontWeight.w700),
               ),
             ),
           ),
-        SizedBox(
-          width: widget.spacing ?? 0,
-        ),
+        SizedBox(width: widget.spacing ?? 0),
         IconButton(
-          icon: widget.nextIcon ??
+          icon:
+              widget.nextIcon ??
               Icon(
                 Icons.arrow_circle_right_outlined,
                 color: widget.selectedPage < widget.numOfPages ? secondaryColor : Colors.grey,
