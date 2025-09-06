@@ -61,7 +61,7 @@ class _UserDetailState extends State<UserDetail> {
     controller: TextEditingController(),
     labelText: 'information'.tr(gender: 'phoneNo'),
     isNumber: true,
-    maxCharacter: 10,
+    maxCharacter: 13,
     prefixIcon: Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -103,8 +103,6 @@ class _UserDetailState extends State<UserDetail> {
       _userStatus.value = widget.user?.userStatus == 1;
     }
     try {
-      print(context.read<BranchController>().branchAllResponse?.code);
-      print(context.read<BranchController>().branchAllResponse?.data?.data?.first.branchId);
       if (context.read<BranchController>().branchAllResponse == null) {
         BranchController.getAll(context, 1, 100).then((value) {
           if (responseCode(value.code)) {
