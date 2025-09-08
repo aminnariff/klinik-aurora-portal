@@ -682,13 +682,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                     Column(
                                                       mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
-                                                        CardContainer(
-                                                          Padding(
-                                                            padding: EdgeInsets.all(screenPadding),
-                                                            child: SelectionCalendarView(
-                                                              startMonth: now.month,
-                                                              year: now.year,
-                                                              initialDateTimes: availableDateTime,
+                                                        Container(
+                                                          constraints: BoxConstraints(maxWidth: screenWidth(80)),
+                                                          child: CardContainer(
+                                                            Padding(
+                                                              padding: EdgeInsets.all(screenPadding),
+                                                              child: SelectionCalendarView(
+                                                                startMonth: now.month,
+                                                                year: now.year,
+                                                                initialDateTimes: availableDateTime,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),

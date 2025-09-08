@@ -112,25 +112,23 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
 
           weekRow.add(
             GestureDetector(
-              onTap:
-                  isDisabled
-                      ? null
-                      : () => setState(() {
-                        selectedDate = key;
-                        selectedTime = null;
-                      }),
+              onTap: isDisabled
+                  ? null
+                  : () => setState(() {
+                      selectedDate = key;
+                      selectedTime = null;
+                    }),
               child: Container(
                 margin: const EdgeInsets.all(4),
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color:
-                      isSelected
-                          ? Colors.blue.shade100
-                          : isToday
-                          ? Colors.orange.shade100
-                          : null,
+                  color: isSelected
+                      ? Colors.blue.shade100
+                      : isToday
+                      ? Colors.orange.shade100
+                      : null,
                   border: isSelected ? Border.all(color: Colors.blue, width: 2) : null,
                 ),
                 alignment: Alignment.center,
@@ -138,12 +136,11 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
                   '$dayCounter',
                   style: TextStyle(
                     fontSize: 14,
-                    color:
-                        isDisabled
-                            ? Colors.grey.shade400
-                            : (j == 0 || j == 6)
-                            ? Colors.black
-                            : Colors.black,
+                    color: isDisabled
+                        ? Colors.grey.shade400
+                        : (j == 0 || j == 6)
+                        ? Colors.black
+                        : Colors.black,
                     fontWeight: isToday || isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -184,6 +181,7 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   DateFormat('EEEE, d MMM yyyy').format(DateTime.parse(selectedDate!)),
@@ -195,18 +193,16 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children:
-                availableSlots[selectedDate]!
-                    .map(
-                      (t) => OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: selectedTime == t ? Colors.blue.shade50 : null,
-                        ),
-                        onPressed: () => setState(() => selectedTime = t),
-                        child: Text(t.format(context)),
-                      ),
-                    )
-                    .toList(),
+            alignment: WrapAlignment.center,
+            children: availableSlots[selectedDate]!
+                .map(
+                  (t) => OutlinedButton(
+                    style: OutlinedButton.styleFrom(backgroundColor: selectedTime == t ? Colors.blue.shade50 : null),
+                    onPressed: () => setState(() => selectedTime = t),
+                    child: Text(t.format(context)),
+                  ),
+                )
+                .toList(),
           ),
         ],
         AppPadding.vertical(),
