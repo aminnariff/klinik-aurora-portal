@@ -66,11 +66,14 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
           timeMap[timeKey]!.selectedDates[key] = true;
         } catch (e) {
           debugPrint('SKIP $e');
-          // Invalid format, skip
         }
       }
+
+      final sortedList = timeMap.values.toList()
+        ..sort((a, b) => (a.time.hour * 60 + a.time.minute).compareTo(b.time.hour * 60 + b.time.minute));
+
       setState(() {
-        timeSlots.addAll(timeMap.values);
+        timeSlots.addAll(sortedList);
       });
     });
   }
