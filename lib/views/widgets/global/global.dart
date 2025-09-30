@@ -112,7 +112,6 @@ String convertMalaysiaTimeToUtc(String malaysiaTimeStr, {bool plainFormat = fals
     final malaysiaTime = inputFormat.parseStrict(malaysiaTimeStr);
 
     final utcTime = malaysiaTime.toUtc();
-    print('UTC TIME - $utcTime');
 
     if (plainFormat) {
       return "${utcTime.year.toString().padLeft(4, '0')}-"

@@ -8,13 +8,15 @@ class SelectionCalendarView extends StatefulWidget {
   final int year;
   final int totalMonths;
   final List<String> initialDateTimes;
+  final bool readOnly;
 
   const SelectionCalendarView({
     super.key,
     required this.startMonth,
     required this.year,
-    this.totalMonths = 2,
+    this.totalMonths = 3,
     required this.initialDateTimes,
+    this.readOnly = false,
   });
 
   @override
@@ -206,29 +208,31 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
           ),
         ],
         AppPadding.vertical(),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
-            onPressed: selectedDate != null && selectedTime != null ? _onContinue : null,
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return Colors.grey.shade300;
-                }
-                return Colors.blue;
-              }),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-              child: Text(
-                "Continue",
-                style: AppTypography.bodyMedium(
-                  context,
-                ).apply(fontWeightDelta: 1, color: selectedDate != null && selectedTime != null ? Colors.white : null),
+        if (widget.readOnly == false)
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: selectedDate != null && selectedTime != null ? _onContinue : null,
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.disabled)) {
+                    return Colors.grey.shade300;
+                  }
+                  return Colors.blue;
+                }),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                child: Text(
+                  "Continue",
+                  style: AppTypography.bodyMedium(context).apply(
+                    fontWeightDelta: 1,
+                    color: selectedDate != null && selectedTime != null ? Colors.white : null,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

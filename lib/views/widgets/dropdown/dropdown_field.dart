@@ -59,33 +59,31 @@ class _AppDropdownState extends State<AppDropdown> {
                       child: Text(
                         (widget.attributeList.value != '' && widget.attributeList.value != null)
                             ? widget.attributeList.titleCase == false
-                                ? widget.attributeList.value.toString()
-                                : widget.attributeList.value.toString().titleCase()
+                                  ? widget.attributeList.value.toString()
+                                  : widget.attributeList.value.toString().titleCase()
                             : widget.attributeList.hintText ?? 'Select',
                         style: Theme.of(context).textTheme.bodyMedium?.apply(
-                          color:
-                              (widget.attributeList.value != '' && widget.attributeList.value != null)
-                                  ? Colors.black
-                                  : Colors.grey,
+                          color: (widget.attributeList.value != '' && widget.attributeList.value != null)
+                              ? Colors.black
+                              : Colors.grey,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                items:
-                    widget.attributeList.items
-                        .map(
-                          (item) => DropdownMenuItem<DropdownAttribute>(
-                            value: item,
-                            child: Text(
-                              widget.attributeList.titleCase == true ? item.name.titleCase() : item.name,
-                              style: Theme.of(context).textTheme.bodyMedium?.apply(),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        )
-                        .toList(),
+                items: widget.attributeList.items
+                    .map(
+                      (item) => DropdownMenuItem<DropdownAttribute>(
+                        value: item,
+                        child: Text(
+                          widget.attributeList.titleCase == true ? item.name.titleCase() : item.name,
+                          style: Theme.of(context).textTheme.bodyMedium?.apply(),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
                 onChanged: (selected) {
                   selectedValue.value = selected;
                   widget.attributeList.onChanged!(selected);

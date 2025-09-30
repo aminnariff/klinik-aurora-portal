@@ -769,7 +769,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                             serviceBranchAvailableDatetimeId: updateId,
                             startMonth: now.month,
                             year: now.year,
-                            totalMonths: 2,
+                            totalMonths: 3,
                             initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
                           ),
                         ),

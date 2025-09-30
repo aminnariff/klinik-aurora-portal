@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -14,16 +15,21 @@ import 'package:klinik_aurora_portal/controllers/appointment/appointment_control
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/appointment_dashboard_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_exception_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
+import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -76,6 +82,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   int _selectedTabIndex = 0;
   DropdownAttribute? _appointmentBranch;
   List<DropdownAttribute> branches = [];
+  List<DropdownAttribute> serviceList = [];
 
   @override
   void initState() {
@@ -84,6 +91,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(
         AppointmentHomepage.displayName,
       );
+      getService();
 
       if (context.read<AuthController>().isSuperAdmin == true) {
         BranchController.getAll(context, 1, 100).then((value) {
@@ -140,6 +148,28 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           }
         });
       }
+    }
+  }
+
+  void getService() {
+    if (serviceList.isEmpty) {
+      ServiceBranchController.getAll(
+        context,
+        1,
+        100,
+        branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+      ).then((value) {
+        if (responseCode(value.code)) {
+          if (value.data != null) {
+            for (service_branch_model.Data item in value.data?.data ?? []) {
+              serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
+            }
+          }
+          serviceList.sort((a, b) => a.name.compareTo(b.name));
+          context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+          rebuildDropdown.add(DateTime.now());
+        }
+      });
     }
   }
 
@@ -1054,6 +1084,20 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             ],
           ),
         ),
+        IconButton(
+          onPressed: () {
+            checkSlots();
+          },
+          icon: Icon(Icons.calendar_month, color: Colors.blue),
+          tooltip: 'Check Slots',
+        ),
+        IconButton(
+          onPressed: () {
+            showAppointmentGuidelineDialog(context);
+          },
+          icon: Icon(Icons.bookmark, color: Colors.red),
+          tooltip: 'Guideline',
+        ),
       ],
     );
   }
@@ -1086,5 +1130,234 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   void _movePage(int page) {
     filtering(page: page, enableDebounce: false);
+  }
+
+  void checkSlots() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: screenHeight(90),
+          child: Column(
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: CardContainer(
+                        Column(
+                          children: [
+                            AppPadding.vertical(),
+                            Text('List of services', style: AppTypography.bodyLarge(context).apply()),
+                            AppPadding.vertical(denominator: 2),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Branch: ${context.read<AuthController>().authenticationResponse?.data?.user?.userFullname}',
+                                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Total: ${serviceList.length} service(s)',
+                                    style: AppTypography.bodyMedium(context).apply(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    AppPadding.vertical(denominator: 2),
+                                    for (DropdownAttribute item in serviceList)
+                                      ListTile(
+                                        onTap: () async {
+                                          showLoading();
+                                          DateTime now = DateTime.now();
+                                          List<String> availableDateTime = [];
+                                          List<String> tempExceptionDateTime = [];
+                                          ServiceBranchAvailableDtController.get(
+                                            context,
+                                            1,
+                                            200,
+                                            branchId: _appointmentBranch?.key,
+                                            serviceBranchId: item.key,
+                                          ).then((value) {
+                                            if (responseCode(value.code)) {
+                                              context
+                                                      .read<ServiceBranchAvailableDtController>()
+                                                      .serviceBranchAvailableDtResponse =
+                                                  value.data;
+                                              availableDateTime = value.data?.data?.first.availableDatetimes ?? [];
+                                              ServiceBranchExceptionController.get(
+                                                context,
+                                                1,
+                                                999,
+                                                serviceBranchId: item.key,
+                                              ).then((value) async {
+                                                dismissLoading();
+                                                if (responseCode(value.code)) {
+                                                  context
+                                                          .read<ServiceBranchExceptionController>()
+                                                          .serviceBranchExceptionResponse =
+                                                      value.data;
+                                                  value.data?.data?.forEach((element) {
+                                                    tempExceptionDateTime.add(element.exceptionDatetime ?? '');
+                                                  });
+                                                  final result = availableDateTime
+                                                      .toSet()
+                                                      .difference(tempExceptionDateTime.toSet())
+                                                      .toList();
+                                                  availableDateTime = result;
+                                                  availableDateTime = removePastDates(availableDateTime);
+                                                  availableDateTime.sort(
+                                                    (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
+                                                  );
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Column(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Container(
+                                                                constraints: BoxConstraints(maxWidth: screenWidth(80)),
+                                                                child: CardContainer(
+                                                                  Container(
+                                                                    constraints: BoxConstraints(maxWidth: 600),
+                                                                    padding: EdgeInsets.all(screenPadding),
+                                                                    child: SelectionCalendarView(
+                                                                      startMonth: now.month,
+                                                                      year: now.year,
+                                                                      initialDateTimes: availableDateTime,
+                                                                      readOnly: true,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                }
+                                              });
+                                            } else {
+                                              dismissLoading();
+                                            }
+                                          });
+                                        },
+                                        title: Text(item.name, style: AppTypography.bodyMedium(context)),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<String> removePastDates(List<String> dateList) {
+    return dateList.where((dateStr) {
+      try {
+        final dateTime = DateTime.parse(dateStr);
+        return dateTime.isAfter(DateTime.now().toUtc());
+      } catch (e) {
+        debugPrint('Invalid date format: $dateStr');
+        return false; // Or keep it if preferred
+      }
+    }).toList();
+  }
+
+  void showAppointmentGuidelineDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text('Klinik Aurora Appointment Guidelines', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: SizedBox(
+          width: 600,
+          height: 500,
+          child: Scrollbar(
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(right: 12),
+              child: SelectableText('''
+✅ 1. Get Latest Appointment List
+- Click the "Reset" button at the top right or refresh the page to load the latest appointments.
+
+🔁 2. Rescheduling Appointments
+- Branch staff can reschedule same-day appointments.
+- Patients can only reschedule via the app if more than 24 hours remain before the appointment.
+
+  Example:
+  - Now is 1:00 PM, appointment is tomorrow 2:00 PM → ✅ Patient can reschedule via the app.
+  - Now is 1:00 PM, appointment is today 1:00 PM → ❌ Cannot reschedule, must contact staff.
+
+📅 3. No-Show Status Auto-Update
+- The system will automatically mark un-updated appointments as "No-Show" at 12:00 AM daily.
+- Please update appointment statuses promptly to avoid confusion on the patient's app.
+
+🔄 4. Changing Appointment Service
+- If a patient wants to change the service:
+  1. Process a refund.
+  2. Create a new appointment with the desired service.
+
+👤 5. Appointments for Patients Without Accounts
+- If a patient does not want to register:
+  - Create a user account internally using their email and mobile number (do not inform the patient).
+  - Make the appointment from the Users tab.
+  - If booking fee is required, collect payment and upload the proof.
+
+💸 6. Cancellation vs Refund
+- Only mark as “Canceled” if the service does **not require** a booking fee.
+- If booking fee is required, update status to **“Refunded”** instead.
+
+💬 7. Contacting Patients via WhatsApp
+- Click the WhatsApp icon beside the appointment to:
+  - Send reminders,
+  - Follow up,
+  - Or assist with manual changes.
+
+📌 Daily Checklist:
+[ ] Click Reset to load latest data  
+[ ] Update appointment status post-session  
+[ ] Reschedule only under proper conditions  
+[ ] Process refund and create new if changing service  
+[ ] Collect & upload proof of booking fee  
+[ ] Use WhatsApp for reminders  
+[ ] Use “Refunded” (not Canceled) if payment involved
+              ''', style: const TextStyle(fontSize: 14, height: 1.6)),
+            ),
+          ),
+        ),
+        actions: [TextButton(onPressed: () => context.pop(), child: const Text('Close'))],
+      ),
+    );
   }
 }
