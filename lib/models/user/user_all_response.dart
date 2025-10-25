@@ -4,12 +4,7 @@ class UserAllResponse {
   int? totalPage;
   int? totalCount;
 
-  UserAllResponse({
-    this.message,
-    this.data,
-    this.totalPage,
-    this.totalCount,
-  });
+  UserAllResponse({this.message, this.data, this.totalPage, this.totalCount});
 
   UserAllResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -46,22 +41,27 @@ class UserResponse {
   String? userReferral;
   int? userStatus;
   int? totalPoint;
+  int? createdByAdmin;
+  int? tncAccepted;
   String? createdDate;
   String? modifiedDate;
 
-  UserResponse(
-      {this.userId,
-      this.userEmail,
-      this.userFullname,
-      this.userName,
-      this.userDob,
-      this.branchId,
-      this.userPhone,
-      this.userReferral,
-      this.totalPoint,
-      this.userStatus,
-      this.createdDate,
-      this.modifiedDate});
+  UserResponse({
+    this.userId,
+    this.userEmail,
+    this.userFullname,
+    this.userName,
+    this.userDob,
+    this.branchId,
+    this.userPhone,
+    this.userReferral,
+    this.totalPoint,
+    this.userStatus,
+    this.createdByAdmin,
+    this.tncAccepted,
+    this.createdDate,
+    this.modifiedDate,
+  });
 
   UserResponse.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
@@ -74,6 +74,8 @@ class UserResponse {
     userReferral = json['userReferral'];
     userStatus = json['userStatus'];
     totalPoint = json['totalPoint'];
+    createdByAdmin = json['createdByAdmin'];
+    tncAccepted = json['tncAccepted'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
   }
@@ -90,6 +92,8 @@ class UserResponse {
     data['userReferral'] = userReferral;
     data['userStatus'] = userStatus;
     data['totalPoint'] = totalPoint;
+    data['createdByAdmin'] = createdByAdmin;
+    data['tncAccepted'] = tncAccepted;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
     return data;

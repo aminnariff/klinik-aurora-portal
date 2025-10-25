@@ -182,6 +182,7 @@ class _UserDetailState extends State<UserDetail> {
                                 SizedBox(
                                   width: screenWidth1728(26),
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       InputField(field: usernameAttribute),
                                       SizedBox(height: 12),
@@ -211,6 +212,14 @@ class _UserDetailState extends State<UserDetail> {
                                         child: ReadOnly(InputField(field: dobAttribute), isEditable: false),
                                       ),
                                       SizedBox(height: 12),
+                                      labelValue('Created by', widget.user?.createdByAdmin == 1 ? 'Admin' : 'Patient'),
+                                      SizedBox(height: 12),
+                                      labelValue(
+                                        'T&C Status',
+                                        widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0
+                                            ? 'Accepted'
+                                            : 'Not Accepted',
+                                      ),
                                       // if (widget.type == 'create') ...[
                                       //   InputField(
                                       //     field: InputFieldAttribute(
@@ -228,6 +237,7 @@ class _UserDetailState extends State<UserDetail> {
                                   width: screenWidth1728(30),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       InputField(field: phoneAttribute),
                                       SizedBox(height: 12),
@@ -267,6 +277,10 @@ class _UserDetailState extends State<UserDetail> {
                                         ],
                                       ),
                                       SizedBox(height: 12),
+                                      labelValue('Created At', dateConverter(widget.user?.createdDate) ?? ''),
+                                      SizedBox(height: 12),
+                                      if (widget.user?.modifiedDate != null)
+                                        labelValue('Last Updated At', dateConverter(widget.user?.modifiedDate) ?? ''),
                                     ],
                                   ),
                                 ),
@@ -374,6 +388,17 @@ class _UserDetailState extends State<UserDetail> {
             );
           },
         ),
+      ],
+    );
+  }
+
+  Widget labelValue(String label, String value, {bool alignStart = true}) {
+    return Column(
+      crossAxisAlignment: alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      children: [
+        AppSelectableText(label, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+        SizedBox(height: 2),
+        AppSelectableText(value, style: AppTypography.bodyMedium(context)),
       ],
     );
   }

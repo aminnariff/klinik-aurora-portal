@@ -17,6 +17,8 @@ import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart';
+import 'package:klinik_aurora_portal/views/payment/branch_summary_homepage.dart';
+import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
 import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
@@ -75,6 +77,18 @@ class _HomepageState extends State<Homepage> {
         },
         label: AppointmentHomepage.displayName,
       ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.payment, color: Colors.white);
+        },
+        label: PaymentSummaryPage.displayName,
+      ),
+      // SidebarXItem(
+      //   iconBuilder: (selected, hovered) {
+      //     return Icon(Icons.money, color: Colors.white);
+      //   },
+      //   label: BranchPaymentSummaryPage.displayName,
+      // ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return Icon(Icons.medical_services, color: Colors.white);
@@ -433,6 +447,10 @@ class _HomepageState extends State<Homepage> {
         context.go(RewardHomepage.routeName);
       case RewardHistoryHomepage.displayName:
         context.go(RewardHistoryHomepage.routeName);
+      case PaymentSummaryPage.displayName:
+        context.go(PaymentSummaryPage.routeName);
+      case BranchPaymentSummaryPage.displayName:
+        context.go(BranchPaymentSummaryPage.routeName);
     }
   }
 

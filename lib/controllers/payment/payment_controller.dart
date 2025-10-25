@@ -8,9 +8,79 @@ import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
+import 'package:klinik_aurora_portal/models/payment/branch_payment_summary_response.dart';
+import 'package:klinik_aurora_portal/models/payment/payment_report_response.dart';
 import 'package:klinik_aurora_portal/models/promotion/update_promotion_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class PaymentController extends ChangeNotifier {
+  PaymentReportResponse? _paymentReportResponse;
+  PaymentReportResponse? get paymentReportResponse => _paymentReportResponse;
+  BranchPaymentSummaryResponse? _branchPaymentReportResponse;
+  BranchPaymentSummaryResponse? get branchPaymentReportResponse => _branchPaymentReportResponse;
+
+  set paymentReportResponse(PaymentReportResponse? value) {
+    _paymentReportResponse = value;
+    notifyListeners();
+  }
+
+  set branchPaymentReportResponse(BranchPaymentSummaryResponse? value) {
+    _branchPaymentReportResponse = value;
+    notifyListeners();
+  }
+
+  static Future<ApiResponse<PaymentReportResponse>> report(
+    BuildContext context, {
+    String? startDate,
+    String? endDate,
+    String? branchId,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/payment/report',
+          queryParameters: {
+            'startDate': startDate,
+            'endDate': endDate,
+            if (notNullOrEmptyString(branchId)) 'branchId': branchId,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: PaymentReportResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  static Future<ApiResponse<BranchPaymentSummaryResponse>> branchReport(
+    BuildContext context, {
+    String? startDate,
+    String? endDate,
+    String? branchId,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/payment/branch-summary',
+          queryParameters: {
+            'startDate': startDate,
+            'endDate': endDate,
+            if (notNullOrEmptyString(branchId)) 'branchId': branchId,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: BranchPaymentSummaryResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
   static Future<ApiResponse<UpdatePromotionResponse>> upload(
     BuildContext context,
     String appointmentId,
@@ -29,12 +99,11 @@ class PaymentController extends ChangeNotifier {
           MultipartFile.fromBytes(
             item.value!,
             filename: item.name,
-            contentType:
-                item.name != null
-                    ? item.name!.contains(".pdf")
-                        ? MediaType("application", "pdf")
-                        : MediaType("image", item.name.toString().split(".").last)
-                    : MediaType("image", item.name.toString().split(".").last),
+            contentType: item.name != null
+                ? item.name!.contains(".pdf")
+                      ? MediaType("application", "pdf")
+                      : MediaType("image", item.name.toString().split(".").last)
+                : MediaType("image", item.name.toString().split(".").last),
           ),
         ),
       );
