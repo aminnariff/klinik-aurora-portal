@@ -99,6 +99,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(ServiceHomepage.displayName);
     });
+    _page = 1;
     filtering();
     super.initState();
   }
@@ -698,7 +699,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               context,
               UpdateServiceRequest(
                 serviceId: service.serviceId,
-                serviceName: service.serviceDescription,
+                serviceName: service.serviceName,
                 serviceDescription: service.serviceDescription,
                 servicePrice: service.servicePrice != null ? double.parse(service.servicePrice ?? '0') : null,
                 serviceBookingFee: service.serviceBookingFee != null
