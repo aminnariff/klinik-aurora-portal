@@ -207,7 +207,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                           padding: const EdgeInsets.only(top: 8.0),
                                           child: TextFormField(
                                             controller: whatsappTemplateControllers[index],
-                                            maxLines: 3,
+                                            maxLines: 6,
                                             style: AppTypography.bodyMedium(context),
                                             decoration: appInputDecoration(context, "Template ${index + 1}"),
                                           ),

@@ -28,6 +28,7 @@ import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -221,7 +222,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            AppSelectableText('Appointment Details', style: AppTypography.bodyLarge(context)),
+                            Row(
+                              children: [
+                                AppSelectableText('Appointment Details', style: AppTypography.bodyLarge(context)),
+                                CopyButton(
+                                  textToCopy:
+                                      'Appointment Details\n\n${patientNameController.controller.text}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
+                                  tooltip: 'Copy Appointment Details',
+                                ),
+                              ],
+                            ),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
@@ -249,11 +259,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               patientNameController.controller.text,
                                               alignStart: true,
                                             ),
-                                            Text(
+                                            AppSelectableText(
                                               patientContactNoController.controller.text,
                                               style: AppTypography.bodyMedium(context),
                                             ),
-                                            Text(
+                                            AppSelectableText(
                                               patientEmailController.controller.text,
                                               style: AppTypography.bodyMedium(context),
                                             ),
@@ -379,7 +389,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 builder: (context, snapshot) {
                                                                   return snapshot.data == null
                                                                       ? SizedBox()
-                                                                      : Text(
+                                                                      : AppSelectableText(
                                                                           snapshot.data ?? '',
                                                                           style: AppTypography.bodyMedium(
                                                                             context,
@@ -533,7 +543,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         widget.appointment?.service?.serviceName ?? '',
                                         alignStart: true,
                                       ),
-                                      Text('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
+                                      AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
                                     ],
                                     if (widget.type == 'create')
                                       StreamBuilder<DateTime>(
@@ -988,7 +998,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: 4),
-                Text('Booking Fee', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+                AppSelectableText('Booking Fee', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
                 (widget.appointment?.service?.serviceBookingFee != null ||
                         (double.parse(widget.appointment?.service?.serviceBookingFee ?? '0') > 0))
                     ? showPaymentStatus(
@@ -1035,7 +1045,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               (element) => element.paymentType == 2 && element.paymentStatus == 1,
                             ) ==
                             true)) ...[
-                  Text(
+                  AppSelectableText(
                     'appointmentPage'.tr(gender: 'paymentProof'),
                     style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                   ),
@@ -1084,7 +1094,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           (element) => element.paymentType == 4 && element.paymentStatus == 1,
                         ) ==
                         true) ...[
-                  Text(
+                  AppSelectableText(
                     'appointmentPage'.tr(gender: 'refundProof'),
                     style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                   ),
@@ -1186,9 +1196,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     return Column(
       crossAxisAlignment: alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
-        Text(label, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+        AppSelectableText(label, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
         SizedBox(height: 2),
-        Text(value, style: AppTypography.bodyMedium(context)),
+        AppSelectableText(value, style: AppTypography.bodyMedium(context)),
       ],
     );
   }

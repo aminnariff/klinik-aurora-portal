@@ -16,6 +16,7 @@ import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
+import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart';
 import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
@@ -134,7 +135,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   getAuthController() {
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthController>().init(context).then((value) {
         if (value != null) {
           if (context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f') == false) {
@@ -351,10 +352,11 @@ class _HomepageState extends State<Homepage> {
                       color: Colors.white,
                       tooltip: '',
                       onSelected: _handleMenuSelection,
-                      itemBuilder:
-                          (BuildContext context) => <PopupMenuEntry<String>>[
-                            const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
-                          ],
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                        if (context.read<AuthController>().isSuperAdmin)
+                          const PopupMenuItem<String>(value: 'announcement', child: Text('Announcement')),
+                        const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
+                      ],
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -393,6 +395,13 @@ class _HomepageState extends State<Homepage> {
       } catch (e) {
         debugPrint(e.toString());
       }
+    } else if (value == 'announcement') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return NotificationHomepage();
+        },
+      );
     } else if (value == 'relocate') {
       AppToast.snackbar(context, 'We\'re actively developing this feature and it\'s on its way.');
     }

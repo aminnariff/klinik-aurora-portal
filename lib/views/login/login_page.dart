@@ -15,7 +15,6 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/password_recovery/password_recovery_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
-import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
@@ -48,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   ValueNotifier<bool> isObscure = ValueNotifier<bool>(false);
+  bool loginSuccess = false;
   InputFieldAttribute emailAttribute = InputFieldAttribute(
     controller: TextEditingController(text: ''),
     hintText: 'information'.tr(gender: 'email'),
@@ -57,12 +57,17 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      prefs.remove(authResponse);
-      prefs.remove(jwtResponse);
-      prefs.remove(token);
+      context.read<AuthController>().init(context).then((controller) {
+        if (controller?.data != null &&
+            DateTime.parse(controller?.data?.expiryDt ?? '').difference(DateTime.now()).isNegative) {
+          prefs.remove(authResponse);
+          prefs.remove(jwtResponse);
+          prefs.remove(token);
+        }
+      });
       context.read<AuthController>().checkDateTime().then((value) {
         String tokenStatus = value;
-        if (tokenStatus == 'expired' || widget.resetUser == true) {
+        if (tokenStatus == 'expired') {
           context.read<AuthController>().logout(context);
         }
         List<String>? rememberMeCredentials = context.read<AuthController>().getRememberMeCredentials();
@@ -75,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     if (kDebugMode) {
       usernameController.text = 'superadmin';
-      usernameController.text = 'auroramedicare@gmail.com';
+      // usernameController.text = 'bukit-rimau@yopmail.com';
       // bndrsridamansara@gmail.com
       // Auror@123
       // usernameController.text = 'amin.ariff@klinikauroramembership.com';
@@ -90,31 +95,21 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget view() {
-    return FutureBuilder<AuthResponse?>(
-      future: context.read<AuthController>().init(context),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+    return Consumer<AuthController>(
+      builder: (context, controller, _) {
+        if (controller.authenticationResponse != null &&
+            DateTime.parse(
+                  controller.authenticationResponse?.data?.expiryDt ?? '',
+                ).difference(DateTime.now()).isNegative ==
+                false &&
+            (widget.resetUser != true || loginSuccess == true)) {
+          Future.delayed(const Duration(milliseconds: 500), () {
+            context.replaceNamed(Homepage.routeName);
+          });
           return loadingScreen();
+        } else {
+          return LayoutWidget(mobile: authPage(), desktop: authPage());
         }
-        if (snapshot.connectionState == ConnectionState.done || snapshot.connectionState == ConnectionState.active) {
-          return Consumer<AuthController>(
-            builder: (context, controller, _) {
-              if (controller.authenticationResponse != null &&
-                  !DateTime.parse(
-                    controller.authenticationResponse?.data?.expiryDt ?? '',
-                  ).difference(DateTime.now()).isNegative) {
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  context.replaceNamed(Homepage.routeName);
-                });
-                return loadingScreen();
-              } else {
-                return LayoutWidget(mobile: authPage(), desktop: authPage());
-              }
-            },
-          );
-        }
-
-        return loadingScreen();
       },
     );
   }
@@ -295,16 +290,19 @@ class _LoginPageState extends State<LoginPage> {
                                     ).then((value) {
                                       dismissLoading();
                                       if (responseCode(value.code)) {
+                                        loginSuccess = true;
                                         if (prefs.getBool(rememberMe) == true) {
                                           prefs.setBool(rememberMe, true);
                                           prefs.setString(username, usernameController.text);
                                           prefs.setString(password, passwordController.text);
                                         }
-                                        context.read<AuthController>().setAuthenticationResponse(
-                                          value.data,
-                                          usernameValue: usernameController.text,
-                                          passwordValue: passwordController.text,
-                                        );
+                                        SchedulerBinding.instance.addPostFrameCallback((_) {
+                                          context.read<AuthController>().setAuthenticationResponse(
+                                            value.data,
+                                            usernameValue: usernameController.text,
+                                            passwordValue: passwordController.text,
+                                          );
+                                        });
                                       }
                                     });
                                   }

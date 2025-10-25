@@ -4,12 +4,7 @@ class DoctorBranchResponse {
   int? totalPage;
   int? totalCount;
 
-  DoctorBranchResponse({
-    this.message,
-    this.data,
-    this.totalPage,
-    this.totalCount,
-  });
+  DoctorBranchResponse({this.message, this.data, this.totalPage, this.totalCount});
 
   DoctorBranchResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -45,15 +40,16 @@ class Data {
   String? createdDate;
   String? modifiedDate;
 
-  Data(
-      {this.doctorId,
-      this.doctorName,
-      this.doctorPhone,
-      this.doctorImage,
-      this.branchId,
-      this.doctorStatus,
-      this.createdDate,
-      this.modifiedDate});
+  Data({
+    this.doctorId,
+    this.doctorName,
+    this.doctorPhone,
+    this.doctorImage,
+    this.branchId,
+    this.doctorStatus,
+    this.createdDate,
+    this.modifiedDate,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     doctorId = json['doctorId'];

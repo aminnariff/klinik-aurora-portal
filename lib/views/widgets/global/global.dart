@@ -171,3 +171,18 @@ String getAppointmentStatusLabel(int? statusId) {
   );
   return match.name;
 }
+
+String formatToDisplayDate(String input) {
+  final inputFormat = DateFormat("dd-MM-yyyy HH:mm");
+  final dateTime = inputFormat.parse(input);
+  return "${dateTime.day.toString().padLeft(2, '0')}-"
+      "${dateTime.month.toString().padLeft(2, '0')}-"
+      "${dateTime.year}";
+}
+
+String formatToDisplayTime(String input) {
+  final inputFormat = DateFormat("dd-MM-yyyy HH:mm");
+  final dateTime = inputFormat.parse(input);
+  final formatter = DateFormat('h.mm a');
+  return formatter.format(dateTime);
+}

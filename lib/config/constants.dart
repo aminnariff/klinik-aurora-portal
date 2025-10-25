@@ -57,6 +57,10 @@ List<DropdownAttribute> appointmentStatus = [
   DropdownAttribute('6', 'Refunded'),
   DropdownAttribute('7', 'No Show'),
 ];
+List<DropdownAttribute> notificationChannel = [
+  DropdownAttribute('general', 'All Users'),
+  DropdownAttribute('authorised-user-announcements', 'Signed In Users'),
+];
 
 double fileSizeLimit = 1.0;
 
