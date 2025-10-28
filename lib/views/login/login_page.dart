@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -80,7 +81,12 @@ class _LoginPageState extends State<LoginPage> {
     });
     if (kDebugMode) {
       usernameController.text = 'superadmin';
-      usernameController.text = 'bukit-rimau@yopmail.com';
+      if (environment == Flavor.production) {
+        usernameController.text = 'auroramedicare@gmail.com';
+      } else {
+        usernameController.text = 'bukit-rimau@yopmail.com';
+      }
+      usernameController.text = 'auroramedicare@gmail.com';
       // bndrsridamansara@gmail.com
       // Auror@123
       // usernameController.text = 'amin.ariff@klinikauroramembership.com';

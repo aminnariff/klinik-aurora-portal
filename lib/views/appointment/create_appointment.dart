@@ -16,6 +16,7 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
@@ -25,7 +26,8 @@ import 'package:klinik_aurora_portal/models/appointment/create_appointment_reque
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
-import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
+import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_response.dart'
+    as service_branch_available_model;
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
@@ -96,6 +98,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   List<FileAttribute> selectedFiles = [];
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   List<DropdownAttribute> serviceList = [];
+  service_branch_available_model.Data? selectedService;
+  GestationalController? gestationalResult;
 
   @override
   void initState() {
@@ -108,24 +112,27 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     if (widget.appointment?.appointmentDatetime != null) {
       dateTimeController.text =
           dateConverter(widget.appointment?.appointmentDatetime, format: 'dd-MM-yyyy HH:mm') ?? '';
+      if (widget.appointment?.service?.eddRequired != null &&
+          widget.appointment?.service?.dueDateToggle == 1 &&
+          dueDateController.controller.text != '') {
+        calculateGestational();
+      }
     }
 
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       if (context.read<AuthController>().isSuperAdmin == false && widget.type == 'create') {
-        ServiceBranchController.getAll(
+        ServiceBranchController.available(
           context,
-          1,
-          100,
           branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
         ).then((value) {
           if (responseCode(value.code)) {
             if (value.data != null) {
-              for (service_branch_model.Data item in value.data?.data ?? []) {
+              for (service_branch_available_model.Data item in value.data?.data ?? []) {
                 serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
               }
             }
             serviceList.sort((a, b) => a.name.compareTo(b.name));
-            context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+            context.read<ServiceBranchController>().serviceBranchAvailableResponse = value.data;
             rebuildDropdown.add(DateTime.now());
           }
         });
@@ -195,6 +202,20 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     super.initState();
   }
 
+  void calculateGestational() {
+    try {
+      gestationalResult = getGestationalStatusFromString(
+        eddStr: dueDateController.controller.text,
+        range: widget.appointment?.service?.eddRequired ?? selectedService?.eddRequired ?? '',
+        appointmentDate: DateTime.parse(convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true)),
+      );
+      rebuild.add(DateTime.now());
+    } catch (e) {
+      debugPrint('$e');
+      rebuild.add(DateTime.now());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return editBranch();
@@ -225,11 +246,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             Row(
                               children: [
                                 AppSelectableText('Appointment Details', style: AppTypography.bodyLarge(context)),
-                                CopyButton(
-                                  textToCopy:
-                                      'Appointment Details\n\n${patientNameController.controller.text}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
-                                  tooltip: 'Copy Appointment Details',
-                                ),
+                                if (widget.type == 'update')
+                                  CopyButton(
+                                    textToCopy:
+                                        'Appointment Details\n\n${patientNameController.controller.text}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
+                                    tooltip: 'Copy Appointment Details',
+                                  ),
                               ],
                             ),
                             CloseButton(
@@ -275,30 +297,55 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                       : SizedBox()
                                                 : InputField(field: appointmentNoteController),
                                             AppPadding.vertical(denominator: 2),
-                                            (widget.appointment?.appointmentStatus == 2 ||
-                                                    widget.appointment?.appointmentStatus == 6)
-                                                ? dateTimeController.text != ''
-                                                      ? labelValue('Due Date', dateTimeController.text)
-                                                      : SizedBox()
-                                                : GestureDetector(
-                                                    onTap: () async {
-                                                      dueDateCalendar();
-                                                    },
-                                                    child: ReadOnly(
-                                                      InputField(field: dueDateController),
-                                                      isEditable: false,
+                                            if ((widget.appointment?.service?.dueDateToggle == 1) ||
+                                                selectedService?.dueDateToggle == 1)
+                                              (widget.appointment?.appointmentStatus == 2 ||
+                                                      widget.appointment?.appointmentStatus == 6)
+                                                  ? dateTimeController.text != ''
+                                                        ? labelValue('Due Date', dateTimeController.text)
+                                                        : SizedBox()
+                                                  : GestureDetector(
+                                                      onTap: () async {
+                                                        dueDateCalendar();
+                                                      },
+                                                      child: ReadOnly(
+                                                        InputField(field: dueDateController),
+                                                        isEditable: false,
+                                                      ),
                                                     ),
-                                                  ),
+                                            if (((notNullOrEmptyString(widget.appointment?.service?.eddRequired) &&
+                                                        widget.appointment?.service?.dueDateToggle == 1) ||
+                                                    selectedService?.dueDateToggle == 1 &&
+                                                        selectedService?.eddRequired != null) &&
+                                                dueDateController.controller.text != '' &&
+                                                dateTimeController.text != '')
+                                              StreamBuilder(
+                                                stream: rebuild.stream,
+                                                builder: (context, asyncSnapshot) {
+                                                  return gestationalResult != null
+                                                      ? Padding(
+                                                          padding: const EdgeInsets.only(top: 4.0),
+                                                          child: Text(
+                                                            getGestationalStatusMessage(
+                                                                  result: gestationalResult,
+                                                                  range:
+                                                                      widget.appointment?.service?.eddRequired ??
+                                                                      selectedService?.eddRequired ??
+                                                                      '',
+                                                                  showRange: true,
+                                                                ) ??
+                                                                '',
+                                                            style: AppTypography.bodyMedium(context).apply(
+                                                              color: gestationalStatusColor(gestationalResult?.status),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : SizedBox();
+                                                },
+                                              ),
                                             if (widget.appointment?.service?.serviceBookingFee != null ||
                                                 (_service != null &&
-                                                    notNullOrEmptyString(
-                                                          serviceBranchController.serviceBranchResponse?.data
-                                                              ?.firstWhere(
-                                                                (element) => element.serviceBranchId == _service?.key,
-                                                              )
-                                                              .serviceBookingFee,
-                                                        ) ==
-                                                        true) ||
+                                                    notNullOrEmptyString(selectedService?.serviceBookingFee) == true) ||
                                                 (widget.type == 'update' && _status?.key == '6'))
                                               Container(
                                                 padding: EdgeInsets.only(bottom: 8),
@@ -315,15 +362,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 widget.type == 'create' &&
                                                                 (_service != null &&
                                                                     notNullOrEmptyString(
-                                                                          serviceBranchController
-                                                                              .serviceBranchResponse
-                                                                              ?.data
-                                                                              ?.firstWhere(
-                                                                                (element) =>
-                                                                                    element.serviceBranchId ==
-                                                                                    _service?.key,
-                                                                              )
-                                                                              .serviceBookingFee,
+                                                                          selectedService?.serviceBookingFee,
                                                                         ) ==
                                                                         true)) ||
                                                             (selectedFiles.isEmpty &&
@@ -512,17 +551,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   onChanged: (p0) {
                                                     _appointmentBranch = p0;
                                                     if (_appointmentBranch != null) {
-                                                      ServiceBranchController.getAll(
+                                                      ServiceBranchController.available(
                                                         context,
-                                                        1,
-                                                        100,
                                                         branchId: _appointmentBranch?.key,
-                                                        serviceBranchStatus: 1,
                                                       ).then((value) {
                                                         if (responseCode(value.code)) {
                                                           context
                                                                   .read<ServiceBranchController>()
-                                                                  .serviceBranchResponse =
+                                                                  .serviceBranchAvailableResponse =
                                                               value.data;
                                                           rebuildDropdown.add(DateTime.now());
                                                         }
@@ -571,6 +607,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             _status = appointmentStatus.firstWhere(
                                                               (element) => element.key == '1',
                                                             );
+                                                            try {
+                                                              selectedService = context
+                                                                  .read<ServiceBranchController>()
+                                                                  .serviceBranchAvailableResponse
+                                                                  ?.data
+                                                                  ?.firstWhere((e) => e.serviceBranchId == p0?.key);
+                                                              rebuild.add(DateTime.now());
+                                                            } catch (e) {
+                                                              debugPrint(e.toString());
+                                                            }
                                                           } catch (e) {
                                                             debugPrint(e.toString());
                                                           }
@@ -620,17 +666,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         return Consumer<ServiceBranchController>(
                                           builder: (context, serviceBranchController, _) {
                                             if (_service != null &&
-                                                notNullOrEmptyString(
-                                                      context
-                                                          .read<ServiceBranchController>()
-                                                          .serviceBranchResponse
-                                                          ?.data
-                                                          ?.firstWhere(
-                                                            (element) => element.serviceBranchId == _service?.key,
-                                                          )
-                                                          .serviceBookingFee,
-                                                    ) ==
-                                                    true) {
+                                                notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
                                               return Text('* Booking Fee is required for this service');
                                             } else {
                                               return SizedBox();
@@ -763,6 +799,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             format: 'yyyy-MM-dd HH:mm',
                                                           ) ??
                                                           '';
+                                                      calculateGestational();
                                                     } else if (widget.type == 'update' &&
                                                         context
                                                                 .read<ServiceBranchAvailableDtController>()
@@ -859,6 +896,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     format: 'yyyy-MM-dd HH:mm',
                                                                   ) ??
                                                                   '';
+                                                              calculateGestational();
                                                               rebuildDropdown.add(DateTime.now());
                                                             }
                                                           });
@@ -956,9 +994,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     if (results != null) {
       if (dueDateController.errorMessage != null) {
         dueDateController.errorMessage = null;
-        rebuild.add(DateTime.now());
       }
       dueDateController.controller.text = dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
+      calculateGestational();
     }
   }
 
@@ -1253,29 +1291,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  if (_service != null &&
-                      notNullOrEmptyString(
-                            context
-                                .read<ServiceBranchController>()
-                                .serviceBranchResponse
-                                ?.data
-                                ?.firstWhere((element) => element.serviceBranchId == _service?.key)
-                                .serviceBookingFee,
-                          ) ==
-                          true) {
+                  if (_service != null && notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
                     showLoading();
                     PaymentController.upload(
                       context,
                       value.data?.id ?? '',
                       widget.appointment?.user?.userId ?? '',
                       2,
-                      context
-                              .read<ServiceBranchController>()
-                              .serviceBranchResponse
-                              ?.data
-                              ?.firstWhere((element) => element.serviceBranchId == _service?.key)
-                              .serviceBookingFee ??
-                          '50.00',
+                      selectedService?.serviceBookingFee ?? '50.00',
                       [selectedFiles[0]],
                     ).then((documentUploadResponse) {
                       dismissLoading();
@@ -1328,13 +1351,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       value.data?.id ?? '',
                       widget.appointment?.user?.userId ?? '',
                       4,
-                      context
-                              .read<ServiceBranchController>()
-                              .serviceBranchResponse
-                              ?.data
-                              ?.firstWhere((element) => element.serviceBranchId == _service?.key)
-                              .serviceBookingFee ??
-                          '50.00',
+                      selectedService?.serviceBookingFee ?? '50.00',
                       [selectedFiles[0]],
                     ).then((documentUploadResponse) {
                       dismissLoading();
@@ -1424,15 +1441,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       showDialogError(context, ErrorMessage.required(field: 'Slots'));
     } else if (widget.type == 'create' &&
         _service != null &&
-        notNullOrEmptyString(
-              context
-                  .read<ServiceBranchController>()
-                  .serviceBranchResponse
-                  ?.data
-                  ?.firstWhere((element) => element.serviceBranchId == _service?.key)
-                  .serviceBookingFee,
-            ) ==
-            true &&
+        notNullOrEmptyString(selectedService?.serviceBookingFee) == true &&
         selectedFiles.isEmpty) {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'paymentProof')));

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
+import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_response.dart';
@@ -80,6 +81,28 @@ class AppointmentController extends ChangeNotifier {
         return ApiResponse(code: 400, message: e.toString());
       }
     });
+  }
+
+  static Future<ApiResponse<AppointmentDetailResponse>> detail(
+    BuildContext context, {
+    String? appointmentId,
+    String? userId,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/appointment',
+          queryParameters: {'appointmentId': appointmentId},
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: AppointmentDetailResponse.fromJson(value.data));
+          } catch (e) {
+            debugPrint(e.toString());
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   String buildQueryString(Map<String, dynamic> params) {

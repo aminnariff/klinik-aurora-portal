@@ -1,6 +1,7 @@
 // fvm flutter pub run flutter_launcher_icons -f launcher_icons.yaml
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 
 const primary = Color(0xFFDF6E98);
 const primaryColors = [
@@ -104,3 +105,19 @@ final Map<int, Color> appointmentStatusColors = {
   6: Colors.grey, // Refunded
   7: Colors.purple, // No Show
 };
+
+Color gestationalStatusColor(GestationalEligibility? eligiblity) {
+  switch (eligiblity) {
+    case GestationalEligibility.eligible:
+      return const Color(0xFF29A838);
+
+    case GestationalEligibility.tooFar:
+      return const Color(0XFFDF184A);
+
+    case GestationalEligibility.notYetEligible:
+      return const Color.fromARGB(255, 209, 165, 35);
+
+    default:
+      return const Color(0xFF1C4B9D);
+  }
+}

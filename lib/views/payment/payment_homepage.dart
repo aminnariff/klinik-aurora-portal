@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
+import 'package:klinik_aurora_portal/views/payment/appointment_ids.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
@@ -188,7 +190,32 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                   DataCell(Text('${snapshot.paymentReportResponse?.data?[index].branchName}')),
                                   DataCell(Text('${snapshot.paymentReportResponse?.data?[index].paymentDate}')),
                                   DataCell(Text('${snapshot.paymentReportResponse?.data?[index].totalPayments}')),
-                                  DataCell(Text('${snapshot.paymentReportResponse?.data?[index].successfulPayments}')),
+                                  DataCell(
+                                    TextButton(
+                                      child: Text(
+                                        '${snapshot.paymentReportResponse?.data?[index].successfulPayments}',
+                                        style: AppTypography.bodyMedium(context).apply(color: CupertinoColors.link),
+                                      ),
+                                      onPressed: () {
+                                        showLoading();
+                                        PaymentController.successPayment(
+                                          context,
+                                          date: snapshot.paymentReportResponse?.data?[index].paymentDate,
+                                          branchId: snapshot.paymentReportResponse?.data?[index].branchId,
+                                        ).then((value) {
+                                          dismissLoading();
+                                          if (responseCode(value.code)) {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AppointmentIds(response: value.data);
+                                              },
+                                            );
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
                                   DataCell(Text('${snapshot.paymentReportResponse?.data?[index].failedPayments}')),
                                   DataCell(Text('${snapshot.paymentReportResponse?.data?[index].totalPaidAmount}')),
                                   DataCell(Text('${snapshot.paymentReportResponse?.data?[index].totalRefundAmount}')),

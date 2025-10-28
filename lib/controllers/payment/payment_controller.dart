@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/payment/branch_payment_summary_response.dart';
 import 'package:klinik_aurora_portal/models/payment/payment_report_response.dart';
+import 'package:klinik_aurora_portal/models/payment/payment_success_response.dart';
 import 'package:klinik_aurora_portal/models/promotion/update_promotion_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
@@ -75,6 +76,27 @@ class PaymentController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: BranchPaymentSummaryResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  static Future<ApiResponse<PaymentSuccessResponse>> successPayment(
+    BuildContext context, {
+    String? date,
+    String? branchId,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/payment/success-payment',
+          queryParameters: {'date': date, 'branchId': branchId},
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: PaymentSuccessResponse.fromJson(value.data));
           } catch (e) {
             return ApiResponse(code: 400, message: e.toString());
           }

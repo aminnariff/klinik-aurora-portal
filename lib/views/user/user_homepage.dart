@@ -18,6 +18,7 @@ import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/user/appointment_ids.dart';
 import 'package:klinik_aurora_portal/views/user/user_detail.dart';
 import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
@@ -397,6 +398,10 @@ class _UserHomepageState extends State<UserHomepage> {
                                                     child: Text('Appointment'),
                                                   ),
                                                   const PopupMenuItem<String>(
+                                                    value: 'appointmentHistory',
+                                                    child: Text('Appointment History'),
+                                                  ),
+                                                  const PopupMenuItem<String>(
                                                     value: 'managePoints',
                                                     child: Text('Manage Points'),
                                                   ),
@@ -489,6 +494,19 @@ class _UserHomepageState extends State<UserHomepage> {
           );
         },
       );
+    } else if (value == 'appointmentHistory') {
+      showLoading();
+      UserController.appointment(context, user.userId ?? '').then((value) {
+        dismissLoading();
+        if (responseCode(value.code)) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return UserAppointmentIds(response: value.data, patient: user);
+            },
+          );
+        }
+      });
     } else if (value == 'managePoints') {
       showDialog(
         context: context,

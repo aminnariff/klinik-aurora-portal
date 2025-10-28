@@ -73,11 +73,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
-  final currencyFormatter = NumberFormat.currency(
-    locale: 'en_MY', // or 'ms_MY' for Malay
-    symbol: 'RM ',
-    decimalDigits: 2,
-  );
+  final currencyFormatter = NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2);
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   int _selectedTabIndex = 0;
   DropdownAttribute? _appointmentBranch;
@@ -118,6 +114,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) return;
       _selectedTabIndex = _tabController.index;
+      _page = 1;
       debugPrint('Active Tab Index: $_selectedTabIndex (${_tabs[_selectedTabIndex]})');
       filtering(enableDebounce: false);
     });

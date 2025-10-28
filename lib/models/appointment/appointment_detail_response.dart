@@ -1,12 +1,12 @@
-class AppointmentResponse {
+class AppointmentDetailResponse {
   String? message;
   List<Data>? data;
   int? totalCount;
   int? totalPage;
 
-  AppointmentResponse({this.message, this.data, this.totalCount, this.totalPage});
+  AppointmentDetailResponse({this.message, this.data, this.totalCount, this.totalPage});
 
-  AppointmentResponse.fromJson(Map<String, dynamic> json) {
+  AppointmentDetailResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     if (json['data'] != null) {
       data = <Data>[];
@@ -36,11 +36,14 @@ class Data {
   String? appointmentDatetime;
   String? appointmentNote;
   String? customerDueDate;
-  int? appointmentRating;
+  String? appointmentRating;
   String? appointmentFeedback;
   int? appointmentStatus;
   String? createdDate;
   String? modifiedDate;
+  int? isAdminOnly;
+  int? dueDateToggle;
+  String? eddRequired;
   User? user;
   Service? service;
   List<Payment>? payment;
@@ -57,6 +60,9 @@ class Data {
     this.appointmentStatus,
     this.createdDate,
     this.modifiedDate,
+    this.isAdminOnly,
+    this.dueDateToggle,
+    this.eddRequired,
     this.user,
     this.service,
     this.payment,
@@ -74,6 +80,9 @@ class Data {
     appointmentStatus = json['appointmentStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
+    isAdminOnly = json['isAdminOnly'];
+    dueDateToggle = json['dueDateToggle'];
+    eddRequired = json['eddRequired'];
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     service = json['service'] != null ? Service.fromJson(json['service']) : null;
     if (json['payment'] != null) {
@@ -97,6 +106,9 @@ class Data {
     data['appointmentStatus'] = appointmentStatus;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
+    data['isAdminOnly'] = isAdminOnly;
+    data['dueDateToggle'] = dueDateToggle;
+    data['eddRequired'] = eddRequired;
     if (user != null) {
       data['user'] = user!.toJson();
     }
@@ -144,49 +156,45 @@ class User {
 class Service {
   String? serviceId;
   String? serviceName;
-  String? serviceDescription;
+  int? doctorType;
+  String? serviceBookingFee;
   String? servicePrice;
   int? isAdminOnly;
   int? dueDateToggle;
   String? eddRequired;
-  int? doctorType;
-  String? serviceBookingFee;
 
   Service({
     this.serviceId,
     this.serviceName,
-    this.serviceDescription,
-    this.servicePrice,
     this.doctorType,
+    this.serviceBookingFee,
+    this.servicePrice,
     this.isAdminOnly,
     this.dueDateToggle,
     this.eddRequired,
-    this.serviceBookingFee,
   });
 
   Service.fromJson(Map<String, dynamic> json) {
     serviceId = json['serviceId'];
     serviceName = json['serviceName'];
-    serviceDescription = json['serviceDescription'];
-    servicePrice = json['servicePrice'];
     doctorType = json['doctorType'];
+    serviceBookingFee = json['serviceBookingFee'];
+    servicePrice = json['servicePrice'];
     isAdminOnly = json['isAdminOnly'];
     dueDateToggle = json['dueDateToggle'];
     eddRequired = json['eddRequired'];
-    serviceBookingFee = json['serviceBookingFee'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['serviceId'] = serviceId;
     data['serviceName'] = serviceName;
-    data['serviceDescription'] = serviceDescription;
-    data['servicePrice'] = servicePrice;
     data['doctorType'] = doctorType;
     data['serviceBookingFee'] = serviceBookingFee;
+    data['servicePrice'] = servicePrice;
+    data['isAdminOnly'] = isAdminOnly;
     data['dueDateToggle'] = dueDateToggle;
     data['eddRequired'] = eddRequired;
-    data['doctorType'] = doctorType;
     return data;
   }
 }
