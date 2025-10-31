@@ -564,12 +564,12 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       temp = false;
       serviceCategoryController.errorMessage = ErrorMessage.required(field: serviceCategoryController.labelText);
     }
-    if (widget.type == 'create') {
-      if (selectedFile.value == null) {
-        temp = false;
-        showDialogError(context, 'Please upload an image for the Service.');
-      }
-    }
+    // if (widget.type == 'create') {
+    //   if (selectedFile.value == null) {
+    //     temp = false;
+    //     showDialogError(context, 'Please upload an image for the Service.');
+    //   }
+    // }
     setState(() {});
     return temp;
   }

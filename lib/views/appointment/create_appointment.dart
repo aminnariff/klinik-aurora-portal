@@ -263,7 +263,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         ),
                         AppPadding.vertical(denominator: 2),
                         Container(
-                          constraints: BoxConstraints(maxWidth: 700, minWidth: 600),
+                          constraints: BoxConstraints(maxWidth: 750, minWidth: 600),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -544,34 +544,49 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         builder: (context, snapshot) {
                                           return Consumer<AuthController>(
                                             builder: (context, authController, _) {
-                                              return AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  authController.isSuperAdmin ? branches : [],
-                                                  labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                                  isEditable: authController.isSuperAdmin,
-                                                  fieldColor: authController.isSuperAdmin
-                                                      ? null
-                                                      : textFormFieldUneditableColor,
-                                                  value: _appointmentBranch?.name,
-                                                  onChanged: (p0) {
-                                                    _appointmentBranch = p0;
-                                                    if (_appointmentBranch != null) {
-                                                      ServiceBranchController.available(
-                                                        context,
-                                                        branchId: _appointmentBranch?.key,
-                                                      ).then((value) {
-                                                        if (responseCode(value.code)) {
-                                                          context
-                                                                  .read<ServiceBranchController>()
-                                                                  .serviceBranchAvailableResponse =
-                                                              value.data;
-                                                          rebuildDropdown.add(DateTime.now());
+                                              return Column(
+                                                children: [
+                                                  AppDropdown(
+                                                    attributeList: DropdownAttributeList(
+                                                      authController.isSuperAdmin ? branches : [],
+                                                      labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                                      isEditable: authController.isSuperAdmin,
+                                                      fieldColor: authController.isSuperAdmin
+                                                          ? null
+                                                          : textFormFieldUneditableColor,
+                                                      value: _appointmentBranch?.name,
+                                                      onChanged: (p0) {
+                                                        _appointmentBranch = p0;
+                                                        if (_appointmentBranch != null) {
+                                                          ServiceBranchController.available(
+                                                            context,
+                                                            branchId: _appointmentBranch?.key,
+                                                          ).then((value) {
+                                                            if (responseCode(value.code)) {
+                                                              context
+                                                                      .read<ServiceBranchController>()
+                                                                      .serviceBranchAvailableResponse =
+                                                                  value.data;
+                                                              if (value.data != null) {
+                                                                for (service_branch_available_model.Data item
+                                                                    in value.data?.data ?? []) {
+                                                                  serviceList.add(
+                                                                    DropdownAttribute(
+                                                                      item.serviceBranchId ?? '',
+                                                                      item.serviceName ?? '',
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              }
+                                                              rebuildDropdown.add(DateTime.now());
+                                                            }
+                                                          });
                                                         }
-                                                      });
-                                                    }
-                                                  },
-                                                  width: 331,
-                                                ),
+                                                      },
+                                                      width: 331,
+                                                    ),
+                                                  ),
+                                                ],
                                               );
                                             },
                                           );
@@ -665,6 +680,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           );
                                         },
                                       ),
+
                                     StreamBuilder(
                                       stream: rebuild.stream,
                                       builder: (context, _) {

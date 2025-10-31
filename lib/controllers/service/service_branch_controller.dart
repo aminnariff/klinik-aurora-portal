@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_response.dart';
+import 'package:klinik_aurora_portal/models/service_branch/rescan_service_branch_response.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_response.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart';
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
@@ -48,6 +49,26 @@ class ServiceBranchController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: ServiceBranchResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  static Future<ApiResponse<RescanServiceBranchResponse>> rescanServiceBranchId(
+    BuildContext context, {
+    String? branchId,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/service-branch/rescan-service-branch',
+          queryParameters: {if (notNullOrEmptyString(branchId)) "branchId": branchId},
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: RescanServiceBranchResponse.fromJson(value.data));
           } catch (e) {
             return ApiResponse(code: 400, message: e.toString());
           }

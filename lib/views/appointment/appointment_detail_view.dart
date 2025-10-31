@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
+import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
+import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
@@ -67,8 +71,9 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                           children: [
                             Expanded(
                               child: _infoBlock("Patient Details", [
-                                _infoRow(widget.response?.data?.first.user?.userFullName ?? ''),
-                                _infoRow(widget.response?.data?.first.user?.userNric ?? ''),
+                                _infoRow(widget.response?.data?.first.user?.userFullName?.titleCase() ?? ''),
+                                if (notNullOrEmptyString(widget.response?.data?.first.user?.userNric))
+                                  _infoRow(widget.response?.data?.first.user?.userNric ?? ''),
                                 _infoRow(widget.response?.data?.first.user?.userPhone ?? ''),
                                 _infoRow(widget.response?.data?.first.user?.userEmail ?? ''),
                                 const SizedBox(height: 12),
@@ -101,7 +106,38 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                               child: _infoBlock("Branch", [
                                 _infoRow(widget.response?.data?.first.branch?.branchName ?? ''),
                                 const SizedBox(height: 12),
-                                _infoLabel("Service"),
+                                Row(
+                                  children: [
+                                    _infoLabel("Service"),
+                                    if (widget.response?.data?.first.service?.serviceName?.contains('Anatomy') == true)
+                                      TextButton(
+                                        onPressed: () {
+                                          showLoading();
+                                          ServiceBranchController.rescanServiceBranchId(
+                                            context,
+                                            branchId: widget.response?.data?.first.branch?.branchId,
+                                          ).then((value) {
+                                            dismissLoading();
+                                            showDialog(
+                                              context: context,
+                                              builder: (_) {
+                                                return RescanAppointment(
+                                                  appointment: widget.response,
+                                                  serviceBranchId: value.data?.serviceBranchId ?? '',
+                                                );
+                                              },
+                                            );
+                                          });
+                                        },
+                                        child: Text(
+                                          'Rescan',
+                                          style: AppTypography.bodyMedium(
+                                            context,
+                                          ).apply(color: Colors.blue, fontWeightDelta: 1),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                                 _infoRow(
                                   '${widget.response?.data?.first.service?.serviceName}\nRM ${widget.response?.data?.first.service?.servicePrice}',
                                 ),
