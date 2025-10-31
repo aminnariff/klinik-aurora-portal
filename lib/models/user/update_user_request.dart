@@ -2,6 +2,7 @@ class UpdateUserRequest {
   String? userId;
   String? userName;
   String? userFullname;
+  String? userNric;
   String? branchId;
   String? userPhone;
   String? userDob;
@@ -11,6 +12,7 @@ class UpdateUserRequest {
     this.userId,
     this.userName,
     this.userFullname,
+    this.userNric,
     this.branchId,
     this.userPhone,
     this.userStatus,
@@ -21,6 +23,7 @@ class UpdateUserRequest {
     userId = json['userId'];
     userName = json['userName'];
     userFullname = json['userFullname'];
+    userNric = json['userNric'];
     branchId = json['branchId'];
     userPhone = json['userPhone'];
     userStatus = json['userStatus'];
@@ -32,6 +35,7 @@ class UpdateUserRequest {
     data['userId'] = userId;
     data['userName'] = userName;
     data['userFullname'] = userFullname;
+    data['userNric'] = userNric;
     data['branchId'] = branchId;
     data['userPhone'] = userPhone;
     data['userStatus'] = userStatus;

@@ -4,8 +4,10 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
 class AppointmentDetailsView extends StatefulWidget {
@@ -41,7 +43,16 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(),
-                            Text('Appointment Details', style: AppTypography.displayMedium(context)),
+                            Row(
+                              children: [
+                                Text('Appointment Details', style: AppTypography.displayMedium(context)),
+                                CopyButton(
+                                  textToCopy:
+                                      'Appointment Details\n\n${widget.response?.data?.first.user?.userFullName}\n${widget.response?.data?.first.user?.userPhone}\n${widget.response?.data?.first.user?.userEmail}\n${widget.response?.data?.first.service?.serviceName}\n${formatToDisplayDate(widget.response?.data?.first.appointmentDatetime ?? '')}\n${formatToDisplayTime(widget.response?.data?.first.appointmentDatetime ?? '')}\n${widget.response?.data?.first.branch?.branchName ?? ''}\nCreated Date : ${dateConverter(widget.response?.data?.first.createdDate ?? '')}\n',
+                                  tooltip: 'Copy Appointment Details',
+                                ),
+                              ],
+                            ),
                             CloseButton(
                               onPressed: () {
                                 context.pop();
@@ -57,6 +68,7 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                             Expanded(
                               child: _infoBlock("Patient Details", [
                                 _infoRow(widget.response?.data?.first.user?.userFullName ?? ''),
+                                _infoRow(widget.response?.data?.first.user?.userNric ?? ''),
                                 _infoRow(widget.response?.data?.first.user?.userPhone ?? ''),
                                 _infoRow(widget.response?.data?.first.user?.userEmail ?? ''),
                                 const SizedBox(height: 12),
@@ -162,7 +174,7 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+        AppSelectableText(title, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
         const SizedBox(height: 8),
         ...children,
       ],
@@ -172,7 +184,7 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
   Widget _infoRow(String value, {Color? textColor, int? bold}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Text(
+      child: AppSelectableText(
         value,
         style: AppTypography.bodyMedium(context).apply(color: textColor, fontWeightDelta: bold ?? 0),
       ),
@@ -182,7 +194,7 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
   Widget _infoLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 4),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+      child: AppSelectableText(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
     );
   }
 
@@ -195,7 +207,7 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
         border: Border.all(color: Colors.grey.shade400),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(text.isEmpty ? "—" : text, style: const TextStyle(fontSize: 14)),
+      child: AppSelectableText(text.isEmpty ? "—" : text, style: const TextStyle(fontSize: 14)),
     );
   }
 }

@@ -342,7 +342,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                         DataCell(
                                           AppTooltip(
                                             message:
-                                                'Email:\n${snapshot.userAllResponse?[index].userEmail}\n\nContact No:\n${snapshot.userAllResponse?[index].userPhone}',
+                                                '${notNullOrEmptyString(snapshot.userAllResponse?[index].userNric) ? 'Document ID:\n${snapshot.userAllResponse?[index].userNric}\n\n' : ''}Email:\n${snapshot.userAllResponse?[index].userEmail}\n\nContact No:\n${snapshot.userAllResponse?[index].userPhone}',
                                             child: Text(
                                               snapshot.userAllResponse?[index].userFullname?.titleCase() ??
                                                   snapshot.userAllResponse?[index].userName ??

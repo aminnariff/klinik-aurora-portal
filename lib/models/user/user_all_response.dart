@@ -36,6 +36,7 @@ class UserResponse {
   String? userFullname;
   String? userName;
   String? userDob;
+  String? userNric;
   String? branchId;
   String? userPhone;
   String? userReferral;
@@ -52,6 +53,7 @@ class UserResponse {
     this.userFullname,
     this.userName,
     this.userDob,
+    this.userNric,
     this.branchId,
     this.userPhone,
     this.userReferral,
@@ -69,6 +71,7 @@ class UserResponse {
     userFullname = json['userFullname'];
     userName = json['userName'];
     userDob = json['userDob'];
+    userNric = json['userNric'];
     branchId = json['branchId'];
     userPhone = json['userPhone'];
     userReferral = json['userReferral'];
@@ -87,6 +90,7 @@ class UserResponse {
     data['userFullname'] = userFullname;
     data['userName'] = userName;
     data['userDob'] = userDob;
+    data['userNric'] = userNric;
     data['branchId'] = branchId;
     data['userPhone'] = userPhone;
     data['userReferral'] = userReferral;

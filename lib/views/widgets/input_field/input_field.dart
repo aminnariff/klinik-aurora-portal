@@ -3,17 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/currency_formatter.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/upper_case_alpha_formatter.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class InputField extends StatelessWidget {
   final double? width;
   final InputFieldAttribute field;
 
-  const InputField({
-    super.key,
-    required this.field,
-    this.width,
-  });
+  const InputField({super.key, required this.field, this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +62,7 @@ class InputField extends StatelessWidget {
                   if (field.tooltip != null)
                     Tooltip(
                       message: field.tooltip,
-                      child: IconButton(
-                        icon: const Icon(Icons.info),
-                        onPressed: () {},
-                      ),
+                      child: IconButton(icon: const Icon(Icons.info), onPressed: () {}),
                     ),
                 ],
               );
@@ -87,12 +81,13 @@ class InputField extends StatelessWidget {
       obscureText: field.obscureText,
       validator: field.validator,
       focusNode: field.focusNode,
-      keyboardType: field.textInputType ??
+      keyboardType:
+          field.textInputType ??
           ((field.isNumber || field.isCurrency)
               ? TextInputType.number
               : (field.isEmail)
-                  ? TextInputType.emailAddress
-                  : TextInputType.text),
+              ? TextInputType.emailAddress
+              : TextInputType.text),
       decoration: InputDecoration(
         fillColor: field.isEditable ? field.isEditableColor : field.uneditableColor,
         filled: true,
@@ -109,50 +104,42 @@ class InputField extends StatelessWidget {
                 ),
               )
             : field.isDatePicker
-                ? Padding(
-                    padding: EdgeInsets.only(right: screenPadding / 3),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(
-                          Icons.calendar_month_rounded,
-                          color: primary,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 2),
-                        if (field.controller.text != '')
-                          const Icon(
-                            Icons.close,
-                            color: Colors.transparent,
-                            size: 22,
-                          ),
-                      ],
-                    ),
-                  )
-                : field.suffixWidget,
-        prefixIcon: (field.prefixText != null)
             ? Padding(
-                padding:
-                    EdgeInsets.fromLTRB(screenPadding / 2, (screenPadding / 3), screenPadding / 3, screenPadding / 3),
-                child: Text(
-                  field.prefixText!,
-                  style: Theme.of(context).textTheme.bodyLarge!.apply(),
+                padding: EdgeInsets.only(right: screenPadding / 3),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Icon(Icons.calendar_month_rounded, color: primary, size: 24),
+                    const SizedBox(width: 2),
+                    if (field.controller.text != '') const Icon(Icons.close, color: Colors.transparent, size: 22),
+                  ],
                 ),
               )
+            : field.suffixWidget,
+        prefixIcon: (field.prefixText != null)
+            ? Padding(
+                padding: EdgeInsets.fromLTRB(
+                  screenPadding / 2,
+                  (screenPadding / 3),
+                  screenPadding / 3,
+                  screenPadding / 3,
+                ),
+                child: Text(field.prefixText!, style: Theme.of(context).textTheme.bodyLarge!.apply()),
+              )
             : field.prefixIcon != null
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: screenPadding / 2),
-                        child: field.prefixIcon!,
-                      ),
-                    ],
-                  )
-                : null,
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: screenPadding / 2),
+                    child: field.prefixIcon!,
+                  ),
+                ],
+              )
+            : null,
         hintText: field.hintText,
         hintStyle: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.grey),
         labelText: field.labelText,
@@ -197,6 +184,7 @@ class InputField extends StatelessWidget {
       inputFormatters: [
         if (field.isCurrency) FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
         if (field.isCurrency) CurrencyInputFormatter(),
+        if (field.isUpperCase) UpperCaseAlphaFormatter(),
         if (field.isNumber) FilteringTextInputFormatter.digitsOnly,
         if (field.isAlphaNumericOnly) FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
         LengthLimitingTextInputFormatter(field.maxCharacter),
@@ -209,9 +197,7 @@ class InputField extends StatelessWidget {
 
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(ClipboardData(text: field.controller.text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Text copied to clipboard')),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Text copied to clipboard')));
   }
 }
 

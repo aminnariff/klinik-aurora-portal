@@ -45,6 +45,7 @@ class _UserDetailState extends State<UserDetail> {
     controller: TextEditingController(),
     maxCharacter: 20,
     isAlphaNumericOnly: true,
+    isEditable: false,
     labelText: 'information'.tr(gender: 'username'),
   );
   InputFieldAttribute fullNameAttribute = InputFieldAttribute(
@@ -52,6 +53,7 @@ class _UserDetailState extends State<UserDetail> {
     labelText: 'information'.tr(gender: 'fullName'),
   );
   InputFieldAttribute passwordAttribute = InputFieldAttribute(controller: TextEditingController());
+  TextEditingController nricController = TextEditingController();
   InputFieldAttribute dobAttribute = InputFieldAttribute(
     controller: TextEditingController(),
     labelText: 'information'.tr(gender: 'dob'),
@@ -98,6 +100,7 @@ class _UserDetailState extends State<UserDetail> {
       fullNameAttribute.controller.text = widget.user?.userFullname ?? '';
       branchIdAttribute.controller.text = widget.user?.branchId ?? '';
       dobAttribute.controller.text = dateConverter(widget.user?.userDob, format: 'dd-MM-yyyy') ?? '';
+      nricController.text = widget.user?.userNric ?? '';
       phoneAttribute.controller.text = widget.user?.userPhone ?? '';
       emailAttribute.controller.text = widget.user?.userEmail ?? '';
       _userStatus.value = widget.user?.userStatus == 1;
@@ -212,14 +215,43 @@ class _UserDetailState extends State<UserDetail> {
                                         child: ReadOnly(InputField(field: dobAttribute), isEditable: false),
                                       ),
                                       SizedBox(height: 12),
-                                      labelValue('Created by', widget.user?.createdByAdmin == 1 ? 'Admin' : 'Patient'),
-                                      SizedBox(height: 12),
-                                      labelValue(
-                                        'T&C Status',
-                                        widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0
-                                            ? 'Accepted'
-                                            : 'Not Accepted',
+                                      InputField(
+                                        field: InputFieldAttribute(
+                                          labelText: 'Document ID',
+                                          helpText:
+                                              'If patient is a Malaysian, please enter their NRIC. Otherwise, provide their passport number.',
+                                          controller: nricController,
+                                          isEditable: true,
+                                          maxCharacter: 12,
+                                          isUpperCase: true,
+                                          isAlphaNumericOnly: true,
+                                          onChanged: (value) {
+                                            if (widget.user?.userDob == null) {
+                                              try {
+                                                if (value.length == 12 && int.tryParse(value) != null) {
+                                                  try {
+                                                    final dob = extractDobFromNric(value);
+                                                    if (dob != null) {
+                                                      dobAttribute.controller.text = dob;
+                                                      dobAttribute.errorMessage = null;
+                                                      rebuild.add(DateTime.now());
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(e.toString());
+                                                  }
+                                                }
+                                              } catch (e) {
+                                                debugPrint(e.toString());
+                                              }
+                                            }
+                                          },
+                                        ),
                                       ),
+                                      SizedBox(height: 12),
+                                      labelValue('Created At', dateConverter(widget.user?.createdDate) ?? ''),
+                                      SizedBox(height: 12),
+                                      if (widget.user?.modifiedDate != null)
+                                        labelValue('Last Updated At', dateConverter(widget.user?.modifiedDate) ?? ''),
                                       // if (widget.type == 'create') ...[
                                       //   InputField(
                                       //     field: InputFieldAttribute(
@@ -277,10 +309,14 @@ class _UserDetailState extends State<UserDetail> {
                                         ],
                                       ),
                                       SizedBox(height: 12),
-                                      labelValue('Created At', dateConverter(widget.user?.createdDate) ?? ''),
+                                      labelValue('Created by', widget.user?.createdByAdmin == 1 ? 'Admin' : 'Patient'),
                                       SizedBox(height: 12),
-                                      if (widget.user?.modifiedDate != null)
-                                        labelValue('Last Updated At', dateConverter(widget.user?.modifiedDate) ?? ''),
+                                      labelValue(
+                                        'T&C Status',
+                                        widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0
+                                            ? 'Accepted'
+                                            : 'Not Accepted',
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -301,6 +337,9 @@ class _UserDetailState extends State<UserDetail> {
                                           userId: widget.user?.userId,
                                           userName: usernameAttribute.controller.text.trim(),
                                           userFullname: fullNameAttribute.controller.text.trim(),
+                                          userNric: notNullOrEmptyString(nricController.text)
+                                              ? nricController.text
+                                              : null,
                                           userDob: convertStringToDate(dobAttribute.controller.text),
                                           userPhone: phoneAttribute.controller.text.trim(),
                                           branchId: _selectedBranch?.key,

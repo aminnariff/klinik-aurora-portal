@@ -13,6 +13,7 @@ class InputFieldAttribute {
   bool obscureText;
   bool isEditable;
   bool isNumber;
+  bool isUpperCase;
   bool isCurrency;
   bool isEmail;
   bool isAlphaNumericOnly;
@@ -47,6 +48,7 @@ class InputFieldAttribute {
     this.hintText,
     this.isPassword = false,
     this.obscureText = false,
+    this.isUpperCase = false,
     this.isEditable = true,
     this.tooltip,
     this.isNumber = false,

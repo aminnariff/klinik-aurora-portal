@@ -116,27 +116,27 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                     children: [
                       SummaryCard(
                         title: 'Total Payments',
-                        value: '${snapshot.branchPaymentReportResponse?.summary?.totalPayments ?? 'N/A'}',
+                        value: '${snapshot.branchPaymentReportResponse?.summaryTotals?.totalPayments ?? 'N/A'}',
                       ),
                       SummaryCard(
                         title: 'Successful',
-                        value: snapshot.branchPaymentReportResponse?.summary?.successfulPayments ?? 'N/A',
+                        value: '${snapshot.branchPaymentReportResponse?.summaryTotals?.successfulPayments ?? 'N/A'}',
                       ),
                       SummaryCard(
                         title: 'Failed',
-                        value: snapshot.branchPaymentReportResponse?.summary?.failedPayments ?? 'N/A',
+                        value: '${snapshot.branchPaymentReportResponse?.summaryTotals?.failedPayments ?? 'N/A'}',
                       ),
                       SummaryCard(
                         title: 'Paid Amount',
-                        value: 'RM ${snapshot.branchPaymentReportResponse?.summary?.totalPaidAmount ?? 'N/A'}',
+                        value: 'RM ${snapshot.branchPaymentReportResponse?.summaryTotals?.totalPaidAmount ?? 'N/A'}',
                       ),
                       SummaryCard(
                         title: 'Refunded',
-                        value: 'RM ${snapshot.branchPaymentReportResponse?.summary?.totalRefundAmount ?? 'N/A'}',
+                        value: 'RM ${snapshot.branchPaymentReportResponse?.summaryTotals?.totalRefundAmount ?? 'N/A'}',
                       ),
                       SummaryCard(
                         title: 'Net Revenue',
-                        value: 'RM ${snapshot.branchPaymentReportResponse?.summary?.netRevenue ?? 'N/A'}',
+                        value: 'RM ${snapshot.branchPaymentReportResponse?.summaryTotals?.netRevenue ?? 'N/A'}',
                       ),
                     ],
                   ),

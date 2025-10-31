@@ -186,3 +186,22 @@ String formatToDisplayTime(String input) {
   final formatter = DateFormat('h.mm a');
   return formatter.format(dateTime);
 }
+
+String? extractDobFromNric(String nric) {
+  if (nric.length != 12) return null;
+
+  final yearPart = nric.substring(0, 2);
+  final monthPart = nric.substring(2, 4);
+  final dayPart = nric.substring(4, 6);
+
+  final now = DateTime.now();
+  final currentYear = now.year % 100;
+  final fullYear = int.parse(yearPart) > currentYear ? 1900 + int.parse(yearPart) : 2000 + int.parse(yearPart);
+
+  try {
+    final date = DateTime(fullYear, int.parse(monthPart), int.parse(dayPart));
+    return DateFormat('dd-MM-yyyy').format(date);
+  } catch (e) {
+    return null;
+  }
+}

@@ -130,15 +130,17 @@ class User {
   String? userName;
   String? userFullName;
   String? userEmail;
+  String? userNric;
   String? userPhone;
 
-  User({this.userId, this.userName, this.userFullName, this.userEmail, this.userPhone});
+  User({this.userId, this.userName, this.userFullName, this.userEmail, this.userNric, this.userPhone});
 
   User.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     userName = json['userName'];
     userFullName = json['userFullName'];
     userEmail = json['userEmail'];
+    userNric = json['userNric'];
     userPhone = json['userPhone'];
   }
 
@@ -148,6 +150,7 @@ class User {
     data['userName'] = userName;
     data['userFullName'] = userFullName;
     data['userEmail'] = userEmail;
+    data['userNric'] = userNric;
     data['userPhone'] = userPhone;
     return data;
   }

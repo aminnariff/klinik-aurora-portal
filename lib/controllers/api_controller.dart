@@ -68,11 +68,17 @@ class ApiController {
         Headers.contentTypeHeader: 'application/json',
         'Authorization': 'Bearer $token',
       },
+      receiveTimeout: const Duration(seconds: 15),
+      sendTimeout: const Duration(seconds: 10),
     );
   }
 
   Options unauthenticatedHeaders() {
-    return Options(headers: {Headers.acceptHeader: '*/*', Headers.contentTypeHeader: 'application/json'});
+    return Options(
+      headers: {Headers.acceptHeader: '*/*', Headers.contentTypeHeader: 'application/json'},
+      receiveTimeout: const Duration(seconds: 15),
+      sendTimeout: const Duration(seconds: 10),
+    );
   }
 
   Future<bool> checkToken(BuildContext context, bool isAuthenticated) async {
@@ -250,15 +256,15 @@ class ApiController {
                     },
                     text:
                         e.response?.data?['message'] ==
-                                'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
-                            ? 'error'.tr(gender: 'err-6')
-                            : 'error'.tr(gender: e.response?.statusCode == 500 ? 'generic' : 'internal'),
+                            'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
+                        ? 'error'.tr(gender: 'err-6')
+                        : 'error'.tr(gender: e.response?.statusCode == 500 ? 'generic' : 'internal'),
                     buttonColor: errorColor,
                     buttonText:
                         e.response?.data?['message'] ==
-                                'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
-                            ? null
-                            : 'button'.tr(gender: 'retry'),
+                            'java.lang.ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate cannot be found'
+                        ? null
+                        : 'button'.tr(gender: 'retry'),
                     barrierDismissible: true,
                   );
                 });

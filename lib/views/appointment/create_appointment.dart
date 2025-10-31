@@ -249,7 +249,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 if (widget.type == 'update')
                                   CopyButton(
                                     textToCopy:
-                                        'Appointment Details\n\n${patientNameController.controller.text}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
+                                        'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
                                     tooltip: 'Copy Appointment Details',
                                   ),
                               ],
@@ -281,6 +281,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               patientNameController.controller.text,
                                               alignStart: true,
                                             ),
+                                            if (notNullOrEmptyString(widget.appointment?.user?.userNric))
+                                              AppSelectableText(
+                                                widget.appointment?.user?.userNric ?? '',
+                                                style: AppTypography.bodyMedium(context),
+                                              ),
                                             AppSelectableText(
                                               patientContactNoController.controller.text,
                                               style: AppTypography.bodyMedium(context),

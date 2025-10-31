@@ -1,17 +1,17 @@
 class BranchPaymentSummaryResponse {
   String? message;
   Filters? filters;
-  int? limit;
-  Summary? summary;
+  Range? range;
+  SummaryTotals? summaryTotals;
   List<Data>? data;
 
-  BranchPaymentSummaryResponse({this.message, this.filters, this.limit, this.summary, this.data});
+  BranchPaymentSummaryResponse({this.message, this.filters, this.range, this.summaryTotals, this.data});
 
   BranchPaymentSummaryResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     filters = json['filters'] != null ? Filters.fromJson(json['filters']) : null;
-    limit = json['limit'];
-    summary = json['summary'] != null ? Summary.fromJson(json['summary']) : null;
+    range = json['range'] != null ? Range.fromJson(json['range']) : null;
+    summaryTotals = json['summaryTotals'] != null ? SummaryTotals.fromJson(json['summaryTotals']) : null;
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
@@ -26,9 +26,11 @@ class BranchPaymentSummaryResponse {
     if (filters != null) {
       data['filters'] = filters!.toJson();
     }
-    data['limit'] = limit;
-    if (summary != null) {
-      data['summary'] = summary!.toJson();
+    if (range != null) {
+      data['range'] = range!.toJson();
+    }
+    if (summaryTotals != null) {
+      data['summaryTotals'] = summaryTotals!.toJson();
     }
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
@@ -56,15 +58,34 @@ class Filters {
   }
 }
 
-class Summary {
+class Range {
+  String? start;
+  String? end;
+
+  Range({this.start, this.end});
+
+  Range.fromJson(Map<String, dynamic> json) {
+    start = json['start'];
+    end = json['end'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['start'] = start;
+    data['end'] = end;
+    return data;
+  }
+}
+
+class SummaryTotals {
   int? totalPayments;
-  String? successfulPayments;
-  String? failedPayments;
+  int? successfulPayments;
+  int? failedPayments;
   String? totalPaidAmount;
   String? totalRefundAmount;
   String? netRevenue;
 
-  Summary({
+  SummaryTotals({
     this.totalPayments,
     this.successfulPayments,
     this.failedPayments,
@@ -73,7 +94,7 @@ class Summary {
     this.netRevenue,
   });
 
-  Summary.fromJson(Map<String, dynamic> json) {
+  SummaryTotals.fromJson(Map<String, dynamic> json) {
     totalPayments = json['totalPayments'];
     successfulPayments = json['successfulPayments'];
     failedPayments = json['failedPayments'];
