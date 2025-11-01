@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
+import 'package:klinik_aurora_portal/views/service/slot_generator.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
+import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
@@ -17,6 +19,7 @@ class TimeSlotDates {
 
 class MultiTimeCalendarPage extends StatefulWidget {
   final String serviceBranchId;
+  final String serviceTiming;
   final String? serviceBranchAvailableDatetimeId;
   final int startMonth;
   final int year;
@@ -26,6 +29,7 @@ class MultiTimeCalendarPage extends StatefulWidget {
   const MultiTimeCalendarPage({
     super.key,
     required this.serviceBranchId,
+    required this.serviceTiming,
     this.serviceBranchAvailableDatetimeId,
     required this.startMonth,
     required this.year,
@@ -45,6 +49,8 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
   @override
   void initState() {
     super.initState();
+    currentMonthIndex = DateTime.now().month - widget.startMonth;
+    currentMonthIndex = currentMonthIndex.clamp(0, widget.totalMonths - 1);
     if (widget.initialDateTimes != null) {
       _loadInitialSelections(widget.initialDateTimes!);
     }
@@ -83,6 +89,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
     if (picked != null) {
       setState(() {
         timeSlots.add(TimeSlotDates(time: picked, selectedDates: {}));
+        timeSlots.sort((a, b) => (a.time.hour * 60 + a.time.minute).compareTo(b.time.hour * 60 + b.time.minute));
       });
     }
   }
@@ -254,13 +261,90 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: primary,
-        onPressed: _addTimeSlot,
-        label: const Text("Add Time"),
-        icon: const Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          IconButton(
+            onPressed: () async {
+              final result = await showDialog<List<String>>(
+                context: context,
+                builder: (BuildContext context) {
+                  return Center(
+                    child: SingleChildScrollView(
+                      child: CardContainer(
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                          constraints: BoxConstraints(maxWidth: 800, maxHeight: 800),
+                          child: WeeklySlotGenerator(initInterval: convertToMinutes(widget.serviceTiming)),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+
+              if (result != null && result.isNotEmpty) {
+                setState(() {
+                  for (var iso in result) {
+                    final dt = DateTime.parse(iso);
+                    final time = TimeOfDay(hour: dt.hour, minute: dt.minute);
+                    final dateKey =
+                        '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+
+                    var existing = timeSlots.firstWhere(
+                      (t) => t.time.hour == time.hour && t.time.minute == time.minute,
+                      orElse: () {
+                        final newSlot = TimeSlotDates(time: time, selectedDates: {});
+                        timeSlots.add(newSlot);
+                        return newSlot;
+                      },
+                    );
+
+                    existing.selectedDates[dateKey] = true;
+                  }
+                  timeSlots.sort(
+                    (a, b) => (a.time.hour * 60 + a.time.minute).compareTo(b.time.hour * 60 + b.time.minute),
+                  );
+                });
+              }
+            },
+            color: secondaryColor,
+            icon: Row(children: [Icon(Icons.interests), SizedBox(width: 8), Text('Generate')]),
+          ),
+          IconButton(
+            onPressed: _addTimeSlot,
+            color: primary,
+            icon: Row(children: [Icon(Icons.timer), SizedBox(width: 8), Text('Add Time')]),
+          ),
+        ],
       ),
     );
+  }
+
+  int convertToMinutes(String input) {
+    try {
+      input = input.toLowerCase().trim();
+
+      final RegExp pattern = RegExp(r'^(\d+)\s*(minute|minutes|hour|hours)$');
+      final match = pattern.firstMatch(input);
+
+      if (match != null) {
+        final value = int.tryParse(match.group(1)!);
+        final unit = match.group(2)!;
+
+        if (value != null) {
+          if (unit.startsWith('hour')) {
+            return value * 60;
+          } else {
+            return value;
+          }
+        }
+      }
+
+      throw FormatException("Invalid time format: '$input'");
+    } catch (e) {
+      return 30;
+    }
   }
 
   Widget _buildCalendar(Map<String, bool> selectedDates, int displayMonth, int displayYear) {

@@ -39,6 +39,7 @@ class Data {
   String? serviceName;
   String? serviceDescription;
   String? serviceImage;
+  String? serviceTime;
   String? serviceBookingFee;
   String? servicePrice;
   int? doctorType;
@@ -60,6 +61,7 @@ class Data {
     this.serviceName,
     this.serviceDescription,
     this.serviceImage,
+    this.serviceTime,
     this.servicePrice,
     this.serviceBookingFee,
     this.doctorType,
@@ -82,6 +84,7 @@ class Data {
     serviceName = json['serviceName'];
     serviceDescription = json['serviceDescription'];
     serviceImage = json['serviceImage'];
+    serviceTime = json['serviceTime'];
     servicePrice = json['servicePrice'];
     serviceBookingFee = json['serviceBookingFee'];
     doctorType = json['doctorType'];
@@ -105,6 +108,7 @@ class Data {
     data['serviceName'] = serviceName;
     data['serviceDescription'] = serviceDescription;
     data['serviceImage'] = serviceImage;
+    data['serviceTime'] = serviceTime;
     data['servicePrice'] = servicePrice;
     data['serviceBookingFee'] = serviceBookingFee;
     data['doctorType'] = doctorType;

@@ -767,6 +767,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           padding: EdgeInsets.all(screenPadding),
                           child: MultiTimeCalendarPage(
                             serviceBranchId: serviceBranch.serviceBranchId ?? '',
+                            serviceTiming: serviceBranch.serviceTime ?? '',
                             serviceBranchAvailableDatetimeId: updateId,
                             startMonth: now.month,
                             year: now.year,

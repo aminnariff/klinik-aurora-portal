@@ -45,7 +45,7 @@ class _UserDetailState extends State<UserDetail> {
     controller: TextEditingController(),
     maxCharacter: 20,
     isAlphaNumericOnly: true,
-    isEditable: false,
+    isEditable: true,
     labelText: 'information'.tr(gender: 'username'),
   );
   InputFieldAttribute fullNameAttribute = InputFieldAttribute(
@@ -335,7 +335,7 @@ class _UserDetailState extends State<UserDetail> {
                                         context,
                                         UpdateUserRequest(
                                           userId: widget.user?.userId,
-                                          userName: usernameAttribute.controller.text.trim(),
+                                          userName: widget.user?.userName ?? usernameAttribute.controller.text.trim(),
                                           userFullname: fullNameAttribute.controller.text.trim(),
                                           userNric: notNullOrEmptyString(nricController.text)
                                               ? nricController.text
