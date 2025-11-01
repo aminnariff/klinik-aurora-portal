@@ -3,15 +3,24 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/service/service_branch_available_dt_response.dart';
+import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_timing_response.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class ServiceBranchAvailableDtController extends ChangeNotifier {
   ServiceBranchAvailableDtResponse? _serviceBranchAvailableDtResponse;
   ServiceBranchAvailableDtResponse? get serviceBranchAvailableDtResponse => _serviceBranchAvailableDtResponse;
+  ServiceBranchAvailableTimingResponse? _serviceBranchAvailableTimingResponse;
+  ServiceBranchAvailableTimingResponse? get serviceBranchAvailableTimingResponse =>
+      _serviceBranchAvailableTimingResponse;
 
   set serviceBranchAvailableDtResponse(ServiceBranchAvailableDtResponse? value) {
     _serviceBranchAvailableDtResponse = value;
+    notifyListeners();
+  }
+
+  set serviceBranchAvailableTimingResponse(ServiceBranchAvailableTimingResponse? value) {
+    _serviceBranchAvailableTimingResponse = value;
     notifyListeners();
   }
 
@@ -38,6 +47,26 @@ class ServiceBranchAvailableDtController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: ServiceBranchAvailableDtResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  static Future<ApiResponse<ServiceBranchAvailableTimingResponse>> getAvailableSlot(
+    BuildContext context, {
+    String? serviceBranchId,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/service-available-datetime/available',
+          queryParameters: {if (notNullOrEmptyString(serviceBranchId)) "serviceBranchId": serviceBranchId},
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: ServiceBranchAvailableTimingResponse.fromJson(value.data));
           } catch (e) {
             return ApiResponse(code: 400, message: e.toString());
           }

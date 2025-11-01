@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
@@ -20,7 +20,6 @@ import 'package:klinik_aurora_portal/controllers/gestational/gestational_control
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
-import 'package:klinik_aurora_portal/controllers/service/service_branch_exception_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
@@ -98,6 +97,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   List<FileAttribute> selectedFiles = [];
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   List<DropdownAttribute> serviceList = [];
+  List<String> availableDateTime = [];
   service_branch_available_model.Data? selectedService;
   GestationalController? gestationalResult;
 
@@ -640,34 +640,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           } catch (e) {
                                                             debugPrint(e.toString());
                                                           }
-                                                          ServiceBranchAvailableDtController.get(
+                                                          ServiceBranchAvailableDtController.getAvailableSlot(
                                                             context,
-                                                            1,
-                                                            200,
-                                                            branchId: _appointmentBranch?.key,
                                                             serviceBranchId: _service?.key,
                                                           ).then((value) {
                                                             if (responseCode(value.code)) {
                                                               context
                                                                       .read<ServiceBranchAvailableDtController>()
-                                                                      .serviceBranchAvailableDtResponse =
+                                                                      .serviceBranchAvailableTimingResponse =
                                                                   value.data;
+                                                              availableDateTime = value.data?.slots ?? [];
+                                                              rebuild.add(DateTime.now());
                                                               rebuildDropdown.add(DateTime.now());
-                                                              ServiceBranchExceptionController.get(
-                                                                context,
-                                                                1,
-                                                                999,
-                                                                serviceBranchId:
-                                                                    widget.appointment?.serviceBranchId ??
-                                                                    _service?.key,
-                                                              ).then((value) {
-                                                                if (responseCode(value.code)) {
-                                                                  context
-                                                                          .read<ServiceBranchExceptionController>()
-                                                                          .serviceBranchExceptionResponse =
-                                                                      value.data;
-                                                                }
-                                                              });
                                                             }
                                                           });
                                                         },
@@ -738,47 +722,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                         'c54a2d91-499c-11f0-9169-bc24115a1342',
                                                       ) ==
                                                       false) {
-                                                    if (_appointmentBranch != null &&
-                                                        (snapshot.serviceBranchAvailableDtResponse?.data != null &&
-                                                            (snapshot.serviceBranchAvailableDtResponse?.data?.length ??
-                                                                    0) >
-                                                                0)) {
+                                                    if (_appointmentBranch != null && (availableDateTime.isNotEmpty)) {
                                                       DateTime now = DateTime.now();
-                                                      List<String> availableDateTime =
-                                                          snapshot
-                                                              .serviceBranchAvailableDtResponse
-                                                              ?.data
-                                                              ?.first
-                                                              .availableDatetimes ??
-                                                          [];
-
-                                                      List<String> tempExceptionDateTime = [];
-                                                      for (
-                                                        int index = 0;
-                                                        index <
-                                                            (context
-                                                                    .read<ServiceBranchExceptionController>()
-                                                                    .serviceBranchExceptionResponse
-                                                                    ?.data
-                                                                    ?.length ??
-                                                                0);
-                                                        index++
-                                                      ) {
-                                                        tempExceptionDateTime.add(
-                                                          context
-                                                                  .read<ServiceBranchExceptionController>()
-                                                                  .serviceBranchExceptionResponse
-                                                                  ?.data?[index]
-                                                                  .exceptionDatetime ??
-                                                              '',
-                                                        );
-                                                      }
-
-                                                      final result = availableDateTime
-                                                          .toSet()
-                                                          .difference(tempExceptionDateTime.toSet())
-                                                          .toList();
-                                                      availableDateTime = result;
                                                       availableDateTime = removePastDates(availableDateTime);
                                                       availableDateTime.sort(
                                                         (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
@@ -821,106 +766,49 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           ) ??
                                                           '';
                                                       calculateGestational();
-                                                    } else if (widget.type == 'update' &&
-                                                        context
-                                                                .read<ServiceBranchAvailableDtController>()
-                                                                .serviceBranchAvailableDtResponse ==
-                                                            null) {
-                                                      ServiceBranchAvailableDtController.get(
+                                                    } else if (widget.type == 'update' && availableDateTime.isEmpty) {
+                                                      ServiceBranchAvailableDtController.getAvailableSlot(
                                                         context,
-                                                        1,
-                                                        100,
                                                         serviceBranchId: widget.appointment?.serviceBranchId,
-                                                        serviceBranchStatus: 1,
-                                                      ).then((value) {
+                                                      ).then((value) async {
                                                         if (responseCode(value.code)) {
-                                                          context
-                                                                  .read<ServiceBranchAvailableDtController>()
-                                                                  .serviceBranchAvailableDtResponse =
-                                                              value.data;
-                                                          ServiceBranchExceptionController.get(
-                                                            context,
-                                                            1,
-                                                            999,
-                                                            serviceBranchId: widget.appointment?.serviceBranchId,
-                                                          ).then((value) async {
-                                                            if (responseCode(value.code)) {
-                                                              context
-                                                                      .read<ServiceBranchExceptionController>()
-                                                                      .serviceBranchExceptionResponse =
-                                                                  value.data;
-                                                              DateTime now = DateTime.now();
-                                                              List<String> availableDateTime =
-                                                                  snapshot
-                                                                      .serviceBranchAvailableDtResponse
-                                                                      ?.data
-                                                                      ?.first
-                                                                      .availableDatetimes ??
-                                                                  [];
-                                                              List<String> exceptionDateTime = [];
-                                                              for (
-                                                                int index = 0;
-                                                                index <
-                                                                    (context
-                                                                            .read<ServiceBranchExceptionController>()
-                                                                            .serviceBranchExceptionResponse
-                                                                            ?.data
-                                                                            ?.length ??
-                                                                        0);
-                                                                index++
-                                                              ) {
-                                                                exceptionDateTime.add(
-                                                                  context
-                                                                          .read<ServiceBranchExceptionController>()
-                                                                          .serviceBranchExceptionResponse
-                                                                          ?.data?[index]
-                                                                          .exceptionDatetime ??
-                                                                      '',
-                                                                );
-                                                              }
-
-                                                              final result = availableDateTime
-                                                                  .toSet()
-                                                                  .difference(exceptionDateTime.toSet())
-                                                                  .toList();
-                                                              availableDateTime = result;
-                                                              availableDateTime = removePastDates(availableDateTime);
-                                                              String? selectedDateTime = await showDialog(
-                                                                context: context,
-                                                                builder: (BuildContext context) {
-                                                                  return Row(
+                                                          availableDateTime = value.data?.slots ?? [];
+                                                          DateTime now = DateTime.now();
+                                                          availableDateTime = removePastDates(availableDateTime);
+                                                          String? selectedDateTime = await showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return Row(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                children: [
+                                                                  Column(
                                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                                     children: [
-                                                                      Column(
-                                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                                        children: [
-                                                                          CardContainer(
-                                                                            Padding(
-                                                                              padding: EdgeInsets.all(screenPadding),
-                                                                              child: SelectionCalendarView(
-                                                                                startMonth: now.month,
-                                                                                year: now.year,
-                                                                                initialDateTimes: availableDateTime,
-                                                                              ),
-                                                                            ),
+                                                                      CardContainer(
+                                                                        Padding(
+                                                                          padding: EdgeInsets.all(screenPadding),
+                                                                          child: SelectionCalendarView(
+                                                                            startMonth: now.month,
+                                                                            year: now.year,
+                                                                            initialDateTimes: availableDateTime,
                                                                           ),
-                                                                        ],
+                                                                        ),
                                                                       ),
                                                                     ],
-                                                                  );
-                                                                },
+                                                                  ),
+                                                                ],
                                                               );
-                                                              dateTimeController.text =
-                                                                  formatDateTimeToDisplay(selectedDateTime) ??
-                                                                  dateConverter(
-                                                                    widget.appointment?.appointmentDatetime,
-                                                                    format: 'yyyy-MM-dd HH:mm',
-                                                                  ) ??
-                                                                  '';
-                                                              calculateGestational();
-                                                              rebuildDropdown.add(DateTime.now());
-                                                            }
-                                                          });
+                                                            },
+                                                          );
+                                                          dateTimeController.text =
+                                                              formatDateTimeToDisplay(selectedDateTime) ??
+                                                              dateConverter(
+                                                                widget.appointment?.appointmentDatetime,
+                                                                format: 'yyyy-MM-dd HH:mm',
+                                                              ) ??
+                                                              '';
+                                                          calculateGestational();
+                                                          rebuildDropdown.add(DateTime.now());
                                                         }
                                                       });
                                                     } else if (_service == null) {
@@ -930,12 +818,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           field: 'appointmentPage'.tr(gender: 'service'),
                                                         ),
                                                       );
-                                                    } else if ((snapshot
-                                                                .serviceBranchAvailableDtResponse
-                                                                ?.data
-                                                                ?.length ??
-                                                            0) ==
-                                                        0) {
+                                                    } else if (availableDateTime.isEmpty) {
                                                       showDialogError(context, 'No available slots');
                                                     } else {
                                                       showDialogError(
@@ -1312,7 +1195,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  if (_service != null && notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
+                  if (_service != null &&
+                      notNullOrEmptyString(selectedService?.serviceBookingFee) == true &&
+                      kDebugMode == false) {
                     showLoading();
                     PaymentController.upload(
                       context,
@@ -1460,7 +1345,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     } else if (dateTimeController.text == "") {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'Slots'));
-    } else if (widget.type == 'create' &&
+    } else if (kDebugMode == false &&
+        widget.type == 'create' &&
         _service != null &&
         notNullOrEmptyString(selectedService?.serviceBookingFee) == true &&
         selectedFiles.isEmpty) {
