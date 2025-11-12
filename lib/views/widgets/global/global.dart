@@ -49,6 +49,9 @@ String doctorType(int? type) {
     case 3:
       return 'Therapist';
 
+    case 4:
+      return 'Spa Therapist';
+
     default:
       return 'Doctor';
   }

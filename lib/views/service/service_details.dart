@@ -96,6 +96,8 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         _doctorType = DropdownAttribute('2', 'Sonographer');
       } else if (widget.service?.doctorType == 3) {
         _doctorType = DropdownAttribute('3', 'Therapist');
+      } else if (widget.service?.doctorType == 3) {
+        _doctorType = DropdownAttribute('3', 'Spa Therapist');
       }
     }
     super.initState();
@@ -170,6 +172,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                             DropdownAttribute('1', 'Doctor'),
                                             DropdownAttribute('2', 'Sonographer'),
                                             DropdownAttribute('3', 'Therapist'),
+                                            DropdownAttribute('4', 'Spa Therapist'),
                                           ],
                                           labelText: 'servicesHomepage'.tr(gender: 'doctorType'),
                                           value: _doctorType?.name,

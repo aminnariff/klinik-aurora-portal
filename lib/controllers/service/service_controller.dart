@@ -79,7 +79,7 @@ class ServiceController extends ChangeNotifier {
             "serviceDescription": request.serviceDescription, // optional
             "servicePrice": request.servicePrice,
             "serviceBookingFee": request.serviceBookingFee, // optional
-            "doctorType": request.doctorType, // 1 = General, 2 = sonographer, 3 = therapist
+            "doctorType": request.doctorType, // 1 = General, 2 = sonographer, 3 = therapist, 4 = spaTherapist
             "serviceTime": request.serviceTime,
             "serviceCategory": request.serviceCategory,
             "serviceStatus": request.serviceStatus, // 1 = active, 2 = inactive
