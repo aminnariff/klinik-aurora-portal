@@ -568,9 +568,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                           ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.appointmentResponse?.data?.data?[index].service?.doctorType == 2
-                                                ? 'Sonographer'
-                                                : 'Doctor',
+                                            doctorType(
+                                              snapshot.appointmentResponse?.data?.data?[index].service?.doctorType,
+                                            ),
                                           ),
                                         ),
                                         DataCell(
@@ -699,6 +699,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                                             ?.data?[index]
                                                             .branch
                                                             ?.branchName ??
+                                                        '',
+                                                    branchPhone:
+                                                        snapshot
+                                                            .appointmentResponse
+                                                            ?.data
+                                                            ?.data?[index]
+                                                            .branch
+                                                            ?.branchPhone ??
                                                         '',
                                                     dateTime: DateTime.parse(
                                                       snapshot

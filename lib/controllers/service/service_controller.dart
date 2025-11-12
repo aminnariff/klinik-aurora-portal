@@ -79,7 +79,7 @@ class ServiceController extends ChangeNotifier {
             "serviceDescription": request.serviceDescription, // optional
             "servicePrice": request.servicePrice,
             "serviceBookingFee": request.serviceBookingFee, // optional
-            "doctorType": request.doctorType, // 1 = General, 2 = sonographer,
+            "doctorType": request.doctorType, // 1 = General, 2 = sonographer, 3 = therapist
             "serviceTime": request.serviceTime,
             "serviceCategory": request.serviceCategory,
             "serviceStatus": request.serviceStatus, // 1 = active, 2 = inactive
@@ -110,12 +110,11 @@ class ServiceController extends ChangeNotifier {
           MultipartFile.fromBytes(
             item.value!,
             filename: item.name,
-            contentType:
-                item.name != null
-                    ? item.name!.contains(".pdf")
-                        ? MediaType("application", "pdf")
-                        : MediaType("image", item.name.toString().split(".").last)
-                    : MediaType("image", item.name.toString().split(".").last),
+            contentType: item.name != null
+                ? item.name!.contains(".pdf")
+                      ? MediaType("application", "pdf")
+                      : MediaType("image", item.name.toString().split(".").last)
+                : MediaType("image", item.name.toString().split(".").last),
           ),
         ),
       );

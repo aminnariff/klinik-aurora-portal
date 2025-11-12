@@ -38,6 +38,22 @@ String? dateConverter(String? value, {String? format}) {
   }
 }
 
+String doctorType(int? type) {
+  switch (type) {
+    case 1:
+      return 'Doctor';
+
+    case 2:
+      return 'Sonographer';
+
+    case 3:
+      return 'Therapist';
+
+    default:
+      return 'Doctor';
+  }
+}
+
 String convertStringToDate(String dateString) {
   // Assuming the date is in day-month-year format
   List<String> parts = dateString.split('-');

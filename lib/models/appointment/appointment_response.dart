@@ -240,13 +240,15 @@ class Branch {
   String? branchId;
   String? branchCode;
   String? branchName;
+  String? branchPhone;
 
-  Branch({this.branchId, this.branchCode, this.branchName});
+  Branch({this.branchId, this.branchCode, this.branchName, this.branchPhone});
 
   Branch.fromJson(Map<String, dynamic> json) {
     branchId = json['branchId'];
     branchCode = json['branchCode'];
     branchName = json['branchName'];
+    branchPhone = json['branchPhone'];
   }
 
   Map<String, dynamic> toJson() {
@@ -254,6 +256,7 @@ class Branch {
     data['branchId'] = branchId;
     data['branchCode'] = branchCode;
     data['branchName'] = branchName;
+    data['branchPhone'] = branchPhone;
     return data;
   }
 }

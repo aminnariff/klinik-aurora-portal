@@ -352,9 +352,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.servicesResponse?.data?[index].doctorType == 2
-                                                ? 'Sonographer'
-                                                : 'Doctor',
+                                            doctorType(snapshot.servicesResponse?.data?[index].doctorType),
                                           ),
                                         ),
                                         DataCell(
@@ -549,9 +547,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                         ),
                                         DataCell(
                                           AppSelectableText(
-                                            snapshot.serviceBranchResponse?.data?[index].doctorType == 2
-                                                ? 'Sonographer'
-                                                : 'Doctor',
+                                            doctorType(snapshot.serviceBranchResponse?.data?[index].doctorType),
                                           ),
                                         ),
                                         DataCell(

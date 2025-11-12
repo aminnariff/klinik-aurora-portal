@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
 class WeeklySlotGenerator extends StatefulWidget {
@@ -69,6 +72,51 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
     //     actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
     //   ),
     // );
+  }
+
+  Future<void> _saveAllSlotsToPrefs() async {
+    final data = {
+      for (var day in days)
+        if (selectedDays[day] == true)
+          day: timeRanges[day]!.map((r) => {'start': _formatTime(r.start), 'end': _formatTime(r.end)}).toList(),
+    };
+    await prefs.setString('saved_weekly_slots', jsonEncode(data));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved all day slots to memory')));
+  }
+
+  Future<void> _loadAllSlotsFromPrefs() async {
+    try {
+      final jsonString = prefs.getString('saved_weekly_slots');
+
+      if (jsonString == null || jsonString.trim().isEmpty) {
+        showDialogError(context, 'No saved slots found.');
+        debugPrint('No saved slots found.');
+        return;
+      }
+
+      final Map<String, dynamic> data = jsonDecode(jsonString);
+      for (var entry in data.entries) {
+        selectedDays[entry.key] = true;
+        timeRanges[entry.key] = (entry.value as List).map((item) {
+          return TimeRange(start: _parseTime(item['start']), end: _parseTime(item['end']));
+        }).toList();
+      }
+
+      rebuild.add(DateTime.now());
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pasted saved slots to all days')));
+    } catch (e) {
+      debugPrint('Error loading saved slots: $e');
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to load saved slots')));
+    }
+  }
+
+  String _formatTime(TimeOfDay t) {
+    return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+  }
+
+  TimeOfDay _parseTime(String s) {
+    final parts = s.split(':').map(int.parse).toList();
+    return TimeOfDay(hour: parts[0], minute: parts[1]);
   }
 
   bool _isBeforeOrEqual(TimeOfDay a, TimeOfDay b) {
@@ -150,6 +198,21 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                       90,
                       120,
                     ].map((i) => DropdownMenuItem(value: i, child: Text('$i mins'))).toList(),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(width: 16),
+                      TextButton(
+                        onPressed: _saveAllSlotsToPrefs,
+                        child: Row(children: [Text('Save All Timing')]),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: _loadAllSlotsFromPrefs,
+                        child: Row(children: [Text('Paste Saved Timing')]),
+                      ),
+                    ],
                   ),
                 ],
               ),

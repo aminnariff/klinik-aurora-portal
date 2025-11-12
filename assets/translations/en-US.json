@@ -142,6 +142,7 @@
     "serviceBookingFee": "Booking Fee",
     "doctorType": "Type",
     "serviceTime": "Service Time",
+    "estimatedDuration": "Estimated Duration",
     "serviceImage": "Service Image",
     "browseFile": "Browse your files here (max 1MB)",
     "serviceCategory": "Category"

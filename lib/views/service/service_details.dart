@@ -63,7 +63,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
   );
   final InputFieldAttribute serviceTimeController = InputFieldAttribute(
     controller: TextEditingController(),
-    labelText: 'servicesHomepage'.tr(gender: 'serviceTime'),
+    labelText: 'servicesHomepage'.tr(gender: 'estimatedDuration'),
   );
   final InputFieldAttribute serviceCategoryController = InputFieldAttribute(
     controller: TextEditingController(),
@@ -94,6 +94,8 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         _doctorType = DropdownAttribute('1', 'Doctor');
       } else if (widget.service?.doctorType == 2) {
         _doctorType = DropdownAttribute('2', 'Sonographer');
+      } else if (widget.service?.doctorType == 3) {
+        _doctorType = DropdownAttribute('3', 'Therapist');
       }
     }
     super.initState();
@@ -164,7 +166,11 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                     builder: (context, snapshot) {
                                       return AppDropdown(
                                         attributeList: DropdownAttributeList(
-                                          [DropdownAttribute('1', 'Doctor'), DropdownAttribute('2', 'Sonographer')],
+                                          [
+                                            DropdownAttribute('1', 'Doctor'),
+                                            DropdownAttribute('2', 'Sonographer'),
+                                            DropdownAttribute('3', 'Therapist'),
+                                          ],
                                           labelText: 'servicesHomepage'.tr(gender: 'doctorType'),
                                           value: _doctorType?.name,
                                           onChanged: (p0) {
@@ -191,7 +197,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                             const TextSpan(text: "Tip: Use "),
                                             TextSpan(
                                               text:
-                                                  "{{name}}, {{service}}, {{branchName}}, {{formattedDate}}, {{formattedTime}}",
+                                                  "{{name}}, {{service}}, {{branchName}}, {{branchPhone}}, {{formattedDate}}, {{formattedTime}}",
                                               style: AppTypography.bodyMedium(
                                                 context,
                                               ).apply(color: primary, fontWeightDelta: 1),

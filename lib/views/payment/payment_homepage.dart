@@ -61,6 +61,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         startDate = DateTime(now.year, now.month, 1);
         endDate = DateTime(now.year, now.month + 1, 0);
         break;
+      case 'Last Month':
+        startDate = DateTime(now.year, now.month - 1, 1);
+        endDate = DateTime(now.year, now.month, 0);
+        break;
       case 'Custom':
         // default to full month for now, can add date picker later
         startDate = DateTime(now.year, now.month, 1);
@@ -97,6 +101,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           'Today',
                           'Yesterday',
                           'This Month',
+                          'Last Month',
                           'Custom',
                         ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                         onChanged: (val) async {

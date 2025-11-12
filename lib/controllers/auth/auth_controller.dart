@@ -188,7 +188,6 @@ class AuthController extends ChangeNotifier {
         prefs.remove(authResponse);
         prefs.remove(loginDateTime);
         prefs.remove(token);
-        print('sini dah clearkan');
         notifyListeners();
       }
     } catch (e) {
@@ -255,6 +254,7 @@ class AuthController extends ChangeNotifier {
   }
 
   void logout(BuildContext context) {
+    prefs.remove(jwtResponse);
     setAuthenticationResponse(null);
     notifyListeners();
   }

@@ -12,6 +12,7 @@ void showWhatsAppTemplateDialog({
   required String phone,
   required String service,
   required String branchName,
+  required String branchPhone,
   required DateTime dateTime,
 }) {
   final gmt8DateTime = dateTime.add(const Duration(hours: 8));
@@ -23,6 +24,7 @@ void showWhatsAppTemplateDialog({
     "name": name,
     "service": service,
     "branchName": branchName,
+    "branchPhone": branchPhone,
     "formattedDate": formattedDate,
     "formattedTime": formattedTime,
   };
@@ -103,7 +105,6 @@ String renderTemplate(String template, Map<String, String> values) {
 void _launchWhatsApp(String phone, String message) async {
   final encodedMessage = Uri.encodeComponent(message);
   final url = 'https://web.whatsapp.com/send?phone=6$phone&text=$encodedMessage';
-  print(url);
 
   if (await canLaunchUrl(Uri.parse(url))) {
     await launchUrl(Uri.parse(url), mode: LaunchMode.inAppWebView);

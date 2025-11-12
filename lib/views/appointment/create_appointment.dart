@@ -168,12 +168,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       } catch (e) {
         debugPrint(e.toString());
       }
-
-      // if (widget.appointment?.doctorType == 1) {
-      //   _status = DropdownAttribute('1', 'General');
-      // } else if (widget.appointment?.doctorType == 2) {
-      //   _status = DropdownAttribute('2', 'Sonographer');
-      // }
       if (widget.type == 'create') {
         branches = [];
         if (context.read<BranchController>().branchAllResponse?.data?.data == null) {

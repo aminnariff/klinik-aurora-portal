@@ -57,6 +57,10 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
         startDate = DateTime(now.year, now.month, 1);
         endDate = DateTime(now.year, now.month + 1, 0);
         break;
+      case 'Last Month':
+        startDate = DateTime(now.year, now.month - 1, 1);
+        endDate = DateTime(now.year, now.month, 0);
+        break;
       case 'Custom':
         startDate = DateTime(now.year, now.month, 1);
         endDate = now;
@@ -92,6 +96,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                           'Today',
                           'Yesterday',
                           'This Month',
+                          'Last Month',
                           'Custom',
                         ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                         onChanged: (val) {
