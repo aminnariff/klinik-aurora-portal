@@ -96,7 +96,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         _doctorType = DropdownAttribute('2', 'Sonographer');
       } else if (widget.service?.doctorType == 3) {
         _doctorType = DropdownAttribute('3', 'Therapist');
-      } else if (widget.service?.doctorType == 3) {
+      } else if (widget.service?.doctorType == 4) {
         _doctorType = DropdownAttribute('4', 'Spa Therapist');
       }
     }
