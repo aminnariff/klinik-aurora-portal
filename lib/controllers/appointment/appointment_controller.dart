@@ -92,7 +92,7 @@ class AppointmentController extends ChangeNotifier {
         .call(
           context,
           method: Method.get,
-          endpoint: 'admin/appointment',
+          endpoint: 'admin/appointment/detail',
           queryParameters: {'appointmentId': appointmentId},
         )
         .then((value) {

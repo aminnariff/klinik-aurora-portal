@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
@@ -54,6 +56,52 @@ class PaymentController extends ChangeNotifier {
             return ApiResponse(code: 400, message: e.toString());
           }
         });
+  }
+
+  static Future<void> exportCsvDownload({
+    required String fileName,
+    String? startDate,
+    String? endDate,
+    String? branchId,
+  }) async {
+    try {
+      final dio = Dio();
+
+      final response = await dio.get(
+        '${Environment.appUrl}admin/payment/export-payment-report',
+        queryParameters: {
+          if (startDate != null) 'startDate': startDate,
+          if (endDate != null) 'endDate': endDate,
+          if (branchId != null) 'branchId': branchId,
+        },
+        options: Options(
+          responseType: ResponseType.plain,
+          headers: {
+            Headers.acceptHeader: '*/*',
+            Headers.contentTypeHeader: 'application/json',
+            'Authorization': 'Bearer ${prefs.getString(token)}',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final csvText = response.data.toString();
+        final Uint8List bytes = Uint8List.fromList(csvText.codeUnits);
+
+        final savedPath = await FileSaver.instance.saveFile(
+          name: fileName,
+          bytes: bytes,
+          fileExtension: "csv",
+          mimeType: MimeType.csv,
+        );
+
+        debugPrint("✅ CSV saved to: $savedPath");
+      } else {
+        debugPrint("❌ Failed to download CSV: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("❌ CSV download failed: $e");
+    }
   }
 
   static Future<ApiResponse<BranchPaymentSummaryResponse>> branchReport(

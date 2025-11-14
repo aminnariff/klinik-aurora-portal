@@ -1,126 +1,96 @@
 class AppointmentDetailResponse {
   String? message;
-  List<Data>? data;
-  int? totalCount;
-  int? totalPage;
+  Data? data;
 
-  AppointmentDetailResponse({this.message, this.data, this.totalCount, this.totalPage});
+  AppointmentDetailResponse({this.message, this.data});
 
   AppointmentDetailResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
-      });
-    }
-    totalCount = json['totalCount'];
-    totalPage = json['totalPage'];
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['message'] = message;
     if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
+      data['data'] = this.data!.toJson();
     }
-    data['totalCount'] = totalCount;
-    data['totalPage'] = totalPage;
     return data;
   }
 }
 
 class Data {
   String? appointmentId;
-  String? serviceBranchId;
   String? appointmentDatetime;
   String? appointmentNote;
   String? customerDueDate;
   String? appointmentRating;
   String? appointmentFeedback;
   int? appointmentStatus;
+  int? appointmentIsDeleted;
   String? createdDate;
   String? modifiedDate;
-  int? isAdminOnly;
-  int? dueDateToggle;
-  String? eddRequired;
   User? user;
   Service? service;
-  List<Payment>? payment;
   Branch? branch;
+  String? serviceBranchId;
 
   Data({
     this.appointmentId,
-    this.serviceBranchId,
     this.appointmentDatetime,
     this.appointmentNote,
     this.customerDueDate,
     this.appointmentRating,
     this.appointmentFeedback,
     this.appointmentStatus,
+    this.appointmentIsDeleted,
     this.createdDate,
     this.modifiedDate,
-    this.isAdminOnly,
-    this.dueDateToggle,
-    this.eddRequired,
     this.user,
     this.service,
-    this.payment,
     this.branch,
+    this.serviceBranchId,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
     appointmentId = json['appointmentId'];
-    serviceBranchId = json['serviceBranchId'];
     appointmentDatetime = json['appointmentDatetime'];
     appointmentNote = json['appointmentNote'];
     customerDueDate = json['customerDueDate'];
     appointmentRating = json['appointmentRating'];
     appointmentFeedback = json['appointmentFeedback'];
     appointmentStatus = json['appointmentStatus'];
+    appointmentIsDeleted = json['appointmentIsDeleted'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
-    isAdminOnly = json['isAdminOnly'];
-    dueDateToggle = json['dueDateToggle'];
-    eddRequired = json['eddRequired'];
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     service = json['service'] != null ? Service.fromJson(json['service']) : null;
-    if (json['payment'] != null) {
-      payment = <Payment>[];
-      json['payment'].forEach((v) {
-        payment!.add(Payment.fromJson(v));
-      });
-    }
     branch = json['branch'] != null ? Branch.fromJson(json['branch']) : null;
+    serviceBranchId = json['serviceBranchId'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['appointmentId'] = appointmentId;
-    data['serviceBranchId'] = serviceBranchId;
     data['appointmentDatetime'] = appointmentDatetime;
     data['appointmentNote'] = appointmentNote;
     data['customerDueDate'] = customerDueDate;
     data['appointmentRating'] = appointmentRating;
     data['appointmentFeedback'] = appointmentFeedback;
     data['appointmentStatus'] = appointmentStatus;
+    data['appointmentIsDeleted'] = appointmentIsDeleted;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
-    data['isAdminOnly'] = isAdminOnly;
-    data['dueDateToggle'] = dueDateToggle;
-    data['eddRequired'] = eddRequired;
     if (user != null) {
       data['user'] = user!.toJson();
     }
     if (service != null) {
       data['service'] = service!.toJson();
     }
-    if (payment != null) {
-      data['payment'] = payment!.map((v) => v.toJson()).toList();
-    }
     if (branch != null) {
       data['branch'] = branch!.toJson();
     }
+    data['serviceBranchId'] = serviceBranchId;
     return data;
   }
 }
@@ -198,48 +168,6 @@ class Service {
     data['isAdminOnly'] = isAdminOnly;
     data['dueDateToggle'] = dueDateToggle;
     data['eddRequired'] = eddRequired;
-    return data;
-  }
-}
-
-class Payment {
-  String? paymentId;
-  int? paymentType;
-  String? paymentAsset;
-  String? paymentAmount;
-  int? paymentStatus;
-  String? createdDate;
-  String? modifiedDate;
-
-  Payment({
-    this.paymentId,
-    this.paymentType,
-    this.paymentAsset,
-    this.paymentAmount,
-    this.paymentStatus,
-    this.createdDate,
-    this.modifiedDate,
-  });
-
-  Payment.fromJson(Map<String, dynamic> json) {
-    paymentId = json['paymentId'];
-    paymentType = json['paymentType'];
-    paymentAsset = json['paymentAsset'];
-    paymentAmount = json['paymentAmount'];
-    paymentStatus = json['paymentStatus'];
-    createdDate = json['createdDate'];
-    modifiedDate = json['modifiedDate'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['paymentId'] = paymentId;
-    data['paymentType'] = paymentType;
-    data['paymentAsset'] = paymentAsset;
-    data['paymentAmount'] = paymentAmount;
-    data['paymentStatus'] = paymentStatus;
-    data['createdDate'] = createdDate;
-    data['modifiedDate'] = modifiedDate;
     return data;
   }
 }

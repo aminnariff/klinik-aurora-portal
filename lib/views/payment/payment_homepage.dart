@@ -45,6 +45,19 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     });
   }
 
+  void exportData() {
+    showLoading();
+    print('A');
+    PaymentController.exportCsvDownload(
+      fileName: 'payment-report',
+      startDate: DateFormat('yyyy-MM-dd').format(startDate),
+      endDate: DateFormat('yyyy-MM-dd').format(endDate),
+      branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+    ).then((response) {
+      dismissLoading();
+    });
+  }
+
   void applyDateFilter() {
     final now = DateTime.now();
     switch (selectedFilter) {
@@ -132,8 +145,19 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           }
                         },
                       ),
-                      const Spacer(),
+                      SizedBox(width: 16),
                       Text(getFormattedDateRange(), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      TextButton.icon(
+                        onPressed: () {
+                          exportData();
+                        },
+                        icon: Icon(Icons.download, color: Colors.blue),
+                        label: Text(
+                          'Export',
+                          style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1, color: Colors.blue),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),

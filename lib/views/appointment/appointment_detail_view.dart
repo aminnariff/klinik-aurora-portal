@@ -52,7 +52,7 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                                 Text('Appointment Details', style: AppTypography.displayMedium(context)),
                                 CopyButton(
                                   textToCopy:
-                                      'Appointment Details\n\n${widget.response?.data?.first.user?.userFullName}\n${widget.response?.data?.first.user?.userPhone}\n${widget.response?.data?.first.user?.userEmail}\n${widget.response?.data?.first.service?.serviceName}\n${formatToDisplayDate(widget.response?.data?.first.appointmentDatetime ?? '')}\n${formatToDisplayTime(widget.response?.data?.first.appointmentDatetime ?? '')}\n${widget.response?.data?.first.branch?.branchName ?? ''}\nCreated Date : ${dateConverter(widget.response?.data?.first.createdDate ?? '')}\n',
+                                      'Appointment Details\n\n${widget.response?.data?.user?.userFullName}\n${widget.response?.data?.user?.userPhone}\n${widget.response?.data?.user?.userEmail}\n${widget.response?.data?.service?.serviceName}\n${formatToDisplayDate(widget.response?.data?.appointmentDatetime ?? '')}\n${formatToDisplayTime(widget.response?.data?.appointmentDatetime ?? '')}\n${widget.response?.data?.branch?.branchName ?? ''}\nCreated Date : ${dateConverter(widget.response?.data?.createdDate ?? '')}\n',
                                   tooltip: 'Copy Appointment Details',
                                 ),
                               ],
@@ -71,28 +71,27 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                           children: [
                             Expanded(
                               child: _infoBlock("Patient Details", [
-                                _infoRow(widget.response?.data?.first.user?.userFullName?.titleCase() ?? ''),
-                                if (notNullOrEmptyString(widget.response?.data?.first.user?.userNric))
-                                  _infoRow(widget.response?.data?.first.user?.userNric ?? ''),
-                                _infoRow(widget.response?.data?.first.user?.userPhone ?? ''),
-                                _infoRow(widget.response?.data?.first.user?.userEmail ?? ''),
+                                _infoRow(widget.response?.data?.user?.userFullName?.titleCase() ?? ''),
+                                if (notNullOrEmptyString(widget.response?.data?.user?.userNric))
+                                  _infoRow(widget.response?.data?.user?.userNric ?? ''),
+                                _infoRow(widget.response?.data?.user?.userPhone ?? ''),
+                                _infoRow(widget.response?.data?.user?.userEmail ?? ''),
                                 const SizedBox(height: 12),
                                 _infoLabel("Note"),
-                                _infoRow(widget.response?.data?.first.appointmentNote ?? '-'),
+                                _infoRow(widget.response?.data?.appointmentNote ?? '-'),
                                 const SizedBox(height: 12),
-                                if (widget.response?.data?.first.service?.dueDateToggle == 1) ...[
+                                if (widget.response?.data?.service?.dueDateToggle == 1) ...[
                                   _infoLabel("Estimated Due Date (EDD)"),
                                   _infoRow(
-                                    dateConverter(widget.response?.data?.first.customerDueDate, format: 'dd-MM-yyyy') ??
-                                        '-',
+                                    dateConverter(widget.response?.data?.customerDueDate, format: 'dd-MM-yyyy') ?? '-',
                                   ),
                                   const SizedBox(height: 12),
-                                  if (notNullOrEmptyString(widget.response?.data?.first.service?.eddRequired)) ...[
+                                  if (notNullOrEmptyString(widget.response?.data?.service?.eddRequired)) ...[
                                     _infoLabel("Estimated gestational age at appointment"),
                                     _infoRow(
                                       calculateGestationalAge(
-                                            edd: widget.response?.data?.first.customerDueDate ?? '',
-                                            appointmentDate: widget.response?.data?.first.appointmentDatetime ?? '',
+                                            edd: widget.response?.data?.customerDueDate ?? '',
+                                            appointmentDate: widget.response?.data?.appointmentDatetime ?? '',
                                           ) ??
                                           '-',
                                     ),
@@ -104,18 +103,18 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                             const SizedBox(width: 16),
                             Expanded(
                               child: _infoBlock("Branch", [
-                                _infoRow(widget.response?.data?.first.branch?.branchName ?? ''),
+                                _infoRow(widget.response?.data?.branch?.branchName ?? ''),
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
                                     _infoLabel("Service"),
-                                    if (widget.response?.data?.first.service?.serviceName?.contains('Anatomy') == true)
+                                    if (widget.response?.data?.service?.serviceName?.contains('Anatomy') == true)
                                       TextButton(
                                         onPressed: () {
                                           showLoading();
                                           ServiceBranchController.rescanServiceBranchId(
                                             context,
-                                            branchId: widget.response?.data?.first.branch?.branchId,
+                                            branchId: widget.response?.data?.branch?.branchId,
                                           ).then((value) {
                                             dismissLoading();
                                             showDialog(
@@ -139,24 +138,22 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                                   ],
                                 ),
                                 _infoRow(
-                                  '${widget.response?.data?.first.service?.serviceName}\nRM ${widget.response?.data?.first.service?.servicePrice}',
+                                  '${widget.response?.data?.service?.serviceName}\nRM ${widget.response?.data?.service?.servicePrice}',
                                 ),
                                 const SizedBox(height: 12),
                                 _infoLabel("Status"),
                                 _infoRow(
                                   appointmentStatus
-                                      .firstWhere(
-                                        (e) => widget.response?.data?.first.appointmentStatus?.toString() == e.key,
-                                      )
+                                      .firstWhere((e) => widget.response?.data?.appointmentStatus?.toString() == e.key)
                                       .name,
-                                  textColor: appointmentStatusColors[widget.response?.data?.first.appointmentStatus],
+                                  textColor: appointmentStatusColors[widget.response?.data?.appointmentStatus],
                                   bold: 1,
                                 ),
                                 const SizedBox(height: 12),
                                 _infoLabel("Slots"),
                                 _infoRow(
                                   dateConverter(
-                                        widget.response?.data?.first.appointmentDatetime ?? '',
+                                        widget.response?.data?.appointmentDatetime ?? '',
                                         format: 'dd-MM-yyyy HH:mm',
                                       ) ??
                                       '',
@@ -176,19 +173,19 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                                 _infoRow("✅ Paid"),
                                 const SizedBox(height: 8),
                                 _infoLabel("Booking Fee Amount"),
-                                _infoRow(widget.response?.data?.first.service?.serviceBookingFee ?? ''),
+                                _infoRow(widget.response?.data?.service?.serviceBookingFee ?? ''),
                                 _infoLabel("Balance"),
                                 _infoRow(
-                                  'RM ${double.parse(widget.response?.data?.first.service?.servicePrice ?? '') - double.parse(widget.response?.data?.first.service?.serviceBookingFee ?? '')}',
+                                  'RM ${double.parse(widget.response?.data?.service?.servicePrice ?? '') - double.parse(widget.response?.data?.service?.serviceBookingFee ?? '')}',
                                 ),
                               ]),
                             ),
                             Expanded(
                               child: _infoBlock("", [
                                 _infoLabel("Created Date"),
-                                _infoRow(dateConverter(widget.response?.data?.first.createdDate) ?? ''),
+                                _infoRow(dateConverter(widget.response?.data?.createdDate) ?? ''),
                                 _infoLabel("Updated Date"),
-                                _infoRow(dateConverter(widget.response?.data?.first.modifiedDate) ?? ''),
+                                _infoRow(dateConverter(widget.response?.data?.modifiedDate) ?? ''),
                               ]),
                             ),
                           ],

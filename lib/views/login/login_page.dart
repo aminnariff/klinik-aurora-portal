@@ -74,62 +74,25 @@ class _LoginPageState extends State<LoginPage> {
             authController.logout(context);
           }
         }
-
-        final rememberMeCredentials = authController.getRememberMeCredentials();
-        final remember = prefs.getBool(rememberMe) ?? false;
-        if (rememberMeCredentials != null && remember) {
-          usernameController.text = rememberMeCredentials[0];
-          passwordController.text = rememberMeCredentials[1];
-        }
       });
+      final rememberMeCredentials = authController.getRememberMeCredentials();
+      final remember = prefs.getBool(rememberMe) ?? false;
+      context.read<AuthController>().remember = remember;
+      if (rememberMeCredentials != null && remember == true) {
+        usernameController.text = rememberMeCredentials[0];
+        passwordController.text = rememberMeCredentials[1];
+      }
       if (kDebugMode) {
         usernameController.text = 'superadmin';
         if (environment == Flavor.production) {
           usernameController.text = 'auroramedicare@gmail.com';
-          usernameController.text = 'aurorasripristana@gmail.com';
+          // usernameController.text = 'aurorasripristana@gmail.com';
         } else {
           usernameController.text = 'bukit-rimau@yopmail.com';
         }
         passwordController.text = 'Admin12345!';
       }
     });
-    // SchedulerBinding.instance.scheduleFrameCallback((_) {
-    //   context.read<AuthController>().init(context).then((controller) {
-    //     if (controller?.data != null &&
-    //         DateTime.parse(controller?.data?.expiryDt ?? '').difference(DateTime.now()).isNegative) {
-    //       prefs.remove(authResponse);
-    //       prefs.remove(jwtResponse);
-    //       prefs.remove(token);
-    //     }
-    //   });
-    //   context.read<AuthController>().checkDateTime().then((value) {
-    //     String tokenStatus = value;
-    //     if (tokenStatus == 'expired') {
-    //       context.read<AuthController>().logout(context);
-    //     }
-    //     List<String>? rememberMeCredentials = context.read<AuthController>().getRememberMeCredentials();
-    //     bool remember = prefs.getBool(rememberMe) ?? false;
-    //     if (rememberMeCredentials != null && remember) {
-    //       usernameController.text = rememberMeCredentials[0];
-    //       passwordController.text = rememberMeCredentials[1];
-    //     }
-    //   });
-    // });
-    // if (kDebugMode) {
-    //   usernameController.text = 'superadmin';
-    //   if (environment == Flavor.production) {
-    //     usernameController.text = 'auroramedicare@gmail.com';
-    //     usernameController.text = 'aurorasripristana@gmail.com';
-    //   } else {
-    //     usernameController.text = 'bukit-rimau@yopmail.com';
-    //   }
-    //   // usernameController.text = 'auroramedicare@gmail.com';
-    //   // bndrsridamansara@gmail.com
-    //   // Auror@123
-    //   // usernameController.text = 'amin.ariff@klinikauroramembership.com';
-    //   passwordController.text = 'Admin12345!';
-    //   // passwordController.text = 'Auror@123';
-    // }
     dismissLoading();
     super.initState();
   }

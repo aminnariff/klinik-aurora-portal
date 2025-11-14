@@ -62,36 +62,35 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _infoBlock("Patient Details", [
-                            _infoRow(widget.appointment?.data?.first.user?.userFullName?.titleCase() ?? ''),
-                            if (notNullOrEmptyString(widget.appointment?.data?.first.user?.userNric))
-                              _infoRow(widget.appointment?.data?.first.user?.userNric ?? ''),
-                            _infoRow(widget.appointment?.data?.first.user?.userPhone ?? ''),
-                            _infoRow(widget.appointment?.data?.first.user?.userEmail ?? ''),
+                            _infoRow(widget.appointment?.data?.user?.userFullName?.titleCase() ?? ''),
+                            if (notNullOrEmptyString(widget.appointment?.data?.user?.userNric))
+                              _infoRow(widget.appointment?.data?.user?.userNric ?? ''),
+                            _infoRow(widget.appointment?.data?.user?.userPhone ?? ''),
+                            _infoRow(widget.appointment?.data?.user?.userEmail ?? ''),
                           ]),
                           AppPadding.vertical(),
                           _infoBlock("Branch", [
-                            _infoRow(widget.appointment?.data?.first.branch?.branchName ?? ''),
+                            _infoRow(widget.appointment?.data?.branch?.branchName ?? ''),
                             const SizedBox(height: 12),
                             _infoLabel("Service"),
-                            _infoRow('Rescan - ${widget.appointment?.data?.first.service?.serviceName}\nRM 0.00'),
+                            _infoRow('Rescan - ${widget.appointment?.data?.service?.serviceName}\nRM 0.00'),
                           ]),
                           const SizedBox(height: 12),
-                          if (widget.appointment?.data?.first.service?.dueDateToggle == 1) ...[
+                          if (widget.appointment?.data?.service?.dueDateToggle == 1) ...[
                             _infoLabel("Estimated Due Date (EDD)"),
                             _infoRow(
-                              dateConverter(widget.appointment?.data?.first.customerDueDate, format: 'dd-MM-yyyy') ??
-                                  '-',
+                              dateConverter(widget.appointment?.data?.customerDueDate, format: 'dd-MM-yyyy') ?? '-',
                             ),
                             const SizedBox(height: 12),
-                            if (notNullOrEmptyString(widget.appointment?.data?.first.service?.eddRequired)) ...[
+                            if (notNullOrEmptyString(widget.appointment?.data?.service?.eddRequired)) ...[
                               _infoLabel("Estimated gestational age at appointment"),
                               if (notNullOrEmptyString(_selectedDateTime) &&
-                                  notNullOrEmptyString(widget.appointment?.data?.first.customerDueDate))
+                                  notNullOrEmptyString(widget.appointment?.data?.customerDueDate))
                                 _infoRow(
                                   calculateGestationalAge(
                                         edd:
                                             dateConverter(
-                                              widget.appointment?.data?.first.customerDueDate,
+                                              widget.appointment?.data?.customerDueDate,
                                               format: 'dd-MM-yyyy',
                                             ) ??
                                             '',
@@ -110,7 +109,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                               Text(
                                 getGestationalStatusMessage(
                                       result: gestationalResult,
-                                      range: widget.appointment?.data?.first.service?.eddRequired ?? '',
+                                      range: widget.appointment?.data?.service?.eddRequired ?? '',
                                       showRange: true,
                                     ) ??
                                     '',
@@ -122,7 +121,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                           ],
                           AppPadding.vertical(),
                           _infoLabel("Note"),
-                          _infoRow(widget.appointment?.data?.first.appointmentNote ?? '-'),
+                          _infoRow(widget.appointment?.data?.appointmentNote ?? '-'),
                           SizedBox(height: 16),
                           _infoLabel("Slot"),
                           Row(
@@ -167,19 +166,16 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                       selectedTime = formatTimeOfDay(picked);
                                       _selectedDateTime = '$selectedDate $selectedTime';
                                       try {
-                                        if (notNullOrEmptyString(widget.appointment?.data?.first.customerDueDate) &&
-                                            notNullOrEmptyString(
-                                              widget.appointment?.data?.first.service?.eddRequired,
-                                            )) {
+                                        if (notNullOrEmptyString(widget.appointment?.data?.customerDueDate) &&
+                                            notNullOrEmptyString(widget.appointment?.data?.service?.eddRequired)) {
                                           gestationalResult = getGestationalStatusFromString(
                                             eddStr:
                                                 dateConverter(
-                                                  widget.appointment?.data?.first.customerDueDate,
+                                                  widget.appointment?.data?.customerDueDate,
                                                   format: 'dd-MM-yyyy',
                                                 ) ??
                                                 '',
-                                            range:
-                                                widget.appointment?.data?.first.service?.eddRequired ?? '26w0d-31w1d',
+                                            range: widget.appointment?.data?.service?.eddRequired ?? '26w0d-31w1d',
                                             appointmentDate: DateTime.parse(
                                               convertMalaysiaTimeToUtc(_selectedDateTime ?? '', plainFormat: true),
                                             ),
@@ -200,14 +196,14 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                             if (notNullOrEmptyString(_selectedDateTime)) {
                               showConfirmDialog(
                                 context,
-                                "Are you sure you want to create a rescan appointment for ${widget.appointment?.data?.first.user?.userFullName?.titleCase()}",
+                                "Are you sure you want to create a rescan appointment for ${widget.appointment?.data?.user?.userFullName?.titleCase()}",
                               ).then((value) {
                                 if (value) {
                                   showLoading();
                                   AppointmentController.create(
                                     context,
                                     CreateAppointmentRequest(
-                                      userId: widget.appointment?.data?.first.user?.userId,
+                                      userId: widget.appointment?.data?.user?.userId,
                                       serviceBranchId: widget.serviceBranchId,
                                       appointmentDateTime: convertMalaysiaTimeToUtc(
                                         _selectedDateTime.toString(),
@@ -215,7 +211,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                       ),
                                       appointmentNote: '',
                                       customerDueDate: dateConverter(
-                                        widget.appointment?.data?.first.customerDueDate,
+                                        widget.appointment?.data?.customerDueDate,
                                         format: 'dd-MM-yyyy',
                                       ),
                                       appointmentStatus: 1,
