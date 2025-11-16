@@ -188,6 +188,7 @@ class AuthController extends ChangeNotifier {
         prefs.remove(authResponse);
         prefs.remove(loginDateTime);
         prefs.remove(token);
+        prefs.remove('isSuperAdmin');
         notifyListeners();
       }
     } catch (e) {

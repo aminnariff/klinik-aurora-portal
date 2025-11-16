@@ -295,21 +295,21 @@ class _LoginPageState extends State<LoginPage> {
                                     AuthController.logIn(
                                       context,
                                       AuthRequest(username: usernameController.text, password: passwordController.text),
-                                    ).then((value) {
+                                    ).then((value) async {
                                       dismissLoading();
                                       if (responseCode(value.code)) {
-                                        loginSuccess = true;
                                         if (prefs.getBool(rememberMe) == true) {
                                           prefs.setBool(rememberMe, true);
                                           prefs.setString(username, usernameController.text);
                                           prefs.setString(password, passwordController.text);
                                         }
-                                        SchedulerBinding.instance.addPostFrameCallback((_) {
-                                          context.read<AuthController>().setAuthenticationResponse(
-                                            value.data,
-                                            usernameValue: usernameController.text,
-                                            passwordValue: passwordController.text,
-                                          );
+                                        await context.read<AuthController>().setAuthenticationResponse(
+                                          value.data,
+                                          usernameValue: usernameController.text,
+                                          passwordValue: passwordController.text,
+                                        );
+                                        setState(() {
+                                          loginSuccess = true;
                                         });
                                       }
                                     });
