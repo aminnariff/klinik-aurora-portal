@@ -67,7 +67,13 @@ class _HomepageState extends State<Homepage> {
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+          return Icon(Icons.person, color: Colors.white);
+        },
+        label: UserHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.numbers, color: Colors.white);
         },
         label: PointHomepage.displayName,
       ),
@@ -94,12 +100,6 @@ class _HomepageState extends State<Homepage> {
           return Icon(Icons.medical_services, color: Colors.white);
         },
         label: ServiceHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.person, color: Colors.white);
-        },
-        label: UserHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {

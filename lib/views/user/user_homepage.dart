@@ -44,8 +44,8 @@ import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
 import 'package:provider/provider.dart';
 
 class UserHomepage extends StatefulWidget {
-  static const routeName = '/user';
-  static const displayName = 'Users';
+  static const routeName = '/patients';
+  static const displayName = 'Patients';
   const UserHomepage({super.key});
 
   @override
