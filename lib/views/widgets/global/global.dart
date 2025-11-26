@@ -57,6 +57,28 @@ String doctorType(int? type) {
   }
 }
 
+String pointType(int? type) {
+  switch (type) {
+    case 1:
+      return 'Referral';
+
+    case 2:
+      return 'Voucher';
+
+    case 3:
+      return 'Claim Reward';
+
+    case 4:
+      return 'Spending';
+
+    case 5:
+      return 'Expired';
+
+    default:
+      return 'Spending';
+  }
+}
+
 String convertStringToDate(String dateString) {
   // Assuming the date is in day-month-year format
   List<String> parts = dateString.split('-');

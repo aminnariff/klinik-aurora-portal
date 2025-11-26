@@ -8,11 +8,19 @@ import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/update_user_response.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/models/user/user_appointment_response.dart';
+import 'package:klinik_aurora_portal/models/user/user_point_history_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 class UserController extends ChangeNotifier {
   List<UserResponse>? _userAllResponse;
   List<UserResponse>? get userAllResponse => _userAllResponse;
+  UserPointHistoryResponse? _userPoints;
+  UserPointHistoryResponse? get userPoints => _userPoints;
+
+  set userPoints(UserPointHistoryResponse? value) {
+    _userPoints = value;
+    notifyListeners();
+  }
 
   set userAllResponse(List<UserResponse>? value) {
     _userAllResponse = value;
@@ -66,6 +74,18 @@ class UserController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: UserAppointmentResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  static Future<ApiResponse<UserPointHistoryResponse>> points(BuildContext context, String userId) async {
+    return ApiController()
+        .call(context, method: Method.get, endpoint: 'admin/user-management/points/history/$userId')
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UserPointHistoryResponse.fromJson(value.data));
           } catch (e) {
             return ApiResponse(code: 400, message: e.toString());
           }

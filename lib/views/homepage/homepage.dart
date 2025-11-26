@@ -162,10 +162,6 @@ class _HomepageState extends State<Homepage> {
           if (context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') == false) {
             sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
           }
-          if (!context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') ||
-              context.read<AuthController>().isSuperAdmin == false) {
-            sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
-          }
           if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') ||
               context.read<AuthController>().isSuperAdmin == false) {
             sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);

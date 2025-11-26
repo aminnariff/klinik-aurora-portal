@@ -1,16 +1,18 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/point_management/point_management_controller.dart';
+import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/points/point_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
@@ -33,12 +35,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
       allowSorting: false,
       columnSize: ColumnSize.S,
     ),
-    TableHeaderAttribute(
-      attribute: 'voucherName',
-      label: 'Voucher Name',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
+    TableHeaderAttribute(attribute: 'type', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'points',
       label: 'Points',
@@ -46,6 +43,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
       columnSize: ColumnSize.S,
       width: 100,
     ),
+    TableHeaderAttribute(attribute: 'description', label: 'Description', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
       attribute: 'createdDate',
       label: 'Created Date',
@@ -54,14 +52,28 @@ class _UserPointDetailState extends State<UserPointDetail> {
       width: 150,
     ),
   ];
+  bool? isLoading;
+
   @override
   void initState() {
-    PointManagementController.get(context, 1, userId: widget.user.userId).then((value) {
-      if (responseCode(value.code)) {
-        context.read<PointManagementController>().userPointsResponse = value.data;
-      } else {
-        showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
-      }
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      context.read<UserController>().userPoints = null;
+      UserController.points(context, widget.user.userId ?? '').then((value) {
+        isLoading = false;
+        if (responseCode(value.code)) {
+          context.read<UserController>().userPoints = value.data;
+        } else {
+          isLoading = true;
+          showDialogError(context, 'Unable to fetch user\'s points history');
+        }
+      });
+      PointManagementController.get(context, 1, userId: widget.user.userId).then((value) {
+        if (responseCode(value.code)) {
+          context.read<PointManagementController>().userPointsResponse = value.data;
+        } else {
+          showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
+        }
+      });
     });
     super.initState();
   }
@@ -79,7 +91,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Consumer<PointManagementController>(
+              Consumer<UserController>(
                 builder: (context, snapshot, _) {
                   return CardContainer(
                     Stack(
@@ -91,17 +103,30 @@ class _UserPointDetailState extends State<UserPointDetail> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                SizedBox(height: 16),
                                 AppSelectableText(
                                   '${widget.user.userFullname}\'s Points',
                                   style: AppTypography.displayMedium(context).apply(color: primary),
                                 ),
-                                AppPadding.vertical(),
+                                if (snapshot.userPoints != null) ...[
+                                  SizedBox(height: 8),
+                                  AppSelectableText(
+                                    'Total Points: ${snapshot.userPoints?.data?.totalPoint}',
+                                    style: AppTypography.bodyMedium(context),
+                                  ),
+                                  SizedBox(height: 4),
+                                  AppSelectableText(
+                                    'Next Expiry: ${dateConverter(snapshot.userPoints?.data?.nextExpiry, format: 'dd-MM-yyyy')}',
+                                    style: AppTypography.bodyMedium(context),
+                                  ),
+                                ],
+                                SizedBox(height: 16),
                                 SizedBox(
                                   width: screenWidth1728(50),
                                   height: screenHeight829(55),
-                                  child:
-                                      (snapshot.userPointsResponse != null &&
-                                          snapshot.userPointsResponse!.data!.isEmpty)
+                                  child: isLoading != false
+                                      ? Center(child: CircularProgressIndicator())
+                                      : ((snapshot.userPoints?.data?.history?.length ?? 0) == 0)
                                       ? const NoRecordsWidget()
                                       : DataTable2(
                                           columnSpacing: 12,
@@ -138,7 +163,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                                           rows: [
                                             for (
                                               int index = 0;
-                                              index < (snapshot.userPointsResponse?.data?.length ?? 0);
+                                              index < (snapshot.userPoints?.data?.history?.length ?? 0);
                                               index++
                                             )
                                               DataRow(
@@ -148,25 +173,28 @@ class _UserPointDetailState extends State<UserPointDetail> {
                                                 cells: [
                                                   DataCell(
                                                     AppSelectableText(
-                                                      snapshot.userPointsResponse?.data?[index].transactionId ?? 'N/A',
+                                                      snapshot.userPoints?.data?.history?[index].transactionId ?? 'N/A',
                                                     ),
                                                   ),
                                                   DataCell(
                                                     AppSelectableText(
-                                                      snapshot.userPointsResponse?.data?[index].voucherName ?? 'N/A',
+                                                      pointType(snapshot.userPoints?.data?.history?[index].pointType),
                                                     ),
                                                   ),
                                                   DataCell(
                                                     AppSelectableText(
-                                                      snapshot.userPointsResponse?.data?[index].totalPoint.toString() ??
+                                                      snapshot.userPoints?.data?.history?[index].points.toString() ??
                                                           'N/A',
                                                     ),
                                                   ),
                                                   DataCell(
                                                     AppSelectableText(
-                                                      dateConverter(
-                                                            snapshot.userPointsResponse?.data?[index].createdDate,
-                                                          ) ??
+                                                      snapshot.userPoints?.data?.history?[index].description ?? '',
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    AppSelectableText(
+                                                      dateConverter(snapshot.userPoints?.data?.history?[index].date) ??
                                                           'N/A',
                                                     ),
                                                   ),
@@ -179,24 +207,25 @@ class _UserPointDetailState extends State<UserPointDetail> {
                             ),
                           ),
                         ),
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Container(
-                            decoration: const BoxDecoration(shape: BoxShape.circle, color: secondaryColor),
-                            child: IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return PointDetail(user: widget.user);
-                                  },
-                                );
-                              },
-                              icon: const Icon(Icons.add),
+                        if (context.read<AuthController>().isSuperAdmin)
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Container(
+                              decoration: const BoxDecoration(shape: BoxShape.circle, color: secondaryColor),
+                              child: IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return PointDetail(user: widget.user);
+                                    },
+                                  );
+                                },
+                                icon: const Icon(Icons.add),
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   );
