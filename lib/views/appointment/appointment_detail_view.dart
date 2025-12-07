@@ -108,7 +108,10 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
                                 Row(
                                   children: [
                                     _infoLabel("Service"),
-                                    if (widget.response?.data?.service?.serviceName?.contains('Anatomy') == true)
+                                    if (widget.response?.data?.service?.serviceName?.toLowerCase().contains(
+                                          'screening',
+                                        ) ==
+                                        true)
                                       TextButton(
                                         onPressed: () {
                                           showLoading();
