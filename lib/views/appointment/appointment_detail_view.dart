@@ -234,16 +234,16 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
     );
   }
 
-  Widget _infoBox(String text) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        border: Border.all(color: Colors.grey.shade400),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: AppSelectableText(text.isEmpty ? "—" : text, style: const TextStyle(fontSize: 14)),
-    );
-  }
+  // Widget _infoBox(String text) {
+  //   return Container(
+  //     width: double.infinity,
+  //     padding: const EdgeInsets.all(12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.grey.shade100,
+  //       border: Border.all(color: Colors.grey.shade400),
+  //       borderRadius: BorderRadius.circular(8),
+  //     ),
+  //     child: AppSelectableText(text.isEmpty ? "—" : text, style: const TextStyle(fontSize: 14)),
+  //   );
+  // }
 }

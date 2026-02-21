@@ -110,7 +110,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     return editBranch();
   }
 
-  editBranch() {
+  Row editBranch() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -500,7 +500,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     );
   }
 
-  getLatestData() {
+  void getLatestData() {
     ServiceController.getAll(context, 1, 100).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -522,7 +522,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     });
   }
 
-  addPicture() async {
+  Future<void> addPicture() async {
     documentErrorMessage.add(null);
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 

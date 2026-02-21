@@ -103,7 +103,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
     return editUser();
   }
 
-  editUser() {
+  Row editUser() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,

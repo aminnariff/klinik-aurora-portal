@@ -48,7 +48,7 @@ class UserController extends ChangeNotifier {
             if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
             if (notNullOrEmptyString(userEmail)) 'userEmail': userEmail,
             if (notNullOrEmptyString(branchId)) 'branchId': branchId,
-            if (userStatus != null) 'userStatus': userStatus,
+            'userStatus': ?userStatus,
             'page': page,
             'pageSize': pageSize,
           },

@@ -145,7 +145,7 @@ class _UserDetailState extends State<UserDetail> {
     return editUser();
   }
 
-  editUser() {
+  Row editUser() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,

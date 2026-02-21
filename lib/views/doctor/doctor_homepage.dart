@@ -646,7 +646,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _userNameController.text = '';
     _userPhoneController.text = '';
     _selectedUserStatus = null;

@@ -1,16 +1,13 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-enum ToastType {
-  error,
-  info,
-}
+enum ToastType { error, info }
 
 abstract class AppToast {
-  static show(String message, {ToastType type = ToastType.error}) {
+  static void show(String message, {ToastType type = ToastType.error}) {
     Fluttertoast.showToast(
       msg: message,
       toastLength: Toast.LENGTH_SHORT,
@@ -26,23 +23,15 @@ abstract class AppToast {
     );
   }
 
-  static snackbar(BuildContext context, String message) {
+  static void snackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(
-              Icons.info_outlined,
-              color: Colors.red,
-            ),
+            const Icon(Icons.info_outlined, color: Colors.red),
             AppPadding.horizontal(),
             Expanded(
-              child: AppSelectableText(
-                message,
-                style: AppTypography.bodyMedium(context).apply(
-                  color: Colors.white,
-                ),
-              ),
+              child: AppSelectableText(message, style: AppTypography.bodyMedium(context).apply(color: Colors.white)),
             ),
           ],
         ),

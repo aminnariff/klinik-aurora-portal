@@ -74,10 +74,7 @@ class _PlatformRedirectPageState extends State<PlatformRedirectPage> {
             ? const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    color: quaternaryColor,
-                    strokeWidth: 4,
-                  ),
+                  CircularProgressIndicator(color: quaternaryColor, strokeWidth: 4),
                   SizedBox(height: 16),
                   Text('Redirecting, please wait...'),
                 ],
@@ -90,9 +87,7 @@ class _PlatformRedirectPageState extends State<PlatformRedirectPage> {
                     height: 100,
                     colorFilter: const ColorFilter.mode(Color(0XFFDF184A), BlendMode.srcIn),
                   ),
-                  const SizedBox(
-                    height: 25,
-                  ),
+                  const SizedBox(height: 25),
                   const Text(
                     'Unsupported platform. Unable to redirect.',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

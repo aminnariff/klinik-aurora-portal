@@ -61,11 +61,11 @@ class AppointmentController extends ChangeNotifier {
   }) async {
     final queryParams = {
       'appointmentStatus': status,
-      if (userId != null) 'userId': userId,
-      if (branchId != null) 'branchId': branchId,
-      if (serviceBranchId != null) 'serviceBranchId': serviceBranchId,
-      if (startDate != null) 'startDate': startDate,
-      if (endDate != null) 'endDate': endDate,
+      'userId': ?userId,
+      'branchId': ?branchId,
+      'serviceBranchId': ?serviceBranchId,
+      'startDate': ?startDate,
+      'endDate': ?endDate,
       'page': page,
       'pageSize': pageSize,
     };

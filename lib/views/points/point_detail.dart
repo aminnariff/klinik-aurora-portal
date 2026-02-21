@@ -70,7 +70,7 @@ class _PointDetailState extends State<PointDetail> {
     return editUser();
   }
 
-  editUser() {
+  Row editUser() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -337,7 +337,7 @@ class _PointDetailState extends State<PointDetail> {
     );
   }
 
-  postAction() {
+  void postAction() {
     PointManagementController.get(context, 1, userId: widget.user?.userId).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {

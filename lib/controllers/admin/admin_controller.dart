@@ -30,130 +30,112 @@ class AdminController extends ChangeNotifier {
     String? userEmail,
     int? userStatus,
   }) async {
-    return ApiController().call(
-      context,
-      method: Method.get,
-      endpoint: 'admin/admin-management',
-      queryParameters: {
-        if (notNullOrEmptyString(userName)) 'userName': userName,
-        if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
-        if (notNullOrEmptyString(userEmail)) 'userEmail': userEmail,
-        if (userStatus != null) 'userStatus': userStatus,
-        'page': page,
-        'pageSize': pageSize,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(code: value.code, data: AdminAllResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/admin-management',
+          queryParameters: {
+            if (notNullOrEmptyString(userName)) 'userName': userName,
+            if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
+            if (notNullOrEmptyString(userEmail)) 'userEmail': userEmail,
+            'userStatus': ?userStatus,
+            'page': page,
+            'pageSize': pageSize,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: AdminAllResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<CreateAdminResponse>> create(BuildContext context, CreateAdminRequest request) async {
     return ApiController()
         .call(
-      context,
-      method: Method.post,
-      data: {
-        "userEmail": request.userEmail,
-        "userName": request.userName,
-        "userPassword": request.userPassword,
-        "userRetypePassword": request.userPassword,
-        "userFullname": request.userFullname,
-        if (request.branchId != null) "branchId": request.branchId,
-      },
-      endpoint: 'admin/admin-management/create',
-    )
+          context,
+          method: Method.post,
+          data: {
+            "userEmail": request.userEmail,
+            "userName": request.userName,
+            "userPassword": request.userPassword,
+            "userRetypePassword": request.userPassword,
+            "userFullname": request.userFullname,
+            if (request.branchId != null) "branchId": request.branchId,
+          },
+          endpoint: 'admin/admin-management/create',
+        )
         .then((value) {
-      try {
-        return ApiResponse(code: value.code, data: CreateAdminResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: CreateAdminResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdateAdminResponse>> update(BuildContext context, UpdateAdminRequest request) async {
     return ApiController()
         .call(
-      context,
-      method: Method.put,
-      data: {
-        "userId": request.userId,
-        if (request.userFullname != null) "userFullname": request.userFullname,
-        if (request.userStatus != null) "userStatus": request.userStatus,
-        if (request.branchId != null) "branchId": request.branchId,
-      },
-      endpoint: 'admin/admin-management/update',
-    )
+          context,
+          method: Method.put,
+          data: {
+            "userId": request.userId,
+            if (request.userFullname != null) "userFullname": request.userFullname,
+            if (request.userStatus != null) "userStatus": request.userStatus,
+            if (request.branchId != null) "branchId": request.branchId,
+          },
+          endpoint: 'admin/admin-management/update',
+        )
         .then((value) {
-      try {
-        return ApiResponse(code: value.code, data: UpdateAdminResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: UpdateAdminResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<PermissionAdminResponse>> getPermission(BuildContext context, String userId) async {
     return ApiController()
         .call(
-      context,
-      method: Method.get,
-      queryParameters: {
-        'userId': userId,
-      },
-      endpoint: 'admin/admin-management/permission',
-    )
+          context,
+          method: Method.get,
+          queryParameters: {'userId': userId},
+          endpoint: 'admin/admin-management/permission',
+        )
         .then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: PermissionAdminResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: PermissionAdminResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdatePermissionAdminResponse>> updatePermission(
-      BuildContext context, UpdatePermissionAdminRequest request) async {
+    BuildContext context,
+    UpdatePermissionAdminRequest request,
+  ) async {
     return ApiController()
         .call(
-      context,
-      method: Method.post,
-      data: {
-        'userId': request.userId,
-        'permissionIds': [
-          for (String item in request.permissionIds ?? []) item,
-        ]
-      },
-      endpoint: 'admin/admin-management/assign',
-    )
+          context,
+          method: Method.post,
+          data: {
+            'userId': request.userId,
+            'permissionIds': [for (String item in request.permissionIds ?? []) item],
+          },
+          endpoint: 'admin/admin-management/assign',
+        )
         .then((value) {
-      try {
-        return ApiResponse(code: value.code, data: UpdatePermissionAdminResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: UpdatePermissionAdminResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 }

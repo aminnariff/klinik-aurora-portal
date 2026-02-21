@@ -37,90 +37,88 @@ class RewardHistoryController extends ChangeNotifier {
     int? rewardHistoryStatus,
     int? rewardStatus,
   }) async {
-    return ApiController().call(
-      context,
-      method: Method.get,
-      endpoint: 'admin/reward-history',
-      queryParameters: {
-        if (notNullOrEmptyString(rewardId)) "rewardId": rewardId,
-        if (notNullOrEmptyString(pointTransactionId)) "pointTransactionId": pointTransactionId,
-        if (notNullOrEmptyString(customerName)) "userFullname": customerName,
-        if (notNullOrEmptyString(customerUsername)) "userName": customerUsername,
-        if (notNullOrEmptyString(userPhone)) "userPhone": userPhone,
-        if (notNullOrEmptyString(rewardName)) "rewardName": rewardName,
-        if (rewardStatus != null) "rewardStatus": rewardStatus,
-        if (rewardHistoryStatus != null) "rewardHistoryStatus": rewardHistoryStatus,
-        'page': page,
-        'pageSize': pageSize,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(code: value.code, data: RewardHistoryResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/reward-history',
+          queryParameters: {
+            if (notNullOrEmptyString(rewardId)) "rewardId": rewardId,
+            if (notNullOrEmptyString(pointTransactionId)) "pointTransactionId": pointTransactionId,
+            if (notNullOrEmptyString(customerName)) "userFullname": customerName,
+            if (notNullOrEmptyString(customerUsername)) "userName": customerUsername,
+            if (notNullOrEmptyString(userPhone)) "userPhone": userPhone,
+            if (notNullOrEmptyString(rewardName)) "rewardName": rewardName,
+            "rewardStatus": ?rewardStatus,
+            "rewardHistoryStatus": ?rewardHistoryStatus,
+            'page': page,
+            'pageSize': pageSize,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: RewardHistoryResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<CreateRewardHistoryResponse>> create(
-      BuildContext context, CreateRewardHistoryRequest request) async {
-    return ApiController().call(
-      context,
-      method: Method.post,
-      endpoint: 'admin/reward-history/create',
-      data: {
-        "rewardId": request.rewardId,
-        "pointTransactionId": request.pointTransactionId,
-        "rewardHistoryDescription": request.rewardHistoryDescription,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: CreateRewardHistoryResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    BuildContext context,
+    CreateRewardHistoryRequest request,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.post,
+          endpoint: 'admin/reward-history/create',
+          data: {
+            "rewardId": request.rewardId,
+            "pointTransactionId": request.pointTransactionId,
+            "rewardHistoryDescription": request.rewardHistoryDescription,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: CreateRewardHistoryResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdateRewardResponse>> update(
-      BuildContext context, UpdateRewardHistoryRequest request) async {
-    return ApiController().call(
-      context,
-      method: Method.put,
-      endpoint: 'admin/reward-history/update',
-      data: {
-        "rewardId": request.rewardId,
-        "rewardHistoryId": request.rewardHistoryId,
-        "pointTransactionId": request.pointTransactionId,
-        "rewardHistoryDescription": request.rewardHistoryDescription,
-        "rewardHistoryStatus": request.rewardHistoryStatus, // 1 - in-progress, 0 = completed
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: UpdateRewardResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    BuildContext context,
+    UpdateRewardHistoryRequest request,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.put,
+          endpoint: 'admin/reward-history/update',
+          data: {
+            "rewardId": request.rewardId,
+            "rewardHistoryId": request.rewardHistoryId,
+            "pointTransactionId": request.pointTransactionId,
+            "rewardHistoryDescription": request.rewardHistoryDescription,
+            "rewardHistoryStatus": request.rewardHistoryStatus, // 1 - in-progress, 0 = completed
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UpdateRewardResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdateRewardResponse>> upload(
-      BuildContext context, String rewardId, FileAttribute document) async {
+    BuildContext context,
+    String rewardId,
+    FileAttribute document,
+  ) async {
     Dio dio = Dio();
     FormData formData = FormData();
 
@@ -133,8 +131,8 @@ class RewardHistoryController extends ChangeNotifier {
             filename: item.name,
             contentType: item.name != null
                 ? item.name!.contains(".pdf")
-                    ? MediaType("application", "pdf")
-                    : MediaType("image", item.name.toString().split(".").last)
+                      ? MediaType("application", "pdf")
+                      : MediaType("image", item.name.toString().split(".").last)
                 : MediaType("image", item.name.toString().split(".").last),
           ),
         ),
@@ -145,37 +143,28 @@ class RewardHistoryController extends ChangeNotifier {
     try {
       return dio
           .put(
-        '${Environment.appUrl}admin/reward-history/upload',
-        options: Options(
-          method: 'PUT',
-          headers: {
-            Headers.acceptHeader: "*/*",
-            Headers.contentTypeHeader: "multipart/form-data",
-            'Authorization': 'Bearer ${prefs.getString(token)}',
-          },
-          contentType: "multipart/form-data",
-          responseType: ResponseType.json,
-        ),
-        data: formData,
-      )
+            '${Environment.appUrl}admin/reward-history/upload',
+            options: Options(
+              method: 'PUT',
+              headers: {
+                Headers.acceptHeader: "*/*",
+                Headers.contentTypeHeader: "multipart/form-data",
+                'Authorization': 'Bearer ${prefs.getString(token)}',
+              },
+              contentType: "multipart/form-data",
+              responseType: ResponseType.json,
+            ),
+            data: formData,
+          )
           .then((value) {
-        try {
-          return ApiResponse(
-            code: value.statusCode,
-            data: UpdateRewardResponse.fromJson(value.data),
-          );
-        } catch (e) {
-          return ApiResponse(
-            code: 400,
-            message: e.toString(),
-          );
-        }
-      });
+            try {
+              return ApiResponse(code: value.statusCode, data: UpdateRewardResponse.fromJson(value.data));
+            } catch (e) {
+              return ApiResponse(code: 400, message: e.toString());
+            }
+          });
     } catch (e) {
-      return ApiResponse(
-        code: 400,
-        message: e.toString(),
-      );
+      return ApiResponse(code: 400, message: e.toString());
     }
   }
 }

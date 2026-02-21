@@ -71,7 +71,7 @@ Future<void> main() async {
       }
       AppVersion.init();
       AppLoading.init();
-      Storage.init();
+      await Storage.init();
       runApp(
         EasyLocalization(
           supportedLocales: const [Locale('en', 'US')],

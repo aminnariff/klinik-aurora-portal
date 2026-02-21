@@ -961,7 +961,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _serviceNameController.text = '';
     _selectedServiceStatus = null;
     rebuildDropdown.add(DateTime.now());
@@ -994,7 +994,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           child: SearchToggle(
             hintText: 'Service Name',
             action: (value) {
-              print(value);
+              debugPrint(value);
             },
           ),
         ),

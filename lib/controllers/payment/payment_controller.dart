@@ -69,11 +69,7 @@ class PaymentController extends ChangeNotifier {
 
       final response = await dio.get(
         '${Environment.appUrl}admin/payment/export-payment-report',
-        queryParameters: {
-          if (startDate != null) 'startDate': startDate,
-          if (endDate != null) 'endDate': endDate,
-          if (branchId != null) 'branchId': branchId,
-        },
+        queryParameters: {'startDate': ?startDate, 'endDate': ?endDate, 'branchId': ?branchId},
         options: Options(
           responseType: ResponseType.plain,
           headers: {

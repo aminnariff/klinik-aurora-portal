@@ -41,7 +41,7 @@ class ServiceBranchController extends ChangeNotifier {
           queryParameters: {
             if (notNullOrEmptyString(serviceId)) "serviceId": serviceId,
             if (notNullOrEmptyString(branchId)) "branchId": branchId,
-            if (serviceBranchStatus != null) "serviceBranchStatus": serviceBranchStatus,
+            "serviceBranchStatus": ?serviceBranchStatus,
             'page': page,
             'pageSize': pageSize,
           },

@@ -40,12 +40,11 @@ class _MainDashboardState extends State<MainDashboard> {
               final targetMonth = DateTime(currentDate.year, currentDate.month - i, 1);
               final registrationData = totalRegistrationList.firstWhere(
                 (item) => item.year == targetMonth.year && item.month == targetMonth.month,
-                orElse:
-                    () => TotalRegistrationByMonth(
-                      year: targetMonth.year,
-                      month: targetMonth.month,
-                      totalRegistrationByMonth: 0,
-                    ),
+                orElse: () => TotalRegistrationByMonth(
+                  year: targetMonth.year,
+                  month: targetMonth.month,
+                  totalRegistrationByMonth: 0,
+                ),
               );
               lastThreeMonths.add(registrationData);
             }
@@ -122,7 +121,7 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  firstRowContent(Color color, String label, String total, {Color? textColor}) {
+  Expanded firstRowContent(Color color, String label, String total, {Color? textColor}) {
     return Expanded(
       child: CardContainer(
         Padding(
@@ -144,7 +143,7 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
-  firstContent() {
+  Consumer<DashboardController> firstContent() {
     return Consumer<DashboardController>(
       builder: (context, snapshot, _) {
         return SizedBox(

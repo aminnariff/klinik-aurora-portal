@@ -703,7 +703,7 @@ class _UserHomepageState extends State<UserHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _userFullNameController.text = '';
     _userNameController.text = '';
     _userPhoneController.text = '';

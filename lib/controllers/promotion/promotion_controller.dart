@@ -24,114 +24,109 @@ class PromotionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<ApiResponse<PromotionAllResponse>> getAll(BuildContext context, int page, int pageSize,
-      {String? promotionName, int? promotionStatus}) async {
-    return ApiController().call(
-      context,
-      method: Method.get,
-      endpoint: 'admin/promotion',
-      queryParameters: {
-        if (notNullOrEmptyString(promotionName)) 'promotionName': promotionName,
-        if (promotionStatus != null) 'promotionStatus': promotionStatus,
-        'page': page,
-        'pageSize': pageSize,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(code: value.code, data: PromotionAllResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+  static Future<ApiResponse<PromotionAllResponse>> getAll(
+    BuildContext context,
+    int page,
+    int pageSize, {
+    String? promotionName,
+    int? promotionStatus,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/promotion',
+          queryParameters: {
+            if (notNullOrEmptyString(promotionName)) 'promotionName': promotionName,
+            'promotionStatus': ?promotionStatus,
+            'page': page,
+            'pageSize': pageSize,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: PromotionAllResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdatePromotionResponse>> remove(BuildContext context, String id) async {
-    return ApiController().call(
-      context,
-      method: Method.post,
-      endpoint: 'admin/promotion/upload/remove',
-      data: {
-        'id': id,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(code: value.code, data: UpdatePromotionResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    return ApiController()
+        .call(context, method: Method.post, endpoint: 'admin/promotion/upload/remove', data: {'id': id})
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UpdatePromotionResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<CreatePromotionResponse>> create(
-      BuildContext context, CreatePromotionRequest request) async {
-    return ApiController().call(
-      context,
-      method: Method.post,
-      endpoint: 'admin/promotion/create',
-      data: {
-        "promotionName": request.promotionName,
-        "promotionDescription": request.promotionDescription,
-        "promotionStartDate": request.promotionStartDate,
-        "promotionEndDate": request.promotionEndDate,
-        "showOnStart": request.showOnStart,
-        "promotionTnc": request.promotionTnc,
-        "voucherId": request.voucherId,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: CreatePromotionResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    BuildContext context,
+    CreatePromotionRequest request,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.post,
+          endpoint: 'admin/promotion/create',
+          data: {
+            "promotionName": request.promotionName,
+            "promotionDescription": request.promotionDescription,
+            "promotionStartDate": request.promotionStartDate,
+            "promotionEndDate": request.promotionEndDate,
+            "showOnStart": request.showOnStart,
+            "promotionTnc": request.promotionTnc,
+            "voucherId": request.voucherId,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: CreatePromotionResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdatePromotionResponse>> update(
-      BuildContext context, UpdatePromotionRequest request) async {
-    return ApiController().call(
-      context,
-      method: Method.put,
-      endpoint: 'admin/promotion/update',
-      data: {
-        "promotionId": request.promotionId,
-        "promotionName": request.promotionName,
-        "promotionDescription": request.promotionDescription,
-        "promotionStartDate": request.promotionStartDate,
-        "promotionEndDate": request.promotionEndDate,
-        "showOnStart": request.showOnStart,
-        "promotionStatus": request.promotionStatus,
-        "promotionTnc": request.promotionTnc,
-        "voucherId": request.voucherId,
-      },
-    ).then((value) {
-      try {
-        return ApiResponse(
-          code: value.code,
-          data: UpdatePromotionResponse.fromJson(value.data),
-        );
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+    BuildContext context,
+    UpdatePromotionRequest request,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.put,
+          endpoint: 'admin/promotion/update',
+          data: {
+            "promotionId": request.promotionId,
+            "promotionName": request.promotionName,
+            "promotionDescription": request.promotionDescription,
+            "promotionStartDate": request.promotionStartDate,
+            "promotionEndDate": request.promotionEndDate,
+            "showOnStart": request.showOnStart,
+            "promotionStatus": request.promotionStatus,
+            "promotionTnc": request.promotionTnc,
+            "voucherId": request.voucherId,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UpdatePromotionResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<UpdatePromotionResponse>> upload(
-      BuildContext context, String promotionId, List<FileAttribute> documents) async {
+    BuildContext context,
+    String promotionId,
+    List<FileAttribute> documents,
+  ) async {
     Dio dio = Dio();
     FormData formData = FormData();
 
@@ -144,8 +139,8 @@ class PromotionController extends ChangeNotifier {
             filename: item.name,
             contentType: item.name != null
                 ? item.name!.contains(".pdf")
-                    ? MediaType("application", "pdf")
-                    : MediaType("image", item.name.toString().split(".").last)
+                      ? MediaType("application", "pdf")
+                      : MediaType("image", item.name.toString().split(".").last)
                 : MediaType("image", item.name.toString().split(".").last),
           ),
         ),
@@ -156,37 +151,28 @@ class PromotionController extends ChangeNotifier {
     try {
       return dio
           .put(
-        '${Environment.appUrl}admin/promotion/upload',
-        options: Options(
-          method: 'PUT',
-          headers: {
-            Headers.acceptHeader: "*/*",
-            Headers.contentTypeHeader: "multipart/form-data",
-            'Authorization': 'Bearer ${prefs.getString(token)}',
-          },
-          contentType: "multipart/form-data",
-          responseType: ResponseType.json,
-        ),
-        data: formData,
-      )
+            '${Environment.appUrl}admin/promotion/upload',
+            options: Options(
+              method: 'PUT',
+              headers: {
+                Headers.acceptHeader: "*/*",
+                Headers.contentTypeHeader: "multipart/form-data",
+                'Authorization': 'Bearer ${prefs.getString(token)}',
+              },
+              contentType: "multipart/form-data",
+              responseType: ResponseType.json,
+            ),
+            data: formData,
+          )
           .then((value) {
-        try {
-          return ApiResponse(
-            code: value.statusCode,
-            data: UpdatePromotionResponse.fromJson(value.data),
-          );
-        } catch (e) {
-          return ApiResponse(
-            code: 400,
-            message: e.toString(),
-          );
-        }
-      });
+            try {
+              return ApiResponse(code: value.statusCode, data: UpdatePromotionResponse.fromJson(value.data));
+            } catch (e) {
+              return ApiResponse(code: 400, message: e.toString());
+            }
+          });
     } catch (e) {
-      return ApiResponse(
-        code: 400,
-        message: e.toString(),
-      );
+      return ApiResponse(code: 400, message: e.toString());
     }
   }
 }

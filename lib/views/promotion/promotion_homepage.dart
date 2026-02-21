@@ -252,7 +252,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
     filtering(page: page, enableDebounce: false);
   }
 
-  createNewPromotion() {
+  void createNewPromotion() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -748,7 +748,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
     showLoading();
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _promotionNameController.text = '';
     _promotionStatus = null;
     rebuildDropdown.add(DateTime.now());

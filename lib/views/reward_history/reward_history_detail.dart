@@ -76,7 +76,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     return rewardHistoryDetails();
   }
 
-  rewardHistoryDetails() {
+  Row rewardHistoryDetails() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -201,75 +201,75 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                                       if (widget.type == 'create') ...[
                                         selectedFile?.value == null
                                             ? UploadDocumentsField(
-                                              title: 'rewardHistoryPage'.tr(gender: 'browseFile'),
-                                              fieldTitle: 'rewardHistoryPage'.tr(gender: 'rewardImage'),
-                                              // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                              action: () {
-                                                addPicture();
-                                              },
-                                              cancelAction: () {},
-                                            )
+                                                title: 'rewardHistoryPage'.tr(gender: 'browseFile'),
+                                                fieldTitle: 'rewardHistoryPage'.tr(gender: 'rewardImage'),
+                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                action: () {
+                                                  addPicture();
+                                                },
+                                                cancelAction: () {},
+                                              )
                                             : Stack(
-                                              alignment: Alignment.topRight,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    addPicture();
-                                                  },
-                                                  child: Image.memory(selectedFile?.value as Uint8List, height: 410),
-                                                ),
-                                                IconButton(
-                                                  onPressed: () {
-                                                    selectedFile = FileAttribute();
-                                                    fileRebuild.add(DateTime.now());
-                                                  },
-                                                  icon: const Icon(Icons.close),
-                                                ),
-                                              ],
-                                            ),
+                                                alignment: Alignment.topRight,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      addPicture();
+                                                    },
+                                                    child: Image.memory(selectedFile?.value as Uint8List, height: 410),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      selectedFile = FileAttribute();
+                                                      fileRebuild.add(DateTime.now());
+                                                    },
+                                                    icon: const Icon(Icons.close),
+                                                  ),
+                                                ],
+                                              ),
                                       ],
                                       if (widget.type == 'update')
                                         widget.data.rewardHistoryImage == null
                                             ? selectedFile?.name != null
-                                                ? Stack(
-                                                  alignment: Alignment.topRight,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
+                                                  ? Stack(
+                                                      alignment: Alignment.topRight,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            addPicture();
+                                                          },
+                                                          child: Image.memory(
+                                                            selectedFile?.value as Uint8List,
+                                                            height: 410,
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            selectedFile = FileAttribute();
+                                                            fileRebuild.add(DateTime.now());
+                                                          },
+                                                          icon: const Icon(Icons.close),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : UploadDocumentsField(
+                                                      title: 'branchImage'.tr(gender: 'browseFile'),
+                                                      fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                      action: () {
                                                         addPicture();
                                                       },
-                                                      child: Image.memory(
-                                                        selectedFile?.value as Uint8List,
-                                                        height: 410,
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        selectedFile = FileAttribute();
-                                                        fileRebuild.add(DateTime.now());
-                                                      },
-                                                      icon: const Icon(Icons.close),
-                                                    ),
-                                                  ],
-                                                )
-                                                : UploadDocumentsField(
-                                                  title: 'branchImage'.tr(gender: 'browseFile'),
-                                                  fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                  // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                  action: () {
-                                                    addPicture();
-                                                  },
-                                                  cancelAction: () {},
-                                                )
+                                                      cancelAction: () {},
+                                                    )
                                             : GestureDetector(
-                                              onTap: () {
-                                                addPicture();
-                                              },
-                                              child: Image.network(
-                                                '${Environment.imageUrl}${widget.data.rewardHistoryImage}',
-                                                height: 410,
+                                                onTap: () {
+                                                  addPicture();
+                                                },
+                                                child: Image.network(
+                                                  '${Environment.imageUrl}${widget.data.rewardHistoryImage}',
+                                                  height: 410,
+                                                ),
                                               ),
-                                            ),
                                       if (widget.data.createdByFullname != null) ...[
                                         AppPadding.vertical(denominator: 1),
                                         InputField(
@@ -394,7 +394,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     );
   }
 
-  _onRefresh() {
+  void _onRefresh() {
     RewardHistoryController.getAll(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -404,7 +404,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     });
   }
 
-  getLatestData() {
+  void getLatestData() {
     RewardController.getAll(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -432,7 +432,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     });
   }
 
-  addPicture() async {
+  Future<void> addPicture() async {
     documentErrorMessage.add(null);
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 

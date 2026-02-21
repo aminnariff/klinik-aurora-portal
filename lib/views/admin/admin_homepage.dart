@@ -634,7 +634,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _userNameController.text = '';
     _userPhoneController.text = '';
     _userEmailController.text = '';

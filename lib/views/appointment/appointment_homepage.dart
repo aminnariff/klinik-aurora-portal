@@ -953,7 +953,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _serviceNameController.text = '';
     _selectedServiceStatus = null;
     rebuildDropdown.add(DateTime.now());

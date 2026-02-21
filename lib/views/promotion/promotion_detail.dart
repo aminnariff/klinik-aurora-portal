@@ -72,7 +72,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
     return editPromotion();
   }
 
-  editPromotion() {
+  Row editPromotion() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,

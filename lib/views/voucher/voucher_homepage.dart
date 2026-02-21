@@ -615,7 +615,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _voucherNameController.text = '';
     _voucherCodeController.text = '';
     _voucherStatus = null;

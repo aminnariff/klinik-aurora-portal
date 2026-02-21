@@ -42,7 +42,7 @@ class DoctorController extends ChangeNotifier {
             'branchId': branchId,
             if (notNullOrEmptyString(doctorName)) 'doctorName': doctorName,
             if (notNullOrEmptyString(doctorPhone)) 'doctorPhone': doctorPhone,
-            if (doctorStatus != null) 'doctorStatus': doctorStatus,
+            'doctorStatus': ?doctorStatus,
             'page': page,
             'pageSize': pageSize,
           },
@@ -95,12 +95,11 @@ class DoctorController extends ChangeNotifier {
           MultipartFile.fromBytes(
             item.value!,
             filename: item.name,
-            contentType:
-                item.name != null
-                    ? item.name!.contains(".pdf")
-                        ? MediaType("application", "pdf")
-                        : MediaType("image", item.name.toString().split(".").last)
-                    : MediaType("image", item.name.toString().split(".").last),
+            contentType: item.name != null
+                ? item.name!.contains(".pdf")
+                      ? MediaType("application", "pdf")
+                      : MediaType("image", item.name.toString().split(".").last)
+                : MediaType("image", item.name.toString().split(".").last),
           ),
         ),
       );

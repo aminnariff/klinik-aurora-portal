@@ -4,7 +4,7 @@ import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:lottie/lottie.dart';
 
 class AppLoading {
-  static init() {
+  static void init() {
     EasyLoading.instance
       // ..displayDuration = const Duration(milliseconds: 2000)
       ..indicatorType = EasyLoadingIndicatorType.threeBounce
@@ -12,10 +12,7 @@ class AppLoading {
       // ..indicatorSize = 200.0
       // ..radius = 10.0
       ..indicatorWidget = CardContainer(
-        Lottie.asset(
-          'assets/lottie/simple-loading.json',
-          width: 140,
-        ),
+        Lottie.asset('assets/lottie/simple-loading.json', width: 140),
         margin: EdgeInsets.zero,
       )
       ..progressColor = Colors.white
@@ -30,12 +27,12 @@ class AppLoading {
   }
 }
 
-showLoading() {
+void showLoading() {
   EasyLoading.show(
-      // status: 'Loading...',
-      );
+    // status: 'Loading...',
+  );
 }
 
-dismissLoading() {
+void dismissLoading() {
   EasyLoading.dismiss();
 }

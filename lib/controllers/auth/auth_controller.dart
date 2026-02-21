@@ -26,7 +26,7 @@ class AuthController extends ChangeNotifier {
   }
 
   bool get isSuperAdmin {
-    return prefs.getBool('isSuperAdmin') ?? false;
+    return _authenticationResponse?.data?.user?.isSuperadmin ?? false;
   }
 
   set authenticationResponse(AuthResponse? value) {
@@ -181,14 +181,12 @@ class AuthController extends ChangeNotifier {
         await prefs.setString(authResponse, jsonEncode(data));
         await prefs.setString(loginDateTime, loginDt);
         await prefs.setString(token, data.data?.accessToken ?? '');
-        await prefs.setBool('isSuperAdmin', data.data?.user?.isSuperadmin ?? false);
         _authenticationResponse = data;
         notifyListeners();
       } else {
         prefs.remove(authResponse);
         prefs.remove(loginDateTime);
         prefs.remove(token);
-        prefs.remove('isSuperAdmin');
         notifyListeners();
       }
     } catch (e) {

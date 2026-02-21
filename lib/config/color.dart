@@ -49,7 +49,7 @@ const Color contentColorPink = Color(0xFFFF3AF2);
 const Color contentColorRed = Color(0xFFE80054);
 const Color contentColorCyan = Color(0xFF50E4FF);
 
-List<Color> colorOptions(color) {
+List<Color> colorOptions(String color) {
   switch (color) {
     case 'primary':
       {

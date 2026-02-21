@@ -72,7 +72,7 @@ class _RewardDetailState extends State<RewardDetail> {
     return rewardDetails();
   }
 
-  rewardDetails() {
+  Row rewardDetails() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -376,7 +376,7 @@ class _RewardDetailState extends State<RewardDetail> {
     );
   }
 
-  getLatestData() {
+  void getLatestData() {
     RewardController.getAll(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -402,7 +402,7 @@ class _RewardDetailState extends State<RewardDetail> {
     });
   }
 
-  addPicture() async {
+  Future<void> addPicture() async {
     documentErrorMessage.add(null);
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 

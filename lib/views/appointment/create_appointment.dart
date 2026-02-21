@@ -215,7 +215,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     return editBranch();
   }
 
-  editBranch() {
+  Row editBranch() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1289,7 +1289,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     );
   }
 
-  getLatestData() {
+  void getLatestData() {
     AppointmentController()
         .get(
           context,

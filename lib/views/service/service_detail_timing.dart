@@ -37,8 +37,9 @@ class _TimeListManagerState extends State<TimeListManager> {
   void initState() {
     super.initState();
     if (widget.serviceBranch?.serviceBranchAvailableTime != null) {
-      timeList =
-          widget.serviceBranch!.serviceBranchAvailableTime!.map((time) => convert24HourToAmPmFormat(time)).toList();
+      timeList = widget.serviceBranch!.serviceBranchAvailableTime!
+          .map((time) => convert24HourToAmPmFormat(time))
+          .toList();
     }
   }
 
@@ -193,7 +194,7 @@ class _TimeListManagerState extends State<TimeListManager> {
     );
   }
 
-  getLatestData() {
+  void getLatestData() {
     showLoading();
     ServiceBranchController.getAll(context, 1, 100, serviceId: widget.serviceBranch?.serviceId).then((value) {
       dismissLoading();

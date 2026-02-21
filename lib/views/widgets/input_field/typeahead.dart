@@ -78,10 +78,13 @@ class DropdownSearch extends StatelessWidget {
     if (initialValue != null) {
       controller!.text = initialValue!;
     }
-    return SizedBox(width: width, child: ReadOnly(field(context), isEditable: isEditable));
+    return SizedBox(
+      width: width,
+      child: ReadOnly(field(context), isEditable: isEditable),
+    );
   }
 
-  Widget field(context) {
+  Widget field(BuildContext context) {
     return Column(
       children: [
         TypeAheadField<TypeaheadAtribute?>(
@@ -105,20 +108,19 @@ class DropdownSearch extends StatelessWidget {
                 fillColor: fillColor ?? (isEditable ? textFormFieldEditableColor : textFormFieldUneditableColor),
                 filled: true,
                 prefixText: prefixText,
-                suffix:
-                    enabledClear
-                        ? ValueListenableBuilder(
-                          valueListenable: hasValue,
-                          builder: (context, value, child) {
-                            return value == true
-                                ? Padding(
+                suffix: enabledClear
+                    ? ValueListenableBuilder(
+                        valueListenable: hasValue,
+                        builder: (context, value, child) {
+                          return value == true
+                              ? Padding(
                                   padding: EdgeInsets.only(right: screenPadding / 2),
                                   child: InkWell(onTap: onClear, child: const Icon(Icons.close)),
                                 )
-                                : const SizedBox();
-                          },
-                        )
-                        : suffixWidget,
+                              : const SizedBox();
+                        },
+                      )
+                    : suffixWidget,
                 hintText: hintText,
                 hintStyle:
                     hintStyle ?? Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.grey, fontWeightDelta: -2),
@@ -190,13 +192,12 @@ class DropdownSearch extends StatelessWidget {
           //   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
           // ),
           loadingBuilder: (context) => const Text('Loading...'),
-          emptyBuilder:
-              (context) => ListTile(
-                title: Text(
-                  emptyItemText ?? 'noItemsFound'.tr(),
-                  style: AppTypography.bodyMedium(context).apply(color: Colors.grey),
-                ),
-              ),
+          emptyBuilder: (context) => ListTile(
+            title: Text(
+              emptyItemText ?? 'noItemsFound'.tr(),
+              style: AppTypography.bodyMedium(context).apply(color: Colors.grey),
+            ),
+          ),
           onSelected: onSelected,
           hideOnError: true,
           // minCharsForSuggestions: minCharForSuggestion ?? 0,

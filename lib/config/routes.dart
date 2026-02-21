@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/storage.dart';
+import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 import 'package:klinik_aurora_portal/privacy/privacy_policy.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
@@ -27,6 +32,63 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 final router = GoRouter(
   initialLocation: LoginPage.routeName,
   navigatorKey: rootNavigatorKey,
+  redirect: (context, state) {
+    final uri = state.uri.path;
+
+    // 1. Allow public routes
+    if (uri == LoginPage.routeName || uri == AdminPasswordRecoveryPage.routeName || uri == PrivacyPolicy.routeName) {
+      return null;
+    }
+
+    // 2. Check for missing authentication completely
+    final rawAuth = prefs.getString(authResponse);
+    if (rawAuth == null || rawAuth.isEmpty) {
+      return LoginPage.routeName;
+    }
+
+    // 3. Synchronously unpack the token payload to check for permissions
+    try {
+      final decoded = json.decode(rawAuth);
+      final parsed = AuthResponse.fromJson(decoded);
+
+      if (parsed.data?.accessToken == null) {
+        return LoginPage.routeName;
+      }
+
+      final isSuperAdmin = parsed.data?.user?.isSuperadmin ?? false;
+      final permissions = parsed.data?.user?.permissions ?? <String>[];
+
+      // 4. Checking specific SuperAdmin guarded pages
+      final requiresSuperAdmin = [AdminHomepage.routeName, BranchHomepage.routeName, PromotionHomepage.routeName];
+
+      if (requiresSuperAdmin.contains(uri) && !isSuperAdmin) {
+        return Homepage.routeName; // Standard deflect to dashboard
+      }
+
+      // 5. Checking exact UUID permission constraints
+      final permissionMap = {
+        UserHomepage.routeName: '1bda631e-ef17-11ee-bd1b-cc801b09db2f',
+        AdminHomepage.routeName: '4ac042fa-ef2d-11ee-bd1b-cc801b09db2f',
+        PointHomepage.routeName: 'a231db36-058d-11ef-943b-626efeb17d5e',
+        BranchHomepage.routeName: '68c537d4-ef31-11ee-bd1b-cc801b09db2f',
+        VoucherHomepage.routeName: 'd98236e8-f490-11ee-befc-aabaa50b463f',
+        RewardHistoryHomepage.routeName: 'dc4e7a5a-0e15-11ef-82b0-94653af51fb9',
+        PromotionHomepage.routeName: 'e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f',
+        DoctorHomepage.routeName: 'f90f9f18-057b-11ef-943b-626efeb17d5e',
+        RewardHomepage.routeName: '6e0fe1f8-2f1f-11ef-8db9-6677d190faa2',
+        ServiceHomepage.routeName: '0699ac1c-ac52-11ef-a1b7-bc24115a1342',
+      };
+
+      final requiredPermission = permissionMap[uri];
+      if (requiredPermission != null && !permissions.contains(requiredPermission)) {
+        return Homepage.routeName; // Standard deflect to dashboard
+      }
+    } catch (e) {
+      return LoginPage.routeName; // Deflect to login heavily if JSON parsing fails (corrupted)
+    }
+
+    return null;
+  },
   routes: <RouteBase>[
     GoRoute(
       name: AdminPasswordRecoveryPage.routeName,

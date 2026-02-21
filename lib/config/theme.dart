@@ -82,4 +82,4 @@ ThemeData darkThemeData(BuildContext context) {
   );
 }
 
-AppBarTheme appBarTheme = const AppBarTheme(color: Colors.transparent, elevation: 0);
+AppBarTheme appBarTheme = const AppBarTheme(backgroundColor: Colors.transparent, elevation: 0);

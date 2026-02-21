@@ -41,7 +41,7 @@ class ShimmerContainer extends StatelessWidget {
     return enableShimmer ? wrapWidgetWithShimmer(child) : child;
   }
 
-  Widget getGridContainer(context) {
+  Widget getGridContainer(BuildContext context) {
     Widget child = GridView.count(
       padding: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, screenPadding / 2),
       childAspectRatio: 2.3,

@@ -609,7 +609,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _rewardNameController.text = '';
     _rewardStatus = null;
     rebuildDropdown.add(DateTime.now());

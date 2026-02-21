@@ -172,7 +172,7 @@ class _AdminDetailState extends State<AdminDetail> {
     );
   }
 
-  editAdmin() {
+  Row editAdmin() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,

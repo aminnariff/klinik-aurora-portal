@@ -52,7 +52,7 @@ class ServiceController extends ChangeNotifier {
           queryParameters: {
             if (notNullOrEmptyString(serviceId)) "serviceId": serviceId,
             if (notNullOrEmptyString(serviceName)) "serviceName": serviceName,
-            if (serviceStatus != null) "serviceStatus": serviceStatus,
+            "serviceStatus": ?serviceStatus,
             'page': page,
             'pageSize': pageSize,
           },
@@ -61,7 +61,7 @@ class ServiceController extends ChangeNotifier {
           try {
             return ApiResponse(code: value.code, data: ServicesResponse.fromJson(value.data));
           } catch (e) {
-            print(e.toString());
+            debugPrint(e.toString());
             return ApiResponse(code: 400, message: e.toString());
           }
         });

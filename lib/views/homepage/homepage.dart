@@ -148,7 +148,7 @@ class _HomepageState extends State<Homepage> {
     super.initState();
   }
 
-  getAuthController() {
+  void getAuthController() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthController>().init(context).then((value) {
         if (value != null) {

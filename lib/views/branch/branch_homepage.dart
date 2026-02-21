@@ -607,7 +607,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _branchNameController.text = '';
     _selectedBranchStatus = null;
     _selectedState = null;

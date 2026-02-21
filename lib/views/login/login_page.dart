@@ -348,7 +348,7 @@ class _LoginPageState extends State<LoginPage> {
     return temp;
   }
 
-  forgotPassword() {
+  void forgotPassword() {
     StreamController<DateTime> rebuild = StreamController.broadcast();
     showDialog(
       context: context,

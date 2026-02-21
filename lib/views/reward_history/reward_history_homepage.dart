@@ -658,7 +658,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     ];
   }
 
-  resetAllFilter() {
+  void resetAllFilter() {
     _customerNameController.text = '';
     _customerUserNameController.text = '';
     _rewardNameController.text = '';

@@ -89,7 +89,7 @@ class _BranchDetailState extends State<BranchDetail> {
     return editBranch();
   }
 
-  editBranch() {
+  Row editBranch() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -553,7 +553,7 @@ class _BranchDetailState extends State<BranchDetail> {
     );
   }
 
-  addPicture() async {
+  Future<void> addPicture() async {
     documentErrorMessage.add(null);
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 

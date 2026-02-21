@@ -33,27 +33,24 @@ class BranchController extends ChangeNotifier {
   }) async {
     return ApiController()
         .call(
-      context,
-      method: Method.get,
-      queryParameters: {
-        'page': page,
-        'pageSize': pageSize,
-        if (notNullOrEmptyString(branchName)) 'branchName': branchName,
-        if (notNullOrEmptyString(branchState)) 'state': branchState,
-        if (branchStatus != null) 'branchStatus': branchStatus,
-      },
-      endpoint: 'admin/branch',
-    )
+          context,
+          method: Method.get,
+          queryParameters: {
+            'page': page,
+            'pageSize': pageSize,
+            if (notNullOrEmptyString(branchName)) 'branchName': branchName,
+            if (notNullOrEmptyString(branchState)) 'state': branchState,
+            'branchStatus': ?branchStatus,
+          },
+          endpoint: 'admin/branch',
+        )
         .then((value) {
-      try {
-        return ApiResponse(code: value.code, data: BranchAllResponse.fromJson(value.data));
-      } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
-      }
-    });
+          try {
+            return ApiResponse(code: value.code, data: BranchAllResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 
   static Future<ApiResponse<CreateBranchResponse>> create(CreateBranchRequest request) async {
@@ -88,37 +85,28 @@ class BranchController extends ChangeNotifier {
     try {
       return dio
           .post(
-        '${Environment.appUrl}admin/branch',
-        options: Options(
-          method: 'POST',
-          headers: {
-            Headers.acceptHeader: "*/*",
-            Headers.contentTypeHeader: "multipart/form-data",
-            'Authorization': 'Bearer ${prefs.getString(token)}',
-          },
-          contentType: "multipart/form-data",
-          responseType: ResponseType.json,
-        ),
-        data: formData,
-      )
+            '${Environment.appUrl}admin/branch',
+            options: Options(
+              method: 'POST',
+              headers: {
+                Headers.acceptHeader: "*/*",
+                Headers.contentTypeHeader: "multipart/form-data",
+                'Authorization': 'Bearer ${prefs.getString(token)}',
+              },
+              contentType: "multipart/form-data",
+              responseType: ResponseType.json,
+            ),
+            data: formData,
+          )
           .then((value) {
-        try {
-          return ApiResponse(
-            code: value.statusCode,
-            data: CreateBranchResponse.fromJson(value.data),
-          );
-        } catch (e) {
-          return ApiResponse(
-            code: 400,
-            message: e.toString(),
-          );
-        }
-      });
+            try {
+              return ApiResponse(code: value.statusCode, data: CreateBranchResponse.fromJson(value.data));
+            } catch (e) {
+              return ApiResponse(code: 400, message: e.toString());
+            }
+          });
     } catch (e) {
-      return ApiResponse(
-        code: 400,
-        message: e.toString(),
-      );
+      return ApiResponse(code: 400, message: e.toString());
     }
   }
 
@@ -153,37 +141,28 @@ class BranchController extends ChangeNotifier {
     try {
       return dio
           .put(
-        '${Environment.appUrl}admin/branch',
-        options: Options(
-          method: 'PUT',
-          headers: {
-            Headers.acceptHeader: "*/*",
-            Headers.contentTypeHeader: "multipart/form-data",
-            'Authorization': 'Bearer ${prefs.getString(token)}',
-          },
-          contentType: "multipart/form-data",
-          responseType: ResponseType.json,
-        ),
-        data: formData,
-      )
+            '${Environment.appUrl}admin/branch',
+            options: Options(
+              method: 'PUT',
+              headers: {
+                Headers.acceptHeader: "*/*",
+                Headers.contentTypeHeader: "multipart/form-data",
+                'Authorization': 'Bearer ${prefs.getString(token)}',
+              },
+              contentType: "multipart/form-data",
+              responseType: ResponseType.json,
+            ),
+            data: formData,
+          )
           .then((value) {
-        try {
-          return ApiResponse(
-            code: value.statusCode,
-            data: UpdateBranchResponse.fromJson(value.data),
-          );
-        } catch (e) {
-          return ApiResponse(
-            code: 400,
-            message: e.toString(),
-          );
-        }
-      });
+            try {
+              return ApiResponse(code: value.statusCode, data: UpdateBranchResponse.fromJson(value.data));
+            } catch (e) {
+              return ApiResponse(code: 400, message: e.toString());
+            }
+          });
     } catch (e) {
-      return ApiResponse(
-        code: 400,
-        message: e.toString(),
-      );
+      return ApiResponse(code: 400, message: e.toString());
     }
   }
 }

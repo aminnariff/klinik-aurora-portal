@@ -116,7 +116,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     return editBranch();
   }
 
-  editBranch() {
+  Row editBranch() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -415,7 +415,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     );
   }
 
-  getLatestData() {
+  void getLatestData() {
     DoctorController.get(context, 1, pageSize).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
@@ -437,7 +437,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     });
   }
 
-  addPicture() async {
+  Future<void> addPicture() async {
     documentErrorMessage.add(null);
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 

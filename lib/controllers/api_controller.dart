@@ -312,7 +312,7 @@ class ApiController {
     });
   }
 
-  promptDialog(
+  Future<void> promptDialog(
     BuildContext context, {
     required Function() action,
     required String text,
@@ -339,7 +339,7 @@ class ApiController {
     });
   }
 
-  printData(Response response) {
+  void printData(Response response) {
     // debugPrint('${response.statusCode} -> ${response.data}');
   }
 }
