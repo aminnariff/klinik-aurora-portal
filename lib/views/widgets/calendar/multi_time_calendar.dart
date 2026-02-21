@@ -156,44 +156,109 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                   ],
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: timeSlots.length,
-                    itemBuilder: (context, index) {
-                      final slot = timeSlots[index];
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('${index + 1}.'),
-                          Card(
-                            margin: const EdgeInsets.all(12),
-                            color: Colors.grey.shade100,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Time: ${slot.time.format(context)}",
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                                        onPressed: () => setState(() => timeSlots.removeAt(index)),
-                                      ),
-                                    ],
-                                  ),
-                                  _buildCalendar(slot.selectedDates, displayMonth, displayYear),
-                                ],
+                  child: timeSlots.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.dashboard_customize_outlined, size: 60, color: Colors.grey.shade300),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Your Calendar is Empty',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade500,
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Click "Generate" or "Add Time" to begin.',
+                                style: TextStyle(fontSize: 14, color: Colors.grey.shade400),
+                              ),
+                            ],
                           ),
-                        ],
-                      );
-                    },
-                  ),
+                        )
+                      : ListView.builder(
+                          itemCount: timeSlots.length,
+                          itemBuilder: (context, index) {
+                            final slot = timeSlots[index];
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 24.0, left: 16.0),
+                                  child: Text(
+                                    '${index + 1}.',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey.shade500,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withAlpha(20),
+                                          spreadRadius: 2,
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                        BoxShadow(
+                                          color: Colors.grey.withAlpha(10),
+                                          spreadRadius: 0,
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
+                                      border: Border.all(color: Colors.grey.shade100),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Icon(Icons.access_time_filled, color: primary, size: 20),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    slot.time.format(context),
+                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                  ),
+                                                ],
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.delete_outline,
+                                                  color: Colors.redAccent,
+                                                  size: 22,
+                                                ),
+                                                onPressed: () => setState(() => timeSlots.removeAt(index)),
+                                                tooltip: 'Remove Time Slot',
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                          _buildCalendar(slot.selectedDates, displayMonth, displayYear),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                 ),
                 SizedBox(height: 8),
                 Row(
@@ -395,35 +460,52 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
           ).isBefore(DateTime(today.year, today.month, today.day));
           final textColor = isPast
               ? Colors.grey.shade400
+              : isSelected
+              ? Colors.blue.shade700
               : (j == 0 || j == 6)
               ? Colors.grey
-              : Colors.black;
+              : Colors.black87;
 
           weekRow.add(
-            GestureDetector(
-              onTap: isPast
-                  ? null
-                  : () {
-                      setState(() {
-                        selectedDates[key] = !isSelected;
-                      });
-                    },
-              child: Container(
-                margin: const EdgeInsets.all(4),
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isToday ? Colors.orange.shade100 : null,
-                  border: isSelected ? Border.all(color: Colors.blue, width: 2) : null,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '$dayCounter',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                    color: textColor,
+            Container(
+              margin: const EdgeInsets.all(4),
+              width: 36,
+              height: 36,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: isPast
+                      ? null
+                      : () {
+                          setState(() {
+                            selectedDates[key] = !isSelected;
+                          });
+                        },
+                  borderRadius: BorderRadius.circular(18),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? Colors.blue.shade50
+                          : isToday
+                          ? Colors.orange.shade50
+                          : Colors.transparent,
+                      border: isSelected
+                          ? Border.all(color: Colors.blue.shade300, width: 2)
+                          : isToday
+                          ? Border.all(color: Colors.orange.shade200, width: 1)
+                          : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$dayCounter',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: (isToday || isSelected) ? FontWeight.bold : FontWeight.w500,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -465,7 +547,25 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
     }
 
     if (dateToTimes.isEmpty) {
-      return const Text('No appointment slots selected.');
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.event_busy, size: 60, color: Colors.grey.shade300),
+            const SizedBox(height: 16),
+            Text(
+              'No dates selected yet.',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade500),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add a time slot or generate a schedule\nto see the summary.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade400),
+            ),
+          ],
+        ),
+      );
     }
 
     // Step 2: Group by (year, month) for only-allowed dates
@@ -492,19 +592,33 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 6),
-              child: Text('📆 $monthKey', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              padding: const EdgeInsets.only(top: 12, bottom: 8),
+              child: Text(
+                '📆 $monthKey',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87),
+              ),
             ),
             ...dates.map((date) {
               final times = dateToTimes[date]!
                 ..sort((a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
 
-              return Card(
+              return Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                color: Colors.grey.shade100,
-                elevation: 2,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withAlpha(15),
+                      spreadRadius: 1,
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.grey.shade100),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -516,9 +630,10 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                            icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
+                            tooltip: 'Clear Date',
                             onPressed: () {
                               setState(() {
                                 final dateKey =
@@ -533,13 +648,28 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 8),
                       Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: times
                             .map(
-                              (time) => Chip(label: Text(time.format(context), style: const TextStyle(fontSize: 12))),
+                              (time) => Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueGrey.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.blueGrey.shade100),
+                                ),
+                                child: Text(
+                                  time.format(context),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.blueGrey.shade700,
+                                  ),
+                                ),
+                              ),
                             )
                             .toList(),
                       ),

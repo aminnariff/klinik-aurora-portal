@@ -126,19 +126,42 @@ class _GraphWidgetState extends State<GraphWidget> {
     return [adjustedMin, median, adjustedMax, max + 10];
   }
 
-  LineChartData mainData(Data? response) {
-    // double first = response?.totalRegistrationByMonth?[0].totalRegistrationByMonth?.toDouble() ?? 0;
-    // double second = response?.totalRegistrationByMonth?[1].totalRegistrationByMonth?.toDouble() ?? 0;
-    // double third = response?.totalRegistrationByMonth?[2].totalRegistrationByMonth?.toDouble() ?? 0;
-    // double forth = response?.totalRegistrationByMonth?[3].totalRegistrationByMonth?.toDouble() ?? 0;
-    // double fifth = response?.totalRegistrationByMonth?[4].totalRegistrationByMonth?.toDouble() ?? 0;
-    // double sixth = response?.totalRegistrationByMonth?[5].totalRegistrationByMonth?.toDouble() ?? 0;
-    // double seventh = response?.totalRegistrationByMonth?[6].totalRegistrationByMonth?.toDouble() ?? 0;
+  LineTouchData get lineTouchData => LineTouchData(
+    handleBuiltInTouches: true,
+    touchTooltipData: LineTouchTooltipData(
+      getTooltipColor: (touchedSpot) => Colors.blueGrey.withAlpha(opacityCalculation(.8)),
+      getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+        return touchedBarSpots.map((barSpot) {
+          final flSpot = barSpot;
+          if (flSpot.x == 0 || flSpot.x == 6) {
+            return null;
+          }
+          return LineTooltipItem(
+            '${flSpot.y.toInt()} \n',
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(
+                text: 'Registrations',
+                style: TextStyle(
+                  color: Colors.white.withAlpha(opacityCalculation(.8)),
+                  fontWeight: FontWeight.normal,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          );
+        }).toList();
+      },
+    ),
+  );
 
+  LineChartData mainData(Data? response) {
+    List<int> totalRegistrations = [];
     for (TotalRegistrationByMonth? element in response?.totalRegistrationByMonth ?? []) {
       totalRegistrations.add(element?.totalRegistrationByMonth ?? 0);
     }
     return LineChartData(
+      lineTouchData: lineTouchData,
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
@@ -174,23 +197,21 @@ class _GraphWidgetState extends State<GraphWidget> {
                 index.toDouble(),
                 response?.totalRegistrationByMonth?[index].totalRegistrationByMonth?.toDouble() ?? 0,
               ),
-            // FlSpot(0, first),
-            // FlSpot(1, second),
-            // FlSpot(2, third),
-            // FlSpot(3, forth),
-            // FlSpot(4, fifth),
-            // FlSpot(5, sixth),
-            // FlSpot(6, seventh),
           ],
           isCurved: true,
           gradient: LinearGradient(colors: gradientColors),
           barWidth: 5,
           isStrokeCapRound: true,
-          dotData: const FlDotData(show: false),
+          dotData: const FlDotData(show: true),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors: gradientColors.map((color) => color.withAlpha(opacityCalculation(.3))).toList(),
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                gradientColors.first.withAlpha(opacityCalculation(.4)),
+                gradientColors.last.withAlpha(opacityCalculation(.0)),
+              ],
             ),
           ),
         ),
