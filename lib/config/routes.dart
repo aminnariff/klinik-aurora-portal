@@ -249,11 +249,3 @@ final router = GoRouter(
   ],
   errorBuilder: (context, state) => ErrorPage(error: state.error),
 );
-
-// returning value
-// onTap: () {
-//   final bool? result = await context.push<bool>('/page2');
-//   if(result ?? false)...
-// }
-
-// onTap: () => context.pop(true)
