@@ -68,6 +68,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(attribute: 'serviceName', label: 'Service', allowSorting: false, columnSize: ColumnSize.M),
     TableHeaderAttribute(attribute: 'category', label: 'Category', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'eta', label: 'Allocated Time', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(attribute: 'servicePrice', label: 'Price', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(attribute: 'doctorType', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
@@ -532,6 +533,11 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                         DataCell(
                                           AppSelectableText(
                                             snapshot.serviceBranchResponse?.data?[index].serviceCategory ?? 'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
+                                          AppSelectableText(
+                                            snapshot.serviceBranchResponse?.data?[index].serviceTime ?? 'N/A',
                                           ),
                                         ),
                                         DataCell(
