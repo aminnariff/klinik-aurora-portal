@@ -59,94 +59,19 @@ class _GraphWidgetState extends State<GraphWidget> {
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(color: Color(0xff68737d), fontWeight: FontWeight.bold, fontSize: 16);
-    Widget text;
     Data? response = context.read<DashboardController>().dashboardResponse?.data;
-    switch (value.toInt()) {
-      case 0:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(
-                  convertToMonthYear(
-                    response.totalRegistrationByMonth?[0].month ?? 0,
-                    response.totalRegistrationByMonth?[0].year ?? 0,
-                  ),
-                  style: style,
-                );
-        break;
-      case 1:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(
-                  convertToMonthYear(
-                    response.totalRegistrationByMonth?[1].month ?? 0,
-                    response.totalRegistrationByMonth?[1].year ?? 0,
-                  ),
-                  style: style,
-                );
-        break;
-      case 2:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(
-                  convertToMonthYear(
-                    response.totalRegistrationByMonth?[2].month ?? 0,
-                    response.totalRegistrationByMonth?[2].year ?? 0,
-                  ),
-                  style: style,
-                );
-      case 3:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(
-                  convertToMonthYear(
-                    response.totalRegistrationByMonth?[3].month ?? 0,
-                    response.totalRegistrationByMonth?[3].year ?? 0,
-                  ),
-                  style: style,
-                );
-      case 4:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(
-                  convertToMonthYear(
-                    response.totalRegistrationByMonth?[4].month ?? 0,
-                    response.totalRegistrationByMonth?[4].year ?? 0,
-                  ),
-                  style: style,
-                );
-      case 5:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(
-                  convertToMonthYear(
-                    response.totalRegistrationByMonth?[5].month ?? 0,
-                    response.totalRegistrationByMonth?[5].year ?? 0,
-                  ),
-                  style: style,
-                );
-      case 6:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(
-                  convertToMonthYear(
-                    response.totalRegistrationByMonth?[6].month ?? 0,
-                    response.totalRegistrationByMonth?[6].year ?? 0,
-                  ),
-                  style: style,
-                );
-      default:
-        text = const Text('', style: style);
-        break;
+
+    int index = value.toInt();
+    Widget text = const SizedBox();
+
+    if (response != null && response.totalRegistrationByMonth != null) {
+      if (index >= 0 && index < response.totalRegistrationByMonth!.length) {
+        var item = response.totalRegistrationByMonth![index];
+        text = Text(convertToMonthYear(item.month ?? 0, item.year ?? 0), style: style);
+      }
     }
 
-    return SideTitleWidget(meta: meta, child: text);
+    return SideTitleWidget(meta: meta, fitInside: SideTitleFitInsideData.fromTitleMeta(meta), child: text);
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {

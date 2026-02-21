@@ -180,7 +180,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                                         style: const TextStyle(fontWeight: FontWeight.bold),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.delete),
+                                        icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                                         onPressed: () => setState(() => timeSlots.removeAt(index)),
                                       ),
                                     ],
@@ -197,7 +197,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                 ),
                 SizedBox(height: 8),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Button(() async {
                       if (await showConfirmDialog(
@@ -241,8 +241,67 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                         }
                       }
                     }, actionText: widget.serviceBranchAvailableDatetimeId == null ? 'Create' : 'Update'),
+                    const SizedBox(width: 16),
+                    IconButton(
+                      onPressed: () async {
+                        final result = await showDialog<List<String>>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Center(
+                              child: SingleChildScrollView(
+                                child: CardContainer(
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                                    constraints: const BoxConstraints(maxWidth: 800, maxHeight: 800),
+                                    child: WeeklySlotGenerator(initInterval: convertToMinutes(widget.serviceTiming)),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+
+                        if (result != null && result.isNotEmpty) {
+                          setState(() {
+                            for (var iso in result) {
+                              final dt = DateTime.parse(iso);
+                              final time = TimeOfDay(hour: dt.hour, minute: dt.minute);
+                              final dateKey =
+                                  '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+
+                              var existing = timeSlots.firstWhere(
+                                (t) => t.time.hour == time.hour && t.time.minute == time.minute,
+                                orElse: () {
+                                  final newSlot = TimeSlotDates(time: time, selectedDates: {});
+                                  timeSlots.add(newSlot);
+                                  return newSlot;
+                                },
+                              );
+
+                              existing.selectedDates[dateKey] = true;
+                            }
+                            timeSlots.sort(
+                              (a, b) => (a.time.hour * 60 + a.time.minute).compareTo(b.time.hour * 60 + b.time.minute),
+                            );
+                          });
+                        }
+                      },
+                      color: secondaryColor,
+                      tooltip: 'Generate Time Slots',
+                      style: IconButton.styleFrom(backgroundColor: Colors.white, elevation: 2),
+                      icon: const Row(children: [Icon(Icons.interests), SizedBox(width: 8), Text('Generate')]),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: _addTimeSlot,
+                      color: primary,
+                      tooltip: 'Add Time Slot',
+                      style: IconButton.styleFrom(backgroundColor: Colors.white, elevation: 2),
+                      icon: const Row(children: [Icon(Icons.timer), SizedBox(width: 8), Text('Add Time')]),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -258,63 +317,6 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          IconButton(
-            onPressed: () async {
-              final result = await showDialog<List<String>>(
-                context: context,
-                builder: (BuildContext context) {
-                  return Center(
-                    child: SingleChildScrollView(
-                      child: CardContainer(
-                        Container(
-                          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                          constraints: BoxConstraints(maxWidth: 800, maxHeight: 800),
-                          child: WeeklySlotGenerator(initInterval: convertToMinutes(widget.serviceTiming)),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-
-              if (result != null && result.isNotEmpty) {
-                setState(() {
-                  for (var iso in result) {
-                    final dt = DateTime.parse(iso);
-                    final time = TimeOfDay(hour: dt.hour, minute: dt.minute);
-                    final dateKey =
-                        '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-
-                    var existing = timeSlots.firstWhere(
-                      (t) => t.time.hour == time.hour && t.time.minute == time.minute,
-                      orElse: () {
-                        final newSlot = TimeSlotDates(time: time, selectedDates: {});
-                        timeSlots.add(newSlot);
-                        return newSlot;
-                      },
-                    );
-
-                    existing.selectedDates[dateKey] = true;
-                  }
-                  timeSlots.sort(
-                    (a, b) => (a.time.hour * 60 + a.time.minute).compareTo(b.time.hour * 60 + b.time.minute),
-                  );
-                });
-              }
-            },
-            color: secondaryColor,
-            icon: Row(children: [Icon(Icons.interests), SizedBox(width: 8), Text('Generate')]),
-          ),
-          IconButton(
-            onPressed: _addTimeSlot,
-            color: primary,
-            icon: Row(children: [Icon(Icons.timer), SizedBox(width: 8), Text('Add Time')]),
           ),
         ],
       ),
@@ -506,9 +508,30 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '📅 ${DateFormat('EEE, d MMM yyyy').format(date)}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '📅 ${DateFormat('EEE, d MMM yyyy').format(date)}',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () {
+                              setState(() {
+                                final dateKey =
+                                    '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+                                for (var slot in timeSlots) {
+                                  if (slot.selectedDates.containsKey(dateKey)) {
+                                    slot.selectedDates[dateKey] = false;
+                                  }
+                                }
+                              });
+                            },
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Wrap(

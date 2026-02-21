@@ -58,57 +58,19 @@ class _Graph2WidgetState extends State<Graph2Widget> {
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(color: Color(0xff68737d), fontWeight: FontWeight.bold, fontSize: 16);
-    Widget text;
     Data? response = context.read<DashboardController>().dashboardResponse?.data;
-    switch (value.toInt()) {
-      case 0:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(convertToDayMonth(response.totalRegistrationByDay?[0].date ?? ""), style: style);
-        break;
-      case 1:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(convertToDayMonth(response.totalRegistrationByDay?[1].date ?? ""), style: style);
-        break;
-      case 2:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(convertToDayMonth(response.totalRegistrationByDay?[2].date ?? ""), style: style);
-        break;
-      case 3:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(convertToDayMonth(response.totalRegistrationByDay?[3].date ?? ""), style: style);
-        break;
-      case 4:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(convertToDayMonth(response.totalRegistrationByDay?[4].date ?? ""), style: style);
-        break;
-      case 5:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(convertToDayMonth(response.totalRegistrationByDay?[5].date ?? ""), style: style);
-        break;
-      case 6:
-        text =
-            response == null
-                ? const SizedBox()
-                : Text(convertToDayMonth(response.totalRegistrationByDay?[6].date ?? ""), style: style);
-        break;
-      default:
-        text = const Text('', style: style);
-        break;
+
+    int index = value.toInt();
+    Widget text = const SizedBox();
+
+    if (response != null && response.totalRegistrationByDay != null) {
+      if (index >= 0 && index < response.totalRegistrationByDay!.length) {
+        String dateStr = response.totalRegistrationByDay![index].date ?? "";
+        text = Text(convertToDayMonth(dateStr), style: style);
+      }
     }
 
-    return SideTitleWidget(meta: meta, child: text);
+    return SideTitleWidget(meta: meta, fitInside: SideTitleFitInsideData.fromTitleMeta(meta), child: text);
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
