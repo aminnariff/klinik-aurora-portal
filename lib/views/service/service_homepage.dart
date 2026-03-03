@@ -341,6 +341,11 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                           ),
                                         ),
                                         DataCell(
+                                          AppSelectableText(
+                                            snapshot.servicesResponse?.data?[index].serviceTime ?? 'N/A',
+                                          ),
+                                        ),
+                                        DataCell(
                                           AppTooltip(
                                             message:
                                                 'Booking Fee: RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}',
