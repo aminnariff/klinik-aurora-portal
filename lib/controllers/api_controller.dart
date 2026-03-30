@@ -221,13 +221,13 @@ class ApiController {
             } else if (e.response?.statusCode == 401 ||
                 e.response?.statusCode == 403 ||
                 e.response?.statusCode == 410) {
-              if (isSessionExpiredDialogOpen == false) {
+              if (isSessionExpiredDialogOpen == false && context.mounted) {
                 dismissLoading();
                 isSessionExpiredDialogOpen = true;
                 await promptDialog(
                   context,
                   action: () {
-                    context.pop(context);
+                    Navigator.of(context, rootNavigator: true).pop();
                     isSessionExpiredDialogOpen = false;
                     context.read<AuthController>().logout(context);
                     context.goNamed(LoginPage.routeName);
@@ -236,6 +236,7 @@ class ApiController {
                   buttonColor: errorColor,
                   buttonText: 'button'.tr(gender: 'reLogin'),
                 );
+                isSessionExpiredDialogOpen = false;
               }
             } else if (e.response?.statusCode == 500 || e.response?.statusCode == 503) {
               try {
@@ -320,23 +321,23 @@ class ApiController {
     Color? buttonColor,
     bool barrierDismissible = false,
   }) async {
-    Future.delayed(Duration.zero, () {
-      return showDialog(
-        context: context,
-        barrierDismissible: barrierDismissible,
-        builder: (BuildContext context) {
-          return AppDialog(
-            DialogAttribute(
-              text: text,
-              buttonAttributes: [
-                if (buttonText != null)
-                  DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
-              ],
-            ),
-          );
-        },
-      );
-    });
+    await Future.delayed(Duration.zero);
+    if (!context.mounted) return;
+    await showDialog(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (BuildContext context) {
+        return AppDialog(
+          DialogAttribute(
+            text: text,
+            buttonAttributes: [
+              if (buttonText != null)
+                DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void printData(Response response) {

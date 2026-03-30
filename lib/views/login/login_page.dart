@@ -94,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     });
     dismissLoading();
+    isSessionExpiredDialogOpen = false;
     super.initState();
   }
 
