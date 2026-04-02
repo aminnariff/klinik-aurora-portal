@@ -100,12 +100,14 @@ class _MainDashboardState extends State<MainDashboard> {
             child: const RegistrationChart(),
           ),
           AppPadding.vertical(denominator: 2),
-          Container(
-            width: contentWidth,
-            margin: EdgeInsets.symmetric(horizontal: screenPadding),
-            child: const BranchPerformanceChart(),
-          ),
-          AppPadding.vertical(),
+          if (context.read<AuthController>().isSuperAdmin) ...[
+            Container(
+              width: contentWidth,
+              margin: EdgeInsets.symmetric(horizontal: screenPadding),
+              child: const BranchPerformanceChart(),
+            ),
+            AppPadding.vertical(),
+          ],
         ],
       ),
     );

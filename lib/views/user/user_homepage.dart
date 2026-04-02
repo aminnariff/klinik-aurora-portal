@@ -21,26 +21,20 @@ import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/user/appointment_ids.dart';
 import 'package:klinik_aurora_portal/views/user/user_detail.dart';
 import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
-import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class UserHomepage extends StatefulWidget {
@@ -61,42 +55,15 @@ class _UserHomepageState extends State<UserHomepage> {
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
   List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(attribute: 'userFullname', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
-
-    TableHeaderAttribute(
-      attribute: 'totalPoints',
-      label: 'Points',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 90,
-    ),
-    TableHeaderAttribute(
-      attribute: 'branchId',
-      label: 'Registered Branch',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'userStatus',
-      label: 'Status',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 70,
-    ),
-    TableHeaderAttribute(
-      attribute: 'createdDate',
-      label: 'Created Date',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'actions',
-      label: 'Actions',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 80,
-    ),
+    TableHeaderAttribute(attribute: 'userFullname', label: 'Patient', allowSorting: false, columnSize: ColumnSize.M),
+    TableHeaderAttribute(attribute: 'userPhone', label: 'Mobile No.', allowSorting: false, columnSize: ColumnSize.S, width: 140),
+    TableHeaderAttribute(attribute: 'totalPoints', label: 'Points', allowSorting: false, columnSize: ColumnSize.S, width: 90),
+    TableHeaderAttribute(attribute: 'branchId', label: 'Registered Branch', allowSorting: false, columnSize: ColumnSize.M),
+    TableHeaderAttribute(attribute: 'userStatus', label: 'Status', allowSorting: false, columnSize: ColumnSize.S, width: 90),
+    TableHeaderAttribute(attribute: 'createdDate', label: 'Joined', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'actions', label: '', allowSorting: false, columnSize: ColumnSize.S, width: 56),
   ];
+
   final TextEditingController _userFullNameController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _userPhoneController = TextEditingController();
@@ -104,6 +71,25 @@ class _UserHomepageState extends State<UserHomepage> {
   DropdownAttribute? _selectedBranch;
   DropdownAttribute? _selectedUserStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
+
+  static const List<Color> _avatarColors = [
+    Color(0xFF6AD1E3), Color(0xFFDF6E98), Color(0xFF7E57C2),
+    Color(0xFF26A69A), Color(0xFFEF5350), Color(0xFF42A5F5),
+    Color(0xFFFF7043), Color(0xFF66BB6A),
+  ];
+
+  Color _avatarColor(String name) {
+    if (name.isEmpty) return _avatarColors[0];
+    return _avatarColors[name.codeUnitAt(0) % _avatarColors.length];
+  }
+
+  String _initials(String? fullname, String? username) {
+    final name = fullname?.trim() ?? username?.trim() ?? '';
+    if (name.isEmpty) return '?';
+    final parts = name.split(' ').where((p) => p.isNotEmpty).toList();
+    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    return name[0].toUpperCase();
+  }
 
   @override
   void initState() {
@@ -127,122 +113,105 @@ class _UserHomepageState extends State<UserHomepage> {
     return LayoutWidget(mobile: mobileView(), desktop: desktopView());
   }
 
+  // ─── Mobile ──────────────────────────────────────────────────────────────────
+
   Widget mobileView() {
-    // return StreamBuilder<List<Results>>(
-    //   stream: results.stream,
-    //   builder: (context, snapshot) {
-    return Column(
-      children: [
-        searchField(
-          InputFieldAttribute(controller: _userFullNameController, hintText: 'Search', labelText: 'Order Reference'),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                for (int index = 0; index < (2); index++)
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CardContainer(
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: screenPadding * 1.5,
-                                    horizontal: screenPadding,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      mobileText('Central Office', 'N/A'),
-                                      mobileText('Serving Cabinet', 'N/A'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: CardContainer(
-                      Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('N/A'),
-                            Text('N/A'),
-                            Row(children: [Text('N/A')]),
-                            Text('aaaaa'),
-                          ],
-                        ),
-                      ),
-                      margin: EdgeInsets.symmetric(vertical: screenPadding / 2, horizontal: screenPadding),
+    return Consumer<UserController>(
+      builder: (context, snapshot, _) {
+        final users = snapshot.userAllResponse ?? [];
+        return Column(
+          children: [
+            _mobileSearchBar(),
+            Expanded(
+              child: users.isEmpty
+                  ? const Center(child: NoRecordsWidget())
+                  : ListView.builder(
+                      padding: EdgeInsets.all(screenPadding),
+                      itemCount: users.length,
+                      itemBuilder: (context, index) => _mobileCard(users[index]),
                     ),
-                  ),
-              ],
             ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        ),
-      ],
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: screenPadding / 2),
+              child: pagination(),
+            ),
+          ],
+        );
+      },
     );
-    // },
-    // );
   }
 
-  Widget mobileText(String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
-        AppPadding.horizontal(denominator: 2),
-        Expanded(child: AppSelectableText(value)),
-      ],
+  Widget _mobileSearchBar() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, 0),
+      child: TextField(
+        controller: _userFullNameController,
+        onChanged: (_) => filtering(page: 1),
+        decoration: InputDecoration(
+          hintText: 'Search patients…',
+          prefixIcon: const Icon(Icons.search, size: 20, color: Color(0xFF9CA3AF)),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+        ),
+      ),
     );
   }
+
+  Widget _mobileCard(UserResponse user) {
+    final initials = _initials(user.userFullname, user.userName);
+    final color = _avatarColor(user.userFullname ?? user.userName ?? '');
+    return Card(
+      margin: EdgeInsets.only(bottom: screenPadding / 2),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE5E7EB))),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            CircleAvatar(radius: 22, backgroundColor: color.withAlpha(40),
+              child: Text(initials, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 14))),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(user.userFullname?.titleCase() ?? user.userName ?? 'N/A',
+                      style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
+                  const SizedBox(height: 2),
+                  Text(user.userPhone ?? 'No phone', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+                  const SizedBox(height: 4),
+                  Row(children: [
+                    _statusChip(user.userStatus == 1),
+                    const SizedBox(width: 8),
+                    Text('${user.totalPoint ?? 0} pts', style: AppTypography.bodyMedium(context).apply(color: secondaryColor, fontWeightDelta: 1)),
+                  ]),
+                ],
+              ),
+            ),
+            _actionMenu(user),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── Desktop ─────────────────────────────────────────────────────────────────
 
   Widget desktopView() {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F6FA),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              AppPadding.horizontal(),
-              searchField(
-                InputFieldAttribute(controller: _userFullNameController, hintText: 'Search', labelText: 'Full Name'),
-              ),
-              // AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
-              // ),
-            ],
-          ),
+          _topBar(),
           Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: CardContainer(
-                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
-                    color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
-                  ),
-                ),
-              ],
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding),
+              child: _tableCard(),
             ),
           ),
         ],
@@ -250,362 +219,481 @@ class _UserHomepageState extends State<UserHomepage> {
     );
   }
 
-  Widget searchField(InputFieldAttribute attribute) {
-    return Column(
-      children: [
-        AppPadding.vertical(),
-        InputField(
-          field: InputFieldAttribute(
-            controller: attribute.controller,
-            hintText: attribute.hintText,
-            labelText: attribute.labelText,
-            suffixWidget: TextButton(
-              onPressed: () {
-                filtering(page: 1);
-              },
-              child: const Icon(Icons.search, color: Colors.blue),
+  Widget _topBar() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Row(
+        children: [
+          // Search
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: TextField(
+                controller: _userFullNameController,
+                onChanged: (_) { setState(() {}); filtering(page: 1); },
+                style: AppTypography.bodyMedium(context),
+                decoration: InputDecoration(
+                  hintText: 'Search by name, username…',
+                  hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
+                  prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 18),
+                  suffixIcon: _userFullNameController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
+                          onPressed: () { _userFullNameController.clear(); filtering(enableDebounce: false, page: 1); setState(() {}); })
+                      : null,
+                  filled: true,
+                  fillColor: const Color(0xFFF9FAFB),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+                ),
+              ),
             ),
-            isEditableColor: const Color(0xFFEEF3F7),
-            onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 1);
-            },
-            onChanged: (value) {
-              // filtering(enableDebounce: true, page: 1);
-            },
           ),
-          width: screenWidthByBreakpoint(90, 70, 26),
-        ),
+          const SizedBox(width: 12),
+          // Filter button
+          OutlinedButton.icon(
+            onPressed: _showFilterPanel,
+            icon: const Icon(Icons.tune_rounded, size: 16),
+            label: const Text('Filter', style: TextStyle(fontSize: 13)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF374151),
+              side: const BorderSide(color: Color(0xFFD1D5DB)),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Reset
+          IconButton(
+            onPressed: () { resetAllFilter(); filtering(enableDebounce: false, page: 1); },
+            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            tooltip: 'Reset filters',
+            style: IconButton.styleFrom(
+              backgroundColor: const Color(0xFFF3F4F6),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Add patient
+          ElevatedButton.icon(
+            onPressed: () => showDialog(context: context, builder: (_) => const UserDetail(type: 'create')),
+            icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
+            label: const Text('Add Patient', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: secondaryColor,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tableCard() {
+    return Consumer<UserController>(
+      builder: (context, snapshot, _) {
+        if (snapshot.userAllResponse == null) {
+          return const Center(child: CircularProgressIndicator(color: secondaryColor));
+        }
+        if (snapshot.userAllResponse!.isEmpty) {
+          return Container(
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE5E7EB))),
+            child: const Center(child: NoRecordsWidget()),
+          );
+        }
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
+            children: [
+              Expanded(child: _dataTable(snapshot.userAllResponse!)),
+              const Divider(height: 1, color: Color(0xFFE5E7EB)),
+              _tableFooter(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _dataTable(List<UserResponse> users) {
+    return DataTable2(
+      columnSpacing: 12,
+      horizontalMargin: 16,
+      isHorizontalScrollBarVisible: false,
+      isVerticalScrollBarVisible: true,
+      decoration: const BoxDecoration(),
+      headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+      headingRowHeight: 44,
+      dataRowHeight: 60,
+      dividerThickness: 1,
+      columns: columns(),
+      rows: [
+        for (int i = 0; i < users.length; i++)
+          DataRow2(
+            color: WidgetStateProperty.all(Colors.white),
+            cells: _buildCells(users[i]),
+          ),
       ],
     );
   }
 
-  Widget orderTable() {
-    return Consumer<UserController>(
-      builder: (context, snapshot, child) {
-        if (snapshot.userAllResponse == null) {
-          return const Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+  List<DataCell> _buildCells(UserResponse user) {
+    final initials = _initials(user.userFullname, user.userName);
+    final color = _avatarColor(user.userFullname ?? user.userName ?? '');
+    return [
+      // Patient (avatar + name + email)
+      DataCell(
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: color.withAlpha(40),
+              child: Text(initials, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppTooltip(
+                    message: '${notNullOrEmptyString(user.userNric) ? 'NRIC: ${user.userNric}\n' : ''}Email: ${user.userEmail ?? 'N/A'}',
+                    child: Text(
+                      user.userFullname?.titleCase() ?? user.userName ?? 'N/A',
+                      style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    user.userEmail ?? '',
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-            ],
-          );
-        } else {
-          return snapshot.userAllResponse == null || snapshot.userAllResponse!.isEmpty
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    const Expanded(child: Center(child: NoRecordsWidget())),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                              padding: const EdgeInsets.all(5),
-                              child: DataTable2(
-                                columnSpacing: 12,
-                                horizontalMargin: 12,
-                                isHorizontalScrollBarVisible: true,
-                                isVerticalScrollBarVisible: true,
-                                columns: columns(),
-                                headingRowColor: WidgetStateProperty.all(Colors.white),
-                                headingRowHeight: 51,
-                                decoration: const BoxDecoration(),
-                                border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  verticalInside: BorderSide(
-                                    width: 1,
-                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                  ),
-                                ),
-                                rows: [
-                                  for (int index = 0; index < (snapshot.userAllResponse?.length ?? 0); index++)
-                                    DataRow(
-                                      color: WidgetStateProperty.all(
-                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                      ),
-                                      cells: [
-                                        DataCell(
-                                          AppTooltip(
-                                            message:
-                                                '${notNullOrEmptyString(snapshot.userAllResponse?[index].userNric) ? 'Document ID:\n${snapshot.userAllResponse?[index].userNric}\n\n' : ''}Email:\n${snapshot.userAllResponse?[index].userEmail}\n\nContact No:\n${snapshot.userAllResponse?[index].userPhone}',
-                                            child: Text(
-                                              snapshot.userAllResponse?[index].userFullname?.titleCase() ??
-                                                  snapshot.userAllResponse?[index].userName ??
-                                                  'N/A',
-                                            ),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              AppSelectableText(
-                                                '${snapshot.userAllResponse?[index].totalPoint ?? 'N/A'}',
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
-                                                '-',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [showStatus(snapshot.userAllResponse?[index].userStatus == 1)],
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            dateConverter(snapshot.userAllResponse?[index].createdDate) ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              PopupMenuButton<String>(
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                offset: const Offset(8, 35),
-                                                color: Colors.white,
-                                                tooltip: '',
-                                                onSelected: (value) =>
-                                                    _handleMenuSelection(value, snapshot.userAllResponse![index]),
-                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                                                  const PopupMenuItem<String>(
-                                                    value: 'update',
-                                                    child: Text('Update Info'),
-                                                  ),
-                                                  const PopupMenuItem<String>(
-                                                    value: 'appointment',
-                                                    child: Text('Appointment'),
-                                                  ),
-                                                  const PopupMenuItem<String>(
-                                                    value: 'appointmentHistory',
-                                                    child: Text('Appointment History'),
-                                                  ),
-                                                  const PopupMenuItem<String>(
-                                                    value: 'managePoints',
-                                                    child: Text('Manage Points'),
-                                                  ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'enableDisable',
-                                                    child: Text(
-                                                      snapshot.userAllResponse?[index].userStatus == 1
-                                                          ? 'Deactivate'
-                                                          : 'Re-Activate',
-                                                    ),
-                                                  ),
-                                                ],
-                                                child: Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Container(
-                                                      padding: const EdgeInsets.all(4),
-                                                      // decoration: const BoxDecoration(
-                                                      //   color: Colors.white,
-                                                      //   shape: BoxShape.circle,
-                                                      // ),
-                                                      child: Icon(Icons.more_vert, color: Colors.grey),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: pagination()),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isMobile && !isTablet)
-                                    const Flexible(
-                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                    ),
-                                  perPage(),
-                                ],
-                              ),
-                            ),
-                            if (!isMobile && !isTablet)
-                              Text(
-                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-        }
-      },
+            ),
+          ],
+        ),
+      ),
+      // Mobile
+      DataCell(Text(user.userPhone ?? '—', style: AppTypography.bodyMedium(context))),
+      // Points
+      DataCell(
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: secondaryColor.withAlpha(25),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            '${user.totalPoint ?? 0}',
+            style: TextStyle(color: secondaryColor.withAlpha(230), fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+        ),
+      ),
+      // Branch
+      DataCell(Text(translateToBranchName(user.branchId ?? '') ?? '—',
+          style: AppTypography.bodyMedium(context), overflow: TextOverflow.ellipsis)),
+      // Status
+      DataCell(_statusChip(user.userStatus == 1)),
+      // Joined
+      DataCell(Text(dateConverter(user.createdDate) ?? '—',
+          style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)))),
+      // Actions
+      DataCell(_actionMenu(user)),
+    ];
+  }
+
+  Widget _statusChip(bool active) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: active ? Colors.green.withAlpha(25) : Colors.red.withAlpha(25),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        active ? 'Active' : 'Inactive',
+        style: TextStyle(
+          color: active ? Colors.green.shade700 : Colors.red.shade700,
+          fontWeight: FontWeight.w600,
+          fontSize: 11,
+        ),
+      ),
     );
   }
+
+  Widget _actionMenu(UserResponse user) {
+    return PopupMenuButton<String>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      offset: const Offset(0, 32),
+      color: Colors.white,
+      elevation: 4,
+      tooltip: '',
+      onSelected: (value) => _handleMenuSelection(value, user),
+      itemBuilder: (_) => [
+        _menuItem('update', Icons.edit_outlined, 'Update Info'),
+        _menuItem('appointment', Icons.calendar_today_outlined, 'Appointment'),
+        _menuItem('appointmentHistory', Icons.history_rounded, 'Appointment History'),
+        _menuItem('managePoints', Icons.stars_rounded, 'Manage Points'),
+        PopupMenuItem<String>(
+          value: 'enableDisable',
+          child: Row(children: [
+            Icon(user.userStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+                size: 16, color: user.userStatus == 1 ? Colors.red : Colors.green),
+            const SizedBox(width: 10),
+            Text(user.userStatus == 1 ? 'Deactivate' : 'Re-Activate',
+                style: TextStyle(fontSize: 13, color: user.userStatus == 1 ? Colors.red : Colors.green)),
+          ]),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: const Icon(Icons.more_horiz_rounded, size: 16, color: Color(0xFF6B7280)),
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _menuItem(String value, IconData icon, String label) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(children: [
+        Icon(icon, size: 16, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 10),
+        Text(label, style: const TextStyle(fontSize: 13)),
+      ]),
+    );
+  }
+
+  Widget _tableFooter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(child: pagination()),
+          Row(
+            children: [
+              const Text('Rows: ', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+              perPage(),
+              const SizedBox(width: 16),
+              if (!isMobile && !isTablet)
+                Text(
+                  '${(_page * _pageSize) - _pageSize + 1}–${math.min(_page * _pageSize, _totalCount)} of $_totalCount',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Filter Panel ─────────────────────────────────────────────────────────────
+
+  void _showFilterPanel() {
+    showDialog(
+      context: context,
+      builder: (_) => Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Material(
+            color: Colors.white,
+            elevation: 8,
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+            child: SizedBox(
+              width: 320,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 56, 20, 20),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Filter Patients', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 16),
+                          _filterField(_userFullNameController, 'Full Name'),
+                          const SizedBox(height: 12),
+                          _filterField(_userNameController, 'Username'),
+                          const SizedBox(height: 12),
+                          _filterField(_userPhoneController, 'Contact Number'),
+                          const SizedBox(height: 12),
+                          _filterField(_userEmailController, 'Email'),
+                          const SizedBox(height: 12),
+                          StreamBuilder<DateTime>(
+                            stream: rebuildDropdown.stream,
+                            builder: (context, _) => Column(children: [
+                              AppDropdown(
+                                attributeList: DropdownAttributeList(
+                                  [
+                                    if (context.read<BranchController>().branchAllResponse?.data?.data != null)
+                                      for (branch.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
+                                        DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
+                                  ],
+                                  labelText: 'information'.tr(gender: 'registeredBranch'),
+                                  value: _selectedBranch?.name,
+                                  onChanged: (p0) { _selectedBranch = p0; rebuildDropdown.add(DateTime.now()); filtering(page: 1); },
+                                  width: 280,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              AppDropdown(
+                                attributeList: DropdownAttributeList(
+                                  [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                                  labelText: 'Status',
+                                  value: _selectedUserStatus?.name,
+                                  onChanged: (p0) { _selectedUserStatus = p0; rebuildDropdown.add(DateTime.now()); filtering(page: 1); },
+                                  width: 280,
+                                ),
+                              ),
+                            ]),
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () { resetAllFilter(); filtering(enableDebounce: false, page: 1); },
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFFD1D5DB)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text('Clear Filters'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8, right: 8,
+                    child: IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _filterField(TextEditingController controller, String label) {
+    return TextField(
+      controller: controller,
+      onChanged: (_) => filtering(page: 1),
+      style: const TextStyle(fontSize: 13),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 13),
+        filled: true,
+        fillColor: const Color(0xFFF9FAFB),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+      ),
+    );
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────────
 
   void _handleMenuSelection(String value, UserResponse user) async {
     if (value == 'appointment') {
       showDialog(
         context: context,
-        builder: (BuildContext context) {
-          return AppointmentDetails(
-            type: 'create',
-            appointment: appointment_model.Data(
-              user: appointment_model.User(
-                userId: user.userId,
-                userName: user.userName,
-                userEmail: user.userEmail,
-                userFullName: user.userFullname,
-                userPhone: user.userPhone,
-              ),
+        builder: (_) => AppointmentDetails(
+          type: 'create',
+          appointment: appointment_model.Data(
+            user: appointment_model.User(
+              userId: user.userId, userName: user.userName,
+              userEmail: user.userEmail, userFullName: user.userFullname, userPhone: user.userPhone,
             ),
-          );
-        },
+          ),
+        ),
       );
     } else if (value == 'appointmentHistory') {
       showLoading();
       UserController.appointment(context, user.userId ?? '').then((value) {
         dismissLoading();
         if (responseCode(value.code)) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return UserAppointmentIds(response: value.data, patient: user);
-            },
-          );
+          showDialog(context: context, builder: (_) => UserAppointmentIds(response: value.data, patient: user));
         }
       });
     } else if (value == 'managePoints') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return UserPointDetail(user: user);
-        },
-      );
+      showDialog(context: context, builder: (_) => UserPointDetail(user: user));
     } else if (value == 'update') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return UserDetail(user: user, type: 'update');
-        },
-      );
+      showDialog(context: context, builder: (_) => UserDetail(user: user, type: 'update'));
     } else if (value == 'enableDisable') {
       try {
         if (await showConfirmDialog(
           context,
           user.userStatus == 1
-              ? 'Are you certain you wish to deactivate this user account? Please note, this action can be reversed at a later time.'
-              : 'Are you certain you wish to activate this user account? Please note, this action can be reversed at a later time.',
+              ? 'Are you certain you wish to deactivate this account?'
+              : 'Are you certain you wish to activate this account?',
         )) {
           Future.delayed(Duration.zero, () {
             UserController.update(
               context,
               UpdateUserRequest(
-                userId: user.userId,
-                userName: user.userName,
-                userFullname: user.userFullname,
-                userDob: dateConverter(user.userDob, format: 'yyyy-MM-dd'),
-                userPhone: user.userPhone,
-                branchId: user.branchId,
-                userStatus: user.userStatus == 1 ? 0 : 1,
+                userId: user.userId, userName: user.userName, userFullname: user.userFullname,
+                userDob: dateConverter(user.userDob, format: 'yyyy-MM-dd'), userPhone: user.userPhone,
+                branchId: user.branchId, userStatus: user.userStatus == 1 ? 0 : 1,
               ),
             ).then((value) {
               if (responseCode(value.code)) {
                 filtering();
-                showDialogSuccess(
-                  context,
-                  'The user account has been successfully ${user.userStatus == 1 ? 'deactivated' : 'activated'}.',
-                );
+                showDialogSuccess(context, 'Account ${user.userStatus == 1 ? 'deactivated' : 'activated'} successfully.');
               } else {
                 showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });
         }
-      } catch (e) {
-        debugPrint(e.toString());
-      }
+      } catch (e) { debugPrint(e.toString()); }
     }
   }
 
   String? translateToBranchName(String branchId) {
     try {
-      if (context.read<BranchController>().branchAllResponse?.data?.data != null) {
-        return context
-            .read<BranchController>()
-            .branchAllResponse
-            ?.data
-            ?.data!
-            .firstWhere((element) => element.branchId == branchId)
-            .branchName;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      return null;
-    }
+      return context.read<BranchController>().branchAllResponse?.data?.data!
+          .firstWhere((e) => e.branchId == branchId).branchName;
+    } catch (_) { return null; }
   }
 
   void filtering({bool enableDebounce = true, int? page}) {
-    enableDebounce
-        ? _debouncer.run(() {
-            runFiltering(page: page);
-          })
-        : runFiltering(page: page);
+    enableDebounce ? _debouncer.run(() => runFiltering(page: page)) : runFiltering(page: page);
   }
 
   void runFiltering({bool enableDebounce = true, int? page}) {
     showLoading();
-    if (page != null) {
-      _page = page;
-    }
+    if (page != null) _page = page;
     UserController.getAll(
-      context,
-      _page,
-      _pageSize,
+      context, _page, _pageSize,
       userFullName: _userFullNameController.text,
       userName: _userNameController.text,
       userPhone: _userPhoneController.text,
       userEmail: _userEmailController.text,
       branchId: _selectedBranch?.key,
       userStatus: _selectedUserStatus != null
-          ? _selectedUserStatus?.key == '1'
-                ? 1
-                : _selectedUserStatus?.key == '0'
-                ? 0
-                : null
+          ? _selectedUserStatus?.key == '1' ? 1 : _selectedUserStatus?.key == '0' ? 0 : null
           : null,
     ).then((value) {
       dismissLoading();
@@ -613,94 +701,8 @@ class _UserHomepageState extends State<UserHomepage> {
         _totalCount = value.data?.totalCount ?? 0;
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<UserController>().userAllResponse = value.data?.data;
-      } else if (value.code == 404) {}
-      return null;
-    });
-  }
-
-  String? getOrderBy() {
-    try {
-      return headers.firstWhere((element) => element.isSort).attribute;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  String? getSortType() {
-    if (getOrderBy() != null) {
-      if (headers.firstWhere((element) => element.isSort).sort == SortType.asc) {
-        return 'asc';
-      } else {
-        return 'desc';
       }
-    } else {
-      return null;
-    }
-  }
-
-  void getData({int? page}) async {
-    showLoading();
-  }
-
-  List<DataColumn2> columns() {
-    return [
-      for (TableHeaderAttribute item in headers)
-        DataColumn2(
-          fixedWidth: item.width,
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: AppSelectableText(
-                        item.label,
-                        style: Theme.of(context).textTheme.bodyMedium?.apply(fontWeightDelta: 2),
-                      ),
-                    ),
-                    // if (item.tooltip != null) ...[
-                    //   const SizedBox(
-                    //     width: 10,
-                    //   ),
-                    //   const Icon(
-                    //     Icons.help_outline_rounded,
-                    //     size: 18,
-                    //     color: Colors.grey,
-                    //   ),
-                    // ],
-                  ],
-                ),
-              ),
-              if (item.allowSorting)
-                TextButton(
-                  onPressed: () {
-                    if (getOrderBy() != item.attribute) {
-                      resetAllFilter();
-                    }
-                    if (item.isSort) {
-                      if (item.sort == SortType.asc) {
-                        item.sort = SortType.desc;
-                        filtering(enableDebounce: false);
-                      } else {
-                        item.sort = SortType.asc;
-                        item.isSort = false;
-                        filtering(enableDebounce: false);
-                      }
-                    } else {
-                      item.isSort = true;
-                      filtering(enableDebounce: false);
-                    }
-                  },
-                  child: sortingIcon(item),
-                ),
-            ],
-          ),
-          numeric: item.numeric,
-          tooltip: item.tooltip,
-          size: item.columnSize ?? ColumnSize.M,
-        ),
-    ];
+    });
   }
 
   void resetAllFilter() {
@@ -711,221 +713,39 @@ class _UserHomepageState extends State<UserHomepage> {
     _selectedBranch = null;
     _selectedUserStatus = null;
     rebuildDropdown.add(DateTime.now());
-
-    for (TableHeaderAttribute item in headers) {
-      item.isSort = false;
-      item.sort = SortType.asc;
-    }
+    for (TableHeaderAttribute item in headers) { item.isSort = false; item.sort = SortType.asc; }
   }
 
-  Widget sortingIcon(TableHeaderAttribute header) {
-    Widget child = Icon(
-      header.isSort ? Icons.sort : Icons.menu,
-      color: header.isSort ? (header.sort == SortType.asc ? Colors.green : Colors.red) : Colors.grey,
-    );
-
-    return header.isSort
-        ? header.sort == SortType.desc
-              ? Transform.rotate(angle: -math.pi, child: child)
-              : child
-        : child;
-  }
-
-  Widget tableButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const UserDetail(type: 'create');
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.add, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Add new user', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Card(
-                      surfaceTintColor: Colors.white,
-                      elevation: 5.0,
-                      color: Colors.white,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                            child: Column(
-                              children: [
-                                searchField(
-                                  InputFieldAttribute(
-                                    controller: _userFullNameController,
-                                    hintText: 'Search',
-                                    labelText: 'Full Name',
-                                  ),
-                                ),
-                                AppPadding.vertical(denominator: 2),
-                                searchField(
-                                  InputFieldAttribute(
-                                    controller: _userNameController,
-                                    hintText: 'Search',
-                                    labelText: 'Username',
-                                  ),
-                                ),
-                                AppPadding.vertical(denominator: 2),
-                                searchField(
-                                  InputFieldAttribute(
-                                    controller: _userPhoneController,
-                                    hintText: 'Search',
-                                    labelText: 'Contact Number',
-                                  ),
-                                ),
-                                AppPadding.vertical(denominator: 2),
-                                searchField(
-                                  InputFieldAttribute(
-                                    controller: _userEmailController,
-                                    hintText: 'Search',
-                                    labelText: 'Email',
-                                  ),
-                                ),
-                                AppPadding.vertical(),
-                                StreamBuilder<DateTime>(
-                                  stream: rebuildDropdown.stream,
-                                  builder: (context, snapshot) {
-                                    return Column(
-                                      children: [
-                                        AppDropdown(
-                                          attributeList: DropdownAttributeList(
-                                            [
-                                              if (context.read<BranchController>().branchAllResponse?.data?.data !=
-                                                  null)
-                                                for (branch.Data item
-                                                    in context.read<BranchController>().branchAllResponse?.data?.data ??
-                                                        [])
-                                                  DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                            ],
-                                            labelText: 'information'.tr(gender: 'registeredBranch'),
-                                            value: _selectedBranch?.name,
-                                            onChanged: (p0) {
-                                              _selectedBranch = p0;
-                                              rebuildDropdown.add(DateTime.now());
-                                              filtering(page: 1);
-                                            },
-                                            width: screenWidthByBreakpoint(90, 70, 26),
-                                          ),
-                                        ),
-                                        AppPadding.vertical(),
-                                        AppDropdown(
-                                          attributeList: DropdownAttributeList(
-                                            [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
-                                            labelText: 'information'.tr(gender: 'userStatus'),
-                                            value: _selectedUserStatus?.name,
-                                            onChanged: (p0) {
-                                              _selectedUserStatus = p0;
-                                              rebuildDropdown.add(DateTime.now());
-                                              filtering(page: 1);
-                                            },
-                                            width: screenWidthByBreakpoint(90, 70, 26),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                AppPadding.vertical(denominator: 1 / 3),
-                                AppOutlinedButton(
-                                  () {
-                                    resetAllFilter();
-                                    filtering(enableDebounce: true, page: 1);
-                                  },
-                                  backgroundColor: Colors.white,
-                                  borderRadius: 15,
-                                  width: 131,
-                                  height: 45,
-                                  text: 'Clear',
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.filter_list, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            resetAllFilter();
-            filtering(enableDebounce: true, page: 1);
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.refresh, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-      ],
-    );
+  List<DataColumn2> columns() {
+    return headers.map((item) => DataColumn2(
+      fixedWidth: item.width,
+      size: item.columnSize ?? ColumnSize.M,
+      label: Text(item.label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280))),
+    )).toList();
   }
 
   Widget perPage() {
-    return PerPageWidget(
-      _pageSize.toString(),
-      DropdownAttributeList(
-        [],
-        onChanged: (selected) {
-          DropdownAttribute item = selected as DropdownAttribute;
-          _pageSize = int.parse(item.key);
-          filtering(enableDebounce: false);
-        },
-      ),
-    );
+    return PerPageWidget(_pageSize.toString(), DropdownAttributeList([], onChanged: (selected) {
+      _pageSize = int.parse((selected as DropdownAttribute).key);
+      filtering(enableDebounce: false);
+    }));
   }
 
   Widget pagination() {
     return Pagination(
-      numOfPages: _totalPage,
-      selectedPage: _page,
-      pagesVisible: 5,
-      spacing: 10,
-      onPageChanged: (page) {
-        _movePage(page);
-      },
+      numOfPages: _totalPage, selectedPage: _page, pagesVisible: isMobile ? 3 : 5,
+      spacing: 10, onPageChanged: (page) => filtering(page: page, enableDebounce: false),
     );
   }
 
-  void _movePage(int page) {
-    filtering(page: page, enableDebounce: false);
+  String? getOrderBy() {
+    try { return headers.firstWhere((e) => e.isSort).attribute; } catch (_) { return null; }
+  }
+
+  String? getSortType() {
+    if (getOrderBy() != null) {
+      return headers.firstWhere((e) => e.isSort).sort == SortType.asc ? 'asc' : 'desc';
+    }
+    return null;
   }
 }

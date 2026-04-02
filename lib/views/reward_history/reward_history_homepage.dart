@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
@@ -10,25 +9,19 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/reward/reward_history_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/models/reward/reward_history_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_detail.dart';
-import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
-import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class RewardHistoryHomepage extends StatefulWidget {
@@ -46,45 +39,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   int _totalCount = 0;
   int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
-  ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
-  List<TableHeaderAttribute> headers = [
-    // TableHeaderAttribute(
-    //   attribute: 'transactionId',
-    //   label: 'Transaction Id',
-    //   allowSorting: false,
-    //   columnSize: ColumnSize.S,
-    // ),
-    TableHeaderAttribute(
-      attribute: 'userFullName',
-      label: 'Patient Name',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(attribute: 'rewardName', label: 'Reward', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(
-      attribute: 'status',
-      label: 'Status',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 110,
-    ),
-    TableHeaderAttribute(attribute: 'description', label: 'Remark', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(
-      attribute: 'updatedDate',
-      label: 'Last Update',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 120,
-    ),
-    TableHeaderAttribute(
-      attribute: 'actions',
-      label: 'Actions',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 100,
-    ),
-  ];
+  final TextEditingController _searchController = TextEditingController();
   final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _customerUserNameController = TextEditingController();
   final TextEditingController _rewardNameController = TextEditingController();
@@ -97,135 +53,55 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(
-        RewardHistoryHomepage.displayName,
-      );
+      Provider.of<TopBarController>(context, listen: false).pageValue =
+          Homepage.getPageId(RewardHistoryHomepage.displayName);
     });
     filtering();
     super.initState();
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    _customerNameController.dispose();
+    _customerUserNameController.dispose();
+    _rewardNameController.dispose();
+    _customerPhoneController.dispose();
+    rebuildDropdown.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
+    return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
   }
 
-  Widget mobileView() {
-    // return StreamBuilder<List<Results>>(
-    //   stream: results.stream,
-    //   builder: (context, snapshot) {
-    return Column(
-      children: [
-        searchField(
-          InputFieldAttribute(controller: _customerNameController, hintText: 'Search', labelText: 'Patient Name'),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                for (int index = 0; index < (2); index++)
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CardContainer(
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: screenPadding * 1.5,
-                                    horizontal: screenPadding,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      mobileText('Central Office', 'N/A'),
-                                      mobileText('Serving Cabinet', 'N/A'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: CardContainer(
-                      Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('N/A'),
-                            Text('N/A'),
-                            Row(children: [Text('N/A')]),
-                            Text('aaaaa'),
-                          ],
-                        ),
-                      ),
-                      margin: EdgeInsets.symmetric(vertical: screenPadding / 2, horizontal: screenPadding),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        ),
-      ],
-    );
-    // },
-    // );
-  }
+  // ─── Desktop ────────────────────────────────────────────────────────────────
 
-  Widget mobileText(String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
-        AppPadding.horizontal(denominator: 2),
-        Expanded(child: AppSelectableText(value)),
-      ],
-    );
-  }
-
-  Widget desktopView() {
+  Widget _desktopView() {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F6FA),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
         children: [
-          Row(
-            children: [
-              AppPadding.horizontal(),
-              searchField(
-                InputFieldAttribute(controller: _customerNameController, hintText: 'Search', labelText: 'Patient Name'),
-              ),
-              // AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
-              // ),
-            ],
-          ),
+          _topBar(),
           Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: CardContainer(
-                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
-                    color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(13),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
+                child: _historyTable(),
+              ),
             ),
           ),
         ],
@@ -233,429 +109,703 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     );
   }
 
-  Widget searchField(InputFieldAttribute attribute) {
-    return Column(
-      children: [
-        AppPadding.vertical(),
-        InputField(
-          field: InputFieldAttribute(
-            controller: attribute.controller,
-            hintText: attribute.hintText,
-            labelText: attribute.labelText,
-            suffixWidget: TextButton(
-              onPressed: () {
-                filtering(page: 1);
-              },
-              child: const Icon(Icons.search, color: Colors.blue),
+  Widget _topBar() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  _customerNameController.text = val;
+                  filtering(page: 1);
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search by patient name...',
+                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  contentPadding: EdgeInsets.zero,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
             ),
-            isEditableColor: const Color(0xFFEEF3F7),
-            onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 1);
+          ),
+          const SizedBox(width: 12),
+          _toolbarButton(
+            icon: Icons.filter_list_rounded,
+            label: 'Filter',
+            color: const Color(0xFF6366F1),
+            onTap: _showFilterPanel,
+          ),
+          const SizedBox(width: 8),
+          _toolbarButton(
+            icon: Icons.refresh_rounded,
+            label: 'Reset',
+            color: Colors.grey[600]!,
+            onTap: () {
+              _searchController.clear();
+              resetAllFilter();
+              filtering(enableDebounce: false, page: 1);
             },
           ),
-          width: screenWidthByBreakpoint(90, 70, 26),
+        ],
+      ),
+    );
+  }
+
+  Widget _toolbarButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 16, color: color),
+      label: Text(label, style: TextStyle(color: color, fontSize: 13)),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        side: BorderSide(color: color.withAlpha(80)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  void _showFilterPanel() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (_) {
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
+            ),
+            elevation: 8,
+            child: SizedBox(
+              width: 320,
+              height: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: StatefulBuilder(
+                  builder: (ctx, _) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Filter',
+                              style: AppTypography.bodyLarge(context)
+                                  .copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              icon: const Icon(Icons.close_rounded),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        _filterLabel('Patient Name'),
+                        const SizedBox(height: 6),
+                        _filterTextField(_customerNameController, 'Search by name'),
+                        const SizedBox(height: 14),
+                        _filterLabel('Patient Username'),
+                        const SizedBox(height: 6),
+                        _filterTextField(_customerUserNameController, 'Search by username'),
+                        const SizedBox(height: 14),
+                        _filterLabel('Patient Contact No.'),
+                        const SizedBox(height: 6),
+                        _filterTextField(_customerPhoneController, 'Search by phone'),
+                        const SizedBox(height: 14),
+                        _filterLabel('Reward Name'),
+                        const SizedBox(height: 6),
+                        _filterTextField(_rewardNameController, 'Search by reward'),
+                        const SizedBox(height: 14),
+                        _filterLabel('Redemption Status'),
+                        const SizedBox(height: 6),
+                        StreamBuilder<DateTime>(
+                          stream: rebuildDropdown.stream,
+                          builder: (context, __) {
+                            return Column(
+                              children: [
+                                AppDropdown(
+                                  attributeList: DropdownAttributeList(
+                                    [
+                                      DropdownAttribute('1', 'In-Progress'),
+                                      DropdownAttribute('0', 'Completed'),
+                                    ],
+                                    labelText: 'Redemption Status',
+                                    value: _rewardHistoryStatus?.name,
+                                    onChanged: (p0) {
+                                      _rewardHistoryStatus = p0;
+                                      rebuildDropdown.add(DateTime.now());
+                                      filtering(page: 1);
+                                    },
+                                    width: 280,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                AppDropdown(
+                                  attributeList: DropdownAttributeList(
+                                    [
+                                      DropdownAttribute('1', 'Active'),
+                                      DropdownAttribute('0', 'Inactive'),
+                                    ],
+                                    labelText: 'Reward Status',
+                                    value: _rewardStatus?.name,
+                                    onChanged: (p0) {
+                                      _rewardStatus = p0;
+                                      rebuildDropdown.add(DateTime.now());
+                                      filtering(page: 1);
+                                    },
+                                    width: 280,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const Spacer(),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              resetAllFilter();
+                              filtering(enableDebounce: false, page: 1);
+                              Navigator.pop(ctx);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: const Text('Clear Filters'),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _filterLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+          fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+    );
+  }
+
+  Widget _filterTextField(TextEditingController controller, String hint) {
+    return SizedBox(
+      height: 40,
+      child: TextField(
+        controller: controller,
+        onChanged: (_) => filtering(page: 1),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+          filled: true,
+          fillColor: const Color(0xFFF5F6FA),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─── Table ──────────────────────────────────────────────────────────────────
+
+  Widget _historyTable() {
+    return Consumer<RewardHistoryController>(
+      builder: (context, snapshot, _) {
+        if (snapshot.rewardHistoryResponse == null) {
+          return const Center(child: CircularProgressIndicator(color: secondaryColor));
+        }
+        final items = snapshot.rewardHistoryResponse?.data?.data ?? [];
+        if (items.isEmpty) {
+          return const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [NoRecordsWidget()],
+          );
+        }
+        return Column(
+          children: [
+            Expanded(
+              child: DataTable2(
+                columnSpacing: 16,
+                horizontalMargin: 20,
+                minWidth: 900,
+                isHorizontalScrollBarVisible: true,
+                isVerticalScrollBarVisible: true,
+                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowHeight: 48,
+                dataRowHeight: 64,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                columns: [
+                  _col('Patient', ColumnSize.L),
+                  _col('Reward', ColumnSize.M),
+                  _col('Points Used', ColumnSize.S, fixedWidth: 110),
+                  _col('Status', ColumnSize.S, fixedWidth: 120),
+                  _col('Remark', ColumnSize.M),
+                  _col('Last Update', ColumnSize.S, fixedWidth: 130),
+                  _col('Actions', ColumnSize.S, fixedWidth: 80),
+                ],
+                rows: [
+                  for (int i = 0; i < items.length; i++)
+                    DataRow2(
+                      color: WidgetStateProperty.all(
+                        i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC),
+                      ),
+                      cells: [
+                        DataCell(_patientCell(items[i])),
+                        DataCell(_rewardCell(items[i])),
+                        DataCell(_pointsBadge(items[i].transactionPoint)),
+                        DataCell(_statusChip(items[i])),
+                        DataCell(
+                          Text(
+                            items[i].rewardHistoryDescription ?? '—',
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        DataCell(
+                          Text(
+                            dateConverter(items[i].rewardHistoryModifiedDate) ??
+                                dateConverter(items[i].rewardHistoryCreatedDate) ??
+                                '—',
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                          ),
+                        ),
+                        DataCell(
+                          _iconBtn(
+                            Icons.edit_outlined,
+                            const Color(0xFF6366F1),
+                            () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => RewardHistoryDetail(
+                                  data: items[i],
+                                  type: 'update',
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+            _tableFooter(),
+          ],
+        );
+      },
+    );
+  }
+
+  DataColumn2 _col(String label, ColumnSize size, {double? fixedWidth}) {
+    return DataColumn2(
+      fixedWidth: fixedWidth,
+      size: size,
+      label: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF6B7280),
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+
+  Widget _patientCell(Data item) {
+    final name = item.userFullname ?? '—';
+    final initials = name
+        .trim()
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0].toUpperCase())
+        .join();
+    final colors = [
+      const Color(0xFF6366F1),
+      const Color(0xFF06B6D4),
+      const Color(0xFF10B981),
+      const Color(0xFFF59E0B),
+      const Color(0xFFEF4444),
+      const Color(0xFF8B5CF6),
+      const Color(0xFFEC4899),
+      const Color(0xFF14B8A6),
+    ];
+    final color = colors[(name.codeUnitAt(0)) % colors.length];
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 18,
+          backgroundColor: color.withAlpha(40),
+          child: Text(
+            initials,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF111827),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (item.userPhone != null && item.userPhone!.isNotEmpty)
+                Text(
+                  item.userPhone!,
+                  style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget orderTable() {
-    return Consumer<RewardHistoryController>(
-      builder: (context, snapshot, child) {
-        if (snapshot.rewardHistoryResponse == null) {
-          return const Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
-              ),
-            ],
-          );
-        } else {
-          return snapshot.rewardHistoryResponse == null || snapshot.rewardHistoryResponse!.data!.data!.isEmpty
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    const Expanded(child: Center(child: NoRecordsWidget())),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                              padding: const EdgeInsets.all(5),
-                              child: DataTable2(
-                                columnSpacing: 12,
-                                horizontalMargin: 12,
-                                minWidth: 900,
-                                isHorizontalScrollBarVisible: true,
-                                isVerticalScrollBarVisible: true,
-                                columns: columns(),
-                                headingRowColor: WidgetStateProperty.all(Colors.white),
-                                headingRowHeight: 51,
-                                decoration: const BoxDecoration(),
-                                border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  verticalInside: BorderSide(
-                                    width: 1,
-                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                  ),
-                                ),
-                                rows: [
-                                  for (
-                                    int index = 0;
-                                    index < (snapshot.rewardHistoryResponse?.data?.data?.length ?? 0);
-                                    index++
-                                  )
-                                    DataRow(
-                                      color: WidgetStateProperty.all(
-                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                      ),
-                                      cells: [
-                                        // DataCell(
-                                        //   TextButton(
-                                        //     onPressed: () {
-                                        //       // showDialog(
-                                        //       //     context: context,
-                                        //       //     builder: (BuildContext context) {
-                                        //       //       return RewardDetail(
-                                        //       //           type: 'update',
-                                        //       //           reward: snapshot.rewardHistoryResponse?.data?.data?[index]);
-                                        //       //     });
-                                        //     },
-                                        //     child: Text(
-                                        //       snapshot.rewardHistoryResponse?.data?.data?[index].rewardId ?? 'N/A',
-                                        //       style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                        //     ),
-                                        //   ),
-                                        // ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.rewardHistoryResponse?.data?.data?[index].userFullname ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.rewardHistoryResponse?.data?.data?[index].rewardName ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              showStatus(
-                                                snapshot
-                                                        .rewardHistoryResponse
-                                                        ?.data
-                                                        ?.data?[index]
-                                                        .rewardHistoryStatus ==
-                                                    1,
-                                                valueText:
-                                                    snapshot
-                                                            .rewardHistoryResponse
-                                                            ?.data
-                                                            ?.data?[index]
-                                                            .rewardHistoryStatus ==
-                                                        1
-                                                    ? 'In-Progress'
-                                                    : 'Completed',
+  Widget _rewardCell(Data item) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          item.rewardName ?? '—',
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF111827),
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (item.rewardDescription != null && item.rewardDescription!.isNotEmpty)
+          Text(
+            item.rewardDescription!,
+            style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+            overflow: TextOverflow.ellipsis,
+          ),
+      ],
+    );
+  }
 
-                                                valueColor: statusColor(
-                                                  snapshot
-                                                              .rewardHistoryResponse
-                                                              ?.data
-                                                              ?.data?[index]
-                                                              .rewardHistoryStatus ==
-                                                          1
-                                                      ? 'in-progress'
-                                                      : 'completed',
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot
-                                                    .rewardHistoryResponse
-                                                    ?.data
-                                                    ?.data?[index]
-                                                    .rewardHistoryDescription ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            dateConverter(
-                                                  snapshot
-                                                      .rewardHistoryResponse
-                                                      ?.data
-                                                      ?.data?[index]
-                                                      .rewardHistoryModifiedDate,
-                                                ) ??
-                                                dateConverter(
-                                                  snapshot
-                                                      .rewardHistoryResponse
-                                                      ?.data
-                                                      ?.data?[index]
-                                                      .rewardHistoryCreatedDate,
-                                                ) ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext context) {
-                                                      return RewardHistoryDetail(
-                                                        data: snapshot.rewardHistoryResponse!.data!.data![index],
-                                                        type: 'update',
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                icon: const Icon(Icons.edit, color: Colors.grey),
-                                              ),
-                                              // IconButton(
-                                              //   onPressed: () async {
-                                              //     try {
-                                              //       Data? data = snapshot.rewardHistoryResponse?.data?.data?[index];
-                                              //       if (await showConfirmDialog(
-                                              //           context,
-                                              //           data?.rewardStatus == 1
-                                              //               ? 'Are you certain you wish to deactivate this reward item? Please note, this action can be reversed at a later time.'
-                                              //               : 'Are you certain you wish to activate this reward item? Please note, this action can be reversed at a later time.')) {
-                                              //         Future.delayed(Duration.zero, () {
-                                              //           RewardController.update(
-                                              //             context,
-                                              //             UpdateRewardRequest(
-                                              //               rewardId: data?.rewardId ?? '',
-                                              //               rewardName: data?.rewardName ?? '',
-                                              //               rewardDescription: data?.rewardDescription ?? '',
-                                              //               rewardPoint: data?.rewardPoint ?? 0,
-                                              //               totalReward: data?.totalReward ?? 0,
-                                              //               rewardStartDate: data?.rewardStartDate ?? '',
-                                              //               rewardEndDate: data?.rewardEndDate ?? '',
-                                              //               rewardStatus: data?.rewardStatus == 1 ? 0 : 1,
-                                              //             ),
-                                              //           ).then((value) {
-                                              //             if (responseCode(value.code)) {
-                                              //               filtering();
-                                              //               showDialogSuccess(context,
-                                              //                   'The reward item has been successfully ${data?.rewardStatus == 1 ? 'deactivated' : 'activated'}.');
-                                              //             } else {
-                                              //               showDialogError(context, value.message ?? value.data?.message ?? '');
-                                              //             }
-                                              //           });
-                                              //         });
-                                              //       }
-                                              //     } catch (e) {
-                                              //       debugPrint(e.toString());
-                                              //     }
-                                              //   },
-                                              //   icon: Icon(
-                                              //     snapshot.rewardHistoryResponse?.data?.data?[index]
-                                              //                 .rewardHistoryStatus ==
-                                              //             1
-                                              //         ? Icons.delete
-                                              //         : Icons.play_arrow,
-                                              //     color: Colors.grey,
-                                              //   ),
-                                              // ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                          ],
-                        ),
-                      ),
+  Widget _pointsBadge(int? points) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F9FF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFBAE6FD)),
+      ),
+      child: Text(
+        '${points ?? 0} pts',
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF0369A1),
+        ),
+      ),
+    );
+  }
+
+  Widget _statusChip(Data item) {
+    final isInProgress = item.rewardHistoryStatus == 1;
+    final label = isInProgress ? 'In-Progress' : 'Completed';
+    final bg = isInProgress ? const Color(0xFFFFF7ED) : const Color(0xFFDCFCE7);
+    final textColor = isInProgress ? const Color(0xFFC2410C) : const Color(0xFF15803D);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _iconBtn(IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: color.withAlpha(20),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Icon(icon, size: 16, color: color),
+      ),
+    );
+  }
+
+  Widget _tableFooter() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Color(0xFFF3F4F6))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Pagination(
+              numOfPages: _totalPage,
+              selectedPage: _page,
+              pagesVisible: 5,
+              spacing: 10,
+              onPageChanged: (page) => filtering(page: page, enableDebounce: false),
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!isMobile && !isTablet)
+                Text(
+                  'Rows per page: ',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              PerPageWidget(
+                _pageSize.toString(),
+                DropdownAttributeList(
+                  [],
+                  onChanged: (selected) {
+                    _pageSize = int.parse((selected as DropdownAttribute).key);
+                    filtering(enableDebounce: false);
+                  },
+                ),
+              ),
+              if (!isMobile && !isTablet) ...[
+                const SizedBox(width: 8),
+                Text(
+                  '${((_page) * _pageSize) - _pageSize + 1}–${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Mobile ──────────────────────────────────────────────────────────────────
+
+  Widget _mobileView() {
+    return Consumer<RewardHistoryController>(
+      builder: (context, snapshot, _) {
+        final items = snapshot.rewardHistoryResponse?.data?.data ?? [];
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  _customerNameController.text = val;
+                  filtering(page: 1);
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search by patient name...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+              ),
+            ),
+            Expanded(
+              child: items.isEmpty
+                  ? const Center(child: NoRecordsWidget())
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemCount: items.length,
+                      itemBuilder: (_, i) => _mobileCard(items[i]),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: pagination()),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isMobile && !isTablet)
-                                    const Flexible(
-                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                    ),
-                                  perPage(),
-                                ],
-                              ),
-                            ),
-                            if (!isMobile && !isTablet)
-                              Text(
-                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-        }
+            ),
+            _tableFooter(),
+          ],
+        );
       },
     );
   }
 
+  Widget _mobileCard(Data item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE5E7EB)),
+      ),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item.userFullname ?? '—',
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                ),
+                _statusChip(item),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _mobileRow('Reward', item.rewardName ?? '—'),
+            _mobileRow('Points', '${item.transactionPoint ?? 0} pts'),
+            if (item.userPhone != null) _mobileRow('Phone', item.userPhone!),
+            _mobileRow(
+              'Updated',
+              dateConverter(item.rewardHistoryModifiedDate) ??
+                  dateConverter(item.rewardHistoryCreatedDate) ??
+                  '—',
+            ),
+            if (item.rewardHistoryDescription != null &&
+                item.rewardHistoryDescription!.isNotEmpty)
+              _mobileRow('Remark', item.rewardHistoryDescription!),
+            const SizedBox(height: 8),
+            _iconBtn(Icons.edit_outlined, const Color(0xFF6366F1), () {
+              showDialog(
+                context: context,
+                builder: (_) => RewardHistoryDetail(data: item, type: 'update'),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _mobileRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Filter / Logic ──────────────────────────────────────────────────────────
+
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce
-        ? _debouncer.run(() {
-            runFiltering(page: page);
-          })
+        ? _debouncer.run(() => runFiltering(page: page))
         : runFiltering(page: page);
   }
 
   void runFiltering({bool enableDebounce = true, int? page}) {
     showLoading();
-    if (page != null) {
-      _page = page;
-    }
+    if (page != null) _page = page;
     RewardHistoryController.getAll(
       context,
       _page,
       _pageSize,
-      customerName: _customerNameController.text != '' ? _customerNameController.text : null,
-      customerUsername: _customerUserNameController.text != '' ? _customerUserNameController.text : null,
-      userPhone: _customerPhoneController.text != '' ? _customerPhoneController.text : null,
-      rewardName: _rewardNameController.text != '' ? _rewardNameController.text : null,
+      customerName: _customerNameController.text.isNotEmpty ? _customerNameController.text : null,
+      customerUsername:
+          _customerUserNameController.text.isNotEmpty ? _customerUserNameController.text : null,
+      userPhone: _customerPhoneController.text.isNotEmpty ? _customerPhoneController.text : null,
+      rewardName: _rewardNameController.text.isNotEmpty ? _rewardNameController.text : null,
       rewardHistoryStatus: _rewardHistoryStatus != null
           ? _rewardHistoryStatus?.key == '1'
-                ? 1
-                : _rewardHistoryStatus?.key == '0'
-                ? 0
-                : null
+              ? 1
+              : _rewardHistoryStatus?.key == '0'
+                  ? 0
+                  : null
           : null,
       rewardStatus: _rewardStatus != null
           ? _rewardStatus?.key == '1'
-                ? 1
-                : _rewardStatus?.key == '0'
-                ? 0
-                : null
+              ? 1
+              : _rewardStatus?.key == '0'
+                  ? 0
+                  : null
           : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         _totalCount = value.data?.totalCount ?? 0;
-        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalPage =
+            value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<RewardHistoryController>().rewardHistoryResponse = value;
-        // _page = 0;
-      } else if (value.code == 404) {}
+      }
       return null;
     });
-  }
-
-  String? getOrderBy() {
-    try {
-      return headers.firstWhere((element) => element.isSort).attribute;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  String? getSortType() {
-    if (getOrderBy() != null) {
-      if (headers.firstWhere((element) => element.isSort).sort == SortType.asc) {
-        return 'asc';
-      } else {
-        return 'desc';
-      }
-    } else {
-      return null;
-    }
-  }
-
-  void getData({int? page}) async {
-    showLoading();
-  }
-
-  List<DataColumn2> columns() {
-    return [
-      for (TableHeaderAttribute item in headers)
-        DataColumn2(
-          fixedWidth: item.width,
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: AppSelectableText(
-                        item.label,
-                        style: Theme.of(context).textTheme.bodyMedium?.apply(fontWeightDelta: 2),
-                      ),
-                    ),
-                    // if (item.tooltip != null) ...[
-                    //   const SizedBox(
-                    //     width: 10,
-                    //   ),
-                    //   const Icon(
-                    //     Icons.help_outline_rounded,
-                    //     size: 18,
-                    //     color: Colors.grey,
-                    //   ),
-                    // ],
-                  ],
-                ),
-              ),
-              if (item.allowSorting)
-                TextButton(
-                  onPressed: () {
-                    if (getOrderBy() != item.attribute) {
-                      resetAllFilter();
-                    }
-                    if (item.isSort) {
-                      if (item.sort == SortType.asc) {
-                        item.sort = SortType.desc;
-                        filtering(enableDebounce: false);
-                      } else {
-                        item.sort = SortType.asc;
-                        item.isSort = false;
-                        filtering(enableDebounce: false);
-                      }
-                    } else {
-                      item.isSort = true;
-                      filtering(enableDebounce: false);
-                    }
-                  },
-                  child: sortingIcon(item),
-                ),
-            ],
-          ),
-          numeric: item.numeric,
-          tooltip: item.tooltip,
-          size: item.columnSize ?? ColumnSize.M,
-        ),
-    ];
   }
 
   void resetAllFilter() {
@@ -666,204 +816,5 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     _rewardHistoryStatus = null;
     _rewardStatus = null;
     rebuildDropdown.add(DateTime.now());
-
-    for (TableHeaderAttribute item in headers) {
-      item.isSort = false;
-      item.sort = SortType.asc;
-    }
-  }
-
-  Widget sortingIcon(TableHeaderAttribute header) {
-    Widget child = Icon(
-      header.isSort ? Icons.sort : Icons.menu,
-      color: header.isSort ? (header.sort == SortType.asc ? Colors.green : Colors.red) : Colors.grey,
-    );
-
-    return header.isSort
-        ? header.sort == SortType.desc
-              ? Transform.rotate(angle: -math.pi, child: child)
-              : child
-        : child;
-  }
-
-  Widget tableButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Flexible(
-                      child: Card(
-                        surfaceTintColor: Colors.white,
-                        elevation: 5.0,
-                        color: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            bottomLeft: Radius.circular(15),
-                          ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                              child: Column(
-                                children: [
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _customerNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Patient Name',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _customerUserNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Patient Username',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _customerPhoneController,
-                                      hintText: 'Search',
-                                      labelText: 'Patient Contact No.',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _rewardNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Reward Name',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  StreamBuilder<DateTime>(
-                                    stream: rebuildDropdown.stream,
-                                    builder: (context, snapshot) {
-                                      return Column(
-                                        children: [
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [
-                                                DropdownAttribute('1', 'In-Progress'),
-                                                DropdownAttribute('0', 'Completed'),
-                                              ],
-                                              labelText: 'Reward History Status',
-                                              value: _rewardHistoryStatus?.name,
-                                              onChanged: (p0) {
-                                                _rewardHistoryStatus = p0;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 1);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
-                                          ),
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
-                                              labelText: 'Reward Status',
-                                              value: _rewardStatus?.name,
-                                              onChanged: (p0) {
-                                                _rewardStatus = p0;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 1);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  AppPadding.vertical(denominator: 1 / 3),
-                                  AppOutlinedButton(
-                                    () {
-                                      resetAllFilter();
-                                      filtering(enableDebounce: true, page: 1);
-                                    },
-                                    backgroundColor: Colors.white,
-                                    borderRadius: 15,
-                                    width: 131,
-                                    height: 45,
-                                    text: 'Clear',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.filter_list, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            resetAllFilter();
-            filtering(enableDebounce: true, page: 1);
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.refresh, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget perPage() {
-    return PerPageWidget(
-      _pageSize.toString(),
-      DropdownAttributeList(
-        [],
-        onChanged: (selected) {
-          DropdownAttribute item = selected as DropdownAttribute;
-          _pageSize = int.parse(item.key);
-          filtering(enableDebounce: false);
-        },
-      ),
-    );
-  }
-
-  Widget pagination() {
-    return Pagination(
-      numOfPages: _totalPage,
-      selectedPage: _page,
-      pagesVisible: 5,
-      spacing: 10,
-      onPageChanged: (page) {
-        _movePage(page);
-      },
-    );
-  }
-
-  void _movePage(int page) {
-    filtering(page: page, enableDebounce: false);
   }
 }

@@ -113,37 +113,14 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                             SizedBox(
                               width: screenWidth1728(26),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: TextEditingController(text: widget.data.rewardHistoryId),
-                                      isNumber: true,
-                                      maxCharacter: 6,
-                                      labelText: 'ID *',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 1),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: TextEditingController(text: widget.data.rewardName),
-                                      labelText: 'Reward Name *',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 1),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: TextEditingController(text: widget.data.userFullname),
-                                      labelText: 'Patient Name *',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 1),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: TextEditingController(text: widget.data.userPhone),
-                                      labelText: 'Patient Contact No *',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 1),
+                                  _labelValue('Reward Name', widget.data.rewardName ?? 'N/A'),
+                                  SizedBox(height: 16),
+                                  _labelValue('Patient Name', widget.data.userFullname ?? 'N/A'),
+                                  SizedBox(height: 16),
+                                  _labelValue('Patient Contact No.', widget.data.userPhone ?? 'N/A'),
+                                  SizedBox(height: 16),
                                   InputField(
                                     field: InputFieldAttribute(
                                       controller: historyDescription.controller,
@@ -271,26 +248,15 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                                                 ),
                                               ),
                                       if (widget.data.createdByFullname != null) ...[
-                                        AppPadding.vertical(denominator: 1),
-                                        InputField(
-                                          field: InputFieldAttribute(
-                                            controller: TextEditingController(text: widget.data.createdByFullname),
-                                            isEditable: false,
-                                            labelText: 'Updated by',
-                                          ),
-                                        ),
+                                        SizedBox(height: 16),
+                                        _labelValue('Updated by', widget.data.createdByFullname ?? 'N/A'),
                                       ],
-                                      AppPadding.vertical(denominator: 1),
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: TextEditingController(
-                                            text: dateConverter(widget.data.rewardHistoryModifiedDate),
-                                          ),
-                                          isEditable: false,
-                                          labelText: 'Updated At',
-                                        ),
+                                      SizedBox(height: 16),
+                                      _labelValue(
+                                        'Updated At',
+                                        dateConverter(widget.data.rewardHistoryModifiedDate) ?? 'N/A',
                                       ),
-                                      AppPadding.vertical(denominator: 1),
+                                      SizedBox(height: 16),
                                     ],
                                   );
                                 },
@@ -390,6 +356,17 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _labelValue(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
+        const SizedBox(height: 2),
+        AppSelectableText(value, style: AppTypography.bodyMedium(context)),
       ],
     );
   }

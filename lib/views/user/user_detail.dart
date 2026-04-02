@@ -178,7 +178,9 @@ class _UserDetailState extends State<UserDetail> {
                                 ),
                               ],
                             ),
-                            AppPadding.vertical(denominator: 2),
+                            const SizedBox(height: 4),
+                            const Divider(color: Color(0xFFF3F4F6), height: 1),
+                            const SizedBox(height: 16),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -187,7 +189,10 @@ class _UserDetailState extends State<UserDetail> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      InputField(field: usernameAttribute),
+                                      if (widget.type == 'update')
+                                        labelValue('Username', usernameAttribute.controller.text)
+                                      else
+                                        InputField(field: usernameAttribute),
                                       SizedBox(height: 12),
                                       InputField(field: fullNameAttribute),
                                       SizedBox(height: 12),
@@ -273,15 +278,17 @@ class _UserDetailState extends State<UserDetail> {
                                     children: [
                                       InputField(field: phoneAttribute),
                                       SizedBox(height: 12),
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: emailAttribute.controller,
-                                          labelText: emailAttribute.labelText,
-                                          isEmail: true,
-                                          errorMessage: emailAttribute.errorMessage,
-                                          isEditable: widget.type == 'update' ? false : true,
+                                      if (widget.type == 'update')
+                                        labelValue('Email', emailAttribute.controller.text)
+                                      else
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: emailAttribute.controller,
+                                            labelText: emailAttribute.labelText,
+                                            isEmail: true,
+                                            errorMessage: emailAttribute.errorMessage,
+                                          ),
                                         ),
-                                      ),
                                       SizedBox(height: 12),
                                       Row(
                                         children: [
@@ -322,7 +329,50 @@ class _UserDetailState extends State<UserDetail> {
                                 ),
                               ],
                             ),
-                            AppPadding.vertical(denominator: 1 / 1.5),
+                            const SizedBox(height: 16),
+                            const Divider(color: Color(0xFFF3F4F6), height: 1),
+                            const SizedBox(height: 12),
+                            if (widget.type == 'update')
+                              ValueListenableBuilder<bool>(
+                                valueListenable: _userStatus,
+                                builder: (context, status, _) {
+                                  return Row(
+                                    children: [
+                                      const Text(
+                                        'Account Status',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF374151),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: status ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          status ? 'Active' : 'Inactive',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: status ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Switch(
+                                        value: status,
+                                        onChanged: (val) => _userStatus.value = val,
+                                        activeThumbColor: const Color(0xFF15803D),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            const SizedBox(height: 16),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
@@ -435,9 +485,28 @@ class _UserDetailState extends State<UserDetail> {
     return Column(
       crossAxisAlignment: alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
-        AppSelectableText(label, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
-        SizedBox(height: 2),
-        AppSelectableText(value, style: AppTypography.bodyMedium(context)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF6B7280),
+            letterSpacing: 0.3,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            // color: const Color(0xFFF3F4F6),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: AppSelectableText(
+            value.isNotEmpty ? value : '—',
+            style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+          ),
+        ),
       ],
     );
   }
@@ -454,8 +523,8 @@ class _UserDetailState extends State<UserDetail> {
 
     final requiredFields = [
       fullNameAttribute,
-      usernameAttribute,
-      emailAttribute,
+      if (widget.type != 'update') usernameAttribute,
+      if (widget.type != 'update') emailAttribute,
       phoneAttribute,
       dobAttribute,
       branchIdAttribute,
@@ -465,14 +534,16 @@ class _UserDetailState extends State<UserDetail> {
       checkRequired(field);
     }
 
-    if (usernameAttribute.controller.text.contains(' ')) {
+    if (widget.type != 'update' && usernameAttribute.controller.text.contains(' ')) {
       usernameAttribute.errorMessage = 'Username must not contain spaces.';
       isValid = false;
     }
 
     final emailRegex = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
-    if (emailAttribute.controller.text.isNotEmpty && !emailRegex.hasMatch(emailAttribute.controller.text)) {
+    if (widget.type != 'update' &&
+        emailAttribute.controller.text.isNotEmpty &&
+        !emailRegex.hasMatch(emailAttribute.controller.text)) {
       emailAttribute.errorMessage = 'Please enter a valid email address.';
       isValid = false;
     }

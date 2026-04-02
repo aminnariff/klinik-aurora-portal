@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -21,7 +19,6 @@ import 'package:klinik_aurora_portal/models/service_branch/update_service_branch
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/service/service_details.dart';
-import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
@@ -29,19 +26,11 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/search_toggle.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
-import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
@@ -61,37 +50,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   int _totalCount = 0;
   int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
+  final TextEditingController _searchController = TextEditingController();
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
-  ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
-
-  List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(attribute: 'serviceName', label: 'Service', allowSorting: false, columnSize: ColumnSize.M),
-    TableHeaderAttribute(attribute: 'category', label: 'Category', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(attribute: 'eta', label: 'Allocated Time', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(attribute: 'servicePrice', label: 'Price', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(attribute: 'doctorType', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(
-      attribute: 'serviceStatus',
-      label: 'Status',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 70,
-    ),
-    TableHeaderAttribute(
-      attribute: 'createdDate',
-      label: 'Created Date',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'actions',
-      label: 'Actions',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 80,
-    ),
-  ];
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   @override
@@ -106,574 +67,759 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    _serviceNameController.dispose();
+    rebuildDropdown.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
+    return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
   }
 
-  Widget mobileView() {
-    // return StreamBuilder<List<Results>>(
-    //   stream: results.stream,
-    //   builder: (context, snapshot) {
-    return Column(
-      children: [
-        searchField(
-          InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Service Name'),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                for (int index = 0; index < (2); index++)
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CardContainer(
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: screenPadding * 1.5,
-                                    horizontal: screenPadding,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      mobileText('Central Office', 'N/A'),
-                                      mobileText('Serving Cabinet', 'N/A'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: CardContainer(
-                      Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('N/A'),
-                            Text('N/A'),
-                            Row(children: [Text('N/A')]),
-                            Text('aaaaa'),
-                          ],
-                        ),
-                      ),
-                      margin: EdgeInsets.symmetric(vertical: screenPadding / 2, horizontal: screenPadding),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        ),
-      ],
-    );
-    // },
-    // );
-  }
+  // ─── Desktop ────────────────────────────────────────────────────────────────
 
-  Widget mobileText(String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
-        AppPadding.horizontal(denominator: 2),
-        Expanded(child: AppSelectableText(value)),
-      ],
-    );
-  }
-
-  Widget desktopView() {
-    return
-    // (widget.orderReference == null)
-    //     ?
-    Scaffold(
-      backgroundColor: Colors.white,
+  Widget _desktopView() {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
         children: [
-          Row(
-            children: [
-              AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(controller: _serviceNameController, hintText: 'Search', labelText: 'Service Name'),
-              // ),
-              // AppPadding.horizontal(),
-              // searchField(
-              //   InputFieldAttribute(controller: _emailController, hintText: 'Search', labelText: 'Email'),
-              // ),
-            ],
-          ),
+          _topBar(),
           Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: CardContainer(
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
-                      child: context.read<AuthController>().isSuperAdmin == true ? superadminTable() : adminTable(),
-                    ),
-                    color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, screenPadding),
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: Colors.black.withAlpha(13), blurRadius: 8, offset: const Offset(0, 2))],
                 ),
-              ],
+                child: context.read<AuthController>().isSuperAdmin == true ? _superadminTable() : _adminTable(),
+              ),
             ),
           ),
         ],
       ),
     );
-    // : OrderDetailHomepage(
-    //     orderReference: widget.orderReference!,
-    //     previousPage: ServiceHomepage.routeName,
-    //   );
   }
 
-  Widget searchField(InputFieldAttribute attribute) {
-    return Column(
-      children: [
-        AppPadding.vertical(),
-        InputField(
-          field: InputFieldAttribute(
-            controller: attribute.controller,
-            hintText: attribute.hintText,
-            labelText: attribute.labelText,
-            suffixWidget: TextButton(
-              onPressed: () {
-                filtering(page: 1);
-              },
-              child: const Icon(Icons.search, color: Colors.blue),
+  Widget _topBar() {
+    final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  _serviceNameController.text = val;
+                  filtering(page: 1);
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search services...',
+                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  contentPadding: EdgeInsets.zero,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                ),
+              ),
             ),
-            isEditableColor: const Color(0xFFEEF3F7),
-            onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 1);
-            },
           ),
-          width: screenWidthByBreakpoint(90, 70, 26),
+          const SizedBox(width: 12),
+          if (isSuperAdmin) ...[
+            _toolbarButton(
+              icon: Icons.filter_list_rounded,
+              label: 'Filter',
+              color: const Color(0xFF6366F1),
+              onTap: _showFilterPanel,
+            ),
+            const SizedBox(width: 8),
+            _toolbarButton(
+              icon: Icons.refresh_rounded,
+              label: 'Reset',
+              color: Colors.grey[600]!,
+              onTap: () {
+                _searchController.clear();
+                resetAllFilter();
+                filtering(enableDebounce: false, page: 1);
+              },
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const ServiceDetails(type: 'create'),
+                );
+              },
+              icon: const Icon(Icons.add_rounded, size: 18, color: Colors.white),
+              label: const Text('Add Service', style: TextStyle(color: Colors.white, fontSize: 13)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primary,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
+              ),
+            ),
+          ] else ...[
+            _toolbarButton(
+              icon: Icons.refresh_rounded,
+              label: 'Refresh',
+              color: Colors.grey[600]!,
+              onTap: () => filtering(enableDebounce: false, page: 1),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _toolbarButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 16, color: color),
+      label: Text(label, style: TextStyle(color: color, fontSize: 13)),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        side: BorderSide(color: color.withAlpha(80)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  void _showFilterPanel() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (_) {
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
+            elevation: 8,
+            child: SizedBox(
+              width: 320,
+              height: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: StatefulBuilder(
+                  builder: (ctx, _) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Filter',
+                              style: AppTypography.bodyLarge(context).copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              icon: const Icon(Icons.close_rounded),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        _filterLabel('Service Name'),
+                        const SizedBox(height: 6),
+                        _filterTextField(_serviceNameController, 'Search by name'),
+                        const SizedBox(height: 16),
+                        _filterLabel('Status'),
+                        const SizedBox(height: 6),
+                        StreamBuilder<DateTime>(
+                          stream: rebuildDropdown.stream,
+                          builder: (context, _) {
+                            return AppDropdown(
+                              attributeList: DropdownAttributeList(
+                                [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                                labelText: 'Status',
+                                value: _selectedServiceStatus?.name,
+                                onChanged: (p0) {
+                                  _selectedServiceStatus = p0;
+                                  rebuildDropdown.add(DateTime.now());
+                                  filtering(page: 1);
+                                },
+                                width: 280,
+                              ),
+                            );
+                          },
+                        ),
+                        const Spacer(),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              resetAllFilter();
+                              filtering(enableDebounce: false, page: 1);
+                              Navigator.pop(ctx);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: const Text('Clear Filters'),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _filterLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+    );
+  }
+
+  Widget _filterTextField(TextEditingController controller, String hint) {
+    return SizedBox(
+      height: 40,
+      child: TextField(
+        controller: controller,
+        onChanged: (_) => filtering(page: 1),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+          filled: true,
+          fillColor: const Color(0xFFF5F6FA),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+        ),
+      ),
+    );
+  }
+
+  // ─── Superadmin Table ────────────────────────────────────────────────────────
+
+  Widget _superadminTable() {
+    return Consumer<ServiceController>(
+      builder: (context, snapshot, _) {
+        if (snapshot.servicesResponse == null) {
+          return const Center(child: CircularProgressIndicator(color: secondaryColor));
+        }
+        final items = snapshot.servicesResponse?.data ?? [];
+        if (items.isEmpty) {
+          return const Column(mainAxisAlignment: MainAxisAlignment.center, children: [NoRecordsWidget()]);
+        }
+        return Column(
+          children: [
+            Expanded(
+              child: DataTable2(
+                columnSpacing: 16,
+                horizontalMargin: 20,
+                minWidth: 900,
+                isHorizontalScrollBarVisible: true,
+                isVerticalScrollBarVisible: true,
+                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowHeight: 48,
+                dataRowHeight: 64,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                ),
+                columns: _superadminColumns(),
+                rows: [
+                  for (int i = 0; i < items.length; i++)
+                    DataRow2(
+                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                      cells: [
+                        DataCell(_serviceNameCell(items[i].serviceName, items[i].serviceDescription)),
+                        DataCell(_categoryChip(items[i].serviceCategory)),
+                        DataCell(_timeBadge(items[i].serviceTime)),
+                        DataCell(_priceCell(items[i].servicePrice, items[i].serviceBookingFee)),
+                        DataCell(_doctorTypeChip(items[i].doctorType)),
+                        DataCell(_statusChip(items[i].serviceStatus == 1)),
+                        DataCell(
+                          Text(
+                            dateConverter(items[i].createdDate) ?? '—',
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                          ),
+                        ),
+                        DataCell(_superadminActions(items[i])),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+            _tableFooter(),
+          ],
+        );
+      },
+    );
+  }
+
+  List<DataColumn2> _superadminColumns() {
+    return [
+      _col('Service', ColumnSize.L),
+      _col('Category', ColumnSize.S),
+      _col('Time', ColumnSize.S, fixedWidth: 100),
+      _col('Price', ColumnSize.S, fixedWidth: 120),
+      _col('Type', ColumnSize.S, fixedWidth: 100),
+      _col('Status', ColumnSize.S, fixedWidth: 90),
+      _col('Created', ColumnSize.S, fixedWidth: 120),
+      _col('Actions', ColumnSize.S, fixedWidth: 80),
+    ];
+  }
+
+  Widget _superadminActions(Data service) {
+    return PopupMenuButton<String>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      offset: const Offset(0, 36),
+      color: Colors.white,
+      tooltip: '',
+      onSelected: (value) => _handleMenuSelection(value, service),
+      itemBuilder: (_) => [
+        const PopupMenuItem<String>(value: 'update', child: Text('Edit Service')),
+        const PopupMenuItem<String>(value: 'updateBranchesStatus', child: Text('Update Branch Service')),
+        PopupMenuItem<String>(
+          value: 'enableDisable',
+          child: Text(service.serviceStatus == 1 ? 'Deactivate' : 'Re-Activate'),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),
+        child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
+      ),
+    );
+  }
+
+  // ─── Admin Table ─────────────────────────────────────────────────────────────
+
+  Widget _adminTable() {
+    return Consumer<ServiceBranchController>(
+      builder: (context, snapshot, _) {
+        if (snapshot.serviceBranchResponse == null) {
+          return const Center(child: CircularProgressIndicator(color: secondaryColor));
+        }
+        final items = snapshot.serviceBranchResponse?.data ?? [];
+        if (items.isEmpty) {
+          return const Column(mainAxisAlignment: MainAxisAlignment.center, children: [NoRecordsWidget()]);
+        }
+        return Column(
+          children: [
+            Expanded(
+              child: DataTable2(
+                columnSpacing: 16,
+                horizontalMargin: 20,
+                minWidth: 900,
+                isHorizontalScrollBarVisible: true,
+                isVerticalScrollBarVisible: true,
+                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowHeight: 48,
+                dataRowHeight: 64,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                ),
+                columns: _adminColumns(),
+                rows: [
+                  for (int i = 0; i < items.length; i++)
+                    DataRow2(
+                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                      cells: [
+                        DataCell(_serviceNameCell(items[i].serviceName, items[i].serviceDescription)),
+                        DataCell(_categoryChip(items[i].serviceCategory)),
+                        DataCell(_timeBadge(items[i].serviceTime)),
+                        DataCell(_priceCell(items[i].servicePrice, items[i].serviceBookingFee)),
+                        DataCell(_doctorTypeChip(items[i].doctorType)),
+                        DataCell(_statusChip(items[i].serviceBranchStatus == 1)),
+                        DataCell(
+                          Text(
+                            dateConverter(items[i].createdDate) ?? '—',
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                          ),
+                        ),
+                        DataCell(_adminActions(items[i])),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+            _tableFooter(),
+          ],
+        );
+      },
+    );
+  }
+
+  List<DataColumn2> _adminColumns() {
+    return [
+      _col('Service', ColumnSize.L),
+      _col('Category', ColumnSize.S),
+      _col('Time', ColumnSize.S, fixedWidth: 100),
+      _col('Price', ColumnSize.S, fixedWidth: 120),
+      _col('Type', ColumnSize.S, fixedWidth: 100),
+      _col('Status', ColumnSize.S, fixedWidth: 90),
+      _col('Created', ColumnSize.S, fixedWidth: 120),
+      _col('Actions', ColumnSize.S, fixedWidth: 80),
+    ];
+  }
+
+  Widget _adminActions(service_branch_model.Data serviceBranch) {
+    return PopupMenuButton<String>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      offset: const Offset(0, 36),
+      color: Colors.white,
+      tooltip: '',
+      onSelected: (value) => _handleAdminMenuSelection(value, serviceBranch),
+      itemBuilder: (_) => [
+        const PopupMenuItem<String>(value: 'update', child: Text('Update Timing')),
+        PopupMenuItem<String>(
+          value: 'enableDisable',
+          child: Text(serviceBranch.serviceBranchStatus == 1 ? 'Deactivate' : 'Re-Activate'),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),
+        child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
+      ),
+    );
+  }
+
+  // ─── Shared Cell Widgets ─────────────────────────────────────────────────────
+
+  DataColumn2 _col(String label, ColumnSize size, {double? fixedWidth}) {
+    return DataColumn2(
+      fixedWidth: fixedWidth,
+      size: size,
+      label: Text(
+        label,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280), letterSpacing: 0.3),
+      ),
+    );
+  }
+
+  Widget _serviceNameCell(String? name, String? description) {
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(color: secondaryColor.withAlpha(40), borderRadius: BorderRadius.circular(8)),
+          child: const Icon(Icons.medical_services_outlined, size: 18, color: secondaryColor),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Tooltip(
+                message: (description != null && description.isNotEmpty) ? description : null,
+                child: Text(
+                  name ?? '—',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget superadminTable() {
-    return Consumer<ServiceController>(
-      builder: (context, snapshot, child) {
-        if (snapshot.servicesResponse == null) {
-          return const Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
-              ),
-            ],
-          );
-        } else {
-          return snapshot.servicesResponse?.data == null || snapshot.servicesResponse!.data!.isEmpty
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    const Expanded(child: Center(child: NoRecordsWidget())),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                              padding: const EdgeInsets.all(5),
-                              child: DataTable2(
-                                columnSpacing: 12,
-                                horizontalMargin: 12,
-                                isHorizontalScrollBarVisible: true,
-                                isVerticalScrollBarVisible: true,
-                                columns: columns(),
-                                headingRowColor: WidgetStateProperty.all(Colors.white),
-                                headingRowHeight: 51,
-                                decoration: const BoxDecoration(),
-                                border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  verticalInside: BorderSide(
-                                    width: 1,
-                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                  ),
-                                ),
-                                rows: [
-                                  for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
-                                    DataRow(
-                                      color: WidgetStateProperty.all(
-                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                      ),
-                                      cells: [
-                                        DataCell(
-                                          Text(
-                                            snapshot.servicesResponse?.data?[index].serviceName ?? 'N/A',
-                                            style: AppTypography.bodyMedium(context).apply(),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.servicesResponse?.data?[index].serviceCategory ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.servicesResponse?.data?[index].serviceTime ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppTooltip(
-                                            message:
-                                                'Booking Fee: RM ${snapshot.servicesResponse?.data?[index].serviceBookingFee}',
-                                            child: Text(
-                                              snapshot.servicesResponse?.data?[index].servicePrice != null
-                                                  ? 'RM ${snapshot.servicesResponse?.data?[index].servicePrice}'
-                                                  : 'N/A',
-                                            ),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            doctorType(snapshot.servicesResponse?.data?[index].doctorType),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              showStatus(snapshot.servicesResponse?.data?[index].serviceStatus == 1),
-                                            ],
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            dateConverter(snapshot.servicesResponse?.data?[index].createdDate) ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              PopupMenuButton<String>(
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                offset: const Offset(8, 35),
-                                                color: Colors.white,
-                                                tooltip: '',
-                                                onSelected: (value) => _handleMenuSelection(
-                                                  value,
-                                                  snapshot.servicesResponse?.data?[index] ?? Data(),
-                                                ),
-                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                                                  if (context.read<AuthController>().isSuperAdmin)
-                                                    PopupMenuItem<String>(value: 'update', child: Text('Update')),
-                                                  if (context.read<AuthController>().isSuperAdmin)
-                                                    PopupMenuItem<String>(
-                                                      value: 'updateBranchesStatus',
-                                                      child: Text('Update Branch Service'),
-                                                    ),
-                                                  PopupMenuItem<String>(
-                                                    value: 'enableDisable',
-                                                    child: Text(
-                                                      snapshot.servicesResponse?.data?[index].serviceStatus == 1
-                                                          ? 'Deactivate'
-                                                          : 'Re-Activate',
-                                                    ),
-                                                  ),
-                                                ],
-                                                child: Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Container(
-                                                      padding: const EdgeInsets.all(4),
-                                                      // decoration: const BoxDecoration(
-                                                      //   color: Colors.white,
-                                                      //   shape: BoxShape.circle,
-                                                      // ),
-                                                      child: Icon(Icons.more_vert, color: Colors.grey),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: pagination()),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isMobile && !isTablet)
-                                    const Flexible(
-                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                    ),
-                                  perPage(),
-                                ],
-                              ),
-                            ),
-                            if (!isMobile && !isTablet)
-                              Text(
-                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-        }
-      },
+  Widget _categoryChip(String? category) {
+    if (category == null || category.isEmpty) {
+      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
+      child: Text(
+        category,
+        style: const TextStyle(fontSize: 11, color: Color(0xFF374151), fontWeight: FontWeight.w500),
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 
-  Widget adminTable() {
-    return Consumer<ServiceBranchController>(
-      builder: (context, snapshot, child) {
-        if (snapshot.serviceBranchResponse == null) {
-          return const Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
-              ),
-            ],
-          );
-        } else {
-          return snapshot.serviceBranchResponse?.data == null || snapshot.serviceBranchResponse!.data!.isEmpty
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    const Expanded(child: Center(child: NoRecordsWidget())),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                              padding: const EdgeInsets.all(5),
-                              child: DataTable2(
-                                columnSpacing: 12,
-                                horizontalMargin: 12,
-                                isHorizontalScrollBarVisible: true,
-                                isVerticalScrollBarVisible: true,
-                                columns: columns(),
-                                headingRowColor: WidgetStateProperty.all(Colors.white),
-                                headingRowHeight: 51,
-                                decoration: const BoxDecoration(),
-                                border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  verticalInside: BorderSide(
-                                    width: 1,
-                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                  ),
-                                ),
-                                rows: [
-                                  for (
-                                    int index = 0;
-                                    index < (snapshot.serviceBranchResponse?.data?.length ?? 0);
-                                    index++
-                                  )
-                                    DataRow(
-                                      color: WidgetStateProperty.all(
-                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                      ),
-                                      cells: [
-                                        DataCell(
-                                          Text(
-                                            snapshot.serviceBranchResponse?.data?[index].serviceName ?? 'N/A',
-                                            style: AppTypography.bodyMedium(context).apply(),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.serviceBranchResponse?.data?[index].serviceCategory ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            snapshot.serviceBranchResponse?.data?[index].serviceTime ?? 'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppTooltip(
-                                            message:
-                                                'Booking Fee: RM ${snapshot.serviceBranchResponse?.data?[index].serviceBookingFee ?? '0.00'}',
-                                            child: Text(
-                                              snapshot.serviceBranchResponse?.data?[index].servicePrice != null
-                                                  ? 'RM ${snapshot.serviceBranchResponse?.data?[index].servicePrice}'
-                                                  : 'N/A',
-                                            ),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            doctorType(snapshot.serviceBranchResponse?.data?[index].doctorType),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              showStatus(
-                                                snapshot.serviceBranchResponse?.data?[index].serviceBranchStatus == 1,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            dateConverter(snapshot.serviceBranchResponse?.data?[index].createdDate) ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              PopupMenuButton<String>(
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                offset: const Offset(8, 35),
-                                                color: Colors.white,
-                                                tooltip: '',
-                                                onSelected: (value) => _handleAdminMenuSelection(
-                                                  value,
-                                                  snapshot.serviceBranchResponse?.data?[index] ??
-                                                      service_branch_model.Data(),
-                                                ),
-                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                                                  PopupMenuItem<String>(value: 'update', child: Text('Update Timing')),
-                                                  PopupMenuItem<String>(
-                                                    value: 'enableDisable',
-                                                    child: Text(
-                                                      snapshot
-                                                                  .serviceBranchResponse
-                                                                  ?.data?[index]
-                                                                  .serviceBranchStatus ==
-                                                              1
-                                                          ? 'Deactivate'
-                                                          : 'Re-Activate',
-                                                    ),
-                                                  ),
-                                                ],
-                                                child: Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Container(
-                                                      padding: const EdgeInsets.all(4),
-                                                      // decoration: const BoxDecoration(
-                                                      //   color: Colors.white,
-                                                      //   shape: BoxShape.circle,
-                                                      // ),
-                                                      child: Icon(Icons.more_vert, color: Colors.grey),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: pagination()),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isMobile && !isTablet)
-                                    const Flexible(
-                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                    ),
-                                  perPage(),
-                                ],
-                              ),
-                            ),
-                            if (!isMobile && !isTablet)
-                              Text(
-                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-        }
-      },
+  Widget _timeBadge(String? time) {
+    if (time == null || time.isEmpty) {
+      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+    }
+    return Row(
+      children: [
+        const Icon(Icons.schedule_outlined, size: 13, color: Color(0xFF6B7280)),
+        const SizedBox(width: 4),
+        Text(time, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+      ],
     );
   }
+
+  Widget _priceCell(String? price, String? bookingFee) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          price != null ? 'RM $price' : '—',
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+        ),
+        if (bookingFee != null && bookingFee.isNotEmpty)
+          Text('Fee: RM $bookingFee', style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF))),
+      ],
+    );
+  }
+
+  Widget _doctorTypeChip(int? type) {
+    final label = doctorType(type);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(6)),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 11, color: Color(0xFF4338CA), fontWeight: FontWeight.w500),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _statusChip(bool isActive) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        isActive ? 'Active' : 'Inactive',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+        ),
+      ),
+    );
+  }
+
+  Widget _tableFooter() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Color(0xFFF3F4F6))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Pagination(
+              numOfPages: _totalPage,
+              selectedPage: _page,
+              pagesVisible: 5,
+              spacing: 10,
+              onPageChanged: (page) => filtering(page: page, enableDebounce: false),
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!isMobile && !isTablet)
+                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+              PerPageWidget(
+                _pageSize.toString(),
+                DropdownAttributeList(
+                  [],
+                  onChanged: (selected) {
+                    _pageSize = int.parse((selected as DropdownAttribute).key);
+                    filtering(enableDebounce: false);
+                  },
+                ),
+              ),
+              if (!isMobile && !isTablet) ...[
+                const SizedBox(width: 8),
+                Text(
+                  '${((_page) * _pageSize) - _pageSize + 1}–${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Mobile ──────────────────────────────────────────────────────────────────
+
+  Widget _mobileView() {
+    final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
+    if (isSuperAdmin) {
+      return Consumer<ServiceController>(
+        builder: (context, snapshot, _) {
+          final items = snapshot.servicesResponse?.data ?? [];
+          return _mobileList(
+            items
+                .map<Widget>(
+                  (s) => _mobileServiceCard(
+                    name: s.serviceName,
+                    category: s.serviceCategory,
+                    time: s.serviceTime,
+                    price: s.servicePrice,
+                    isActive: s.serviceStatus == 1,
+                    onTap: () => _handleMenuSelection('update', s),
+                  ),
+                )
+                .toList(),
+          );
+        },
+      );
+    } else {
+      return Consumer<ServiceBranchController>(
+        builder: (context, snapshot, _) {
+          final items = snapshot.serviceBranchResponse?.data ?? [];
+          return _mobileList(
+            items
+                .map<Widget>(
+                  (s) => _mobileServiceCard(
+                    name: s.serviceName,
+                    category: s.serviceCategory,
+                    time: s.serviceTime,
+                    price: s.servicePrice,
+                    isActive: s.serviceBranchStatus == 1,
+                    onTap: () => _handleAdminMenuSelection('update', s),
+                  ),
+                )
+                .toList(),
+          );
+        },
+      );
+    }
+  }
+
+  Widget _mobileList(List<Widget> cards) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: TextField(
+            controller: _searchController,
+            onChanged: (val) {
+              _serviceNameController.text = val;
+              filtering(page: 1);
+            },
+            decoration: InputDecoration(
+              hintText: 'Search services...',
+              prefixIcon: const Icon(Icons.search, size: 20),
+              filled: true,
+              fillColor: const Color(0xFFF5F6FA),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            ),
+          ),
+        ),
+        Expanded(
+          child: cards.isEmpty
+              ? const Center(child: NoRecordsWidget())
+              : ListView(padding: const EdgeInsets.symmetric(horizontal: 12), children: cards),
+        ),
+        _tableFooter(),
+      ],
+    );
+  }
+
+  Widget _mobileServiceCard({
+    String? name,
+    String? category,
+    String? time,
+    String? price,
+    bool isActive = false,
+    VoidCallback? onTap,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE5E7EB)),
+      ),
+      color: Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: secondaryColor.withAlpha(40),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.medical_services_outlined, size: 18, color: secondaryColor),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(name ?? '—', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  ),
+                  _statusChip(isActive),
+                ],
+              ),
+              const SizedBox(height: 10),
+              if (category != null) _mobileRow('Category', category),
+              if (time != null) _mobileRow('Time', time),
+              if (price != null) _mobileRow('Price', 'RM $price'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mobileRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+          ),
+          Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+        ],
+      ),
+    );
+  }
+
+  // ─── Menu Handlers ────────────────────────────────────────────────────────────
 
   void _handleMenuSelection(String value, Data service) async {
     if (value == 'update') {
       showDialog(
         context: context,
-        builder: (BuildContext context) {
-          return ServiceDetails(service: service, type: 'update');
-        },
+        builder: (_) => ServiceDetails(service: service, type: 'update'),
       );
     } else if (value == 'updateBranchesStatus') {
       ServiceBranchController.getAll(
@@ -687,9 +833,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           context.read<ServiceBranchController>().serviceBranchResponse = value.data;
           showDialog(
             context: context,
-            builder: (BuildContext context) {
-              return ServiceBranch(serviceBranch: value.data);
-            },
+            builder: (_) => ServiceBranch(serviceBranch: value.data),
           );
         }
       });
@@ -722,7 +866,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 filtering();
                 showDialogSuccess(
                   context,
-                  'The Services has been successfully ${service.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
+                  'The service has been successfully ${service.serviceStatus == 1 ? 'deactivated' : 'activated'}.',
                 );
               } else {
                 showDialogError(context, value.message ?? value.data?.message ?? '');
@@ -748,7 +892,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         bool haveElements = false;
         try {
           updateId = value.data?.data
-              ?.firstWhere((element) => element.serviceBranchId == serviceBranch.serviceBranchId)
+              ?.firstWhere((e) => e.serviceBranchId == serviceBranch.serviceBranchId)
               .serviceBranchAvailableDatetimeId;
         } catch (e) {
           debugPrint(e.toString());
@@ -762,34 +906,32 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         }
         showDialog(
           context: context,
-          builder: (BuildContext context) {
-            return Row(
-              children: [
-                Expanded(
-                  child: CardContainer(
-                    Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(screenPadding),
-                          child: MultiTimeCalendarPage(
-                            serviceBranchId: serviceBranch.serviceBranchId ?? '',
-                            serviceTiming: serviceBranch.serviceTime ?? '',
-                            serviceBranchAvailableDatetimeId: updateId,
-                            startMonth: now.month,
-                            year: now.year,
-                            totalMonths: 3,
-                            initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
-                          ),
+          builder: (_) => Row(
+            children: [
+              Expanded(
+                child: CardContainer(
+                  Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(screenPadding),
+                        child: MultiTimeCalendarPage(
+                          serviceBranchId: serviceBranch.serviceBranchId ?? '',
+                          serviceTiming: serviceBranch.serviceTime ?? '',
+                          serviceBranchAvailableDatetimeId: updateId,
+                          startMonth: now.month,
+                          year: now.year,
+                          totalMonths: 3,
+                          initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
                         ),
-                        CloseButton(),
-                      ],
-                    ),
+                      ),
+                      const CloseButton(),
+                    ],
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+            ],
+          ),
         );
       });
     } else if (value == 'enableDisable') {
@@ -836,19 +978,15 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     }
   }
 
+  // ─── Filter / Logic ──────────────────────────────────────────────────────────
+
   void filtering({bool enableDebounce = true, int? page}) {
-    enableDebounce
-        ? _debouncer.run(() {
-            runFiltering(page: page);
-          })
-        : runFiltering(page: page);
+    enableDebounce ? _debouncer.run(() => runFiltering(page: page)) : runFiltering(page: page);
   }
 
   void runFiltering({bool enableDebounce = true, int? page}) {
     showLoading();
-    if (page != null) {
-      _page = page;
-    }
+    if (page != null) _page = page;
     if (context.read<AuthController>().isSuperAdmin == false) {
       ServiceBranchController.getAll(
         context,
@@ -887,288 +1025,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     }
   }
 
-  String? getOrderBy() {
-    try {
-      return headers.firstWhere((element) => element.isSort).attribute;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  String? getSortType() {
-    if (getOrderBy() != null) {
-      if (headers.firstWhere((element) => element.isSort).sort == SortType.asc) {
-        return 'asc';
-      } else {
-        return 'desc';
-      }
-    } else {
-      return null;
-    }
-  }
-
-  void getData({int? page}) async {
-    showLoading();
-  }
-
-  List<DataColumn2> columns() {
-    return [
-      for (TableHeaderAttribute item in headers)
-        DataColumn2(
-          fixedWidth: item.width,
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: AppSelectableText(
-                        item.label,
-                        style: Theme.of(context).textTheme.bodyMedium?.apply(fontWeightDelta: 2),
-                      ),
-                    ),
-                    // if (item.tooltip != null) ...[
-                    //   const SizedBox(
-                    //     width: 10,
-                    //   ),
-                    //   const Icon(
-                    //     Icons.help_outline_rounded,
-                    //     size: 18,
-                    //     color: Colors.grey,
-                    //   ),
-                    // ],
-                  ],
-                ),
-              ),
-              if (item.allowSorting)
-                TextButton(
-                  onPressed: () {
-                    if (getOrderBy() != item.attribute) {
-                      resetAllFilter();
-                    }
-                    if (item.isSort) {
-                      if (item.sort == SortType.asc) {
-                        item.sort = SortType.desc;
-                        filtering(enableDebounce: false);
-                      } else {
-                        item.sort = SortType.asc;
-                        item.isSort = false;
-                        filtering(enableDebounce: false);
-                      }
-                    } else {
-                      item.isSort = true;
-                      filtering(enableDebounce: false);
-                    }
-                  },
-                  child: sortingIcon(item),
-                ),
-            ],
-          ),
-          numeric: item.numeric,
-          tooltip: item.tooltip,
-          size: item.columnSize ?? ColumnSize.M,
-        ),
-    ];
-  }
-
   void resetAllFilter() {
     _serviceNameController.text = '';
     _selectedServiceStatus = null;
     rebuildDropdown.add(DateTime.now());
-
-    for (TableHeaderAttribute item in headers) {
-      item.isSort = false;
-      item.sort = SortType.asc;
-    }
-  }
-
-  Widget sortingIcon(TableHeaderAttribute header) {
-    Widget child = Icon(
-      header.isSort ? Icons.sort : Icons.menu,
-      color: header.isSort ? (header.sort == SortType.asc ? Colors.green : Colors.red) : Colors.grey,
-    );
-
-    return header.isSort
-        ? header.sort == SortType.desc
-              ? Transform.rotate(angle: -math.pi, child: child)
-              : child
-        : child;
-  }
-
-  Widget tableButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          child: SearchToggle(
-            hintText: 'Service Name',
-            action: (value) {
-              debugPrint(value);
-            },
-          ),
-        ),
-        if (context.read<AuthController>().isSuperAdmin)
-          TextButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const ServiceDetails(type: 'create');
-                },
-              );
-            },
-            child: Row(
-              children: [
-                const Icon(Icons.add, color: Colors.blue),
-                AppPadding.horizontal(denominator: 2),
-                Text('Add new service', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-              ],
-            ),
-          ),
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Card(
-                        surfaceTintColor: Colors.white,
-                        elevation: 5.0,
-                        color: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            bottomLeft: Radius.circular(15),
-                          ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                              child: Column(
-                                children: [
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _serviceNameController,
-                                      hintText: 'Search',
-                                      labelText: 'Service Name',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  StreamBuilder<DateTime>(
-                                    stream: rebuildDropdown.stream,
-                                    builder: (context, snapshot) {
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  [
-                                                    DropdownAttribute('1', 'Active'),
-                                                    DropdownAttribute('0', 'Inactive'),
-                                                  ],
-                                                  labelText: 'information'.tr(gender: 'userStatus'),
-                                                  value: _selectedServiceStatus?.name,
-                                                  onChanged: (p0) {
-                                                    _selectedServiceStatus = p0;
-                                                    rebuildDropdown.add(DateTime.now());
-                                                    filtering(page: 1);
-                                                  },
-                                                  width: screenWidthByBreakpoint(90, 70, 26),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  AppPadding.vertical(denominator: 1 / 3),
-                                  AppOutlinedButton(
-                                    () {
-                                      resetAllFilter();
-                                      filtering(enableDebounce: true, page: 1);
-                                    },
-                                    backgroundColor: Colors.white,
-                                    borderRadius: 15,
-                                    width: 131,
-                                    height: 45,
-                                    text: 'Clear',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.filter_list, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            resetAllFilter();
-            filtering(enableDebounce: true, page: 1);
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.refresh, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget perPage() {
-    return PerPageWidget(
-      _pageSize.toString(),
-      DropdownAttributeList(
-        [],
-        onChanged: (selected) {
-          DropdownAttribute item = selected as DropdownAttribute;
-          _pageSize = int.parse(item.key);
-          filtering(enableDebounce: false);
-        },
-      ),
-    );
-  }
-
-  Widget pagination() {
-    return Pagination(
-      numOfPages: _totalPage,
-      selectedPage: _page,
-      pagesVisible: 5,
-      spacing: 10,
-      onPageChanged: (page) {
-        _movePage(page);
-      },
-    );
-  }
-
-  void _movePage(int page) {
-    filtering(page: page, enableDebounce: false);
   }
 }

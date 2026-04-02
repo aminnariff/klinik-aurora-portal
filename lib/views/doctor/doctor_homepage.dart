@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
@@ -17,24 +16,16 @@ import 'package:klinik_aurora_portal/models/doctor/doctor_branch_response.dart';
 import 'package:klinik_aurora_portal/models/doctor/update_doctor_request.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/widgets/button/outlined_button.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
-import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
@@ -54,59 +45,38 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   int _totalCount = 0;
   int _totalPage = 0;
   final _debouncer = Debouncer(milliseconds: 1200);
-  ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
 
-  List<TableHeaderAttribute> headers = [
-    TableHeaderAttribute(attribute: 'doctorName', label: 'Name', allowSorting: false, columnSize: ColumnSize.S),
-    TableHeaderAttribute(
-      attribute: 'doctorPhone',
-      label: 'Contact No.',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 130,
-    ),
-    TableHeaderAttribute(
-      attribute: 'doctorStatus',
-      label: 'Status',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 70,
-    ),
-    TableHeaderAttribute(
-      attribute: 'branchId',
-      label: 'Managing Branch',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'createdDate',
-      label: 'Created Date',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-    ),
-    TableHeaderAttribute(
-      attribute: 'actions',
-      label: 'Actions',
-      allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 80,
-    ),
-  ];
-  final TextEditingController _userNameController = TextEditingController();
-  final TextEditingController _userPhoneController = TextEditingController();
-  DropdownAttribute? _selectedUserStatus;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  DropdownAttribute? _selectedStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
+
+  static const List<Color> _avatarColors = [
+    Color(0xFF6AD1E3), Color(0xFFDF6E98), Color(0xFF7E57C2),
+    Color(0xFF26A69A), Color(0xFFEF5350), Color(0xFF42A5F5),
+    Color(0xFFFF7043), Color(0xFF66BB6A),
+  ];
+
+  Color _avatarColor(String name) =>
+      name.isEmpty ? _avatarColors[0] : _avatarColors[name.codeUnitAt(0) % _avatarColors.length];
+
+  String _initials(String? name) {
+    final n = name?.trim() ?? '';
+    if (n.isEmpty) return '?';
+    final parts = n.split(' ').where((p) => p.isNotEmpty).toList();
+    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    return n[0].toUpperCase();
+  }
 
   @override
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(DoctorHomepage.displayName);
+      Provider.of<TopBarController>(context, listen: false).pageValue =
+          Homepage.getPageId(DoctorHomepage.displayName);
       if (context.read<BranchController>().branchAllResponse == null) {
         BranchController.getAll(context, 1, 1000).then((value) {
-          if (responseCode(value.code)) {
-            context.read<BranchController>().branchAllResponse = value;
-          }
+          if (responseCode(value.code)) context.read<BranchController>().branchAllResponse = value;
         });
       }
       filtering();
@@ -115,725 +85,539 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
-  }
+  Widget build(BuildContext context) =>
+      LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
 
-  Widget mobileView() {
-    // return StreamBuilder<List<Results>>(
-    //   stream: results.stream,
-    //   builder: (context, snapshot) {
-    return Column(
-      children: [
-        searchField(InputFieldAttribute(controller: _userNameController, hintText: 'Search', labelText: 'PIC Name')),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                for (int index = 0; index < (2); index++)
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CardContainer(
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: screenPadding * 1.5,
-                                    horizontal: screenPadding,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      mobileText('Central Office', 'N/A'),
-                                      mobileText('Serving Cabinet', 'N/A'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: CardContainer(
-                      Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('N/A'),
-                            Text('N/A'),
-                            Row(children: [Text('N/A')]),
-                            Text('aaaaa'),
-                          ],
-                        ),
-                      ),
-                      margin: EdgeInsets.symmetric(vertical: screenPadding / 2, horizontal: screenPadding),
-                    ),
-                  ),
-              ],
+  // ─── Mobile ──────────────────────────────────────────────────────────────────
+
+  Widget _mobileView() {
+    return Consumer<DoctorController>(
+      builder: (context, snapshot, _) {
+        final docs = snapshot.doctorBranchResponse?.data ?? [];
+        return Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, 0),
+              child: _searchInput(_nameController, 'Search by name…'),
             ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        ),
-      ],
-    );
-    // },
-    // );
-  }
-
-  Widget mobileText(String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
-        AppPadding.horizontal(denominator: 2),
-        Expanded(child: AppSelectableText(value)),
-      ],
+            Expanded(
+              child: docs.isEmpty
+                  ? const Center(child: NoRecordsWidget())
+                  : ListView.builder(
+                      padding: EdgeInsets.all(screenPadding),
+                      itemCount: docs.length,
+                      itemBuilder: (_, i) => _mobileCard(docs[i]),
+                    ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: screenPadding / 2),
+              child: _pagination(),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget desktopView() {
-    return
-    // (widget.orderReference == null)
-    //     ?
-    Scaffold(
-      backgroundColor: Colors.white,
+  Widget _mobileCard(Data doc) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0xFFE5E7EB))),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            _avatar(doc),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(doc.doctorName ?? 'N/A',
+                      style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
+                  const SizedBox(height: 2),
+                  Text(doc.doctorPhone ?? '—',
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                  const SizedBox(height: 4),
+                  _statusChip(doc.doctorStatus == 1),
+                ],
+              ),
+            ),
+            _actionMenu(doc),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── Desktop ─────────────────────────────────────────────────────────────────
+
+  Widget _desktopView() {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Row(
-          //   children: [
-          //     AppPadding.horizontal(),
-          //     searchField(
-          //       InputFieldAttribute(
-          //           controller: _orderReferenceController, hintText: 'Search', labelText: 'Order Reference'),
-          //     ),
-          //   ],
-          // ),
-          AppPadding.vertical(),
+          _topBar(),
           Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: CardContainer(
-                    Padding(padding: const EdgeInsets.fromLTRB(15, 4, 15, 0), child: orderTable()),
-                    color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(screenPadding, screenPadding / 2, screenPadding, screenPadding),
-                  ),
-                ),
-              ],
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding),
+              child: _tableCard(),
             ),
           ),
         ],
       ),
     );
-    // : OrderDetailHomepage(
-    //     orderReference: widget.orderReference!,
-    //     previousPage: DoctorHomepage.routeName,
-    //   );
   }
 
-  Widget searchField(InputFieldAttribute attribute) {
-    return Column(
-      children: [
-        AppPadding.vertical(),
-        InputField(
-          field: InputFieldAttribute(
-            controller: attribute.controller,
-            hintText: attribute.hintText,
-            labelText: attribute.labelText,
-            suffixWidget: TextButton(
-              onPressed: () {
-                filtering(page: 1);
-              },
-              child: const Icon(Icons.search, color: Colors.blue),
+  Widget _topBar() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: _searchInput(_nameController, 'Search by PIC name…'),
             ),
-            isEditableColor: const Color(0xFFEEF3F7),
-            onFieldSubmitted: (value) {
-              filtering(enableDebounce: true, page: 1);
-            },
           ),
-          width: screenWidthByBreakpoint(90, 70, 26),
-        ),
-      ],
+          const SizedBox(width: 12),
+          OutlinedButton.icon(
+            onPressed: _showFilterPanel,
+            icon: const Icon(Icons.tune_rounded, size: 16),
+            label: const Text('Filter', style: TextStyle(fontSize: 13)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF374151),
+              side: const BorderSide(color: Color(0xFFD1D5DB)),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            onPressed: () { _resetFilters(); filtering(enableDebounce: false, page: 1); },
+            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            tooltip: 'Reset filters',
+            style: IconButton.styleFrom(
+              backgroundColor: const Color(0xFFF3F4F6),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          ElevatedButton.icon(
+            onPressed: () =>
+                showDialog(context: context, builder: (_) => const DoctorDetails(type: 'create')),
+            icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
+            label: const Text('Add PIC', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: secondaryColor,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget orderTable() {
+  Widget _tableCard() {
     return Consumer<DoctorController>(
-      builder: (context, snapshot, child) {
+      builder: (context, snapshot, _) {
         if (snapshot.doctorBranchResponse == null) {
-          return const Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Center(child: CircularProgressIndicator(color: secondaryColor)),
-              ),
-            ],
-          );
-        } else {
-          return snapshot.doctorBranchResponse == null || snapshot.doctorBranchResponse!.data!.isEmpty
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    const Expanded(child: Center(child: NoRecordsWidget())),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    tableButton(),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
-                              padding: const EdgeInsets.all(5),
-                              child: DataTable2(
-                                columnSpacing: 12,
-                                horizontalMargin: 12,
-                                isHorizontalScrollBarVisible: true,
-                                isVerticalScrollBarVisible: true,
-                                columns: columns(),
-                                headingRowColor: WidgetStateProperty.all(Colors.white),
-                                headingRowHeight: 51,
-                                decoration: const BoxDecoration(),
-                                border: TableBorder(
-                                  left: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  top: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  bottom: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  right: BorderSide(width: 1, color: Colors.black.withAlpha(opacityCalculation(.1))),
-                                  verticalInside: BorderSide(
-                                    width: 1,
-                                    color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                  ),
-                                ),
-                                rows: [
-                                  for (
-                                    int index = 0;
-                                    index < (snapshot.doctorBranchResponse?.data?.length ?? 0);
-                                    index++
-                                  )
-                                    DataRow(
-                                      color: WidgetStateProperty.all(
-                                        index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                      ),
-                                      cells: [
-                                        DataCell(
-                                          Text(
-                                            snapshot.doctorBranchResponse?.data?[index].doctorName ?? 'N/A',
-                                            style: AppTypography.bodyMedium(context).apply(),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          InkWell(
-                                            child: Text(
-                                              snapshot.doctorBranchResponse?.data?[index].doctorPhone ??
-                                                  '60 12 498 2969',
-                                            ),
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              showStatus(snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1),
-                                            ],
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            translateToBranchName(
-                                                  snapshot.doctorBranchResponse?.data?[index].branchId ?? '',
-                                                ) ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          AppSelectableText(
-                                            dateConverter(snapshot.doctorBranchResponse?.data?[index].createdDate) ??
-                                                'N/A',
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              PopupMenuButton<String>(
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                offset: const Offset(8, 35),
-                                                color: Colors.white,
-                                                tooltip: '',
-                                                onSelected: (value) => _handleMenuSelection(
-                                                  value,
-                                                  snapshot.doctorBranchResponse?.data?[index] ?? Data(),
-                                                ),
-                                                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                                                  const PopupMenuItem<String>(value: 'update', child: Text('Update')),
-                                                  PopupMenuItem<String>(
-                                                    value: 'enableDisable',
-                                                    child: Text(
-                                                      snapshot.doctorBranchResponse?.data?[index].doctorStatus == 1
-                                                          ? 'Deactivate'
-                                                          : 'Re-Activate',
-                                                    ),
-                                                  ),
-                                                ],
-                                                child: Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Container(
-                                                      padding: const EdgeInsets.all(4),
-                                                      // decoration: const BoxDecoration(
-                                                      //   color: Colors.white,
-                                                      //   shape: BoxShape.circle,
-                                                      // ),
-                                                      child: Icon(Icons.more_vert, color: Colors.grey),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (isNoRecords.value) const AppSelectableText('No Records Found'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: pagination()),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isMobile && !isTablet)
-                                    const Flexible(
-                                      child: Text('Items per page: ', overflow: TextOverflow.ellipsis, maxLines: 1),
-                                    ),
-                                  perPage(),
-                                ],
-                              ),
-                            ),
-                            if (!isMobile && !isTablet)
-                              Text(
-                                '${((_page) * _pageSize) - _pageSize + 1} - ${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                );
+          return const Center(child: CircularProgressIndicator(color: secondaryColor));
         }
+        final docs = snapshot.doctorBranchResponse?.data ?? [];
+        if (docs.isEmpty) {
+          return Container(
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE5E7EB))),
+            child: const Center(child: NoRecordsWidget()),
+          );
+        }
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
+            children: [
+              Expanded(child: _dataTable(docs)),
+              const Divider(height: 1, color: Color(0xFFE5E7EB)),
+              _tableFooter(),
+            ],
+          ),
+        );
       },
     );
   }
 
-  void _handleMenuSelection(String value, Data data) async {
-    if (value == 'update') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return DoctorDetails(doctor: data, type: 'update');
-        },
+  Widget _dataTable(List<Data> docs) {
+    const headerStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280));
+    return DataTable2(
+      columnSpacing: 12,
+      horizontalMargin: 16,
+      isHorizontalScrollBarVisible: false,
+      isVerticalScrollBarVisible: true,
+      decoration: const BoxDecoration(),
+      headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+      headingRowHeight: 44,
+      dataRowHeight: 64,
+      dividerThickness: 1,
+      columns: const [
+        DataColumn2(label: Text('Person In Charge', style: headerStyle), size: ColumnSize.M),
+        DataColumn2(label: Text('Contact', style: headerStyle), size: ColumnSize.S),
+        DataColumn2(label: Text('Branch', style: headerStyle), size: ColumnSize.M),
+        DataColumn2(label: Text('Status', style: headerStyle), fixedWidth: 90),
+        DataColumn2(label: Text('Joined', style: headerStyle), size: ColumnSize.S),
+        DataColumn2(label: Text('', style: headerStyle), fixedWidth: 56),
+      ],
+      rows: docs.map((doc) => DataRow2(
+        color: WidgetStateProperty.all(Colors.white),
+        cells: [
+          // Name + avatar
+          DataCell(Row(
+            children: [
+              _avatar(doc),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(doc.doctorName ?? 'N/A',
+                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          )),
+          // Phone
+          DataCell(Text(doc.doctorPhone ?? '—',
+              style: const TextStyle(fontSize: 13, color: Color(0xFF374151)))),
+          // Branch
+          DataCell(Text(_branchName(doc.branchId ?? '') ?? '—',
+              style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis)),
+          // Status
+          DataCell(_statusChip(doc.doctorStatus == 1)),
+          // Created
+          DataCell(Text(dateConverter(doc.createdDate) ?? '—',
+              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)))),
+          // Actions
+          DataCell(_actionMenu(doc)),
+        ],
+      )).toList(),
+    );
+  }
+
+  Widget _avatar(Data doc) {
+    final color = _avatarColor(doc.doctorName ?? '');
+    if (doc.doctorImage != null) {
+      return CircleAvatar(
+        radius: 20,
+        backgroundImage: NetworkImage('${Environment.imageUrl}${doc.doctorImage}'),
+        onBackgroundImageError: (_, __) {},
+        backgroundColor: color.withAlpha(40),
+        child: null,
       );
+    }
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: color.withAlpha(40),
+      child: Text(_initials(doc.doctorName),
+          style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13)),
+    );
+  }
+
+  Widget _statusChip(bool active) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: active ? Colors.green.withAlpha(25) : Colors.red.withAlpha(25),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        active ? 'Active' : 'Inactive',
+        style: TextStyle(
+          color: active ? Colors.green.shade700 : Colors.red.shade700,
+          fontWeight: FontWeight.w600,
+          fontSize: 11,
+        ),
+      ),
+    );
+  }
+
+  Widget _actionMenu(Data doc) {
+    return PopupMenuButton<String>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      offset: const Offset(0, 32),
+      color: Colors.white,
+      elevation: 4,
+      tooltip: '',
+      onSelected: (value) => _handleMenu(value, doc),
+      itemBuilder: (_) => [
+        PopupMenuItem<String>(
+          value: 'update',
+          child: Row(children: const [
+            Icon(Icons.edit_outlined, size: 16, color: Color(0xFF6B7280)),
+            SizedBox(width: 10),
+            Text('Update', style: TextStyle(fontSize: 13)),
+          ]),
+        ),
+        PopupMenuItem<String>(
+          value: 'enableDisable',
+          child: Row(children: [
+            Icon(doc.doctorStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+                size: 16, color: doc.doctorStatus == 1 ? Colors.red : Colors.green),
+            const SizedBox(width: 10),
+            Text(doc.doctorStatus == 1 ? 'Deactivate' : 'Re-Activate',
+                style: TextStyle(
+                    fontSize: 13,
+                    color: doc.doctorStatus == 1 ? Colors.red : Colors.green)),
+          ]),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: const Icon(Icons.more_horiz_rounded, size: 16, color: Color(0xFF6B7280)),
+      ),
+    );
+  }
+
+  Widget _tableFooter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(child: _pagination()),
+          Row(children: [
+            const Text('Rows: ', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+            _perPage(),
+            const SizedBox(width: 16),
+            if (!isMobile && !isTablet)
+              Text(
+                '${(_page * _pageSize) - _pageSize + 1}–${(_page * _pageSize < _totalCount) ? _page * _pageSize : _totalCount} of $_totalCount',
+                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // ─── Filter Panel ─────────────────────────────────────────────────────────────
+
+  void _showFilterPanel() {
+    showDialog(
+      context: context,
+      builder: (_) => Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Material(
+            color: Colors.white,
+            elevation: 8,
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+            child: SizedBox(
+              width: 300,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 56, 20, 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Filter PICs', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 16),
+                        _filterTextField(_nameController, 'PIC Name'),
+                        const SizedBox(height: 12),
+                        _filterTextField(_phoneController, 'Contact Number'),
+                        const SizedBox(height: 12),
+                        StreamBuilder<DateTime>(
+                          stream: rebuildDropdown.stream,
+                          builder: (context, _) => AppDropdown(
+                            attributeList: DropdownAttributeList(
+                              [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                              labelText: 'Status',
+                              value: _selectedStatus?.name,
+                              onChanged: (p0) {
+                                _selectedStatus = p0;
+                                rebuildDropdown.add(DateTime.now());
+                                filtering(page: 1);
+                              },
+                              width: 260,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () { _resetFilters(); filtering(enableDebounce: false, page: 1); },
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFFD1D5DB)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text('Clear Filters'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 8, right: 8,
+                    child: IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+  Widget _searchInput(TextEditingController ctrl, String hint) {
+    return TextField(
+      controller: ctrl,
+      onChanged: (_) { setState(() {}); filtering(page: 1); },
+      style: const TextStyle(fontSize: 13),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
+        prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 18),
+        suffixIcon: ctrl.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
+                onPressed: () { ctrl.clear(); filtering(enableDebounce: false, page: 1); setState(() {}); })
+            : null,
+        filled: true,
+        fillColor: const Color(0xFFF9FAFB),
+        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+      ),
+    );
+  }
+
+  Widget _filterTextField(TextEditingController ctrl, String label) {
+    return TextField(
+      controller: ctrl,
+      onChanged: (_) => filtering(page: 1),
+      style: const TextStyle(fontSize: 13),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 13),
+        filled: true,
+        fillColor: const Color(0xFFF9FAFB),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+      ),
+    );
+  }
+
+  void _handleMenu(String value, Data doc) async {
+    if (value == 'update') {
+      showDialog(context: context, builder: (_) => DoctorDetails(doctor: doc, type: 'update'));
     } else if (value == 'enableDisable') {
       try {
         if (await showConfirmDialog(
           context,
-          data.doctorStatus == 1
-              ? 'Are you certain you wish to deactivate this PIC? Please note, this action can be reversed at a later time.'
-              : 'Are you certain you wish to activate this PIC? Please note, this action can be reversed at a later time.',
+          doc.doctorStatus == 1
+              ? 'Are you certain you wish to deactivate this PIC?'
+              : 'Are you certain you wish to activate this PIC?',
         )) {
           Future.delayed(Duration.zero, () {
             DoctorController.update(
               context,
               UpdateDoctorRequest(
-                doctorId: data.doctorId,
-                doctorName: data.doctorName,
-                branchId: data.branchId,
-                doctorPhone: data.doctorPhone,
-                doctorStatus: data.doctorStatus == 1 ? 0 : 1,
+                doctorId: doc.doctorId, doctorName: doc.doctorName,
+                branchId: doc.branchId, doctorPhone: doc.doctorPhone,
+                doctorStatus: doc.doctorStatus == 1 ? 0 : 1,
               ),
             ).then((value) {
               if (responseCode(value.code)) {
                 filtering();
-                showDialogSuccess(
-                  context,
-                  'The PIC has been successfully ${data.doctorStatus == 1 ? 'deactivated' : 'activated'}.',
-                );
+                showDialogSuccess(context,
+                    'PIC ${doc.doctorStatus == 1 ? 'deactivated' : 'activated'} successfully.');
               } else {
                 showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });
         }
-      } catch (e) {
-        debugPrint(e.toString());
-      }
+      } catch (e) { debugPrint(e.toString()); }
     }
   }
 
-  String? translateToBranchName(String branchId) {
+  String? _branchName(String branchId) {
     try {
-      if (context.read<BranchController>().branchAllResponse?.data?.data != null) {
-        return context
-            .read<BranchController>()
-            .branchAllResponse
-            ?.data
-            ?.data!
-            .firstWhere((element) => element.branchId == branchId)
-            .branchName;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      return null;
-    }
+      return context.read<BranchController>().branchAllResponse?.data?.data!
+          .firstWhere((e) => e.branchId == branchId).branchName;
+    } catch (_) { return null; }
   }
 
   void filtering({bool enableDebounce = true, int? page}) {
-    enableDebounce
-        ? _debouncer.run(() {
-            runFiltering(page: page);
-          })
-        : runFiltering(page: page);
+    enableDebounce ? _debouncer.run(() => _runFiltering(page: page)) : _runFiltering(page: page);
   }
 
-  void runFiltering({bool enableDebounce = true, int? page}) {
+  void _runFiltering({int? page}) {
     showLoading();
-    if (page != null) {
-      _page = page;
-    }
+    if (page != null) _page = page;
     DoctorController.get(
-      context,
-      _page,
-      _pageSize,
+      context, _page, _pageSize,
       branchId: context.read<AuthController>().isSuperAdmin
           ? null
           : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-      doctorName: _userNameController.text,
-      doctorPhone: _userPhoneController.text,
-      doctorStatus: _selectedUserStatus != null
-          ? _selectedUserStatus?.key == '1'
-                ? 1
-                : _selectedUserStatus?.key == '0'
-                ? 0
-                : null
+      doctorName: _nameController.text,
+      doctorPhone: _phoneController.text,
+      doctorStatus: _selectedStatus != null
+          ? _selectedStatus?.key == '1' ? 1 : 0
           : null,
-      // branchId: '62743240-006d-11ef-a129-6677d190faa2',
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         _totalCount = value.data?.totalCount ?? 0;
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<DoctorController>().doctorBranchResponse = value.data;
-        // _page = 0;
-      } else if (value.code == 404) {}
-      return null;
+      }
     });
   }
 
-  String? getOrderBy() {
-    try {
-      return headers.firstWhere((element) => element.isSort).attribute;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  String? getSortType() {
-    if (getOrderBy() != null) {
-      if (headers.firstWhere((element) => element.isSort).sort == SortType.asc) {
-        return 'asc';
-      } else {
-        return 'desc';
-      }
-    } else {
-      return null;
-    }
-  }
-
-  void getData({int? page}) async {
-    showLoading();
-  }
-
-  List<DataColumn2> columns() {
-    return [
-      for (TableHeaderAttribute item in headers)
-        DataColumn2(
-          fixedWidth: item.width,
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: AppSelectableText(
-                        item.label,
-                        style: Theme.of(context).textTheme.bodyMedium?.apply(fontWeightDelta: 2),
-                      ),
-                    ),
-                    // if (item.tooltip != null) ...[
-                    //   const SizedBox(
-                    //     width: 10,
-                    //   ),
-                    //   const Icon(
-                    //     Icons.help_outline_rounded,
-                    //     size: 18,
-                    //     color: Colors.grey,
-                    //   ),
-                    // ],
-                  ],
-                ),
-              ),
-              if (item.allowSorting)
-                TextButton(
-                  onPressed: () {
-                    if (getOrderBy() != item.attribute) {
-                      resetAllFilter();
-                    }
-                    if (item.isSort) {
-                      if (item.sort == SortType.asc) {
-                        item.sort = SortType.desc;
-                        filtering(enableDebounce: false);
-                      } else {
-                        item.sort = SortType.asc;
-                        item.isSort = false;
-                        filtering(enableDebounce: false);
-                      }
-                    } else {
-                      item.isSort = true;
-                      filtering(enableDebounce: false);
-                    }
-                  },
-                  child: sortingIcon(item),
-                ),
-            ],
-          ),
-          numeric: item.numeric,
-          tooltip: item.tooltip,
-          size: item.columnSize ?? ColumnSize.M,
-        ),
-    ];
-  }
-
-  void resetAllFilter() {
-    _userNameController.text = '';
-    _userPhoneController.text = '';
-    _selectedUserStatus = null;
+  void _resetFilters() {
+    _nameController.text = '';
+    _phoneController.text = '';
+    _selectedStatus = null;
     rebuildDropdown.add(DateTime.now());
-
-    for (TableHeaderAttribute item in headers) {
-      item.isSort = false;
-      item.sort = SortType.asc;
-    }
   }
 
-  Widget sortingIcon(TableHeaderAttribute header) {
-    Widget child = Icon(
-      header.isSort ? Icons.sort : Icons.menu,
-      color: header.isSort ? (header.sort == SortType.asc ? Colors.green : Colors.red) : Colors.grey,
-    );
-
-    return header.isSort
-        ? header.sort == SortType.desc
-              ? Transform.rotate(angle: -math.pi, child: child)
-              : child
-        : child;
+  Widget _perPage() {
+    return PerPageWidget(_pageSize.toString(), DropdownAttributeList([], onChanged: (selected) {
+      _pageSize = int.parse((selected as DropdownAttribute).key);
+      filtering(enableDebounce: false);
+    }));
   }
 
-  Widget tableButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const DoctorDetails(type: 'create');
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.add, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Add new PIC', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Flexible(
-                      child: Card(
-                        surfaceTintColor: Colors.white,
-                        elevation: 5.0,
-                        color: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            bottomLeft: Radius.circular(15),
-                          ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-                              child: Column(
-                                children: [
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _userNameController,
-                                      hintText: 'Search',
-                                      labelText: 'PIC Name',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  searchField(
-                                    InputFieldAttribute(
-                                      controller: _userPhoneController,
-                                      hintText: 'Search',
-                                      labelText: 'PIC Contact Number',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(),
-                                  StreamBuilder<DateTime>(
-                                    stream: rebuildDropdown.stream,
-                                    builder: (context, snapshot) {
-                                      return Column(
-                                        children: [
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
-                                              labelText: 'information'.tr(gender: 'userStatus'),
-                                              value: _selectedUserStatus?.name,
-                                              onChanged: (p0) {
-                                                _selectedUserStatus = p0;
-                                                rebuildDropdown.add(DateTime.now());
-                                                filtering(page: 1);
-                                              },
-                                              width: screenWidthByBreakpoint(90, 70, 26),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  AppPadding.vertical(denominator: 1 / 3),
-                                  AppOutlinedButton(
-                                    () {
-                                      resetAllFilter();
-                                      filtering(enableDebounce: true, page: 1);
-                                    },
-                                    backgroundColor: Colors.white,
-                                    borderRadius: 15,
-                                    width: 131,
-                                    height: 45,
-                                    text: 'Clear',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Padding(padding: EdgeInsets.all(8.0), child: CloseButton()),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.filter_list, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Filter', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            resetAllFilter();
-            filtering(enableDebounce: true, page: 1);
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.refresh, color: Colors.blue),
-              AppPadding.horizontal(denominator: 2),
-              Text('Reset', style: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.blue)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget perPage() {
-    return PerPageWidget(
-      _pageSize.toString(),
-      DropdownAttributeList(
-        [],
-        onChanged: (selected) {
-          DropdownAttribute item = selected as DropdownAttribute;
-          _pageSize = int.parse(item.key);
-          filtering(enableDebounce: false);
-        },
-      ),
-    );
-  }
-
-  Widget pagination() {
+  Widget _pagination() {
     return Pagination(
-      numOfPages: _totalPage,
-      selectedPage: _page,
-      pagesVisible: isMobile ? 3 : 5,
-      spacing: 10,
-      onPageChanged: (page) {
-        _movePage(page);
-      },
+      numOfPages: _totalPage, selectedPage: _page,
+      pagesVisible: isMobile ? 3 : 5, spacing: 10,
+      onPageChanged: (page) => filtering(page: page, enableDebounce: false),
     );
-  }
-
-  void _movePage(int page) {
-    filtering(page: page, enableDebounce: false);
   }
 }
