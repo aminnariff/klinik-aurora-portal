@@ -1,8 +1,12 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
+import 'package:klinik_aurora_portal/models/payment/branch_payment_summary_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +23,23 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
   String selectedFilter = 'Today';
   late DateTime startDate;
   late DateTime endDate;
+
+  static const _bgDark = Color(0xff232d37);
+  static const _divider = Color(0xff37434d);
+  static const _muted = Color(0xff68737d);
+
+  static const List<Color> _branchColors = [
+    Color(0xFF2196F3),
+    Color(0xFFDF6E98),
+    Color(0xFF4CAF50),
+    Color(0xFFFF9800),
+    Color(0xFF9C27B0),
+    Color(0xFF00BCD4),
+    Color(0xFFFF5722),
+    Color(0xFF8BC34A),
+    Color(0xFFE91E63),
+    Color(0xFF607D8B),
+  ];
 
   @override
   void initState() {
@@ -73,149 +94,552 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
     if (startDate == endDate) {
       return df.format(startDate);
     } else {
-      return '${df.format(startDate)} - ${df.format(endDate)}';
+      return '${df.format(startDate)} – ${df.format(endDate)}';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Consumer<PaymentController>(
-            builder: (context, snapshot, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      DropdownButton<String>(
-                        value: selectedFilter,
-                        items: [
-                          'Today',
-                          'Yesterday',
-                          'This Month',
-                          'Last Month',
-                          'Custom',
-                        ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() {
-                              selectedFilter = val;
-                              applyDateFilter();
-                              getData();
-                            });
-                          }
-                        },
-                      ),
-                      const Spacer(),
-                      Text(getFormattedDateRange(), style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Summary', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SummaryCard(
-                        title: 'Total Payments',
-                        value: '${snapshot.branchPaymentReportResponse?.summaryTotals?.totalPayments ?? 'N/A'}',
-                      ),
-                      SummaryCard(
-                        title: 'Successful',
-                        value: '${snapshot.branchPaymentReportResponse?.summaryTotals?.successfulPayments ?? 'N/A'}',
-                      ),
-                      SummaryCard(
-                        title: 'Failed',
-                        value: '${snapshot.branchPaymentReportResponse?.summaryTotals?.failedPayments ?? 'N/A'}',
-                      ),
-                      SummaryCard(
-                        title: 'Paid Amount',
-                        value: 'RM ${snapshot.branchPaymentReportResponse?.summaryTotals?.totalPaidAmount ?? 'N/A'}',
-                      ),
-                      SummaryCard(
-                        title: 'Refunded',
-                        value: 'RM ${snapshot.branchPaymentReportResponse?.summaryTotals?.totalRefundAmount ?? 'N/A'}',
-                      ),
-                      SummaryCard(
-                        title: 'Net Revenue',
-                        value: 'RM ${snapshot.branchPaymentReportResponse?.summaryTotals?.netRevenue ?? 'N/A'}',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  const Text('Branch Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 400,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: SingleChildScrollView(
-                        child: DataTable(
-                          columns: const [
-                            DataColumn(label: Text('Branch Name')),
-                            DataColumn(label: Text('Payments')),
-                            DataColumn(label: Text('Success')),
-                            DataColumn(label: Text('Failed')),
-                            DataColumn(label: Text('Paid')),
-                            DataColumn(label: Text('Refund')),
-                            DataColumn(label: Text('Net Revenue')),
-                          ],
-                          rows: [
-                            for (
-                              int index = 0;
-                              index < (snapshot.branchPaymentReportResponse?.data?.length ?? 0);
-                              index++
-                            )
-                              DataRow(
-                                cells: [
-                                  DataCell(Text('${snapshot.branchPaymentReportResponse?.data?[index].branchName}')),
-                                  DataCell(Text('${snapshot.branchPaymentReportResponse?.data?[index].totalPayments}')),
-                                  DataCell(
-                                    Text('${snapshot.branchPaymentReportResponse?.data?[index].successfulPayments}'),
-                                  ),
-                                  DataCell(
-                                    Text('${snapshot.branchPaymentReportResponse?.data?[index].failedPayments}'),
-                                  ),
-                                  DataCell(
-                                    Text('${snapshot.branchPaymentReportResponse?.data?[index].totalPaidAmount}'),
-                                  ),
-                                  DataCell(
-                                    Text('${snapshot.branchPaymentReportResponse?.data?[index].totalRefundAmount}'),
-                                  ),
-                                  DataCell(Text('${snapshot.branchPaymentReportResponse?.data?[index].netRevenue}')),
-                                ],
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+      backgroundColor: const Color(0xFFF5F6FA),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(screenPadding),
+        child: Consumer<PaymentController>(
+          builder: (context, controller, _) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                SizedBox(height: screenPadding),
+                _buildFilterChips(),
+                SizedBox(height: screenPadding),
+                _buildSummaryCards(controller),
+                SizedBox(height: screenPadding),
+                _buildChart(controller),
+                SizedBox(height: screenPadding),
+                _buildTable(controller),
+              ],
+            );
+          },
         ),
       ),
     );
   }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Branch Payment Summary', style: AppTypography.displayMedium(context)),
+        const SizedBox(height: 2),
+        Text(
+          getFormattedDateRange(),
+          style: AppTypography.bodyMedium(context).apply(color: _muted),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChips() {
+    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Custom'];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.map((f) {
+          final selected = selectedFilter == f;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () async {
+                if (f == 'Custom') {
+                  final picked = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2023),
+                    lastDate: DateTime.now(),
+                    initialDateRange: DateTimeRange(start: startDate, end: endDate),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      selectedFilter = 'Custom';
+                      startDate = picked.start;
+                      endDate = picked.end;
+                    });
+                    getData();
+                  }
+                } else {
+                  setState(() {
+                    selectedFilter = f;
+                    applyDateFilter();
+                  });
+                  getData();
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: selected ? const Color(0xFF2196F3) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
+                  ),
+                  boxShadow: selected
+                      ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(51), blurRadius: 8, offset: const Offset(0, 2))]
+                      : null,
+                ),
+                child: Text(
+                  f,
+                  style: AppTypography.bodyMedium(context).apply(
+                    color: selected ? Colors.white : const Color(0xFF374151),
+                    fontWeightDelta: selected ? 1 : 0,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildSummaryCards(PaymentController controller) {
+    final summary = controller.branchPaymentReportResponse?.summaryTotals;
+
+    final cards = [
+      _CardConfig(
+        label: 'Total Payments',
+        value: '${summary?.totalPayments ?? 0}',
+        icon: Icons.receipt_long_rounded,
+        accent: const Color(0xFF2196F3),
+        bg: const Color(0xFFE3F2FD),
+        valueColor: const Color(0xFF1565C0),
+      ),
+      _CardConfig(
+        label: 'Successful',
+        value: '${summary?.successfulPayments ?? 0}',
+        icon: Icons.check_circle_rounded,
+        accent: const Color(0xFF059669),
+        bg: const Color(0xFFD1FAE5),
+        valueColor: const Color(0xFF065F46),
+      ),
+      _CardConfig(
+        label: 'Failed',
+        value: '${summary?.failedPayments ?? 0}',
+        icon: Icons.cancel_rounded,
+        accent: const Color(0xFFEF4444),
+        bg: const Color(0xFFFEE2E2),
+        valueColor: const Color(0xFF991B1B),
+      ),
+      _CardConfig(
+        label: 'Paid Amount',
+        value: 'RM ${summary?.totalPaidAmount ?? '0.00'}',
+        icon: Icons.payments_rounded,
+        accent: const Color(0xFF7C3AED),
+        bg: const Color(0xFFEDE9FE),
+        valueColor: const Color(0xFF4C1D95),
+      ),
+      _CardConfig(
+        label: 'Refunded',
+        value: 'RM ${summary?.totalRefundAmount ?? '0.00'}',
+        icon: Icons.undo_rounded,
+        accent: const Color(0xFFF59E0B),
+        bg: const Color(0xFFFEF3C7),
+        valueColor: const Color(0xFF92400E),
+      ),
+      _CardConfig(
+        label: 'Net Revenue',
+        value: 'RM ${summary?.netRevenue ?? '0.00'}',
+        icon: Icons.trending_up_rounded,
+        accent: const Color(0xFF0891B2),
+        bg: const Color(0xFFCFFAFE),
+        valueColor: const Color(0xFF164E63),
+      ),
+    ];
+
+    if (isMobile) {
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(child: _SummaryCard(config: cards[0])),
+              const SizedBox(width: 12),
+              Expanded(child: _SummaryCard(config: cards[1])),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: _SummaryCard(config: cards[2])),
+              const SizedBox(width: 12),
+              Expanded(child: _SummaryCard(config: cards[3])),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: _SummaryCard(config: cards[4])),
+              const SizedBox(width: 12),
+              Expanded(child: _SummaryCard(config: cards[5])),
+            ],
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      children: cards
+          .map((c) => Expanded(child: Padding(padding: const EdgeInsets.only(right: 12), child: _SummaryCard(config: c))))
+          .toList(),
+    );
+  }
+
+  Widget _buildChart(PaymentController controller) {
+    final data = controller.branchPaymentReportResponse?.data ?? [];
+    if (data.isEmpty) return const SizedBox();
+
+    final branches = data.map((d) => d.branchName ?? 'Unknown').toList();
+    final revenues = data.map((d) => double.tryParse(d.netRevenue ?? '0') ?? 0.0).toList();
+    final maxVal = revenues.isEmpty ? 10.0 : revenues.reduce((a, b) => a > b ? a : b);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: _bgDark,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: EdgeInsets.all(screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Net Revenue by Branch',
+            style: AppTypography.displayMedium(context).apply(color: Colors.white),
+          ),
+          const SizedBox(height: 4),
+          Text(getFormattedDateRange(), style: const TextStyle(color: _muted, fontSize: 11)),
+          SizedBox(height: screenPadding),
+          AspectRatio(
+            aspectRatio: isMobile ? 1.4 : 3,
+            child: BarChart(
+              BarChartData(
+                maxY: maxVal == 0 ? 10 : maxVal * 1.3,
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => Colors.blueGrey.withAlpha(opacityCalculation(.85)),
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        '${branches[group.x]}\nRM ${rod.toY.toStringAsFixed(2)}',
+                        const TextStyle(color: Colors.white, fontSize: 11),
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 50,
+                      getTitlesWidget: (value, meta) {
+                        if (value == meta.max || value == 0) return const SizedBox();
+                        return Text(
+                          'RM ${value.toInt()}',
+                          style: const TextStyle(color: _muted, fontSize: 10),
+                        );
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        final index = value.toInt();
+                        if (index < 0 || index >= branches.length) return const SizedBox();
+                        final name = branches[index];
+                        final truncated = name.length > 10 ? '${name.substring(0, 10)}…' : name;
+                        return SideTitleWidget(
+                          meta: meta,
+                          child: Text(
+                            truncated,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: _muted, fontSize: 9),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                gridData: FlGridData(
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (_) => const FlLine(color: _divider, strokeWidth: 1),
+                ),
+                borderData: FlBorderData(show: false),
+                barGroups: List.generate(branches.length, (i) {
+                  final color = _branchColors[i % _branchColors.length];
+                  return BarChartGroupData(
+                    x: i,
+                    barRods: [
+                      BarChartRodData(
+                        toY: revenues[i],
+                        color: color,
+                        width: 24,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTable(PaymentController controller) {
+    final data = controller.branchPaymentReportResponse?.data ?? [];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
+            child: Text('Branch Breakdown', style: AppTypography.displayMedium(context)),
+          ),
+          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: _buildDataTable(data),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataTable(List<Data> data) {
+    const headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF6B7280));
+    const cellStyle = TextStyle(fontSize: 13, color: Color(0xFF111827));
+
+    Widget headerCell(String text) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Text(text, style: headerStyle),
+      );
+    }
+
+    return Table(
+      defaultColumnWidth: const IntrinsicColumnWidth(),
+      border: TableBorder(
+        horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1),
+      ),
+      children: [
+        TableRow(
+          decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
+          children: [
+            headerCell('Branch'),
+            headerCell('Payments'),
+            headerCell('Successful'),
+            headerCell('Failed'),
+            headerCell('Paid (RM)'),
+            headerCell('Refund (RM)'),
+            headerCell('Net Revenue (RM)'),
+          ],
+        ),
+        if (data.isEmpty)
+          TableRow(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                child: Text('No data available', style: AppTypography.bodyMedium(context).apply(color: _muted)),
+              ),
+              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
+              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
+              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
+              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
+              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
+              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
+            ],
+          ),
+        for (int i = 0; i < data.length; i++)
+          TableRow(
+            decoration: BoxDecoration(color: i.isEven ? Colors.white : const Color(0xFFFAFAFA)),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _branchColors[i % _branchColors.length],
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(data[i].branchName ?? '—', style: cellStyle.copyWith(fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Text('${data[i].totalPayments ?? 0}', style: cellStyle),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD1FAE5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.check_circle_outline_rounded, size: 13, color: Color(0xFF059669)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${data[i].successfulPayments ?? 0}',
+                        style: const TextStyle(
+                          color: Color(0xFF065F46),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEE2E2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.cancel_outlined, size: 13, color: Color(0xFFEF4444)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${data[i].failedPayments ?? 0}',
+                        style: const TextStyle(
+                          color: Color(0xFF991B1B),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Text(data[i].totalPaidAmount ?? '0.00', style: cellStyle),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Text(
+                  data[i].totalRefundAmount ?? '0.00',
+                  style: cellStyle.copyWith(
+                    color: (double.tryParse(data[i].totalRefundAmount ?? '0') ?? 0) > 0
+                        ? const Color(0xFFF59E0B)
+                        : null,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Text(
+                  data[i].netRevenue ?? '0.00',
+                  style: cellStyle.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF0891B2),
+                  ),
+                ),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
 }
 
-class SummaryCard extends StatelessWidget {
-  final String title;
+class _CardConfig {
+  final String label;
   final String value;
-  const SummaryCard({super.key, required this.title, required this.value});
+  final IconData icon;
+  final Color accent;
+  final Color bg;
+  final Color valueColor;
+
+  const _CardConfig({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.accent,
+    required this.bg,
+    required this.valueColor,
+  });
+}
+
+class _SummaryCard extends StatelessWidget {
+  final _CardConfig config;
+  const _SummaryCard({required this.config});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(value, style: AppTypography.displayMedium(context)),
-        const SizedBox(height: 4),
-        Text(title, style: AppTypography.bodyMedium(context)),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(color: config.bg, borderRadius: BorderRadius.circular(10)),
+                child: Icon(config.icon, color: config.accent, size: 18),
+              ),
+              Container(
+                width: 4,
+                height: 32,
+                decoration: BoxDecoration(color: config.accent, borderRadius: BorderRadius.circular(2)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            config.value,
+            style: TextStyle(
+              fontSize: isMobile ? 16 : 20,
+              fontWeight: FontWeight.bold,
+              color: config.valueColor,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            config.label,
+            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280), fontSizeDelta: -1),
+          ),
+        ],
+      ),
     );
   }
 }

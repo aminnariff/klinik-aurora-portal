@@ -551,6 +551,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                       value: _appointmentBranch?.name,
                                                       onChanged: (p0) {
                                                         _appointmentBranch = p0;
+                                                        _service = null;
+                                                        serviceList = [];
+                                                        availableDateTime = [];
+                                                        dateTimeController.clear();
                                                         if (_appointmentBranch != null) {
                                                           ServiceBranchController.available(
                                                             context,
@@ -572,9 +576,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                   );
                                                                 }
                                                               }
+                                                              serviceList.sort((a, b) => a.name.compareTo(b.name));
                                                               rebuildDropdown.add(DateTime.now());
                                                             }
                                                           });
+                                                        } else {
+                                                          rebuildDropdown.add(DateTime.now());
                                                         }
                                                       },
                                                       width: 331,
@@ -716,7 +723,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                         'c54a2d91-499c-11f0-9169-bc24115a1342',
                                                       ) ==
                                                       false) {
-                                                    if (_appointmentBranch != null && (availableDateTime.isNotEmpty)) {
+                                                    if (context.read<AuthController>().isSuperAdmin &&
+                                                        _appointmentBranch == null) {
+                                                      showDialogError(
+                                                        context,
+                                                        ErrorMessage.required(
+                                                          field: 'appointmentPage'.tr(gender: 'branch'),
+                                                        ),
+                                                      );
+                                                    } else if (_appointmentBranch != null &&
+                                                        (availableDateTime.isNotEmpty)) {
                                                       DateTime now = DateTime.now();
                                                       availableDateTime = removePastDates(availableDateTime);
                                                       availableDateTime.sort(

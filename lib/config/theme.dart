@@ -2,14 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 
 ThemeData theme(BuildContext context) {
+  final baseScheme = ColorScheme.fromSeed(seedColor: primary);
   return ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(seedColor: primary),
+    colorScheme: baseScheme.copyWith(
+      surface: Colors.white,
+      surfaceTint: Colors.transparent,
+    ),
     brightness: Brightness.light,
     canvasColor: Colors.white,
     primaryColor: primary,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     fontFamily: 'Proxima',
+    dialogTheme: const DialogThemeData(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+    ),
+    popupMenuTheme: const PopupMenuThemeData(
+      color: Colors.white,
+      surfaceTintColor: Colors.transparent,
+    ),
+    cardTheme: const CardThemeData(
+      color: Colors.white,
+      surfaceTintColor: Colors.transparent,
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         textStyle: const TextStyle(color: Colors.white),

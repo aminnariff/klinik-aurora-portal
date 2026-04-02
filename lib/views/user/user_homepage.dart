@@ -363,7 +363,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                         DataCell(
                                           AppSelectableText(
                                             translateToBranchName(snapshot.userAllResponse?[index].branchId ?? '') ??
-                                                'N/A',
+                                                '-',
                                           ),
                                         ),
                                         DataCell(

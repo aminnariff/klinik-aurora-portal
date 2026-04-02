@@ -14,23 +14,23 @@ class DashboardController extends ChangeNotifier {
   }
 
   static Future<ApiResponse<DashboardResponse>> get(BuildContext context, {String? branchId}) async {
-    return ApiController()
-        .call(
-      context,
-      method: Method.get,
-      endpoint: 'admin/dashboard',
-    )
-        .then((value) {
+    return ApiController().call(context, method: Method.get, endpoint: 'admin/dashboard').then((value) {
       try {
-        return ApiResponse(
-          code: value.code,
-          data: DashboardResponse.fromJson(value.data),
-        );
+        return ApiResponse(code: value.code, data: DashboardResponse.fromJson(value.data));
       } catch (e) {
-        return ApiResponse(
-          code: 400,
-          message: e.toString(),
-        );
+        return ApiResponse(code: 400, message: e.toString());
+      }
+    });
+  }
+
+  static Future<ApiResponse<DashboardResponse>> getAppointment(BuildContext context, {String? branchId}) async {
+    return ApiController().call(context, method: Method.get, endpoint: 'admin/dashboard/branch-performance').then((
+      value,
+    ) {
+      try {
+        return ApiResponse(code: value.code, data: DashboardResponse.fromJson(value.data));
+      } catch (e) {
+        return ApiResponse(code: 400, message: e.toString());
       }
     });
   }

@@ -3,10 +3,11 @@ import 'package:intl/intl.dart';
 
 class DateRange {
   final String label;
+  final String shortLabel;
   final DateTime? start;
   final DateTime? end;
 
-  DateRange({required this.label, this.start, this.end});
+  DateRange({required this.label, required this.shortLabel, this.start, this.end});
 }
 
 class DateFilterDropdown extends StatefulWidget {
@@ -29,58 +30,65 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
 
   DateRange _defaultThisMonth() {
     final now = DateTime.now();
-    final startOfMonth = DateTime(now.year, now.month, 1);
-    final endOfMonth = DateTime(now.year, now.month + 1, 0);
     return DateRange(
       label: 'This month (${DateFormat('MMMM yyyy').format(now)})',
-      start: startOfMonth,
-      end: endOfMonth,
+      shortLabel: 'This Month',
+      start: DateTime(now.year, now.month, 1),
+      end: DateTime(now.year, now.month + 1, 0),
     );
   }
 
   List<DateRange> _generateDateRanges() {
     final now = DateTime.now();
-
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final endOfWeek = startOfWeek.add(const Duration(days: 6));
-
     final startOfMonth = DateTime(now.year, now.month, 1);
     final endOfMonth = DateTime(now.year, now.month + 1, 0);
-
     final startOfYear = DateTime(now.year, 1, 1);
     final endOfYear = DateTime(now.year, 12, 31);
-
     final lastMonth = DateTime(now.year, now.month - 1, 1);
     final endOfLastMonth = DateTime(now.year, now.month, 0);
-
     final nextMonth = DateTime(now.year, now.month + 1, 1);
     final endOfNextMonth = DateTime(now.year, now.month + 2, 0);
 
     return [
       DateRange(
-        label: 'Today (${DateFormat('dd MMMM yyyy').format(now)})',
+        label: 'Today (${DateFormat('dd MMM yyyy').format(now)})',
+        shortLabel: 'Today',
         start: DateTime(now.year, now.month, now.day),
         end: DateTime(now.year, now.month, now.day, 23, 59, 59),
       ),
       DateRange(
-        label:
-            'This week (${DateFormat('dd MMM').format(startOfWeek)} - ${DateFormat('dd MMM yyyy').format(endOfWeek)})',
+        label: 'This week (${DateFormat('dd MMM').format(startOfWeek)} – ${DateFormat('dd MMM').format(endOfWeek)})',
+        shortLabel: 'This Week',
         start: startOfWeek,
         end: endOfWeek,
       ),
       DateRange(
         label: 'Last month (${DateFormat('MMMM yyyy').format(lastMonth)})',
+        shortLabel: 'Last Month',
         start: lastMonth,
         end: endOfLastMonth,
       ),
-      DateRange(label: 'This month (${DateFormat('MMMM yyyy').format(now)})', start: startOfMonth, end: endOfMonth),
+      DateRange(
+        label: 'This month (${DateFormat('MMMM yyyy').format(now)})',
+        shortLabel: 'This Month',
+        start: startOfMonth,
+        end: endOfMonth,
+      ),
       DateRange(
         label: 'Next month (${DateFormat('MMMM yyyy').format(nextMonth)})',
+        shortLabel: 'Next Month',
         start: nextMonth,
         end: endOfNextMonth,
       ),
-      DateRange(label: 'This year (${now.year})', start: startOfYear, end: endOfYear),
-      DateRange(label: 'All time', start: null, end: null),
+      DateRange(
+        label: 'This year (${now.year})',
+        shortLabel: 'This Year',
+        start: startOfYear,
+        end: endOfYear,
+      ),
+      DateRange(label: 'All time', shortLabel: 'All Time', start: null, end: null),
     ];
   }
 
@@ -88,24 +96,52 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
   Widget build(BuildContext context) {
     final options = _generateDateRanges();
 
-    return PopupMenuButton<DateRange>(
-      color: Colors.white,
-      onSelected: (range) {
-        setState(() => _selected = range);
-        widget.onSelected(range);
-      },
-      itemBuilder: (context) {
-        return options.map((range) => PopupMenuItem<DateRange>(value: range, child: Text(range.label))).toList();
-      },
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _selected.label.split('(')[0].trim(), // "This month", etc.
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const Icon(Icons.keyboard_arrow_down),
-        ],
+        children: options.map((range) {
+          final selected = _selected.shortLabel == range.shortLabel;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Tooltip(
+              message: range.label,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() => _selected = range);
+                  widget.onSelected(range);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: selected ? const Color(0xFFDF6E98) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: selected ? const Color(0xFFDF6E98) : const Color(0xFFE5E7EB),
+                    ),
+                    boxShadow: selected
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFFDF6E98).withAlpha(51),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Text(
+                    range.shortLabel,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                      color: selected ? Colors.white : const Color(0xFF6B7280),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

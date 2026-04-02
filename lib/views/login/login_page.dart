@@ -385,7 +385,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 AppPadding.vertical(),
                                 SizedBox(
-                                  width: screenWidth1728(20),
+                                  width: screenWidthByBreakpoint(80, 60, 20),
                                   child: InputField(field: emailAttribute),
                                 ),
                                 AppPadding.vertical(),

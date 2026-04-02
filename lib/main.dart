@@ -22,6 +22,7 @@ import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/appointment_dashboard_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dashboard/branch_performance_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
@@ -135,6 +136,7 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<AdminController>(create: (_) => AdminController()),
             ChangeNotifierProvider<AppointmentController>(create: (_) => AppointmentController()),
             ChangeNotifierProvider<AppointmentDashboardController>(create: (_) => AppointmentDashboardController()),
+            ChangeNotifierProvider<BranchPerformanceController>(create: (_) => BranchPerformanceController()),
             ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
             ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),
             ChangeNotifierProvider<DashboardController>(create: (_) => DashboardController()),

@@ -1,17 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dashboard/branch_performance_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
 import 'package:klinik_aurora_portal/models/dashboard/dashboard_response.dart';
-import 'package:klinik_aurora_portal/views/homepage/graph.dart';
-import 'package:klinik_aurora_portal/views/homepage/graph2.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
+import 'package:klinik_aurora_portal/views/homepage/branch_performance_chart.dart';
+import 'package:klinik_aurora_portal/views/homepage/dashboard_stats.dart';
+import 'package:klinik_aurora_portal/views/homepage/registration_chart.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class MainDashboard extends StatefulWidget {
@@ -22,13 +21,18 @@ class MainDashboard extends StatefulWidget {
 }
 
 class _MainDashboardState extends State<MainDashboard> {
-  Color bgContainer = const Color.fromARGB(255, 248, 251, 255);
   List<UserData> userData = [];
 
   @override
   void initState() {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
+        BranchPerformanceController.get(context).then((value) {
+          if (responseCode(value.code) && mounted) {
+            context.read<BranchPerformanceController>().branchPerformanceResponse = value.data;
+          }
+        });
+
         DashboardController.get(context).then((value) {
           if (responseCode(value.code)) {
             final currentDate = DateTime.now();
@@ -69,7 +73,6 @@ class _MainDashboardState extends State<MainDashboard> {
                 totalRegistrationByDay: last7days,
               ),
             );
-            value.data;
           }
         });
       }
@@ -79,174 +82,59 @@ class _MainDashboardState extends State<MainDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    if (isMobile) return _buildMobileLayout();
+    return _buildDesktopLayout();
+  }
+
+  Widget _buildDesktopLayout() {
+    final contentWidth = screenWidth(85);
     return SingleChildScrollView(
       child: Column(
         children: [
-          Row(children: [firstContent()]),
           AppPadding.vertical(denominator: 2),
-          secondContent(),
+          SizedBox(width: contentWidth, child: const DashboardStats()),
+          AppPadding.vertical(denominator: 2),
+          Container(
+            width: contentWidth,
+            margin: EdgeInsets.symmetric(horizontal: screenPadding),
+            child: const RegistrationChart(),
+          ),
+          AppPadding.vertical(denominator: 2),
+          Container(
+            width: contentWidth,
+            margin: EdgeInsets.symmetric(horizontal: screenPadding),
+            child: const BranchPerformanceChart(),
+          ),
           AppPadding.vertical(),
         ],
       ),
     );
   }
 
-  Widget secondContent() {
-    return Container(
-      width: screenWidth(85),
-      margin: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 0),
-      decoration: BoxDecoration(
-        color: bgContainer,
-        border: Border.all(color: const Color.fromRGBO(226, 225, 225, 1)),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: const Column(
+  Widget _buildMobileLayout() {
+    // Charts are wrapped in a horizontally scrollable container so they never
+    // overflow — user can scroll right to see the full chart, or switch to table.
+    return SingleChildScrollView(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     const Text(
-          //       "APP SESSION",
-          //     ),
-          //     Button(
-          //       () {},
-          //     )
-          //   ],
-          // ),
-          Graph2Widget(),
+          AppPadding.vertical(denominator: 2),
+          const DashboardStats(),
+          AppPadding.vertical(denominator: 2),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenPadding),
+            child: const RegistrationChart(),
+          ),
+          AppPadding.vertical(denominator: 2),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenPadding),
+            child: const BranchPerformanceChart(),
+          ),
+          AppPadding.vertical(),
         ],
       ),
     );
   }
-
-  Expanded firstRowContent(Color color, String label, String total, {Color? textColor}) {
-    return Expanded(
-      child: CardContainer(
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding / 2, horizontal: screenPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: AppTypography.bodyLarge(context).apply(color: textColor)),
-              Text(
-                total,
-                style: AppTypography.bodyMedium(context).apply(color: textColor, fontSizeDelta: 10, fontWeightDelta: 3),
-              ),
-            ],
-          ),
-        ),
-        color: color,
-        margin: EdgeInsets.all(screenPadding / 2),
-      ),
-    );
-  }
-
-  Consumer<DashboardController> firstContent() {
-    return Consumer<DashboardController>(
-      builder: (context, snapshot, _) {
-        return SizedBox(
-          width: screenWidth(85),
-          child: Column(
-            children: [
-              Container(
-                height: 160,
-                margin: EdgeInsets.symmetric(horizontal: screenPadding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    firstRowContent(
-                      darkModeCardColor,
-                      "Total Users",
-                      "${snapshot.dashboardResponse?.data?.totalUser ?? ''}",
-                      textColor: Colors.white,
-                    ),
-                    firstRowContent(
-                      cardColor,
-                      "Total Active Users",
-                      "${snapshot.dashboardResponse?.data?.totalActiveUser ?? ''}",
-                    ),
-                    firstRowContent(
-                      cardColor,
-                      "Total Active Branch",
-                      "${snapshot.dashboardResponse?.data?.totalActiveBranch ?? ''}",
-                    ),
-                    firstRowContent(
-                      cardColor,
-                      "Total Active Promotion",
-                      "${snapshot.dashboardResponse?.data?.totalActivePromotion ?? ''}",
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 0),
-                decoration: BoxDecoration(
-                  color: bgContainer,
-                  border: Border.all(color: const Color.fromRGBO(226, 225, 225, 1)),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Row(
-                    //   crossAxisAlignment: CrossAxisAlignment.start,
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     const Text(
-                    //       "APP SESSION",
-                    //     ),
-                    //     Button(
-                    //       () {},
-                    //     )
-                    //   ],
-                    // ),
-                    GraphWidget(),
-                  ],
-                ),
-              ),
-              // Container(
-              //   height: screenHeight(27),
-              //   margin: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding),
-              //   decoration: BoxDecoration(
-              //       color: bgContainer,
-              //       border: Border.all(
-              //         color: const Color.fromRGBO(226, 225, 225, 1),
-              //       ),
-              //       borderRadius: BorderRadius.circular(30)),
-              // ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // secondContent() {
-  //   return Expanded(
-  //     child: SizedBox(
-  //       height: screenHeight(100),
-  //       width: screenWidth1728(10),
-  //       child: Column(
-  //         children: [
-  //           Expanded(
-  //             child: Container(
-  //               margin: EdgeInsets.fromLTRB(0, screenPadding * 2, screenPadding, screenPadding / 2),
-  //               decoration: BoxDecoration(
-  //                   color: bgContainer,
-  //                   border: Border.all(
-  //                     color: const Color.fromRGBO(226, 225, 225, 1),
-  //                   ),
-  //                   borderRadius: BorderRadius.circular(30)),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }
 
 class UserData {
