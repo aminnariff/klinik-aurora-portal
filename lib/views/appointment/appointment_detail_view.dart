@@ -8,24 +8,19 @@ import 'package:klinik_aurora_portal/controllers/service/service_branch_controll
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
-class AppointmentDetailsView extends StatefulWidget {
+class AppointmentDetailsView extends StatelessWidget {
   final AppointmentDetailResponse? response;
 
   const AppointmentDetailsView({super.key, required this.response});
 
   @override
-  State<AppointmentDetailsView> createState() => _AppointmentDetailsViewState();
-}
-
-class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
-  @override
   Widget build(BuildContext context) {
+    final data = response?.data;
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -35,168 +30,59 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              constraints: BoxConstraints(maxWidth: 800, maxHeight: 800),
-              child: CardContainer(
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(),
-                            Row(
-                              children: [
-                                Text('Appointment Details', style: AppTypography.displayMedium(context)),
-                                CopyButton(
-                                  textToCopy:
-                                      'Appointment Details\n\n${widget.response?.data?.user?.userFullName}\n${widget.response?.data?.user?.userPhone}\n${widget.response?.data?.user?.userEmail}\n${widget.response?.data?.service?.serviceName}\n${formatToDisplayDate(widget.response?.data?.appointmentDatetime ?? '')}\n${formatToDisplayTime(widget.response?.data?.appointmentDatetime ?? '')}\n${widget.response?.data?.branch?.branchName ?? ''}\nCreated Date : ${dateConverter(widget.response?.data?.createdDate ?? '')}\n',
-                                  tooltip: 'Copy Appointment Details',
-                                ),
-                              ],
-                            ),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 32),
-                        // SECTION 1 - Patient & Branch
-                        Row(
+              constraints: const BoxConstraints(maxWidth: 840, maxHeight: 840),
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _headerBar(context, data),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: _infoBlock("Patient Details", [
-                                _infoRow(widget.response?.data?.user?.userFullName?.titleCase() ?? ''),
-                                if (notNullOrEmptyString(widget.response?.data?.user?.userNric))
-                                  _infoRow(widget.response?.data?.user?.userNric ?? ''),
-                                _infoRow(widget.response?.data?.user?.userPhone ?? ''),
-                                _infoRow(widget.response?.data?.user?.userEmail ?? ''),
-                                const SizedBox(height: 12),
-                                _infoLabel("Note"),
-                                _infoRow(widget.response?.data?.appointmentNote ?? '-'),
-                                const SizedBox(height: 12),
-                                if (widget.response?.data?.service?.dueDateToggle == 1) ...[
-                                  _infoLabel("Estimated Due Date (EDD)"),
-                                  _infoRow(
-                                    dateConverter(widget.response?.data?.customerDueDate, format: 'dd-MM-yyyy') ?? '-',
-                                  ),
-                                  const SizedBox(height: 12),
-                                  if (notNullOrEmptyString(widget.response?.data?.service?.eddRequired)) ...[
-                                    _infoLabel("Estimated gestational age at appointment"),
-                                    _infoRow(
-                                      calculateGestationalAge(
-                                            edd: widget.response?.data?.customerDueDate ?? '',
-                                            appointmentDate: widget.response?.data?.appointmentDatetime ?? '',
-                                          ) ??
-                                          '-',
-                                    ),
-                                  ],
-                                ],
-                                const SizedBox(height: 8),
-                              ]),
+                            // Main info row
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: _patientSection(context, data)),
+                                const SizedBox(width: 20),
+                                Expanded(child: _appointmentSection(context, data)),
+                              ],
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _infoBlock("Branch", [
-                                _infoRow(widget.response?.data?.branch?.branchName ?? ''),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    _infoLabel("Service"),
-                                    if (widget.response?.data?.service?.serviceName?.toLowerCase().contains(
-                                          'screening',
-                                        ) ==
-                                        true)
-                                      TextButton(
-                                        onPressed: () {
-                                          showLoading();
-                                          ServiceBranchController.rescanServiceBranchId(
-                                            context,
-                                            branchId: widget.response?.data?.branch?.branchId,
-                                          ).then((value) {
-                                            dismissLoading();
-                                            showDialog(
-                                              context: context,
-                                              builder: (_) {
-                                                return RescanAppointment(
-                                                  appointment: widget.response,
-                                                  serviceBranchId: value.data?.serviceBranchId ?? '',
-                                                );
-                                              },
-                                            );
-                                          });
-                                        },
-                                        child: Text(
-                                          'Rescan',
-                                          style: AppTypography.bodyMedium(
-                                            context,
-                                          ).apply(color: Colors.blue, fontWeightDelta: 1),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                _infoRow(
-                                  '${widget.response?.data?.service?.serviceName}\nRM ${widget.response?.data?.service?.servicePrice}',
-                                ),
-                                const SizedBox(height: 12),
-                                _infoLabel("Status"),
-                                _infoRow(
-                                  appointmentStatus
-                                      .firstWhere((e) => widget.response?.data?.appointmentStatus?.toString() == e.key)
-                                      .name,
-                                  textColor: appointmentStatusColors[widget.response?.data?.appointmentStatus],
-                                  bold: 1,
-                                ),
-                                const SizedBox(height: 12),
-                                _infoLabel("Slots"),
-                                _infoRow(
-                                  dateConverter(
-                                        widget.response?.data?.appointmentDatetime ?? '',
-                                        format: 'dd-MM-yyyy HH:mm',
-                                      ) ??
-                                      '',
-                                ),
-                              ]),
+                            const SizedBox(height: 20),
+                            const Divider(color: Color(0xFFF3F4F6), height: 1),
+                            const SizedBox(height: 20),
+                            // Fee row
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: _feeSection(context, data)),
+                                const SizedBox(width: 20),
+                                Expanded(child: _metaSection(context, data)),
+                              ],
                             ),
+                            // Rating / feedback (conditional)
+                            if (data?.appointmentRating != null ||
+                                (data?.appointmentFeedback != null && data!.appointmentFeedback!.isNotEmpty)) ...[
+                              const SizedBox(height: 20),
+                              const Divider(color: Color(0xFFF3F4F6), height: 1),
+                              const SizedBox(height: 20),
+                              _feedbackSection(context, data),
+                            ],
                           ],
                         ),
-
-                        const Divider(height: 32),
-
-                        // SECTION 2 - Payment
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _infoBlock("Booking Fee", [
-                                _infoRow("✅ Paid"),
-                                const SizedBox(height: 8),
-                                _infoLabel("Booking Fee Amount"),
-                                _infoRow(widget.response?.data?.service?.serviceBookingFee ?? ''),
-                                _infoLabel("Balance"),
-                                _infoRow(
-                                  'RM ${double.parse(widget.response?.data?.service?.servicePrice ?? '') - double.parse(widget.response?.data?.service?.serviceBookingFee ?? '')}',
-                                ),
-                              ]),
-                            ),
-                            Expanded(
-                              child: _infoBlock("", [
-                                _infoLabel("Created Date"),
-                                _infoRow(dateConverter(widget.response?.data?.createdDate) ?? ''),
-                                _infoLabel("Updated Date"),
-                                _infoRow(dateConverter(widget.response?.data?.modifiedDate) ?? ''),
-                              ]),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -206,44 +92,440 @@ class _AppointmentDetailsViewState extends State<AppointmentDetailsView> {
     );
   }
 
-  Widget _infoBlock(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppSelectableText(title, style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
-        const SizedBox(height: 8),
-        ...children,
-      ],
-    );
-  }
-
-  Widget _infoRow(String value, {Color? textColor, int? bold}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: AppSelectableText(
-        value,
-        style: AppTypography.bodyMedium(context).apply(color: textColor, fontWeightDelta: bold ?? 0),
+  Widget _headerBar(BuildContext context, Data? data) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF9FAFB),
+        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
+          const SizedBox(width: 8),
+          const Text('Appointment Details', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+          if (data?.appointmentId != null) ...[
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
+              child: Text(
+                '#${data!.appointmentId!.substring(0, 8).toUpperCase()}',
+                style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontFamily: 'monospace'),
+              ),
+            ),
+          ],
+          const Spacer(),
+          CopyButton(
+            textToCopy:
+                'Appointment Details\n\n${data?.user?.userFullName}\n${data?.user?.userPhone}\n${data?.user?.userEmail}\n${data?.service?.serviceName}\n${formatToDisplayDate(data?.appointmentDatetime ?? '')}\n${formatToDisplayTime(data?.appointmentDatetime ?? '')}\n${data?.branch?.branchName ?? ''}\nCreated: ${dateConverter(data?.createdDate ?? '')}\n',
+            tooltip: 'Copy Appointment Details',
+          ),
+          const SizedBox(width: 4),
+          CloseButton(onPressed: () => context.pop()),
+        ],
       ),
     );
   }
 
-  Widget _infoLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 4),
-      child: AppSelectableText(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+  Widget _patientSection(BuildContext context, Data? data) {
+    final user = data?.user;
+    final name = user?.userFullName?.titleCase() ?? '—';
+    final initials = name.trim().split(' ').where((w) => w.isNotEmpty).take(2).map((w) => w[0].toUpperCase()).join();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('Patient'),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: primary.withAlpha(30),
+              child: Text(
+                initials,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: primary),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                  if (user?.userPhone != null) _subtleText(user!.userPhone!),
+                  if (user?.userEmail != null) _subtleText(user!.userEmail!),
+                  if (notNullOrEmptyString(user?.userNric)) _subtleText('NRIC: ${user!.userNric}'),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (notNullOrEmptyString(data?.appointmentNote)) ...[
+          const SizedBox(height: 14),
+          _fieldLabel('Note'),
+          const SizedBox(height: 4),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9FAFB),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            child: AppSelectableText(
+              data!.appointmentNote!,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+            ),
+          ),
+        ],
+        if (data?.service?.dueDateToggle == 1) ...[
+          const SizedBox(height: 14),
+          _fieldLabel('Estimated Due Date (EDD)'),
+          const SizedBox(height: 4),
+          _valueText(dateConverter(data?.customerDueDate, format: 'dd-MM-yyyy') ?? '—'),
+          if (notNullOrEmptyString(data?.service?.eddRequired)) ...[
+            const SizedBox(height: 8),
+            _fieldLabel('Gestational Age at Appointment'),
+            const SizedBox(height: 4),
+            _valueText(
+              calculateGestationalAge(
+                    edd: data?.customerDueDate ?? '',
+                    appointmentDate: data?.appointmentDatetime ?? '',
+                  ) ??
+                  '—',
+            ),
+          ],
+        ],
+      ],
     );
   }
 
-  // Widget _infoBox(String text) {
-  //   return Container(
-  //     width: double.infinity,
-  //     padding: const EdgeInsets.all(12),
-  //     decoration: BoxDecoration(
-  //       color: Colors.grey.shade100,
-  //       border: Border.all(color: Colors.grey.shade400),
-  //       borderRadius: BorderRadius.circular(8),
-  //     ),
-  //     child: AppSelectableText(text.isEmpty ? "—" : text, style: const TextStyle(fontSize: 14)),
-  //   );
-  // }
+  Widget _appointmentSection(BuildContext context, Data? data) {
+    final statusCode = data?.appointmentStatus ?? 0;
+    final statusEntry = appointmentStatus.firstWhere(
+      (e) => statusCode.toString() == e.key,
+      orElse: () => DropdownAttribute('0', 'Unknown'),
+    );
+    final statusColor = appointmentStatusColors[statusCode] ?? Colors.grey;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('Appointment'),
+        const SizedBox(height: 10),
+        // Date & Time chip
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F9FF),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: secondaryColor.withAlpha(60)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.event_rounded, size: 18, color: secondaryColor),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    formatToDisplayDate(data?.appointmentDatetime ?? ''),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF111827)),
+                  ),
+                  Text(
+                    formatToDisplayTime(data?.appointmentDatetime ?? ''),
+                    style: const TextStyle(fontSize: 13, color: secondaryColor, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        _fieldLabel('Branch'),
+        const SizedBox(height: 4),
+        _valueText(data?.branch?.branchName ?? '—'),
+        const SizedBox(height: 12),
+        // Service row
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _fieldLabel('Service'),
+                  const SizedBox(height: 4),
+                  _valueText(data?.service?.serviceName ?? '—'),
+                  if (data?.service?.servicePrice != null) _subtleText('RM ${data!.service!.servicePrice}'),
+                ],
+              ),
+            ),
+            // Rescan button (for screening services)
+            if (data?.service?.serviceName?.toLowerCase().contains('screening') == true)
+              TextButton.icon(
+                onPressed: () {
+                  showLoading();
+                  ServiceBranchController.rescanServiceBranchId(context, branchId: data?.branch?.branchId).then((
+                    value,
+                  ) {
+                    dismissLoading();
+                    showDialog(
+                      context: context,
+                      builder: (_) => RescanAppointment(
+                        appointment: AppointmentDetailResponse(data: data),
+                        serviceBranchId: value.data?.serviceBranchId ?? '',
+                      ),
+                    );
+                  });
+                },
+                icon: const Icon(Icons.refresh_rounded, size: 14),
+                label: const Text('Rescan', style: TextStyle(fontSize: 12)),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _fieldLabel('Status'),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: statusColor.withAlpha(30),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: statusColor.withAlpha(80)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                statusEntry.name,
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: statusColor),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _feeSection(BuildContext context, Data? data) {
+    final price = double.tryParse(data?.service?.servicePrice ?? '');
+    final bookingFee = double.tryParse(data?.service?.serviceBookingFee ?? '');
+    final isCompleted = data?.appointmentStatus == 5;
+
+    // Completed = fully paid at clinic → remaining balance is RM 0.00
+    final balance = isCompleted
+        ? (price != null ? 0.0 : null)
+        : (price != null && bookingFee != null)
+        ? price - bookingFee
+        : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('Fees'),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _feeCard(
+                label: 'Service Price',
+                value: price != null ? 'RM ${price.toStringAsFixed(2)}' : '—',
+                icon: Icons.receipt_long_outlined,
+                color: const Color(0xFF6366F1),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _feeCard(
+                label: 'Booking Fee',
+                value: bookingFee != null ? 'RM ${bookingFee.toStringAsFixed(2)}' : '—',
+                icon: Icons.payments_outlined,
+                color: const Color(0xFF0369A1),
+              ),
+            ),
+          ],
+        ),
+        if (balance != null) ...[
+          const SizedBox(height: 10),
+          _feeCard(
+            label: isCompleted ? 'Remaining Balance (Fully Paid)' : 'Remaining Balance',
+            value: 'RM ${balance.toStringAsFixed(2)}',
+            icon: isCompleted || balance == 0
+                ? Icons.check_circle_outline_rounded
+                : Icons.account_balance_wallet_outlined,
+            color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+            fullWidth: true,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _feeCard({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color color,
+    bool fullWidth = false,
+  }) {
+    return Container(
+      width: fullWidth ? double.infinity : null,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withAlpha(15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withAlpha(40)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: color),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _metaSection(BuildContext context, Data? data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('Record Info'),
+        const SizedBox(height: 10),
+        _metaRow(Icons.add_circle_outline, 'Created', dateConverter(data?.createdDate) ?? '—'),
+        const SizedBox(height: 8),
+        _metaRow(Icons.edit_outlined, 'Last Updated', dateConverter(data?.modifiedDate) ?? '—'),
+        if (data?.appointmentId != null) ...[
+          const SizedBox(height: 8),
+          _metaRow(Icons.tag_rounded, 'Appointment ID', data!.appointmentId!.toUpperCase()),
+        ],
+      ],
+    );
+  }
+
+  Widget _metaRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 14, color: const Color(0xFF9CA3AF)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+              ),
+              Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _feedbackSection(BuildContext context, Data? data) {
+    final rating = int.tryParse(data?.appointmentRating ?? '');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionLabel('Patient Feedback'),
+        const SizedBox(height: 10),
+        if (rating != null)
+          Row(
+            children: [
+              _fieldLabel('Rating'),
+              const SizedBox(width: 12),
+              ...List.generate(
+                5,
+                (i) => Icon(
+                  i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                  size: 18,
+                  color: i < rating ? const Color(0xFFF59E0B) : Colors.grey.shade300,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '$rating/5',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFF59E0B)),
+              ),
+            ],
+          ),
+        if (data?.appointmentFeedback != null && data!.appointmentFeedback!.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _fieldLabel('Comments'),
+          const SizedBox(height: 4),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9FAFB),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            child: AppSelectableText(
+              data.appointmentFeedback!,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _sectionLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF9CA3AF), letterSpacing: 0.8),
+    );
+  }
+
+  Widget _fieldLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+    );
+  }
+
+  Widget _valueText(String text) {
+    return AppSelectableText(
+      text,
+      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF111827)),
+    );
+  }
+
+  Widget _subtleText(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 1),
+      child: Text(text, style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+    );
+  }
 }

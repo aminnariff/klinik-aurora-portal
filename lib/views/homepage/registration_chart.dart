@@ -150,7 +150,6 @@ class _RegistrationChartState extends State<RegistrationChart> {
     );
   }
 
-  // ─── Chart ─────────────────────────────────────────────────────────────────
 
   Widget _buildChart(Data? data) {
     if (_showDaily) {
@@ -312,8 +311,6 @@ class _RegistrationChartState extends State<RegistrationChart> {
     final max = values.reduce((a, b) => a > b ? a : b);
     return max == 0 ? 10 : max * 1.4;
   }
-
-  // ─── Table ─────────────────────────────────────────────────────────────────
 
   Widget _buildTable(Data? data) {
     final days = data?.totalRegistrationByDay ?? [];

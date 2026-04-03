@@ -88,7 +88,6 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   Widget build(BuildContext context) =>
       LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
 
-  // ─── Mobile ──────────────────────────────────────────────────────────────────
 
   Widget _mobileView() {
     return Consumer<DoctorController>(
@@ -154,7 +153,6 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     );
   }
 
-  // ─── Desktop ─────────────────────────────────────────────────────────────────
 
   Widget _desktopView() {
     return Scaffold(
@@ -411,7 +409,6 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     );
   }
 
-  // ─── Filter Panel ─────────────────────────────────────────────────────────────
 
   void _showFilterPanel() {
     showDialog(
@@ -487,7 +484,6 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     );
   }
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────────
 
   Widget _searchInput(TextEditingController ctrl, String hint) {
     return TextField(

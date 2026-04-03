@@ -365,7 +365,6 @@ class _PointHomepageState extends State<PointHomepage> {
     );
   }
 
-  // ── How It Works Banner ───────────────────────────────────────────────────
 
   Widget _howItWorksBanner() {
     return Container(

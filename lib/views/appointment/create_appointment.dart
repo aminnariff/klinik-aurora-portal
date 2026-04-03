@@ -101,6 +101,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   service_branch_available_model.Data? selectedService;
   GestationalController? gestationalResult;
 
+  bool get _isLocked =>
+      widget.appointment?.appointmentStatus == 2 ||
+      widget.appointment?.appointmentStatus == 4 ||
+      widget.appointment?.appointmentStatus == 5;
+
   @override
   void initState() {
     patientNameController.controller.text = widget.appointment?.user?.userFullName?.titleCase() ?? '';
@@ -221,570 +226,761 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                AppSelectableText('Appointment Details', style: AppTypography.bodyLarge(context)),
-                                if (widget.type == 'update')
-                                  CopyButton(
-                                    textToCopy:
-                                        'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
-                                    tooltip: 'Copy Appointment Details',
-                                  ),
-                              ],
-                            ),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              constraints: const BoxConstraints(maxWidth: 840, maxHeight: 860),
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ── Header bar ──────────────────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF9FAFB),
+                        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.type == 'create' ? 'New Appointment' : 'Update Appointment',
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                          ),
+                          if (widget.appointment?.appointmentId != null) ...[
+                            const SizedBox(width: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '#${widget.appointment!.appointmentId!.substring(0, 8).toUpperCase()}',
+                                style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontFamily: 'monospace'),
+                              ),
                             ),
                           ],
-                        ),
-                        AppPadding.vertical(denominator: 2),
-                        Container(
-                          constraints: BoxConstraints(maxWidth: 750, minWidth: 600),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Consumer<ServiceBranchController>(
-                                builder: (context, serviceBranchController, _) {
-                                  return StreamBuilder<DateTime>(
-                                    stream: rebuild.stream,
-                                    builder: (context, snapshot) {
-                                      return Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            labelValue(
-                                              'Patient Details',
-                                              patientNameController.controller.text,
-                                              alignStart: true,
-                                            ),
-                                            if (notNullOrEmptyString(widget.appointment?.user?.userNric))
-                                              AppSelectableText(
-                                                widget.appointment?.user?.userNric ?? '',
-                                                style: AppTypography.bodyMedium(context),
-                                              ),
-                                            AppSelectableText(
-                                              patientContactNoController.controller.text,
-                                              style: AppTypography.bodyMedium(context),
-                                            ),
-                                            AppSelectableText(
-                                              patientEmailController.controller.text,
-                                              style: AppTypography.bodyMedium(context),
-                                            ),
-                                            AppPadding.vertical(denominator: 1),
-                                            (widget.appointment?.appointmentStatus == 2 ||
-                                                    widget.appointment?.appointmentStatus == 6)
-                                                ? appointmentNoteController.controller.text != ''
-                                                      ? labelValue('Notes', appointmentNoteController.controller.text)
-                                                      : SizedBox()
-                                                : InputField(field: appointmentNoteController),
-                                            AppPadding.vertical(denominator: 2),
-                                            if ((widget.appointment?.service?.dueDateToggle == 1) ||
-                                                selectedService?.dueDateToggle == 1)
-                                              (widget.appointment?.appointmentStatus == 2 ||
-                                                      widget.appointment?.appointmentStatus == 6)
-                                                  ? dateTimeController.text != ''
-                                                        ? labelValue('Due Date', dateTimeController.text)
-                                                        : SizedBox()
-                                                  : GestureDetector(
-                                                      onTap: () async {
-                                                        dueDateCalendar();
-                                                      },
-                                                      child: ReadOnly(
-                                                        InputField(field: dueDateController),
-                                                        isEditable: false,
-                                                      ),
-                                                    ),
-                                            if (((notNullOrEmptyString(widget.appointment?.service?.eddRequired) &&
-                                                        widget.appointment?.service?.dueDateToggle == 1) ||
-                                                    selectedService?.dueDateToggle == 1 &&
-                                                        selectedService?.eddRequired != null) &&
-                                                dueDateController.controller.text != '' &&
-                                                dateTimeController.text != '')
-                                              StreamBuilder(
-                                                stream: rebuild.stream,
-                                                builder: (context, asyncSnapshot) {
-                                                  return gestationalResult != null
-                                                      ? Padding(
-                                                          padding: const EdgeInsets.only(top: 4.0),
-                                                          child: Text(
-                                                            getGestationalStatusMessage(
-                                                                  result: gestationalResult,
-                                                                  range:
-                                                                      widget.appointment?.service?.eddRequired ??
-                                                                      selectedService?.eddRequired ??
-                                                                      '',
-                                                                  showRange: true,
-                                                                ) ??
-                                                                '',
-                                                            style: AppTypography.bodyMedium(context).apply(
-                                                              color: gestationalStatusColor(gestationalResult?.status),
+                          const Spacer(),
+                          if (widget.type == 'update')
+                            CopyButton(
+                              textToCopy:
+                                  'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
+                              tooltip: 'Copy Appointment Details',
+                            ),
+                          const SizedBox(width: 4),
+                          CloseButton(onPressed: () => context.pop()),
+                        ],
+                      ),
+                    ),
+                    // ── Scrollable body ─────────────────────────────────────
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              constraints: const BoxConstraints(maxWidth: 760, minWidth: 580),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Consumer<ServiceBranchController>(
+                                    builder: (context, serviceBranchController, _) {
+                                      return StreamBuilder<DateTime>(
+                                        stream: rebuild.stream,
+                                        builder: (context, snapshot) {
+                                          return Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                labelValue(
+                                                  'Patient Details',
+                                                  patientNameController.controller.text,
+                                                  alignStart: true,
+                                                ),
+                                                if (notNullOrEmptyString(widget.appointment?.user?.userNric))
+                                                  AppSelectableText(
+                                                    widget.appointment?.user?.userNric ?? '',
+                                                    style: AppTypography.bodyMedium(context),
+                                                  ),
+                                                AppSelectableText(
+                                                  patientContactNoController.controller.text,
+                                                  style: AppTypography.bodyMedium(context),
+                                                ),
+                                                AppSelectableText(
+                                                  patientEmailController.controller.text,
+                                                  style: AppTypography.bodyMedium(context),
+                                                ),
+                                                AppPadding.vertical(denominator: 1),
+                                                _isLocked
+                                                    ? appointmentNoteController.controller.text != ''
+                                                          ? labelValue(
+                                                              'Notes',
+                                                              appointmentNoteController.controller.text,
+                                                            )
+                                                          : SizedBox()
+                                                    : InputField(field: appointmentNoteController),
+                                                AppPadding.vertical(denominator: 2),
+                                                if ((widget.appointment?.service?.dueDateToggle == 1) ||
+                                                    selectedService?.dueDateToggle == 1)
+                                                  _isLocked
+                                                      ? dateTimeController.text != ''
+                                                            ? labelValue('Due Date', dateTimeController.text)
+                                                            : SizedBox()
+                                                      : GestureDetector(
+                                                          onTap: () async {
+                                                            dueDateCalendar();
+                                                          },
+                                                          child: ReadOnly(
+                                                            InputField(field: dueDateController),
+                                                            isEditable: false,
+                                                          ),
+                                                        ),
+                                                if (((notNullOrEmptyString(widget.appointment?.service?.eddRequired) &&
+                                                            widget.appointment?.service?.dueDateToggle == 1) ||
+                                                        (selectedService?.dueDateToggle == 1 &&
+                                                            selectedService?.eddRequired != null)) &&
+                                                    dueDateController.controller.text != '')
+                                                  StreamBuilder(
+                                                    stream: rebuild.stream,
+                                                    builder: (context, asyncSnapshot) {
+                                                      if (dateTimeController.text == '') {
+                                                        return Container(
+                                                          margin: const EdgeInsets.only(top: 6),
+                                                          padding: const EdgeInsets.symmetric(
+                                                            horizontal: 10,
+                                                            vertical: 7,
+                                                          ),
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.grey.withAlpha(18),
+                                                            borderRadius: BorderRadius.circular(8),
+                                                            border: Border.all(
+                                                              color: Colors.grey.withAlpha(60),
                                                             ),
                                                           ),
-                                                        )
-                                                      : SizedBox();
-                                                },
-                                              ),
-                                            if (widget.appointment?.service?.serviceBookingFee != null ||
-                                                (_service != null &&
-                                                    notNullOrEmptyString(selectedService?.serviceBookingFee) == true) ||
-                                                (widget.type == 'update' && _status?.key == '6'))
-                                              Container(
-                                                padding: EdgeInsets.only(bottom: 8),
-                                                width: screenWidth1728(30),
-                                                child: StreamBuilder<DateTime>(
-                                                  stream: fileRebuild.stream,
-                                                  builder: (context, snapshot) {
-                                                    return Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        AppPadding.vertical(),
-                                                        if ((selectedFiles.isEmpty &&
-                                                                widget.type == 'create' &&
-                                                                (_service != null &&
-                                                                    notNullOrEmptyString(
-                                                                          selectedService?.serviceBookingFee,
-                                                                        ) ==
-                                                                        true)) ||
-                                                            (selectedFiles.isEmpty &&
-                                                                widget.type == 'update' &&
-                                                                _status?.key == '6' &&
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.info_outline_rounded,
+                                                                size: 13,
+                                                                color: Colors.grey.shade500,
+                                                              ),
+                                                              const SizedBox(width: 6),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  'Select appointment date to check eligibility',
+                                                                  style: TextStyle(
+                                                                    fontSize: 12,
+                                                                    color: Colors.grey.shade600,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      }
+                                                      if (gestationalResult == null) return const SizedBox();
+                                                      final color = gestationalStatusColor(gestationalResult?.status);
+                                                      final isEligible =
+                                                          gestationalResult?.status == GestationalEligibility.eligible;
+                                                      return Container(
+                                                        margin: const EdgeInsets.only(top: 6),
+                                                        padding: const EdgeInsets.symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 8,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: color.withAlpha(18),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                          border: Border.all(color: color.withAlpha(60)),
+                                                        ),
+                                                        child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 1),
+                                                              child: Icon(
+                                                                isEligible
+                                                                    ? Icons.check_circle_rounded
+                                                                    : Icons.warning_amber_rounded,
+                                                                size: 13,
+                                                                color: color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(width: 6),
+                                                            Flexible(
+                                                              child: Text(
+                                                                getGestationalStatusMessage(
+                                                                      result: gestationalResult,
+                                                                      range:
+                                                                          widget.appointment?.service?.eddRequired ??
+                                                                          selectedService?.eddRequired ??
+                                                                          '',
+                                                                      showRange: true,
+                                                                    ) ??
+                                                                    '',
+                                                                style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: color,
+                                                                  height: 1.4,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                if (widget.appointment?.service?.serviceBookingFee != null ||
+                                                    (_service != null &&
+                                                        notNullOrEmptyString(selectedService?.serviceBookingFee) ==
+                                                            true) ||
+                                                    (widget.type == 'update' && _status?.key == '6'))
+                                                  Container(
+                                                    padding: EdgeInsets.only(bottom: 8),
+                                                    width: screenWidth1728(30),
+                                                    child: StreamBuilder<DateTime>(
+                                                      stream: fileRebuild.stream,
+                                                      builder: (context, snapshot) {
+                                                        return Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          children: [
+                                                            AppPadding.vertical(),
+                                                            if (_status?.key == '6' &&
                                                                 widget.appointment?.payment?.any(
                                                                       (element) => element.paymentType == 4,
                                                                     ) ==
-                                                                    false)) ...[
-                                                          Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              UploadDocumentsField(
-                                                                title: 'promotionPage'.tr(gender: 'browseFile'),
-                                                                fieldTitle: _status?.key == '6'
-                                                                    ? 'appointmentPage'.tr(gender: 'refundProof')
-                                                                    : 'appointmentPage'.tr(gender: 'paymentProof'),
-                                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                                action: () async {
-                                                                  documentErrorMessage.add(null);
-                                                                  FilePickerResult? result = await FilePicker.platform
-                                                                      .pickFiles();
-
-                                                                  if (result != null) {
-                                                                    PlatformFile file = result.files.first;
-                                                                    if (supportedExtensions.contains(file.extension)) {
-                                                                      debugPrint(bytesToMB(file.size).toString());
-                                                                      debugPrint(file.name);
-                                                                      if (bytesToMB(file.size) < 1.0) {
-                                                                        Uint8List? fileBytes = result.files.first.bytes;
-                                                                        String fileName = result.files.first.name;
-
-                                                                        selectedFiles.add(
-                                                                          FileAttribute(
-                                                                            name: fileName,
-                                                                            value: fileBytes,
-                                                                          ),
-                                                                        );
-                                                                        fileRebuild.add(DateTime.now());
-                                                                      } else {
-                                                                        showDialogError(
-                                                                          context,
-                                                                          'error'.tr(
-                                                                            gender: 'err-21',
-                                                                            args: [fileSizeLimit.toStringAsFixed(0)],
-                                                                          ),
-                                                                        );
-                                                                      }
-                                                                    } else {
-                                                                      showDialogError(
-                                                                        context,
-                                                                        'error'.tr(gender: 'err-22'),
-                                                                      );
-                                                                    }
-                                                                  } else {
-                                                                    // User canceled the picker
-                                                                  }
-                                                                },
-                                                                cancelAction: () {},
-                                                              ),
-                                                              StreamBuilder<String?>(
-                                                                stream: documentErrorMessage.stream,
-                                                                builder: (context, snapshot) {
-                                                                  return snapshot.data == null
-                                                                      ? SizedBox()
-                                                                      : AppSelectableText(
-                                                                          snapshot.data ?? '',
-                                                                          style: AppTypography.bodyMedium(
-                                                                            context,
-                                                                          ).apply(color: errorColor, fontSizeDelta: -1),
-                                                                        );
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                        for (int index = 0; index < selectedFiles.length; index++)
-                                                          ListTile(
-                                                            title: GestureDetector(
-                                                              onTap: () {
-                                                                if (selectedFiles[index].path != null ||
-                                                                    selectedFiles[index].value != null) {
-                                                                  showDialog(
-                                                                    context: context,
-                                                                    builder: (BuildContext context) {
-                                                                      return GestureDetector(
-                                                                        onTap: () {
-                                                                          context.pop();
-                                                                        },
-                                                                        child: Row(
-                                                                          mainAxisSize: MainAxisSize.min,
-                                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                                          children: [
-                                                                            Flexible(
-                                                                              child: CardContainer(
-                                                                                selectedFiles[index].value != null
-                                                                                    ? Image.memory(
-                                                                                        selectedFiles[index].value!,
-                                                                                      )
-                                                                                    : selectedFiles[index].path != null
-                                                                                    ? Padding(
-                                                                                        padding: EdgeInsets.all(
-                                                                                          screenPadding,
-                                                                                        ),
-                                                                                        child: Image.network(
-                                                                                          '${Environment.imageUrl}${selectedFiles[index].path}',
-                                                                                        ),
-                                                                                      )
-                                                                                    : const SizedBox(),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  );
-                                                                }
-                                                              },
-                                                              child: Row(
-                                                                children: [
-                                                                  Text(
-                                                                    '${index + 1}. ',
-                                                                    style: AppTypography.bodyMedium(context),
+                                                                    false) ...[
+                                                              Container(
+                                                                margin: const EdgeInsets.only(bottom: 8),
+                                                                padding: const EdgeInsets.symmetric(
+                                                                  horizontal: 12,
+                                                                  vertical: 8,
+                                                                ),
+                                                                decoration: BoxDecoration(
+                                                                  color: const Color(0xFFFFF7ED),
+                                                                  borderRadius: BorderRadius.circular(8),
+                                                                  border: Border.all(
+                                                                    color: const Color(0xFFFB923C).withAlpha(80),
                                                                   ),
-                                                                  Flexible(
-                                                                    child: Text(
-                                                                      '  ${selectedFiles[index].name ?? ''}',
-                                                                      style: AppTypography.bodyMedium(
-                                                                        context,
-                                                                      ).apply(color: Colors.blue),
+                                                                ),
+                                                                child: const Row(
+                                                                  children: [
+                                                                    Icon(
+                                                                      Icons.info_outline_rounded,
+                                                                      size: 14,
+                                                                      color: Color(0xFFEA580C),
                                                                     ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            enableFeedback: true,
-                                                            enabled: true,
-                                                            trailing: IconButton(
-                                                              icon: const Icon(Icons.close),
-                                                              tooltip: 'button'.tr(gender: 'remove'),
-                                                              onPressed: () {
-                                                                selectedFiles.removeAt(0);
-                                                                fileRebuild.add(DateTime.now());
-                                                              },
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                              AppPadding.horizontal(),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    if (widget.type == 'update')
-                                      labelValue(
-                                        'Branch',
-                                        widget.appointment?.branch?.branchName ?? '',
-                                        alignStart: true,
-                                      ),
-                                    if (widget.type == 'create')
-                                      StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return Consumer<AuthController>(
-                                            builder: (context, authController, _) {
-                                              return Column(
-                                                children: [
-                                                  AppDropdown(
-                                                    attributeList: DropdownAttributeList(
-                                                      authController.isSuperAdmin ? branches : [],
-                                                      labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                                      isEditable: authController.isSuperAdmin,
-                                                      fieldColor: authController.isSuperAdmin
-                                                          ? null
-                                                          : textFormFieldUneditableColor,
-                                                      value: _appointmentBranch?.name,
-                                                      onChanged: (p0) {
-                                                        _appointmentBranch = p0;
-                                                        _service = null;
-                                                        serviceList = [];
-                                                        availableDateTime = [];
-                                                        dateTimeController.clear();
-                                                        if (_appointmentBranch != null) {
-                                                          ServiceBranchController.available(
-                                                            context,
-                                                            branchId: _appointmentBranch?.key,
-                                                          ).then((value) {
-                                                            if (responseCode(value.code)) {
-                                                              context
-                                                                      .read<ServiceBranchController>()
-                                                                      .serviceBranchAvailableResponse =
-                                                                  value.data;
-                                                              if (value.data != null) {
-                                                                for (service_branch_available_model.Data item
-                                                                    in value.data?.data ?? []) {
-                                                                  serviceList.add(
-                                                                    DropdownAttribute(
-                                                                      item.serviceBranchId ?? '',
-                                                                      item.serviceName ?? '',
-                                                                    ),
-                                                                  );
-                                                                }
-                                                              }
-                                                              serviceList.sort((a, b) => a.name.compareTo(b.name));
-                                                              rebuildDropdown.add(DateTime.now());
-                                                            }
-                                                          });
-                                                        } else {
-                                                          rebuildDropdown.add(DateTime.now());
-                                                        }
-                                                      },
-                                                      width: 331,
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-                                    AppPadding.vertical(denominator: 2),
-                                    if (widget.type == 'update') ...[
-                                      labelValue(
-                                        'Service',
-                                        widget.appointment?.service?.serviceName ?? '',
-                                        alignStart: true,
-                                      ),
-                                      AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
-                                    ],
-                                    if (widget.type == 'create')
-                                      StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return Consumer<ServiceBranchController>(
-                                            builder: (context, serviceBranchController, _) {
-                                              return Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: AppDropdown(
-                                                      attributeList: DropdownAttributeList(
-                                                        width: 331,
-                                                        serviceList,
-                                                        labelText: 'appointmentPage'.tr(gender: 'service'),
-                                                        value: _service?.name,
-                                                        fieldColor: widget.type == 'update'
-                                                            ? textFormFieldUneditableColor
-                                                            : null,
-                                                        isEditable: widget.type == 'create',
-                                                        onChanged: (p0) {
-                                                          _service = p0;
-                                                          rebuild.add(DateTime.now());
-                                                          try {
-                                                            _status = appointmentStatus.firstWhere(
-                                                              (element) => element.key == '1',
-                                                            );
-                                                            try {
-                                                              selectedService = context
-                                                                  .read<ServiceBranchController>()
-                                                                  .serviceBranchAvailableResponse
-                                                                  ?.data
-                                                                  ?.firstWhere((e) => e.serviceBranchId == p0?.key);
-                                                              rebuild.add(DateTime.now());
-                                                            } catch (e) {
-                                                              debugPrint(e.toString());
-                                                            }
-                                                          } catch (e) {
-                                                            debugPrint(e.toString());
-                                                          }
-                                                          ServiceBranchAvailableDtController.getAvailableSlot(
-                                                            context,
-                                                            serviceBranchId: _service?.key,
-                                                          ).then((value) {
-                                                            if (responseCode(value.code)) {
-                                                              context
-                                                                      .read<ServiceBranchAvailableDtController>()
-                                                                      .serviceBranchAvailableTimingResponse =
-                                                                  value.data;
-                                                              availableDateTime = value.data?.slots ?? [];
-                                                              rebuild.add(DateTime.now());
-                                                              rebuildDropdown.add(DateTime.now());
-                                                            }
-                                                          });
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-
-                                    StreamBuilder(
-                                      stream: rebuild.stream,
-                                      builder: (context, _) {
-                                        return Consumer<ServiceBranchController>(
-                                          builder: (context, serviceBranchController, _) {
-                                            if (_service != null &&
-                                                notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
-                                              return Text('* Booking Fee is required for this service');
-                                            } else {
-                                              return SizedBox();
-                                            }
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    AppPadding.vertical(denominator: 2),
-                                    StreamBuilder<DateTime>(
-                                      stream: rebuildDropdown.stream,
-                                      builder: (context, snapshot) {
-                                        return Row(
-                                          children: [
-                                            (widget.appointment?.appointmentStatus == 2 ||
-                                                    widget.appointment?.appointmentStatus == 6)
-                                                ? labelValue('Status', _status?.name ?? '')
-                                                : AppDropdown(
-                                                    attributeList: DropdownAttributeList(
-                                                      widget.type == 'update' ? getAppointmentStatus() : [],
-                                                      isEditable: widget.type == 'update',
-                                                      fieldColor: widget.type == 'update'
-                                                          ? null
-                                                          : textFormFieldUneditableColor,
-                                                      labelText: 'appointmentPage'.tr(gender: 'status'),
-                                                      value: _status?.name,
-                                                      onChanged: (p0) {
-                                                        _status = p0;
-                                                        rebuild.add(DateTime.now());
-                                                        rebuildDropdown.add(DateTime.now());
-                                                      },
-                                                      width: 331,
-                                                    ),
-                                                  ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                    AppPadding.vertical(),
-                                    Consumer<ServiceBranchAvailableDtController>(
-                                      builder: (context, snapshot, _) {
-                                        return (widget.appointment?.appointmentStatus == 2 ||
-                                                widget.appointment?.appointmentStatus == 6)
-                                            ? labelValue('Slots', dateTimeController.text)
-                                            : GestureDetector(
-                                                onTap: () async {
-                                                  if (context.read<AuthController>().hasPermission(
-                                                        'c54a2d91-499c-11f0-9169-bc24115a1342',
-                                                      ) ==
-                                                      false) {
-                                                    if (context.read<AuthController>().isSuperAdmin &&
-                                                        _appointmentBranch == null) {
-                                                      showDialogError(
-                                                        context,
-                                                        ErrorMessage.required(
-                                                          field: 'appointmentPage'.tr(gender: 'branch'),
-                                                        ),
-                                                      );
-                                                    } else if (_appointmentBranch != null &&
-                                                        (availableDateTime.isNotEmpty)) {
-                                                      DateTime now = DateTime.now();
-                                                      availableDateTime = removePastDates(availableDateTime);
-                                                      availableDateTime.sort(
-                                                        (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
-                                                      );
-                                                      String? selectedDateTime = await showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext context) {
-                                                          return Row(
-                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                            children: [
-                                                              Column(
-                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                children: [
-                                                                  Container(
-                                                                    constraints: BoxConstraints(
-                                                                      maxWidth: screenWidth(80),
-                                                                    ),
-                                                                    child: CardContainer(
-                                                                      Padding(
-                                                                        padding: EdgeInsets.all(screenPadding),
-                                                                        child: SelectionCalendarView(
-                                                                          startMonth: now.month,
-                                                                          year: now.year,
-                                                                          initialDateTimes: availableDateTime,
+                                                                    SizedBox(width: 6),
+                                                                    Flexible(
+                                                                      child: Text(
+                                                                        'Refund document required — upload proof below',
+                                                                        style: TextStyle(
+                                                                          fontSize: 12,
+                                                                          color: Color(0xFF9A3412),
                                                                         ),
                                                                       ),
                                                                     ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                            if ((selectedFiles.isEmpty &&
+                                                                    widget.type == 'create' &&
+                                                                    (_service != null &&
+                                                                        notNullOrEmptyString(
+                                                                              selectedService?.serviceBookingFee,
+                                                                            ) ==
+                                                                            true)) ||
+                                                                (selectedFiles.isEmpty &&
+                                                                    widget.type == 'update' &&
+                                                                    _status?.key == '6' &&
+                                                                    widget.appointment?.payment?.any(
+                                                                          (element) => element.paymentType == 4,
+                                                                        ) ==
+                                                                        false)) ...[
+                                                              Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  UploadDocumentsField(
+                                                                    title: 'promotionPage'.tr(gender: 'browseFile'),
+                                                                    fieldTitle: _status?.key == '6'
+                                                                        ? 'appointmentPage'.tr(gender: 'refundProof')
+                                                                        : 'appointmentPage'.tr(gender: 'paymentProof'),
+                                                                    // tooltipText: 'promotionPage'.tr(gender: 'browse'),
+                                                                    action: () async {
+                                                                      documentErrorMessage.add(null);
+                                                                      FilePickerResult? result = await FilePicker
+                                                                          .platform
+                                                                          .pickFiles();
+
+                                                                      if (result != null) {
+                                                                        PlatformFile file = result.files.first;
+                                                                        if (supportedExtensions.contains(
+                                                                          file.extension,
+                                                                        )) {
+                                                                          debugPrint(bytesToMB(file.size).toString());
+                                                                          debugPrint(file.name);
+                                                                          if (bytesToMB(file.size) < 1.0) {
+                                                                            Uint8List? fileBytes =
+                                                                                result.files.first.bytes;
+                                                                            String fileName = result.files.first.name;
+
+                                                                            selectedFiles.add(
+                                                                              FileAttribute(
+                                                                                name: fileName,
+                                                                                value: fileBytes,
+                                                                              ),
+                                                                            );
+                                                                            fileRebuild.add(DateTime.now());
+                                                                          } else {
+                                                                            showDialogError(
+                                                                              context,
+                                                                              'error'.tr(
+                                                                                gender: 'err-21',
+                                                                                args: [
+                                                                                  fileSizeLimit.toStringAsFixed(0),
+                                                                                ],
+                                                                              ),
+                                                                            );
+                                                                          }
+                                                                        } else {
+                                                                          showDialogError(
+                                                                            context,
+                                                                            'error'.tr(gender: 'err-22'),
+                                                                          );
+                                                                        }
+                                                                      } else {
+                                                                        // User canceled the picker
+                                                                      }
+                                                                    },
+                                                                    cancelAction: () {},
+                                                                  ),
+                                                                  StreamBuilder<String?>(
+                                                                    stream: documentErrorMessage.stream,
+                                                                    builder: (context, snapshot) {
+                                                                      return snapshot.data == null
+                                                                          ? SizedBox()
+                                                                          : AppSelectableText(
+                                                                              snapshot.data ?? '',
+                                                                              style: AppTypography.bodyMedium(context)
+                                                                                  .apply(
+                                                                                    color: errorColor,
+                                                                                    fontSizeDelta: -1,
+                                                                                  ),
+                                                                            );
+                                                                    },
                                                                   ),
                                                                 ],
                                                               ),
                                                             ],
+                                                            for (int index = 0; index < selectedFiles.length; index++)
+                                                              Container(
+                                                                margin: const EdgeInsets.only(top: 6),
+                                                                padding: const EdgeInsets.symmetric(
+                                                                  horizontal: 12,
+                                                                  vertical: 9,
+                                                                ),
+                                                                decoration: BoxDecoration(
+                                                                  color: const Color(0xFFF0FDF4),
+                                                                  borderRadius: BorderRadius.circular(8),
+                                                                  border: Border.all(
+                                                                    color: const Color(0xFF86EFAC),
+                                                                  ),
+                                                                ),
+                                                                child: Row(
+                                                                  children: [
+                                                                    const Icon(
+                                                                      Icons.insert_drive_file_rounded,
+                                                                      size: 15,
+                                                                      color: Color(0xFF16A34A),
+                                                                    ),
+                                                                    const SizedBox(width: 8),
+                                                                    Expanded(
+                                                                      child: GestureDetector(
+                                                                        onTap: () {
+                                                                          if (selectedFiles[index].path != null ||
+                                                                              selectedFiles[index].value != null) {
+                                                                            showDialog(
+                                                                              context: context,
+                                                                              builder: (BuildContext context) {
+                                                                                return GestureDetector(
+                                                                                  onTap: () => context.pop(),
+                                                                                  child: Center(
+                                                                                    child: Flexible(
+                                                                                      child: CardContainer(
+                                                                                        selectedFiles[index].value !=
+                                                                                                null
+                                                                                            ? Image.memory(
+                                                                                                selectedFiles[index]
+                                                                                                    .value!,
+                                                                                              )
+                                                                                            : selectedFiles[index]
+                                                                                                        .path !=
+                                                                                                    null
+                                                                                            ? Padding(
+                                                                                                padding: EdgeInsets.all(
+                                                                                                  screenPadding,
+                                                                                                ),
+                                                                                                child: Image.network(
+                                                                                                  '${Environment.imageUrl}${selectedFiles[index].path}',
+                                                                                                ),
+                                                                                              )
+                                                                                            : const SizedBox(),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                );
+                                                                              },
+                                                                            );
+                                                                          }
+                                                                        },
+                                                                        child: Text(
+                                                                          selectedFiles[index].name ?? '',
+                                                                          style: const TextStyle(
+                                                                            fontSize: 12.5,
+                                                                            color: Color(0xFF16A34A),
+                                                                            decoration: TextDecoration.underline,
+                                                                            decorationColor: Color(0xFF16A34A),
+                                                                          ),
+                                                                          overflow: TextOverflow.ellipsis,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(width: 4),
+                                                                    GestureDetector(
+                                                                      onTap: () {
+                                                                        selectedFiles.removeAt(index);
+                                                                        fileRebuild.add(DateTime.now());
+                                                                      },
+                                                                      child: const Icon(
+                                                                        Icons.close_rounded,
+                                                                        size: 15,
+                                                                        color: Color(0xFF6B7280),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  AppPadding.horizontal(),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        if (widget.type == 'update')
+                                          labelValue(
+                                            'Branch',
+                                            widget.appointment?.branch?.branchName ?? '',
+                                            alignStart: true,
+                                          ),
+                                        if (widget.type == 'create')
+                                          StreamBuilder<DateTime>(
+                                            stream: rebuildDropdown.stream,
+                                            builder: (context, snapshot) {
+                                              return Consumer<AuthController>(
+                                                builder: (context, authController, _) {
+                                                  return Column(
+                                                    children: [
+                                                      AppDropdown(
+                                                        attributeList: DropdownAttributeList(
+                                                          authController.isSuperAdmin ? branches : [],
+                                                          labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                                          isEditable: authController.isSuperAdmin,
+                                                          fieldColor: authController.isSuperAdmin
+                                                              ? null
+                                                              : textFormFieldUneditableColor,
+                                                          value: _appointmentBranch?.name,
+                                                          onChanged: (p0) {
+                                                            _appointmentBranch = p0;
+                                                            _service = null;
+                                                            serviceList = [];
+                                                            availableDateTime = [];
+                                                            dateTimeController.clear();
+                                                            if (_appointmentBranch != null) {
+                                                              ServiceBranchController.available(
+                                                                context,
+                                                                branchId: _appointmentBranch?.key,
+                                                              ).then((value) {
+                                                                if (responseCode(value.code)) {
+                                                                  context
+                                                                          .read<ServiceBranchController>()
+                                                                          .serviceBranchAvailableResponse =
+                                                                      value.data;
+                                                                  if (value.data != null) {
+                                                                    for (service_branch_available_model.Data item
+                                                                        in value.data?.data ?? []) {
+                                                                      serviceList.add(
+                                                                        DropdownAttribute(
+                                                                          item.serviceBranchId ?? '',
+                                                                          item.serviceName ?? '',
+                                                                        ),
+                                                                      );
+                                                                    }
+                                                                  }
+                                                                  serviceList.sort((a, b) => a.name.compareTo(b.name));
+                                                                  rebuildDropdown.add(DateTime.now());
+                                                                }
+                                                              });
+                                                            } else {
+                                                              rebuildDropdown.add(DateTime.now());
+                                                            }
+                                                          },
+                                                          width: 331,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        AppPadding.vertical(denominator: 2),
+                                        if (widget.type == 'update') ...[
+                                          labelValue(
+                                            'Service',
+                                            widget.appointment?.service?.serviceName ?? '',
+                                            alignStart: true,
+                                          ),
+                                          AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
+                                        ],
+                                        if (widget.type == 'create')
+                                          StreamBuilder<DateTime>(
+                                            stream: rebuildDropdown.stream,
+                                            builder: (context, snapshot) {
+                                              return Consumer<ServiceBranchController>(
+                                                builder: (context, serviceBranchController, _) {
+                                                  return Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: AppDropdown(
+                                                          attributeList: DropdownAttributeList(
+                                                            width: 331,
+                                                            serviceList,
+                                                            labelText: 'appointmentPage'.tr(gender: 'service'),
+                                                            value: _service?.name,
+                                                            fieldColor: widget.type == 'update'
+                                                                ? textFormFieldUneditableColor
+                                                                : null,
+                                                            isEditable: widget.type == 'create',
+                                                            onChanged: (p0) {
+                                                              _service = p0;
+                                                              rebuild.add(DateTime.now());
+                                                              try {
+                                                                _status = appointmentStatus.firstWhere(
+                                                                  (element) => element.key == '1',
+                                                                );
+                                                                try {
+                                                                  selectedService = context
+                                                                      .read<ServiceBranchController>()
+                                                                      .serviceBranchAvailableResponse
+                                                                      ?.data
+                                                                      ?.firstWhere((e) => e.serviceBranchId == p0?.key);
+                                                                  rebuild.add(DateTime.now());
+                                                                } catch (e) {
+                                                                  debugPrint(e.toString());
+                                                                }
+                                                              } catch (e) {
+                                                                debugPrint(e.toString());
+                                                              }
+                                                              ServiceBranchAvailableDtController.getAvailableSlot(
+                                                                context,
+                                                                serviceBranchId: _service?.key,
+                                                              ).then((value) {
+                                                                if (responseCode(value.code)) {
+                                                                  context
+                                                                          .read<ServiceBranchAvailableDtController>()
+                                                                          .serviceBranchAvailableTimingResponse =
+                                                                      value.data;
+                                                                  availableDateTime = value.data?.slots ?? [];
+                                                                  rebuild.add(DateTime.now());
+                                                                  rebuildDropdown.add(DateTime.now());
+                                                                }
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+
+                                        StreamBuilder(
+                                          stream: rebuild.stream,
+                                          builder: (context, _) {
+                                            return Consumer<ServiceBranchController>(
+                                              builder: (context, serviceBranchController, _) {
+                                                if (_service != null &&
+                                                    notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
+                                                  return Container(
+                                                    margin: const EdgeInsets.only(top: 6),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFFFF7ED),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(color: const Color(0xFFFB923C).withAlpha(80)),
+                                                    ),
+                                                    child: const Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.info_outline_rounded,
+                                                          size: 14,
+                                                          color: Color(0xFFEA580C),
+                                                        ),
+                                                        SizedBox(width: 6),
+                                                        Flexible(
+                                                          child: Text(
+                                                            'Booking fee required — upload payment proof below',
+                                                            style: TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return const SizedBox();
+                                                }
+                                              },
+                                            );
+                                          },
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        StreamBuilder<DateTime>(
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    _isLocked
+                                                        ? labelValue('Status', _status?.name ?? '')
+                                                        : AppDropdown(
+                                                            attributeList: DropdownAttributeList(
+                                                              widget.type == 'update' ? getAppointmentStatus() : [],
+                                                              isEditable: widget.type == 'update',
+                                                              fieldColor: widget.type == 'update'
+                                                                  ? null
+                                                                  : textFormFieldUneditableColor,
+                                                              labelText: 'appointmentPage'.tr(gender: 'status'),
+                                                              value: _status?.name,
+                                                              onChanged: (p0) {
+                                                                _status = p0;
+                                                                rebuild.add(DateTime.now());
+                                                                rebuildDropdown.add(DateTime.now());
+                                                              },
+                                                              width: 331,
+                                                            ),
+                                                          ),
+                                                  ],
+                                                ),
+                                                if (_status?.key == '2' || _status?.key == '6') ...[
+                                                  const SizedBox(height: 10),
+                                                  Container(
+                                                    padding: const EdgeInsets.all(12),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFFFF7ED),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(
+                                                        color: const Color(0xFFFB923C).withAlpha(80),
+                                                      ),
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            const Icon(
+                                                              Icons.policy_outlined,
+                                                              size: 14,
+                                                              color: Color(0xFFEA580C),
+                                                            ),
+                                                            const SizedBox(width: 6),
+                                                            Text(
+                                                              _status?.key == '6'
+                                                                  ? 'Refund Policy'
+                                                                  : 'Cancellation Policy',
+                                                              style: const TextStyle(
+                                                                fontSize: 12,
+                                                                fontWeight: FontWeight.w700,
+                                                                color: Color(0xFF9A3412),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 6),
+                                                        const Text(
+                                                          '• Each appointment may only be rescheduled once.\n'
+                                                          '• Refunds, if approved, are processed within 5–7 business days.\n'
+                                                          '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
+                                                          style: TextStyle(
+                                                            fontSize: 11.5,
+                                                            color: Color(0xFF9A3412),
+                                                            height: 1.6,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                        AppPadding.vertical(),
+                                        Consumer<ServiceBranchAvailableDtController>(
+                                          builder: (context, snapshot, _) {
+                                            return _isLocked
+                                                ? labelValue('Slots', dateTimeController.text)
+                                                : GestureDetector(
+                                                    onTap: () async {
+                                                      if (context.read<AuthController>().hasPermission(
+                                                            'c54a2d91-499c-11f0-9169-bc24115a1342',
+                                                          ) ==
+                                                          false) {
+                                                        if (context.read<AuthController>().isSuperAdmin &&
+                                                            _appointmentBranch == null) {
+                                                          showDialogError(
+                                                            context,
+                                                            ErrorMessage.required(
+                                                              field: 'appointmentPage'.tr(gender: 'branch'),
+                                                            ),
                                                           );
-                                                        },
-                                                      );
-                                                      dateTimeController.text =
-                                                          formatDateTimeToDisplay(selectedDateTime) ??
-                                                          dateConverter(
-                                                            widget.appointment?.appointmentDatetime,
-                                                            format: 'yyyy-MM-dd HH:mm',
-                                                          ) ??
-                                                          '';
-                                                      calculateGestational();
-                                                    } else if (widget.type == 'update' && availableDateTime.isEmpty) {
-                                                      ServiceBranchAvailableDtController.getAvailableSlot(
-                                                        context,
-                                                        serviceBranchId: widget.appointment?.serviceBranchId,
-                                                      ).then((value) async {
-                                                        if (responseCode(value.code)) {
-                                                          availableDateTime = value.data?.slots ?? [];
+                                                        } else if (_appointmentBranch != null &&
+                                                            (availableDateTime.isNotEmpty)) {
                                                           DateTime now = DateTime.now();
                                                           availableDateTime = removePastDates(availableDateTime);
+                                                          availableDateTime.sort(
+                                                            (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
+                                                          );
                                                           String? selectedDateTime = await showDialog(
                                                             context: context,
                                                             builder: (BuildContext context) {
@@ -794,13 +990,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                   Column(
                                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                                     children: [
-                                                                      CardContainer(
-                                                                        Padding(
-                                                                          padding: EdgeInsets.all(screenPadding),
-                                                                          child: SelectionCalendarView(
-                                                                            startMonth: now.month,
-                                                                            year: now.year,
-                                                                            initialDateTimes: availableDateTime,
+                                                                      Container(
+                                                                        constraints: BoxConstraints(
+                                                                          maxWidth: screenWidth(80),
+                                                                        ),
+                                                                        child: CardContainer(
+                                                                          Padding(
+                                                                            padding: EdgeInsets.all(screenPadding),
+                                                                            child: SelectionCalendarView(
+                                                                              startMonth: now.month,
+                                                                              year: now.year,
+                                                                              initialDateTimes: availableDateTime,
+                                                                            ),
                                                                           ),
                                                                         ),
                                                                       ),
@@ -818,66 +1019,171 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               ) ??
                                                               '';
                                                           calculateGestational();
-                                                          rebuildDropdown.add(DateTime.now());
+                                                        } else if (widget.type == 'update' &&
+                                                            availableDateTime.isEmpty) {
+                                                          ServiceBranchAvailableDtController.getAvailableSlot(
+                                                            context,
+                                                            serviceBranchId: widget.appointment?.serviceBranchId,
+                                                          ).then((value) async {
+                                                            if (responseCode(value.code)) {
+                                                              availableDateTime = value.data?.slots ?? [];
+                                                              DateTime now = DateTime.now();
+                                                              availableDateTime = removePastDates(availableDateTime);
+                                                              String? selectedDateTime = await showDialog(
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  return Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                    children: [
+                                                                      Column(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        children: [
+                                                                          CardContainer(
+                                                                            Padding(
+                                                                              padding: EdgeInsets.all(screenPadding),
+                                                                              child: SelectionCalendarView(
+                                                                                startMonth: now.month,
+                                                                                year: now.year,
+                                                                                initialDateTimes: availableDateTime,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              );
+                                                              dateTimeController.text =
+                                                                  formatDateTimeToDisplay(selectedDateTime) ??
+                                                                  dateConverter(
+                                                                    widget.appointment?.appointmentDatetime,
+                                                                    format: 'yyyy-MM-dd HH:mm',
+                                                                  ) ??
+                                                                  '';
+                                                              calculateGestational();
+                                                              rebuildDropdown.add(DateTime.now());
+                                                            }
+                                                          });
+                                                        } else if (_service == null) {
+                                                          showDialogError(
+                                                            context,
+                                                            ErrorMessage.required(
+                                                              field: 'appointmentPage'.tr(gender: 'service'),
+                                                            ),
+                                                          );
+                                                        } else if (availableDateTime.isEmpty) {
+                                                          showDialogError(context, 'No available slots');
+                                                        } else {
+                                                          showDialogError(
+                                                            context,
+                                                            ErrorMessage.required(
+                                                              field: 'appointmentPage'.tr(gender: 'branch'),
+                                                            ),
+                                                          );
                                                         }
-                                                      });
-                                                    } else if (_service == null) {
-                                                      showDialogError(
-                                                        context,
-                                                        ErrorMessage.required(
-                                                          field: 'appointmentPage'.tr(gender: 'service'),
-                                                        ),
-                                                      );
-                                                    } else if (availableDateTime.isEmpty) {
-                                                      showDialogError(context, 'No available slots');
-                                                    } else {
-                                                      showDialogError(
-                                                        context,
-                                                        ErrorMessage.required(
-                                                          field: 'appointmentPage'.tr(gender: 'branch'),
-                                                        ),
-                                                      );
-                                                    }
-                                                  }
-                                                },
-                                                child: ReadOnly(
-                                                  isEditable: false,
-                                                  InputField(
-                                                    field: InputFieldAttribute(
-                                                      controller: dateTimeController,
-                                                      labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                                      }
+                                                    },
+                                                    child: ReadOnly(
                                                       isEditable: false,
-                                                      uneditableColor: textFormFieldEditableColor,
-                                                      suffixWidget: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: [Icon(Icons.date_range)],
+                                                      InputField(
+                                                        field: InputFieldAttribute(
+                                                          controller: dateTimeController,
+                                                          labelText: 'appointmentPage'.tr(
+                                                            gender: 'appointmentDateTime',
+                                                          ),
+                                                          isEditable: false,
+                                                          uneditableColor: textFormFieldEditableColor,
+                                                          suffixWidget: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [Icon(Icons.date_range)],
+                                                          ),
+                                                        ),
+                                                        width: screenWidthByBreakpoint(90, 70, 30),
                                                       ),
                                                     ),
-                                                    width: screenWidthByBreakpoint(90, 70, 30),
-                                                  ),
-                                                ),
-                                              );
-                                      },
+                                                  );
+                                          },
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                      ],
                                     ),
-                                    AppPadding.vertical(denominator: 2),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
+                            ),
+                            const Divider(color: Color(0xFFF3F4F6), height: 1),
+                            const SizedBox(height: 20),
+                            if (widget.type == 'update') extraInformation(),
+                            const SizedBox(height: 16),
+                            if (!_isLocked) ...[
+                              StreamBuilder<DateTime>(
+                                stream: rebuild.stream,
+                                builder: (context, _) {
+                                  final notes = <String>[];
+                                  if (widget.type == 'update') {
+                                    notes.add(
+                                      'Changing the appointment slot will automatically set the status to Rescheduled.',
+                                    );
+                                  }
+                                  if (_status?.key == '6') {
+                                    notes.add(
+                                      'Uploading a refund document will initiate the refund review process.',
+                                    );
+                                  }
+                                  if (widget.type == 'create' &&
+                                      _service != null &&
+                                      notNullOrEmptyString(selectedService?.serviceBookingFee)) {
+                                    notes.add(
+                                      'Payment proof must be uploaded for services with a booking fee.',
+                                    );
+                                  }
+                                  if (notes.isEmpty) return const SizedBox();
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: notes
+                                          .map(
+                                            (note) => Padding(
+                                              padding: const EdgeInsets.only(bottom: 3),
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  const Text(
+                                                    '* ',
+                                                    style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                                  ),
+                                                  Flexible(
+                                                    child: Text(
+                                                      note,
+                                                      style: const TextStyle(
+                                                        fontSize: 11,
+                                                        color: Color(0xFF9CA3AF),
+                                                        height: 1.4,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              Center(child: button()),
                             ],
-                          ),
+                          ],
                         ),
-                        Divider(),
-                        if (widget.type == 'update') extraInformation(),
-                        AppPadding.vertical(denominator: 1 / 1.5),
-                        if (widget.appointment?.appointmentStatus != 2 && widget.appointment?.appointmentStatus != 6)
-                          button(),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
@@ -940,201 +1246,355 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   Widget extraInformation() {
-    return Row(
+    final isCompleted = widget.appointment?.appointmentStatus == 5;
+    final hasPaidBooking =
+        widget.appointment?.payment?.any((e) => e.paymentStatus == 1) == true;
+    final paidBookingEntry = hasPaidBooking
+        ? widget.appointment!.payment!.firstWhere((e) => e.paymentStatus == 1)
+        : null;
+    final servicePrice = double.tryParse(
+      '${widget.appointment?.service?.servicePrice ?? 0}',
+    );
+    final paidAmount = double.tryParse(paidBookingEntry?.paymentAmount ?? '0');
+
+    // If completed, remaining balance = 0 (fully paid at clinic)
+    final balance = isCompleted
+        ? 0.0
+        : (servicePrice != null && paidAmount != null)
+        ? servicePrice - paidAmount
+        : null;
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.type == 'update')
+        // ── Fee section ──────────────────────────────────────────────────────
+        if (widget.type == 'update') ...[
+          _extraSectionLabel('Fees & Payment'),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _extraFeeCard(
+                  label: 'Booking Fee',
+                  value: paidBookingEntry != null
+                      ? 'RM ${paidBookingEntry.paymentAmount}'
+                      : (widget.appointment?.service?.serviceBookingFee != null
+                            ? 'RM ${widget.appointment!.service!.serviceBookingFee}'
+                            : 'N/A'),
+                  icon: Icons.payments_outlined,
+                  color: const Color(0xFF0369A1),
+                  badge: showPaymentStatus(
+                    context,
+                    isCompleted
+                        ? 1
+                        : hasPaidBooking
+                        ? 1
+                        : 0,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _extraFeeCard(
+                  label: 'Service Price',
+                  value: servicePrice != null
+                      ? 'RM ${servicePrice.toStringAsFixed(2)}'
+                      : '—',
+                  icon: Icons.receipt_long_outlined,
+                  color: const Color(0xFF6366F1),
+                ),
+              ),
+            ],
+          ),
+          if (balance != null) ...[
+            const SizedBox(height: 10),
+            _extraFeeCard(
+              label: isCompleted
+                  ? 'Remaining Balance (Fully Paid)'
+                  : 'Remaining Balance',
+              value: 'RM ${balance.toStringAsFixed(2)}',
+              icon: isCompleted || balance == 0
+                  ? Icons.check_circle_outline_rounded
+                  : Icons.account_balance_wallet_outlined,
+              color: isCompleted || balance == 0
+                  ? const Color(0xFF15803D)
+                  : const Color(0xFFC2410C),
+              fullWidth: true,
+            ),
+          ],
+          if (paidBookingEntry != null) ...[
+            const SizedBox(height: 8),
+            _metaInfoRow(
+              Icons.tag_rounded,
+              'Payment ID',
+              '${paidBookingEntry.paymentId}',
+            ),
+          ],
+          // Payment proof
+          if (selectedFiles.isNotEmpty ||
+              (widget.type == 'update' &&
+                  widget.appointment?.payment
+                          ?.any((e) => e.paymentType == 2 && e.paymentStatus == 1) ==
+                      true)) ...[
+            const SizedBox(height: 12),
+            _proofButton(
+              label: 'appointmentPage'.tr(gender: 'paymentProof'),
+              icon: Icons.receipt_outlined,
+              color: const Color(0xFF0369A1),
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => GestureDetector(
+                  onTap: () => context.pop(),
+                  child: Center(
+                    child: CardContainer(
+                      Padding(
+                        padding: EdgeInsets.all(screenPadding),
+                        child: Image.network(
+                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((e) => e.paymentType == 2 && e.paymentStatus == 1).paymentAsset}',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          // Refund proof
+          if (widget.type == 'update' &&
+              widget.appointment?.payment
+                      ?.any((e) => e.paymentType == 4 && e.paymentStatus == 1) ==
+                  true) ...[
+            const SizedBox(height: 8),
+            _proofButton(
+              label: 'appointmentPage'.tr(gender: 'refundProof'),
+              icon: Icons.undo_rounded,
+              color: const Color(0xFFDC2626),
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => GestureDetector(
+                  onTap: () => context.pop(),
+                  child: Center(
+                    child: CardContainer(
+                      Padding(
+                        padding: EdgeInsets.all(screenPadding),
+                        child: Image.network(
+                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((e) => e.paymentType == 4 && e.paymentStatus == 1).paymentAsset}',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 20),
+          const Divider(color: Color(0xFFF3F4F6), height: 1),
+          const SizedBox(height: 16),
+        ],
+        // ── Feedback + Record Info ────────────────────────────────────────────
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.appointment?.appointmentStatus == 5) ...[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _extraSectionLabel('Patient Feedback'),
+                    const SizedBox(height: 10),
+                    AbsorbPointer(
+                      child: RatingStars(
+                        value: double.parse(
+                          '${widget.appointment?.appointmentRating ?? 0}',
+                        ),
+                        onValueChanged: (v) {},
+                        starBuilder: (index, color) =>
+                            Icon(Icons.star, color: color),
+                        starCount: 5,
+                        starSize: 20,
+                        valueLabelColor: const Color(0xff9b9b9b),
+                        valueLabelTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12.0,
+                        ),
+                        valueLabelRadius: 10,
+                        maxValue: 5,
+                        starSpacing: 2,
+                        maxValueVisibility: true,
+                        valueLabelVisibility: true,
+                        animationDuration: Duration(milliseconds: 1000),
+                        valueLabelPadding:
+                            const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+                        valueLabelMargin: const EdgeInsets.only(right: 8),
+                        starOffColor: const Color(0xffe7e8ea),
+                        starColor: Colors.amber,
+                      ),
+                    ),
+                    if (widget.appointment?.appointmentFeedback != null &&
+                        widget.appointment!.appointmentFeedback!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.appointment!.appointmentFeedback!,
+                        style: const TextStyle(
+                            fontSize: 13, color: Color(0xFF374151)),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 20),
+            ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _extraSectionLabel('Record Info'),
+                  const SizedBox(height: 10),
+                  _metaInfoRow(
+                    Icons.add_circle_outline,
+                    'Created',
+                    dateConverter(widget.appointment?.createdDate) ?? '—',
+                  ),
+                  if (widget.appointment?.modifiedDate != null) ...[
+                    const SizedBox(height: 6),
+                    _metaInfoRow(
+                      Icons.edit_outlined,
+                      'Last Updated',
+                      dateConverter(widget.appointment?.modifiedDate) ?? '—',
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _extraSectionLabel(String text) {
+    return Text(
+      text.toUpperCase(),
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF9CA3AF),
+        letterSpacing: 0.8,
+      ),
+    );
+  }
+
+  Widget _extraFeeCard({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color color,
+    Widget? badge,
+    bool fullWidth = false,
+  }) {
+    return Container(
+      width: fullWidth ? double.infinity : null,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withAlpha(15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withAlpha(40)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 4),
-                AppSelectableText('Booking Fee', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1)),
-                (widget.appointment?.service?.serviceBookingFee != null ||
-                        (double.parse(widget.appointment?.service?.serviceBookingFee ?? '0') > 0))
-                    ? showPaymentStatus(
-                        context,
-                        (widget.appointment?.appointmentStatus == 5)
-                            ? 1
-                            : (widget.appointment?.payment?.length ?? 0) > 0
-                            ? widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
-                                  ? 1
-                                  : 0
-                            : 0,
-                      )
-                    : Text('N/A'),
-                SizedBox(height: 4),
-                if (widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true) ...[
-                  labelValue(
-                    'Payment ID',
-                    widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
-                        ? '${widget.appointment?.payment?.firstWhere((element) => element.paymentStatus == 1).paymentId}'
-                        : '',
-                    alignStart: true,
-                  ),
-                  SizedBox(height: 4),
-                  labelValue(
-                    'Booking Fee Amount',
-                    widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
-                        ? 'RM ${widget.appointment?.payment?.firstWhere((element) => element.paymentStatus == 1).paymentAmount}'
-                        : '',
-                    alignStart: true,
-                  ),
-                  SizedBox(height: 4),
-                  labelValue(
-                    'Balance',
-                    widget.appointment?.payment?.any((element) => element.paymentStatus == 1) == true
-                        ? 'RM ${(double.parse('${widget.appointment?.service?.servicePrice ?? 0}') - double.parse(widget.appointment?.payment?.firstWhere((element) => element.paymentStatus == 1).paymentAmount ?? '0')).toStringAsFixed(2)}'
-                        : '',
-                    alignStart: true,
-                  ),
-                ],
-                SizedBox(height: 4),
-                if (selectedFiles.isNotEmpty ||
-                    (widget.type == 'update' &&
-                        widget.appointment?.payment?.any(
-                              (element) => element.paymentType == 2 && element.paymentStatus == 1,
-                            ) ==
-                            true)) ...[
-                  AppSelectableText(
-                    'appointmentPage'.tr(gender: 'paymentProof'),
-                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return GestureDetector(
-                            onTap: () {
-                              context.pop();
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CardContainer(
-                                      Padding(
-                                        padding: EdgeInsets.all(screenPadding),
-                                        child: Image.network(
-                                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((element) => element.paymentType == 2 && element.paymentStatus == 1).paymentAsset}',
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: Text(
-                      'View File',
-                      style: AppTypography.bodyMedium(context).apply(color: Colors.blue, fontWeightDelta: 1),
+                Row(
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6B7280)),
                     ),
-                  ),
-                ],
-                if (widget.type == 'update' &&
-                    widget.appointment?.payment?.any(
-                          (element) => element.paymentType == 4 && element.paymentStatus == 1,
-                        ) ==
-                        true) ...[
-                  AppSelectableText(
-                    'appointmentPage'.tr(gender: 'refundProof'),
-                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return GestureDetector(
-                            onTap: () {
-                              context.pop();
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CardContainer(
-                                      Padding(
-                                        padding: EdgeInsets.all(screenPadding),
-                                        child: Image.network(
-                                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((element) => element.paymentType == 4 && element.paymentStatus == 1).paymentAsset}',
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: Text(
-                      'View File',
-                      style: AppTypography.bodyMedium(context).apply(color: Colors.blue, fontWeightDelta: 1),
-                    ),
-                  ),
-                ],
+                    if (badge != null) ...[
+                      const SizedBox(width: 6),
+                      badge,
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w700, color: color),
+                ),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _metaInfoRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 14, color: const Color(0xFF9CA3AF)),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.appointment?.appointmentStatus == 5) ...[
-                labelValue('Feedback', dateConverter(widget.appointment?.appointmentFeedback) ?? 'Pending Feedback'),
-                SizedBox(height: 4),
-                AbsorbPointer(
-                  child: RatingStars(
-                    value: double.parse('${widget.appointment?.appointmentRating ?? 0}'),
-                    onValueChanged: (v) {},
-                    starBuilder: (index, color) => Icon(Icons.star, color: color),
-                    starCount: 5,
-                    starSize: 20,
-                    valueLabelColor: const Color(0xff9b9b9b),
-                    valueLabelTextStyle: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                      fontStyle: FontStyle.normal,
-                      fontSize: 12.0,
-                    ),
-                    valueLabelRadius: 10,
-                    maxValue: 5,
-                    starSpacing: 2,
-                    maxValueVisibility: true,
-                    valueLabelVisibility: true,
-                    animationDuration: Duration(milliseconds: 1000),
-                    valueLabelPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
-                    valueLabelMargin: const EdgeInsets.only(right: 8),
-                    starOffColor: const Color(0xffe7e8ea),
-                    starColor: Colors.amber,
-                  ),
-                ),
-              ],
-              SizedBox(height: 4),
-              labelValue('Created Date', dateConverter(widget.appointment?.createdDate) ?? ''),
-              if (widget.appointment?.modifiedDate != null)
-                labelValue('Updated Date', dateConverter(widget.appointment?.modifiedDate) ?? ''),
+              Text(label,
+                  style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF9CA3AF))),
+              Text(value,
+                  style: const TextStyle(
+                      fontSize: 12, color: Color(0xFF374151))),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _proofButton({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withAlpha(12),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withAlpha(50)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 15, color: color),
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w600, color: color),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.open_in_new_rounded,
+                size: 12, color: color.withAlpha(160)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1362,6 +1822,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         selectedFiles.isEmpty) {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'paymentProof')));
+    } else if (widget.type == 'update' &&
+        _status?.key == '6' &&
+        selectedFiles.isEmpty &&
+        widget.appointment?.payment?.any((element) => element.paymentType == 4) == false) {
+      temp = false;
+      showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'refundProof')));
     }
     setState(() {});
     return temp;

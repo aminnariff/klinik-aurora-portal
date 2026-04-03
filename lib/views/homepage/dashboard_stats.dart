@@ -28,7 +28,6 @@ class DashboardStats extends StatelessWidget {
   }
 }
 
-// ─── Desktop: single-row 4-card layout ────────────────────────────────────────
 
 class _DesktopStats extends StatelessWidget {
   final Data? data;
@@ -73,8 +72,6 @@ class _DesktopStats extends StatelessWidget {
     );
   }
 }
-
-// ─── Mobile: donut full-width + 2×2 grid ──────────────────────────────────────
 
 class _MobileStats extends StatelessWidget {
   final Data? data;
@@ -138,7 +135,6 @@ class _MobileStats extends StatelessWidget {
   }
 }
 
-// ─── Donut card ────────────────────────────────────────────────────────────────
 
 class _UserDonutCard extends StatelessWidget {
   final Data? data;
@@ -232,7 +228,6 @@ class _UserDonutCard extends StatelessWidget {
   }
 }
 
-// ─── Generic stat card ─────────────────────────────────────────────────────────
 
 class _StatCard extends StatelessWidget {
   final String label;

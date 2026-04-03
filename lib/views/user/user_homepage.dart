@@ -56,10 +56,33 @@ class _UserHomepageState extends State<UserHomepage> {
 
   List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(attribute: 'userFullname', label: 'Patient', allowSorting: false, columnSize: ColumnSize.M),
-    TableHeaderAttribute(attribute: 'userPhone', label: 'Mobile No.', allowSorting: false, columnSize: ColumnSize.S, width: 140),
-    TableHeaderAttribute(attribute: 'totalPoints', label: 'Points', allowSorting: false, columnSize: ColumnSize.S, width: 90),
-    TableHeaderAttribute(attribute: 'branchId', label: 'Registered Branch', allowSorting: false, columnSize: ColumnSize.M),
-    TableHeaderAttribute(attribute: 'userStatus', label: 'Status', allowSorting: false, columnSize: ColumnSize.S, width: 90),
+    TableHeaderAttribute(
+      attribute: 'userPhone',
+      label: 'Mobile No.',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 140,
+    ),
+    TableHeaderAttribute(
+      attribute: 'totalPoints',
+      label: 'Points',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 90,
+    ),
+    TableHeaderAttribute(
+      attribute: 'branchId',
+      label: 'Registered Branch',
+      allowSorting: false,
+      columnSize: ColumnSize.M,
+    ),
+    TableHeaderAttribute(
+      attribute: 'userStatus',
+      label: 'Status',
+      allowSorting: false,
+      columnSize: ColumnSize.S,
+      width: 90,
+    ),
     TableHeaderAttribute(attribute: 'createdDate', label: 'Joined', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(attribute: 'actions', label: '', allowSorting: false, columnSize: ColumnSize.S, width: 56),
   ];
@@ -73,9 +96,14 @@ class _UserHomepageState extends State<UserHomepage> {
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   static const List<Color> _avatarColors = [
-    Color(0xFF6AD1E3), Color(0xFFDF6E98), Color(0xFF7E57C2),
-    Color(0xFF26A69A), Color(0xFFEF5350), Color(0xFF42A5F5),
-    Color(0xFFFF7043), Color(0xFF66BB6A),
+    Color(0xFF6AD1E3),
+    Color(0xFFDF6E98),
+    Color(0xFF7E57C2),
+    Color(0xFF26A69A),
+    Color(0xFFEF5350),
+    Color(0xFF42A5F5),
+    Color(0xFFFF7043),
+    Color(0xFF66BB6A),
   ];
 
   Color _avatarColor(String name) {
@@ -113,7 +141,6 @@ class _UserHomepageState extends State<UserHomepage> {
     return LayoutWidget(mobile: mobileView(), desktop: desktopView());
   }
 
-  // ─── Mobile ──────────────────────────────────────────────────────────────────
 
   Widget mobileView() {
     return Consumer<UserController>(
@@ -153,8 +180,14 @@ class _UserHomepageState extends State<UserHomepage> {
           filled: true,
           fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(vertical: 10),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          ),
         ),
       ),
     );
@@ -166,29 +199,48 @@ class _UserHomepageState extends State<UserHomepage> {
     return Card(
       margin: EdgeInsets.only(bottom: screenPadding / 2),
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE5E7EB))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE5E7EB)),
+      ),
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            CircleAvatar(radius: 22, backgroundColor: color.withAlpha(40),
-              child: Text(initials, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 14))),
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: color.withAlpha(40),
+              child: Text(
+                initials,
+                style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 14),
+              ),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user.userFullname?.titleCase() ?? user.userName ?? 'N/A',
-                      style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
+                  Text(
+                    user.userFullname?.titleCase() ?? user.userName ?? 'N/A',
+                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2),
+                  ),
                   const SizedBox(height: 2),
-                  Text(user.userPhone ?? 'No phone', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+                  Text(
+                    user.userPhone ?? 'No phone',
+                    style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280)),
+                  ),
                   const SizedBox(height: 4),
-                  Row(children: [
-                    _statusChip(user.userStatus == 1),
-                    const SizedBox(width: 8),
-                    Text('${user.totalPoint ?? 0} pts', style: AppTypography.bodyMedium(context).apply(color: secondaryColor, fontWeightDelta: 1)),
-                  ]),
+                  Row(
+                    children: [
+                      _statusChip(user.userStatus == 1),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${user.totalPoint ?? 0} pts',
+                        style: AppTypography.bodyMedium(context).apply(color: secondaryColor, fontWeightDelta: 1),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -199,7 +251,6 @@ class _UserHomepageState extends State<UserHomepage> {
     );
   }
 
-  // ─── Desktop ─────────────────────────────────────────────────────────────────
 
   Widget desktopView() {
     return Scaffold(
@@ -231,7 +282,10 @@ class _UserHomepageState extends State<UserHomepage> {
               height: 40,
               child: TextField(
                 controller: _userFullNameController,
-                onChanged: (_) { setState(() {}); filtering(page: 1); },
+                onChanged: (_) {
+                  setState(() {});
+                  filtering(page: 1);
+                },
                 style: AppTypography.bodyMedium(context),
                 decoration: InputDecoration(
                   hintText: 'Search by name, username…',
@@ -240,14 +294,28 @@ class _UserHomepageState extends State<UserHomepage> {
                   suffixIcon: _userFullNameController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
-                          onPressed: () { _userFullNameController.clear(); filtering(enableDebounce: false, page: 1); setState(() {}); })
+                          onPressed: () {
+                            _userFullNameController.clear();
+                            filtering(enableDebounce: false, page: 1);
+                            setState(() {});
+                          },
+                        )
                       : null,
                   filled: true,
                   fillColor: const Color(0xFFF9FAFB),
                   contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+                  ),
                 ),
               ),
             ),
@@ -268,7 +336,10 @@ class _UserHomepageState extends State<UserHomepage> {
           const SizedBox(width: 8),
           // Reset
           IconButton(
-            onPressed: () { resetAllFilter(); filtering(enableDebounce: false, page: 1); },
+            onPressed: () {
+              resetAllFilter();
+              filtering(enableDebounce: false, page: 1);
+            },
             icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
@@ -279,7 +350,10 @@ class _UserHomepageState extends State<UserHomepage> {
           const SizedBox(width: 12),
           // Add patient
           ElevatedButton.icon(
-            onPressed: () => showDialog(context: context, builder: (_) => const UserDetail(type: 'create')),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => const UserDetail(type: 'create'),
+            ),
             icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
             label: const Text('Add Patient', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
@@ -303,8 +377,11 @@ class _UserHomepageState extends State<UserHomepage> {
         }
         if (snapshot.userAllResponse!.isEmpty) {
           return Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE5E7EB))),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
             child: const Center(child: NoRecordsWidget()),
           );
         }
@@ -340,10 +417,7 @@ class _UserHomepageState extends State<UserHomepage> {
       columns: columns(),
       rows: [
         for (int i = 0; i < users.length; i++)
-          DataRow2(
-            color: WidgetStateProperty.all(Colors.white),
-            cells: _buildCells(users[i]),
-          ),
+          DataRow2(color: WidgetStateProperty.all(Colors.white), cells: _buildCells(users[i])),
       ],
     );
   }
@@ -359,7 +433,10 @@ class _UserHomepageState extends State<UserHomepage> {
             CircleAvatar(
               radius: 18,
               backgroundColor: color.withAlpha(40),
-              child: Text(initials, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
+              child: Text(
+                initials,
+                style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12),
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -368,7 +445,8 @@ class _UserHomepageState extends State<UserHomepage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppTooltip(
-                    message: '${notNullOrEmptyString(user.userNric) ? 'NRIC: ${user.userNric}\n' : ''}Email: ${user.userEmail ?? 'N/A'}',
+                    message:
+                        '${notNullOrEmptyString(user.userNric) ? 'NRIC: ${user.userNric}\n' : ''}Email: ${user.userEmail ?? 'N/A'}',
                     child: Text(
                       user.userFullname?.titleCase() ?? user.userName ?? 'N/A',
                       style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
@@ -392,10 +470,7 @@ class _UserHomepageState extends State<UserHomepage> {
       DataCell(
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: secondaryColor.withAlpha(25),
-            borderRadius: BorderRadius.circular(20),
-          ),
+          decoration: BoxDecoration(color: secondaryColor.withAlpha(25), borderRadius: BorderRadius.circular(20)),
           child: Text(
             '${user.totalPoint ?? 0}',
             style: TextStyle(color: secondaryColor.withAlpha(230), fontWeight: FontWeight.w700, fontSize: 12),
@@ -403,13 +478,19 @@ class _UserHomepageState extends State<UserHomepage> {
         ),
       ),
       // Branch
-      DataCell(Text(translateToBranchName(user.branchId ?? '') ?? '—',
-          style: AppTypography.bodyMedium(context), overflow: TextOverflow.ellipsis)),
+      DataCell(
+        Text(
+          translateToBranchName(user.branchId ?? '') ?? '—',
+          style: AppTypography.bodyMedium(context),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
       // Status
       DataCell(_statusChip(user.userStatus == 1)),
       // Joined
-      DataCell(Text(dateConverter(user.createdDate) ?? '—',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)))),
+      DataCell(
+        Text(dateConverter(user.createdDate) ?? '—', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+      ),
       // Actions
       DataCell(_actionMenu(user)),
     ];
@@ -448,13 +529,20 @@ class _UserHomepageState extends State<UserHomepage> {
         _menuItem('managePoints', Icons.stars_rounded, 'Manage Points'),
         PopupMenuItem<String>(
           value: 'enableDisable',
-          child: Row(children: [
-            Icon(user.userStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
-                size: 16, color: user.userStatus == 1 ? Colors.red : Colors.green),
-            const SizedBox(width: 10),
-            Text(user.userStatus == 1 ? 'Deactivate' : 'Re-Activate',
-                style: TextStyle(fontSize: 13, color: user.userStatus == 1 ? Colors.red : Colors.green)),
-          ]),
+          child: Row(
+            children: [
+              Icon(
+                user.userStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+                size: 16,
+                color: user.userStatus == 1 ? Colors.red : Colors.green,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                user.userStatus == 1 ? 'Deactivate' : 'Re-Activate',
+                style: TextStyle(fontSize: 13, color: user.userStatus == 1 ? Colors.red : Colors.green),
+              ),
+            ],
+          ),
         ),
       ],
       child: Container(
@@ -471,11 +559,13 @@ class _UserHomepageState extends State<UserHomepage> {
   PopupMenuItem<String> _menuItem(String value, IconData icon, String label) {
     return PopupMenuItem<String>(
       value: value,
-      child: Row(children: [
-        Icon(icon, size: 16, color: const Color(0xFF6B7280)),
-        const SizedBox(width: 10),
-        Text(label, style: const TextStyle(fontSize: 13)),
-      ]),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: const Color(0xFF6B7280)),
+          const SizedBox(width: 10),
+          Text(label, style: const TextStyle(fontSize: 13)),
+        ],
+      ),
     );
   }
 
@@ -502,7 +592,6 @@ class _UserHomepageState extends State<UserHomepage> {
     );
   }
 
-  // ─── Filter Panel ─────────────────────────────────────────────────────────────
 
   void _showFilterPanel() {
     showDialog(
@@ -536,37 +625,51 @@ class _UserHomepageState extends State<UserHomepage> {
                           const SizedBox(height: 12),
                           StreamBuilder<DateTime>(
                             stream: rebuildDropdown.stream,
-                            builder: (context, _) => Column(children: [
-                              AppDropdown(
-                                attributeList: DropdownAttributeList(
-                                  [
-                                    if (context.read<BranchController>().branchAllResponse?.data?.data != null)
-                                      for (branch.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
-                                        DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
-                                  ],
-                                  labelText: 'information'.tr(gender: 'registeredBranch'),
-                                  value: _selectedBranch?.name,
-                                  onChanged: (p0) { _selectedBranch = p0; rebuildDropdown.add(DateTime.now()); filtering(page: 1); },
-                                  width: 280,
+                            builder: (context, _) => Column(
+                              children: [
+                                AppDropdown(
+                                  attributeList: DropdownAttributeList(
+                                    [
+                                      if (context.read<BranchController>().branchAllResponse?.data?.data != null)
+                                        for (branch.Data item
+                                            in context.read<BranchController>().branchAllResponse?.data?.data ?? [])
+                                          DropdownAttribute(item.branchId ?? '', item.branchName ?? ''),
+                                    ],
+                                    labelText: 'information'.tr(gender: 'registeredBranch'),
+                                    value: _selectedBranch?.name,
+                                    onChanged: (p0) {
+                                      _selectedBranch = p0;
+                                      rebuildDropdown.add(DateTime.now());
+                                      filtering(page: 1);
+                                    },
+                                    width: 280,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              AppDropdown(
-                                attributeList: DropdownAttributeList(
-                                  [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
-                                  labelText: 'Status',
-                                  value: _selectedUserStatus?.name,
-                                  onChanged: (p0) { _selectedUserStatus = p0; rebuildDropdown.add(DateTime.now()); filtering(page: 1); },
-                                  width: 280,
+                                const SizedBox(height: 12),
+                                AppDropdown(
+                                  attributeList: DropdownAttributeList(
+                                    [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
+                                    labelText: 'Status',
+                                    value: _selectedUserStatus?.name,
+                                    onChanged: (p0) {
+                                      _selectedUserStatus = p0;
+                                      rebuildDropdown.add(DateTime.now());
+                                      filtering(page: 1);
+                                    },
+                                    width: 280,
+                                  ),
                                 ),
-                              ),
-                            ]),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 20),
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton(
-                              onPressed: () { resetAllFilter(); filtering(enableDebounce: false, page: 1); },
+                              onPressed: () {
+                                resetAllFilter();
+                                filtering(enableDebounce: false, page: 1);
+                              },
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Color(0xFFD1D5DB)),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -579,13 +682,7 @@ class _UserHomepageState extends State<UserHomepage> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 8, right: 8,
-                    child: IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 20),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
+                  Positioned(top: 8, right: 8, child: CloseButton()),
                 ],
               ),
             ),
@@ -606,14 +703,22 @@ class _UserHomepageState extends State<UserHomepage> {
         filled: true,
         fillColor: const Color(0xFFF9FAFB),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+        ),
       ),
     );
   }
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────────
 
   void _handleMenuSelection(String value, UserResponse user) async {
     if (value == 'appointment') {
@@ -623,8 +728,11 @@ class _UserHomepageState extends State<UserHomepage> {
           type: 'create',
           appointment: appointment_model.Data(
             user: appointment_model.User(
-              userId: user.userId, userName: user.userName,
-              userEmail: user.userEmail, userFullName: user.userFullname, userPhone: user.userPhone,
+              userId: user.userId,
+              userName: user.userName,
+              userEmail: user.userEmail,
+              userFullName: user.userFullname,
+              userPhone: user.userPhone,
             ),
           ),
         ),
@@ -634,13 +742,22 @@ class _UserHomepageState extends State<UserHomepage> {
       UserController.appointment(context, user.userId ?? '').then((value) {
         dismissLoading();
         if (responseCode(value.code)) {
-          showDialog(context: context, builder: (_) => UserAppointmentIds(response: value.data, patient: user));
+          showDialog(
+            context: context,
+            builder: (_) => UserAppointmentIds(response: value.data, patient: user),
+          );
         }
       });
     } else if (value == 'managePoints') {
-      showDialog(context: context, builder: (_) => UserPointDetail(user: user));
+      showDialog(
+        context: context,
+        builder: (_) => UserPointDetail(user: user),
+      );
     } else if (value == 'update') {
-      showDialog(context: context, builder: (_) => UserDetail(user: user, type: 'update'));
+      showDialog(
+        context: context,
+        builder: (_) => UserDetail(user: user, type: 'update'),
+      );
     } else if (value == 'enableDisable') {
       try {
         if (await showConfirmDialog(
@@ -653,29 +770,45 @@ class _UserHomepageState extends State<UserHomepage> {
             UserController.update(
               context,
               UpdateUserRequest(
-                userId: user.userId, userName: user.userName, userFullname: user.userFullname,
-                userDob: dateConverter(user.userDob, format: 'yyyy-MM-dd'), userPhone: user.userPhone,
-                branchId: user.branchId, userStatus: user.userStatus == 1 ? 0 : 1,
+                userId: user.userId,
+                userName: user.userName,
+                userFullname: user.userFullname,
+                userDob: dateConverter(user.userDob, format: 'yyyy-MM-dd'),
+                userPhone: user.userPhone,
+                branchId: user.branchId,
+                userStatus: user.userStatus == 1 ? 0 : 1,
               ),
             ).then((value) {
               if (responseCode(value.code)) {
                 filtering();
-                showDialogSuccess(context, 'Account ${user.userStatus == 1 ? 'deactivated' : 'activated'} successfully.');
+                showDialogSuccess(
+                  context,
+                  'Account ${user.userStatus == 1 ? 'deactivated' : 'activated'} successfully.',
+                );
               } else {
                 showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });
         }
-      } catch (e) { debugPrint(e.toString()); }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     }
   }
 
   String? translateToBranchName(String branchId) {
     try {
-      return context.read<BranchController>().branchAllResponse?.data?.data!
-          .firstWhere((e) => e.branchId == branchId).branchName;
-    } catch (_) { return null; }
+      return context
+          .read<BranchController>()
+          .branchAllResponse
+          ?.data
+          ?.data!
+          .firstWhere((e) => e.branchId == branchId)
+          .branchName;
+    } catch (_) {
+      return null;
+    }
   }
 
   void filtering({bool enableDebounce = true, int? page}) {
@@ -686,14 +819,20 @@ class _UserHomepageState extends State<UserHomepage> {
     showLoading();
     if (page != null) _page = page;
     UserController.getAll(
-      context, _page, _pageSize,
+      context,
+      _page,
+      _pageSize,
       userFullName: _userFullNameController.text,
       userName: _userNameController.text,
       userPhone: _userPhoneController.text,
       userEmail: _userEmailController.text,
       branchId: _selectedBranch?.key,
       userStatus: _selectedUserStatus != null
-          ? _selectedUserStatus?.key == '1' ? 1 : _selectedUserStatus?.key == '0' ? 0 : null
+          ? _selectedUserStatus?.key == '1'
+                ? 1
+                : _selectedUserStatus?.key == '0'
+                ? 0
+                : null
           : null,
     ).then((value) {
       dismissLoading();
@@ -713,33 +852,56 @@ class _UserHomepageState extends State<UserHomepage> {
     _selectedBranch = null;
     _selectedUserStatus = null;
     rebuildDropdown.add(DateTime.now());
-    for (TableHeaderAttribute item in headers) { item.isSort = false; item.sort = SortType.asc; }
+    for (TableHeaderAttribute item in headers) {
+      item.isSort = false;
+      item.sort = SortType.asc;
+    }
   }
 
   List<DataColumn2> columns() {
-    return headers.map((item) => DataColumn2(
-      fixedWidth: item.width,
-      size: item.columnSize ?? ColumnSize.M,
-      label: Text(item.label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280))),
-    )).toList();
+    return headers
+        .map(
+          (item) => DataColumn2(
+            fixedWidth: item.width,
+            size: item.columnSize ?? ColumnSize.M,
+            label: Text(
+              item.label,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+            ),
+          ),
+        )
+        .toList();
   }
 
   Widget perPage() {
-    return PerPageWidget(_pageSize.toString(), DropdownAttributeList([], onChanged: (selected) {
-      _pageSize = int.parse((selected as DropdownAttribute).key);
-      filtering(enableDebounce: false);
-    }));
+    return PerPageWidget(
+      _pageSize.toString(),
+      DropdownAttributeList(
+        [],
+        onChanged: (selected) {
+          _pageSize = int.parse((selected as DropdownAttribute).key);
+          filtering(enableDebounce: false);
+        },
+      ),
+    );
   }
 
   Widget pagination() {
     return Pagination(
-      numOfPages: _totalPage, selectedPage: _page, pagesVisible: isMobile ? 3 : 5,
-      spacing: 10, onPageChanged: (page) => filtering(page: page, enableDebounce: false),
+      numOfPages: _totalPage,
+      selectedPage: _page,
+      pagesVisible: isMobile ? 3 : 5,
+      spacing: 10,
+      onPageChanged: (page) => filtering(page: page, enableDebounce: false),
     );
   }
 
   String? getOrderBy() {
-    try { return headers.firstWhere((e) => e.isSort).attribute; } catch (_) { return null; }
+    try {
+      return headers.firstWhere((e) => e.isSort).attribute;
+    } catch (_) {
+      return null;
+    }
   }
 
   String? getSortType() {

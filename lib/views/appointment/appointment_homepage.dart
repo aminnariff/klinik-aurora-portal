@@ -118,8 +118,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     super.initState();
   }
 
-  // ─── Business Logic (unchanged) ──────────────────────────────────────────
-
   void getDashboard() {
     if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
       bool temp = true;
@@ -806,8 +804,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   ),
                 ],
                 child: Container(
-                  padding: const EdgeInsets.all(4),
-                  child: const Icon(Icons.more_vert_rounded, size: 24, color: Color(0xFF6B7280)),
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),
+                  child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
                 ),
               ),
             ],

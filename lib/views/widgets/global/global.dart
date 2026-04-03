@@ -217,18 +217,41 @@ String getAppointmentStatusLabel(int? statusId) {
 }
 
 String formatToDisplayDate(String input) {
-  final inputFormat = DateFormat("dd-MM-yyyy HH:mm");
-  final dateTime = inputFormat.parse(input);
-  return "${dateTime.day.toString().padLeft(2, '0')}-"
-      "${dateTime.month.toString().padLeft(2, '0')}-"
-      "${dateTime.year}";
+  if (input.isEmpty) return '—';
+  try {
+    // ISO / UTC from API — add 8 hrs for Malaysia time
+    final myt = DateTime.parse(input).add(const Duration(hours: 8));
+    return "${myt.day.toString().padLeft(2, '0')}-"
+        "${myt.month.toString().padLeft(2, '0')}-"
+        "${myt.year}";
+  } catch (_) {
+    try {
+      // Already in local dd-MM-yyyy HH:mm format (from date picker)
+      final dt = DateFormat("dd-MM-yyyy HH:mm").parse(input);
+      return "${dt.day.toString().padLeft(2, '0')}-"
+          "${dt.month.toString().padLeft(2, '0')}-"
+          "${dt.year}";
+    } catch (_) {
+      return input;
+    }
+  }
 }
 
 String formatToDisplayTime(String input) {
-  final inputFormat = DateFormat("dd-MM-yyyy HH:mm");
-  final dateTime = inputFormat.parse(input);
-  final formatter = DateFormat('h.mm a');
-  return formatter.format(dateTime);
+  if (input.isEmpty) return '—';
+  try {
+    // ISO / UTC from API — add 8 hrs for Malaysia time
+    final myt = DateTime.parse(input).add(const Duration(hours: 8));
+    return DateFormat('h.mm a').format(myt);
+  } catch (_) {
+    try {
+      // Already in local dd-MM-yyyy HH:mm format
+      final dt = DateFormat("dd-MM-yyyy HH:mm").parse(input);
+      return DateFormat('h.mm a').format(dt);
+    } catch (_) {
+      return input;
+    }
+  }
 }
 
 String? extractDobFromNric(String nric) {

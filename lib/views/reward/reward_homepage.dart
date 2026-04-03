@@ -71,7 +71,6 @@ class _RewardHomepageState extends State<RewardHomepage> {
     return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
   }
 
-  // ─── Desktop ────────────────────────────────────────────────────────────────
 
   Widget _desktopView() {
     return Scaffold(
@@ -319,7 +318,6 @@ class _RewardHomepageState extends State<RewardHomepage> {
     );
   }
 
-  // ─── Table ──────────────────────────────────────────────────────────────────
 
   Widget _rewardTable() {
     return Consumer<RewardController>(
@@ -639,7 +637,6 @@ class _RewardHomepageState extends State<RewardHomepage> {
     );
   }
 
-  // ─── Mobile ──────────────────────────────────────────────────────────────────
 
   Widget _mobileView() {
     return Consumer<RewardController>(
@@ -761,7 +758,6 @@ class _RewardHomepageState extends State<RewardHomepage> {
     );
   }
 
-  // ─── Filter / Logic ──────────────────────────────────────────────────────────
 
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce

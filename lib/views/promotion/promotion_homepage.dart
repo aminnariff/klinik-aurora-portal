@@ -355,8 +355,6 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
     );
   }
 
-  // ─── Create Dialog ────────────────────────────────────────────────────────
-
   void _openCreateDialog() {
     _promotionName.clear();
     _promotionDescription.clear();
@@ -437,8 +435,6 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
     return true;
   }
 
-  // ─── Filtering ────────────────────────────────────────────────────────────
-
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce ? _debouncer.run(() => _runFiltering(page: page)) : _runFiltering(page: page);
   }
@@ -465,8 +461,6 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
 
   double bytesToMB(int bytes) => bytes / 1048576.0;
 }
-
-// ─── Promotion Card ──────────────────────────────────────────────────────────
 
 class _PromotionCard extends StatefulWidget {
   final Data promotion;
@@ -645,8 +639,6 @@ class _PromotionCardState extends State<_PromotionCard> {
     );
   }
 }
-
-// ─── Create / Edit Form Dialog ───────────────────────────────────────────────
 
 class _PromotionFormDialog extends StatelessWidget {
   final String title;

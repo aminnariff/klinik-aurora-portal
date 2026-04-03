@@ -79,7 +79,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
   }
 
-  // ─── Desktop ────────────────────────────────────────────────────────────────
 
   Widget _desktopView() {
     return Scaffold(
@@ -317,7 +316,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  // ─── Superadmin Table ────────────────────────────────────────────────────────
 
   Widget _superadminTable() {
     return Consumer<ServiceController>(
@@ -411,7 +409,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  // ─── Admin Table ─────────────────────────────────────────────────────────────
 
   Widget _adminTable() {
     return Consumer<ServiceBranchController>(
@@ -504,7 +501,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  // ─── Shared Cell Widgets ─────────────────────────────────────────────────────
 
   DataColumn2 _col(String label, ColumnSize size, {double? fixedWidth}) {
     return DataColumn2(
@@ -667,7 +663,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  // ─── Mobile ──────────────────────────────────────────────────────────────────
 
   Widget _mobileView() {
     final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
@@ -813,8 +808,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  // ─── Menu Handlers ────────────────────────────────────────────────────────────
-
   void _handleMenuSelection(String value, Data service) async {
     if (value == 'update') {
       showDialog(
@@ -922,6 +915,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           startMonth: now.month,
                           year: now.year,
                           totalMonths: 3,
+                          branchId: serviceBranch.branchId,
                           initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
                         ),
                       ),
@@ -978,7 +972,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     }
   }
 
-  // ─── Filter / Logic ──────────────────────────────────────────────────────────
 
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce ? _debouncer.run(() => runFiltering(page: page)) : runFiltering(page: page);
