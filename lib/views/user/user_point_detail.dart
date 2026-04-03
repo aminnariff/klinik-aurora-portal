@@ -94,20 +94,40 @@ class _UserPointDetailState extends State<UserPointDetail> {
               Consumer<UserController>(
                 builder: (context, snapshot, _) {
                   return CardContainer(
-                    Stack(
-                      alignment: Alignment.topRight,
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 16),
-                                AppSelectableText(
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF9FAFB),
+                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.stars_rounded, size: 18, color: Color(0xFF6B7280)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
                                   '${widget.user.userFullname}\'s Points',
-                                  style: AppTypography.displayMedium(context).apply(color: primary),
+                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                SizedBox(height: 8),
                                 if (snapshot.userPoints != null) ...[
                                   SizedBox(height: 8),
                                   AppSelectableText(
@@ -226,6 +246,8 @@ class _UserPointDetailState extends State<UserPointDetail> {
                               ),
                             ),
                           ),
+                      ],
+                    ),
                       ],
                     ),
                   );

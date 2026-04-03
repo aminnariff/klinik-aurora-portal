@@ -25,7 +25,6 @@ import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
@@ -103,280 +102,339 @@ class _VoucherDetailState extends State<VoucherDetail> {
     return editUser();
   }
 
+  Widget _sectionLabel(String label, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 3, height: 13, decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2))),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(label.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF6B7280), letterSpacing: 1.0)),
+      ],
+    );
+  }
+
   Row editUser() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CardContainer(
+                  IntrinsicWidth(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppSelectableText('Voucher Details', style: AppTypography.bodyLarge(context)),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 2),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: screenWidth1728(26),
-                              child: Column(
+                        // ── Header ──────────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF9FAFB),
+                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(8)),
+                                child: const Icon(Icons.confirmation_number_rounded, size: 16, color: Color(0xFF6366F1)),
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  InputField(field: _voucherName),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(field: _voucherDescription),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(field: _voucherCode),
-                                  AppPadding.vertical(denominator: 2),
-                                  Consumer<RewardController>(
-                                    builder: (context, snapshot, _) {
-                                      return StreamBuilder<DateTime>(
-                                        stream: rebuildDropdown.stream,
-                                        builder: (context, snapshot) {
-                                          return widget.type == 'update'
-                                              ? selectedReward?.name != null
-                                                    ? InputField(
-                                                        field: InputFieldAttribute(
-                                                          controller: TextEditingController(
-                                                            text: selectedReward?.name ?? '',
+                                  Text(
+                                    widget.type == 'create' ? 'New Voucher' : 'Edit Voucher',
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                                  ),
+                                  Text(
+                                    widget.type == 'create' ? 'Create a new redeemable voucher' : 'Update voucher details and validity',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              CloseButton(onPressed: () => context.pop()),
+                            ],
+                          ),
+                        ),
+                        // ── Body ────────────────────────────────────────────
+                        Padding(
+                          padding: EdgeInsets.all(screenPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Left: Voucher Details
+                                  SizedBox(
+                                    width: screenWidth1728(26),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Voucher Details', Icons.local_offer_outlined),
+                                        const SizedBox(height: 12),
+                                        InputField(field: _voucherName),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(field: _voucherDescription),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(field: _voucherCode),
+                                        AppPadding.vertical(denominator: 2),
+                                        const SizedBox(height: 8),
+                                        _sectionLabel('Linked Reward', Icons.card_giftcard_outlined),
+                                        const SizedBox(height: 12),
+                                        Consumer<RewardController>(
+                                          builder: (context, snap, _) {
+                                            return StreamBuilder<DateTime>(
+                                              stream: rebuildDropdown.stream,
+                                              builder: (context, snapshot) {
+                                                if (widget.type == 'update') {
+                                                  return selectedReward?.name != null
+                                                      ? InputField(
+                                                          field: InputFieldAttribute(
+                                                            controller: TextEditingController(text: selectedReward?.name ?? ''),
+                                                            isEditable: false,
                                                           ),
-                                                          isEditable: false,
+                                                        )
+                                                      : const SizedBox();
+                                                }
+                                                if (rewards.isEmpty) {
+                                                  return Container(
+                                                    padding: const EdgeInsets.all(12),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFFFF7ED),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(color: const Color(0xFFFED7AA)),
+                                                    ),
+                                                    child: Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFD97706)),
+                                                        const SizedBox(width: 8),
+                                                        Expanded(
+                                                          child: Text(
+                                                            'No rewards available. Vouchers without a linked reward will grant points only.',
+                                                            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF92400E)),
+                                                          ),
                                                         ),
-                                                      )
-                                                    : const SizedBox()
-                                              : rewards.isEmpty
-                                              ? Text(
-                                                  'No rewards available. Please add rewards to attach to this voucher if needed. When a staff member scans the customer\'s QR code, any voucher linked to a reward will be automatically redeemed by the customer, eliminating the need for them to redeem it manually in the rewards section.',
-                                                  style: AppTypography.bodyMedium(context),
-                                                  textAlign: TextAlign.justify,
-                                                )
-                                              : SizedBox(
-                                                  width: screenWidth1728(26),
-                                                  child: Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                                    children: [
-                                                      AppDropdown(
-                                                        attributeList: DropdownAttributeList(
-                                                          rewards,
-                                                          hintText: 'Select Reward (Optional)',
-                                                          value: selectedReward?.name,
-                                                          onChanged: (a) {
-                                                            if (a != null) {
-                                                              setState(() {
-                                                                selectedReward = a;
-                                                              });
-                                                            }
-                                                          },
-                                                          width: screenWidth1728(23),
-                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }
+                                                return Row(
+                                                  children: [
+                                                    AppDropdown(
+                                                      attributeList: DropdownAttributeList(
+                                                        rewards,
+                                                        hintText: 'Select Reward (Optional)',
+                                                        value: selectedReward?.name,
+                                                        onChanged: (a) {
+                                                          if (a != null) setState(() => selectedReward = a);
+                                                        },
+                                                        width: screenWidth1728(23),
                                                       ),
-                                                      const Tooltip(
-                                                        message:
-                                                            'Note: Adding rewards to a voucher is optional. If a voucher is created without rewards, the customer will receive points only',
-                                                        child: Padding(
-                                                          padding: EdgeInsets.only(left: 12),
-                                                          child: Icon(Icons.info_outline),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                    const Tooltip(
+                                                      message: 'Adding a reward is optional. Without one, the customer receives points only.',
+                                                      child: Padding(padding: EdgeInsets.only(left: 12), child: Icon(Icons.info_outline, size: 18)),
+                                                    ),
+                                                  ],
                                                 );
-                                        },
-                                      );
-                                    },
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  AppPadding.horizontal(),
+                                  // Right: Points & Schedule
+                                  SizedBox(
+                                    width: screenWidth1728(30),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Points & Schedule', Icons.schedule_outlined),
+                                        const SizedBox(height: 12),
+                                        InputField(field: _voucherPoint),
+                                        AppPadding.vertical(denominator: 2),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            var results = await showCalendarDatePicker2Dialog(
+                                              context: context,
+                                              config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now()),
+                                              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            );
+                                            if (_startDate.errorMessage != null) setState(() => _startDate.errorMessage = null);
+                                            _startDate.controller.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                          },
+                                          child: ReadOnly(
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                controller: _startDate.controller,
+                                                isEditable: false,
+                                                uneditableColor: textFormFieldEditableColor,
+                                                errorMessage: _startDate.errorMessage,
+                                                labelText: 'voucherPage'.tr(gender: 'startDate'),
+                                                suffixWidget: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.calendar_month)]),
+                                              ),
+                                            ),
+                                            isEditable: false,
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            var results = await showCalendarDatePicker2Dialog(
+                                              context: context,
+                                              config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now().add(const Duration(days: 1))),
+                                              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            );
+                                            if (_endDate.errorMessage != null) setState(() => _endDate.errorMessage = null);
+                                            _endDate.controller.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                          },
+                                          child: ReadOnly(
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                controller: _endDate.controller,
+                                                errorMessage: _endDate.errorMessage,
+                                                isEditable: false,
+                                                uneditableColor: textFormFieldEditableColor,
+                                                labelText: 'voucherPage'.tr(gender: 'endDate'),
+                                                suffixWidget: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.calendar_month)]),
+                                              ),
+                                            ),
+                                            isEditable: false,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF9FAFB),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: const Color(0xFFF3F4F6)),
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Icon(Icons.lightbulb_outline_rounded, size: 14, color: Color(0xFF9CA3AF)),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'When staff scan a customer\'s QR code, linked reward vouchers are auto-redeemed — no manual action needed.',
+                                                  style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                            AppPadding.horizontal(),
-                            SizedBox(
-                              width: screenWidth1728(30),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  InputField(field: _voucherPoint),
-                                  AppPadding.vertical(denominator: 2),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      var results = await showCalendarDatePicker2Dialog(
-                                        context: context,
-                                        config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now()),
-                                        dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                        borderRadius: BorderRadius.circular(15),
-                                      );
-                                      if (_startDate.errorMessage != null) {
-                                        setState(() {
-                                          _startDate.errorMessage = null;
+                                  Button(() {
+                                    if (validate()) {
+                                      showLoading();
+                                      if (widget.type == 'update') {
+                                        VoucherController.update(
+                                          context,
+                                          UpdateVoucherRequest(
+                                            voucherId: widget.voucher?.voucherId,
+                                            voucherName: _voucherName.controller.text,
+                                            voucherDescription: _voucherDescription.controller.text,
+                                            voucherStartDate: convertStringToDate(_startDate.controller.text),
+                                            voucherEndDate: convertStringToDate(_endDate.controller.text),
+                                            voucherStatus: widget.voucher?.voucherStatus,
+                                            voucherCode: _voucherCode.controller.text,
+                                            voucherPoint: int.parse(_voucherPoint.controller.text),
+                                            rewardId: selectedReward?.key,
+                                          ),
+                                        ).then((value) {
+                                          if (responseCode(value.code)) {
+                                            VoucherController.getAll(context, 1, pageSize).then((value) {
+                                              dismissLoading();
+                                              if (responseCode(value.code)) {
+                                                context.read<VoucherController>().voucherAllResponse = value;
+                                                context.pop();
+                                                showDialogSuccess(context, 'Successfully updated voucher');
+                                              } else {
+                                                context.pop();
+                                                showDialogSuccess(context, 'Successfully updated voucher');
+                                              }
+                                            });
+                                          } else {
+                                            showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                                          }
+                                        });
+                                      } else {
+                                        showLoading();
+                                        VoucherController.create(
+                                          context,
+                                          CreateVoucherRequest(
+                                            voucherName: _voucherName.controller.text,
+                                            voucherDescription: _voucherDescription.controller.text,
+                                            voucherStartDate: convertStringToDate(_startDate.controller.text),
+                                            voucherEndDate: convertStringToDate(_endDate.controller.text),
+                                            voucherCode: _voucherCode.controller.text,
+                                            voucherPoint: int.parse(_voucherPoint.controller.text),
+                                            rewardId: selectedReward?.key,
+                                          ),
+                                        ).then((value) {
+                                          dismissLoading();
+                                          if (responseCode(value.code)) {
+                                            VoucherController.getAll(context, 1, pageSize).then((value) {
+                                              dismissLoading();
+                                              if (responseCode(value.code)) {
+                                                context.read<VoucherController>().voucherAllResponse = value;
+                                                context.pop();
+                                                showDialogSuccess(context, 'Successfully created voucher');
+                                              } else {
+                                                context.pop();
+                                                showDialogSuccess(context, 'Successfully created voucher');
+                                              }
+                                            });
+                                          } else {
+                                            showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                                          }
                                         });
                                       }
-                                      _startDate.controller.text =
-                                          dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                    },
-                                    child: ReadOnly(
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: _startDate.controller,
-                                          isEditable: false,
-                                          uneditableColor: textFormFieldEditableColor,
-                                          errorMessage: _startDate.errorMessage,
-                                          labelText: 'voucherPage'.tr(gender: 'startDate'),
-                                          suffixWidget: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [Icon(Icons.calendar_month)],
-                                          ),
-                                        ),
-                                      ),
-                                      isEditable: false,
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      var results = await showCalendarDatePicker2Dialog(
-                                        context: context,
-                                        config: CalendarDatePicker2WithActionButtonsConfig(
-                                          currentDate: DateTime.now().add(const Duration(days: 1)),
-                                        ),
-                                        dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                        borderRadius: BorderRadius.circular(15),
-                                      );
-                                      if (_endDate.errorMessage != null) {
-                                        setState(() {
-                                          _endDate.errorMessage = null;
-                                        });
-                                      }
-                                      _endDate.controller.text =
-                                          dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                    },
-                                    child: ReadOnly(
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: _endDate.controller,
-                                          errorMessage: _endDate.errorMessage,
-                                          isEditable: false,
-                                          uneditableColor: textFormFieldEditableColor,
-                                          labelText: 'voucherPage'.tr(gender: 'endDate'),
-                                          suffixWidget: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [Icon(Icons.calendar_month)],
-                                          ),
-                                        ),
-                                      ),
-                                      isEditable: false,
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
+                                    }
+                                  }, actionText: 'button'.tr(gender: widget.type)),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 1 / 1.5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Button(() {
-                              if (validate()) {
-                                showLoading();
-                                if (widget.type == 'update') {
-                                  VoucherController.update(
-                                    context,
-                                    UpdateVoucherRequest(
-                                      voucherId: widget.voucher?.voucherId,
-                                      voucherName: _voucherName.controller.text,
-                                      voucherDescription: _voucherDescription.controller.text,
-                                      voucherStartDate: convertStringToDate(_startDate.controller.text),
-                                      voucherEndDate: convertStringToDate(_endDate.controller.text),
-                                      voucherStatus: widget.voucher?.voucherStatus,
-                                      voucherCode: _voucherCode.controller.text,
-                                      voucherPoint: int.parse(_voucherPoint.controller.text),
-                                      rewardId: selectedReward?.key,
-                                    ),
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      VoucherController.getAll(context, 1, pageSize).then((value) {
-                                        dismissLoading();
-                                        if (responseCode(value.code)) {
-                                          context.read<VoucherController>().voucherAllResponse = value;
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully updated voucher voucherPage');
-                                        } else {
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully updated voucher voucherPage');
-                                        }
-                                      });
-                                    } else {
-                                      showDialogError(
-                                        context,
-                                        value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                      );
-                                    }
-                                  });
-                                } else {
-                                  showLoading();
-                                  VoucherController.create(
-                                    context,
-                                    CreateVoucherRequest(
-                                      voucherName: _voucherName.controller.text,
-                                      voucherDescription: _voucherDescription.controller.text,
-                                      voucherStartDate: convertStringToDate(_startDate.controller.text),
-                                      voucherEndDate: convertStringToDate(_endDate.controller.text),
-                                      voucherCode: _voucherCode.controller.text,
-                                      voucherPoint: int.parse(_voucherPoint.controller.text),
-                                      rewardId: selectedReward?.key,
-                                    ),
-                                  ).then((value) {
-                                    dismissLoading();
-                                    if (responseCode(value.code)) {
-                                      VoucherController.getAll(context, 1, pageSize).then((value) {
-                                        dismissLoading();
-                                        if (responseCode(value.code)) {
-                                          context.read<VoucherController>().voucherAllResponse = value;
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully created voucher');
-                                        } else {
-                                          context.pop();
-                                          showDialogSuccess(context, 'Successfully created customer voucherPage');
-                                        }
-                                      });
-                                    } else {
-                                      showDialogError(
-                                        context,
-                                        value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                      );
-                                    }
-                                  });
-                                }
-                              }
-                            }, actionText: 'button'.tr(gender: widget.type)),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

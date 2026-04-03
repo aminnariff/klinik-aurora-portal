@@ -356,7 +356,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.shield_outlined, color: Colors.white.withAlpha(180), size: 13),
+                            Icon(Icons.shield_outlined, color: Colors.white.withAlpha(180), size: 17),
                             const SizedBox(width: 6),
                             Text(
                               'Authorized Personnel Only  ·  System is monitored',
@@ -472,7 +472,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.admin_panel_settings_rounded, color: secondaryColor, size: 12),
+                  Icon(Icons.admin_panel_settings_rounded, color: secondaryColor, size: 17),
                   SizedBox(width: 5),
                   Text(
                     'Healthcare Admin  ·  Management Portal',
@@ -817,7 +817,7 @@ class _FeatureBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 13),
+          Icon(icon, color: Colors.white, size: 17),
           const SizedBox(width: 6),
           Text(
             label,

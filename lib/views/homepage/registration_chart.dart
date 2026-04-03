@@ -32,22 +32,14 @@ class _RegistrationChartState extends State<RegistrationChart> {
         final data = controller.dashboardResponse?.data;
 
         return Container(
-          decoration: const BoxDecoration(
-            color: _bgColor,
-            borderRadius: BorderRadius.all(Radius.circular(18)),
-          ),
+          decoration: const BoxDecoration(color: _bgColor, borderRadius: BorderRadius.all(Radius.circular(18))),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(context),
               Divider(color: _dividerColor, height: 1),
               Padding(
-                padding: EdgeInsets.fromLTRB(
-                  screenPadding * 1.5,
-                  screenPadding,
-                  screenPadding * 1.5,
-                  screenPadding,
-                ),
+                padding: EdgeInsets.fromLTRB(screenPadding * 1.5, screenPadding, screenPadding * 1.5, screenPadding),
                 child: _showChart ? _buildChart(data) : _buildTable(data),
               ),
             ],
@@ -63,17 +55,8 @@ class _RegistrationChartState extends State<RegistrationChart> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            'Registrations',
-            style: AppTypography.displayMedium(context).apply(color: Colors.white),
-          ),
-          Row(
-            children: [
-              if (_showChart) _buildPeriodToggle(),
-              const SizedBox(width: 8),
-              _buildViewToggle(),
-            ],
-          ),
+          Text('Registrations', style: AppTypography.displayMedium(context).apply(color: Colors.white)),
+          Row(children: [if (_showChart) _buildPeriodToggle(), const SizedBox(width: 8), _buildViewToggle()]),
         ],
       ),
     );
@@ -81,16 +64,10 @@ class _RegistrationChartState extends State<RegistrationChart> {
 
   Widget _buildPeriodToggle() {
     return Container(
-      decoration: BoxDecoration(
-        color: _dividerColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: _dividerColor, borderRadius: BorderRadius.circular(8)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _periodOption('7 Days', true),
-          _periodOption('7 Months', false),
-        ],
+        children: [_periodOption('7 Days', true), _periodOption('7 Months', false)],
       ),
     );
   }
@@ -102,9 +79,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected
-              ? (isDaily ? const Color(0xFFDF6E98) : const Color(0xff23b6e6))
-              : Colors.transparent,
+          color: selected ? (isDaily ? const Color(0xFFDF6E98) : const Color(0xff23b6e6)) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -121,16 +96,10 @@ class _RegistrationChartState extends State<RegistrationChart> {
 
   Widget _buildViewToggle() {
     return Container(
-      decoration: BoxDecoration(
-        color: _dividerColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: _dividerColor, borderRadius: BorderRadius.circular(8)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _viewOption(Icons.show_chart_rounded, true),
-          _viewOption(Icons.table_chart_outlined, false),
-        ],
+        children: [_viewOption(Icons.show_chart_rounded, true), _viewOption(Icons.table_chart_outlined, false)],
       ),
     );
   }
@@ -149,7 +118,6 @@ class _RegistrationChartState extends State<RegistrationChart> {
       ),
     );
   }
-
 
   Widget _buildChart(Data? data) {
     if (_showDaily) {
@@ -172,9 +140,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
       aspectRatio: isMobile ? 1.8 : 4,
       child: LineChart(
         LineChartData(
-          lineTouchData: _lineTouchData(
-            getLabel: (spot) => '${spot.y.toInt()} registrations',
-          ),
+          lineTouchData: _lineTouchData(getLabel: (spot) => '${spot.y.toInt()} registrations'),
           gridData: _gridData(),
           titlesData: FlTitlesData(
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -223,9 +189,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
       aspectRatio: isMobile ? 1.8 : 4,
       child: LineChart(
         LineChartData(
-          lineTouchData: _lineTouchData(
-            getLabel: (spot) => '${spot.y.toInt()} registrations',
-          ),
+          lineTouchData: _lineTouchData(getLabel: (spot) => '${spot.y.toInt()} registrations'),
           gridData: _gridData(),
           titlesData: FlTitlesData(
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -297,10 +261,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            colors.first.withAlpha(opacityCalculation(.3)),
-            colors.last.withAlpha(opacityCalculation(.0)),
-          ],
+          colors: [colors.first.withAlpha(opacityCalculation(.3)), colors.last.withAlpha(opacityCalculation(.0))],
         ),
       ),
     );
@@ -325,7 +286,10 @@ class _RegistrationChartState extends State<RegistrationChart> {
     Widget sectionHeader(String label, Color color) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 6),
-        child: Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+        child: Text(
+          label,
+          style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+        ),
       );
     }
 
@@ -350,10 +314,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
     // build daily columns
     final dayColumns = days.map((d) {
       return Column(
-        children: [
-          colHeader(convertToDayMonth(d.date ?? '')),
-          colValue('${d.totalRegistrationByDay ?? 0}'),
-        ],
+        children: [colHeader(convertToDayMonth(d.date ?? '')), colValue('${d.totalRegistrationByDay ?? 0}')],
       );
     }).toList();
 
@@ -372,16 +333,34 @@ class _RegistrationChartState extends State<RegistrationChart> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // row label column
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 30),
+              const Opacity(
+                opacity: 0,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 4),
+                  child: Text('X', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+              ),
               Container(
                 height: 26,
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.only(right: 16),
-                child: const Text('Total', style: cellStyle),
+                child: const Text(
+                  'Date',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 26,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(right: 16),
+                    child: const Text('Total', style: cellStyle),
+                  ),
+                ],
               ),
             ],
           ),
@@ -418,7 +397,9 @@ class _RegistrationChartState extends State<RegistrationChart> {
   Widget _emptyState() {
     return const SizedBox(
       height: 120,
-      child: Center(child: Text('No data available', style: TextStyle(color: _mutedColor))),
+      child: Center(
+        child: Text('No data available', style: TextStyle(color: _mutedColor)),
+      ),
     );
   }
 }

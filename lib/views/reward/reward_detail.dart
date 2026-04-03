@@ -23,9 +23,7 @@ import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
@@ -72,250 +70,360 @@ class _RewardDetailState extends State<RewardDetail> {
     return rewardDetails();
   }
 
+  Widget _sectionLabel(String label, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 3,
+          height: 13,
+          decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF6B7280),
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
+    );
+  }
+
   Row rewardDetails() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CardContainer(
+                  IntrinsicWidth(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppSelectableText('Reward Information', style: AppTypography.bodyLarge(context)),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 2),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: screenWidth1728(26),
-                              child: Column(
+                        // ── Header ──────────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF9FAFB),
+                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2FF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.redeem_rounded, size: 16, color: Color(0xFF6366F1)),
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  InputField(
-                                    field: InputFieldAttribute(controller: _rewardName, labelText: 'Name'),
+                                  Text(
+                                    widget.type == 'create' ? 'New Reward' : 'Edit Reward',
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  TextField(
-                                    maxLines: null,
-                                    style: Theme.of(context).textTheme.bodyMedium!.apply(),
-                                    controller: _rewardDescription,
-                                    decoration: appInputDecoration(context, 'Description'),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _rewardPoint,
-                                      isNumber: true,
-                                      maxCharacter: 6,
-                                      labelText: 'Redemption Points',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _rewardTotal,
-                                      isNumber: true,
-                                      maxCharacter: 7,
-                                      labelText: 'No. of Items',
-                                      tooltip: 'Enter \'0\' for the item count if it is infinite.',
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      var results = await showCalendarDatePicker2Dialog(
-                                        context: context,
-                                        config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now()),
-                                        dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                        borderRadius: BorderRadius.circular(15),
-                                      );
-                                      _startDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                    },
-                                    child: ReadOnly(
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: _startDate,
-                                          isEditable: false,
-                                          labelText: 'rewardPage'.tr(gender: 'startDate'),
-                                          suffixWidget: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [Icon(Icons.calendar_month)],
-                                          ),
-                                        ),
-                                      ),
-                                      isEditable: false,
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      var results = await showCalendarDatePicker2Dialog(
-                                        context: context,
-                                        config: CalendarDatePicker2WithActionButtonsConfig(
-                                          currentDate: DateTime.now().add(const Duration(days: 1)),
-                                        ),
-                                        dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                        borderRadius: BorderRadius.circular(15),
-                                      );
-                                      _endDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                    },
-                                    child: ReadOnly(
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: _endDate,
-                                          isEditable: false,
-                                          labelText: 'rewardPage'.tr(gender: 'endDate'),
-                                          suffixWidget: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [Icon(Icons.calendar_month)],
-                                          ),
-                                        ),
-                                      ),
-                                      isEditable: false,
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  const Text(
-                                    '* Leave Start Date and End Date blank if you prefer not to specify a timeframe for this reward.',
+                                  Text(
+                                    widget.type == 'create'
+                                        ? 'Create a new redeemable reward for customers'
+                                        : 'Update reward details, points, and availability',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
                                   ),
                                 ],
                               ),
-                            ),
-                            AppPadding.horizontal(),
-                            SizedBox(
-                              width: screenWidth1728(30),
-                              child: StreamBuilder<DateTime>(
-                                stream: fileRebuild.stream,
-                                builder: (context, snapshot) {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      if (widget.type == 'create') ...[
-                                        selectedFile?.value == null
-                                            ? UploadDocumentsField(
-                                                title: 'rewardPage'.tr(gender: 'browseFile'),
-                                                fieldTitle: 'rewardPage'.tr(gender: 'rewardImage'),
-                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                action: () {
-                                                  addPicture();
-                                                },
-                                                cancelAction: () {},
-                                              )
-                                            : Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      addPicture();
-                                                    },
-                                                    child: Image.memory(selectedFile?.value as Uint8List, height: 410),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      selectedFile = FileAttribute();
-                                                      fileRebuild.add(DateTime.now());
-                                                    },
-                                                    icon: const Icon(Icons.close),
-                                                  ),
-                                                ],
+                              const Spacer(),
+                              CloseButton(onPressed: () => context.pop()),
+                            ],
+                          ),
+                        ),
+                        // ── Body ────────────────────────────────────────────
+                        Padding(
+                          padding: EdgeInsets.all(screenPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Left: Reward Info + Schedule
+                                  SizedBox(
+                                    width: screenWidth1728(26),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Reward Details', Icons.card_giftcard_outlined),
+                                        const SizedBox(height: 12),
+                                        InputField(
+                                          field: InputFieldAttribute(controller: _rewardName, labelText: 'Name'),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        TextField(
+                                          maxLines: null,
+                                          style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                                          controller: _rewardDescription,
+                                          decoration: appInputDecoration(context, 'Description'),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _rewardPoint,
+                                            isNumber: true,
+                                            maxCharacter: 6,
+                                            labelText: 'Redemption Points',
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _rewardTotal,
+                                            isNumber: true,
+                                            maxCharacter: 7,
+                                            labelText: 'No. of Items',
+                                            tooltip: 'Enter \'0\' for the item count if it is infinite.',
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        _sectionLabel('Availability', Icons.date_range_outlined),
+                                        const SizedBox(height: 12),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            var results = await showCalendarDatePicker2Dialog(
+                                              context: context,
+                                              config: CalendarDatePicker2WithActionButtonsConfig(
+                                                currentDate: DateTime.now(),
                                               ),
-                                      ],
-                                      if (widget.type == 'update')
-                                        widget.reward?.rewardImage == null
-                                            ? selectedFile?.name != null
-                                                  ? Stack(
-                                                      alignment: Alignment.topRight,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            addPicture();
-                                                          },
-                                                          child: Image.memory(
-                                                            selectedFile?.value as Uint8List,
-                                                            height: 410,
-                                                          ),
-                                                        ),
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            selectedFile = FileAttribute();
-                                                            fileRebuild.add(DateTime.now());
-                                                          },
-                                                          icon: const Icon(Icons.close),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  : UploadDocumentsField(
-                                                      title: 'branchImage'.tr(gender: 'browseFile'),
-                                                      fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                      action: () {
-                                                        addPicture();
-                                                      },
-                                                      cancelAction: () {},
-                                                    )
-                                            : GestureDetector(
-                                                onTap: () {
-                                                  addPicture();
-                                                },
-                                                child: Image.network(
-                                                  '${Environment.imageUrl}${widget.reward?.rewardImage}',
-                                                  height: 410,
+                                              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            );
+                                            _startDate.text =
+                                                dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                          },
+                                          child: ReadOnly(
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                controller: _startDate,
+                                                isEditable: false,
+                                                labelText: 'rewardPage'.tr(gender: 'startDate'),
+                                                suffixWidget: const Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [Icon(Icons.calendar_month)],
                                                 ),
                                               ),
-                                      AppPadding.vertical(denominator: 2),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 1 / 1.5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Button(() {
-                              if (widget.type == 'update') {
-                                RewardController.update(
-                                  context,
-                                  UpdateRewardRequest(
-                                    rewardId: widget.reward?.rewardId ?? '',
-                                    rewardName: _rewardName.text,
-                                    rewardDescription: _rewardDescription.text,
-                                    rewardPoint: int.parse(_rewardPoint.text),
-                                    rewardStartDate: convertStringToDate(_startDate.text),
-                                    rewardEndDate: convertStringToDate(_endDate.text),
-                                    totalReward: int.parse(_rewardTotal.text),
-                                    rewardStatus: widget.reward?.rewardStatus,
+                                            ),
+                                            isEditable: false,
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            var results = await showCalendarDatePicker2Dialog(
+                                              context: context,
+                                              config: CalendarDatePicker2WithActionButtonsConfig(
+                                                currentDate: DateTime.now().add(const Duration(days: 1)),
+                                              ),
+                                              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            );
+                                            _endDate.text =
+                                                dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                          },
+                                          child: ReadOnly(
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                controller: _endDate,
+                                                isEditable: false,
+                                                labelText: 'rewardPage'.tr(gender: 'endDate'),
+                                                suffixWidget: const Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [Icon(Icons.calendar_month)],
+                                                ),
+                                              ),
+                                            ),
+                                            isEditable: false,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF9FAFB),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: const Color(0xFFF3F4F6)),
+                                          ),
+                                          child: const Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Icon(Icons.info_outline_rounded, size: 13, color: Color(0xFF9CA3AF)),
+                                              SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'Leave Start/End Date blank to make this reward available indefinitely.',
+                                                  style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ).then((value) {
-                                  if (responseCode(value.code)) {
-                                    if (selectedFile?.value != null) {
-                                      RewardController.upload(context, widget.reward!.rewardId!, selectedFile!).then((
-                                        value,
-                                      ) {
+                                  AppPadding.horizontal(),
+                                  // Right: Image
+                                  SizedBox(
+                                    width: screenWidth1728(30),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Reward Image', Icons.image_outlined),
+                                        const SizedBox(height: 12),
+                                        StreamBuilder<DateTime>(
+                                          stream: fileRebuild.stream,
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                if (widget.type == 'create') ...[
+                                                  selectedFile?.value == null
+                                                      ? UploadDocumentsField(
+                                                          title: 'rewardPage'.tr(gender: 'browseFile'),
+                                                          fieldTitle: 'rewardPage'.tr(gender: 'rewardImage'),
+                                                          action: () => addPicture(),
+                                                          cancelAction: () {},
+                                                        )
+                                                      : Stack(
+                                                          alignment: Alignment.topRight,
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: GestureDetector(
+                                                                onTap: () => addPicture(),
+                                                                child: Image.memory(
+                                                                  selectedFile?.value as Uint8List,
+                                                                  height: 300,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            IconButton(
+                                                              onPressed: () {
+                                                                selectedFile = FileAttribute();
+                                                                fileRebuild.add(DateTime.now());
+                                                              },
+                                                              icon: const Icon(Icons.close),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                ],
+                                                if (widget.type == 'update')
+                                                  widget.reward?.rewardImage == null
+                                                      ? selectedFile?.name != null
+                                                            ? Stack(
+                                                                alignment: Alignment.topRight,
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius: BorderRadius.circular(10),
+                                                                    child: GestureDetector(
+                                                                      onTap: () => addPicture(),
+                                                                      child: Image.memory(
+                                                                        selectedFile?.value as Uint8List,
+                                                                        height: 300,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  IconButton(
+                                                                    onPressed: () {
+                                                                      selectedFile = FileAttribute();
+                                                                      fileRebuild.add(DateTime.now());
+                                                                    },
+                                                                    icon: const Icon(Icons.close),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            : UploadDocumentsField(
+                                                                title: 'branchImage'.tr(gender: 'browseFile'),
+                                                                fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                                action: () => addPicture(),
+                                                                cancelAction: () {},
+                                                              )
+                                                      : ClipRRect(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          child: GestureDetector(
+                                                            onTap: () => addPicture(),
+                                                            child: Image.network(
+                                                              '${Environment.imageUrl}${widget.reward?.rewardImage}',
+                                                              height: 300,
+                                                            ),
+                                                          ),
+                                                        ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Button(() {
+                                    if (widget.type == 'update') {
+                                      RewardController.update(
+                                        context,
+                                        UpdateRewardRequest(
+                                          rewardId: widget.reward?.rewardId ?? '',
+                                          rewardName: _rewardName.text,
+                                          rewardDescription: _rewardDescription.text,
+                                          rewardPoint: int.parse(_rewardPoint.text),
+                                          rewardStartDate: convertStringToDate(_startDate.text),
+                                          rewardEndDate: convertStringToDate(_endDate.text),
+                                          totalReward: int.parse(_rewardTotal.text),
+                                          rewardStatus: widget.reward?.rewardStatus,
+                                        ),
+                                      ).then((value) {
                                         if (responseCode(value.code)) {
-                                          getLatestData();
+                                          if (selectedFile?.value != null) {
+                                            RewardController.upload(
+                                              context,
+                                              widget.reward!.rewardId!,
+                                              selectedFile!,
+                                            ).then((value) {
+                                              if (responseCode(value.code)) {
+                                                getLatestData();
+                                              } else {
+                                                showDialogError(
+                                                  context,
+                                                  value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                                );
+                                              }
+                                            });
+                                          } else {
+                                            context.pop();
+                                            getLatestData();
+                                          }
                                         } else {
                                           showDialogError(
                                             context,
@@ -323,53 +431,45 @@ class _RewardDetailState extends State<RewardDetail> {
                                           );
                                         }
                                       });
-                                    } else {
-                                      context.pop();
-                                      getLatestData();
+                                    } else if (widget.type == 'create') {
+                                      RewardController.create(
+                                        context,
+                                        CreateRewardRequest(
+                                          rewardName: _rewardName.text,
+                                          rewardDescription: _rewardDescription.text,
+                                          rewardPoint: int.parse(_rewardPoint.text),
+                                          rewardStartDate: convertStringToDate(_startDate.text),
+                                          rewardEndDate: convertStringToDate(_endDate.text),
+                                          totalReward: _rewardTotal.text != '' ? int.parse(_rewardTotal.text) : null,
+                                        ),
+                                      ).then((value) {
+                                        if (responseCode(value.code)) {
+                                          context.pop();
+                                          RewardController.upload(context, value.data!.id!, selectedFile!).then((
+                                            value,
+                                          ) {
+                                            if (responseCode(value.code)) getLatestData();
+                                          });
+                                        } else {
+                                          showDialogError(
+                                            context,
+                                            value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
+                                          );
+                                        }
+                                      });
                                     }
-                                  } else {
-                                    showDialogError(
-                                      context,
-                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                    );
-                                  }
-                                });
-                              } else if (widget.type == 'create') {
-                                RewardController.create(
-                                  context,
-                                  CreateRewardRequest(
-                                    rewardName: _rewardName.text,
-                                    rewardDescription: _rewardDescription.text,
-                                    rewardPoint: int.parse(_rewardPoint.text),
-                                    rewardStartDate: convertStringToDate(_startDate.text),
-                                    rewardEndDate: convertStringToDate(_endDate.text),
-                                    totalReward: _rewardTotal.text != '' ? int.parse(_rewardTotal.text) : null,
-                                  ),
-                                ).then((value) {
-                                  if (responseCode(value.code)) {
-                                    context.pop();
-                                    RewardController.upload(context, value.data!.id!, selectedFile!).then((value) {
-                                      if (responseCode(value.code)) {
-                                        getLatestData();
-                                      }
-                                    });
-                                  } else {
-                                    showDialogError(
-                                      context,
-                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                    );
-                                  }
-                                });
-                              }
-                            }, actionText: 'button'.tr(gender: 'update')),
-                          ],
+                                  }, actionText: 'button'.tr(gender: widget.type)),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

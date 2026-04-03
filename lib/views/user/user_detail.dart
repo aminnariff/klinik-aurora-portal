@@ -28,7 +28,6 @@ import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class UserDetail extends StatefulWidget {
@@ -145,337 +144,358 @@ class _UserDetailState extends State<UserDetail> {
     return editUser();
   }
 
+  Widget _sectionLabel(String label, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 3, height: 13, decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2))),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(label.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF6B7280), letterSpacing: 1.0)),
+      ],
+    );
+  }
+
   Row editUser() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        StreamBuilder<DateTime>(
-          stream: rebuild.stream,
-          builder: (context, snapshot) {
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CardContainer(
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                      child: IntrinsicWidth(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: StreamBuilder<DateTime>(
+            stream: rebuild.stream,
+            builder: (context, snapshot) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CardContainer(
+                      IntrinsicWidth(
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                AppSelectableText('User Details', style: AppTypography.bodyLarge(context)),
-                                CloseButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            const Divider(color: Color(0xFFF3F4F6), height: 1),
-                            const SizedBox(height: 16),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: screenWidth1728(26),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      if (widget.type == 'update')
-                                        labelValue('Username', usernameAttribute.controller.text)
-                                      else
-                                        InputField(field: usernameAttribute),
-                                      SizedBox(height: 12),
-                                      InputField(field: fullNameAttribute),
-                                      SizedBox(height: 12),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          var results = await showCalendarDatePicker2Dialog(
-                                            context: context,
-                                            config: CalendarDatePicker2WithActionButtonsConfig(
-                                              firstDate: DateTime(DateTime.now().year - 100),
-                                              lastDate: DateTime.now(),
-                                              calendarViewMode: CalendarDatePicker2Mode.year,
-                                            ),
-                                            dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                            borderRadius: BorderRadius.circular(15),
-                                          );
-                                          if (results != null) {
-                                            if (dobAttribute.errorMessage != null) {
-                                              dobAttribute.errorMessage = null;
-                                              rebuild.add(DateTime.now());
-                                            }
-                                            dobAttribute.controller.text =
-                                                dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
-                                          }
-                                        },
-                                        child: ReadOnly(InputField(field: dobAttribute), isEditable: false),
-                                      ),
-                                      SizedBox(height: 12),
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          labelText: 'Document ID',
-                                          helpText:
-                                              'If patient is a Malaysian, please enter their NRIC. Otherwise, provide their passport number.',
-                                          controller: nricController,
-                                          isEditable: true,
-                                          maxCharacter: 12,
-                                          isUpperCase: true,
-                                          isAlphaNumericOnly: true,
-                                          onChanged: (value) {
-                                            if (widget.user?.userDob == null) {
-                                              try {
-                                                if (value.length == 12 && int.tryParse(value) != null) {
-                                                  try {
-                                                    final dob = extractDobFromNric(value);
-                                                    if (dob != null) {
-                                                      dobAttribute.controller.text = dob;
-                                                      dobAttribute.errorMessage = null;
-                                                      rebuild.add(DateTime.now());
-                                                    }
-                                                  } catch (e) {
-                                                    debugPrint(e.toString());
-                                                  }
-                                                }
-                                              } catch (e) {
-                                                debugPrint(e.toString());
-                                              }
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                      SizedBox(height: 12),
-                                      labelValue('Created At', dateConverter(widget.user?.createdDate) ?? ''),
-                                      SizedBox(height: 12),
-                                      if (widget.user?.modifiedDate != null)
-                                        labelValue('Last Updated At', dateConverter(widget.user?.modifiedDate) ?? ''),
-                                      // if (widget.type == 'create') ...[
-                                      //   InputField(
-                                      //     field: InputFieldAttribute(
-                                      //       controller: _password,
-                                      //       labelText: 'information'.tr(gender: 'password'),
-                                      //     ),
-                                      //   ),
-                                      //   AppPadding.vertical(denominator: 2),
-                                      // ],
-                                    ],
-                                  ),
-                                ),
-                                AppPadding.horizontal(),
-                                SizedBox(
-                                  width: screenWidth1728(30),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      InputField(field: phoneAttribute),
-                                      SizedBox(height: 12),
-                                      if (widget.type == 'update')
-                                        labelValue('Email', emailAttribute.controller.text)
-                                      else
-                                        InputField(
-                                          field: InputFieldAttribute(
-                                            controller: emailAttribute.controller,
-                                            labelText: emailAttribute.labelText,
-                                            isEmail: true,
-                                            errorMessage: emailAttribute.errorMessage,
-                                          ),
-                                        ),
-                                      SizedBox(height: 12),
-                                      Row(
-                                        children: [
-                                          StreamBuilder<DateTime>(
-                                            stream: rebuildDropdown.stream,
-                                            builder: (context, asyncSnapshot) {
-                                              return AppDropdown(
-                                                attributeList: DropdownAttributeList(
-                                                  branches,
-                                                  onChanged: (selected) {
-                                                    setState(() {
-                                                      _selectedBranch = selected;
-                                                      branchIdAttribute.errorMessage = null;
-                                                      branchIdAttribute.controller.text = selected!.name;
-                                                    });
-                                                  },
-                                                  value: _selectedBranch?.name,
-                                                  hintText: 'Branch',
-                                                  width: screenWidth1728(30),
-                                                  errorMessage: branchIdAttribute.errorMessage,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 12),
-                                      labelValue('Created by', widget.user?.createdByAdmin == 1 ? 'Admin' : 'Patient'),
-                                      SizedBox(height: 12),
-                                      labelValue(
-                                        'T&C Status',
-                                        widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0
-                                            ? 'Accepted'
-                                            : 'Not Accepted',
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            const Divider(color: Color(0xFFF3F4F6), height: 1),
-                            const SizedBox(height: 12),
-                            if (widget.type == 'update')
-                              ValueListenableBuilder<bool>(
-                                valueListenable: _userStatus,
-                                builder: (context, status, _) {
-                                  return Row(
-                                    children: [
-                                      const Text(
-                                        'Account Status',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF374151),
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: status ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        child: Text(
-                                          status ? 'Active' : 'Inactive',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: status ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Switch(
-                                        value: status,
-                                        onChanged: (val) => _userStatus.value = val,
-                                        activeThumbColor: const Color(0xFF15803D),
-                                      ),
-                                    ],
-                                  );
-                                },
+                            // ── Header ──────────────────────────────────────
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFF9FAFB),
+                                border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
                               ),
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Button(() {
-                                  if (validate()) {
-                                    showLoading();
-                                    if (widget.type == 'update') {
-                                      UserController.update(
-                                        context,
-                                        UpdateUserRequest(
-                                          userId: widget.user?.userId,
-                                          userName: widget.user?.userName ?? usernameAttribute.controller.text.trim(),
-                                          userFullname: fullNameAttribute.controller.text.trim(),
-                                          userNric: notNullOrEmptyString(nricController.text)
-                                              ? nricController.text
-                                              : null,
-                                          userDob: convertStringToDate(dobAttribute.controller.text),
-                                          userPhone: phoneAttribute.controller.text.trim(),
-                                          branchId: _selectedBranch?.key,
-                                          userStatus: _userStatus.value ? 1 : 0,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(8)),
+                                    child: const Icon(Icons.person_rounded, size: 16, color: Color(0xFF6366F1)),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        widget.type == 'create' ? 'New Customer' : 'Edit Customer',
+                                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                                      ),
+                                      Text(
+                                        widget.type == 'create' ? 'Register a new customer account' : 'Update customer profile and settings',
+                                        style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                      ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  CloseButton(onPressed: () => context.pop()),
+                                ],
+                              ),
+                            ),
+                            // ── Body ────────────────────────────────────────
+                            Padding(
+                              padding: EdgeInsets.all(screenPadding),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Left: Personal Info
+                                      SizedBox(
+                                        width: screenWidth1728(26),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            _sectionLabel('Personal Information', Icons.badge_outlined),
+                                            const SizedBox(height: 12),
+                                            if (widget.type == 'update')
+                                              labelValue('Username', usernameAttribute.controller.text)
+                                            else
+                                              InputField(field: usernameAttribute),
+                                            const SizedBox(height: 12),
+                                            InputField(field: fullNameAttribute),
+                                            const SizedBox(height: 12),
+                                            GestureDetector(
+                                              onTap: () async {
+                                                var results = await showCalendarDatePicker2Dialog(
+                                                  context: context,
+                                                  config: CalendarDatePicker2WithActionButtonsConfig(
+                                                    firstDate: DateTime(DateTime.now().year - 100),
+                                                    lastDate: DateTime.now(),
+                                                    calendarViewMode: CalendarDatePicker2Mode.year,
+                                                  ),
+                                                  dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                                  borderRadius: BorderRadius.circular(15),
+                                                );
+                                                if (results != null) {
+                                                  if (dobAttribute.errorMessage != null) {
+                                                    dobAttribute.errorMessage = null;
+                                                    rebuild.add(DateTime.now());
+                                                  }
+                                                  dobAttribute.controller.text =
+                                                      dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
+                                                }
+                                              },
+                                              child: ReadOnly(InputField(field: dobAttribute), isEditable: false),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                labelText: 'Document ID',
+                                                helpText: 'If patient is a Malaysian, please enter their NRIC. Otherwise, provide their passport number.',
+                                                controller: nricController,
+                                                isEditable: true,
+                                                maxCharacter: 12,
+                                                isUpperCase: true,
+                                                isAlphaNumericOnly: true,
+                                                onChanged: (value) {
+                                                  if (widget.user?.userDob == null) {
+                                                    try {
+                                                      if (value.length == 12 && int.tryParse(value) != null) {
+                                                        try {
+                                                          final dob = extractDobFromNric(value);
+                                                          if (dob != null) {
+                                                            dobAttribute.controller.text = dob;
+                                                            dobAttribute.errorMessage = null;
+                                                            rebuild.add(DateTime.now());
+                                                          }
+                                                        } catch (e) { debugPrint(e.toString()); }
+                                                      }
+                                                    } catch (e) { debugPrint(e.toString()); }
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            if (widget.type == 'update') ...[
+                                              const SizedBox(height: 20),
+                                              const Divider(color: Color(0xFFF3F4F6), thickness: 1),
+                                              const SizedBox(height: 12),
+                                              _sectionLabel('Record Info', Icons.history_rounded),
+                                              const SizedBox(height: 10),
+                                              labelValue('Created At', dateConverter(widget.user?.createdDate) ?? '—'),
+                                              if (widget.user?.modifiedDate != null) ...[
+                                                const SizedBox(height: 8),
+                                                labelValue('Last Updated At', dateConverter(widget.user?.modifiedDate) ?? '—'),
+                                              ],
+                                            ],
+                                          ],
                                         ),
-                                      ).then((value) {
-                                        if (responseCode(value.code)) {
-                                          UserController.getAll(
-                                            context,
-                                            1,
-                                            pageSize,
-                                            userFullName: '',
-                                            userName: '',
-                                            userPhone: '',
-                                          ).then((value) {
-                                            dismissLoading();
-                                            if (responseCode(value.code)) {
-                                              context.read<UserController>().userAllResponse = value.data?.data;
-                                              context.pop();
-                                              showDialogSuccess(context, 'Successfully updated customer information');
-                                            } else {
-                                              context.pop();
-                                              showDialogSuccess(context, 'Successfully updated customer information');
-                                            }
-                                          });
-                                        } else {
-                                          showDialogError(
-                                            context,
-                                            value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                          );
-                                        }
-                                      });
-                                    } else {
-                                      UserController.create(
-                                        context,
-                                        CreateUserRequest(
-                                          userName: usernameAttribute.controller.text,
-                                          userFullname: fullNameAttribute.controller.text.trim(),
-                                          userPhone: phoneAttribute.controller.text.trim(),
-                                          userEmail: emailAttribute.controller.text.trim(),
-                                          userDob: convertStringToDate(dobAttribute.controller.text),
-                                          userPassword: 'aurora123',
-                                          userRetypePassword: 'aurora123',
-                                          branchId: _selectedBranch?.key,
+                                      ),
+                                      AppPadding.horizontal(),
+                                      // Right: Contact & Branch
+                                      SizedBox(
+                                        width: screenWidth1728(30),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            _sectionLabel('Contact & Branch', Icons.contacts_outlined),
+                                            const SizedBox(height: 12),
+                                            InputField(field: phoneAttribute),
+                                            const SizedBox(height: 12),
+                                            if (widget.type == 'update')
+                                              labelValue('Email', emailAttribute.controller.text)
+                                            else
+                                              InputField(
+                                                field: InputFieldAttribute(
+                                                  controller: emailAttribute.controller,
+                                                  labelText: emailAttribute.labelText,
+                                                  isEmail: true,
+                                                  errorMessage: emailAttribute.errorMessage,
+                                                ),
+                                              ),
+                                            const SizedBox(height: 12),
+                                            StreamBuilder<DateTime>(
+                                              stream: rebuildDropdown.stream,
+                                              builder: (context, asyncSnapshot) {
+                                                return AppDropdown(
+                                                  attributeList: DropdownAttributeList(
+                                                    branches,
+                                                    onChanged: (selected) {
+                                                      setState(() {
+                                                        _selectedBranch = selected;
+                                                        branchIdAttribute.errorMessage = null;
+                                                        branchIdAttribute.controller.text = selected!.name;
+                                                      });
+                                                    },
+                                                    value: _selectedBranch?.name,
+                                                    hintText: 'Branch',
+                                                    width: screenWidth1728(30),
+                                                    errorMessage: branchIdAttribute.errorMessage,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            if (widget.type == 'update') ...[
+                                              const SizedBox(height: 20),
+                                              const Divider(color: Color(0xFFF3F4F6), thickness: 1),
+                                              const SizedBox(height: 12),
+                                              _sectionLabel('Account Metadata', Icons.info_outline_rounded),
+                                              const SizedBox(height: 10),
+                                              labelValue('Created by', widget.user?.createdByAdmin == 1 ? 'Admin' : 'Patient'),
+                                              const SizedBox(height: 8),
+                                              labelValue(
+                                                'T&C Status',
+                                                widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0 ? 'Accepted' : 'Not Accepted',
+                                              ),
+                                            ],
+                                          ],
                                         ),
-                                      ).then((value) {
-                                        if (responseCode(value.code)) {
-                                          UserController.getAll(
-                                            context,
-                                            1,
-                                            pageSize,
-                                            userFullName: '',
-                                            userPhone: '',
-                                            userName: '',
-                                          ).then((value) {
-                                            dismissLoading();
-                                            if (responseCode(value.code)) {
-                                              context.read<UserController>().userAllResponse = value.data?.data;
-                                              context.pop();
-                                              showDialogSuccess(context, 'Successfully created customer');
-                                            } else {
-                                              context.pop();
-                                              showDialogSuccess(context, 'Successfully created customer information');
-                                            }
-                                          });
-                                        } else {
-                                          showDialogError(
-                                            context,
-                                            value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                          );
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  const Divider(color: Color(0xFFF3F4F6), thickness: 1),
+                                  const SizedBox(height: 12),
+                                  if (widget.type == 'update')
+                                    ValueListenableBuilder<bool>(
+                                      valueListenable: _userStatus,
+                                      builder: (context, status, _) {
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: status ? const Color(0xFFF0FDF4) : const Color(0xFFFFF7F7),
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(color: status ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA)),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                status ? Icons.check_circle_outline_rounded : Icons.block_rounded,
+                                                size: 18,
+                                                color: status ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              const Text('Account Status', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151))),
+                                              const Spacer(),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: status ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                                child: Text(
+                                                  status ? 'Active' : 'Inactive',
+                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: status ? const Color(0xFF15803D) : const Color(0xFFB91C1C)),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Switch(value: status, onChanged: (val) => _userStatus.value = val, activeThumbColor: const Color(0xFF15803D)),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Button(() {
+                                        if (validate()) {
+                                          showLoading();
+                                          if (widget.type == 'update') {
+                                            UserController.update(
+                                              context,
+                                              UpdateUserRequest(
+                                                userId: widget.user?.userId,
+                                                userName: widget.user?.userName ?? usernameAttribute.controller.text.trim(),
+                                                userFullname: fullNameAttribute.controller.text.trim(),
+                                                userNric: notNullOrEmptyString(nricController.text) ? nricController.text : null,
+                                                userDob: convertStringToDate(dobAttribute.controller.text),
+                                                userPhone: phoneAttribute.controller.text.trim(),
+                                                branchId: _selectedBranch?.key,
+                                                userStatus: _userStatus.value ? 1 : 0,
+                                              ),
+                                            ).then((value) {
+                                              if (responseCode(value.code)) {
+                                                UserController.getAll(context, 1, pageSize, userFullName: '', userName: '', userPhone: '').then((value) {
+                                                  dismissLoading();
+                                                  if (responseCode(value.code)) {
+                                                    context.read<UserController>().userAllResponse = value.data?.data;
+                                                    context.pop();
+                                                    showDialogSuccess(context, 'Successfully updated customer information');
+                                                  } else {
+                                                    context.pop();
+                                                    showDialogSuccess(context, 'Successfully updated customer information');
+                                                  }
+                                                });
+                                              } else {
+                                                showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                                              }
+                                            });
+                                          } else {
+                                            UserController.create(
+                                              context,
+                                              CreateUserRequest(
+                                                userName: usernameAttribute.controller.text,
+                                                userFullname: fullNameAttribute.controller.text.trim(),
+                                                userPhone: phoneAttribute.controller.text.trim(),
+                                                userEmail: emailAttribute.controller.text.trim(),
+                                                userDob: convertStringToDate(dobAttribute.controller.text),
+                                                userPassword: 'aurora123',
+                                                userRetypePassword: 'aurora123',
+                                                branchId: _selectedBranch?.key,
+                                              ),
+                                            ).then((value) {
+                                              if (responseCode(value.code)) {
+                                                UserController.getAll(context, 1, pageSize, userFullName: '', userPhone: '', userName: '').then((value) {
+                                                  dismissLoading();
+                                                  if (responseCode(value.code)) {
+                                                    context.read<UserController>().userAllResponse = value.data?.data;
+                                                    context.pop();
+                                                    showDialogSuccess(context, 'Successfully created customer');
+                                                  } else {
+                                                    context.pop();
+                                                    showDialogSuccess(context, 'Successfully created customer information');
+                                                  }
+                                                });
+                                              } else {
+                                                showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                                              }
+                                            });
+                                          }
                                         }
-                                      });
-                                    }
-                                  }
-                                }, actionText: 'button'.tr(gender: widget.type)),
-                              ],
+                                      }, actionText: 'button'.tr(gender: widget.type)),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ],
     );

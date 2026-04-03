@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
-
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
@@ -26,7 +24,6 @@ import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
@@ -72,371 +69,371 @@ class _PromotionDetailState extends State<PromotionDetail> {
     return editPromotion();
   }
 
+  Widget _sectionLabel(String label, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 3, height: 13, decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2))),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(label.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF6B7280), letterSpacing: 1.0)),
+      ],
+    );
+  }
+
   Row editPromotion() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CardContainer(
+                  IntrinsicWidth(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppSelectableText('Promotion', style: AppTypography.bodyLarge(context)),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 2),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: screenWidth1728(26),
-                              child: Column(
+                        // ── Header ──────────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF9FAFB),
+                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(8)),
+                                child: const Icon(Icons.campaign_rounded, size: 16, color: Color(0xFF6366F1)),
+                              ),
+                              const SizedBox(width: 10),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  InputField(
-                                    field: InputFieldAttribute(controller: _promotionName, labelText: 'Name'),
+                                  Text('Edit Promotion', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                                  Text('Update promotion content, images, and schedule', style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF))),
+                                ],
+                              ),
+                              const Spacer(),
+                              CloseButton(onPressed: () => context.pop()),
+                            ],
+                          ),
+                        ),
+                        // ── Body ────────────────────────────────────────────
+                        Padding(
+                          padding: EdgeInsets.all(screenPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Left: Content
+                                  SizedBox(
+                                    width: screenWidth1728(26),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Promotion Content', Icons.article_outlined),
+                                        const SizedBox(height: 12),
+                                        InputField(
+                                          field: InputFieldAttribute(controller: _promotionName, labelText: 'Name'),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        TextField(
+                                          maxLines: null,
+                                          style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                                          controller: _promotionDescription,
+                                          decoration: appInputDecoration(context, 'Description'),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        TextField(
+                                          maxLines: null,
+                                          style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                                          controller: _promotionTnc,
+                                          decoration: appInputDecoration(context, 'Terms and Conditions'),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  TextField(
-                                    maxLines: null,
-                                    style: Theme.of(context).textTheme.bodyMedium!.apply(),
-                                    controller: _promotionDescription,
-                                    decoration: appInputDecoration(context, 'Description'),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  TextField(
-                                    maxLines: null,
-                                    style: Theme.of(context).textTheme.bodyMedium!.apply(),
-                                    controller: _promotionTnc,
-                                    decoration: appInputDecoration(context, "Terms and Conditions"),
+                                  AppPadding.horizontal(),
+                                  // Right: Media + Schedule
+                                  SizedBox(
+                                    width: screenWidth1728(30),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Images (max 3)', Icons.image_outlined),
+                                        const SizedBox(height: 12),
+                                        StreamBuilder<DateTime>(
+                                          stream: fileRebuild.stream,
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                if (selectedFiles.length < 3)
+                                                  UploadDocumentsField(
+                                                    title: 'promotionPage'.tr(gender: 'browseFile'),
+                                                    fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
+                                                    action: () async {
+                                                      documentErrorMessage.add(null);
+                                                      FilePickerResult? result = await FilePicker.platform.pickFiles();
+                                                      if (result != null) {
+                                                        PlatformFile file = result.files.first;
+                                                        if (supportedExtensions.contains(file.extension)) {
+                                                          if (bytesToMB(file.size) < 1.0) {
+                                                            selectedFiles.add(FileAttribute(name: result.files.first.name, value: result.files.first.bytes));
+                                                            fileRebuild.add(DateTime.now());
+                                                          } else {
+                                                            showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
+                                                          }
+                                                        } else {
+                                                          showDialogError(context, 'error'.tr(gender: 'err-22', args: [fileSizeLimit.toStringAsFixed(0)]));
+                                                        }
+                                                      }
+                                                    },
+                                                    cancelAction: () {},
+                                                  ),
+                                                const SizedBox(height: 8),
+                                                for (int index = 0; index < selectedFiles.length; index++)
+                                                  Container(
+                                                    margin: const EdgeInsets.only(bottom: 6),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFF9FAFB),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(color: const Color(0xFFF3F4F6)),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        const Icon(Icons.image_outlined, size: 16, color: Color(0xFF9CA3AF)),
+                                                        const SizedBox(width: 8),
+                                                        Expanded(
+                                                          child: GestureDetector(
+                                                            onTap: () {
+                                                              if (selectedFiles[index].path != null || selectedFiles[index].value != null) {
+                                                                showDialog(
+                                                                  context: context,
+                                                                  builder: (_) => GestureDetector(
+                                                                    onTap: () => context.pop(),
+                                                                    child: Row(
+                                                                      mainAxisSize: MainAxisSize.min,
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                      children: [
+                                                                        Flexible(
+                                                                          child: CardContainer(
+                                                                            selectedFiles[index].value != null
+                                                                                ? Image.memory(selectedFiles[index].value!)
+                                                                                : selectedFiles[index].path != null
+                                                                                ? Padding(padding: EdgeInsets.all(screenPadding), child: Image.network('${Environment.imageUrl}${selectedFiles[index].path}'))
+                                                                                : const SizedBox(),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            },
+                                                            child: Text(
+                                                              '${index + 1}. ${selectedFiles[index].name ?? ''}',
+                                                              style: const TextStyle(fontSize: 12, color: Color(0xFF6366F1)),
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        IconButton(
+                                                          icon: const Icon(Icons.close, size: 16),
+                                                          tooltip: 'button'.tr(gender: 'remove'),
+                                                          visualDensity: VisualDensity.compact,
+                                                          onPressed: () {
+                                                            PromotionController.remove(context, selectedFiles[index].name ?? '').then((value) {
+                                                              if (responseCode(value.code)) {
+                                                                selectedFiles.removeAt(index);
+                                                                fileRebuild.add(DateTime.now());
+                                                              } else {
+                                                                showDialogError(context, 'Unable to delete image');
+                                                              }
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(height: 20),
+                                        _sectionLabel('Schedule', Icons.schedule_outlined),
+                                        const SizedBox(height: 12),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            var results = await showCalendarDatePicker2Dialog(
+                                              context: context,
+                                              config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now()),
+                                              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            );
+                                            _startDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                          },
+                                          child: ReadOnly(
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                controller: _startDate,
+                                                isEditable: false,
+                                                labelText: 'promotionPage'.tr(gender: 'startDate'),
+                                                suffixWidget: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.calendar_month)]),
+                                              ),
+                                            ),
+                                            isEditable: false,
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            var results = await showCalendarDatePicker2Dialog(
+                                              context: context,
+                                              config: CalendarDatePicker2WithActionButtonsConfig(currentDate: DateTime.now().add(const Duration(days: 1))),
+                                              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            );
+                                            _endDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+                                          },
+                                          child: ReadOnly(
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                controller: _endDate,
+                                                isEditable: false,
+                                                labelText: 'promotionPage'.tr(gender: 'endDate'),
+                                                suffixWidget: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.calendar_month)]),
+                                              ),
+                                            ),
+                                            isEditable: false,
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        ValueListenableBuilder<bool>(
+                                          valueListenable: _showOnStart,
+                                          builder: (context, shown, _) {
+                                            return GestureDetector(
+                                              onTap: () => _showOnStart.value = !shown,
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                                decoration: BoxDecoration(
+                                                  color: shown ? const Color(0xFFEEF2FF) : const Color(0xFFF9FAFB),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  border: Border.all(color: shown ? const Color(0xFF6366F1) : const Color(0xFFE5E7EB)),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    CheckBoxWidget((p0) => _showOnStart.value = !shown, value: shown),
+                                                    AppPadding.horizontal(denominator: 2),
+                                                    Flexible(
+                                                      child: Text(
+                                                        'promotionPage'.tr(gender: 'showOnStart'),
+                                                        style: TextStyle(fontWeight: shown ? FontWeight.w600 : FontWeight.normal, color: shown ? const Color(0xFF6366F1) : null),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                            AppPadding.horizontal(),
-                            SizedBox(
-                              width: screenWidth1728(30),
-                              child: StreamBuilder<DateTime>(
-                                stream: fileRebuild.stream,
-                                builder: (context, snapshot) {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      if (selectedFiles.length < 3) ...[
-                                        UploadDocumentsField(
-                                          title: 'promotionPage'.tr(gender: 'browseFile'),
-                                          fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
-                                          // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                          action: () async {
-                                            documentErrorMessage.add(null);
-                                            FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-                                            if (result != null) {
-                                              PlatformFile file = result.files.first;
-                                              if (supportedExtensions.contains(file.extension)) {
-                                                debugPrint(bytesToMB(file.size).toString());
-                                                debugPrint(file.name);
-                                                if (bytesToMB(file.size) < 1.0) {
-                                                  Uint8List? fileBytes = result.files.first.bytes;
-                                                  String fileName = result.files.first.name;
-
-                                                  selectedFiles.add(FileAttribute(name: fileName, value: fileBytes));
-                                                  fileRebuild.add(DateTime.now());
-                                                } else {
-                                                  showDialogError(
-                                                    context,
-                                                    'error'.tr(
-                                                      gender: 'err-21',
-                                                      args: [fileSizeLimit.toStringAsFixed(0)],
-                                                    ),
-                                                  );
-                                                }
-                                              } else {
-                                                showDialogError(
-                                                  context,
-                                                  'error'.tr(
-                                                    gender: 'err-22',
-                                                    args: [fileSizeLimit.toStringAsFixed(0)],
-                                                  ),
-                                                );
-                                              }
-                                            } else {
-                                              // User canceled the picker
-                                            }
-                                          },
-                                          cancelAction: () {},
-                                        ),
-                                      ],
-                                      for (int index = 0; index < selectedFiles.length; index++)
-                                        ListTile(
-                                          title: GestureDetector(
-                                            onTap: () {
-                                              if (selectedFiles[index].path != null ||
-                                                  selectedFiles[index].value != null) {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return GestureDetector(
-                                                      onTap: () {
-                                                        context.pop();
-                                                      },
-                                                      child: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: [
-                                                          Flexible(
-                                                            child: CardContainer(
-                                                              selectedFiles[index].value != null
-                                                                  ? Image.memory(selectedFiles[index].value!)
-                                                                  : selectedFiles[index].path != null
-                                                                  ? Padding(
-                                                                      padding: EdgeInsets.all(screenPadding),
-                                                                      child: Image.network(
-                                                                        '${Environment.imageUrl}${selectedFiles[index].path}',
-                                                                      ),
-                                                                    )
-                                                                  : const SizedBox(),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              }
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Text('${index + 1}. ', style: AppTypography.bodyMedium(context)),
-                                                Flexible(
-                                                  child: Text(
-                                                    '  ${selectedFiles[index].name ?? ''}',
-                                                    style: AppTypography.bodyMedium(context).apply(color: Colors.blue),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          enableFeedback: true,
-                                          enabled: true,
-                                          trailing: IconButton(
-                                            icon: const Icon(Icons.close),
-                                            tooltip: 'button'.tr(gender: 'remove'),
-                                            onPressed: () {
-                                              PromotionController.remove(context, selectedFiles[index].name ?? "").then(
-                                                (value) {
-                                                  if (responseCode(value.code)) {
-                                                    selectedFiles.removeAt(index);
-                                                    fileRebuild.add(DateTime.now());
-                                                  } else {
-                                                    showDialogError(context, 'unable to delete image');
-                                                  }
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      AppPadding.vertical(),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          var results = await showCalendarDatePicker2Dialog(
-                                            context: context,
-                                            config: CalendarDatePicker2WithActionButtonsConfig(
-                                              currentDate: DateTime.now(),
-                                            ),
-                                            dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                            borderRadius: BorderRadius.circular(15),
-                                          );
-                                          _startDate.text =
-                                              dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                        },
-                                        child: ReadOnly(
-                                          InputField(
-                                            field: InputFieldAttribute(
-                                              controller: _startDate,
-                                              isEditable: false,
-                                              labelText: 'promotionPage'.tr(gender: 'startDate'),
-                                              suffixWidget: const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [Icon(Icons.calendar_month)],
-                                              ),
-                                            ),
-                                          ),
-                                          isEditable: false,
-                                        ),
-                                      ),
-                                      AppPadding.vertical(denominator: 2),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          var results = await showCalendarDatePicker2Dialog(
-                                            context: context,
-                                            config: CalendarDatePicker2WithActionButtonsConfig(
-                                              currentDate: DateTime.now().add(const Duration(days: 1)),
-                                            ),
-                                            dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                            borderRadius: BorderRadius.circular(15),
-                                          );
-                                          _endDate.text =
-                                              dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-                                        },
-                                        child: ReadOnly(
-                                          InputField(
-                                            field: InputFieldAttribute(
-                                              controller: _endDate,
-                                              isEditable: false,
-                                              labelText: 'promotionPage'.tr(gender: 'endDate'),
-                                            ),
-                                          ),
-                                          isEditable: false,
-                                        ),
-                                      ),
-                                      AppPadding.vertical(denominator: 2),
-                                      ValueListenableBuilder<bool>(
-                                        valueListenable: _showOnStart,
-                                        builder: (context, snapshot, _) {
-                                          return Row(
-                                            children: [
-                                              CheckBoxWidget((p0) {
-                                                _showOnStart.value = !snapshot;
-                                              }, value: snapshot),
-                                              AppPadding.horizontal(denominator: 2),
-                                              Flexible(
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    _showOnStart.value = !snapshot;
-                                                  },
-                                                  child: Text('promotionPage'.tr(gender: 'showOnStart')),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 1 / 1.5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Button(() {
-                              if (validate()) {
-                                showLoading();
-                                PromotionController.update(
-                                  context,
-                                  UpdatePromotionRequest(
-                                    promotionId: widget.promotion.promotionId ?? '',
-                                    promotionName: _promotionName.text,
-                                    promotionDescription: _promotionDescription.text,
-                                    promotionTnc: _promotionTnc.text,
-                                    promotionStartDate: convertStringToDate(_startDate.text),
-                                    promotionEndDate: convertStringToDate(_endDate.text),
-                                    showOnStart: _showOnStart.value,
-                                    promotionStatus: widget.promotion.promotionStatus == 1 ? true : false,
-                                  ),
-                                ).then((value) {
-                                  dismissLoading();
-                                  if (responseCode(value.code)) {
-                                    if (isAnyFileChange()) {
-                                      bool showError = false;
-                                      for (FileAttribute item in selectedFiles) {
-                                        if (item.name!.contains('images/promotion')) {
-                                          showError = true;
-                                          break;
-                                        }
-                                      }
-                                      if (showError) {
-                                        showDialogError(
-                                          context,
-                                          'Please delete the outdated images and upload the updated versions.',
-                                        );
-                                      } else {
-                                        showLoading();
-                                        for (int i = 0; i < selectedFiles.length; i++) {
-                                          if (selectedFiles[i].value != null) {
-                                            PromotionController.upload(context, widget.promotion.promotionId!, [
-                                              selectedFiles[i],
-                                            ]).then((value) {
-                                              dismissLoading();
-                                              if (responseCode(value.code)) {
-                                                if (i == selectedFiles.length - 1) {
-                                                  context.pop();
-                                                  PromotionController.getAll(context, 1, pageSize).then(
-                                                    (value) =>
-                                                        context.read<PromotionController>().promotionAllResponse =
-                                                            value,
-                                                  );
-                                                  showDialogSuccess(
-                                                    context,
-                                                    'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
-                                                  );
-                                                }
-                                              } else {
-                                                showDialogError(
-                                                  context,
-                                                  value.data?.message ?? 'ERROR : ${value.code}',
-                                                );
-                                              }
-                                            });
-                                          } else if (i == selectedFiles.length - 1) {
-                                            context.pop();
-                                            PromotionController.getAll(context, 1, pageSize).then(
-                                              (value) =>
-                                                  context.read<PromotionController>().promotionAllResponse = value,
-                                            );
-                                            showDialogSuccess(
-                                              context,
-                                              'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
-                                            );
-                                          }
-                                        }
-                                      }
-                                    } else {
-                                      context.pop();
-                                      showDialogSuccess(
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Button(() {
+                                    if (validate()) {
+                                      showLoading();
+                                      PromotionController.update(
                                         context,
-                                        'We\'ve just whipped up an amazing new promotion that\'s sure to bring endless joy to our customers! 🎉',
-                                      );
+                                        UpdatePromotionRequest(
+                                          promotionId: widget.promotion.promotionId ?? '',
+                                          promotionName: _promotionName.text,
+                                          promotionDescription: _promotionDescription.text,
+                                          promotionTnc: _promotionTnc.text,
+                                          promotionStartDate: convertStringToDate(_startDate.text),
+                                          promotionEndDate: convertStringToDate(_endDate.text),
+                                          showOnStart: _showOnStart.value,
+                                          promotionStatus: widget.promotion.promotionStatus == 1 ? true : false,
+                                        ),
+                                      ).then((value) {
+                                        dismissLoading();
+                                        if (responseCode(value.code)) {
+                                          if (isAnyFileChange()) {
+                                            bool showError = false;
+                                            for (FileAttribute item in selectedFiles) {
+                                              if (item.name!.contains('images/promotion')) { showError = true; break; }
+                                            }
+                                            if (showError) {
+                                              showDialogError(context, 'Please delete the outdated images and upload the updated versions.');
+                                            } else {
+                                              showLoading();
+                                              for (int i = 0; i < selectedFiles.length; i++) {
+                                                if (selectedFiles[i].value != null) {
+                                                  PromotionController.upload(context, widget.promotion.promotionId!, [selectedFiles[i]]).then((value) {
+                                                    dismissLoading();
+                                                    if (responseCode(value.code)) {
+                                                      if (i == selectedFiles.length - 1) {
+                                                        context.pop();
+                                                        PromotionController.getAll(context, 1, pageSize).then((value) => context.read<PromotionController>().promotionAllResponse = value);
+                                                        showDialogSuccess(context, 'Promotion updated successfully!');
+                                                      }
+                                                    } else {
+                                                      showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                                                    }
+                                                  });
+                                                } else if (i == selectedFiles.length - 1) {
+                                                  context.pop();
+                                                  PromotionController.getAll(context, 1, pageSize).then((value) => context.read<PromotionController>().promotionAllResponse = value);
+                                                  showDialogSuccess(context, 'Promotion updated successfully!');
+                                                }
+                                              }
+                                            }
+                                          } else {
+                                            context.pop();
+                                            showDialogSuccess(context, 'Promotion updated successfully!');
+                                          }
+                                        } else {
+                                          showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                                        }
+                                      });
                                     }
-                                  } else {
-                                    showDialogError(
-                                      context,
-                                      value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                    );
-                                  }
-                                });
-                              }
-                            }, actionText: 'button'.tr(gender: 'update')),
-                          ],
+                                  }, actionText: 'button'.tr(gender: 'update')),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

@@ -103,10 +103,33 @@ class _TimeListManagerState extends State<TimeListManager> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: Column(
-                    children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF9FAFB),
+                        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.schedule_rounded, size: 18, color: Color(0xFF6B7280)),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Manage Time Slots',
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                          ),
+                          const Spacer(),
+                          CloseButton(onPressed: () => context.pop()),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
+                      child: Column(
+                        children: [
                       Row(
                         children: [
                           InputField(
@@ -185,6 +208,8 @@ class _TimeListManagerState extends State<TimeListManager> {
                       }, actionText: 'Update'),
                     ],
                   ),
+                ),
+                  ],
                 ),
               ),
             ],

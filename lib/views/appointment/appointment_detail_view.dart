@@ -21,30 +21,30 @@ class AppointmentDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = response?.data;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              constraints: const BoxConstraints(maxWidth: 840, maxHeight: 840),
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _headerBar(context, data),
-                    Flexible(
-                      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                constraints: const BoxConstraints(maxWidth: 840),
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _headerBar(context, data),
+                      Padding(
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,14 +81,14 @@ class AppointmentDetailsView extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -136,7 +136,7 @@ class AppointmentDetailsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel('Patient'),
+        _sectionLabel('Patient', Icons.person_rounded),
         const SizedBox(height: 10),
         Row(
           children: [
@@ -213,7 +213,7 @@ class AppointmentDetailsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel('Appointment'),
+        _sectionLabel('Appointment', Icons.event_note_rounded),
         const SizedBox(height: 10),
         // Date & Time chip
         Container(
@@ -334,7 +334,7 @@ class AppointmentDetailsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel('Fees'),
+        _sectionLabel('Fees', Icons.receipt_long_outlined),
         const SizedBox(height: 10),
         Row(
           children: [
@@ -417,7 +417,7 @@ class AppointmentDetailsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel('Record Info'),
+        _sectionLabel('Record Info', Icons.info_outline_rounded),
         const SizedBox(height: 10),
         _metaRow(Icons.add_circle_outline, 'Created', dateConverter(data?.createdDate) ?? '—'),
         const SizedBox(height: 8),
@@ -457,7 +457,7 @@ class AppointmentDetailsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel('Patient Feedback'),
+        _sectionLabel('Patient Feedback', Icons.star_outline_rounded),
         const SizedBox(height: 10),
         if (rating != null)
           Row(
@@ -501,10 +501,28 @@ class AppointmentDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _sectionLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF9CA3AF), letterSpacing: 0.8),
+  Widget _sectionLabel(String text, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 3,
+          height: 13,
+          decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(
+          text.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF6B7280),
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
     );
   }
 

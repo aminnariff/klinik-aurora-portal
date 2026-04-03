@@ -27,9 +27,7 @@ import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
@@ -89,278 +87,350 @@ class _BranchDetailState extends State<BranchDetail> {
     return editBranch();
   }
 
+  Widget _sectionLabel(String label, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 3,
+          height: 13,
+          decoration: BoxDecoration(
+            color: const Color(0xFF6366F1),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF6B7280),
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
+    );
+  }
+
   Row editBranch() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CardContainer(
+                  IntrinsicWidth(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppSelectableText('Branch Details', style: AppTypography.bodyLarge(context)),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 2),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: screenWidth1728(26),
-                              child: Column(
+                        // ── Header ───────────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF9FAFB),
+                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2FF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.store_rounded, size: 16, color: Color(0xFF6366F1)),
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _branchName,
-                                      labelText: 'branchPage'.tr(gender: 'branchName'),
-                                    ),
+                                  Text(
+                                    widget.type == 'create' ? 'New Branch' : 'Edit Branch',
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _branchCode,
-                                      labelText: 'branchPage'.tr(gender: 'branchCode'),
-                                    ),
+                                  Text(
+                                    widget.type == 'create'
+                                        ? 'Set up a new clinic branch with its details and hours'
+                                        : 'Update branch information and operating hours',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _address,
-                                      labelText: 'information'.tr(gender: 'address'),
-                                      isEmail: true,
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  SizedBox(
-                                    width: screenWidth1728(30),
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          flex: 1,
-                                          child: InputField(
-                                            field: InputFieldAttribute(
-                                              controller: _postcode,
-                                              maxCharacter: 5,
-                                              labelText: 'information'.tr(gender: 'postalCode'),
-                                            ),
-                                          ),
-                                        ),
-                                        AppPadding.horizontal(denominator: 2),
-                                        Flexible(
-                                          flex: 2,
-                                          child: InputField(
-                                            field: InputFieldAttribute(
-                                              controller: _city,
-                                              labelText: 'information'.tr(gender: 'city'),
-                                              isEmail: true,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  AppDropdown(
-                                    attributeList: DropdownAttributeList(
-                                      states,
-                                      onChanged: (selected) {
-                                        setState(() {
-                                          _state.text = selected!.key;
-                                        });
-                                      },
-                                      value: _state.text,
-                                      width: screenWidth1728(30),
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
                                 ],
                               ),
-                            ),
-                            AppPadding.horizontal(),
-                            SizedBox(
-                              width: screenWidth1728(30),
-                              child: StreamBuilder<DateTime>(
-                                stream: fileRebuild.stream,
-                                builder: (context, snapshot) {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      if (widget.type == 'create') ...[
-                                        selectedFile.value == null
-                                            ? UploadDocumentsField(
-                                                title: 'branchPage'.tr(gender: 'browseFile'),
-                                                fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                action: () {
-                                                  addPicture();
-                                                },
-                                                cancelAction: () {},
-                                              )
-                                            : Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      addPicture();
-                                                    },
-                                                    child: Image.memory(selectedFile.value as Uint8List),
+                              const Spacer(),
+                              CloseButton(onPressed: () => context.pop()),
+                            ],
+                          ),
+                        ),
+                        // ── Body ─────────────────────────────────────────────
+                        Padding(
+                          padding: EdgeInsets.all(screenPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // ── Left Column: Basic Info + Location ───────
+                                  SizedBox(
+                                    width: screenWidth1728(26),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Basic Information
+                                        _sectionLabel('Basic Information', Icons.business_outlined),
+                                        const SizedBox(height: 12),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _branchName,
+                                            labelText: 'branchPage'.tr(gender: 'branchName'),
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _branchCode,
+                                            labelText: 'branchPage'.tr(gender: 'branchCode'),
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _branchPhone,
+                                            labelText: 'branchPage'.tr(gender: 'phoneNo'),
+                                            isNumber: true,
+                                            maxCharacter: 10,
+                                            prefixIcon: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
+                                                  child: const Text(
+                                                    '+60',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w700,
+                                                      fontSize: 15.0,
+                                                      color: textPrimaryColor,
+                                                    ),
                                                   ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      selectedFile = FileAttribute();
-                                                      fileRebuild.add(DateTime.now());
-                                                    },
-                                                    icon: const Icon(Icons.close),
-                                                  ),
-                                                ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 24),
+                                        // Location
+                                        _sectionLabel('Location', Icons.location_on_outlined),
+                                        const SizedBox(height: 12),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _address,
+                                            labelText: 'information'.tr(gender: 'address'),
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        Row(
+                                          children: [
+                                            Flexible(
+                                              flex: 1,
+                                              child: InputField(
+                                                field: InputFieldAttribute(
+                                                  controller: _postcode,
+                                                  maxCharacter: 5,
+                                                  labelText: 'information'.tr(gender: 'postalCode'),
+                                                ),
                                               ),
+                                            ),
+                                            AppPadding.horizontal(denominator: 2),
+                                            Flexible(
+                                              flex: 2,
+                                              child: InputField(
+                                                field: InputFieldAttribute(
+                                                  controller: _city,
+                                                  labelText: 'information'.tr(gender: 'city'),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        AppDropdown(
+                                          attributeList: DropdownAttributeList(
+                                            states,
+                                            onChanged: (selected) {
+                                              setState(() {
+                                                _state.text = selected!.key;
+                                              });
+                                            },
+                                            value: _state.text,
+                                            width: screenWidth1728(26),
+                                          ),
+                                        ),
                                       ],
-                                      if (widget.type == 'update')
-                                        widget.branch?.branchImage == null
-                                            ? selectedFile.name != null
-                                                  ? Stack(
-                                                      alignment: Alignment.topRight,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            addPicture();
-                                                          },
-                                                          child: Image.memory(selectedFile.value as Uint8List),
+                                    ),
+                                  ),
+                                  AppPadding.horizontal(),
+                                  // ── Right Column: Media + Operations ─────────
+                                  SizedBox(
+                                    width: screenWidth1728(30),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Media
+                                        _sectionLabel('Branch Image', Icons.image_outlined),
+                                        const SizedBox(height: 12),
+                                        StreamBuilder<DateTime>(
+                                          stream: fileRebuild.stream,
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                if (widget.type == 'create') ...[
+                                                  selectedFile.value == null
+                                                      ? UploadDocumentsField(
+                                                          title: 'branchPage'.tr(gender: 'browseFile'),
+                                                          fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                          action: () => addPicture(),
+                                                          cancelAction: () {},
+                                                        )
+                                                      : Stack(
+                                                          alignment: Alignment.topRight,
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: GestureDetector(
+                                                                onTap: () => addPicture(),
+                                                                child: Image.memory(selectedFile.value as Uint8List),
+                                                              ),
+                                                            ),
+                                                            IconButton(
+                                                              onPressed: () {
+                                                                selectedFile = FileAttribute();
+                                                                fileRebuild.add(DateTime.now());
+                                                              },
+                                                              icon: const Icon(Icons.close),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            selectedFile = FileAttribute();
-                                                            fileRebuild.add(DateTime.now());
-                                                          },
-                                                          icon: const Icon(Icons.close),
+                                                ],
+                                                if (widget.type == 'update')
+                                                  widget.branch?.branchImage == null
+                                                      ? selectedFile.name != null
+                                                            ? Stack(
+                                                                alignment: Alignment.topRight,
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius: BorderRadius.circular(10),
+                                                                    child: GestureDetector(
+                                                                      onTap: () => addPicture(),
+                                                                      child: Image.memory(selectedFile.value as Uint8List),
+                                                                    ),
+                                                                  ),
+                                                                  IconButton(
+                                                                    onPressed: () {
+                                                                      selectedFile = FileAttribute();
+                                                                      fileRebuild.add(DateTime.now());
+                                                                    },
+                                                                    icon: const Icon(Icons.close),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            : UploadDocumentsField(
+                                                                title: 'branchImage'.tr(gender: 'browseFile'),
+                                                                fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
+                                                                action: () => addPicture(),
+                                                                cancelAction: () {},
+                                                              )
+                                                      : ClipRRect(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          child: GestureDetector(
+                                                            onTap: () => addPicture(),
+                                                            child: Image.network(
+                                                              '${Environment.imageUrl}${widget.branch?.branchImage}',
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ],
-                                                    )
-                                                  : UploadDocumentsField(
-                                                      title: 'branchImage'.tr(gender: 'browseFile'),
-                                                      fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                      action: () {
-                                                        addPicture();
-                                                      },
-                                                      cancelAction: () {},
-                                                    )
-                                            : GestureDetector(
-                                                onTap: () {
-                                                  addPicture();
-                                                },
-                                                child: Image.network(
-                                                  '${Environment.imageUrl}${widget.branch?.branchImage}',
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(height: 24),
+                                        // Operating Hours
+                                        _sectionLabel('Operating Hours', Icons.schedule_outlined),
+                                        const SizedBox(height: 12),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            var results = await showCalendarDatePicker2Dialog(
+                                              context: context,
+                                              config: CalendarDatePicker2WithActionButtonsConfig(
+                                                lastDate: DateTime.now(),
+                                              ),
+                                              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                              borderRadius: BorderRadius.circular(15),
+                                            );
+                                            if (results != null) {
+                                              _launchDate.text =
+                                                  dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
+                                            }
+                                          },
+                                          child: ReadOnly(
+                                            InputField(
+                                              field: InputFieldAttribute(
+                                                controller: _launchDate,
+                                                uneditableColor: textFormFieldEditableColor,
+                                                isEditable: false,
+                                                labelText: 'branchPage'.tr(gender: 'launchDate'),
+                                                suffixWidget: const Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [Icon(Icons.calendar_month)],
                                                 ),
                                               ),
-                                      AppPadding.vertical(denominator: 2),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          var results = await showCalendarDatePicker2Dialog(
-                                            context: context,
-                                            config: CalendarDatePicker2WithActionButtonsConfig(
-                                              lastDate: DateTime.now(),
                                             ),
-                                            dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-                                            borderRadius: BorderRadius.circular(15),
-                                          );
-                                          if (results != null) {
-                                            _launchDate.text =
-                                                dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
-                                          }
-                                        },
-                                        child: ReadOnly(
-                                          InputField(
-                                            field: InputFieldAttribute(
-                                              controller: _launchDate,
-                                              uneditableColor: textFormFieldEditableColor,
-                                              isEditable: false,
-                                              labelText: 'branchPage'.tr(gender: 'launchDate'),
-                                              suffixWidget: const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [Icon(Icons.calendar_month)],
-                                              ),
-                                            ),
-                                          ),
-                                          isEditable: false,
-                                        ),
-                                      ),
-                                      AppPadding.vertical(denominator: 2),
-                                      InputField(
-                                        field: InputFieldAttribute(
-                                          controller: _branchPhone,
-                                          labelText: 'branchPage'.tr(gender: 'phoneNo'),
-                                          isNumber: true,
-                                          maxCharacter: 10,
-                                          prefixIcon: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
-                                                child: const Text(
-                                                  '+60',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 15.0,
-                                                    color: textPrimaryColor,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                            isEditable: false,
                                           ),
                                         ),
-                                      ),
-                                      AppPadding.vertical(denominator: 2),
-                                      ValueListenableBuilder<bool>(
-                                        valueListenable: _is24Hours,
-                                        builder: (context, snapshot, _) {
-                                          return Column(
-                                            children: [
-                                              if (snapshot == false)
-                                                SizedBox(
-                                                  width: screenWidth1728(30),
-                                                  child: Row(
+                                        AppPadding.vertical(denominator: 2),
+                                        ValueListenableBuilder<bool>(
+                                          valueListenable: _is24Hours,
+                                          builder: (context, is24, _) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                if (!is24)
+                                                  Row(
                                                     children: [
                                                       Expanded(
                                                         child: GestureDetector(
                                                           onTap: () async {
-                                                            final TimeOfDay? pickedTime = await showTimePicker(
+                                                            final TimeOfDay? picked = await showTimePicker(
                                                               context: context,
                                                               initialTime: selectedTime,
-                                                              builder: (BuildContext context, Widget? child) {
-                                                                return MediaQuery(
-                                                                  data: MediaQuery.of(
-                                                                    context,
-                                                                  ).copyWith(alwaysUse24HourFormat: true),
-                                                                  child: child ?? const SizedBox(),
-                                                                );
-                                                              },
+                                                              builder: (context, child) => MediaQuery(
+                                                                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                                                child: child ?? const SizedBox(),
+                                                              ),
                                                             );
-
-                                                            if (pickedTime != null && pickedTime != selectedTime) {
+                                                            if (picked != null && picked != selectedTime) {
                                                               setState(() {
-                                                                selectedTime = pickedTime;
+                                                                selectedTime = picked;
                                                                 _openingHours.text =
-                                                                    '${checkTime(selectedTime.hour.toString())}:${checkTime(selectedTime.minute.toString())}';
+                                                                    '${checkTime(picked.hour.toString())}:${checkTime(picked.minute.toString())}';
                                                               });
                                                             }
                                                           },
@@ -385,24 +455,19 @@ class _BranchDetailState extends State<BranchDetail> {
                                                       Expanded(
                                                         child: GestureDetector(
                                                           onTap: () async {
-                                                            final TimeOfDay? pickedTime = await showTimePicker(
+                                                            final TimeOfDay? picked = await showTimePicker(
                                                               context: context,
                                                               initialTime: selectedTime,
-                                                              builder: (BuildContext context, Widget? child) {
-                                                                return MediaQuery(
-                                                                  data: MediaQuery.of(
-                                                                    context,
-                                                                  ).copyWith(alwaysUse24HourFormat: true),
-                                                                  child: child ?? const SizedBox(),
-                                                                );
-                                                              },
+                                                              builder: (context, child) => MediaQuery(
+                                                                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                                                child: child ?? const SizedBox(),
+                                                              ),
                                                             );
-
-                                                            if (pickedTime != null && pickedTime != selectedTime) {
+                                                            if (picked != null && picked != selectedTime) {
                                                               setState(() {
-                                                                selectedTime = pickedTime;
+                                                                selectedTime = picked;
                                                                 _closingHours.text =
-                                                                    '${checkTime(selectedTime.hour.toString())}:${checkTime(selectedTime.minute.toString())}';
+                                                                    '${checkTime(picked.hour.toString())}:${checkTime(picked.minute.toString())}';
                                                               });
                                                             }
                                                           },
@@ -415,7 +480,7 @@ class _BranchDetailState extends State<BranchDetail> {
                                                                 labelText: 'branchPage'.tr(gender: 'closingHours'),
                                                                 suffixWidget: const Row(
                                                                   mainAxisSize: MainAxisSize.min,
-                                                                  children: [Icon(Icons.time_to_leave)],
+                                                                  children: [Icon(Icons.punch_clock_outlined)],
                                                                 ),
                                                               ),
                                                             ),
@@ -425,38 +490,57 @@ class _BranchDetailState extends State<BranchDetail> {
                                                       ),
                                                     ],
                                                   ),
-                                                ),
-                                              Row(
-                                                children: [
-                                                  Checkbox(
-                                                    value: snapshot,
-                                                    onChanged: (selected) {
-                                                      _is24Hours.value = selected ?? false;
-                                                    },
+                                                if (!is24) AppPadding.vertical(denominator: 2),
+                                                GestureDetector(
+                                                  onTap: () => _is24Hours.value = !is24,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                                    decoration: BoxDecoration(
+                                                      color: is24 ? const Color(0xFFEEF2FF) : const Color(0xFFF9FAFB),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(
+                                                        color: is24 ? const Color(0xFF6366F1) : const Color(0xFFE5E7EB),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        Checkbox(
+                                                          value: is24,
+                                                          onChanged: (v) => _is24Hours.value = v ?? false,
+                                                          visualDensity: VisualDensity.compact,
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          'branchPage'.tr(gender: 'open24Hours'),
+                                                          style: TextStyle(
+                                                            fontWeight: is24 ? FontWeight.w600 : FontWeight.normal,
+                                                            color: is24 ? const Color(0xFF6366F1) : null,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                  Text('branchPage'.tr(gender: 'open24Hours')),
-                                                ],
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                      AppPadding.vertical(denominator: 2),
-                                    ],
-                                  );
-                                },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 24),
+                              button(),
+                            ],
+                          ),
                         ),
-                        AppPadding.vertical(denominator: 1 / 1.5),
-                        button(),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

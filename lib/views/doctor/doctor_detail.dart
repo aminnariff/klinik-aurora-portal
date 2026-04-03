@@ -129,23 +129,35 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF9FAFB),
+                        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.person_rounded, size: 18, color: Color(0xFF6B7280)),
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.type == 'create' ? 'New PIC' : 'Edit PIC',
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                          ),
+                          const Spacer(),
+                          CloseButton(onPressed: () => context.pop()),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
+                      child: IntrinsicWidth(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            AppSelectableText('PIC Details', style: AppTypography.bodyLarge(context)),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
                         AppPadding.vertical(denominator: 2),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,9 +337,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                         ),
                         AppPadding.vertical(denominator: 1 / 1.5),
                         button(),
-                      ],
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],

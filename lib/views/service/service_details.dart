@@ -25,9 +25,7 @@ import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
@@ -75,6 +73,8 @@ class _ServiceDetailsState extends State<ServiceDetails> {
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
   FileAttribute selectedFile = FileAttribute();
   final List<TextEditingController> whatsappTemplateControllers = List.generate(6, (_) => TextEditingController());
+  int _activeTemplate = 0;
+  final StreamController<DateTime> templateRebuild = StreamController.broadcast();
   @override
   void initState() {
     if (widget.type == 'update') {
@@ -105,6 +105,31 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     super.initState();
   }
 
+  Widget _sectionLabel(String label, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 3,
+          height: 13,
+          decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF6B7280),
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return editBranch();
@@ -116,173 +141,159 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CardContainer(
+                  IntrinsicWidth(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppSelectableText('Service Details', style: AppTypography.bodyLarge(context)),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 2),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: screenWidth1728(26),
-                              child: Column(
+                        // ── Header ──────────────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF9FAFB),
+                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2FF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.medical_services_rounded, size: 16, color: Color(0xFF6366F1)),
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  InputField(field: serviceNameController),
-                                  AppPadding.vertical(denominator: 2),
-                                  TextField(
-                                    maxLines: null,
-                                    style: Theme.of(context).textTheme.bodyMedium!.apply(),
-                                    controller: serviceDescriptionController.controller,
-                                    decoration: appInputDecoration(context, 'Description'),
+                                  Text(
+                                    widget.type == 'create' ? 'New Service' : 'Edit Service',
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(field: servicePriceController),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(field: serviceBookingFeeController),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(field: serviceTimeController),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(field: serviceCategoryController),
-                                  AppPadding.vertical(denominator: 2),
-                                  StreamBuilder<DateTime>(
-                                    stream: rebuildDropdown.stream,
-                                    builder: (context, snapshot) {
-                                      return AppDropdown(
-                                        attributeList: DropdownAttributeList(
-                                          [
-                                            DropdownAttribute('1', 'Doctor'),
-                                            DropdownAttribute('2', 'Sonographer'),
-                                            DropdownAttribute('3', 'Therapist'),
-                                            DropdownAttribute('4', 'Spa Therapist'),
-                                            DropdownAttribute('5', 'Dietitian'),
-                                          ],
-                                          labelText: 'servicesHomepage'.tr(gender: 'doctorType'),
-                                          value: _doctorType?.name,
-                                          onChanged: (p0) {
-                                            _doctorType = p0;
-                                            rebuildDropdown.add(DateTime.now());
-                                          },
-                                          width: screenWidthByBreakpoint(90, 70, 26),
-                                        ),
-                                      );
-                                    },
+                                  Text(
+                                    widget.type == 'create'
+                                        ? 'Set up a new service with pricing & templates'
+                                        : 'Update service details, pricing, and templates',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "WhatsApp Templates (max 6)",
-                                        style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                                      ),
-                                      RichText(
-                                        text: TextSpan(
-                                          style: AppTypography.bodyMedium(context).apply(),
-                                          children: [
-                                            const TextSpan(text: "Tip: Use "),
-                                            TextSpan(
-                                              text:
-                                                  "{{name}}, {{service}}, {{branchName}}, {{branchPhone}}, {{formattedDate}}, {{formattedTime}}",
-                                              style: AppTypography.bodyMedium(
-                                                context,
-                                              ).apply(color: primary, fontWeightDelta: 1),
-                                            ),
-                                            const TextSpan(
-                                              text: " to auto-fill appointment info. Click a tag below to insert.",
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      ...List.generate(6, (index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(top: 8.0),
-                                          child: TextFormField(
-                                            controller: whatsappTemplateControllers[index],
-                                            maxLines: 6,
-                                            style: AppTypography.bodyMedium(context),
-                                            decoration: appInputDecoration(context, "Template ${index + 1}"),
-                                          ),
-                                        );
-                                      }),
-                                    ],
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
                                 ],
                               ),
-                            ),
-                            AppPadding.horizontal(),
-                            SizedBox(
-                              width: screenWidth1728(30),
-                              child: StreamBuilder<DateTime>(
-                                stream: fileRebuild.stream,
-                                builder: (context, snapshot) {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      if (widget.type == 'create') ...[
-                                        selectedFile.value == null
-                                            ? UploadDocumentsField(
-                                                title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                                fieldTitle: 'servicesHomepage'.tr(gender: 'doctorImage'),
-                                                // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                action: () {
-                                                  addPicture();
-                                                },
-                                                cancelAction: () {},
-                                              )
-                                            : Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      addPicture();
-                                                    },
-                                                    child: Image.memory(selectedFile.value as Uint8List, height: 410),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      selectedFile = FileAttribute();
-                                                      fileRebuild.add(DateTime.now());
-                                                    },
-                                                    icon: const Icon(Icons.close),
-                                                  ),
+                              const Spacer(),
+                              CloseButton(onPressed: () => context.pop()),
+                            ],
+                          ),
+                        ),
+                        // ── Body ────────────────────────────────────────────────
+                        Padding(
+                          padding: EdgeInsets.all(screenPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // ── Left column ───────────────────────────────
+                                  SizedBox(
+                                    width: screenWidth1728(26),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Service Details', Icons.medical_services_outlined),
+                                        const SizedBox(height: 12),
+                                        InputField(field: serviceNameController),
+                                        AppPadding.vertical(denominator: 2),
+                                        TextField(
+                                          maxLines: null,
+                                          style: Theme.of(context).textTheme.bodyMedium!.apply(),
+                                          controller: serviceDescriptionController.controller,
+                                          decoration: appInputDecoration(context, 'Description'),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(field: servicePriceController),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(field: serviceBookingFeeController),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(field: serviceTimeController),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(field: serviceCategoryController),
+                                        AppPadding.vertical(denominator: 2),
+                                        StreamBuilder<DateTime>(
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return AppDropdown(
+                                              attributeList: DropdownAttributeList(
+                                                [
+                                                  DropdownAttribute('1', 'Doctor'),
+                                                  DropdownAttribute('2', 'Sonographer'),
+                                                  DropdownAttribute('3', 'Therapist'),
+                                                  DropdownAttribute('4', 'Spa Therapist'),
+                                                  DropdownAttribute('5', 'Dietitian'),
                                                 ],
+                                                labelText: 'servicesHomepage'.tr(gender: 'doctorType'),
+                                                value: _doctorType?.name,
+                                                onChanged: (p0) {
+                                                  _doctorType = p0;
+                                                  rebuildDropdown.add(DateTime.now());
+                                                },
+                                                width: screenWidthByBreakpoint(90, 70, 26),
                                               ),
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(height: 20),
+                                        _sectionLabel('WhatsApp Templates', Icons.message_outlined),
+                                        const SizedBox(height: 10),
+                                        _whatsAppTemplateSection(),
                                       ],
-                                      if (widget.type == 'update') ...[
-                                        widget.service?.serviceImage == null
-                                            ? selectedFile.name != null
-                                                  ? Stack(
+                                    ),
+                                  ),
+                                  AppPadding.horizontal(),
+                                  // ── Right column ──────────────────────────────
+                                  SizedBox(
+                                    width: screenWidth1728(30),
+                                    child: StreamBuilder<DateTime>(
+                                      stream: fileRebuild.stream,
+                                      builder: (context, snapshot) {
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            _sectionLabel('Service Image', Icons.image_outlined),
+                                            const SizedBox(height: 12),
+                                            if (widget.type == 'create') ...[
+                                              selectedFile.value == null
+                                                  ? UploadDocumentsField(
+                                                      title: 'servicesHomepage'.tr(gender: 'browseFile'),
+                                                      fieldTitle: 'servicesHomepage'.tr(gender: 'doctorImage'),
+                                                      action: () => addPicture(),
+                                                      cancelAction: () {},
+                                                    )
+                                                  : Stack(
                                                       alignment: Alignment.topRight,
                                                       children: [
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            addPicture();
-                                                          },
-                                                          child: Image.memory(
-                                                            selectedFile.value as Uint8List,
-                                                            height: 410,
+                                                        ClipRRect(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          child: GestureDetector(
+                                                            onTap: addPicture,
+                                                            child: Image.memory(
+                                                              selectedFile.value as Uint8List,
+                                                              height: 300,
+                                                              width: double.infinity,
+                                                              fit: BoxFit.cover,
+                                                            ),
                                                           ),
                                                         ),
                                                         IconButton(
@@ -293,102 +304,283 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                                           icon: const Icon(Icons.close),
                                                         ),
                                                       ],
-                                                    )
-                                                  : UploadDocumentsField(
-                                                      title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                                      fieldTitle: 'bservicesHomepage'.tr(gender: 'doctorImage'),
-                                                      // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                      action: () {
-                                                        addPicture();
-                                                      },
-                                                      cancelAction: () {},
-                                                    )
-                                            : GestureDetector(
-                                                onTap: () {
-                                                  addPicture();
-                                                },
-                                                child: Image.network(
-                                                  '${Environment.imageUrl}${widget.service?.serviceImage}',
-                                                  height: 410,
-                                                  loadingBuilder:
-                                                      (
-                                                        BuildContext context,
-                                                        Widget child,
-                                                        ImageChunkEvent? loadingProgress,
-                                                      ) {
-                                                        if (loadingProgress == null) {
-                                                          return child; // The image is fully loaded
-                                                        }
-                                                        return Center(
-                                                          child: CircularProgressIndicator(
-                                                            // You can use any loading indicator
-                                                            value: loadingProgress.expectedTotalBytes != null
-                                                                ? loadingProgress.cumulativeBytesLoaded /
-                                                                      (loadingProgress.expectedTotalBytes ?? 1)
-                                                                : null,
+                                                    ),
+                                            ],
+                                            if (widget.type == 'update') ...[
+                                              widget.service?.serviceImage == null
+                                                  ? selectedFile.name != null
+                                                        ? Stack(
+                                                            alignment: Alignment.topRight,
+                                                            children: [
+                                                              ClipRRect(
+                                                                borderRadius: BorderRadius.circular(10),
+                                                                child: GestureDetector(
+                                                                  onTap: addPicture,
+                                                                  child: Image.memory(
+                                                                    selectedFile.value as Uint8List,
+                                                                    height: 300,
+                                                                    width: double.infinity,
+                                                                    fit: BoxFit.cover,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              IconButton(
+                                                                onPressed: () {
+                                                                  selectedFile = FileAttribute();
+                                                                  fileRebuild.add(DateTime.now());
+                                                                },
+                                                                icon: const Icon(Icons.close),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : UploadDocumentsField(
+                                                            title: 'servicesHomepage'.tr(gender: 'browseFile'),
+                                                            fieldTitle: 'bservicesHomepage'.tr(gender: 'doctorImage'),
+                                                            action: addPicture,
+                                                            cancelAction: () {},
+                                                          )
+                                                  : ClipRRect(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      child: GestureDetector(
+                                                        onTap: addPicture,
+                                                        child: Image.network(
+                                                          '${Environment.imageUrl}${widget.service?.serviceImage}',
+                                                          height: 300,
+                                                          width: double.infinity,
+                                                          fit: BoxFit.cover,
+                                                          loadingBuilder: (context, child, loadingProgress) {
+                                                            if (loadingProgress == null) return child;
+                                                            return SizedBox(
+                                                              height: 300,
+                                                              child: Center(
+                                                                child: CircularProgressIndicator(
+                                                                  value: loadingProgress.expectedTotalBytes != null
+                                                                      ? loadingProgress.cumulativeBytesLoaded /
+                                                                            (loadingProgress.expectedTotalBytes ?? 1)
+                                                                      : null,
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                          errorBuilder: (context, error, stackTrace) => Container(
+                                                            height: 300,
+                                                            decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              color: disabledColor,
+                                                            ),
+                                                            child: const Center(
+                                                              child: Icon(Icons.error, color: errorColor),
+                                                            ),
                                                           ),
-                                                        );
-                                                      },
-                                                  errorBuilder:
-                                                      (BuildContext context, Object error, StackTrace? stackTrace) {
-                                                        return Container(
-                                                          padding: EdgeInsets.all(screenPadding),
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                            color: disabledColor,
-                                                          ),
-                                                          child: const Center(
-                                                            child: Icon(Icons.error, color: errorColor),
-                                                          ),
-                                                        );
-                                                      },
-                                                ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                              const SizedBox(height: 20),
+                                              _sectionLabel('Record Info', Icons.info_outline_rounded),
+                                              const SizedBox(height: 12),
+                                              _metaRow(
+                                                Icons.add_circle_outline,
+                                                'Created Date',
+                                                '${dateConverter(widget.service?.createdDate)}',
                                               ),
-                                        AppPadding.vertical(denominator: 2),
-                                        Row(
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Created Date',
-                                                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                                                ),
-                                                Text(
-                                                  '${dateConverter(widget.service?.createdDate)}',
-                                                  style: AppTypography.bodyMedium(context).apply(),
-                                                ),
-                                                AppPadding.vertical(denominator: 2),
-                                                Text(
-                                                  'Last Updated Date',
-                                                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                                                ),
-                                                Text(
-                                                  '${dateConverter(widget.service?.modifiedDate)}',
-                                                  style: AppTypography.bodyMedium(context).apply(),
-                                                ),
-                                              ],
-                                            ),
+                                              const SizedBox(height: 8),
+                                              _metaRow(
+                                                Icons.edit_outlined,
+                                                'Last Updated',
+                                                '${dateConverter(widget.service?.modifiedDate)}',
+                                              ),
+                                            ],
                                           ],
-                                        ),
-                                      ],
-                                      AppPadding.vertical(denominator: 2),
-                                    ],
-                                  );
-                                },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              AppPadding.vertical(denominator: 1 / 1.5),
+                              button(),
+                            ],
+                          ),
                         ),
-                        AppPadding.vertical(denominator: 1 / 1.5),
-                        button(),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _whatsAppTemplateSection() {
+    const tags = [
+      '{{name}}',
+      '{{service}}',
+      '{{branchName}}',
+      '{{branchPhone}}',
+      '{{formattedDate}}',
+      '{{formattedTime}}',
+    ];
+
+    return StreamBuilder<DateTime>(
+      stream: templateRebuild.stream,
+      builder: (context, _) {
+        final activeCtrl = whatsappTemplateControllers[_activeTemplate];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Template tabs ──────────────────────────────────────────
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(6, (i) {
+                  final hasContent = whatsappTemplateControllers[i].text.trim().isNotEmpty;
+                  final isActive = _activeTemplate == i;
+                  return GestureDetector(
+                    onTap: () {
+                      _activeTemplate = i;
+                      templateRebuild.add(DateTime.now());
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: isActive ? const Color(0xFF6366F1) : const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: isActive ? const Color(0xFF6366F1) : Colors.transparent),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (hasContent) ...[
+                            Container(
+                              width: 6,
+                              height: 6,
+                              margin: const EdgeInsets.only(right: 5),
+                              decoration: BoxDecoration(
+                                color: isActive ? Colors.white : const Color(0xFF6366F1),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ],
+                          Text(
+                            'T${i + 1}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isActive ? Colors.white : const Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // ── Text area ──────────────────────────────────────────────
+            TextField(
+              controller: activeCtrl,
+              maxLines: 8,
+              style: const TextStyle(fontSize: 13, height: 1.5),
+              onChanged: (_) => templateRebuild.add(DateTime.now()),
+              decoration: InputDecoration(
+                hintText: 'Type your WhatsApp message for Template ${_activeTemplate + 1}...',
+                hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
+                filled: true,
+                fillColor: const Color(0xFFF9FAFB),
+                contentPadding: const EdgeInsets.all(12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                '${activeCtrl.text.length} chars',
+                style: const TextStyle(fontSize: 10, color: Color(0xFF9CA3AF)),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // ── Variable chips ─────────────────────────────────────────
+            const Text(
+              'TAP TO INSERT',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF9CA3AF), letterSpacing: 0.8),
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: tags.map((tag) {
+                return GestureDetector(
+                  onTap: () {
+                    final ctrl = whatsappTemplateControllers[_activeTemplate];
+                    final sel = ctrl.selection;
+                    final text = ctrl.text;
+                    final start = sel.isValid && sel.start >= 0 ? sel.start : text.length;
+                    final end = sel.isValid && sel.end >= 0 ? sel.end : text.length;
+                    final newText = text.replaceRange(start, end, tag);
+                    ctrl.value = TextEditingValue(
+                      text: newText,
+                      selection: TextSelection.collapsed(offset: start + tag.length),
+                    );
+                    templateRebuild.add(DateTime.now());
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEEF2FF),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: const Color(0xFF6366F1).withAlpha(60)),
+                    ),
+                    child: Text(
+                      tag,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF6366F1),
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _metaRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 14, color: const Color(0xFF9CA3AF)),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+            ),
+            Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+          ],
         ),
       ],
     );

@@ -59,10 +59,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
         final branches = _getAllBranches(data);
 
         return Container(
-          decoration: const BoxDecoration(
-            color: _bgColor,
-            borderRadius: BorderRadius.all(Radius.circular(18)),
-          ),
+          decoration: const BoxDecoration(color: _bgColor, borderRadius: BorderRadius.all(Radius.circular(18))),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -71,12 +68,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
               _buildMonthlyTotals(data),
               Divider(color: _dividerColor, height: 1),
               Padding(
-                padding: EdgeInsets.fromLTRB(
-                  screenPadding * 1.5,
-                  screenPadding,
-                  screenPadding * 1.5,
-                  screenPadding,
-                ),
+                padding: EdgeInsets.fromLTRB(screenPadding * 1.5, screenPadding, screenPadding * 1.5, screenPadding),
                 child: _showChart ? _buildChart(data, branches) : _buildTable(data, branches),
               ),
             ],
@@ -117,10 +109,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
-                      color: _colorForBranch(branches, b),
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: _colorForBranch(branches, b), shape: BoxShape.circle),
                   ),
                   const SizedBox(width: 5),
                   Text(b, style: const TextStyle(color: _mutedColor, fontSize: 11)),
@@ -169,16 +158,9 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
                   const SizedBox(height: 2),
                   Text(
                     '${month.total ?? 0}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    'appointments',
-                    style: TextStyle(color: _mutedColor, fontSize: 9),
-                  ),
+                  const Text('appointments', style: TextStyle(color: _mutedColor, fontSize: 9)),
                 ],
               ),
             );
@@ -190,16 +172,10 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
 
   Widget _buildToggle() {
     return Container(
-      decoration: BoxDecoration(
-        color: _dividerColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: _dividerColor, borderRadius: BorderRadius.circular(8)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _toggleOption(Icons.bar_chart_rounded, true),
-          _toggleOption(Icons.table_chart_outlined, false),
-        ],
+        children: [_toggleOption(Icons.bar_chart_rounded, true), _toggleOption(Icons.table_chart_outlined, false)],
       ),
     );
   }
@@ -223,15 +199,14 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
     if (data == null || (data.last7Days?.isEmpty ?? true)) {
       return const SizedBox(
         height: 200,
-        child: Center(child: Text('No data available', style: TextStyle(color: _mutedColor))),
+        child: Center(
+          child: Text('No data available', style: TextStyle(color: _mutedColor)),
+        ),
       );
     }
 
     final days = data.last7Days!;
-    final maxY = days.fold<double>(
-      0,
-      (max, d) => (d.total ?? 0).toDouble() > max ? (d.total ?? 0).toDouble() : max,
-    );
+    final maxY = days.fold<double>(0, (max, d) => (d.total ?? 0).toDouble() > max ? (d.total ?? 0).toDouble() : max);
 
     return AspectRatio(
       aspectRatio: isMobile ? 1.8 : 4,
@@ -245,7 +220,8 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
                 final day = days[group.x];
                 final buffer = StringBuffer('${day.dd} ${day.mmm}\n');
                 for (final b in branches) {
-                  final count = day.data
+                  final count =
+                      day.data
                           ?.firstWhere(
                             (bc) => bc.branchName == b,
                             orElse: () => BranchCount(branchName: b, totalAppointments: 0),
@@ -255,10 +231,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
                   if (count > 0) buffer.write('$b: $count\n');
                 }
                 buffer.write('Total: ${day.total ?? 0}');
-                return BarTooltipItem(
-                  buffer.toString(),
-                  const TextStyle(color: Colors.white, fontSize: 11),
-                );
+                return BarTooltipItem(buffer.toString(), const TextStyle(color: Colors.white, fontSize: 11));
               },
             ),
           ),
@@ -271,10 +244,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
                 reservedSize: 36,
                 getTitlesWidget: (value, meta) {
                   if (value == meta.max || value == 0) return const SizedBox();
-                  return Text(
-                    value.toInt().toString(),
-                    style: const TextStyle(color: _mutedColor, fontSize: 11),
-                  );
+                  return Text(value.toInt().toString(), style: const TextStyle(color: _mutedColor, fontSize: 11));
                 },
               ),
             ),
@@ -307,14 +277,15 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
             final day = days[i];
             double yFrom = 0;
             final stackItems = branches.map((b) {
-              final count = (day.data
-                          ?.firstWhere(
-                            (bc) => bc.branchName == b,
-                            orElse: () => BranchCount(branchName: b, totalAppointments: 0),
-                          )
-                          .totalAppointments ??
-                      0)
-                  .toDouble();
+              final count =
+                  (day.data
+                              ?.firstWhere(
+                                (bc) => bc.branchName == b,
+                                orElse: () => BranchCount(branchName: b, totalAppointments: 0),
+                              )
+                              .totalAppointments ??
+                          0)
+                      .toDouble();
               final item = BarChartRodStackItem(yFrom, yFrom + count, _colorForBranch(branches, b));
               yFrom += count;
               return item;
@@ -342,7 +313,9 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
     if (data == null || branches.isEmpty) {
       return const SizedBox(
         height: 100,
-        child: Center(child: Text('No data available', style: TextStyle(color: _mutedColor))),
+        child: Center(
+          child: Text('No data available', style: TextStyle(color: _mutedColor)),
+        ),
       );
     }
 
@@ -364,10 +337,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                color: _colorForBranch(branches, name),
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: _colorForBranch(branches, name), shape: BoxShape.circle),
             ),
             const SizedBox(width: 6),
             Text(name, style: cellStyle),
@@ -379,7 +349,10 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
     Widget sectionHeader(String label, Color color) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 4),
-        child: Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+        child: Text(
+          label,
+          style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+        ),
       );
     }
 
@@ -398,7 +371,8 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
               ),
             ),
             ...branches.map((b) {
-              final count = day.data
+              final count =
+                  day.data
                       ?.firstWhere(
                         (bc) => bc.branchName == b,
                         orElse: () => BranchCount(branchName: b, totalAppointments: 0),
@@ -438,7 +412,8 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
               ),
             ),
             ...branches.map((b) {
-              final count = month.data
+              final count =
+                  month.data
                       ?.firstWhere(
                         (bc) => bc.branchName == b,
                         orElse: () => BranchCount(branchName: b, totalAppointments: 0),
@@ -473,7 +448,24 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 28),
+                // Invisible placeholder matching sectionHeader height
+                const Opacity(
+                  opacity: 0,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Text('X', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                // "Branch" label matching the date header row height (24)
+                Container(
+                  height: 24,
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.only(right: 16),
+                  child: const Text(
+                    'Branch',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                  ),
+                ),
                 ...branches.map(branchCell),
                 Container(
                   height: 28,

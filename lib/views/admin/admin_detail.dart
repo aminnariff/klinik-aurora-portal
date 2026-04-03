@@ -26,7 +26,6 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
@@ -172,171 +171,239 @@ class _AdminDetailState extends State<AdminDetail> {
     );
   }
 
+  Widget _sectionLabel(String label, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 3,
+          height: 13,
+          decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF6B7280),
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
+    );
+  }
+
   Row editAdmin() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CardContainer(
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                  child: IntrinsicWidth(
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.9,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CardContainer(
+                  IntrinsicWidth(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppSelectableText('Admin Details', style: AppTypography.bodyLarge(context)),
-                            CloseButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 2),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: screenWidth1728(26),
-                              child: Column(
+                        // ── Header ──────────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF9FAFB),
+                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2FF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.admin_panel_settings_rounded,
+                                  size: 16,
+                                  color: Color(0xFF6366F1),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _userName,
-                                      labelText: 'information'.tr(gender: 'username'),
-                                      isEditable: allowEditableField,
-                                    ),
+                                  Text(
+                                    widget.type == 'create' ? 'New Admin' : 'Edit Admin',
+                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _userFullname,
-                                      labelText: 'information'.tr(gender: 'fullName'),
-                                    ),
+                                  Text(
+                                    widget.type == 'create'
+                                        ? 'Fill in the details to create a new admin account'
+                                        : 'Update admin account details and permissions',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
-                                  // InputField(
-                                  //   field: InputFieldAttribute(
-                                  //     controller: _userPhone,
-                                  //     labelText: 'information'.tr(gender: 'phoneNo'),
-                                  //     isNumber: true,
-                                  //     maxCharacter: 10,
-                                  //     prefixIcon: Row(
-                                  //       mainAxisSize: MainAxisSize.min,
-                                  //       crossAxisAlignment: CrossAxisAlignment.center,
-                                  //       children: [
-                                  //         Padding(
-                                  //           padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
-                                  //           child: const Text(
-                                  //             '+60',
-                                  //             style: TextStyle(
-                                  //                 fontWeight: FontWeight.w700, fontSize: 15.0, color: textPrimaryColor),
-                                  //           ),
-                                  //         ),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  AppPadding.vertical(denominator: 2),
-                                  if (widget.type == 'create') ...[
-                                    InputField(
-                                      field: InputFieldAttribute(
-                                        controller: _password,
-                                        labelText: 'information'.tr(gender: 'password'),
-                                      ),
-                                    ),
-                                    AppPadding.vertical(denominator: 2),
-                                  ],
                                 ],
                               ),
-                            ),
-                            AppPadding.horizontal(),
-                            SizedBox(
-                              width: screenWidth1728(30),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                              const Spacer(),
+                              CloseButton(onPressed: () => context.pop()),
+                            ],
+                          ),
+                        ),
+                        // ── Body ─────────────────────────────────────────────
+                        Padding(
+                          padding: EdgeInsets.all(screenPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // ── Row 1: Account Info + Assignment ────────────
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  InputField(
-                                    field: InputFieldAttribute(
-                                      controller: _userEmail,
-                                      labelText: 'information'.tr(gender: 'email'),
-                                      isEmail: true,
-                                      isEditable: allowEditableField,
-                                    ),
-                                  ),
-                                  AppPadding.vertical(denominator: 2),
-                                  StreamBuilder<DateTime>(
-                                    stream: rebuildDropdown.stream,
-                                    builder: (context, snapshot) {
-                                      return Row(
-                                        children: [
-                                          AppDropdown(
-                                            attributeList: DropdownAttributeList(
-                                              branches,
-                                              isEditable: true,
-                                              onChanged: (selected) {
-                                                _selectedBranch = selected;
-                                                _branchId.text = selected!.name;
-                                                rebuildDropdown.add(DateTime.now());
-                                              },
-                                              value: _selectedBranch?.name,
-                                              width: screenWidth1728(30),
+                                  // Left: Account Information
+                                  SizedBox(
+                                    width: screenWidth1728(26),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Account Information', Icons.person_outline_rounded),
+                                        const SizedBox(height: 12),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _userFullname,
+                                            labelText: 'information'.tr(gender: 'fullName'),
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _userEmail,
+                                            labelText: 'information'.tr(gender: 'email'),
+                                            isEmail: true,
+                                            isEditable: allowEditableField,
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _userName,
+                                            labelText: 'information'.tr(gender: 'username'),
+                                            isEditable: allowEditableField,
+                                          ),
+                                        ),
+                                        if (widget.type == 'create') ...[
+                                          AppPadding.vertical(denominator: 2),
+                                          InputField(
+                                            field: InputFieldAttribute(
+                                              controller: _password,
+                                              labelText: 'information'.tr(gender: 'password'),
                                             ),
                                           ),
                                         ],
-                                      );
-                                    },
+                                      ],
+                                    ),
                                   ),
-                                  AppPadding.vertical(denominator: 2),
+                                  AppPadding.horizontal(),
+                                  // Right: Branch Assignment
+                                  SizedBox(
+                                    width: screenWidth1728(30),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Branch Assignment', Icons.store_outlined),
+                                        const SizedBox(height: 12),
+                                        StreamBuilder<DateTime>(
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return AppDropdown(
+                                              attributeList: DropdownAttributeList(
+                                                branches,
+                                                isEditable: true,
+                                                onChanged: (selected) {
+                                                  _selectedBranch = selected;
+                                                  _branchId.text = selected!.name;
+                                                  rebuildDropdown.add(DateTime.now());
+                                                },
+                                                value: _selectedBranch?.name,
+                                                width: screenWidth1728(30),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF9FAFB),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: const Color(0xFFF3F4F6)),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.info_outline_rounded,
+                                                size: 14,
+                                                color: Color(0xFF9CA3AF),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'Assigning a branch restricts this admin\'s access scope to the selected branch only.',
+                                                  style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        AppPadding.vertical(denominator: 1 / 1.5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AppSelectableText(
-                              'Permission',
-                              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                            ),
-                            AppPadding.vertical(denominator: 3),
-                            buildPermissionBundles(
-                              permissionBundles: permissionBundles,
-                              selectedPermission: selectedPermission,
-                              allPermissions: context.read<PermissionController>().permissionAllResponse?.data ?? [],
-                              onPermissionChanged: (newList) {
-                                setState(() {
-                                  selectedPermission = newList;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 16),
-                            Container(
-                              width: screenWidth(80),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey, // Border color
-                                  width: 1.5, // Border width
-                                ),
-                                borderRadius: BorderRadius.circular(8), // Optional: rounded corners
+                              const SizedBox(height: 24),
+                              const Divider(color: Color(0xFFF3F4F6), thickness: 1),
+                              const SizedBox(height: 16),
+                              // ── Permissions ──────────────────────────────────
+                              _sectionLabel('Permissions', Icons.lock_outline_rounded),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Quick-select permission bundles:',
+                                style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
+                              const SizedBox(height: 6),
+                              buildPermissionBundles(
+                                permissionBundles: permissionBundles,
+                                selectedPermission: selectedPermission,
+                                allPermissions: context.read<PermissionController>().permissionAllResponse?.data ?? [],
+                                onPermissionChanged: (newList) {
+                                  setState(() {
+                                    selectedPermission = newList;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF9FAFB),
+                                  border: Border.all(color: const Color(0xFFF3F4F6)),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                 child: Wrap(
-                                  spacing: 24,
-                                  runSpacing: 12,
+                                  spacing: 4,
+                                  runSpacing: 4,
                                   children: List.generate(
                                     context.read<PermissionController>().permissionAllResponse?.data?.length ?? 0,
                                     (index) {
@@ -345,7 +412,6 @@ class _AdminDetailState extends State<AdminDetail> {
                                           .permissionAllResponse!
                                           .data![index];
                                       final isChecked = selectedPermission.contains(permission.permissionId);
-
                                       return SizedBox(
                                         width: 180,
                                         child: Row(
@@ -381,31 +447,26 @@ class _AdminDetailState extends State<AdminDetail> {
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 16),
-                            SizedBox(
-                              width: screenWidth(80),
-                              child: Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      'Note:\nThe checkboxes labeled Branch and Sonographer are permission bundles — selecting them will automatically select a group of related permissions.\nYou can still manually customize individual permissions as needed.',
-                                      style: AppTypography.bodyMedium(context),
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: 8),
+                              Text(
+                                'Tip: Bundles auto-select groups of related permissions. You can fine-tune individually after.',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF9CA3AF),
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 24),
-                          ],
+                              const SizedBox(height: 24),
+                              button(),
+                            ],
+                          ),
                         ),
-                        button(),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

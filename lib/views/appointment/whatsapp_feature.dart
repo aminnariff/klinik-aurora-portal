@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
-import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -31,65 +30,226 @@ void showWhatsAppTemplateDialog({
 
   templates = templates.map((t) => renderTemplate(t, values)).toList();
 
-  // final List<String> templates = [
-  //   "Hi $name, this is a reminder about your *$service* appointment at $branchName on *$formattedDate* at *$formattedTime*.",
-  //   "Hello $name, your *$service* is confirmed for *$formattedDate* at *$formattedTime*. See you at $branchName!",
-  //   "Hi $name, thank you for booking *$service*. Your appointment is on *$formattedDate* at *$formattedTime* at $branchName.",
-  // ];
-
-  String? customMessage;
+  final TextEditingController customController = TextEditingController();
 
   showDialog(
     context: context,
     builder: (context) {
-      return AlertDialog(
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
-        title: Text('Send WhatsApp Message'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (String template in templates)
-                Column(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 600, maxHeight: MediaQuery.of(context).size.height * 0.85),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Header
+                Row(
                   children: [
-                    ListTile(
-                      title: Text(template, style: AppTypography.bodyMedium(context)),
-                      onTap: () => _launchWhatsApp(phone, template),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), shape: BoxShape.circle),
+                      child: const Icon(Icons.chat_rounded, color: Colors.green, size: 28),
                     ),
-                    Divider(indent: screenPadding, endIndent: screenPadding, color: Colors.grey),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Send WhatsApp Message',
+                            style: AppTypography.bodyMedium(
+                              context,
+                            ).copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'To: $name ($phone)',
+                            style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ],
                 ),
-              const Divider(),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Custom Message',
-                  labelStyle: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade600),
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 24),
+
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Suggested Templates',
+                          style: AppTypography.bodyMedium(
+                            context,
+                          ).copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade800),
+                        ),
+                        const SizedBox(height: 12),
+                        if (templates.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            child: Center(
+                              child: Text(
+                                'No templates available.',
+                                style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade500),
+                              ),
+                            ),
+                          )
+                        else
+                          ...templates.map(
+                            (template) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => _launchWhatsApp(phone, template),
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Ink(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade50,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.grey.shade200),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            template,
+                                            style: AppTypography.bodyMedium(context).copyWith(height: 1.4),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: primary.withOpacity(0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(Icons.send_rounded, color: primary, size: 20),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        const SizedBox(height: 24),
+                        Text(
+                          'Or write a custom message',
+                          style: AppTypography.bodyMedium(
+                            context,
+                          ).copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade800),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: customController,
+                          decoration: InputDecoration(
+                            hintText: 'Type your message here...',
+                            hintStyle: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade400),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: primary, width: 2),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.all(16),
+                          ),
+                          cursorColor: primary,
+                          style: AppTypography.bodyMedium(context).apply(),
+                          maxLines: 4,
+                          minLines: 3,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline_rounded, size: 14, color: Colors.grey.shade600),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Tap a tag to insert into your custom message',
+                              style: AppTypography.bodyMedium(
+                                context,
+                              ).copyWith(fontSize: 12, color: Colors.grey.shade600),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final entry in values.entries)
+                              ActionChip(
+                                label: Text(
+                                  '{{${entry.key}}}',
+                                  style: AppTypography.bodyMedium(
+                                    context,
+                                  ).copyWith(fontSize: 12, color: primary, fontWeight: FontWeight.w600),
+                                ),
+                                onPressed: () {
+                                  final currentText = customController.text;
+                                  final textToInsert = (currentText.isNotEmpty && !currentText.endsWith(' '))
+                                      ? ' ${entry.value}'
+                                      : entry.value;
+                                  final newText = currentText + textToInsert;
+                                  customController.value = TextEditingValue(
+                                    text: newText,
+                                    selection: TextSelection.collapsed(offset: newText.length),
+                                  );
+                                },
+                                backgroundColor: primary.withOpacity(0.1),
+                                side: const BorderSide(color: Colors.transparent),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              if (customController.text.trim().isNotEmpty) {
+                                _launchWhatsApp(phone, customController.text);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 0,
+                            ),
+                            icon: const Icon(Icons.send, size: 18),
+                            label: const Text('Send Custom Message', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                cursorColor: primary,
-                style: AppTypography.bodyMedium(context).apply(),
-                maxLines: 3,
-                onChanged: (val) {
-                  customMessage = val;
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (customMessage != null && customMessage!.trim().isNotEmpty) {
-                _launchWhatsApp(phone, customMessage!);
-              } else {
-                Navigator.of(context).pop();
-              }
-            },
-            child: const Text('Send Custom'),
-          ),
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
-        ],
       );
     },
   );

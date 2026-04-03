@@ -79,7 +79,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
   }
 
-
   Widget _desktopView() {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
@@ -316,7 +315,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-
   Widget _superadminTable() {
     return Consumer<ServiceController>(
       builder: (context, snapshot, _) {
@@ -394,11 +392,36 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       tooltip: '',
       onSelected: (value) => _handleMenuSelection(value, service),
       itemBuilder: (_) => [
-        const PopupMenuItem<String>(value: 'update', child: Text('Edit Service')),
-        const PopupMenuItem<String>(value: 'updateBranchesStatus', child: Text('Update Branch Service')),
+        const PopupMenuItem<String>(
+          value: 'update',
+          child: Row(children: [
+            Icon(Icons.edit_rounded, size: 16, color: Color(0xFF6B7280)),
+            SizedBox(width: 10),
+            Text('Edit Service', style: TextStyle(fontSize: 13)),
+          ]),
+        ),
+        const PopupMenuItem<String>(
+          value: 'updateBranchesStatus',
+          child: Row(children: [
+            Icon(Icons.account_tree_rounded, size: 16, color: Color(0xFF6B7280)),
+            SizedBox(width: 10),
+            Text('Update Branch Service', style: TextStyle(fontSize: 13)),
+          ]),
+        ),
         PopupMenuItem<String>(
           value: 'enableDisable',
-          child: Text(service.serviceStatus == 1 ? 'Deactivate' : 'Re-Activate'),
+          child: Row(children: [
+            Icon(
+              service.serviceStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+              size: 16,
+              color: service.serviceStatus == 1 ? Colors.red : Colors.green,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              service.serviceStatus == 1 ? 'Deactivate' : 'Re-Activate',
+              style: TextStyle(fontSize: 13, color: service.serviceStatus == 1 ? Colors.red : Colors.green),
+            ),
+          ]),
         ),
       ],
       child: Container(
@@ -408,7 +431,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       ),
     );
   }
-
 
   Widget _adminTable() {
     return Consumer<ServiceBranchController>(
@@ -487,10 +509,31 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       tooltip: '',
       onSelected: (value) => _handleAdminMenuSelection(value, serviceBranch),
       itemBuilder: (_) => [
-        const PopupMenuItem<String>(value: 'update', child: Text('Update Timing')),
+        const PopupMenuItem<String>(
+          value: 'update',
+          child: Row(children: [
+            Icon(Icons.schedule_rounded, size: 16, color: Color(0xFF6B7280)),
+            SizedBox(width: 10),
+            Text('Update Timing', style: TextStyle(fontSize: 13)),
+          ]),
+        ),
         PopupMenuItem<String>(
           value: 'enableDisable',
-          child: Text(serviceBranch.serviceBranchStatus == 1 ? 'Deactivate' : 'Re-Activate'),
+          child: Row(children: [
+            Icon(
+              serviceBranch.serviceBranchStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+              size: 16,
+              color: serviceBranch.serviceBranchStatus == 1 ? Colors.red : Colors.green,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              serviceBranch.serviceBranchStatus == 1 ? 'Deactivate' : 'Re-Activate',
+              style: TextStyle(
+                fontSize: 13,
+                color: serviceBranch.serviceBranchStatus == 1 ? Colors.red : Colors.green,
+              ),
+            ),
+          ]),
         ),
       ],
       child: Container(
@@ -500,7 +543,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       ),
     );
   }
-
 
   DataColumn2 _col(String label, ColumnSize size, {double? fixedWidth}) {
     return DataColumn2(
@@ -662,7 +704,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       ),
     );
   }
-
 
   Widget _mobileView() {
     final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
@@ -915,7 +956,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           startMonth: now.month,
                           year: now.year,
                           totalMonths: 3,
-                          branchId: serviceBranch.branchId,
+                          //TODO: enable back
+                          // branchId: serviceBranch.branchId,
                           initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
                         ),
                       ),
@@ -971,7 +1013,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       }
     }
   }
-
 
   void filtering({bool enableDebounce = true, int? page}) {
     enableDebounce ? _debouncer.run(() => runFiltering(page: page)) : runFiltering(page: page);

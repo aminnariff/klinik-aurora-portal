@@ -104,12 +104,13 @@ class _AppDropdownState extends State<AppDropdown> {
                     widget.attributeList.buttonStyleData ??
                     ButtonStyleData(
                       width: widget.attributeList.width ?? 70,
+                      height: 48,
                       // Same padding as InputField contentPadding
                       padding: EdgeInsets.fromLTRB(
                         screenPadding / 2,
+                        0,
                         screenPadding / 3,
-                        screenPadding / 3,
-                        screenPadding / 3,
+                        0,
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),

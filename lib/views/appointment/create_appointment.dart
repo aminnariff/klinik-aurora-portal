@@ -95,6 +95,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   StreamController<DateTime> rebuild = StreamController.broadcast();
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
   List<FileAttribute> selectedFiles = [];
+  bool _bookingFeeCollected = false;
+  final TextEditingController _receiptNumberController = TextEditingController();
+  final TextEditingController _paymentRemarkController = TextEditingController();
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   List<DropdownAttribute> serviceList = [];
   List<String> availableDateTime = [];
@@ -220,825 +223,994 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     return editBranch();
   }
 
-  Row editBranch() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              constraints: const BoxConstraints(maxWidth: 840, maxHeight: 860),
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // ── Header bar ──────────────────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF9FAFB),
-                        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
-                          const SizedBox(width: 8),
-                          Text(
-                            widget.type == 'create' ? 'New Appointment' : 'Update Appointment',
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                          ),
-                          if (widget.appointment?.appointmentId != null) ...[
-                            const SizedBox(width: 10),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF3F4F6),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '#${widget.appointment!.appointmentId!.substring(0, 8).toUpperCase()}',
-                                style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontFamily: 'monospace'),
-                              ),
-                            ),
-                          ],
-                          const Spacer(),
-                          if (widget.type == 'update')
-                            CopyButton(
-                              textToCopy:
-                                  'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
-                              tooltip: 'Copy Appointment Details',
-                            ),
-                          const SizedBox(width: 4),
-                          CloseButton(onPressed: () => context.pop()),
-                        ],
-                      ),
-                    ),
-                    // ── Scrollable body ─────────────────────────────────────
-                    Flexible(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget editBranch() {
+    return SingleChildScrollView(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                constraints: const BoxConstraints(maxWidth: 840),
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // ── Header bar ──────────────────────────────────────────
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF9FAFB),
+                          border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                        ),
+                        child: Row(
                           children: [
-                            Container(
-                              constraints: const BoxConstraints(maxWidth: 760, minWidth: 580),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Consumer<ServiceBranchController>(
-                                    builder: (context, serviceBranchController, _) {
-                                      return StreamBuilder<DateTime>(
-                                        stream: rebuild.stream,
-                                        builder: (context, snapshot) {
-                                          return Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                labelValue(
-                                                  'Patient Details',
-                                                  patientNameController.controller.text,
-                                                  alignStart: true,
-                                                ),
-                                                if (notNullOrEmptyString(widget.appointment?.user?.userNric))
+                            const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
+                            const SizedBox(width: 8),
+                            Text(
+                              widget.type == 'create' ? 'New Appointment' : 'Update Appointment',
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                            ),
+                            if (widget.appointment?.appointmentId != null) ...[
+                              const SizedBox(width: 10),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF3F4F6),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '#${widget.appointment!.appointmentId!.substring(0, 8).toUpperCase()}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFF6B7280),
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                              ),
+                            ],
+                            const Spacer(),
+                            if (widget.type == 'update')
+                              CopyButton(
+                                textToCopy:
+                                    'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
+                                tooltip: 'Copy Appointment Details',
+                              ),
+                            const SizedBox(width: 4),
+                            CloseButton(onPressed: () => context.pop()),
+                          ],
+                        ),
+                      ),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                constraints: const BoxConstraints(maxWidth: 760, minWidth: 580),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Consumer<ServiceBranchController>(
+                                      builder: (context, serviceBranchController, _) {
+                                        return StreamBuilder<DateTime>(
+                                          stream: rebuild.stream,
+                                          builder: (context, snapshot) {
+                                            return Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  _extraSectionLabel('Patient', Icons.person_rounded),
+                                                  const SizedBox(height: 10),
+                                                  labelValue(
+                                                    'Patient Details',
+                                                    patientNameController.controller.text,
+                                                    alignStart: true,
+                                                  ),
+                                                  if (notNullOrEmptyString(widget.appointment?.user?.userNric))
+                                                    AppSelectableText(
+                                                      widget.appointment?.user?.userNric ?? '',
+                                                      style: AppTypography.bodyMedium(context),
+                                                    ),
                                                   AppSelectableText(
-                                                    widget.appointment?.user?.userNric ?? '',
+                                                    patientContactNoController.controller.text,
                                                     style: AppTypography.bodyMedium(context),
                                                   ),
-                                                AppSelectableText(
-                                                  patientContactNoController.controller.text,
-                                                  style: AppTypography.bodyMedium(context),
-                                                ),
-                                                AppSelectableText(
-                                                  patientEmailController.controller.text,
-                                                  style: AppTypography.bodyMedium(context),
-                                                ),
-                                                AppPadding.vertical(denominator: 1),
-                                                _isLocked
-                                                    ? appointmentNoteController.controller.text != ''
-                                                          ? labelValue(
-                                                              'Notes',
-                                                              appointmentNoteController.controller.text,
-                                                            )
-                                                          : SizedBox()
-                                                    : InputField(field: appointmentNoteController),
-                                                AppPadding.vertical(denominator: 2),
-                                                if ((widget.appointment?.service?.dueDateToggle == 1) ||
-                                                    selectedService?.dueDateToggle == 1)
+                                                  AppSelectableText(
+                                                    patientEmailController.controller.text,
+                                                    style: AppTypography.bodyMedium(context),
+                                                  ),
+                                                  AppPadding.vertical(denominator: 1),
                                                   _isLocked
-                                                      ? dateTimeController.text != ''
-                                                            ? labelValue('Due Date', dateTimeController.text)
+                                                      ? appointmentNoteController.controller.text != ''
+                                                            ? labelValue(
+                                                                'Notes',
+                                                                appointmentNoteController.controller.text,
+                                                              )
                                                             : SizedBox()
-                                                      : GestureDetector(
-                                                          onTap: () async {
-                                                            dueDateCalendar();
-                                                          },
-                                                          child: ReadOnly(
-                                                            InputField(field: dueDateController),
-                                                            isEditable: false,
+                                                      : InputField(field: appointmentNoteController),
+                                                  AppPadding.vertical(denominator: 2),
+                                                  if ((widget.appointment?.service?.dueDateToggle == 1) ||
+                                                      selectedService?.dueDateToggle == 1)
+                                                    _isLocked
+                                                        ? dateTimeController.text != ''
+                                                              ? labelValue('Due Date', dateTimeController.text)
+                                                              : SizedBox()
+                                                        : GestureDetector(
+                                                            onTap: () async {
+                                                              dueDateCalendar();
+                                                            },
+                                                            child: ReadOnly(
+                                                              InputField(field: dueDateController),
+                                                              isEditable: false,
+                                                            ),
                                                           ),
-                                                        ),
-                                                if (((notNullOrEmptyString(widget.appointment?.service?.eddRequired) &&
-                                                            widget.appointment?.service?.dueDateToggle == 1) ||
-                                                        (selectedService?.dueDateToggle == 1 &&
-                                                            selectedService?.eddRequired != null)) &&
-                                                    dueDateController.controller.text != '')
-                                                  StreamBuilder(
-                                                    stream: rebuild.stream,
-                                                    builder: (context, asyncSnapshot) {
-                                                      if (dateTimeController.text == '') {
+                                                  if (((notNullOrEmptyString(
+                                                                widget.appointment?.service?.eddRequired,
+                                                              ) &&
+                                                              widget.appointment?.service?.dueDateToggle == 1) ||
+                                                          (selectedService?.dueDateToggle == 1 &&
+                                                              selectedService?.eddRequired != null)) &&
+                                                      dueDateController.controller.text != '')
+                                                    StreamBuilder(
+                                                      stream: rebuild.stream,
+                                                      builder: (context, asyncSnapshot) {
+                                                        if (dateTimeController.text == '') {
+                                                          return Container(
+                                                            margin: const EdgeInsets.only(top: 6),
+                                                            padding: const EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 7,
+                                                            ),
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.grey.withAlpha(18),
+                                                              borderRadius: BorderRadius.circular(8),
+                                                              border: Border.all(color: Colors.grey.withAlpha(60)),
+                                                            ),
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(
+                                                                  Icons.info_outline_rounded,
+                                                                  size: 13,
+                                                                  color: Colors.grey.shade500,
+                                                                ),
+                                                                const SizedBox(width: 6),
+                                                                Flexible(
+                                                                  child: Text(
+                                                                    'Select appointment date to check eligibility',
+                                                                    style: TextStyle(
+                                                                      fontSize: 12,
+                                                                      color: Colors.grey.shade600,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        }
+                                                        if (gestationalResult == null) return const SizedBox();
+                                                        final color = gestationalStatusColor(gestationalResult?.status);
+                                                        final isEligible =
+                                                            gestationalResult?.status ==
+                                                            GestationalEligibility.eligible;
                                                         return Container(
                                                           margin: const EdgeInsets.only(top: 6),
                                                           padding: const EdgeInsets.symmetric(
                                                             horizontal: 10,
-                                                            vertical: 7,
+                                                            vertical: 8,
                                                           ),
                                                           decoration: BoxDecoration(
-                                                            color: Colors.grey.withAlpha(18),
+                                                            color: color.withAlpha(18),
                                                             borderRadius: BorderRadius.circular(8),
-                                                            border: Border.all(
-                                                              color: Colors.grey.withAlpha(60),
-                                                            ),
+                                                            border: Border.all(color: color.withAlpha(60)),
                                                           ),
                                                           child: Row(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                             children: [
-                                                              Icon(
-                                                                Icons.info_outline_rounded,
-                                                                size: 13,
-                                                                color: Colors.grey.shade500,
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(top: 1),
+                                                                child: Icon(
+                                                                  isEligible
+                                                                      ? Icons.check_circle_rounded
+                                                                      : Icons.warning_amber_rounded,
+                                                                  size: 13,
+                                                                  color: color,
+                                                                ),
                                                               ),
                                                               const SizedBox(width: 6),
                                                               Flexible(
                                                                 child: Text(
-                                                                  'Select appointment date to check eligibility',
+                                                                  getGestationalStatusMessage(
+                                                                        result: gestationalResult,
+                                                                        range:
+                                                                            widget.appointment?.service?.eddRequired ??
+                                                                            selectedService?.eddRequired ??
+                                                                            '',
+                                                                        showRange: true,
+                                                                      ) ??
+                                                                      '',
                                                                   style: TextStyle(
                                                                     fontSize: 12,
-                                                                    color: Colors.grey.shade600,
+                                                                    color: color,
+                                                                    height: 1.4,
                                                                   ),
                                                                 ),
                                                               ),
                                                             ],
                                                           ),
-                                                        );
-                                                      }
-                                                      if (gestationalResult == null) return const SizedBox();
-                                                      final color = gestationalStatusColor(gestationalResult?.status);
-                                                      final isEligible =
-                                                          gestationalResult?.status == GestationalEligibility.eligible;
-                                                      return Container(
-                                                        margin: const EdgeInsets.only(top: 6),
-                                                        padding: const EdgeInsets.symmetric(
-                                                          horizontal: 10,
-                                                          vertical: 8,
-                                                        ),
-                                                        decoration: BoxDecoration(
-                                                          color: color.withAlpha(18),
-                                                          borderRadius: BorderRadius.circular(8),
-                                                          border: Border.all(color: color.withAlpha(60)),
-                                                        ),
-                                                        child: Row(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(top: 1),
-                                                              child: Icon(
-                                                                isEligible
-                                                                    ? Icons.check_circle_rounded
-                                                                    : Icons.warning_amber_rounded,
-                                                                size: 13,
-                                                                color: color,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(width: 6),
-                                                            Flexible(
-                                                              child: Text(
-                                                                getGestationalStatusMessage(
-                                                                      result: gestationalResult,
-                                                                      range:
-                                                                          widget.appointment?.service?.eddRequired ??
-                                                                          selectedService?.eddRequired ??
-                                                                          '',
-                                                                      showRange: true,
-                                                                    ) ??
-                                                                    '',
-                                                                style: TextStyle(
-                                                                  fontSize: 12,
-                                                                  color: color,
-                                                                  height: 1.4,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                if (widget.appointment?.service?.serviceBookingFee != null ||
-                                                    (_service != null &&
-                                                        notNullOrEmptyString(selectedService?.serviceBookingFee) ==
-                                                            true) ||
-                                                    (widget.type == 'update' && _status?.key == '6'))
-                                                  Container(
-                                                    padding: EdgeInsets.only(bottom: 8),
-                                                    width: screenWidth1728(30),
-                                                    child: StreamBuilder<DateTime>(
-                                                      stream: fileRebuild.stream,
-                                                      builder: (context, snapshot) {
-                                                        return Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          children: [
-                                                            AppPadding.vertical(),
-                                                            if (_status?.key == '6' &&
-                                                                widget.appointment?.payment?.any(
-                                                                      (element) => element.paymentType == 4,
-                                                                    ) ==
-                                                                    false) ...[
-                                                              Container(
-                                                                margin: const EdgeInsets.only(bottom: 8),
-                                                                padding: const EdgeInsets.symmetric(
-                                                                  horizontal: 12,
-                                                                  vertical: 8,
-                                                                ),
-                                                                decoration: BoxDecoration(
-                                                                  color: const Color(0xFFFFF7ED),
-                                                                  borderRadius: BorderRadius.circular(8),
-                                                                  border: Border.all(
-                                                                    color: const Color(0xFFFB923C).withAlpha(80),
-                                                                  ),
-                                                                ),
-                                                                child: const Row(
-                                                                  children: [
-                                                                    Icon(
-                                                                      Icons.info_outline_rounded,
-                                                                      size: 14,
-                                                                      color: Color(0xFFEA580C),
-                                                                    ),
-                                                                    SizedBox(width: 6),
-                                                                    Flexible(
-                                                                      child: Text(
-                                                                        'Refund document required — upload proof below',
-                                                                        style: TextStyle(
-                                                                          fontSize: 12,
-                                                                          color: Color(0xFF9A3412),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                            if ((selectedFiles.isEmpty &&
-                                                                    widget.type == 'create' &&
-                                                                    (_service != null &&
-                                                                        notNullOrEmptyString(
-                                                                              selectedService?.serviceBookingFee,
-                                                                            ) ==
-                                                                            true)) ||
-                                                                (selectedFiles.isEmpty &&
-                                                                    widget.type == 'update' &&
-                                                                    _status?.key == '6' &&
-                                                                    widget.appointment?.payment?.any(
-                                                                          (element) => element.paymentType == 4,
-                                                                        ) ==
-                                                                        false)) ...[
-                                                              Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                children: [
-                                                                  UploadDocumentsField(
-                                                                    title: 'promotionPage'.tr(gender: 'browseFile'),
-                                                                    fieldTitle: _status?.key == '6'
-                                                                        ? 'appointmentPage'.tr(gender: 'refundProof')
-                                                                        : 'appointmentPage'.tr(gender: 'paymentProof'),
-                                                                    // tooltipText: 'promotionPage'.tr(gender: 'browse'),
-                                                                    action: () async {
-                                                                      documentErrorMessage.add(null);
-                                                                      FilePickerResult? result = await FilePicker
-                                                                          .platform
-                                                                          .pickFiles();
-
-                                                                      if (result != null) {
-                                                                        PlatformFile file = result.files.first;
-                                                                        if (supportedExtensions.contains(
-                                                                          file.extension,
-                                                                        )) {
-                                                                          debugPrint(bytesToMB(file.size).toString());
-                                                                          debugPrint(file.name);
-                                                                          if (bytesToMB(file.size) < 1.0) {
-                                                                            Uint8List? fileBytes =
-                                                                                result.files.first.bytes;
-                                                                            String fileName = result.files.first.name;
-
-                                                                            selectedFiles.add(
-                                                                              FileAttribute(
-                                                                                name: fileName,
-                                                                                value: fileBytes,
-                                                                              ),
-                                                                            );
-                                                                            fileRebuild.add(DateTime.now());
-                                                                          } else {
-                                                                            showDialogError(
-                                                                              context,
-                                                                              'error'.tr(
-                                                                                gender: 'err-21',
-                                                                                args: [
-                                                                                  fileSizeLimit.toStringAsFixed(0),
-                                                                                ],
-                                                                              ),
-                                                                            );
-                                                                          }
-                                                                        } else {
-                                                                          showDialogError(
-                                                                            context,
-                                                                            'error'.tr(gender: 'err-22'),
-                                                                          );
-                                                                        }
-                                                                      } else {
-                                                                        // User canceled the picker
-                                                                      }
-                                                                    },
-                                                                    cancelAction: () {},
-                                                                  ),
-                                                                  StreamBuilder<String?>(
-                                                                    stream: documentErrorMessage.stream,
-                                                                    builder: (context, snapshot) {
-                                                                      return snapshot.data == null
-                                                                          ? SizedBox()
-                                                                          : AppSelectableText(
-                                                                              snapshot.data ?? '',
-                                                                              style: AppTypography.bodyMedium(context)
-                                                                                  .apply(
-                                                                                    color: errorColor,
-                                                                                    fontSizeDelta: -1,
-                                                                                  ),
-                                                                            );
-                                                                    },
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                            for (int index = 0; index < selectedFiles.length; index++)
-                                                              Container(
-                                                                margin: const EdgeInsets.only(top: 6),
-                                                                padding: const EdgeInsets.symmetric(
-                                                                  horizontal: 12,
-                                                                  vertical: 9,
-                                                                ),
-                                                                decoration: BoxDecoration(
-                                                                  color: const Color(0xFFF0FDF4),
-                                                                  borderRadius: BorderRadius.circular(8),
-                                                                  border: Border.all(
-                                                                    color: const Color(0xFF86EFAC),
-                                                                  ),
-                                                                ),
-                                                                child: Row(
-                                                                  children: [
-                                                                    const Icon(
-                                                                      Icons.insert_drive_file_rounded,
-                                                                      size: 15,
-                                                                      color: Color(0xFF16A34A),
-                                                                    ),
-                                                                    const SizedBox(width: 8),
-                                                                    Expanded(
-                                                                      child: GestureDetector(
-                                                                        onTap: () {
-                                                                          if (selectedFiles[index].path != null ||
-                                                                              selectedFiles[index].value != null) {
-                                                                            showDialog(
-                                                                              context: context,
-                                                                              builder: (BuildContext context) {
-                                                                                return GestureDetector(
-                                                                                  onTap: () => context.pop(),
-                                                                                  child: Center(
-                                                                                    child: Flexible(
-                                                                                      child: CardContainer(
-                                                                                        selectedFiles[index].value !=
-                                                                                                null
-                                                                                            ? Image.memory(
-                                                                                                selectedFiles[index]
-                                                                                                    .value!,
-                                                                                              )
-                                                                                            : selectedFiles[index]
-                                                                                                        .path !=
-                                                                                                    null
-                                                                                            ? Padding(
-                                                                                                padding: EdgeInsets.all(
-                                                                                                  screenPadding,
-                                                                                                ),
-                                                                                                child: Image.network(
-                                                                                                  '${Environment.imageUrl}${selectedFiles[index].path}',
-                                                                                                ),
-                                                                                              )
-                                                                                            : const SizedBox(),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                );
-                                                                              },
-                                                                            );
-                                                                          }
-                                                                        },
-                                                                        child: Text(
-                                                                          selectedFiles[index].name ?? '',
-                                                                          style: const TextStyle(
-                                                                            fontSize: 12.5,
-                                                                            color: Color(0xFF16A34A),
-                                                                            decoration: TextDecoration.underline,
-                                                                            decorationColor: Color(0xFF16A34A),
-                                                                          ),
-                                                                          overflow: TextOverflow.ellipsis,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(width: 4),
-                                                                    GestureDetector(
-                                                                      onTap: () {
-                                                                        selectedFiles.removeAt(index);
-                                                                        fileRebuild.add(DateTime.now());
-                                                                      },
-                                                                      child: const Icon(
-                                                                        Icons.close_rounded,
-                                                                        size: 15,
-                                                                        color: Color(0xFF6B7280),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                          ],
                                                         );
                                                       },
                                                     ),
-                                                  ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                  AppPadding.horizontal(),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        if (widget.type == 'update')
-                                          labelValue(
-                                            'Branch',
-                                            widget.appointment?.branch?.branchName ?? '',
-                                            alignStart: true,
-                                          ),
-                                        if (widget.type == 'create')
-                                          StreamBuilder<DateTime>(
-                                            stream: rebuildDropdown.stream,
-                                            builder: (context, snapshot) {
-                                              return Consumer<AuthController>(
-                                                builder: (context, authController, _) {
-                                                  return Column(
-                                                    children: [
-                                                      AppDropdown(
-                                                        attributeList: DropdownAttributeList(
-                                                          authController.isSuperAdmin ? branches : [],
-                                                          labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                                          isEditable: authController.isSuperAdmin,
-                                                          fieldColor: authController.isSuperAdmin
-                                                              ? null
-                                                              : textFormFieldUneditableColor,
-                                                          value: _appointmentBranch?.name,
-                                                          onChanged: (p0) {
-                                                            _appointmentBranch = p0;
-                                                            _service = null;
-                                                            serviceList = [];
-                                                            availableDateTime = [];
-                                                            dateTimeController.clear();
-                                                            if (_appointmentBranch != null) {
-                                                              ServiceBranchController.available(
-                                                                context,
-                                                                branchId: _appointmentBranch?.key,
-                                                              ).then((value) {
-                                                                if (responseCode(value.code)) {
-                                                                  context
-                                                                          .read<ServiceBranchController>()
-                                                                          .serviceBranchAvailableResponse =
-                                                                      value.data;
-                                                                  if (value.data != null) {
-                                                                    for (service_branch_available_model.Data item
-                                                                        in value.data?.data ?? []) {
-                                                                      serviceList.add(
-                                                                        DropdownAttribute(
-                                                                          item.serviceBranchId ?? '',
-                                                                          item.serviceName ?? '',
-                                                                        ),
-                                                                      );
-                                                                    }
-                                                                  }
-                                                                  serviceList.sort((a, b) => a.name.compareTo(b.name));
-                                                                  rebuildDropdown.add(DateTime.now());
-                                                                }
-                                                              });
-                                                            } else {
-                                                              rebuildDropdown.add(DateTime.now());
-                                                            }
-                                                          },
-                                                          width: 331,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        AppPadding.vertical(denominator: 2),
-                                        if (widget.type == 'update') ...[
-                                          labelValue(
-                                            'Service',
-                                            widget.appointment?.service?.serviceName ?? '',
-                                            alignStart: true,
-                                          ),
-                                          AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
-                                        ],
-                                        if (widget.type == 'create')
-                                          StreamBuilder<DateTime>(
-                                            stream: rebuildDropdown.stream,
-                                            builder: (context, snapshot) {
-                                              return Consumer<ServiceBranchController>(
-                                                builder: (context, serviceBranchController, _) {
-                                                  return Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: AppDropdown(
-                                                          attributeList: DropdownAttributeList(
-                                                            width: 331,
-                                                            serviceList,
-                                                            labelText: 'appointmentPage'.tr(gender: 'service'),
-                                                            value: _service?.name,
-                                                            fieldColor: widget.type == 'update'
-                                                                ? textFormFieldUneditableColor
-                                                                : null,
-                                                            isEditable: widget.type == 'create',
-                                                            onChanged: (p0) {
-                                                              _service = p0;
-                                                              rebuild.add(DateTime.now());
-                                                              try {
-                                                                _status = appointmentStatus.firstWhere(
-                                                                  (element) => element.key == '1',
-                                                                );
-                                                                try {
-                                                                  selectedService = context
-                                                                      .read<ServiceBranchController>()
-                                                                      .serviceBranchAvailableResponse
-                                                                      ?.data
-                                                                      ?.firstWhere((e) => e.serviceBranchId == p0?.key);
-                                                                  rebuild.add(DateTime.now());
-                                                                } catch (e) {
-                                                                  debugPrint(e.toString());
-                                                                }
-                                                              } catch (e) {
-                                                                debugPrint(e.toString());
-                                                              }
-                                                              ServiceBranchAvailableDtController.getAvailableSlot(
-                                                                context,
-                                                                serviceBranchId: _service?.key,
-                                                              ).then((value) {
-                                                                if (responseCode(value.code)) {
-                                                                  context
-                                                                          .read<ServiceBranchAvailableDtController>()
-                                                                          .serviceBranchAvailableTimingResponse =
-                                                                      value.data;
-                                                                  availableDateTime = value.data?.slots ?? [];
-                                                                  rebuild.add(DateTime.now());
-                                                                  rebuildDropdown.add(DateTime.now());
-                                                                }
-                                                              });
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ),
-
-                                        StreamBuilder(
-                                          stream: rebuild.stream,
-                                          builder: (context, _) {
-                                            return Consumer<ServiceBranchController>(
-                                              builder: (context, serviceBranchController, _) {
-                                                if (_service != null &&
-                                                    notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
-                                                  return Container(
-                                                    margin: const EdgeInsets.only(top: 6),
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(0xFFFFF7ED),
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      border: Border.all(color: const Color(0xFFFB923C).withAlpha(80)),
-                                                    ),
-                                                    child: const Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.info_outline_rounded,
-                                                          size: 14,
-                                                          color: Color(0xFFEA580C),
-                                                        ),
-                                                        SizedBox(width: 6),
-                                                        Flexible(
-                                                          child: Text(
-                                                            'Booking fee required — upload payment proof below',
-                                                            style: TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                } else {
-                                                  return const SizedBox();
-                                                }
-                                              },
-                                            );
-                                          },
-                                        ),
-                                        AppPadding.vertical(denominator: 2),
-                                        StreamBuilder<DateTime>(
-                                          stream: rebuildDropdown.stream,
-                                          builder: (context, snapshot) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    _isLocked
-                                                        ? labelValue('Status', _status?.name ?? '')
-                                                        : AppDropdown(
-                                                            attributeList: DropdownAttributeList(
-                                                              widget.type == 'update' ? getAppointmentStatus() : [],
-                                                              isEditable: widget.type == 'update',
-                                                              fieldColor: widget.type == 'update'
-                                                                  ? null
-                                                                  : textFormFieldUneditableColor,
-                                                              labelText: 'appointmentPage'.tr(gender: 'status'),
-                                                              value: _status?.name,
-                                                              onChanged: (p0) {
-                                                                _status = p0;
-                                                                rebuild.add(DateTime.now());
-                                                                rebuildDropdown.add(DateTime.now());
-                                                              },
-                                                              width: 331,
-                                                            ),
-                                                          ),
-                                                  ],
-                                                ),
-                                                if (_status?.key == '2' || _status?.key == '6') ...[
-                                                  const SizedBox(height: 10),
-                                                  Container(
-                                                    padding: const EdgeInsets.all(12),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(0xFFFFF7ED),
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      border: Border.all(
-                                                        color: const Color(0xFFFB923C).withAlpha(80),
-                                                      ),
-                                                    ),
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            const Icon(
-                                                              Icons.policy_outlined,
-                                                              size: 14,
-                                                              color: Color(0xFFEA580C),
-                                                            ),
-                                                            const SizedBox(width: 6),
-                                                            Text(
-                                                              _status?.key == '6'
-                                                                  ? 'Refund Policy'
-                                                                  : 'Cancellation Policy',
-                                                              style: const TextStyle(
-                                                                fontSize: 12,
-                                                                fontWeight: FontWeight.w700,
-                                                                color: Color(0xFF9A3412),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 6),
-                                                        const Text(
-                                                          '• Each appointment may only be rescheduled once.\n'
-                                                          '• Refunds, if approved, are processed within 5–7 business days.\n'
-                                                          '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
-                                                          style: TextStyle(
-                                                            fontSize: 11.5,
-                                                            color: Color(0xFF9A3412),
-                                                            height: 1.6,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                        AppPadding.vertical(),
-                                        Consumer<ServiceBranchAvailableDtController>(
-                                          builder: (context, snapshot, _) {
-                                            return _isLocked
-                                                ? labelValue('Slots', dateTimeController.text)
-                                                : GestureDetector(
-                                                    onTap: () async {
-                                                      if (context.read<AuthController>().hasPermission(
-                                                            'c54a2d91-499c-11f0-9169-bc24115a1342',
-                                                          ) ==
-                                                          false) {
-                                                        if (context.read<AuthController>().isSuperAdmin &&
-                                                            _appointmentBranch == null) {
-                                                          showDialogError(
-                                                            context,
-                                                            ErrorMessage.required(
-                                                              field: 'appointmentPage'.tr(gender: 'branch'),
-                                                            ),
-                                                          );
-                                                        } else if (_appointmentBranch != null &&
-                                                            (availableDateTime.isNotEmpty)) {
-                                                          DateTime now = DateTime.now();
-                                                          availableDateTime = removePastDates(availableDateTime);
-                                                          availableDateTime.sort(
-                                                            (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
-                                                          );
-                                                          String? selectedDateTime = await showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext context) {
-                                                              return Row(
-                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                children: [
-                                                                  Column(
-                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                  if (widget.appointment?.service?.serviceBookingFee != null ||
+                                                      (_service != null &&
+                                                          notNullOrEmptyString(selectedService?.serviceBookingFee) ==
+                                                              true) ||
+                                                      (widget.type == 'update' && _status?.key == '6'))
+                                                    Container(
+                                                      padding: EdgeInsets.only(bottom: 8),
+                                                      width: screenWidth1728(30),
+                                                      child: StreamBuilder<DateTime>(
+                                                        stream: fileRebuild.stream,
+                                                        builder: (context, snapshot) {
+                                                          return Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            children: [
+                                                              AppPadding.vertical(),
+                                                              if (_status?.key == '6' &&
+                                                                  widget.appointment?.payment?.any(
+                                                                        (element) => element.paymentType == 4,
+                                                                      ) ==
+                                                                      false) ...[
+                                                                Container(
+                                                                  margin: const EdgeInsets.only(bottom: 8),
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                    horizontal: 12,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  decoration: BoxDecoration(
+                                                                    color: const Color(0xFFFFF7ED),
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                    border: Border.all(
+                                                                      color: const Color(0xFFFB923C).withAlpha(80),
+                                                                    ),
+                                                                  ),
+                                                                  child: const Row(
                                                                     children: [
-                                                                      Container(
-                                                                        constraints: BoxConstraints(
-                                                                          maxWidth: screenWidth(80),
-                                                                        ),
-                                                                        child: CardContainer(
-                                                                          Padding(
-                                                                            padding: EdgeInsets.all(screenPadding),
-                                                                            child: SelectionCalendarView(
-                                                                              startMonth: now.month,
-                                                                              year: now.year,
-                                                                              initialDateTimes: availableDateTime,
-                                                                            ),
+                                                                      Icon(
+                                                                        Icons.info_outline_rounded,
+                                                                        size: 14,
+                                                                        color: Color(0xFFEA580C),
+                                                                      ),
+                                                                      SizedBox(width: 6),
+                                                                      Flexible(
+                                                                        child: Text(
+                                                                          'Refund document required — upload proof below',
+                                                                          style: TextStyle(
+                                                                            fontSize: 12,
+                                                                            color: Color(0xFF9A3412),
                                                                           ),
                                                                         ),
                                                                       ),
                                                                     ],
                                                                   ),
-                                                                ],
-                                                              );
-                                                            },
-                                                          );
-                                                          dateTimeController.text =
-                                                              formatDateTimeToDisplay(selectedDateTime) ??
-                                                              dateConverter(
-                                                                widget.appointment?.appointmentDatetime,
-                                                                format: 'yyyy-MM-dd HH:mm',
-                                                              ) ??
-                                                              '';
-                                                          calculateGestational();
-                                                        } else if (widget.type == 'update' &&
-                                                            availableDateTime.isEmpty) {
-                                                          ServiceBranchAvailableDtController.getAvailableSlot(
-                                                            context,
-                                                            serviceBranchId: widget.appointment?.serviceBranchId,
-                                                          ).then((value) async {
-                                                            if (responseCode(value.code)) {
-                                                              availableDateTime = value.data?.slots ?? [];
-                                                              DateTime now = DateTime.now();
-                                                              availableDateTime = removePastDates(availableDateTime);
-                                                              String? selectedDateTime = await showDialog(
-                                                                context: context,
-                                                                builder: (BuildContext context) {
-                                                                  return Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                ),
+                                                              ],
+                                                              // ── CREATE: booking fee collected confirmation ──
+                                                              if (widget.type == 'create' &&
+                                                                  _service != null &&
+                                                                  notNullOrEmptyString(
+                                                                        selectedService?.serviceBookingFee,
+                                                                      ) ==
+                                                                      true) ...[
+                                                                Container(
+                                                                  margin: const EdgeInsets.only(top: 4),
+                                                                  decoration: BoxDecoration(
+                                                                    color: _bookingFeeCollected
+                                                                        ? const Color(0xFFF0FDF4)
+                                                                        : const Color(0xFFFFF7ED),
+                                                                    borderRadius: BorderRadius.circular(10),
+                                                                    border: Border.all(
+                                                                      color: _bookingFeeCollected
+                                                                          ? const Color(0xFF86EFAC)
+                                                                          : const Color(0xFFFB923C).withAlpha(80),
+                                                                    ),
+                                                                  ),
+                                                                  child: Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                                     children: [
-                                                                      Column(
-                                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                                        children: [
-                                                                          CardContainer(
+                                                                      // Checkbox row
+                                                                      InkWell(
+                                                                        borderRadius: const BorderRadius.vertical(
+                                                                          top: Radius.circular(10),
+                                                                        ),
+                                                                        onTap: () {
+                                                                          _bookingFeeCollected = !_bookingFeeCollected;
+                                                                          fileRebuild.add(DateTime.now());
+                                                                        },
+                                                                        child: Padding(
+                                                                          padding: const EdgeInsets.symmetric(
+                                                                            horizontal: 12,
+                                                                            vertical: 10,
+                                                                          ),
+                                                                          child: Row(
+                                                                            children: [
+                                                                              SizedBox(
+                                                                                width: 20,
+                                                                                height: 20,
+                                                                                child: Checkbox(
+                                                                                  value: _bookingFeeCollected,
+                                                                                  onChanged: (v) {
+                                                                                    _bookingFeeCollected = v ?? false;
+                                                                                    fileRebuild.add(DateTime.now());
+                                                                                  },
+                                                                                  activeColor: const Color(0xFF16A34A),
+                                                                                  materialTapTargetSize:
+                                                                                      MaterialTapTargetSize.shrinkWrap,
+                                                                                  visualDensity: VisualDensity.compact,
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(width: 10),
+                                                                              Expanded(
+                                                                                child: RichText(
+                                                                                  text: TextSpan(
+                                                                                    style: const TextStyle(
+                                                                                      fontSize: 13,
+                                                                                      color: Color(0xFF374151),
+                                                                                    ),
+                                                                                    children: [
+                                                                                      const TextSpan(
+                                                                                        text:
+                                                                                            'I have collected the booking fee ',
+                                                                                      ),
+                                                                                      TextSpan(
+                                                                                        text:
+                                                                                            '(RM ${selectedService?.serviceBookingFee ?? '—'})',
+                                                                                        style: const TextStyle(
+                                                                                          fontWeight: FontWeight.w700,
+                                                                                          color: Color(0xFF16A34A),
+                                                                                        ),
+                                                                                      ),
+                                                                                      const TextSpan(
+                                                                                        text: ' from the patient',
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      // Expanded fields when checked
+                                                                      if (_bookingFeeCollected) ...[
+                                                                        const Divider(
+                                                                          height: 1,
+                                                                          color: Color(0xFFBBF7D0),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets.fromLTRB(
+                                                                            12,
+                                                                            10,
+                                                                            12,
+                                                                            12,
+                                                                          ),
+                                                                          child: Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              TextField(
+                                                                                controller: _receiptNumberController,
+                                                                                style: const TextStyle(fontSize: 13),
+                                                                                decoration: InputDecoration(
+                                                                                  labelText:
+                                                                                      'Receipt / Reference No. (optional)',
+                                                                                  labelStyle: const TextStyle(
+                                                                                    fontSize: 12,
+                                                                                    color: Color(0xFF6B7280),
+                                                                                  ),
+                                                                                  prefixIcon: const Icon(
+                                                                                    Icons.receipt_outlined,
+                                                                                    size: 16,
+                                                                                    color: Color(0xFF6B7280),
+                                                                                  ),
+                                                                                  filled: true,
+                                                                                  fillColor: Colors.white,
+                                                                                  contentPadding:
+                                                                                      const EdgeInsets.symmetric(
+                                                                                        horizontal: 12,
+                                                                                        vertical: 10,
+                                                                                      ),
+                                                                                  border: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.circular(
+                                                                                      8,
+                                                                                    ),
+                                                                                    borderSide: const BorderSide(
+                                                                                      color: Color(0xFFD1FAE5),
+                                                                                    ),
+                                                                                  ),
+                                                                                  enabledBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.circular(
+                                                                                      8,
+                                                                                    ),
+                                                                                    borderSide: const BorderSide(
+                                                                                      color: Color(0xFFD1FAE5),
+                                                                                    ),
+                                                                                  ),
+                                                                                  focusedBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.circular(
+                                                                                      8,
+                                                                                    ),
+                                                                                    borderSide: const BorderSide(
+                                                                                      color: Color(0xFF16A34A),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(height: 8),
+                                                                              TextField(
+                                                                                controller: _paymentRemarkController,
+                                                                                style: const TextStyle(fontSize: 13),
+                                                                                maxLines: 3,
+                                                                                decoration: InputDecoration(
+                                                                                  labelText:
+                                                                                      'Remarks (visible to patient & admin)',
+                                                                                  labelStyle: const TextStyle(
+                                                                                    fontSize: 12,
+                                                                                    color: Color(0xFF6B7280),
+                                                                                  ),
+                                                                                  prefixIcon: const Padding(
+                                                                                    padding: EdgeInsets.only(
+                                                                                      bottom: 40,
+                                                                                    ),
+                                                                                    child: Icon(
+                                                                                      Icons.notes_rounded,
+                                                                                      size: 16,
+                                                                                      color: Color(0xFF6B7280),
+                                                                                    ),
+                                                                                  ),
+                                                                                  filled: true,
+                                                                                  fillColor: Colors.white,
+                                                                                  contentPadding:
+                                                                                      const EdgeInsets.symmetric(
+                                                                                        horizontal: 12,
+                                                                                        vertical: 10,
+                                                                                      ),
+                                                                                  border: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.circular(
+                                                                                      8,
+                                                                                    ),
+                                                                                    borderSide: const BorderSide(
+                                                                                      color: Color(0xFFD1FAE5),
+                                                                                    ),
+                                                                                  ),
+                                                                                  enabledBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.circular(
+                                                                                      8,
+                                                                                    ),
+                                                                                    borderSide: const BorderSide(
+                                                                                      color: Color(0xFFD1FAE5),
+                                                                                    ),
+                                                                                  ),
+                                                                                  focusedBorder: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.circular(
+                                                                                      8,
+                                                                                    ),
+                                                                                    borderSide: const BorderSide(
+                                                                                      color: Color(0xFF16A34A),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                              // ── UPDATE: refund proof upload ──
+                                                              if (selectedFiles.isEmpty &&
+                                                                  widget.type == 'update' &&
+                                                                  _status?.key == '6' &&
+                                                                  widget.appointment?.payment?.any(
+                                                                        (element) => element.paymentType == 4,
+                                                                      ) ==
+                                                                      false) ...[
+                                                                Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    UploadDocumentsField(
+                                                                      title: 'promotionPage'.tr(gender: 'browseFile'),
+                                                                      fieldTitle: 'appointmentPage'.tr(
+                                                                        gender: 'refundProof',
+                                                                      ),
+                                                                      action: () async {
+                                                                        documentErrorMessage.add(null);
+                                                                        FilePickerResult? result = await FilePicker
+                                                                            .platform
+                                                                            .pickFiles();
+                                                                        if (result != null) {
+                                                                          PlatformFile file = result.files.first;
+                                                                          if (supportedExtensions.contains(
+                                                                            file.extension,
+                                                                          )) {
+                                                                            if (bytesToMB(file.size) < 1.0) {
+                                                                              selectedFiles.add(
+                                                                                FileAttribute(
+                                                                                  name: result.files.first.name,
+                                                                                  value: result.files.first.bytes,
+                                                                                ),
+                                                                              );
+                                                                              fileRebuild.add(DateTime.now());
+                                                                            } else {
+                                                                              showDialogError(
+                                                                                context,
+                                                                                'error'.tr(
+                                                                                  gender: 'err-21',
+                                                                                  args: [
+                                                                                    fileSizeLimit.toStringAsFixed(0),
+                                                                                  ],
+                                                                                ),
+                                                                              );
+                                                                            }
+                                                                          } else {
+                                                                            showDialogError(
+                                                                              context,
+                                                                              'error'.tr(gender: 'err-22'),
+                                                                            );
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      cancelAction: () {},
+                                                                    ),
+                                                                    StreamBuilder<String?>(
+                                                                      stream: documentErrorMessage.stream,
+                                                                      builder: (context, snapshot) {
+                                                                        return snapshot.data == null
+                                                                            ? const SizedBox()
+                                                                            : AppSelectableText(
+                                                                                snapshot.data ?? '',
+                                                                                style: AppTypography.bodyMedium(context)
+                                                                                    .apply(
+                                                                                      color: errorColor,
+                                                                                      fontSizeDelta: -1,
+                                                                                    ),
+                                                                              );
+                                                                      },
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                              for (int index = 0; index < selectedFiles.length; index++)
+                                                                Container(
+                                                                  margin: const EdgeInsets.only(top: 6),
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                    horizontal: 12,
+                                                                    vertical: 9,
+                                                                  ),
+                                                                  decoration: BoxDecoration(
+                                                                    color: const Color(0xFFF0FDF4),
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                    border: Border.all(color: const Color(0xFF86EFAC)),
+                                                                  ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      const Icon(
+                                                                        Icons.insert_drive_file_rounded,
+                                                                        size: 15,
+                                                                        color: Color(0xFF16A34A),
+                                                                      ),
+                                                                      const SizedBox(width: 8),
+                                                                      Expanded(
+                                                                        child: GestureDetector(
+                                                                          onTap: () {
+                                                                            if (selectedFiles[index].path != null ||
+                                                                                selectedFiles[index].value != null) {
+                                                                              showDialog(
+                                                                                context: context,
+                                                                                builder: (BuildContext context) {
+                                                                                  return GestureDetector(
+                                                                                    onTap: () => context.pop(),
+                                                                                    child: Center(
+                                                                                      child: Flexible(
+                                                                                        child: CardContainer(
+                                                                                          selectedFiles[index].value !=
+                                                                                                  null
+                                                                                              ? Image.memory(
+                                                                                                  selectedFiles[index]
+                                                                                                      .value!,
+                                                                                                )
+                                                                                              : selectedFiles[index]
+                                                                                                        .path !=
+                                                                                                    null
+                                                                                              ? Padding(
+                                                                                                  padding:
+                                                                                                      EdgeInsets.all(
+                                                                                                        screenPadding,
+                                                                                                      ),
+                                                                                                  child: Image.network(
+                                                                                                    '${Environment.imageUrl}${selectedFiles[index].path}',
+                                                                                                  ),
+                                                                                                )
+                                                                                              : const SizedBox(),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  );
+                                                                                },
+                                                                              );
+                                                                            }
+                                                                          },
+                                                                          child: Text(
+                                                                            selectedFiles[index].name ?? '',
+                                                                            style: const TextStyle(
+                                                                              fontSize: 12.5,
+                                                                              color: Color(0xFF16A34A),
+                                                                              decoration: TextDecoration.underline,
+                                                                              decorationColor: Color(0xFF16A34A),
+                                                                            ),
+                                                                            overflow: TextOverflow.ellipsis,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(width: 4),
+                                                                      GestureDetector(
+                                                                        onTap: () {
+                                                                          selectedFiles.removeAt(index);
+                                                                          fileRebuild.add(DateTime.now());
+                                                                        },
+                                                                        child: const Icon(
+                                                                          Icons.close_rounded,
+                                                                          size: 15,
+                                                                          color: Color(0xFF6B7280),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    AppPadding.horizontal(),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          _extraSectionLabel('Appointment Details', Icons.event_note_rounded),
+                                          const SizedBox(height: 10),
+                                          if (widget.type == 'update')
+                                            labelValue(
+                                              'Branch',
+                                              widget.appointment?.branch?.branchName ?? '',
+                                              alignStart: true,
+                                            ),
+                                          if (widget.type == 'create')
+                                            StreamBuilder<DateTime>(
+                                              stream: rebuildDropdown.stream,
+                                              builder: (context, snapshot) {
+                                                return Consumer<AuthController>(
+                                                  builder: (context, authController, _) {
+                                                    return Column(
+                                                      children: [
+                                                        AppDropdown(
+                                                          attributeList: DropdownAttributeList(
+                                                            authController.isSuperAdmin ? branches : [],
+                                                            labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                                            isEditable: authController.isSuperAdmin,
+                                                            fieldColor: authController.isSuperAdmin
+                                                                ? null
+                                                                : textFormFieldUneditableColor,
+                                                            value: _appointmentBranch?.name,
+                                                            onChanged: (p0) {
+                                                              _appointmentBranch = p0;
+                                                              _service = null;
+                                                              serviceList = [];
+                                                              availableDateTime = [];
+                                                              dateTimeController.clear();
+                                                              if (_appointmentBranch != null) {
+                                                                ServiceBranchController.available(
+                                                                  context,
+                                                                  branchId: _appointmentBranch?.key,
+                                                                ).then((value) {
+                                                                  if (responseCode(value.code)) {
+                                                                    context
+                                                                            .read<ServiceBranchController>()
+                                                                            .serviceBranchAvailableResponse =
+                                                                        value.data;
+                                                                    if (value.data != null) {
+                                                                      for (service_branch_available_model.Data item
+                                                                          in value.data?.data ?? []) {
+                                                                        serviceList.add(
+                                                                          DropdownAttribute(
+                                                                            item.serviceBranchId ?? '',
+                                                                            item.serviceName ?? '',
+                                                                          ),
+                                                                        );
+                                                                      }
+                                                                    }
+                                                                    serviceList.sort(
+                                                                      (a, b) => a.name.compareTo(b.name),
+                                                                    );
+                                                                    rebuildDropdown.add(DateTime.now());
+                                                                  }
+                                                                });
+                                                              } else {
+                                                                rebuildDropdown.add(DateTime.now());
+                                                              }
+                                                            },
+                                                            width: 331,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                          AppPadding.vertical(denominator: 2),
+                                          if (widget.type == 'update') ...[
+                                            labelValue(
+                                              'Service',
+                                              widget.appointment?.service?.serviceName ?? '',
+                                              alignStart: true,
+                                            ),
+                                            AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
+                                          ],
+                                          if (widget.type == 'create')
+                                            StreamBuilder<DateTime>(
+                                              stream: rebuildDropdown.stream,
+                                              builder: (context, snapshot) {
+                                                return Consumer<ServiceBranchController>(
+                                                  builder: (context, serviceBranchController, _) {
+                                                    return Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: AppDropdown(
+                                                            attributeList: DropdownAttributeList(
+                                                              width: 331,
+                                                              serviceList,
+                                                              labelText: 'appointmentPage'.tr(gender: 'service'),
+                                                              value: _service?.name,
+                                                              fieldColor: widget.type == 'update'
+                                                                  ? textFormFieldUneditableColor
+                                                                  : null,
+                                                              isEditable: widget.type == 'create',
+                                                              onChanged: (p0) {
+                                                                _service = p0;
+                                                                rebuild.add(DateTime.now());
+                                                                try {
+                                                                  _status = appointmentStatus.firstWhere(
+                                                                    (element) => element.key == '1',
+                                                                  );
+                                                                  try {
+                                                                    selectedService = context
+                                                                        .read<ServiceBranchController>()
+                                                                        .serviceBranchAvailableResponse
+                                                                        ?.data
+                                                                        ?.firstWhere(
+                                                                          (e) => e.serviceBranchId == p0?.key,
+                                                                        );
+                                                                    rebuild.add(DateTime.now());
+                                                                  } catch (e) {
+                                                                    debugPrint(e.toString());
+                                                                  }
+                                                                } catch (e) {
+                                                                  debugPrint(e.toString());
+                                                                }
+                                                                ServiceBranchAvailableDtController.getAvailableSlot(
+                                                                  context,
+                                                                  serviceBranchId: _service?.key,
+                                                                ).then((value) {
+                                                                  if (responseCode(value.code)) {
+                                                                    context
+                                                                            .read<ServiceBranchAvailableDtController>()
+                                                                            .serviceBranchAvailableTimingResponse =
+                                                                        value.data;
+                                                                    availableDateTime = value.data?.slots ?? [];
+                                                                    rebuild.add(DateTime.now());
+                                                                    rebuildDropdown.add(DateTime.now());
+                                                                  }
+                                                                });
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            ),
+
+                                          StreamBuilder(
+                                            stream: rebuild.stream,
+                                            builder: (context, _) {
+                                              return Consumer<ServiceBranchController>(
+                                                builder: (context, serviceBranchController, _) {
+                                                  if (_service != null &&
+                                                      notNullOrEmptyString(selectedService?.serviceBookingFee) ==
+                                                          true) {
+                                                    return Container(
+                                                      margin: const EdgeInsets.only(top: 6),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(0xFFFFF7ED),
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        border: Border.all(
+                                                          color: const Color(0xFFFB923C).withAlpha(80),
+                                                        ),
+                                                      ),
+                                                      child: const Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.info_outline_rounded,
+                                                            size: 14,
+                                                            color: Color(0xFFEA580C),
+                                                          ),
+                                                          SizedBox(width: 6),
+                                                          Flexible(
+                                                            child: Text(
+                                                              'Booking fee required — upload payment proof below',
+                                                              style: TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return const SizedBox();
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          AppPadding.vertical(denominator: 2),
+                                          StreamBuilder<DateTime>(
+                                            stream: rebuildDropdown.stream,
+                                            builder: (context, snapshot) {
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      _isLocked
+                                                          ? labelValue('Status', _status?.name ?? '')
+                                                          : AppDropdown(
+                                                              attributeList: DropdownAttributeList(
+                                                                widget.type == 'update' ? getAppointmentStatus() : [],
+                                                                isEditable: widget.type == 'update',
+                                                                fieldColor: widget.type == 'update'
+                                                                    ? null
+                                                                    : textFormFieldUneditableColor,
+                                                                labelText: 'appointmentPage'.tr(gender: 'status'),
+                                                                value: _status?.name,
+                                                                onChanged: (p0) {
+                                                                  _status = p0;
+                                                                  rebuild.add(DateTime.now());
+                                                                  rebuildDropdown.add(DateTime.now());
+                                                                },
+                                                                width: 331,
+                                                              ),
+                                                            ),
+                                                    ],
+                                                  ),
+                                                  if (_status?.key == '2' || _status?.key == '6') ...[
+                                                    const SizedBox(height: 10),
+                                                    Container(
+                                                      padding: const EdgeInsets.all(12),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(0xFFFFF7ED),
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        border: Border.all(
+                                                          color: const Color(0xFFFB923C).withAlpha(80),
+                                                        ),
+                                                      ),
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              const Icon(
+                                                                Icons.policy_outlined,
+                                                                size: 14,
+                                                                color: Color(0xFFEA580C),
+                                                              ),
+                                                              const SizedBox(width: 6),
+                                                              Text(
+                                                                _status?.key == '6'
+                                                                    ? 'Refund Policy'
+                                                                    : 'Cancellation Policy',
+                                                                style: const TextStyle(
+                                                                  fontSize: 12,
+                                                                  fontWeight: FontWeight.w700,
+                                                                  color: Color(0xFF9A3412),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(height: 6),
+                                                          const Text(
+                                                            '• Each appointment may only be rescheduled once.\n'
+                                                            '• Refunds, if approved, are processed within 5–7 business days.\n'
+                                                            '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
+                                                            style: TextStyle(
+                                                              fontSize: 11.5,
+                                                              color: Color(0xFF9A3412),
+                                                              height: 1.6,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                          AppPadding.vertical(),
+                                          Consumer<ServiceBranchAvailableDtController>(
+                                            builder: (context, snapshot, _) {
+                                              return _isLocked
+                                                  ? labelValue('Slots', dateTimeController.text)
+                                                  : GestureDetector(
+                                                      onTap: () async {
+                                                        if (context.read<AuthController>().hasPermission(
+                                                              'c54a2d91-499c-11f0-9169-bc24115a1342',
+                                                            ) ==
+                                                            false) {
+                                                          if (context.read<AuthController>().isSuperAdmin &&
+                                                              _appointmentBranch == null) {
+                                                            showDialogError(
+                                                              context,
+                                                              ErrorMessage.required(
+                                                                field: 'appointmentPage'.tr(gender: 'branch'),
+                                                              ),
+                                                            );
+                                                          } else if (_appointmentBranch != null &&
+                                                              (availableDateTime.isNotEmpty)) {
+                                                            DateTime now = DateTime.now();
+                                                            availableDateTime = removePastDates(availableDateTime);
+                                                            availableDateTime.sort(
+                                                              (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
+                                                            );
+                                                            String? selectedDateTime = await showDialog(
+                                                              context: context,
+                                                              builder: (BuildContext context) {
+                                                                return Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                      children: [
+                                                                        Container(
+                                                                          constraints: BoxConstraints(
+                                                                            maxWidth: screenWidth(80),
+                                                                          ),
+                                                                          child: CardContainer(
                                                                             Padding(
                                                                               padding: EdgeInsets.all(screenPadding),
                                                                               child: SelectionCalendarView(
@@ -1048,144 +1220,185 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                               ),
                                                                             ),
                                                                           ),
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  );
-                                                                },
-                                                              );
-                                                              dateTimeController.text =
-                                                                  formatDateTimeToDisplay(selectedDateTime) ??
-                                                                  dateConverter(
-                                                                    widget.appointment?.appointmentDatetime,
-                                                                    format: 'yyyy-MM-dd HH:mm',
-                                                                  ) ??
-                                                                  '';
-                                                              calculateGestational();
-                                                              rebuildDropdown.add(DateTime.now());
-                                                            }
-                                                          });
-                                                        } else if (_service == null) {
-                                                          showDialogError(
-                                                            context,
-                                                            ErrorMessage.required(
-                                                              field: 'appointmentPage'.tr(gender: 'service'),
-                                                            ),
-                                                          );
-                                                        } else if (availableDateTime.isEmpty) {
-                                                          showDialogError(context, 'No available slots');
-                                                        } else {
-                                                          showDialogError(
-                                                            context,
-                                                            ErrorMessage.required(
-                                                              field: 'appointmentPage'.tr(gender: 'branch'),
-                                                            ),
-                                                          );
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ],
+                                                                );
+                                                              },
+                                                            );
+                                                            dateTimeController.text =
+                                                                formatDateTimeToDisplay(selectedDateTime) ??
+                                                                dateConverter(
+                                                                  widget.appointment?.appointmentDatetime,
+                                                                  format: 'yyyy-MM-dd HH:mm',
+                                                                ) ??
+                                                                '';
+                                                            calculateGestational();
+                                                          } else if (widget.type == 'update' &&
+                                                              availableDateTime.isEmpty) {
+                                                            ServiceBranchAvailableDtController.getAvailableSlot(
+                                                              context,
+                                                              serviceBranchId: widget.appointment?.serviceBranchId,
+                                                            ).then((value) async {
+                                                              if (responseCode(value.code)) {
+                                                                availableDateTime = value.data?.slots ?? [];
+                                                                DateTime now = DateTime.now();
+                                                                availableDateTime = removePastDates(availableDateTime);
+                                                                String? selectedDateTime = await showDialog(
+                                                                  context: context,
+                                                                  builder: (BuildContext context) {
+                                                                    return Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                      children: [
+                                                                        Column(
+                                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                                          children: [
+                                                                            CardContainer(
+                                                                              Padding(
+                                                                                padding: EdgeInsets.all(screenPadding),
+                                                                                child: SelectionCalendarView(
+                                                                                  startMonth: now.month,
+                                                                                  year: now.year,
+                                                                                  initialDateTimes: availableDateTime,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                );
+                                                                dateTimeController.text =
+                                                                    formatDateTimeToDisplay(selectedDateTime) ??
+                                                                    dateConverter(
+                                                                      widget.appointment?.appointmentDatetime,
+                                                                      format: 'yyyy-MM-dd HH:mm',
+                                                                    ) ??
+                                                                    '';
+                                                                calculateGestational();
+                                                                rebuildDropdown.add(DateTime.now());
+                                                              }
+                                                            });
+                                                          } else if (_service == null) {
+                                                            showDialogError(
+                                                              context,
+                                                              ErrorMessage.required(
+                                                                field: 'appointmentPage'.tr(gender: 'service'),
+                                                              ),
+                                                            );
+                                                          } else if (availableDateTime.isEmpty) {
+                                                            showDialogError(context, 'No available slots');
+                                                          } else {
+                                                            showDialogError(
+                                                              context,
+                                                              ErrorMessage.required(
+                                                                field: 'appointmentPage'.tr(gender: 'branch'),
+                                                              ),
+                                                            );
+                                                          }
                                                         }
-                                                      }
-                                                    },
-                                                    child: ReadOnly(
-                                                      isEditable: false,
-                                                      InputField(
-                                                        field: InputFieldAttribute(
-                                                          controller: dateTimeController,
-                                                          labelText: 'appointmentPage'.tr(
-                                                            gender: 'appointmentDateTime',
+                                                      },
+                                                      child: ReadOnly(
+                                                        isEditable: false,
+                                                        InputField(
+                                                          field: InputFieldAttribute(
+                                                            controller: dateTimeController,
+                                                            labelText: 'appointmentPage'.tr(
+                                                              gender: 'appointmentDateTime',
+                                                            ),
+                                                            isEditable: false,
+                                                            uneditableColor: textFormFieldEditableColor,
+                                                            suffixWidget: Row(
+                                                              mainAxisSize: MainAxisSize.min,
+                                                              children: [Icon(Icons.date_range)],
+                                                            ),
                                                           ),
-                                                          isEditable: false,
-                                                          uneditableColor: textFormFieldEditableColor,
-                                                          suffixWidget: Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: [Icon(Icons.date_range)],
-                                                          ),
+                                                          width: screenWidthByBreakpoint(90, 70, 30),
                                                         ),
-                                                        width: screenWidthByBreakpoint(90, 70, 30),
                                                       ),
-                                                    ),
-                                                  );
-                                          },
-                                        ),
-                                        AppPadding.vertical(denominator: 2),
-                                      ],
+                                                    );
+                                            },
+                                          ),
+                                          AppPadding.vertical(denominator: 2),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Divider(color: Color(0xFFF3F4F6), height: 1),
-                            const SizedBox(height: 20),
-                            if (widget.type == 'update') extraInformation(),
-                            const SizedBox(height: 16),
-                            if (!_isLocked) ...[
-                              StreamBuilder<DateTime>(
-                                stream: rebuild.stream,
-                                builder: (context, _) {
-                                  final notes = <String>[];
-                                  if (widget.type == 'update') {
-                                    notes.add(
-                                      'Changing the appointment slot will automatically set the status to Rescheduled.',
-                                    );
-                                  }
-                                  if (_status?.key == '6') {
-                                    notes.add(
-                                      'Uploading a refund document will initiate the refund review process.',
-                                    );
-                                  }
-                                  if (widget.type == 'create' &&
-                                      _service != null &&
-                                      notNullOrEmptyString(selectedService?.serviceBookingFee)) {
-                                    notes.add(
-                                      'Payment proof must be uploaded for services with a booking fee.',
-                                    );
-                                  }
-                                  if (notes.isEmpty) return const SizedBox();
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: notes
-                                          .map(
-                                            (note) => Padding(
-                                              padding: const EdgeInsets.only(bottom: 3),
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    '* ',
-                                                    style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
-                                                  ),
-                                                  Flexible(
-                                                    child: Text(
-                                                      note,
-                                                      style: const TextStyle(
-                                                        fontSize: 11,
-                                                        color: Color(0xFF9CA3AF),
-                                                        height: 1.4,
+                              const Divider(color: Color(0xFFF3F4F6), height: 1),
+                              const SizedBox(height: 20),
+                              if (widget.type == 'update') extraInformation(),
+                              const SizedBox(height: 16),
+                              if (!_isLocked) ...[
+                                StreamBuilder<DateTime>(
+                                  stream: rebuild.stream,
+                                  builder: (context, _) {
+                                    final notes = <String>[];
+                                    if (widget.type == 'update') {
+                                      notes.add(
+                                        'Changing the appointment slot will automatically set the status to Rescheduled.',
+                                      );
+                                    }
+                                    if (_status?.key == '6') {
+                                      notes.add('Uploading a refund document will initiate the refund review process.');
+                                    }
+                                    if (widget.type == 'create' &&
+                                        _service != null &&
+                                        notNullOrEmptyString(selectedService?.serviceBookingFee)) {
+                                      notes.add('Payment proof must be uploaded for services with a booking fee.');
+                                    }
+                                    if (notes.isEmpty) return const SizedBox();
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 12),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: notes
+                                            .map(
+                                              (note) => Padding(
+                                                padding: const EdgeInsets.only(bottom: 3),
+                                                child: Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text(
+                                                      '* ',
+                                                      style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                                    ),
+                                                    Flexible(
+                                                      child: Text(
+                                                        note,
+                                                        style: const TextStyle(
+                                                          fontSize: 11,
+                                                          color: Color(0xFF9CA3AF),
+                                                          height: 1.4,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                          .toList(),
-                                    ),
-                                  );
-                                },
-                              ),
-                              Center(child: button()),
+                                            )
+                                            .toList(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                Center(child: button()),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -1247,14 +1460,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   Widget extraInformation() {
     final isCompleted = widget.appointment?.appointmentStatus == 5;
-    final hasPaidBooking =
-        widget.appointment?.payment?.any((e) => e.paymentStatus == 1) == true;
+    final hasPaidBooking = widget.appointment?.payment?.any((e) => e.paymentStatus == 1) == true;
     final paidBookingEntry = hasPaidBooking
         ? widget.appointment!.payment!.firstWhere((e) => e.paymentStatus == 1)
         : null;
-    final servicePrice = double.tryParse(
-      '${widget.appointment?.service?.servicePrice ?? 0}',
-    );
+    final servicePrice = double.tryParse('${widget.appointment?.service?.servicePrice ?? 0}');
     final paidAmount = double.tryParse(paidBookingEntry?.paymentAmount ?? '0');
 
     // If completed, remaining balance = 0 (fully paid at clinic)
@@ -1269,7 +1479,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       children: [
         // ── Fee section ──────────────────────────────────────────────────────
         if (widget.type == 'update') ...[
-          _extraSectionLabel('Fees & Payment'),
+          _extraSectionLabel('Fees & Payment', Icons.payments_outlined),
           const SizedBox(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1298,9 +1508,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               Expanded(
                 child: _extraFeeCard(
                   label: 'Service Price',
-                  value: servicePrice != null
-                      ? 'RM ${servicePrice.toStringAsFixed(2)}'
-                      : '—',
+                  value: servicePrice != null ? 'RM ${servicePrice.toStringAsFixed(2)}' : '—',
                   icon: Icons.receipt_long_outlined,
                   color: const Color(0xFF6366F1),
                 ),
@@ -1310,33 +1518,23 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           if (balance != null) ...[
             const SizedBox(height: 10),
             _extraFeeCard(
-              label: isCompleted
-                  ? 'Remaining Balance (Fully Paid)'
-                  : 'Remaining Balance',
+              label: isCompleted ? 'Remaining Balance (Fully Paid)' : 'Remaining Balance',
               value: 'RM ${balance.toStringAsFixed(2)}',
               icon: isCompleted || balance == 0
                   ? Icons.check_circle_outline_rounded
                   : Icons.account_balance_wallet_outlined,
-              color: isCompleted || balance == 0
-                  ? const Color(0xFF15803D)
-                  : const Color(0xFFC2410C),
+              color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
               fullWidth: true,
             ),
           ],
           if (paidBookingEntry != null) ...[
             const SizedBox(height: 8),
-            _metaInfoRow(
-              Icons.tag_rounded,
-              'Payment ID',
-              '${paidBookingEntry.paymentId}',
-            ),
+            _metaInfoRow(Icons.tag_rounded, 'Payment ID', '${paidBookingEntry.paymentId}'),
           ],
           // Payment proof
           if (selectedFiles.isNotEmpty ||
               (widget.type == 'update' &&
-                  widget.appointment?.payment
-                          ?.any((e) => e.paymentType == 2 && e.paymentStatus == 1) ==
-                      true)) ...[
+                  widget.appointment?.payment?.any((e) => e.paymentType == 2 && e.paymentStatus == 1) == true)) ...[
             const SizedBox(height: 12),
             _proofButton(
               label: 'appointmentPage'.tr(gender: 'paymentProof'),
@@ -1362,9 +1560,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           ],
           // Refund proof
           if (widget.type == 'update' &&
-              widget.appointment?.payment
-                      ?.any((e) => e.paymentType == 4 && e.paymentStatus == 1) ==
-                  true) ...[
+              widget.appointment?.payment?.any((e) => e.paymentType == 4 && e.paymentStatus == 1) == true) ...[
             const SizedBox(height: 8),
             _proofButton(
               label: 'appointmentPage'.tr(gender: 'refundProof'),
@@ -1401,16 +1597,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _extraSectionLabel('Patient Feedback'),
+                    _extraSectionLabel('Patient Feedback', Icons.star_outline_rounded),
                     const SizedBox(height: 10),
                     AbsorbPointer(
                       child: RatingStars(
-                        value: double.parse(
-                          '${widget.appointment?.appointmentRating ?? 0}',
-                        ),
+                        value: double.parse('${widget.appointment?.appointmentRating ?? 0}'),
                         onValueChanged: (v) {},
-                        starBuilder: (index, color) =>
-                            Icon(Icons.star, color: color),
+                        starBuilder: (index, color) => Icon(Icons.star, color: color),
                         starCount: 5,
                         starSize: 20,
                         valueLabelColor: const Color(0xff9b9b9b),
@@ -1425,8 +1618,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         maxValueVisibility: true,
                         valueLabelVisibility: true,
                         animationDuration: Duration(milliseconds: 1000),
-                        valueLabelPadding:
-                            const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
+                        valueLabelPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
                         valueLabelMargin: const EdgeInsets.only(right: 8),
                         starOffColor: const Color(0xffe7e8ea),
                         starColor: Colors.amber,
@@ -1437,8 +1629,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       const SizedBox(height: 8),
                       Text(
                         widget.appointment!.appointmentFeedback!,
-                        style: const TextStyle(
-                            fontSize: 13, color: Color(0xFF374151)),
+                        style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
                       ),
                     ],
                   ],
@@ -1450,7 +1641,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _extraSectionLabel('Record Info'),
+                  _extraSectionLabel('Record Info', Icons.info_outline_rounded),
                   const SizedBox(height: 10),
                   _metaInfoRow(
                     Icons.add_circle_outline,
@@ -1474,15 +1665,28 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     );
   }
 
-  Widget _extraSectionLabel(String text) {
-    return Text(
-      text.toUpperCase(),
-      style: const TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        color: Color(0xFF9CA3AF),
-        letterSpacing: 0.8,
-      ),
+  Widget _extraSectionLabel(String text, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 3,
+          height: 13,
+          decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 5),
+        Text(
+          text.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF6B7280),
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
     );
   }
 
@@ -1514,22 +1718,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF6B7280)),
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
                     ),
-                    if (badge != null) ...[
-                      const SizedBox(width: 6),
-                      badge,
-                    ],
+                    if (badge != null) ...[const SizedBox(width: 6), badge],
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w700, color: color),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: color),
                 ),
               ],
             ),
@@ -1549,14 +1746,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label,
-                  style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF9CA3AF))),
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 12, color: Color(0xFF374151))),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+              ),
+              Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
             ],
           ),
         ),
@@ -1586,12 +1780,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             const SizedBox(width: 7),
             Text(
               label,
-              style: TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w600, color: color),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color),
             ),
             const SizedBox(width: 6),
-            Icon(Icons.open_in_new_rounded,
-                size: 12, color: color.withAlpha(160)),
+            Icon(Icons.open_in_new_rounded, size: 12, color: color.withAlpha(160)),
           ],
         ),
       ),
@@ -1613,6 +1805,20 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         AppSelectableText(value, style: AppTypography.bodyMedium(context)),
       ],
     );
+  }
+
+  String _buildNoteWithPayment() {
+    final base = appointmentNoteController.controller.text.trim();
+    if (_bookingFeeCollected && _service != null && notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
+      final lines = <String>['[Booking Fee Collected — RM ${selectedService?.serviceBookingFee}]'];
+      final receipt = _receiptNumberController.text.trim();
+      final remark = _paymentRemarkController.text.trim();
+      if (receipt.isNotEmpty) lines.add('Receipt No: $receipt');
+      if (remark.isNotEmpty) lines.add('Remark: $remark');
+      final paymentNote = lines.join('\n');
+      return base.isNotEmpty ? '$base\n\n$paymentNote' : paymentNote;
+    }
+    return base;
   }
 
   List<String> removePastDates(List<String> dateList) {
@@ -1650,7 +1856,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   userId: widget.appointment?.user?.userId,
                   serviceBranchId: _service?.key,
                   appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
-                  appointmentNote: appointmentNoteController.controller.text,
+                  appointmentNote: _buildNoteWithPayment(),
                   customerDueDate: (() {
                     try {
                       return DateFormat(
@@ -1665,34 +1871,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  if (_service != null &&
-                      notNullOrEmptyString(selectedService?.serviceBookingFee) == true &&
-                      kDebugMode == false) {
-                    showLoading();
-                    PaymentController.upload(
-                      context,
-                      value.data?.id ?? '',
-                      widget.appointment?.user?.userId ?? '',
-                      2,
-                      selectedService?.serviceBookingFee ?? '50.00',
-                      [selectedFiles[0]],
-                    ).then((documentUploadResponse) {
-                      dismissLoading();
-                      if (widget.refreshData != null) {
-                        widget.refreshData!();
-                      } else {
-                        context.pop();
-                        showDialogSuccess(context, 'Appointment successfully created for the user');
-                      }
-                    });
+                  if (widget.refreshData != null) {
+                    widget.refreshData!();
                   } else {
-                    dismissLoading();
-                    if (widget.refreshData != null) {
-                      widget.refreshData!();
-                    } else {
-                      context.pop();
-                      showDialogSuccess(context, 'Appointment successfully created for the user');
-                    }
+                    context.pop();
+                    showDialogSuccess(context, 'Appointment successfully created for the user');
                   }
                 } else {
                   dismissLoading();
@@ -1828,6 +2011,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         widget.appointment?.payment?.any((element) => element.paymentType == 4) == false) {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'refundProof')));
+    }
+    if (widget.type == 'create' &&
+        _service != null &&
+        notNullOrEmptyString(selectedService?.serviceBookingFee) == true &&
+        !_bookingFeeCollected) {
+      temp = false;
+      showDialogError(context, 'Please confirm that the booking fee has been collected from the patient.');
     }
     setState(() {});
     return temp;

@@ -56,31 +56,31 @@ class _HomepageState extends State<Homepage> {
     sideBarAttribute = [
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.add_circle_outline_rounded, color: Colors.white);
+          return Icon(Icons.dashboard_rounded, color: Colors.white);
         },
         label: 'Dashboard',
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.person, color: Colors.white);
+          return Icon(Icons.people_rounded, color: Colors.white);
         },
         label: UserHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.numbers, color: Colors.white);
+          return Icon(Icons.stars_rounded, color: Colors.white);
         },
         label: PointHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.date_range, color: Colors.white);
+          return Icon(Icons.event_rounded, color: Colors.white);
         },
         label: AppointmentHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.payment, color: Colors.white);
+          return Icon(Icons.receipt_long_rounded, color: Colors.white);
         },
         label: PaymentSummaryPage.displayName,
       ),
@@ -92,49 +92,49 @@ class _HomepageState extends State<Homepage> {
       // ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.medical_services, color: Colors.white);
+          return Icon(Icons.medical_services_rounded, color: Colors.white);
         },
         label: ServiceHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.admin_panel_settings, color: Colors.white);
+          return Icon(Icons.admin_panel_settings_rounded, color: Colors.white);
         },
         label: AdminHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.codeBranch, color: Colors.white);
+          return Icon(Icons.store_rounded, color: Colors.white);
         },
         label: BranchHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.personArrowUpFromLine, color: Colors.white);
+          return Icon(FontAwesomeIcons.userDoctor, color: Colors.white);
         },
         label: DoctorHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.solidImage, color: Colors.white);
+          return Icon(Icons.campaign_rounded, color: Colors.white);
         },
         label: PromotionHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.ticketSimple, color: Colors.white);
+          return Icon(Icons.confirmation_number_rounded, color: Colors.white);
         },
         label: VoucherHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.gifts, color: Colors.white);
+          return Icon(Icons.redeem_rounded, color: Colors.white);
         },
         label: RewardHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.local_shipping, color: Colors.white);
+          return Icon(Icons.history_rounded, color: Colors.white);
         },
         label: RewardHistoryHomepage.displayName,
       ),
