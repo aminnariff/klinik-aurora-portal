@@ -1,5 +1,4 @@
 import 'package:data_table_2/data_table_2.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -9,12 +8,9 @@ import 'package:klinik_aurora_portal/controllers/point_management/point_manageme
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/points/point_detail.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
-import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
@@ -28,12 +24,12 @@ class UserPointDetail extends StatefulWidget {
 }
 
 class _UserPointDetailState extends State<UserPointDetail> {
-  List<TableHeaderAttribute> headers = [
+  final List<TableHeaderAttribute> headers = [
     TableHeaderAttribute(
       attribute: 'transactionId',
       label: 'Transaction ID',
       allowSorting: false,
-      columnSize: ColumnSize.S,
+      columnSize: ColumnSize.M,
     ),
     TableHeaderAttribute(attribute: 'type', label: 'Type', allowSorting: false, columnSize: ColumnSize.S),
     TableHeaderAttribute(
@@ -43,13 +39,13 @@ class _UserPointDetailState extends State<UserPointDetail> {
       columnSize: ColumnSize.S,
       width: 100,
     ),
-    TableHeaderAttribute(attribute: 'description', label: 'Description', allowSorting: false, columnSize: ColumnSize.S),
+    TableHeaderAttribute(attribute: 'description', label: 'Description', allowSorting: false, columnSize: ColumnSize.L),
     TableHeaderAttribute(
       attribute: 'createdDate',
       label: 'Created Date',
       allowSorting: false,
-      columnSize: ColumnSize.S,
-      width: 150,
+      columnSize: ColumnSize.M,
+      width: 160,
     ),
   ];
   bool? isLoading;
@@ -59,19 +55,16 @@ class _UserPointDetailState extends State<UserPointDetail> {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       context.read<UserController>().userPoints = null;
       UserController.points(context, widget.user.userId ?? '').then((value) {
-        isLoading = false;
+        setState(() => isLoading = false);
         if (responseCode(value.code)) {
           context.read<UserController>().userPoints = value.data;
         } else {
-          isLoading = true;
           showDialogError(context, 'Unable to fetch user\'s points history');
         }
       });
       PointManagementController.get(context, 1, userId: widget.user.userId).then((value) {
         if (responseCode(value.code)) {
           context.read<PointManagementController>().userPointsResponse = value.data;
-        } else {
-          showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
         }
       });
     });
@@ -80,184 +73,270 @@ class _UserPointDetailState extends State<UserPointDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Consumer<UserController>(
-                builder: (context, snapshot, _) {
-                  return CardContainer(
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 900, maxHeight: MediaQuery.of(context).size.height * 0.85),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Modern Header
+            Container(
+              padding: const EdgeInsets.all(24.0),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(color: primary.withOpacity(0.1), shape: BoxShape.circle),
+                    child: Center(
+                      child: Text(
+                        (widget.user.userFullname ?? 'U')[0].toUpperCase(),
+                        style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFF9FAFB),
-                            border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.stars_rounded, size: 18, color: Color(0xFF6B7280)),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  '${widget.user.userFullname}\'s Points',
-                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
+                        Text(
+                          '${widget.user.userFullname}\'s Points',
+                          style: AppTypography.bodyMedium(context).copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        Stack(
-                          alignment: Alignment.topRight,
+                        Text(
+                          'View and manage customer loyalty points',
+                          style: AppTypography.bodyMedium(
+                            context,
+                          ).apply(color: Colors.grey.shade500, fontSizeDelta: -1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (context.read<AuthController>().isSuperAdmin) ...[
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) => PointDetail(user: widget.user),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      icon: const Icon(Icons.add_circle_outline, size: 20),
+                      label: const Text('Add Points', style: TextStyle(fontWeight: FontWeight.w600)),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.close, color: Colors.grey.shade400),
+                  ),
+                ],
+              ),
+            ),
+
+            // Content
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Consumer<UserController>(
+                  builder: (context, snapshot, _) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Summary Cards
+                        Row(
                           children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                SizedBox(height: 8),
-                                if (snapshot.userPoints != null) ...[
-                                  SizedBox(height: 8),
-                                  AppSelectableText(
-                                    'Total Points: ${snapshot.userPoints?.data?.totalPoint}',
-                                    style: AppTypography.bodyMedium(context),
-                                  ),
-                                  SizedBox(height: 4),
-                                  AppSelectableText(
-                                    'Next Expiry: ${dateConverter(snapshot.userPoints?.data?.nextExpiry, format: 'dd-MM-yyyy')}',
-                                    style: AppTypography.bodyMedium(context),
-                                  ),
-                                ],
-                                SizedBox(height: 16),
-                                SizedBox(
-                                  width: screenWidth1728(50),
-                                  height: screenHeight829(55),
-                                  child: isLoading != false
-                                      ? Center(child: CircularProgressIndicator())
-                                      : ((snapshot.userPoints?.data?.history?.length ?? 0) == 0)
-                                      ? const NoRecordsWidget()
-                                      : DataTable2(
-                                          columnSpacing: 12,
-                                          horizontalMargin: 12,
-                                          minWidth: screenWidth1728(50),
-                                          isHorizontalScrollBarVisible: true,
-                                          isVerticalScrollBarVisible: true,
-                                          columns: columns(),
-                                          headingRowColor: WidgetStateProperty.all(Colors.white),
-                                          headingRowHeight: 51,
-                                          decoration: const BoxDecoration(),
-                                          border: TableBorder(
-                                            left: BorderSide(
-                                              width: 1,
-                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                            ),
-                                            top: BorderSide(
-                                              width: 1,
-                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                            ),
-                                            bottom: BorderSide(
-                                              width: 1,
-                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                            ),
-                                            right: BorderSide(
-                                              width: 1,
-                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
-                                            ),
-                                            verticalInside: BorderSide(
-                                              width: 1,
-                                              color: Colors.black.withAlpha(opacityCalculation(.1)),
+                            _buildSummaryCard(
+                              context,
+                              'Current Balance',
+                              '${snapshot.userPoints?.data?.totalPoint ?? 0}',
+                              Icons.stars_rounded,
+                              const Color(0xFFFACC15), // Yellow/Gold
+                            ),
+                            const SizedBox(width: 20),
+                            _buildSummaryCard(
+                              context,
+                              'Next Expiry',
+                              snapshot.userPoints?.data?.nextExpiry != null
+                                  ? dateConverter(snapshot.userPoints?.data?.nextExpiry, format: 'dd MMM yyyy')!
+                                  : 'No expiry',
+                              Icons.timer_outlined,
+                              const Color(0xFFF87171), // Red
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        Text(
+                          'Transaction History',
+                          style: AppTypography.bodyMedium(context).copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Table Section
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade200),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: SizedBox(
+                            height: 450,
+                            child: isLoading != false
+                                ? const Center(child: CircularProgressIndicator())
+                                : ((snapshot.userPoints?.data?.history?.length ?? 0) == 0)
+                                ? const NoRecordsWidget()
+                                : DataTable2(
+                                    columnSpacing: 16,
+                                    horizontalMargin: 16,
+                                    minWidth: 800,
+                                    headingRowColor: WidgetStateProperty.all(Colors.grey.shade50),
+                                    headingRowHeight: 52,
+                                    dataRowHeight: 60,
+                                    columns: columns(),
+                                    rows: List.generate(snapshot.userPoints?.data?.history?.length ?? 0, (index) {
+                                      final item = snapshot.userPoints!.data!.history![index];
+                                      final isNegative = item.pointType == 3 || item.pointType == 5; // Claim or Expired
+
+                                      return DataRow(
+                                        cells: [
+                                          DataCell(
+                                            Text(
+                                              item.transactionId ?? 'N/A',
+                                              style: AppTypography.bodyMedium(
+                                                context,
+                                              ).copyWith(fontFamily: 'Monospace', fontSize: 12),
                                             ),
                                           ),
-                                          rows: [
-                                            for (
-                                              int index = 0;
-                                              index < (snapshot.userPoints?.data?.history?.length ?? 0);
-                                              index++
-                                            )
-                                              DataRow(
-                                                color: WidgetStateProperty.all(
-                                                  index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
-                                                ),
-                                                cells: [
-                                                  DataCell(
-                                                    AppSelectableText(
-                                                      snapshot.userPoints?.data?.history?[index].transactionId ?? 'N/A',
-                                                    ),
-                                                  ),
-                                                  DataCell(
-                                                    AppSelectableText(
-                                                      pointType(snapshot.userPoints?.data?.history?[index].pointType),
-                                                    ),
-                                                  ),
-                                                  DataCell(
-                                                    AppSelectableText(
-                                                      snapshot.userPoints?.data?.history?[index].points.toString() ??
-                                                          'N/A',
-                                                    ),
-                                                  ),
-                                                  DataCell(
-                                                    AppSelectableText(
-                                                      snapshot.userPoints?.data?.history?[index].description ?? '',
-                                                    ),
-                                                  ),
-                                                  DataCell(
-                                                    AppSelectableText(
-                                                      dateConverter(snapshot.userPoints?.data?.history?[index].date) ??
-                                                          'N/A',
-                                                    ),
-                                                  ),
-                                                ],
+                                          DataCell(
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: _getTypeColor(item.pointType).withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(6),
                                               ),
-                                          ],
-                                        ),
-                                ),
-                              ],
-                            ),
+                                              child: Text(
+                                                pointType(item.pointType),
+                                                style: TextStyle(
+                                                  color: _getTypeColor(item.pointType),
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Text(
+                                              '${isNegative ? '-' : '+'}${item.points}',
+                                              style: AppTypography.bodyMedium(context).copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: isNegative ? Colors.red : Colors.green,
+                                              ),
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Text(
+                                              item.description ?? '—',
+                                              style: AppTypography.bodyMedium(context),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Text(
+                                              dateConverter(item.date) ?? 'N/A',
+                                              style: AppTypography.bodyMedium(
+                                                context,
+                                              ).apply(color: Colors.grey.shade600),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                  ),
                           ),
                         ),
-                        if (context.read<AuthController>().isSuperAdmin)
-                          Positioned(
-                            top: 10,
-                            right: 10,
-                            child: Container(
-                              decoration: const BoxDecoration(shape: BoxShape.circle, color: secondaryColor),
-                              child: IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return PointDetail(user: widget.user);
-                                    },
-                                  );
-                                },
-                                icon: const Icon(Icons.add),
-                              ),
-                            ),
-                          ),
                       ],
-                    ),
-                      ],
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
+  }
+
+  Widget _buildSummaryCard(BuildContext context, String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade600, fontSizeDelta: -1),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: AppTypography.bodyMedium(context).copyWith(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getTypeColor(int? type) {
+    switch (type) {
+      case 1:
+        return Colors.blue; // Referral
+      case 2:
+        return Colors.teal; // Voucher
+      case 3:
+        return Colors.orange; // Claim Reward
+      case 4:
+        return Colors.green; // Spending
+      case 5:
+        return Colors.red; // Expired
+      default:
+        return Colors.grey;
+    }
   }
 
   List<DataColumn2> columns() {
@@ -265,36 +344,8 @@ class _UserPointDetailState extends State<UserPointDetail> {
       for (TableHeaderAttribute item in headers)
         DataColumn2(
           fixedWidth: item.width,
-          label: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: AppSelectableText(
-                        item.label,
-                        style: Theme.of(context).textTheme.bodyMedium?.apply(fontWeightDelta: 2),
-                      ),
-                    ),
-                    // if (item.tooltip != null) ...[
-                    //   const SizedBox(
-                    //     width: 10,
-                    //   ),
-                    //   const Icon(
-                    //     Icons.help_outline_rounded,
-                    //     size: 18,
-                    //     color: Colors.grey,
-                    //   ),
-                    // ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-          numeric: item.numeric,
-          tooltip: item.tooltip,
           size: item.columnSize ?? ColumnSize.M,
+          label: Text(item.label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
         ),
     ];
   }
