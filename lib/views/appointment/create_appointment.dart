@@ -1348,7 +1348,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         _service != null &&
                                         notNullOrEmptyString(selectedService?.serviceBookingFee)) {
                                       notes.add(
-                                        'Either a payment proof, receipt number, or a remark must be provided for services with a booking fee.',
+                                        'Either a receipt number or a remark must be provided for services with a booking fee.',
                                       );
                                     }
                                     if (notes.isEmpty) return const SizedBox();
@@ -2012,11 +2012,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       if (!_bookingFeeCollected) {
         temp = false;
         showDialogError(context, 'Please confirm that the booking fee has been collected from the patient.');
-      } else if (selectedFiles.isEmpty &&
-          _receiptNumberController.text.trim().isEmpty &&
-          _paymentRemarkController.text.trim().isEmpty) {
+      } else if (_receiptNumberController.text.trim().isEmpty && _paymentRemarkController.text.trim().isEmpty) {
         temp = false;
-        showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'paymentProof')));
+        showDialogError(context, 'Either a receipt number or a remark must be provided for the booking fee.');
       }
     }
     setState(() {});
