@@ -6,7 +6,6 @@ import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
-import 'package:provider/provider.dart';
 
 class AuthController extends ChangeNotifier {
   AuthResponse? _authenticationResponse;
@@ -41,24 +40,31 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<String> checkDateTime() async {
-    String? loginDt = _authenticationResponse?.data?.issuedDt;
-    loginDt ??= prefs.getString(loginDateTime);
+    final expiryStr = _authenticationResponse?.data?.expiryDt;
 
-    if (loginDt == null || loginDt.isEmpty) {
-      debugPrint("Missing or empty login date.");
-      return "invalid_format";
+    if (expiryStr == null || expiryStr.isEmpty) {
+      debugPrint("Missing or empty expiry date.");
+      return "expired";
     }
 
     try {
-      final loginTime = DateTime.parse(loginDt);
+      final expiryTime = DateTime.parse(expiryStr);
       final now = DateTime.now();
 
-      return (loginTime.year == now.year && loginTime.month == now.month && loginTime.day == now.day)
-          ? "valid"
-          : "expired";
+      if (now.isAfter(expiryTime)) {
+        debugPrint("Session expired. Expiry: $expiryTime, Now: $now");
+        return "expired";
+      }
+
+      // Pre-emptive refresh if within 10 minutes
+      if (expiryTime.difference(now).inMinutes < 10) {
+        return "refresh";
+      }
+
+      return "valid";
     } catch (e) {
-      debugPrint("Invalid loginDateTime format: $loginDt");
-      return "invalid_format";
+      debugPrint("Invalid expiryDt format: $expiryStr");
+      return "expired";
     }
   }
 
@@ -100,10 +106,9 @@ class AuthController extends ChangeNotifier {
       }
 
       final parsed = AuthResponse.fromJson(decoded);
-      context.read<AuthController>().authenticationResponse = parsed;
-
-      context.read<AuthController>().branchId = parsed.data?.user?.branchId;
       _authenticationResponse = parsed;
+
+      branchId = parsed.data?.user?.branchId;
 
       final expiryDtString = _authenticationResponse?.data?.expiryDt;
       if (expiryDtString == null || expiryDtString.trim().isEmpty) {
@@ -160,14 +165,13 @@ class AuthController extends ChangeNotifier {
   Future<void> setAuthenticationResponse(AuthResponse? response, {String? usernameValue, String? passwordValue}) async {
     try {
       if (response != null) {
-        AuthResponse? data = response;
-        data = AuthResponse(
+        AuthResponse? data = AuthResponse(
           data: Data(
             user: response.data?.user,
             accessToken: response.data?.accessToken,
             refreshToken: response.data?.refreshToken,
-            issuedDt: DateTime.now().toString(),
-            expiryDt: DateTime.now().add(const Duration(minutes: 60)).toString(),
+            issuedDt: DateTime.now().toIso8601String(),
+            expiryDt: DateTime.now().add(const Duration(hours: 24)).toIso8601String(),
           ),
         );
 
@@ -176,23 +180,23 @@ class AuthController extends ChangeNotifier {
           return;
         }
 
-        final loginDt = DateTime.now().toIso8601String();
-
         await prefs.setString(authResponse, jsonEncode(data));
-        await prefs.setString(loginDateTime, loginDt);
         await prefs.setString(token, data.data?.accessToken ?? '');
         _authenticationResponse = data;
+        branchId = data.data?.user?.branchId;
         notifyListeners();
       } else {
         prefs.remove(authResponse);
-        prefs.remove(loginDateTime);
         prefs.remove(token);
+        _authenticationResponse = null;
+        branchId = null;
         notifyListeners();
       }
     } catch (e) {
       prefs.remove(authResponse);
-      prefs.remove(loginDateTime);
       prefs.remove(token);
+      _authenticationResponse = null;
+      branchId = null;
       debugPrint("Auth save error: $e");
       notifyListeners();
     }

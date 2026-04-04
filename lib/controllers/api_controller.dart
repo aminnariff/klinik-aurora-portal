@@ -18,6 +18,7 @@ import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_button_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_type.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -102,23 +103,25 @@ class ApiController {
             }
           });
         } else if (tokenStatus == 'expired') {
-          if (isSessionExpiredDialogOpen == false) {
-            context.read<AuthController>().logout(context);
-            context.goNamed(LoginPage.routeName);
-            // isSessionExpiredDialogOpen = true;
-            // promptDialog(context, action: () {
-            //   context.pop(context);
-            //   isSessionExpiredDialogOpen = false;
-            //   context.read<AuthController>().logout(context);
-            //   context.goNamed(LoginPage.routeName, extra: true);
-            // },
-            //     text: 'error'.tr(gender: 'sessionExpired'),
-            //     buttonColor: errorColor,
-            //     buttonText: 'button'.tr(gender: 'reLogin'));
+          if (isSessionExpiredDialogOpen == false && context.mounted) {
+            isSessionExpiredDialogOpen = true;
+            dismissLoading();
+            await promptDialog(
+              context,
+              action: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                isSessionExpiredDialogOpen = false;
+                context.read<AuthController>().logout(context);
+                context.goNamed(LoginPage.routeName);
+              },
+              text: 'error'.tr(gender: 'sessionExpired'),
+              buttonColor: secondaryColor,
+              type: DialogType.info,
+              buttonText: 'button'.tr(gender: 'reLogin'),
+            );
+            isSessionExpiredDialogOpen = false;
           }
-          return true;
-        } else if (tokenStatus == 'continue') {
-          return true;
+          return false;
         } else {
           return true;
         }
@@ -138,10 +141,10 @@ class ApiController {
     Options? headers,
     bool isAuthenticated = true,
   }) async {
-    return checkToken(context, isAuthenticated).then((value) async {
-      String url = getDomain(baseUrl) + endpoint;
-      // String url = kDebugMode ? (getDomain(baseUrl) + endpoint) : endpoint;
+    return checkToken(context, isAuthenticated).then((tokenValid) async {
+      if (!tokenValid) return ApiResponse(code: 401, message: 'Session Expired');
 
+      String url = getDomain(baseUrl) + endpoint;
       try {
         switch (method) {
           case Method.get:
@@ -207,14 +210,13 @@ class ApiController {
       } catch (e) {
         if (e is DioException) {
           debugPrint(
-            'ERROR: url -> $url | data -> $data | code -> ${e.response?.statusCode}  | message -> ${e.response?.data['message']} | ${e.error}',
+            'ERROR: url -> $url | data -> $data | code -> ${e.response?.statusCode}  | message -> ${e.response?.data?['message']} | ${e.error}',
           );
           if (e.isNoConnectionError) {
             debugPrint('Internet connection is now offline');
           } else {
             dismissLoading();
             if (e.response?.statusCode == 401 && isAuthenticated == false) {
-              dismissLoading();
               Future.delayed(Duration.zero, () {
                 showDialogError(context, e.response?.data?['message'] ?? '');
               });
@@ -222,8 +224,8 @@ class ApiController {
                 e.response?.statusCode == 403 ||
                 e.response?.statusCode == 410) {
               if (isSessionExpiredDialogOpen == false && context.mounted) {
-                dismissLoading();
                 isSessionExpiredDialogOpen = true;
+                dismissLoading();
                 await promptDialog(
                   context,
                   action: () {
@@ -233,7 +235,7 @@ class ApiController {
                     context.goNamed(LoginPage.routeName);
                   },
                   text: 'error'.tr(gender: 'sessionExpired'),
-                  buttonColor: errorColor,
+                  buttonColor: secondaryColor,
                   buttonText: 'button'.tr(gender: 'reLogin'),
                 );
                 isSessionExpiredDialogOpen = false;
@@ -319,6 +321,7 @@ class ApiController {
     required String text,
     required String? buttonText,
     Color? buttonColor,
+    DialogType type = DialogType.info,
     bool barrierDismissible = false,
   }) async {
     await Future.delayed(Duration.zero);
@@ -330,9 +333,9 @@ class ApiController {
         return AppDialog(
           DialogAttribute(
             text: text,
+            type: type,
             buttonAttributes: [
-              if (buttonText != null)
-                DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
+              if (buttonText != null) DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
             ],
           ),
         );
