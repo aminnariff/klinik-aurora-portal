@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
@@ -1348,7 +1347,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     if (widget.type == 'create' &&
                                         _service != null &&
                                         notNullOrEmptyString(selectedService?.serviceBookingFee)) {
-                                      notes.add('Payment proof must be uploaded for services with a booking fee.');
+                                      notes.add(
+                                        'Either a payment proof, receipt number, or a remark must be provided for services with a booking fee.',
+                                      );
                                     }
                                     if (notes.isEmpty) return const SizedBox();
                                     return Padding(
@@ -1998,13 +1999,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     } else if (dateTimeController.text == "") {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'Slots'));
-    } else if (kDebugMode == false &&
-        widget.type == 'create' &&
-        _service != null &&
-        notNullOrEmptyString(selectedService?.serviceBookingFee) == true &&
-        selectedFiles.isEmpty) {
-      temp = false;
-      showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'paymentProof')));
     } else if (widget.type == 'update' &&
         _status?.key == '6' &&
         selectedFiles.isEmpty &&
@@ -2014,10 +2008,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     }
     if (widget.type == 'create' &&
         _service != null &&
-        notNullOrEmptyString(selectedService?.serviceBookingFee) == true &&
-        !_bookingFeeCollected) {
-      temp = false;
-      showDialogError(context, 'Please confirm that the booking fee has been collected from the patient.');
+        notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
+      if (!_bookingFeeCollected) {
+        temp = false;
+        showDialogError(context, 'Please confirm that the booking fee has been collected from the patient.');
+      } else if (selectedFiles.isEmpty &&
+          _receiptNumberController.text.trim().isEmpty &&
+          _paymentRemarkController.text.trim().isEmpty) {
+        temp = false;
+        showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'paymentProof')));
+      }
     }
     setState(() {});
     return temp;
