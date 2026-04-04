@@ -394,34 +394,40 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       itemBuilder: (_) => [
         const PopupMenuItem<String>(
           value: 'update',
-          child: Row(children: [
-            Icon(Icons.edit_rounded, size: 16, color: Color(0xFF6B7280)),
-            SizedBox(width: 10),
-            Text('Edit Service', style: TextStyle(fontSize: 13)),
-          ]),
+          child: Row(
+            children: [
+              Icon(Icons.edit_rounded, size: 16, color: Color(0xFF6B7280)),
+              SizedBox(width: 10),
+              Text('Edit Service', style: TextStyle(fontSize: 13)),
+            ],
+          ),
         ),
         const PopupMenuItem<String>(
           value: 'updateBranchesStatus',
-          child: Row(children: [
-            Icon(Icons.account_tree_rounded, size: 16, color: Color(0xFF6B7280)),
-            SizedBox(width: 10),
-            Text('Update Branch Service', style: TextStyle(fontSize: 13)),
-          ]),
+          child: Row(
+            children: [
+              Icon(Icons.account_tree_rounded, size: 16, color: Color(0xFF6B7280)),
+              SizedBox(width: 10),
+              Text('Update Branch Service', style: TextStyle(fontSize: 13)),
+            ],
+          ),
         ),
         PopupMenuItem<String>(
           value: 'enableDisable',
-          child: Row(children: [
-            Icon(
-              service.serviceStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
-              size: 16,
-              color: service.serviceStatus == 1 ? Colors.red : Colors.green,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              service.serviceStatus == 1 ? 'Deactivate' : 'Re-Activate',
-              style: TextStyle(fontSize: 13, color: service.serviceStatus == 1 ? Colors.red : Colors.green),
-            ),
-          ]),
+          child: Row(
+            children: [
+              Icon(
+                service.serviceStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+                size: 16,
+                color: service.serviceStatus == 1 ? Colors.red : Colors.green,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                service.serviceStatus == 1 ? 'Deactivate' : 'Re-Activate',
+                style: TextStyle(fontSize: 13, color: service.serviceStatus == 1 ? Colors.red : Colors.green),
+              ),
+            ],
+          ),
         ),
       ],
       child: Container(
@@ -502,44 +508,42 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   Widget _adminActions(service_branch_model.Data serviceBranch) {
-    return PopupMenuButton<String>(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      offset: const Offset(0, 36),
-      color: Colors.white,
-      tooltip: '',
-      onSelected: (value) => _handleAdminMenuSelection(value, serviceBranch),
-      itemBuilder: (_) => [
-        const PopupMenuItem<String>(
-          value: 'update',
-          child: Row(children: [
-            Icon(Icons.schedule_rounded, size: 16, color: Color(0xFF6B7280)),
-            SizedBox(width: 10),
-            Text('Update Timing', style: TextStyle(fontSize: 13)),
-          ]),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _actionIconButton(
+          icon: Icons.schedule_rounded,
+          tooltip: 'Update Timing',
+          color: secondaryColor,
+          onTap: () => _handleAdminMenuSelection('update', serviceBranch),
         ),
-        PopupMenuItem<String>(
-          value: 'enableDisable',
-          child: Row(children: [
-            Icon(
-              serviceBranch.serviceBranchStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
-              size: 16,
-              color: serviceBranch.serviceBranchStatus == 1 ? Colors.red : Colors.green,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              serviceBranch.serviceBranchStatus == 1 ? 'Deactivate' : 'Re-Activate',
-              style: TextStyle(
-                fontSize: 13,
-                color: serviceBranch.serviceBranchStatus == 1 ? Colors.red : Colors.green,
-              ),
-            ),
-          ]),
+        const SizedBox(width: 8),
+        _actionIconButton(
+          icon: serviceBranch.serviceBranchStatus == 1 ? Icons.toggle_on_rounded : Icons.toggle_off_rounded,
+          tooltip: serviceBranch.serviceBranchStatus == 1 ? 'Deactivate' : 'Re-Activate',
+          color: serviceBranch.serviceBranchStatus == 1 ? const Color(0xFF16A34A) : Colors.grey,
+          onTap: () => _handleAdminMenuSelection('enableDisable', serviceBranch),
         ),
       ],
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),
-        child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
+    );
+  }
+
+  Widget _actionIconButton({
+    required IconData icon,
+    required String tooltip,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(6)),
+          child: Icon(icon, color: color, size: 18),
+        ),
       ),
     );
   }
@@ -740,6 +744,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     time: s.serviceTime,
                     price: s.servicePrice,
                     isActive: s.serviceBranchStatus == 1,
+                    drType: s.doctorType,
                     onTap: () => _handleAdminMenuSelection('update', s),
                   ),
                 )
@@ -787,6 +792,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     String? time,
     String? price,
     bool isActive = false,
+    int? drType,
     VoidCallback? onTap,
   }) {
     return Card(
@@ -825,6 +831,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               ),
               const SizedBox(height: 10),
               if (category != null) _mobileRow('Category', category),
+              if (drType != null) _mobileRow('Performed By', doctorType(drType)),
               if (time != null) _mobileRow('Time', time),
               if (price != null) _mobileRow('Price', 'RM $price'),
             ],
@@ -956,8 +963,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           startMonth: now.month,
                           year: now.year,
                           totalMonths: 3,
-                          //TODO: enable back
-                          // branchId: serviceBranch.branchId,
+                          branchId: serviceBranch.branchId,
                           initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
                         ),
                       ),

@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
-  final Function() action;
+  final Function()? action;
   final String actionText;
   final MainAxisSize mainAxisSize;
   final double? height;
@@ -31,11 +31,7 @@ class Button extends StatelessWidget {
     this.icon,
     this.elevation,
     this.padding,
-    this.gradient = const LinearGradient(
-      colors: primaryColors,
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
+    this.gradient = const LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
     this.color,
     this.isFlexible = false,
     this.textColor,
@@ -49,12 +45,10 @@ class Button extends StatelessWidget {
       width: width,
       height: null,
       decoration: BoxDecoration(
-        gradient: (color != null)
-            ? LinearGradient(
-                colors: [color!, color!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
+        gradient: action == null
+            ? const LinearGradient(colors: [Color(0xFFE5E7EB), Color(0xFFE5E7EB)])
+            : (color != null)
+            ? LinearGradient(colors: [color!, color!], begin: Alignment.topLeft, end: Alignment.bottomRight)
             : gradient,
         borderRadius: BorderRadius.circular(borderRadius ?? 20.0),
       ),
@@ -66,19 +60,20 @@ class Button extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           padding: padding ?? EdgeInsets.symmetric(horizontal: screenPadding, vertical: 25),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius ?? 20.0),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius ?? 20.0)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            buttonText(Text(
-              actionText,
-              textAlign: TextAlign.center,
-              style:
-                  Theme.of(context).textTheme.bodyMedium!.apply(color: textColor ?? Colors.white, fontWeightDelta: 2),
-            )),
+            buttonText(
+              Text(
+                actionText,
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.apply(color: textColor ?? Colors.white, fontWeightDelta: 2),
+              ),
+            ),
           ],
         ),
       ),
@@ -86,10 +81,6 @@ class Button extends StatelessWidget {
   }
 
   Widget buttonText(Widget child) {
-    return isFlexible
-        ? Flexible(
-            child: child,
-          )
-        : child;
+    return isFlexible ? Flexible(child: child) : child;
   }
 }
