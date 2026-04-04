@@ -1,3 +1,5 @@
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+
 class AppointmentDetailResponse {
   String? message;
   Data? data;
@@ -34,6 +36,7 @@ class Data {
   Service? service;
   Branch? branch;
   String? serviceBranchId;
+  List<Payment>? payment;
 
   Data({
     this.appointmentId,
@@ -50,6 +53,7 @@ class Data {
     this.service,
     this.branch,
     this.serviceBranchId,
+    this.payment,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -67,6 +71,12 @@ class Data {
     service = json['service'] != null ? Service.fromJson(json['service']) : null;
     branch = json['branch'] != null ? Branch.fromJson(json['branch']) : null;
     serviceBranchId = json['serviceBranchId'];
+    if (json['payment'] != null) {
+      payment = <Payment>[];
+      json['payment'].forEach((v) {
+        payment!.add(Payment.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -91,6 +101,9 @@ class Data {
       data['branch'] = branch!.toJson();
     }
     data['serviceBranchId'] = serviceBranchId;
+    if (payment != null) {
+      data['payment'] = payment!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -193,3 +206,4 @@ class Branch {
     return data;
   }
 }
+

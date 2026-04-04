@@ -166,6 +166,27 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           widget.appointment?.serviceBranchId ?? '',
           widget.appointment?.service?.serviceName ?? '',
         );
+
+        final note = widget.appointment?.appointmentNote ?? '';
+        if (isBookingFeePaid(note)) {
+          _bookingFeeCollected = true;
+          // Extract receipt and remark if they exist
+          final lines = note.split('\n');
+          for (var line in lines) {
+            final l = line.trim();
+            if (l.toLowerCase().startsWith('receipt no:')) {
+              _receiptNumberController.text = l.substring(l.indexOf(':') + 1).trim();
+            } else if (l.toLowerCase().startsWith('remark:')) {
+              _paymentRemarkController.text = l.substring(l.indexOf(':') + 1).trim();
+            }
+          }
+          // Clean the main note controller to show only base note
+          final paymentMarker = '[Booking Fee Collected';
+          if (note.contains(paymentMarker)) {
+            appointmentNoteController.controller.text = note.split(paymentMarker)[0].trim();
+          }
+        }
+
         rebuildDropdown.add(DateTime.now());
       }
       try {
@@ -1810,8 +1831,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   String _buildNoteWithPayment() {
     final base = appointmentNoteController.controller.text.trim();
-    if (_bookingFeeCollected && _service != null && notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
-      final lines = <String>['[Booking Fee Collected — RM ${selectedService?.serviceBookingFee}]'];
+    final fee = widget.appointment?.service?.serviceBookingFee ?? selectedService?.serviceBookingFee;
+    if (_bookingFeeCollected && _service != null && notNullOrEmptyString(fee) == true) {
+      final lines = <String>['[Booking Fee Collected — RM $fee]'];
       final receipt = _receiptNumberController.text.trim();
       final remark = _paymentRemarkController.text.trim();
       if (receipt.isNotEmpty) lines.add('Receipt No: $receipt');
@@ -1897,7 +1919,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   userId: widget.appointment?.user?.userId,
                   appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
                   serviceBranchId: _service?.key,
-                  appointmentNote: appointmentNoteController.controller.text,
+                  appointmentNote: _buildNoteWithPayment(),
                   customerDueDate: dueDateController.controller.text,
                   appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
                 ),

@@ -323,12 +323,13 @@ class AppointmentDetailsView extends StatelessWidget {
     final price = double.tryParse(data?.service?.servicePrice ?? '');
     final bookingFee = double.tryParse(data?.service?.serviceBookingFee ?? '');
     final isCompleted = data?.appointmentStatus == 5;
+    final isPaid = isCompleted || isBookingFeePaid(data?.appointmentNote, payments: data?.payment);
 
     // Completed = fully paid at clinic → remaining balance is RM 0.00
     final balance = isCompleted
         ? (price != null ? 0.0 : null)
         : (price != null && bookingFee != null)
-        ? price - bookingFee
+        ? (isPaid ? price - bookingFee : price)
         : null;
 
     return Column(
@@ -351,8 +352,8 @@ class AppointmentDetailsView extends StatelessWidget {
               child: _feeCard(
                 label: 'Booking Fee',
                 value: bookingFee != null ? 'RM ${bookingFee.toStringAsFixed(2)}' : '—',
-                icon: Icons.payments_outlined,
-                color: const Color(0xFF0369A1),
+                icon: isPaid ? Icons.check_circle_outline_rounded : Icons.payments_outlined,
+                color: isPaid ? const Color(0xFF15803D) : const Color(0xFF0369A1),
               ),
             ),
           ],
@@ -362,10 +363,10 @@ class AppointmentDetailsView extends StatelessWidget {
           _feeCard(
             label: isCompleted ? 'Remaining Balance (Fully Paid)' : 'Remaining Balance',
             value: 'RM ${balance.toStringAsFixed(2)}',
-            icon: isCompleted || balance == 0
+            icon: isCompleted || (isPaid && balance == 0)
                 ? Icons.check_circle_outline_rounded
                 : Icons.account_balance_wallet_outlined,
-            color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+            color: isCompleted || (isPaid && balance == 0) ? const Color(0xFF15803D) : const Color(0xFFC2410C),
             fullWidth: true,
           ),
         ],

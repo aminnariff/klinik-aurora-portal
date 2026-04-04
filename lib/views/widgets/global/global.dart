@@ -272,3 +272,61 @@ String? extractDobFromNric(String nric) {
     return null;
   }
 }
+
+bool isBookingFeePaid(String? note, {List<Payment>? payments}) {
+  bool paidInNote = false;
+  if (note != null && note.isNotEmpty) {
+    final lowercaseNote = note.toLowerCase();
+    paidInNote = lowercaseNote.contains('booking fee collected') || lowercaseNote.contains('receipt no:');
+  }
+
+  if (paidInNote) return true;
+
+  if (payments != null && payments.isNotEmpty) {
+    return payments.any((e) => e.paymentStatus == 1);
+  }
+
+  return false;
+}
+
+class Payment {
+  String? paymentId;
+  int? paymentType;
+  String? paymentAsset;
+  String? paymentAmount;
+  int? paymentStatus;
+  String? createdDate;
+  String? modifiedDate;
+
+  Payment({
+    this.paymentId,
+    this.paymentType,
+    this.paymentAsset,
+    this.paymentAmount,
+    this.paymentStatus,
+    this.createdDate,
+    this.modifiedDate,
+  });
+
+  Payment.fromJson(Map<String, dynamic> json) {
+    paymentId = json['paymentId'];
+    paymentType = json['paymentType'];
+    paymentAsset = json['paymentAsset'];
+    paymentAmount = json['paymentAmount'];
+    paymentStatus = json['paymentStatus'];
+    createdDate = json['createdDate'];
+    modifiedDate = json['modifiedDate'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['paymentId'] = paymentId;
+    data['paymentType'] = paymentType;
+    data['paymentAsset'] = paymentAsset;
+    data['paymentAmount'] = paymentAmount;
+    data['paymentStatus'] = paymentStatus;
+    data['createdDate'] = createdDate;
+    data['modifiedDate'] = modifiedDate;
+    return data;
+  }
+}

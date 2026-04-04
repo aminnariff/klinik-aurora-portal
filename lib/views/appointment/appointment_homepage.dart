@@ -156,7 +156,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         if (responseCode(value.code)) {
           if (value.data != null) {
             for (service_branch_model.Data item in value.data?.data ?? []) {
-              serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
+              if (item.serviceBranchStatus == 1) {
+                serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
+              }
             }
           }
           serviceList.sort((a, b) => a.name.compareTo(b.name));
@@ -172,7 +174,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       if (responseCode(value.code)) {
         if (value.data != null) {
           for (service_branch_model.Data item in value.data?.data ?? []) {
-            serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
+            if (item.serviceBranchStatus == 1) {
+              serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
+            }
           }
         }
         serviceList.sort((a, b) => a.name.compareTo(b.name));
@@ -722,9 +726,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               ? _buildPaymentBadge(
                   item.appointmentStatus == 5
                       ? 1
-                      : ((item.payment?.length ?? 0) > 0
-                            ? (item.payment!.any((e) => e.paymentStatus == 1) ? 1 : 0)
-                            : 0),
+                      : (isBookingFeePaid(item.appointmentNote, payments: item.payment) ? 1 : 0),
                 )
               : Text('–', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF))),
         ),
@@ -1109,13 +1111,17 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             context,
                             1,
                             200,
-                            branchId: _appointmentBranch?.key,
+                            branchId: authController.isSuperAdmin
+                                ? _appointmentBranch?.key
+                                : authController.authenticationResponse?.data?.user?.branchId,
                             serviceBranchId: item.key,
                           ).then((value) {
                             if (responseCode(value.code)) {
                               context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableDtResponse =
                                   value.data;
-                              availableDateTime = value.data?.data?.first.availableDatetimes ?? [];
+                              availableDateTime = value.data?.data?.isNotEmpty == true
+                                  ? (value.data?.data?.first.availableDatetimes ?? [])
+                                  : [];
                               ServiceBranchExceptionController.get(context, 1, 999, serviceBranchId: item.key).then((
                                 value,
                               ) async {
@@ -1132,6 +1138,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                       .toList();
                                   availableDateTime = removePastDates(result);
                                   availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
+
+                                  if (availableDateTime.isEmpty) {
+                                    showDialogError(context, 'No available slots for this service.');
+                                    return;
+                                  }
+
                                   showDialog(
                                     context: context,
                                     builder: (_) => Row(
