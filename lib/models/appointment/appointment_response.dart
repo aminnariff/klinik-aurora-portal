@@ -37,6 +37,7 @@ class Data {
   String? serviceBranchId;
   String? appointmentDatetime;
   String? appointmentNote;
+  String? appointmentAttachmentUrl;
   String? customerDueDate;
   int? appointmentRating;
   String? appointmentFeedback;
@@ -53,6 +54,7 @@ class Data {
     this.serviceBranchId,
     this.appointmentDatetime,
     this.appointmentNote,
+    this.appointmentAttachmentUrl,
     this.customerDueDate,
     this.appointmentRating,
     this.appointmentFeedback,
@@ -70,6 +72,7 @@ class Data {
     serviceBranchId = json['serviceBranchId'];
     appointmentDatetime = json['appointmentDatetime'];
     appointmentNote = json['appointmentNote'];
+    appointmentAttachmentUrl = json['appointmentAttachmentUrl'];
     customerDueDate = json['customerDueDate'];
     appointmentRating = json['appointmentRating'];
     appointmentFeedback = json['appointmentFeedback'];
@@ -93,6 +96,7 @@ class Data {
     data['serviceBranchId'] = serviceBranchId;
     data['appointmentDatetime'] = appointmentDatetime;
     data['appointmentNote'] = appointmentNote;
+    data['appointmentAttachmentUrl'] = appointmentAttachmentUrl;
     data['customerDueDate'] = customerDueDate;
     data['appointmentRating'] = appointmentRating;
     data['appointmentFeedback'] = appointmentFeedback;
@@ -195,7 +199,6 @@ class Service {
     return data;
   }
 }
-
 
 class Branch {
   String? branchId;

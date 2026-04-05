@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 
 class AppointmentDetailsView extends StatelessWidget {
@@ -316,6 +317,56 @@ class AppointmentDetailsView extends StatelessWidget {
             ],
           ),
         ),
+        if (notNullOrEmptyString(data?.appointmentAttachmentUrl)) ...[
+          const SizedBox(height: 14),
+          _fieldLabel('Attachment'),
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () => launchWebUrl(data?.appointmentAttachmentUrl ?? '', webOnlyWindowName: '_blank'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0F9FF),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: secondaryColor.withAlpha(80)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.attach_file_rounded, size: 15, color: secondaryColor),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      data?.appointmentAttachmentUrl ?? '',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: secondaryColor,
+                        decoration: TextDecoration.underline,
+                        decorationColor: secondaryColor,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.open_in_new_rounded, size: 12, color: secondaryColor),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
+              SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  'Documents are stored for 6 months to 1 year and may be deleted thereafter. Please save your own copy.',
+                  style: TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), height: 1.4),
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }

@@ -25,6 +25,7 @@ class Data {
   String? appointmentId;
   String? appointmentDatetime;
   String? appointmentNote;
+  String? appointmentAttachmentUrl;
   String? customerDueDate;
   String? appointmentRating;
   String? appointmentFeedback;
@@ -42,6 +43,7 @@ class Data {
     this.appointmentId,
     this.appointmentDatetime,
     this.appointmentNote,
+    this.appointmentAttachmentUrl,
     this.customerDueDate,
     this.appointmentRating,
     this.appointmentFeedback,
@@ -60,6 +62,7 @@ class Data {
     appointmentId = json['appointmentId'];
     appointmentDatetime = json['appointmentDatetime'];
     appointmentNote = json['appointmentNote'];
+    appointmentAttachmentUrl = json['appointmentAttachmentUrl'];
     customerDueDate = json['customerDueDate'];
     appointmentRating = json['appointmentRating'];
     appointmentFeedback = json['appointmentFeedback'];
@@ -84,6 +87,7 @@ class Data {
     data['appointmentId'] = appointmentId;
     data['appointmentDatetime'] = appointmentDatetime;
     data['appointmentNote'] = appointmentNote;
+    data['appointmentAttachmentUrl'] = appointmentAttachmentUrl;
     data['customerDueDate'] = customerDueDate;
     data['appointmentRating'] = appointmentRating;
     data['appointmentFeedback'] = appointmentFeedback;

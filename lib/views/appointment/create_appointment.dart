@@ -97,6 +97,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   bool _bookingFeeCollected = false;
   final TextEditingController _receiptNumberController = TextEditingController();
   final TextEditingController _paymentRemarkController = TextEditingController();
+  final TextEditingController _attachmentUrlController = TextEditingController();
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   List<DropdownAttribute> serviceList = [];
   List<String> availableDateTime = [];
@@ -115,6 +116,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     patientEmailController.controller.text = widget.appointment?.user?.userEmail ?? '';
     appointmentNoteController.controller.text = widget.appointment?.appointmentNote ?? '';
     dueDateController.controller.text = dateConverter(widget.appointment?.customerDueDate, format: 'dd-MM-yyyy') ?? '';
+    _attachmentUrlController.text = widget.appointment?.appointmentAttachmentUrl ?? '';
 
     if (widget.appointment?.appointmentDatetime != null) {
       dateTimeController.text =
@@ -1342,6 +1344,57 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             },
                                           ),
                                           AppPadding.vertical(denominator: 2),
+                                          _extraSectionLabel('Attachment', Icons.attach_file_rounded),
+                                          const SizedBox(height: 8),
+                                          TextField(
+                                            controller: _attachmentUrlController,
+                                            style: const TextStyle(fontSize: 13),
+                                            decoration: InputDecoration(
+                                              labelText: 'Attachment URL (optional)',
+                                              labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                                              hintText: 'https://',
+                                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
+                                              prefixIcon: const Icon(
+                                                Icons.link_rounded,
+                                                size: 16,
+                                                color: Color(0xFF6B7280),
+                                              ),
+                                              filled: true,
+                                              fillColor: const Color(0xFFF9FAFB),
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                                borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: const [
+                                              Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
+                                              SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text(
+                                                  'Documents linked here are stored for 6 months to 1 year and may be deleted thereafter. Patients are advised to save their own copy.',
+                                                  style: TextStyle(
+                                                    fontSize: 10.5,
+                                                    color: Color(0xFF9CA3AF),
+                                                    height: 1.4,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          AppPadding.vertical(denominator: 2),
                                         ],
                                       ),
                                     ),
@@ -1880,6 +1933,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   serviceBranchId: _service?.key,
                   appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
                   appointmentNote: _buildNoteWithPayment(),
+                  appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
                   customerDueDate: (() {
                     try {
                       return DateFormat(
@@ -1974,6 +2028,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
                   serviceBranchId: _service?.key,
                   appointmentNote: _buildNoteWithPayment(),
+                  appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
                   customerDueDate: dueDateController.controller.text,
                   appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
                 ),
