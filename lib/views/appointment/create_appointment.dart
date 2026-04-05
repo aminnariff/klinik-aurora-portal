@@ -1482,9 +1482,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   Widget extraInformation() {
     final isCompleted = widget.appointment?.appointmentStatus == 5;
-    final hasPaidBooking = widget.appointment?.payment?.any((e) => e.paymentStatus == 1) == true;
+    final hasPaidBooking = isBookingFeePaid(widget.appointment?.appointmentNote, payments: widget.appointment?.payment);
     final paidBookingEntry = hasPaidBooking
-        ? widget.appointment!.payment!.firstWhere((e) => e.paymentStatus == 1)
+        ? widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentStatus == 1, orElse: () => null)
         : null;
     final servicePrice = double.tryParse('${widget.appointment?.service?.servicePrice ?? 0}');
     final paidAmount = double.tryParse(paidBookingEntry?.paymentAmount ?? '0');
@@ -1571,7 +1571,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       Padding(
                         padding: EdgeInsets.all(screenPadding),
                         child: Image.network(
-                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((e) => e.paymentType == 2 && e.paymentStatus == 1).paymentAsset}',
+                          '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 2 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
                         ),
                       ),
                     ),
@@ -1597,7 +1597,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       Padding(
                         padding: EdgeInsets.all(screenPadding),
                         child: Image.network(
-                          '${Environment.imageUrl}${widget.appointment?.payment?.firstWhere((e) => e.paymentType == 4 && e.paymentStatus == 1).paymentAsset}',
+                          '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 4 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
                         ),
                       ),
                     ),
@@ -1908,6 +1908,60 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 }
               });
             } else {
+              // ── Completion check for unpaid booking fee ──
+              final needsCompletionCheck =
+                  _status?.key == '5' &&
+                  widget.appointment?.appointmentStatus != 5 &&
+                  (double.tryParse(widget.appointment?.service?.serviceBookingFee ?? '0') ?? 0) > 0;
+
+              final alreadyPaid = isBookingFeePaid(
+                widget.appointment?.appointmentNote,
+                payments: widget.appointment?.payment,
+              );
+
+              if (needsCompletionCheck && !alreadyPaid && !_bookingFeeCollected) {
+                dismissLoading();
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Unpaid Booking Fee'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'This appointment has an unpaid booking fee. Please confirm collection and enter receipt no. before completing.',
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _receiptNumberController,
+                          decoration: const InputDecoration(
+                            labelText: 'Receipt No. / Ref No.',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.receipt_long),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_receiptNumberController.text.trim().isEmpty) {
+                            showDialogError(context, 'Please enter a receipt number');
+                            return;
+                          }
+                          _bookingFeeCollected = true;
+                          Navigator.pop(context);
+                          button(); // Re-trigger save
+                        },
+                        child: const Text('Collect & Complete'),
+                      ),
+                    ],
+                  ),
+                );
+                return;
+              }
+
               if (convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true) !=
                   widget.appointment?.appointmentDatetime) {
                 _status = DropdownAttribute('3', 'Rescheduled');

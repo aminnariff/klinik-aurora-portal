@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
+import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -354,6 +355,7 @@ class AppointmentDetailsView extends StatelessWidget {
                 value: bookingFee != null ? 'RM ${bookingFee.toStringAsFixed(2)}' : '—',
                 icon: isPaid ? Icons.check_circle_outline_rounded : Icons.payments_outlined,
                 color: isPaid ? const Color(0xFF15803D) : const Color(0xFF0369A1),
+                badge: showPaymentStatus(context, isPaid ? 1 : 0),
               ),
             ),
           ],
@@ -379,6 +381,7 @@ class AppointmentDetailsView extends StatelessWidget {
     required String value,
     required IconData icon,
     required Color color,
+    Widget? badge,
     bool fullWidth = false,
   }) {
     return Container(
@@ -397,9 +400,14 @@ class AppointmentDetailsView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                Row(
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                    ),
+                    if (badge != null) ...[const SizedBox(width: 6), badge],
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(
