@@ -108,6 +108,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       widget.appointment?.appointmentStatus == 2 ||
       widget.appointment?.appointmentStatus == 4 ||
       widget.appointment?.appointmentStatus == 5;
+  bool get _canSubmitWhenLockedCompleted => widget.type == 'update' && widget.appointment?.appointmentStatus == 5;
 
   @override
   void initState() {
@@ -1405,7 +1406,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               const SizedBox(height: 20),
                               if (widget.type == 'update') extraInformation(),
                               const SizedBox(height: 16),
-                              if (!_isLocked) ...[
+                              if (!_isLocked || _canSubmitWhenLockedCompleted) ...[
                                 StreamBuilder<DateTime>(
                                   stream: rebuild.stream,
                                   builder: (context, _) {

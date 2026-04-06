@@ -858,9 +858,20 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                DateFormat('EEE, d MMM').format(dt),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF374151)),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      DateFormat('EEE, d MMM').format(dt),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF374151)),
+                    ),
+                  ),
+                  _cardActionBtn(
+                    icon: Icons.delete_sweep_rounded,
+                    color: Colors.redAccent,
+                    onTap: () => _deleteEntireDate(dateStr),
+                  ),
+                ],
               ),
               const SizedBox(height: 6),
               Wrap(
@@ -887,6 +898,21 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
         );
       },
     );
+  }
+
+  Future<void> _deleteEntireDate(String dateStr) async {
+    final readableDate = DateFormat('EEE, d MMM').format(DateTime.parse(dateStr));
+    final confirmed = await showConfirmDialog(
+      context,
+      'Remove all slots for $readableDate?',
+    );
+    if (!confirmed) return;
+
+    setState(() {
+      for (final slot in timeSlots) {
+        slot.selectedDates.remove(dateStr);
+      }
+    });
   }
 
   void _openGenerator() async {
