@@ -81,6 +81,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   DropdownAttribute? _appointmentBranch;
   List<DropdownAttribute> branches = [];
   List<DropdownAttribute> serviceList = [];
+  String? _sortBy;
+  String? _sortOrder;
 
   @override
   void initState() {
@@ -234,6 +236,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
           startDate: startDate,
           endDate: endDate,
+          sortBy: _sortBy,
+          sortOrder: _sortOrder,
         )
         .then((value) {
           dismissLoading();
@@ -246,6 +250,19 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   void _movePage(int page) => filtering(page: page, enableDebounce: false);
+
+  void _toggleDateSort() {
+    setState(() {
+      if (_sortBy != 'appointmentDatetime') {
+        _sortBy = 'appointmentDatetime';
+        _sortOrder = 'desc';
+      } else {
+        _sortOrder = _sortOrder == 'asc' ? 'desc' : 'asc';
+      }
+      _page = 1;
+    });
+    filtering(enableDebounce: false, page: 1);
+  }
 
   void resetAllFilter() {
     _serviceNameController.text = '';
@@ -955,7 +972,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       TableHeaderAttribute(
         attribute: 'appointmentDatetime',
         label: 'Date & Time',
-        allowSorting: false,
+        allowSorting: true,
         columnSize: ColumnSize.S,
       ),
       TableHeaderAttribute(
@@ -970,12 +987,40 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       for (TableHeaderAttribute item in headers)
         DataColumn2(
           fixedWidth: item.width,
-          label: Text(
-            item.label,
-            style: AppTypography.bodyMedium(
-              context,
-            ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
-          ),
+          label: item.allowSorting && item.attribute == 'appointmentDatetime'
+              ? InkWell(
+                  onTap: _toggleDateSort,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        item.label,
+                        style: AppTypography.bodyMedium(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        _sortBy == 'appointmentDatetime'
+                            ? (_sortOrder == 'asc'
+                                  ? Icons.keyboard_arrow_up_rounded
+                                  : Icons.keyboard_arrow_down_rounded)
+                            : Icons.unfold_more_rounded,
+                        size: 16,
+                        color: _sortBy == 'appointmentDatetime'
+                            ? const Color(0xFF2196F3)
+                            : const Color(0xFF9CA3AF),
+                      ),
+                    ],
+                  ),
+                )
+              : Text(
+                  item.label,
+                  style: AppTypography.bodyMedium(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
+                ),
           size: item.columnSize ?? ColumnSize.M,
         ),
     ];

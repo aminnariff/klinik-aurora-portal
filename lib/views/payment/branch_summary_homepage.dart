@@ -23,6 +23,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
   String selectedFilter = 'Today';
   late DateTime startDate;
   late DateTime endDate;
+  static const Color _dateAccent = Color(0xFF2196F3);
 
   static const _bgDark = Color(0xff232d37);
   static const _divider = Color(0xff37434d);
@@ -98,6 +99,59 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
     }
   }
 
+  Future<DateTimeRange?> _showCustomDateRangePicker() async {
+    final initialStart = DateTime(startDate.year, startDate.month, startDate.day);
+    final initialEnd = DateTime(endDate.year, endDate.month, endDate.day);
+    final now = DateTime.now();
+    return showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2023),
+      lastDate: now,
+      initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
+      helpText: 'Select date range',
+      confirmText: 'Apply',
+      cancelText: 'Cancel',
+      saveText: 'Apply',
+      fieldStartHintText: 'Start date',
+      fieldEndHintText: 'End date',
+      currentDate: now,
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      switchToInputEntryModeIcon: const Icon(Icons.edit_calendar_rounded),
+      switchToCalendarEntryModeIcon: const Icon(Icons.calendar_month_rounded),
+      builder: (context, child) {
+        final base = Theme.of(context);
+        return Theme(
+          data: base.copyWith(
+            colorScheme: base.colorScheme.copyWith(
+              primary: _dateAccent,
+              onPrimary: Colors.white,
+              secondary: _dateAccent,
+              onSecondary: Colors.white,
+              surface: Colors.white,
+            ),
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: Colors.white,
+              headerBackgroundColor: const Color(0xFFF9FAFB),
+              headerForegroundColor: const Color(0xFF374151),
+              rangeSelectionBackgroundColor: _dateAccent.withAlpha(45),
+              rangeSelectionOverlayColor: WidgetStateProperty.all(_dateAccent.withAlpha(24)),
+              todayBorder: const BorderSide(color: _dateAccent),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            ),
+            dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: _dateAccent,
+                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,12 +206,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
             child: GestureDetector(
               onTap: () async {
                 if (f == 'Custom') {
-                  final picked = await showDateRangePicker(
-                    context: context,
-                    firstDate: DateTime(2023),
-                    lastDate: DateTime.now(),
-                    initialDateRange: DateTimeRange(start: startDate, end: endDate),
-                  );
+                  final picked = await _showCustomDateRangePicker();
                   if (picked != null) {
                     setState(() {
                       selectedFilter = 'Custom';
