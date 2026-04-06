@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 
 class RefreshTokenController extends ChangeNotifier {
-  static Future<ApiResponse<AuthResponse>> refresh(BuildContext context) async {
+  static Future<ApiResponse<AuthResponse>> refresh(BuildContext context, {required String refreshToken}) async {
     return ApiController()
         .call(
           context,
           method: Method.post,
-          endpoint: 'admin/authentication/login',
-          data: {"userEmail": Storage.getString(username), "userPassword": Storage.getString(password)},
+          endpoint: 'admin/authentication/verify',
+          data: {"refreshToken": refreshToken},
           isAuthenticated: false,
         )
         .then((value) {

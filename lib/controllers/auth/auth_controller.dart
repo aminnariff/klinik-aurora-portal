@@ -170,8 +170,8 @@ class AuthController extends ChangeNotifier {
             user: response.data?.user,
             accessToken: response.data?.accessToken,
             refreshToken: response.data?.refreshToken,
-            issuedDt: DateTime.now().toIso8601String(),
-            expiryDt: DateTime.now().add(const Duration(hours: 24)).toIso8601String(),
+            issuedDt: response.data?.issuedDt ?? DateTime.now().toIso8601String(),
+            expiryDt: response.data?.expiryDt ?? DateTime.now().add(const Duration(hours: 24)).toIso8601String(),
           ),
         );
 

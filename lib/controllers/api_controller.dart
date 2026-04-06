@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -89,17 +88,18 @@ class ApiController {
         debugPrint('tokenStatus : $tokenStatus');
         debugPrint('expiredAt : ${context.read<AuthController>().authenticationResponse?.data?.expiryDt}');
         if (tokenStatus == 'refresh') {
-          return await RefreshTokenController.refresh(context).then((tokenRenewResponse) {
+          final refreshToken = context.read<AuthController>().authenticationResponse?.data?.refreshToken;
+          if (refreshToken == null || refreshToken.isEmpty) return false;
+          return await RefreshTokenController.refresh(context, refreshToken: refreshToken).then((tokenRenewResponse) {
             if (responseCode(tokenRenewResponse.code)) {
               if (tokenRenewResponse.data != null) {
                 context.read<AuthController>().setAuthenticationResponse(tokenRenewResponse.data);
-                prefs.setString(authResponse, json.encode(tokenRenewResponse.data));
                 return true;
               } else {
-                return true;
+                return false;
               }
             } else {
-              return true;
+              return false;
             }
           });
         } else if (tokenStatus == 'expired') {
@@ -140,6 +140,7 @@ class ApiController {
     dynamic data,
     Options? headers,
     bool isAuthenticated = true,
+    bool hasRetriedAfterRefresh = false,
   }) async {
     return checkToken(context, isAuthenticated).then((tokenValid) async {
       if (!tokenValid) return ApiResponse(code: 401, message: 'Session Expired');
@@ -220,6 +221,43 @@ class ApiController {
               Future.delayed(Duration.zero, () {
                 showDialogError(context, e.response?.data?['message'] ?? '');
               });
+            } else if (e.response?.statusCode == 401 && isAuthenticated && !hasRetriedAfterRefresh) {
+              final refreshToken = context.read<AuthController>().authenticationResponse?.data?.refreshToken;
+              if (refreshToken != null && refreshToken.isNotEmpty) {
+                final tokenRenewResponse = await RefreshTokenController.refresh(context, refreshToken: refreshToken);
+                if (responseCode(tokenRenewResponse.code) && tokenRenewResponse.data != null) {
+                  await context.read<AuthController>().setAuthenticationResponse(tokenRenewResponse.data);
+                  return call(
+                    context,
+                    baseUrl: baseUrl,
+                    method: method,
+                    endpoint: endpoint,
+                    queryParameters: queryParameters,
+                    data: data,
+                    headers: headers,
+                    isAuthenticated: isAuthenticated,
+                    hasRetriedAfterRefresh: true,
+                  );
+                }
+              }
+              if (isSessionExpiredDialogOpen == false && context.mounted) {
+                isSessionExpiredDialogOpen = true;
+                dismissLoading();
+                await promptDialog(
+                  context,
+                  action: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    isSessionExpiredDialogOpen = false;
+                    context.read<AuthController>().logout(context);
+                    context.goNamed(LoginPage.routeName);
+                  },
+                  text: 'error'.tr(gender: 'sessionExpired'),
+                  buttonColor: secondaryColor,
+                  buttonText: 'button'.tr(gender: 'reLogin'),
+                );
+                isSessionExpiredDialogOpen = false;
+              }
+              return ApiResponse(code: 401, message: 'Session Expired');
             } else if (e.response?.statusCode == 401 ||
                 e.response?.statusCode == 403 ||
                 e.response?.statusCode == 410) {
