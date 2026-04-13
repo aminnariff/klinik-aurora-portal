@@ -417,11 +417,21 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedCount = _selectedDayCount;
-
     return StreamBuilder(
       stream: rebuild.stream,
       builder: (context, _) {
+        final selectedCount = _selectedDayCount;
+        bool canGenerate = selectedCount > 0;
+        if (canGenerate) {
+          for (var day in days) {
+            if (selectedDays[day] == true) {
+              if (timeRanges[day]!.isEmpty || timeRanges[day]!.any((r) => !_isValidRange(r)) || _hasOverlap(day)) {
+                canGenerate = false;
+                break;
+              }
+            }
+          }
+        }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -981,7 +991,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                   const Spacer(),
                   SizedBox(
                     height: 48,
-                    child: Button(selectedCount == 0 ? null : _generateSlots, actionText: 'Generate All Slots'),
+                    child: Button(canGenerate ? _generateSlots : null, actionText: 'Generate All Slots'),
                   ),
                 ],
               ),
