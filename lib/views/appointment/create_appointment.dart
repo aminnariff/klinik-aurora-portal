@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
@@ -16,7 +15,6 @@ import 'package:klinik_aurora_portal/controllers/appointment/appointment_control
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
-import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
@@ -44,7 +42,6 @@ import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
-import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class AppointmentDetails extends StatefulWidget {
@@ -479,8 +476,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   if (widget.appointment?.service?.serviceBookingFee != null ||
                                                       (_service != null &&
                                                           notNullOrEmptyString(selectedService?.serviceBookingFee) ==
-                                                              true) ||
-                                                      (widget.type == 'update' && _status?.key == '6'))
+                                                              true))
                                                     Container(
                                                       padding: EdgeInsets.only(bottom: 8),
                                                       width: screenWidth1728(30),
@@ -492,45 +488,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             mainAxisAlignment: MainAxisAlignment.start,
                                                             children: [
                                                               AppPadding.vertical(),
-                                                              if (_status?.key == '6' &&
-                                                                  widget.appointment?.payment?.any(
-                                                                        (element) => element.paymentType == 4,
-                                                                      ) ==
-                                                                      false) ...[
-                                                                Container(
-                                                                  margin: const EdgeInsets.only(bottom: 8),
-                                                                  padding: const EdgeInsets.symmetric(
-                                                                    horizontal: 12,
-                                                                    vertical: 8,
-                                                                  ),
-                                                                  decoration: BoxDecoration(
-                                                                    color: const Color(0xFFFFF7ED),
-                                                                    borderRadius: BorderRadius.circular(8),
-                                                                    border: Border.all(
-                                                                      color: const Color(0xFFFB923C).withAlpha(80),
-                                                                    ),
-                                                                  ),
-                                                                  child: const Row(
-                                                                    children: [
-                                                                      Icon(
-                                                                        Icons.info_outline_rounded,
-                                                                        size: 14,
-                                                                        color: Color(0xFFEA580C),
-                                                                      ),
-                                                                      SizedBox(width: 6),
-                                                                      Flexible(
-                                                                        child: Text(
-                                                                          'Refund document required — upload proof below',
-                                                                          style: TextStyle(
-                                                                            fontSize: 12,
-                                                                            color: Color(0xFF9A3412),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ],
                                                               // ── CREATE: booking fee collected confirmation ──
                                                               if (widget.type == 'create' &&
                                                                   _service != null &&
@@ -743,79 +700,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                       ],
                                                                     ],
                                                                   ),
-                                                                ),
-                                                              ],
-                                                              // ── UPDATE: refund proof upload ──
-                                                              if (selectedFiles.isEmpty &&
-                                                                  widget.type == 'update' &&
-                                                                  _status?.key == '6' &&
-                                                                  widget.appointment?.payment?.any(
-                                                                        (element) => element.paymentType == 4,
-                                                                      ) ==
-                                                                      false) ...[
-                                                                Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                  children: [
-                                                                    UploadDocumentsField(
-                                                                      title: 'promotionPage'.tr(gender: 'browseFile'),
-                                                                      fieldTitle: 'appointmentPage'.tr(
-                                                                        gender: 'refundProof',
-                                                                      ),
-                                                                      action: () async {
-                                                                        documentErrorMessage.add(null);
-                                                                        FilePickerResult? result = await FilePicker
-                                                                            .platform
-                                                                            .pickFiles();
-                                                                        if (result != null) {
-                                                                          PlatformFile file = result.files.first;
-                                                                          if (supportedExtensions.contains(
-                                                                            file.extension,
-                                                                          )) {
-                                                                            if (bytesToMB(file.size) < 1.0) {
-                                                                              selectedFiles.add(
-                                                                                FileAttribute(
-                                                                                  name: result.files.first.name,
-                                                                                  value: result.files.first.bytes,
-                                                                                ),
-                                                                              );
-                                                                              fileRebuild.add(DateTime.now());
-                                                                            } else {
-                                                                              showDialogError(
-                                                                                context,
-                                                                                'error'.tr(
-                                                                                  gender: 'err-21',
-                                                                                  args: [
-                                                                                    fileSizeLimit.toStringAsFixed(0),
-                                                                                  ],
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                          } else {
-                                                                            showDialogError(
-                                                                              context,
-                                                                              'error'.tr(gender: 'err-22'),
-                                                                            );
-                                                                          }
-                                                                        }
-                                                                      },
-                                                                      cancelAction: () {},
-                                                                    ),
-                                                                    StreamBuilder<String?>(
-                                                                      stream: documentErrorMessage.stream,
-                                                                      builder: (context, snapshot) {
-                                                                        return snapshot.data == null
-                                                                            ? const SizedBox()
-                                                                            : AppSelectableText(
-                                                                                snapshot.data ?? '',
-                                                                                style: AppTypography.bodyMedium(context)
-                                                                                    .apply(
-                                                                                      color: errorColor,
-                                                                                      fontSizeDelta: -1,
-                                                                                    ),
-                                                                              );
-                                                                      },
-                                                                    ),
-                                                                  ],
                                                                 ),
                                                               ],
                                                               for (int index = 0; index < selectedFiles.length; index++)
@@ -1133,6 +1017,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 value: _status?.name,
                                                                 onChanged: (p0) {
                                                                   _status = p0;
+                                                                  if (_status?.key == '6' &&
+                                                                      appointmentNoteController
+                                                                          .controller
+                                                                          .text
+                                                                          .isEmpty) {
+                                                                    appointmentNoteController.controller.text =
+                                                                        "Refund request has been submitted to HQ for processing. Please allow approximately 7-14 business days for completion.";
+                                                                  }
                                                                   rebuild.add(DateTime.now());
                                                                   rebuildDropdown.add(DateTime.now());
                                                                 },
@@ -1417,7 +1309,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       );
                                     }
                                     if (_status?.key == '6') {
-                                      notes.add('Uploading a refund document will initiate the refund review process.');
+                                      notes.add('Refund remark must be provided for the review process.');
                                     }
                                     if (widget.type == 'create' &&
                                         _service != null &&
@@ -2017,56 +1909,56 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 return;
               }
 
-              if (convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true) !=
-                  widget.appointment?.appointmentDatetime) {
-                _status = DropdownAttribute('3', 'Rescheduled');
+              // Normalize times for comparison to detect rescheduling
+              final newUtcStr = convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true);
+              final oldUtcStr = widget.appointment?.appointmentDatetime != null
+                  ? (widget.appointment!.appointmentDatetime!.contains('T')
+                        ? convertMalaysiaTimeToUtc(
+                            dateConverter(widget.appointment!.appointmentDatetime, format: 'dd-MM-yyyy HH:mm') ?? '',
+                            plainFormat: true,
+                          )
+                        : widget.appointment!.appointmentDatetime)
+                  : null;
+
+              if (newUtcStr != oldUtcStr && newUtcStr.isNotEmpty) {
+                // Auto-set status to rescheduled only if it's currently in an "Upcoming/Active" state
+                if (_status?.key == '1' || _status?.key == '4') {
+                  _status = DropdownAttribute('3', 'Rescheduled');
+                }
               }
+
               AppointmentController.update(
                 context,
                 UpdateAppointmentRequest(
                   appointmentId: widget.appointment?.appointmentId,
                   userId: widget.appointment?.user?.userId,
-                  appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
+                  appointmentDateTime: newUtcStr,
                   serviceBranchId: _service?.key,
                   appointmentNote: _buildNoteWithPayment(),
                   appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
-                  customerDueDate: dueDateController.controller.text,
+                  customerDueDate: (() {
+                    try {
+                      return DateFormat(
+                        'yyyy-MM-dd',
+                      ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
+                    } catch (_) {
+                      return dueDateController.controller.text;
+                    }
+                  })(),
                   appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
                 ),
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  if (_status?.key == "6") {
-                    showLoading();
-                    PaymentController.upload(
-                      context,
-                      value.data?.id ?? '',
-                      widget.appointment?.user?.userId ?? '',
-                      4,
-                      selectedService?.serviceBookingFee ?? '50.00',
-                      [selectedFiles[0]],
-                    ).then((documentUploadResponse) {
-                      dismissLoading();
-                      if (widget.refreshData != null) {
-                        widget.refreshData!();
-                        context.pop();
-                        showDialogSuccess(context, 'Appointment successfully created for the user');
-                      } else {
-                        context.pop();
-                        showDialogSuccess(context, 'Appointment successfully created for the user');
-                      }
-                    });
+                  if (widget.refreshData != null) {
+                    dismissLoading();
+                    widget.refreshData!();
+                  }
+                  context.pop();
+                  if (widget.type == 'update') {
+                    showDialogSuccess(context, 'Successfully updated appointment');
                   } else {
-                    if (widget.refreshData != null) {
-                      dismissLoading();
-                      widget.refreshData!();
-                    }
-                    context.pop();
-                    if (widget.type == 'update') {
-                      showDialogSuccess(context, 'Successfully updated appointment');
-                    } else {
-                      showDialogSuccess(context, 'Successfully created new appointment');
-                    }
+                    showDialogSuccess(context, 'Successfully created new appointment');
                   }
                 } else {
                   if (value.code != 500) {
@@ -2131,12 +2023,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     } else if (dateTimeController.text == "") {
       temp = false;
       showDialogError(context, ErrorMessage.required(field: 'Slots'));
-    } else if (widget.type == 'update' &&
-        _status?.key == '6' &&
-        selectedFiles.isEmpty &&
-        widget.appointment?.payment?.any((element) => element.paymentType == 4) == false) {
+    } else if (_status?.key == '6' && appointmentNoteController.controller.text.trim().isEmpty) {
       temp = false;
-      showDialogError(context, ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'refundProof')));
+      appointmentNoteController.errorMessage = ErrorMessage.required(field: appointmentNoteController.labelText);
+      showDialogError(context, 'Remarks are mandatory for refunds');
     }
     if (widget.type == 'create' &&
         _service != null &&
