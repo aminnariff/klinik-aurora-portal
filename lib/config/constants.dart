@@ -56,6 +56,7 @@ List<DropdownAttribute> appointmentStatus = [
   DropdownAttribute('5', 'Completed'),
   DropdownAttribute('6', 'Refunded'),
   DropdownAttribute('7', 'No Show'),
+  DropdownAttribute('8', 'Transferred'),
 ];
 List<DropdownAttribute> notificationChannel = [
   DropdownAttribute('general', 'All Users'),

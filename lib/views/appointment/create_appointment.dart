@@ -104,7 +104,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   bool get _isLocked =>
       widget.appointment?.appointmentStatus == 2 ||
       widget.appointment?.appointmentStatus == 4 ||
-      widget.appointment?.appointmentStatus == 5;
+      widget.appointment?.appointmentStatus == 5 ||
+      widget.appointment?.appointmentStatus == 8;
   bool get _canSubmitWhenLockedCompleted => widget.type == 'update' && widget.appointment?.appointmentStatus == 5;
 
   @override

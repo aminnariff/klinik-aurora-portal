@@ -211,7 +211,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     if (_tabs[_selectedTabIndex] == 'Upcoming') return ['1', '3', '4'];
     if (_tabs[_selectedTabIndex] == 'Completed') return ['5'];
     if (_tabs[_selectedTabIndex] == 'No-Show') return ['7'];
-    if (_tabs[_selectedTabIndex] == 'Cancelled') return ['2', '6'];
+    if (_tabs[_selectedTabIndex] == 'Cancelled') return ['2', '6', '8'];
     return null;
   }
 
@@ -810,18 +810,25 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 color: Colors.white,
                 tooltip: '',
                 onSelected: (value) => _handleMenuSelection(value, item),
-                itemBuilder: (_) => [
-                  PopupMenuItem<String>(
-                    value: 'update',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.edit_rounded, size: 20, color: Color(0xFF374151)),
-                        const SizedBox(width: 8),
-                        Text('Update', style: AppTypography.bodyMedium(context)),
-                      ],
+                itemBuilder: (_) {
+                  final isLocked = [2, 6, 8].contains(item.appointmentStatus);
+                  return [
+                    PopupMenuItem<String>(
+                      value: 'update',
+                      child: Row(
+                        children: [
+                          Icon(
+                            isLocked ? Icons.visibility_rounded : Icons.edit_rounded,
+                            size: 20,
+                            color: const Color(0xFF374151),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(isLocked ? 'View Details' : 'Update', style: AppTypography.bodyMedium(context)),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ];
+                },
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),

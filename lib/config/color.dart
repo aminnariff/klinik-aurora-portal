@@ -104,6 +104,7 @@ final Map<int, Color> appointmentStatusColors = {
   5: Colors.green, // Completed
   6: Colors.grey, // Refunded
   7: Colors.purple, // No Show
+  8: const Color(0xFF0D9488), // Transferred
 };
 
 Color gestationalStatusColor(GestationalEligibility? eligiblity) {
