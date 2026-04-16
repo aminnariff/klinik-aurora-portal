@@ -1256,8 +1256,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 ),
                                                 filled: true,
                                                 fillColor: const Color(0xFFF9FAFB),
-                                                contentPadding:
-                                                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                                contentPadding: const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 10,
+                                                ),
                                                 border: OutlineInputBorder(
                                                   borderRadius: BorderRadius.circular(8),
                                                   borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
@@ -1302,11 +1304,20 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               const SizedBox(height: 20),
                               if (widget.type == 'update') extraInformation(),
                               const SizedBox(height: 16),
-                              if (!_isLocked || _canSubmitWhenLockedCompleted) ...[
-                                StreamBuilder<DateTime>(
-                                  stream: rebuild.stream,
-                                  builder: (context, _) {
-                                    final notes = <String>[];
+                              StreamBuilder<DateTime>(
+                                stream: rebuild.stream,
+                                builder: (context, _) {
+                                  final notes = <String>[];
+
+                                  // Persistent notes (shown even when locked)
+                                  if (_status?.key == '8') {
+                                    notes.add(
+                                      'Please be noted this transferred only a status for this appointment, to transfer to other branch still need to contact the respective branch to check available slots etc or can check via mobile app',
+                                    );
+                                  }
+
+                                  // Editing-specific notes
+                                  if (!_isLocked || _canSubmitWhenLockedCompleted) {
                                     if (widget.type == 'update') {
                                       notes.add(
                                         'Changing the appointment slot will automatically set the status to Rescheduled.',
@@ -1315,11 +1326,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     if (_status?.key == '6') {
                                       notes.add('Refund remark must be provided for the review process.');
                                     }
-                                    if (_status?.key == '8') {
-                                      notes.add(
-                                        'Please be noted this transferred only a status for this appointment, to transfer to other branch still need to contact the respective branch to check available slots etc or can check via mobile app',
-                                      );
-                                    }
                                     if (widget.type == 'create' &&
                                         _service != null &&
                                         notNullOrEmptyString(selectedService?.serviceBookingFee)) {
@@ -1327,43 +1333,44 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         'Either a receipt number or a remark must be provided for services with a booking fee.',
                                       );
                                     }
-                                    if (notes.isEmpty) return const SizedBox();
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 12),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: notes
-                                            .map(
-                                              (note) => Padding(
-                                                padding: const EdgeInsets.only(bottom: 3),
-                                                child: Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    const Text(
-                                                      '* ',
-                                                      style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
-                                                    ),
-                                                    Flexible(
-                                                      child: Text(
-                                                        note,
-                                                        style: const TextStyle(
-                                                          fontSize: 11,
-                                                          color: Color(0xFF9CA3AF),
-                                                          height: 1.4,
-                                                        ),
+                                  }
+
+                                  if (notes.isEmpty) return const SizedBox();
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: notes
+                                          .map(
+                                            (note) => Padding(
+                                              padding: const EdgeInsets.only(bottom: 3),
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  const Text(
+                                                    '* ',
+                                                    style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                                  ),
+                                                  Flexible(
+                                                    child: Text(
+                                                      note,
+                                                      style: const TextStyle(
+                                                        fontSize: 11,
+                                                        color: Color(0xFF9CA3AF),
+                                                        height: 1.4,
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
-                                            )
-                                            .toList(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                Center(child: button()),
-                              ],
+                                            ),
+                                          )
+                                          .toList(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              if (!_isLocked || _canSubmitWhenLockedCompleted) Center(child: button()),
                             ],
                           ),
                         ),
