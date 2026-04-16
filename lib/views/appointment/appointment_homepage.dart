@@ -616,47 +616,47 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     );
   }
 
-  Widget _buildSearchToolbar() {
-    return Container(
-      color: const Color(0xFFF5F6FA),
-      padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 10),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (_) => filtering(page: 1),
-        style: AppTypography.bodyMedium(context),
-        decoration: InputDecoration(
-          hintText: 'Search by patient name…',
-          hintStyle: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
-          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 20),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF9CA3AF)),
-                  onPressed: () {
-                    _searchController.clear();
-                    filtering(enableDebounce: false, page: 1);
-                    setState(() {});
-                  },
-                )
-              : null,
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildSearchToolbar() {
+  //   return Container(
+  //     color: const Color(0xFFF5F6FA),
+  //     padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 10),
+  //     child: TextField(
+  //       controller: _searchController,
+  //       onChanged: (_) => filtering(page: 1),
+  //       style: AppTypography.bodyMedium(context),
+  //       decoration: InputDecoration(
+  //         hintText: 'Search by patient name…',
+  //         hintStyle: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
+  //         prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 20),
+  //         suffixIcon: _searchController.text.isNotEmpty
+  //             ? IconButton(
+  //                 icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF9CA3AF)),
+  //                 onPressed: () {
+  //                   _searchController.clear();
+  //                   filtering(enableDebounce: false, page: 1);
+  //                   setState(() {});
+  //                 },
+  //               )
+  //             : null,
+  //         filled: true,
+  //         fillColor: Colors.white,
+  //         contentPadding: const EdgeInsets.symmetric(vertical: 10),
+  //         border: OutlineInputBorder(
+  //           borderRadius: BorderRadius.circular(10),
+  //           borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+  //         ),
+  //         enabledBorder: OutlineInputBorder(
+  //           borderRadius: BorderRadius.circular(10),
+  //           borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+  //         ),
+  //         focusedBorder: OutlineInputBorder(
+  //           borderRadius: BorderRadius.circular(10),
+  //           borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildEmptyState() {
     return Center(
