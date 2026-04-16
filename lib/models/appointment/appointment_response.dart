@@ -154,6 +154,7 @@ class Service {
   String? serviceId;
   String? serviceName;
   String? serviceDescription;
+  String? serviceTime;
   String? servicePrice;
   int? isAdminOnly;
   int? dueDateToggle;
@@ -165,6 +166,7 @@ class Service {
     this.serviceId,
     this.serviceName,
     this.serviceDescription,
+    this.serviceTime,
     this.servicePrice,
     this.doctorType,
     this.isAdminOnly,
@@ -177,6 +179,7 @@ class Service {
     serviceId = json['serviceId'];
     serviceName = json['serviceName'];
     serviceDescription = json['serviceDescription'];
+    serviceTime = json['serviceTime'];
     servicePrice = json['servicePrice'];
     doctorType = json['doctorType'];
     isAdminOnly = json['isAdminOnly'];
@@ -190,6 +193,7 @@ class Service {
     data['serviceId'] = serviceId;
     data['serviceName'] = serviceName;
     data['serviceDescription'] = serviceDescription;
+    data['serviceTime'] = serviceTime;
     data['servicePrice'] = servicePrice;
     data['doctorType'] = doctorType;
     data['serviceBookingFee'] = serviceBookingFee;

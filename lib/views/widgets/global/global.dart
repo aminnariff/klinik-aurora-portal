@@ -185,6 +185,64 @@ String? convertUtcToMalaysiaTime(String? utcString, {bool showTime = true}) {
   }
 }
 
+Duration parseServiceDuration(String serviceTime) {
+  int hours = 0;
+  int minutes = 0;
+
+  final low = serviceTime.toLowerCase();
+  final hourMatch = RegExp(r'(\d+)\s*hour').firstMatch(low);
+  if (hourMatch != null) {
+    hours = int.parse(hourMatch.group(1)!);
+  }
+
+  final minuteMatch = RegExp(r'(\d+)\s*minutes?').firstMatch(low);
+  if (minuteMatch != null) {
+    minutes = int.parse(minuteMatch.group(1)!);
+  }
+
+  return Duration(hours: hours, minutes: minutes);
+}
+
+String? convertUtcToMalaysiaTimeRange(String? utcString, String? serviceTime, {bool showTime = true}) {
+  try {
+    if (utcString == null || utcString.isEmpty) return null;
+
+    final utcDateTime = DateTime.parse(utcString);
+    final malaysiaDateTime = utcDateTime.add(const Duration(hours: 8));
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final appointmentDay = DateTime(malaysiaDateTime.year, malaysiaDateTime.month, malaysiaDateTime.day);
+
+    String dayLabel;
+    if (appointmentDay == today) {
+      dayLabel = 'Today';
+    } else if (appointmentDay == tomorrow) {
+      dayLabel = 'Tomorrow';
+    } else {
+      dayLabel = DateFormat('EEE, d MMM yyyy').format(malaysiaDateTime);
+    }
+
+    if (!showTime) return dayLabel;
+
+    final startTimeLabel = DateFormat('h.mm a').format(malaysiaDateTime).toLowerCase();
+
+    if (serviceTime == null || serviceTime.isEmpty) {
+      return '$dayLabel\n$startTimeLabel';
+    }
+
+    final duration = parseServiceDuration(serviceTime);
+    final endDateTime = malaysiaDateTime.add(duration);
+    final endTimeLabel = DateFormat('h.mm a').format(endDateTime).toLowerCase();
+
+    return '$dayLabel\n$startTimeLabel - $endTimeLabel';
+  } catch (e) {
+    debugPrint('Invalid date format or service time: $e');
+    return null;
+  }
+}
+
 String formatAppointmentDate(DateTime dateTime, bool time) {
   final malaysiaDateTime = dateTime.add(const Duration(hours: 8)); // force +8
   final now = DateTime.now();

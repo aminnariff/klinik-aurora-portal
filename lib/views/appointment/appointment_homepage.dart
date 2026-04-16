@@ -712,7 +712,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         DataCell(
           Tooltip(
             message:
-                '${item.service?.serviceDescription ?? 'N/A'}\n\nBooking Fee: RM ${item.service?.serviceBookingFee ?? 'N/A'}',
+                '${item.service?.serviceTime ?? 'N/A'}\nBooking Fee: RM ${item.service?.serviceBookingFee ?? 'N/A'}',
             child: Text(
               item.service?.serviceName ?? 'N/A',
               style: AppTypography.bodyMedium(context).copyWith(fontSize: 13),
@@ -752,7 +752,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: () {
-              final raw = convertUtcToMalaysiaTime(item.appointmentDatetime);
+              final raw = convertUtcToMalaysiaTimeRange(item.appointmentDatetime, item.service?.serviceTime);
               if (raw == null) return [const Text('N/A')];
               final parts = raw.split('\n');
               return [
@@ -1008,9 +1008,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                   : Icons.keyboard_arrow_down_rounded)
                             : Icons.unfold_more_rounded,
                         size: 16,
-                        color: _sortBy == 'appointmentDatetime'
-                            ? const Color(0xFF2196F3)
-                            : const Color(0xFF9CA3AF),
+                        color: _sortBy == 'appointmentDatetime' ? const Color(0xFF2196F3) : const Color(0xFF9CA3AF),
                       ),
                     ],
                   ),
@@ -1152,20 +1150,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           DateTime now = DateTime.now();
                           List<String> availableDateTime = [];
                           List<String> tempExceptionDateTime = [];
-                          ServiceBranchAvailableDtController.get(
-                            context,
-                            1,
-                            200,
-                            branchId: authController.isSuperAdmin
-                                ? _appointmentBranch?.key
-                                : authController.authenticationResponse?.data?.user?.branchId,
-                            serviceBranchId: item.key,
-                          ).then((value) {
+                          ServiceBranchAvailableDtController.getAvailableSlot(context, serviceBranchId: item.key).then((
+                            value,
+                          ) {
                             if (responseCode(value.code)) {
-                              context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableDtResponse =
+                              context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableTimingResponse =
                                   value.data;
-                              availableDateTime = value.data?.data?.isNotEmpty == true
-                                  ? (value.data?.data?.first.availableDatetimes ?? [])
+                              availableDateTime = value.data?.slots?.isNotEmpty == true
+                                  ? (value.data?.slots ?? [])
                                   : [];
                               ServiceBranchExceptionController.get(context, 1, 999, serviceBranchId: item.key).then((
                                 value,
