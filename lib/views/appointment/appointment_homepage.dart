@@ -843,20 +843,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   Widget _buildStatusBadge(int? status) {
-    final color = appointmentStatusColors[status] ?? Colors.grey;
-    final label = getAppointmentStatusLabel(status);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withAlpha(25),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withAlpha(80)),
-      ),
-      child: Text(
-        label,
-        style: AppTypography.bodyMedium(context).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: color),
-      ),
-    );
+    return AppointmentStatusBadge(status: status);
   }
 
   Widget _buildPaymentBadge(int status) {

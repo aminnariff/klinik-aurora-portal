@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 
@@ -294,29 +295,7 @@ class AppointmentDetailsView extends StatelessWidget {
         const SizedBox(height: 12),
         _fieldLabel('Status'),
         const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: statusColor.withAlpha(30),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: statusColor.withAlpha(80)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 7,
-                height: 7,
-                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                statusEntry.name,
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: statusColor),
-              ),
-            ],
-          ),
-        ),
+        AppointmentStatusBadge(status: statusCode, showDot: true),
         if (notNullOrEmptyString(data?.appointmentAttachmentUrl)) ...[
           const SizedBox(height: 14),
           _fieldLabel('Attachment'),
