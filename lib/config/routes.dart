@@ -36,7 +36,11 @@ final router = GoRouter(
     final uri = state.uri.path;
 
     // 1. Allow public routes
-    if (uri == LoginPage.routeName || uri == AdminPasswordRecoveryPage.routeName || uri == PrivacyPolicy.routeName) {
+    if (uri == LoginPage.routeName ||
+        uri == AdminPasswordRecoveryPage.routeName ||
+        uri == PrivacyPolicy.routeName ||
+        uri == TermsAndConditions.routeName ||
+        uri == RefundPolicy.routeName) {
       return null;
     }
 
@@ -110,6 +114,20 @@ final router = GoRouter(
       path: PrivacyPolicy.routeName,
       builder: (BuildContext context, GoRouterState state) {
         return const PrivacyPolicy();
+      },
+    ),
+    GoRoute(
+      name: TermsAndConditions.routeName,
+      path: TermsAndConditions.routeName,
+      builder: (BuildContext context, GoRouterState state) {
+        return const TermsAndConditions();
+      },
+    ),
+    GoRoute(
+      name: RefundPolicy.routeName,
+      path: RefundPolicy.routeName,
+      builder: (BuildContext context, GoRouterState state) {
+        return const RefundPolicy();
       },
     ),
     GoRoute(
