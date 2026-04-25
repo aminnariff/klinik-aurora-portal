@@ -86,6 +86,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         startDate = DateTime(now.year, now.month - 1, 1);
         endDate = DateTime(now.year, now.month, 0);
         break;
+      case 'Next Month':
+        startDate = DateTime(now.year, now.month + 1, 1);
+        endDate = DateTime(now.year, now.month + 2, 0);
+        break;
       case 'Custom':
         startDate = DateTime(now.year, now.month, 1);
         endDate = now;
@@ -204,7 +208,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   }
 
   Widget _buildFilterChips() {
-    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Custom'];
+    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Next Month', 'Custom'];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(

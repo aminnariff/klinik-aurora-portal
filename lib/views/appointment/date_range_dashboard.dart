@@ -46,6 +46,8 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
     final endOfMonth = DateTime(now.year, now.month + 1, 0);
     final lastMonth = DateTime(now.year, now.month - 1, 1);
     final endOfLastMonth = DateTime(now.year, now.month, 0);
+    final nextMonth = DateTime(now.year, now.month + 1, 1);
+    final endOfNextMonth = DateTime(now.year, now.month + 2, 0);
 
     return [
       DateRange(
@@ -71,6 +73,18 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
         shortLabel: 'This Month',
         start: startOfMonth,
         end: endOfMonth,
+      ),
+      DateRange(
+        label: 'Next month (${DateFormat('MMMM yyyy').format(nextMonth)})',
+        shortLabel: 'Next Month',
+        start: nextMonth,
+        end: endOfNextMonth,
+      ),
+      DateRange(
+        label: 'Next 3 months',
+        shortLabel: 'Next 3 Months',
+        start: startOfMonth,
+        end: DateTime(now.year, now.month + 3, 0),
       ),
       DateRange(label: 'All time', shortLabel: 'All Time', start: null, end: null),
       DateRange(label: 'Custom date range', shortLabel: 'Custom', start: _selected.start, end: _selected.end),
