@@ -45,6 +45,7 @@ dependencies:
   sidebarx: ^0.17.1
   url_launcher: ^6.2.5
   hovering: ^1.0.4
+  flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
   flutter_test:

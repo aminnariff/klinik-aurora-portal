@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -84,7 +82,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
     _pulse = Tween<double>(begin: 0.5, end: 0.9).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
+    SchedulerBinding.instance.scheduleFrameCallback((_) async {
       _logoCtrl.forward();
       Future.delayed(const Duration(milliseconds: 280), () {
         if (mounted) _entranceCtrl.forward();
@@ -110,16 +108,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       context.read<AuthController>().remember = remember;
       if (rememberMeCredentials != null && remember == true) {
         usernameController.text = rememberMeCredentials[0];
-        passwordController.text = rememberMeCredentials[1];
-      }
-
-      if (kDebugMode) {
-        if (environment == Flavor.production) {
-          usernameController.text = 'auroramedicare@gmail.com';
-        } else {
-          usernameController.text = 'bukit-rimau@yopmail.com';
-        }
-        passwordController.text = 'Admin12345!';
+        passwordController.text = await authController.loadPassword();
       }
     });
 

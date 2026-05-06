@@ -1,11 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
+
+const _secureStorage = FlutterSecureStorage();
 
 class AuthController extends ChangeNotifier {
   AuthResponse? _authenticationResponse;
@@ -156,10 +159,14 @@ class AuthController extends ChangeNotifier {
   List<String>? getRememberMeCredentials() {
     _rememberMe = prefs.getBool(rememberMe) ?? false;
     if (_rememberMe == true) {
-      return [prefs.getString(username) ?? '', prefs.getString(password) ?? ''];
+      return [prefs.getString(username) ?? '', '']; // password loaded via loadPassword()
     } else {
       return null;
     }
+  }
+
+  Future<String> loadPassword() async {
+    return await _secureStorage.read(key: password) ?? '';
   }
 
   Future<void> setAuthenticationResponse(AuthResponse? response, {String? usernameValue, String? passwordValue}) async {
@@ -180,6 +187,14 @@ class AuthController extends ChangeNotifier {
           return;
         }
 
+        if (_rememberMe) {
+          prefs.setString(username, usernameValue ?? "");
+          await _secureStorage.write(key: password, value: passwordValue ?? "");
+        } else {
+          prefs.remove(username);
+          await _secureStorage.delete(key: password);
+        }
+
         await prefs.setString(authResponse, jsonEncode(data));
         await prefs.setString(token, data.data?.accessToken ?? '');
         _authenticationResponse = data;
@@ -188,6 +203,7 @@ class AuthController extends ChangeNotifier {
       } else {
         prefs.remove(authResponse);
         prefs.remove(token);
+        await _secureStorage.delete(key: password);
         _authenticationResponse = null;
         branchId = null;
         notifyListeners();
@@ -195,6 +211,7 @@ class AuthController extends ChangeNotifier {
     } catch (e) {
       prefs.remove(authResponse);
       prefs.remove(token);
+      await _secureStorage.delete(key: password);
       _authenticationResponse = null;
       branchId = null;
       debugPrint("Auth save error: $e");

@@ -296,7 +296,9 @@ class AppointmentDetailsView extends StatelessWidget {
         _fieldLabel('Status'),
         const SizedBox(height: 6),
         AppointmentStatusBadge(status: statusCode, showDot: true),
-        if (notNullOrEmptyString(data?.appointmentAttachmentUrl)) ...[
+        if (notNullOrEmptyString(data?.appointmentAttachmentUrl) &&
+            (data!.appointmentAttachmentUrl!.startsWith('http://') ||
+                data.appointmentAttachmentUrl!.startsWith('https://'))) ...[
           const SizedBox(height: 14),
           _fieldLabel('Attachment'),
           const SizedBox(height: 6),
