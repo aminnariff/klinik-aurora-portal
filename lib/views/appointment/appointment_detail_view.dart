@@ -365,6 +365,9 @@ class AppointmentDetailsView extends StatelessWidget {
         ? (isPaid ? price - bookingFee : price)
         : null;
 
+    // Find the most recent paid online transaction (has a paymentGateway)
+    final Payment? txn = data?.payment?.where((p) => p.paymentGateway != null).lastOrNull;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -404,7 +407,76 @@ class AppointmentDetailsView extends StatelessWidget {
             fullWidth: true,
           ),
         ],
+        if (txn != null) ...[
+          const SizedBox(height: 14),
+          _paymentDetailsCard(txn),
+        ],
       ],
+    );
+  }
+
+  Widget _paymentDetailsCard(Payment txn) {
+    final rows = <_PayDetailRow>[
+      if (txn.paymentChannel != null)
+        _PayDetailRow(Icons.payment_rounded, 'Paid via', txn.channelLabel, const Color(0xFF7C3AED)),
+      _PayDetailRow(Icons.account_balance_rounded, 'Gateway', txn.gatewayLabel, const Color(0xFF0369A1)),
+      _PayDetailRow(Icons.schedule_rounded, 'Settlement', txn.settlementTimeline, const Color(0xFF0891B2)),
+      if (txn.billId != null)
+        _PayDetailRow(Icons.tag_rounded, 'Transaction Ref', txn.billId!, const Color(0xFF374151)),
+      if (txn.paidAt != null)
+        _PayDetailRow(Icons.check_circle_outline_rounded, 'Paid At', dateConverter(txn.paidAt) ?? txn.paidAt!, const Color(0xFF15803D)),
+    ];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FF),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE0E7FF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.credit_card_rounded, size: 13, color: Color(0xFF6366F1)),
+              const SizedBox(width: 6),
+              const Text(
+                'ONLINE PAYMENT DETAILS',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF6366F1), letterSpacing: 0.8),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...rows.map((r) => _payDetailRowWidget(r)).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _payDetailRowWidget(_PayDetailRow row) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Icon(row.icon, size: 13, color: row.color),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 90,
+            child: Text(
+              row.label,
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              row.value,
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: row.color),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -587,4 +659,12 @@ class AppointmentDetailsView extends StatelessWidget {
       child: Text(text, style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
     );
   }
+}
+
+class _PayDetailRow {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  const _PayDetailRow(this.icon, this.label, this.value, this.color);
 }

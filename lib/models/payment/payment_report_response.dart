@@ -3,15 +3,29 @@ class PaymentReportResponse {
   Filters? filters;
   int? limit;
   Summary? summary;
+  List<ChannelBreakdown>? channelBreakdown;
   List<Data>? data;
 
-  PaymentReportResponse({this.message, this.filters, this.limit, this.summary, this.data});
+  PaymentReportResponse({
+    this.message,
+    this.filters,
+    this.limit,
+    this.summary,
+    this.channelBreakdown,
+    this.data,
+  });
 
   PaymentReportResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     filters = json['filters'] != null ? Filters.fromJson(json['filters']) : null;
     limit = json['limit'];
     summary = json['summary'] != null ? Summary.fromJson(json['summary']) : null;
+    if (json['channelBreakdown'] != null) {
+      channelBreakdown = <ChannelBreakdown>[];
+      json['channelBreakdown'].forEach((v) {
+        channelBreakdown!.add(ChannelBreakdown.fromJson(v));
+      });
+    }
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
@@ -30,10 +44,50 @@ class PaymentReportResponse {
     if (summary != null) {
       data['summary'] = summary!.toJson();
     }
+    if (channelBreakdown != null) {
+      data['channelBreakdown'] = channelBreakdown!.map((v) => v.toJson()).toList();
+    }
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     return data;
+  }
+}
+
+class ChannelBreakdown {
+  String? channel;
+  int? count;
+  String? totalAmount;
+
+  ChannelBreakdown({this.channel, this.count, this.totalAmount});
+
+  ChannelBreakdown.fromJson(Map<String, dynamic> json) {
+    channel     = json['channel'];
+    count       = (json['count'] as num?)?.toInt();
+    totalAmount = json['totalAmount']?.toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'channel':     channel,
+      'count':       count,
+      'totalAmount': totalAmount,
+    };
+  }
+
+  String get channelLabel {
+    switch (channel) {
+      case 'credit':      return 'Credit / Debit Card';
+      case 'fpx':         return 'FPX Online Banking';
+      case 'GRAB':        return 'GrabPay';
+      case 'TNG-EWALLET': return "Touch 'n Go";
+      case 'BOOST':       return 'Boost';
+      case 'ShopeePay':   return 'ShopeePay';
+      case 'DUITNOWQR':   return 'DuitNow QR';
+      case 'APPLEPAY':    return 'Apple Pay';
+      case 'GOOGLEPAY':   return 'Google Pay';
+      default:            return channel ?? 'Other';
+    }
   }
 }
 

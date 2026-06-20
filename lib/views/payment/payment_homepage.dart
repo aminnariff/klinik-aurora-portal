@@ -178,6 +178,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 SizedBox(height: screenPadding),
                 _buildSummaryCards(controller),
                 SizedBox(height: screenPadding),
+                _buildChannelBreakdown(controller),
+                SizedBox(height: screenPadding),
                 _buildChart(controller),
                 SizedBox(height: screenPadding),
                 _buildTable(controller),
@@ -369,6 +371,142 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       children: cards
           .map((c) => Expanded(child: Padding(padding: const EdgeInsets.only(right: 12), child: _SummaryCard(config: c))))
           .toList(),
+    );
+  }
+
+  Widget _buildChannelBreakdown(PaymentController controller) {
+    final channels = controller.paymentReportResponse?.channelBreakdown ?? [];
+    if (channels.isEmpty) return const SizedBox();
+
+    final totalCount = channels.fold<int>(0, (sum, c) => sum + (c.count ?? 0));
+
+    // Channel icon mapping
+    IconData _channelIcon(String? ch) {
+      switch (ch) {
+        case 'credit':      return Icons.credit_card_rounded;
+        case 'fpx':         return Icons.account_balance_rounded;
+        case 'GRAB':        return Icons.delivery_dining_rounded;
+        case 'TNG-EWALLET': return Icons.contactless_rounded;
+        case 'BOOST':       return Icons.bolt_rounded;
+        case 'ShopeePay':   return Icons.shopping_bag_rounded;
+        case 'DUITNOWQR':   return Icons.qr_code_2_rounded;
+        case 'APPLEPAY':    return Icons.phone_iphone_rounded;
+        case 'GOOGLEPAY':   return Icons.android_rounded;
+        default:            return Icons.payments_rounded;
+      }
+    }
+
+    final channelColors = [
+      const Color(0xFF6366F1),
+      const Color(0xFF0891B2),
+      const Color(0xFF059669),
+      const Color(0xFF7C3AED),
+      const Color(0xFFF59E0B),
+      const Color(0xFFEF4444),
+      const Color(0xFF0369A1),
+      const Color(0xFF15803D),
+      const Color(0xFFD97706),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
+            child: Row(
+              children: [
+                const Icon(Icons.donut_small_rounded, size: 16, color: Color(0xFF6366F1)),
+                const SizedBox(width: 8),
+                Text('Payment Channel Breakdown', style: AppTypography.displayMedium(context)),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Padding(
+            padding: EdgeInsets.all(screenPadding * 0.75),
+            child: Column(
+              children: channels.asMap().entries.map((entry) {
+                final i = entry.key;
+                final c = entry.value;
+                final color = channelColors[i % channelColors.length];
+                final count = c.count ?? 0;
+                final fraction = totalCount > 0 ? count / totalCount : 0.0;
+                final amount = double.tryParse(c.totalAmount ?? '0') ?? 0.0;
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(color: color.withAlpha(25), borderRadius: BorderRadius.circular(8)),
+                            child: Icon(_channelIcon(c.channel), size: 14, color: color),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              c.channelLabel,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                            ),
+                          ),
+                          Text(
+                            '$count txn${count != 1 ? 's' : ''}',
+                            style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 90,
+                            child: Text(
+                              'RM ${amount.toStringAsFixed(2)}',
+                              textAlign: TextAlign.right,
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF374151)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const SizedBox(width: 38),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: fraction,
+                                minHeight: 6,
+                                backgroundColor: color.withAlpha(20),
+                                valueColor: AlwaysStoppedAnimation<Color>(color),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 38,
+                            child: Text(
+                              '${(fraction * 100).toStringAsFixed(0)}%',
+                              style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

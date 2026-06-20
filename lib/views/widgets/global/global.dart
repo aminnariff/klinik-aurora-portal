@@ -355,6 +355,12 @@ class Payment {
   int? paymentStatus;
   String? createdDate;
   String? modifiedDate;
+  // Fiuu / gateway fields
+  String? billId;
+  String? paymentGateway;
+  String? paymentChannel;
+  String? transactionState;
+  String? paidAt;
 
   Payment({
     this.paymentId,
@@ -364,27 +370,85 @@ class Payment {
     this.paymentStatus,
     this.createdDate,
     this.modifiedDate,
+    this.billId,
+    this.paymentGateway,
+    this.paymentChannel,
+    this.transactionState,
+    this.paidAt,
   });
 
   Payment.fromJson(Map<String, dynamic> json) {
-    paymentId = json['paymentId'];
-    paymentType = json['paymentType'];
-    paymentAsset = json['paymentAsset'];
-    paymentAmount = json['paymentAmount'];
-    paymentStatus = json['paymentStatus'];
-    createdDate = json['createdDate'];
-    modifiedDate = json['modifiedDate'];
+    paymentId        = json['paymentId'];
+    paymentType      = json['paymentType'];
+    paymentAsset     = json['paymentAsset'];
+    paymentAmount    = json['paymentAmount'];
+    paymentStatus    = json['paymentStatus'];
+    createdDate      = json['createdDate'];
+    modifiedDate     = json['modifiedDate'];
+    billId           = json['billId'];
+    paymentGateway   = json['paymentGateway'];
+    paymentChannel   = json['paymentChannel'];
+    transactionState = json['transactionState'];
+    paidAt           = json['paidAt'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['paymentId'] = paymentId;
-    data['paymentType'] = paymentType;
-    data['paymentAsset'] = paymentAsset;
-    data['paymentAmount'] = paymentAmount;
-    data['paymentStatus'] = paymentStatus;
-    data['createdDate'] = createdDate;
-    data['modifiedDate'] = modifiedDate;
+    data['paymentId']        = paymentId;
+    data['paymentType']      = paymentType;
+    data['paymentAsset']     = paymentAsset;
+    data['paymentAmount']    = paymentAmount;
+    data['paymentStatus']    = paymentStatus;
+    data['createdDate']      = createdDate;
+    data['modifiedDate']     = modifiedDate;
+    data['billId']           = billId;
+    data['paymentGateway']   = paymentGateway;
+    data['paymentChannel']   = paymentChannel;
+    data['transactionState'] = transactionState;
+    data['paidAt']           = paidAt;
     return data;
+  }
+
+  String get channelLabel {
+    switch (paymentChannel) {
+      case 'credit':      return 'Credit / Debit Card';
+      case 'fpx':         return 'FPX Online Banking';
+      case 'GRAB':        return 'GrabPay';
+      case 'TNG-EWALLET': return "Touch 'n Go eWallet";
+      case 'BOOST':       return 'Boost';
+      case 'ShopeePay':   return 'ShopeePay';
+      case 'DUITNOWQR':   return 'DuitNow QR';
+      case 'APPLEPAY':    return 'Apple Pay';
+      case 'GOOGLEPAY':   return 'Google Pay';
+      default:            return paymentChannel ?? 'Online Payment';
+    }
+  }
+
+  // Typical Fiuu settlement timeline
+  String get settlementTimeline {
+    switch (paymentChannel) {
+      case 'fpx':
+      case 'DUITNOWQR':
+        return 'T+1 business day';
+      case 'credit':
+      case 'APPLEPAY':
+      case 'GOOGLEPAY':
+        return 'T+3 business days';
+      case 'GRAB':
+      case 'TNG-EWALLET':
+      case 'BOOST':
+      case 'ShopeePay':
+        return 'T+3 business days';
+      default:
+        return paymentGateway?.startsWith('fiuu') == true
+            ? 'T+1 to T+3 business days'
+            : 'Standard settlement';
+    }
+  }
+
+  String get gatewayLabel {
+    if (paymentGateway == 'fiuu_1' || paymentGateway == 'fiuu_2') return 'Fiuu';
+    if (paymentGateway == 'billplz') return 'Billplz';
+    return paymentGateway ?? '—';
   }
 }
