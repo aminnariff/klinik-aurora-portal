@@ -63,7 +63,12 @@ final router = GoRouter(
       final permissions = parsed.data?.user?.permissions ?? <String>[];
 
       // 4. Checking specific SuperAdmin guarded pages
-      final requiresSuperAdmin = [AdminHomepage.routeName, BranchHomepage.routeName, PromotionHomepage.routeName];
+      final requiresSuperAdmin = [
+        AdminHomepage.routeName,
+        BranchHomepage.routeName,
+        PromotionHomepage.routeName,
+        BranchPaymentSummaryPage.routeName,
+      ];
 
       if (requiresSuperAdmin.contains(uri) && !isSuperAdmin) {
         return Homepage.routeName; // Standard deflect to dashboard
@@ -81,6 +86,7 @@ final router = GoRouter(
         DoctorHomepage.routeName: 'f90f9f18-057b-11ef-943b-626efeb17d5e',
         RewardHomepage.routeName: '6e0fe1f8-2f1f-11ef-8db9-6677d190faa2',
         ServiceHomepage.routeName: '0699ac1c-ac52-11ef-a1b7-bc24115a1342',
+        PaymentSummaryPage.routeName: 'f57576c4-4d15-11f0-b054-1ff6746392b2',
       };
 
       final requiredPermission = permissionMap[uri];

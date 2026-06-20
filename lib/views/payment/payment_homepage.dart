@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/models/payment/payment_report_response.dart
 import 'package:klinik_aurora_portal/views/payment/appointment_ids.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
+import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
@@ -61,8 +62,12 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       startDate: DateFormat('yyyy-MM-dd').format(startDate),
       endDate: DateFormat('yyyy-MM-dd').format(endDate),
       branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-    ).then((response) {
+    ).then((_) {
       dismissLoading();
+      AppToast.snackbar(context, 'CSV exported successfully.');
+    }).catchError((_) {
+      dismissLoading();
+      AppToast.snackbar(context, 'Export failed. Please try again.');
     });
   }
 
@@ -85,10 +90,6 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       case 'Last Month':
         startDate = DateTime(now.year, now.month - 1, 1);
         endDate = DateTime(now.year, now.month, 0);
-        break;
-      case 'Next Month':
-        startDate = DateTime(now.year, now.month + 1, 1);
-        endDate = DateTime(now.year, now.month + 2, 0);
         break;
       case 'Custom':
         startDate = DateTime(now.year, now.month, 1);
@@ -167,20 +168,32 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         padding: EdgeInsets.all(screenPadding),
         child: Consumer<PaymentController>(
           builder: (context, controller, _) {
+            final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
+            final data = controller.paymentReportResponse?.data ?? [];
+            final channels = controller.paymentReportResponse?.channelBreakdown ?? [];
+            final branchCount = data.map((d) => d.branchId).toSet().length;
+            final dateCount = data.map((d) => d.paymentDate).toSet().length;
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(),
+                _buildHeader(controller),
                 SizedBox(height: screenPadding),
-                _buildFilterChips(),
-                SizedBox(height: screenPadding * 0.75),
-                _buildExportButton(),
+                _buildFilterRow(),
                 SizedBox(height: screenPadding),
                 _buildSummaryCards(controller),
-                SizedBox(height: screenPadding),
-                _buildChannelBreakdown(controller),
-                SizedBox(height: screenPadding),
-                _buildChart(controller),
+                if (channels.isNotEmpty) ...[
+                  SizedBox(height: screenPadding),
+                  _buildChannelBreakdown(controller),
+                ],
+                if (isSuperAdmin && branchCount >= 2) ...[
+                  SizedBox(height: screenPadding),
+                  _buildBranchOverview(controller),
+                ],
+                if (dateCount >= 2) ...[
+                  SizedBox(height: screenPadding),
+                  _buildChart(controller),
+                ],
                 SizedBox(height: screenPadding),
                 _buildTable(controller),
               ],
@@ -191,95 +204,157 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(PaymentController controller) {
+    final auth = context.read<AuthController>();
+    final isSuperAdmin = auth.isSuperAdmin;
+    final branchName = !isSuperAdmin
+        ? (controller.paymentReportResponse?.data?.isNotEmpty == true
+            ? controller.paymentReportResponse!.data!.first.branchName
+            : null)
+        : null;
+
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Payment Report', style: AppTypography.displayMedium(context)),
-            const SizedBox(height: 2),
-            Text(
-              getFormattedDateRange(),
-              style: AppTypography.bodyMedium(context).apply(color: _muted),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Payment Report', style: AppTypography.displayMedium(context)),
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  Text(
+                    getFormattedDateRange(),
+                    style: AppTypography.bodyMedium(context).apply(color: _muted),
+                  ),
+                  if (!isSuperAdmin) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE3F2FD),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFF2196F3).withAlpha(60)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.store_rounded, size: 11, color: Color(0xFF1565C0)),
+                          const SizedBox(width: 4),
+                          Text(
+                            branchName ?? 'Your Branch',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1565C0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          onPressed: getData,
+          icon: const Icon(Icons.refresh_rounded),
+          tooltip: 'Refresh',
+          style: IconButton.styleFrom(
+            foregroundColor: const Color(0xFF6B7280),
+            backgroundColor: Colors.white,
+            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildFilterChips() {
-    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Next Month', 'Custom'];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: filters.map((f) {
-          final selected = selectedFilter == f;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () async {
-                if (f == 'Custom') {
-                  final picked = await _showCustomDateRangePicker();
-                  if (picked != null) {
-                    setState(() {
-                      selectedFilter = 'Custom';
-                      startDate = picked.start;
-                      endDate = picked.end;
-                    });
-                    getData();
-                  }
-                } else {
-                  setState(() {
-                    selectedFilter = f;
-                    applyDateFilter();
-                  });
-                  getData();
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: selected ? const Color(0xFF2196F3) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
+  Widget _buildFilterRow() {
+    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Custom'];
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: filters.map((f) {
+                final selected = selectedFilter == f;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (f == 'Custom') {
+                        final picked = await _showCustomDateRangePicker();
+                        if (picked != null) {
+                          setState(() {
+                            selectedFilter = 'Custom';
+                            startDate = picked.start;
+                            endDate = picked.end;
+                          });
+                          getData();
+                        }
+                      } else {
+                        setState(() {
+                          selectedFilter = f;
+                          applyDateFilter();
+                        });
+                        getData();
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected ? const Color(0xFF2196F3) : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
+                        ),
+                        boxShadow: selected
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF2196F3).withAlpha(51),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: Text(
+                        f,
+                        style: AppTypography.bodyMedium(context).apply(
+                          color: selected ? Colors.white : const Color(0xFF374151),
+                          fontWeightDelta: selected ? 1 : 0,
+                        ),
+                      ),
+                    ),
                   ),
-                  boxShadow: selected
-                      ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(51), blurRadius: 8, offset: const Offset(0, 2))]
-                      : null,
-                ),
-                child: Text(
-                  f,
-                  style: AppTypography.bodyMedium(context).apply(
-                    color: selected ? Colors.white : const Color(0xFF374151),
-                    fontWeightDelta: selected ? 1 : 0,
-                  ),
-                ),
-              ),
+                );
+              }).toList(),
             ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildExportButton() {
-    return SizedBox(
-      height: 44,
-      child: OutlinedButton.icon(
-        onPressed: exportData,
-        icon: const Icon(Icons.download_rounded, size: 18),
-        label: const Text('Export CSV'),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFF059669),
-          side: const BorderSide(color: Color(0xFF059669)),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          textStyle: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600),
+          ),
         ),
-      ),
+        const SizedBox(width: 8),
+        SizedBox(
+          height: 38,
+          child: OutlinedButton.icon(
+            onPressed: exportData,
+            icon: const Icon(Icons.download_rounded, size: 16),
+            label: const Text('Export CSV'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF059669),
+              side: const BorderSide(color: Color(0xFF059669)),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -368,9 +443,15 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     }
 
     return Row(
-      children: cards
-          .map((c) => Expanded(child: Padding(padding: const EdgeInsets.only(right: 12), child: _SummaryCard(config: c))))
-          .toList(),
+      children: cards.asMap().entries.map((e) {
+        final isLast = e.key == cards.length - 1;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: isLast ? 0 : 12),
+            child: _SummaryCard(config: e.value),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -380,19 +461,28 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     final totalCount = channels.fold<int>(0, (sum, c) => sum + (c.count ?? 0));
 
-    // Channel icon mapping
-    IconData _channelIcon(String? ch) {
+    IconData channelIcon(String? ch) {
       switch (ch) {
-        case 'credit':      return Icons.credit_card_rounded;
-        case 'fpx':         return Icons.account_balance_rounded;
-        case 'GRAB':        return Icons.delivery_dining_rounded;
-        case 'TNG-EWALLET': return Icons.contactless_rounded;
-        case 'BOOST':       return Icons.bolt_rounded;
-        case 'ShopeePay':   return Icons.shopping_bag_rounded;
-        case 'DUITNOWQR':   return Icons.qr_code_2_rounded;
-        case 'APPLEPAY':    return Icons.phone_iphone_rounded;
-        case 'GOOGLEPAY':   return Icons.android_rounded;
-        default:            return Icons.payments_rounded;
+        case 'credit':
+          return Icons.credit_card_rounded;
+        case 'fpx':
+          return Icons.account_balance_rounded;
+        case 'GRAB':
+          return Icons.delivery_dining_rounded;
+        case 'TNG-EWALLET':
+          return Icons.contactless_rounded;
+        case 'BOOST':
+          return Icons.bolt_rounded;
+        case 'ShopeePay':
+          return Icons.shopping_bag_rounded;
+        case 'DUITNOWQR':
+          return Icons.qr_code_2_rounded;
+        case 'APPLEPAY':
+          return Icons.phone_iphone_rounded;
+        case 'GOOGLEPAY':
+          return Icons.android_rounded;
+        default:
+          return Icons.payments_rounded;
       }
     }
 
@@ -450,7 +540,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                             width: 28,
                             height: 28,
                             decoration: BoxDecoration(color: color.withAlpha(25), borderRadius: BorderRadius.circular(8)),
-                            child: Icon(_channelIcon(c.channel), size: 14, color: color),
+                            child: Icon(channelIcon(c.channel), size: 14, color: color),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -510,11 +600,147 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     );
   }
 
+  static const List<Color> _branchColors = [
+    Color(0xFF2196F3), Color(0xFFDF6E98), Color(0xFF4CAF50), Color(0xFFFF9800),
+    Color(0xFF9C27B0), Color(0xFF00BCD4), Color(0xFFFF5722), Color(0xFF8BC34A),
+    Color(0xFFE91E63), Color(0xFF607D8B),
+  ];
+
+  Widget _buildBranchOverview(PaymentController controller) {
+    final data = controller.paymentReportResponse?.data ?? [];
+    if (data.isEmpty) return const SizedBox();
+
+    // Aggregate per-branch from the already-fetched report data
+    final Map<String, _BranchTotals> agg = {};
+    for (final row in data) {
+      final id = row.branchId ?? 'unknown';
+      agg.putIfAbsent(id, () => _BranchTotals(branchName: row.branchName ?? id));
+      agg[id]!.totalPayments += row.totalPayments ?? 0;
+      agg[id]!.successful += int.tryParse(row.successfulPayments ?? '0') ?? 0;
+      agg[id]!.failed += int.tryParse(row.failedPayments ?? '0') ?? 0;
+      agg[id]!.paid += double.tryParse(row.totalPaidAmount ?? '0') ?? 0;
+      agg[id]!.refund += double.tryParse(row.totalRefundAmount ?? '0') ?? 0;
+      agg[id]!.revenue += double.tryParse(row.netRevenue ?? '0') ?? 0;
+    }
+
+    if (agg.length < 2) return const SizedBox();
+
+    final branches = agg.values.toList()..sort((a, b) => b.revenue.compareTo(a.revenue));
+    final maxRevenue = branches.first.revenue;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
+            child: Row(
+              children: [
+                const Icon(Icons.store_rounded, size: 16, color: Color(0xFF7C3AED)),
+                const SizedBox(width: 8),
+                Text('Branch Overview', style: AppTypography.displayMedium(context)),
+                const Spacer(),
+                Text(
+                  '${branches.length} branches',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Padding(
+            padding: EdgeInsets.all(screenPadding * 0.75),
+            child: Column(
+              children: branches.asMap().entries.map((entry) {
+                final i = entry.key;
+                final b = entry.value;
+                final color = _branchColors[i % _branchColors.length];
+                final fraction = maxRevenue > 0 ? b.revenue / maxRevenue : 0.0;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8, height: 8,
+                            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              b.branchName,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                            ),
+                          ),
+                          _miniStatChip('✓ ${b.successful}', const Color(0xFFD1FAE5), const Color(0xFF065F46)),
+                          const SizedBox(width: 6),
+                          _miniStatChip('✗ ${b.failed}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
+                          const SizedBox(width: 10),
+                          SizedBox(
+                            width: 100,
+                            child: Text(
+                              'RM ${b.revenue.toStringAsFixed(2)}',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: fraction,
+                                minHeight: 6,
+                                backgroundColor: color.withAlpha(20),
+                                valueColor: AlwaysStoppedAnimation<Color>(color),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 38,
+                            child: Text(
+                              '${(fraction * 100).toStringAsFixed(0)}%',
+                              style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _miniStatChip(String text, Color bg, Color fg) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
+      child: Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
+    );
+  }
+
   Widget _buildChart(PaymentController controller) {
     final data = controller.paymentReportResponse?.data ?? [];
     if (data.isEmpty) return const SizedBox();
 
-    // Aggregate net revenue by date
     final Map<String, double> byDate = {};
     for (final row in data) {
       final date = row.paymentDate ?? 'N/A';
@@ -642,17 +868,53 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
-            child: Text(
-              isSuperAdmin ? 'Branch Breakdown' : 'Daily Breakdown',
-              style: AppTypography.displayMedium(context),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    isSuperAdmin ? 'Branch Breakdown' : 'Daily Breakdown',
+                    style: AppTypography.displayMedium(context),
+                  ),
+                ),
+                if (data.isNotEmpty)
+                  Text(
+                    '${data.length} row${data.length != 1 ? 's' : ''}',
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                  ),
+              ],
             ),
           ),
           const Divider(height: 1, color: Color(0xFFE5E7EB)),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: _buildDataTable(data, isSuperAdmin, controller),
-          ),
+          data.isEmpty
+              ? _buildEmptyState()
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: _buildDataTable(data, isSuperAdmin, controller),
+                ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: screenPadding * 2),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade300),
+            const SizedBox(height: 12),
+            Text(
+              'No payment data for this period',
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Try selecting a different date range',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -674,7 +936,6 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1),
       ),
       children: [
-        // Header row
         TableRow(
           decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
           children: [
@@ -688,24 +949,6 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             headerCell('Net Revenue (RM)'),
           ],
         ),
-        // Data rows
-        if (data.isEmpty)
-          TableRow(
-            children: [
-              if (isSuperAdmin)
-                const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: Text('No data available', style: AppTypography.bodyMedium(context).apply(color: _muted)),
-              ),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-            ],
-          ),
         for (int i = 0; i < data.length; i++)
           TableRow(
             decoration: BoxDecoration(
@@ -830,6 +1073,18 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       ],
     );
   }
+}
+
+class _BranchTotals {
+  final String branchName;
+  int totalPayments = 0;
+  int successful = 0;
+  int failed = 0;
+  double paid = 0;
+  double refund = 0;
+  double revenue = 0;
+
+  _BranchTotals({required this.branchName});
 }
 
 class _CardConfig {

@@ -359,6 +359,7 @@ class Payment {
   String? billId;
   String? paymentGateway;
   String? paymentChannel;
+  String? cardInfo;
   String? transactionState;
   String? paidAt;
 
@@ -373,6 +374,7 @@ class Payment {
     this.billId,
     this.paymentGateway,
     this.paymentChannel,
+    this.cardInfo,
     this.transactionState,
     this.paidAt,
   });
@@ -388,6 +390,7 @@ class Payment {
     billId           = json['billId'];
     paymentGateway   = json['paymentGateway'];
     paymentChannel   = json['paymentChannel'];
+    cardInfo         = json['cardInfo'];
     transactionState = json['transactionState'];
     paidAt           = json['paidAt'];
   }
@@ -404,6 +407,7 @@ class Payment {
     data['billId']           = billId;
     data['paymentGateway']   = paymentGateway;
     data['paymentChannel']   = paymentChannel;
+    data['cardInfo']         = cardInfo;
     data['transactionState'] = transactionState;
     data['paidAt']           = paidAt;
     return data;

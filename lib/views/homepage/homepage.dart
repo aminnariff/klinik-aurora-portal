@@ -15,7 +15,6 @@ import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart';
-import 'package:klinik_aurora_portal/views/payment/branch_summary_homepage.dart';
 import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
 import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
@@ -84,12 +83,6 @@ class _HomepageState extends State<Homepage> {
         },
         label: PaymentSummaryPage.displayName,
       ),
-      // SidebarXItem(
-      //   iconBuilder: (selected, hovered) {
-      //     return Icon(Icons.money, color: Colors.white);
-      //   },
-      //   label: BranchPaymentSummaryPage.displayName,
-      // ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return Icon(Icons.medical_services_rounded, color: Colors.white);
@@ -179,6 +172,9 @@ class _HomepageState extends State<Homepage> {
           }
           if (context.read<AuthController>().hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342') == false) {
             sideBarAttribute.removeWhere((element) => element.label == ServiceHomepage.displayName);
+          }
+          if (context.read<AuthController>().hasPermission('f57576c4-4d15-11f0-b054-1ff6746392b2') == false) {
+            sideBarAttribute.removeWhere((element) => element.label == PaymentSummaryPage.displayName);
           }
           context.read<TopBarController>().pageValue = 0;
           if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')) {
@@ -617,8 +613,6 @@ class _HomepageState extends State<Homepage> {
         context.go(RewardHistoryHomepage.routeName);
       case PaymentSummaryPage.displayName:
         context.go(PaymentSummaryPage.routeName);
-      case BranchPaymentSummaryPage.displayName:
-        context.go(BranchPaymentSummaryPage.routeName);
     }
   }
 

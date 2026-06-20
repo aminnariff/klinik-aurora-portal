@@ -419,6 +419,8 @@ class AppointmentDetailsView extends StatelessWidget {
     final rows = <_PayDetailRow>[
       if (txn.paymentChannel != null)
         _PayDetailRow(Icons.payment_rounded, 'Paid via', txn.channelLabel, const Color(0xFF7C3AED)),
+      if (txn.cardInfo != null)
+        _PayDetailRow(Icons.credit_card_rounded, 'Card No.', _maskCard(txn.cardInfo!), const Color(0xFF374151)),
       _PayDetailRow(Icons.account_balance_rounded, 'Gateway', txn.gatewayLabel, const Color(0xFF0369A1)),
       _PayDetailRow(Icons.schedule_rounded, 'Settlement', txn.settlementTimeline, const Color(0xFF0891B2)),
       if (txn.billId != null)
@@ -651,6 +653,14 @@ class AppointmentDetailsView extends StatelessWidget {
       text,
       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF111827)),
     );
+  }
+
+  String _maskCard(String raw) {
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.length >= 4) {
+      return '**** **** **** ${digits.substring(digits.length - 4)}';
+    }
+    return raw;
   }
 
   Widget _subtleText(String text) {

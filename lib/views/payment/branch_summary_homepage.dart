@@ -7,12 +7,13 @@ import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart
 import 'package:klinik_aurora_portal/models/payment/branch_payment_summary_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
+import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
 class BranchPaymentSummaryPage extends StatefulWidget {
   static const routeName = '/branch-payment-summary';
-  static const displayName = 'Branch Payment Summary';
+  static const displayName = 'Branch Summary';
   const BranchPaymentSummaryPage({super.key});
 
   @override
@@ -63,6 +64,21 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
     });
   }
 
+  void exportData() {
+    showLoading();
+    PaymentController.exportCsvDownload(
+      fileName: 'branch-payment-summary',
+      startDate: DateFormat('yyyy-MM-dd').format(startDate),
+      endDate: DateFormat('yyyy-MM-dd').format(endDate),
+    ).then((_) {
+      dismissLoading();
+      AppToast.snackbar(context, 'CSV exported successfully.');
+    }).catchError((_) {
+      dismissLoading();
+      AppToast.snackbar(context, 'Export failed. Please try again.');
+    });
+  }
+
   void applyDateFilter() {
     final now = DateTime.now();
     switch (selectedFilter) {
@@ -82,10 +98,6 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
       case 'Last Month':
         startDate = DateTime(now.year, now.month - 1, 1);
         endDate = DateTime(now.year, now.month, 0);
-        break;
-      case 'Next Month':
-        startDate = DateTime(now.year, now.month + 1, 1);
-        endDate = DateTime(now.year, now.month + 2, 0);
         break;
       case 'Custom':
         startDate = DateTime(now.year, now.month, 1);
@@ -169,7 +181,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
               children: [
                 _buildHeader(),
                 SizedBox(height: screenPadding),
-                _buildFilterChips(),
+                _buildFilterRow(),
                 SizedBox(height: screenPadding),
                 _buildSummaryCards(controller),
                 SizedBox(height: screenPadding),
@@ -185,72 +197,134 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
   }
 
   Widget _buildHeader() {
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Branch Payment Summary', style: AppTypography.displayMedium(context)),
-        const SizedBox(height: 2),
-        Text(
-          getFormattedDateRange(),
-          style: AppTypography.bodyMedium(context).apply(color: _muted),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Branch Payment Summary', style: AppTypography.displayMedium(context)),
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  Text(
+                    getFormattedDateRange(),
+                    style: AppTypography.bodyMedium(context).apply(color: _muted),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'All Branches',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          onPressed: getData,
+          icon: const Icon(Icons.refresh_rounded),
+          tooltip: 'Refresh',
+          style: IconButton.styleFrom(
+            foregroundColor: const Color(0xFF6B7280),
+            backgroundColor: Colors.white,
+            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildFilterChips() {
-    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Next Month', 'Custom'];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: filters.map((f) {
-          final selected = selectedFilter == f;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () async {
-                if (f == 'Custom') {
-                  final picked = await _showCustomDateRangePicker();
-                  if (picked != null) {
-                    setState(() {
-                      selectedFilter = 'Custom';
-                      startDate = picked.start;
-                      endDate = picked.end;
-                    });
-                    getData();
-                  }
-                } else {
-                  setState(() {
-                    selectedFilter = f;
-                    applyDateFilter();
-                  });
-                  getData();
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: selected ? const Color(0xFF2196F3) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
+  Widget _buildFilterRow() {
+    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Custom'];
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: filters.map((f) {
+                final selected = selectedFilter == f;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (f == 'Custom') {
+                        final picked = await _showCustomDateRangePicker();
+                        if (picked != null) {
+                          setState(() {
+                            selectedFilter = 'Custom';
+                            startDate = picked.start;
+                            endDate = picked.end;
+                          });
+                          getData();
+                        }
+                      } else {
+                        setState(() {
+                          selectedFilter = f;
+                          applyDateFilter();
+                        });
+                        getData();
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected ? const Color(0xFF2196F3) : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
+                        ),
+                        boxShadow: selected
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF2196F3).withAlpha(51),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: Text(
+                        f,
+                        style: AppTypography.bodyMedium(context).apply(
+                          color: selected ? Colors.white : const Color(0xFF374151),
+                          fontWeightDelta: selected ? 1 : 0,
+                        ),
+                      ),
+                    ),
                   ),
-                  boxShadow: selected
-                      ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(51), blurRadius: 8, offset: const Offset(0, 2))]
-                      : null,
-                ),
-                child: Text(
-                  f,
-                  style: AppTypography.bodyMedium(context).apply(
-                    color: selected ? Colors.white : const Color(0xFF374151),
-                    fontWeightDelta: selected ? 1 : 0,
-                  ),
-                ),
-              ),
+                );
+              }).toList(),
             ),
-          );
-        }).toList(),
-      ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          height: 38,
+          child: OutlinedButton.icon(
+            onPressed: exportData,
+            icon: const Icon(Icons.download_rounded, size: 16),
+            label: const Text('Export CSV'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF059669),
+              side: const BorderSide(color: Color(0xFF059669)),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -339,9 +413,15 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
     }
 
     return Row(
-      children: cards
-          .map((c) => Expanded(child: Padding(padding: const EdgeInsets.only(right: 12), child: _SummaryCard(config: c))))
-          .toList(),
+      children: cards.asMap().entries.map((e) {
+        final isLast = e.key == cards.length - 1;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: isLast ? 0 : 12),
+            child: _SummaryCard(config: e.value),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -444,6 +524,24 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
               ),
             ),
           ),
+          if (branches.length > 1) ...[
+            SizedBox(height: screenPadding * 0.75),
+            Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              children: List.generate(branches.length, (i) {
+                final color = _branchColors[i % _branchColors.length];
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Text(branches[i], style: const TextStyle(color: _muted, fontSize: 11)),
+                  ],
+                );
+              }),
+            ),
+          ],
         ],
       ),
     );
@@ -463,14 +561,48 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
-            child: Text('Branch Breakdown', style: AppTypography.displayMedium(context)),
+            child: Row(
+              children: [
+                Expanded(child: Text('Branch Breakdown', style: AppTypography.displayMedium(context))),
+                if (data.isNotEmpty)
+                  Text(
+                    '${data.length} branch${data.length != 1 ? 'es' : ''}',
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                  ),
+              ],
+            ),
           ),
           const Divider(height: 1, color: Color(0xFFE5E7EB)),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: _buildDataTable(data),
-          ),
+          data.isEmpty
+              ? _buildEmptyState()
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: _buildDataTable(data),
+                ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: screenPadding * 2),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(Icons.store_outlined, size: 48, color: Colors.grey.shade300),
+            const SizedBox(height: 12),
+            Text(
+              'No branch data for this period',
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Try selecting a different date range',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -504,21 +636,6 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
             headerCell('Net Revenue (RM)'),
           ],
         ),
-        if (data.isEmpty)
-          TableRow(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: Text('No data available', style: AppTypography.bodyMedium(context).apply(color: _muted)),
-              ),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-              const Padding(padding: EdgeInsets.all(16), child: Text('—', style: cellStyle)),
-            ],
-          ),
         for (int i = 0; i < data.length; i++)
           TableRow(
             decoration: BoxDecoration(color: i.isEven ? Colors.white : const Color(0xFFFAFAFA)),
