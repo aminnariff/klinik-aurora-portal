@@ -303,7 +303,7 @@ class AppointmentDetailsView extends StatelessWidget {
           _fieldLabel('Attachment'),
           const SizedBox(height: 6),
           GestureDetector(
-            onTap: () => launchWebUrl(data?.appointmentAttachmentUrl ?? '', webOnlyWindowName: '_blank'),
+            onTap: () => launchWebUrl(data.appointmentAttachmentUrl ?? '', webOnlyWindowName: '_blank'),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
@@ -317,7 +317,7 @@ class AppointmentDetailsView extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      data?.appointmentAttachmentUrl ?? '',
+                      data.appointmentAttachmentUrl ?? '',
                       style: const TextStyle(
                         fontSize: 12,
                         color: secondaryColor,
@@ -407,10 +407,7 @@ class AppointmentDetailsView extends StatelessWidget {
             fullWidth: true,
           ),
         ],
-        if (txn != null) ...[
-          const SizedBox(height: 14),
-          _paymentDetailsCard(txn),
-        ],
+        if (txn != null) ...[const SizedBox(height: 14), _paymentDetailsCard(txn)],
       ],
     );
   }
@@ -423,10 +420,14 @@ class AppointmentDetailsView extends StatelessWidget {
         _PayDetailRow(Icons.credit_card_rounded, 'Card No.', _maskCard(txn.cardInfo!), const Color(0xFF374151)),
       _PayDetailRow(Icons.account_balance_rounded, 'Gateway', txn.gatewayLabel, const Color(0xFF0369A1)),
       _PayDetailRow(Icons.schedule_rounded, 'Settlement', txn.settlementTimeline, const Color(0xFF0891B2)),
-      if (txn.billId != null)
-        _PayDetailRow(Icons.tag_rounded, 'Transaction Ref', txn.billId!, const Color(0xFF374151)),
+      if (txn.billId != null) _PayDetailRow(Icons.tag_rounded, 'Transaction Ref', txn.billId!, const Color(0xFF374151)),
       if (txn.paidAt != null)
-        _PayDetailRow(Icons.check_circle_outline_rounded, 'Paid At', dateConverter(txn.paidAt) ?? txn.paidAt!, const Color(0xFF15803D)),
+        _PayDetailRow(
+          Icons.check_circle_outline_rounded,
+          'Paid At',
+          dateConverter(txn.paidAt) ?? txn.paidAt!,
+          const Color(0xFF15803D),
+        ),
     ];
 
     return Container(
@@ -446,12 +447,17 @@ class AppointmentDetailsView extends StatelessWidget {
               const SizedBox(width: 6),
               const Text(
                 'ONLINE PAYMENT DETAILS',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF6366F1), letterSpacing: 0.8),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF6366F1),
+                  letterSpacing: 0.8,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          ...rows.map((r) => _payDetailRowWidget(r)).toList(),
+          ...rows.map((r) => _payDetailRowWidget(r)),
         ],
       ),
     );

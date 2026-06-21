@@ -264,8 +264,9 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
     if (!await showConfirmDialog(
       context,
       'Are you sure you want to ${widget.serviceBranchAvailableDatetimeId == null ? 'create' : 'update'} the available time slots?',
-    ))
+    )) {
       return;
+    }
     showLoading();
     final updatedSlots = filterPastMonths(_getAllDateTimeValues());
     final result = widget.serviceBranchAvailableDatetimeId == null
@@ -447,8 +448,9 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                                           icon: Icons.delete_sweep_rounded,
                                           color: Colors.redAccent,
                                           onTap: () async {
-                                            if (await showConfirmDialog(context, 'Remove this slot?'))
+                                            if (await showConfirmDialog(context, 'Remove this slot?')) {
                                               setState(() => timeSlots.removeAt(index));
+                                            }
                                           },
                                         ),
                                       ],
@@ -843,10 +845,11 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
       });
     }
     final sortedDates = grouped.keys.toList()..sort();
-    if (sortedDates.isEmpty)
+    if (sortedDates.isEmpty) {
       return Center(
         child: Text('No dates scheduled', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
       );
+    }
     return ListView.builder(
       itemCount: sortedDates.length,
       itemBuilder: (context, i) {
@@ -902,10 +905,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
 
   Future<void> _deleteEntireDate(String dateStr) async {
     final readableDate = DateFormat('EEE, d MMM').format(DateTime.parse(dateStr));
-    final confirmed = await showConfirmDialog(
-      context,
-      'Remove all slots for $readableDate?',
-    );
+    final confirmed = await showConfirmDialog(context, 'Remove all slots for $readableDate?');
     if (!confirmed) return;
 
     setState(() {

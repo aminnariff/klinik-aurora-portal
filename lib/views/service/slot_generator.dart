@@ -634,10 +634,11 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                             Expanded(
                               child: _masterTimeField('Start', masterStart, (v) {
                                 setState(() {
-                                  if (isWeekdayMasterMode)
+                                  if (isWeekdayMasterMode) {
                                     weekdayMasterStart = v;
-                                  else
+                                  } else {
                                     weekendMasterStart = v;
+                                  }
                                 });
                               }),
                             ),
@@ -645,10 +646,11 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                             Expanded(
                               child: _masterTimeField('End', masterEnd, (v) {
                                 setState(() {
-                                  if (isWeekdayMasterMode)
+                                  if (isWeekdayMasterMode) {
                                     weekdayMasterEnd = v;
-                                  else
+                                  } else {
                                     weekendMasterEnd = v;
+                                  }
                                 });
                               }),
                             ),
