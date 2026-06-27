@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Appointment System — Meeting Guide</title>
+<style>
+/* ── TOKENS ── */
+:root {
+  --ink: #0C1C2C;
+  --ink-mid: #2A4560;
+  --ink-muted: #5C7A96;
+  --navy: #0C1C2C;
+  --navy-card: #152A40;
+  --navy-border: #1F3D5A;
+  --navy-deep: #091520;
+  --blue: #2D6FA8;
+  --blue-l: #5B9FD4;
+  --teal: #4DA8A8;
+  --amber: #E8923A;
+  --surface: #F0F3F7;
+  --surface-b: #E2E9F0;
+  --white: #FAFCFE;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLL PROGRESS BAR ── */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  z-index: 1000; transition: width 0.1s linear;
+}
+
+/* ── PAGE LOAD KEYFRAMES ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes pulseRing {
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,146,58,0); }
+  50%     { box-shadow: 0 0 0 6px rgba(232,146,58,0.12); }
+}
+
+/* ── HEADER ── */
+.hdr {
+  background: var(--navy);
+  padding: 44px 60px 0;
+  animation: fadeUp 0.6s ease both;
+}
+.hdr::after {
+  content: '';
+  display: block;
+  height: 2px;
+  margin-top: 0;
+  background: linear-gradient(90deg, var(--blue), var(--teal), var(--amber), var(--blue));
+  background-size: 200% 100%;
+  animation: shimmer 5s linear infinite;
+}
+.hdr-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 24px; flex-wrap: wrap; margin-bottom: 28px;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.hdr-eye {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--blue-l); margin-bottom: 10px;
+}
+.hdr-title {
+  font-size: 30px; font-weight: 800; color: var(--white);
+  letter-spacing: -0.02em; line-height: 1.15;
+}
+.hdr-meta { display: flex; flex-direction: column; gap: 8px; align-self: flex-end; }
+.meta-row { display: flex; align-items: center; gap: 10px; }
+.meta-label { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #3A6080; width: 56px; flex-shrink: 0; }
+.meta-input {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--navy-border);
+  border-radius: 3px; padding: 5px 10px; color: #C8DCF0; font-size: 12px;
+  outline: none; font-family: inherit; min-width: 160px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.meta-input:focus { border-color: var(--blue-l); background: rgba(91,159,212,0.08); }
+.meta-input::placeholder { color: #2A4A6A; }
+
+/* DECISION COUNTER */
+.counter-pill {
+  background: rgba(232,146,58,0.15); border: 1px solid rgba(232,146,58,0.3);
+  border-radius: 20px; padding: 5px 14px; font-size: 11.5px; font-weight: 600;
+  color: var(--amber); display: flex; align-items: center; gap: 6px;
+  align-self: flex-end; transition: all 0.3s;
+}
+.counter-num { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.counter-pill.complete { background: rgba(77,168,168,0.15); border-color: rgba(77,168,168,0.3); color: var(--teal); }
+
+/* AGENDA STRIP */
+.agenda-strip {
+  display: flex; overflow-x: auto; border-top: 1px solid var(--navy-border);
+  padding-bottom: 0;
+}
+.agenda-strip::-webkit-scrollbar { display: none; }
+.ag-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 18px; border-right: 1px solid var(--navy-border);
+  flex-shrink: 0; text-decoration: none; position: relative;
+  opacity: 0; animation: slideRight 0.4s ease both;
+  transition: background 0.2s;
+}
+.ag-item:last-child { border-right: none; }
+.ag-item:hover { background: rgba(255,255,255,0.05); }
+.ag-item.has-decision::before {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--amber); opacity: 0.5;
+}
+.ag-item:nth-child(1)  { animation-delay: 0.3s; }
+.ag-item:nth-child(2)  { animation-delay: 0.37s; }
+.ag-item:nth-child(3)  { animation-delay: 0.44s; }
+.ag-item:nth-child(4)  { animation-delay: 0.51s; }
+.ag-item:nth-child(5)  { animation-delay: 0.58s; }
+.ag-item:nth-child(6)  { animation-delay: 0.65s; }
+.ag-item:nth-child(7)  { animation-delay: 0.72s; }
+.ag-item:nth-child(8)  { animation-delay: 0.79s; }
+.ag-item:nth-child(9)  { animation-delay: 0.86s; }
+.ag-item:nth-child(10) { animation-delay: 0.93s; }
+.ag-num { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; color: #3A6080; }
+.ag-item.has-decision .ag-num { color: var(--amber); }
+.ag-name { font-size: 12px; font-weight: 600; color: #8AACCC; white-space: nowrap; }
+.ag-item.has-decision .ag-name { color: #C8DCF0; }
+.ag-time { font-size: 10px; color: #3A6080; white-space: nowrap; }
+
+/* ── PAGE ── */
+.page { max-width: 1000px; margin: 0 auto; padding: 36px 36px 80px; }
+
+/* ── BLOCKS ── */
+.block {
+  background: var(--white);
+  border: 1px solid var(--surface-b);
+  border-radius: 10px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.55s ease, transform 0.55s ease, box-shadow 0.25s ease;
+  will-change: opacity, transform;
+}
+.block.visible { opacity: 1; transform: translateY(0); }
+.block:hover { box-shadow: 0 4px 24px rgba(12,28,44,0.08); }
+.block.decision-block { border-color: rgba(232,146,58,0.2); }
+
+.block-hd {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 28px; border-bottom: 1px solid var(--surface-b);
+  transition: background 0.2s;
+}
+.block:hover .block-hd { background: rgba(240,243,247,0.5); }
+.decision-block .block-hd { background: #FFFBF6; }
+.decision-block .block-hd:hover { background: #FEF6EE; }
+
+.step-num {
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--surface-b);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: var(--ink-mid);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.block:hover .step-num { transform: scale(1.08); box-shadow: 0 0 0 4px rgba(45,111,168,0.1); }
+.decision-block .step-num { background: #FEF0E0; border-color: rgba(232,146,58,0.35); color: #A8601A; }
+.decision-block:hover .step-num { box-shadow: 0 0 0 4px rgba(232,146,58,0.12); }
+
+.block-hd-inner { flex: 1; min-width: 0; }
+.block-eye { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue); margin-bottom: 3px; }
+.decision-block .block-eye { color: #C8801A; }
+.block-title { font-size: 15.5px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; line-height: 1.25; }
+.block-duration {
+  flex-shrink: 0; font-size: 11px; font-weight: 600; color: var(--ink-muted);
+  background: var(--surface); padding: 3px 9px; border-radius: 20px;
+}
+
+.block-body { padding: 24px 28px; }
+.block-intro { font-size: 13.5px; color: var(--ink-muted); line-height: 1.7; margin-bottom: 24px; max-width: 680px; }
+
+/* ── CALLOUTS ── */
+.decision {
+  background: #FEF5E8;
+  border: 1px solid rgba(232,146,58,0.3);
+  border-left: 3px solid var(--amber);
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin-top: 18px;
+  transition: box-shadow 0.25s, border-color 0.2s;
+}
+.decision:hover { box-shadow: 0 2px 16px rgba(232,146,58,0.15); border-color: rgba(232,146,58,0.5); }
+.decision + .decision { margin-top: 12px; }
+.decision-label {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 7px; display: flex; align-items: center; gap: 6px;
+}
+.decision-label::before {
+  content: ''; display: block; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--amber); flex-shrink: 0;
+}
+.decision-q { font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; line-height: 1.35; }
+.decision-context { font-size: 12.5px; color: #8A6030; line-height: 1.65; }
+.decision-note-label { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #C8A060; margin-bottom: 5px; margin-top: 12px; }
+.note-input {
+  width: 100%; border: none; border-bottom: 1.5px solid rgba(232,146,58,0.3);
+  background: transparent; padding: 6px 0; font-size: 13px; color: var(--ink);
+  outline: none; font-family: inherit; line-height: 1.5;
+  transition: border-color 0.2s;
+}
+.note-input:focus { border-color: var(--amber); }
+.note-input::placeholder { color: #D4A870; }
+
+.info {
+  background: #EEF5FC; border: 1px solid rgba(45,111,168,0.18);
+  border-left: 3px solid var(--blue); border-radius: 6px;
+  padding: 14px 18px; margin-top: 16px;
+}
+.info-label { font-size: 9px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+.info-text { font-size: 12.5px; color: var(--ink-mid); line-height: 1.7; }
+
+/* ── SVG DIAGRAM ── */
+.diag-wrap {
+  background: var(--navy-deep); border: 1px solid var(--navy-border);
+  border-radius: 8px; padding: 24px 16px 18px; overflow-x: auto; margin-bottom: 20px;
+}
+.diag-wrap svg { display: block; width: 100%; min-width: 620px; height: auto; }
+.diag-line { stroke-dasharray: 300; stroke-dashoffset: 300; }
+.diag-wrap.visible .diag-line { animation: drawLine 0.8s ease forwards; }
+.diag-wrap.visible .diag-line:nth-child(1)  { animation-delay: 0.1s; }
+.diag-wrap.visible .diag-line:nth-child(2)  { animation-delay: 0.2s; }
+.diag-wrap.visible .diag-line:nth-child(3)  { animation-delay: 0.28s; }
+.diag-wrap.visible .diag-line:nth-child(4)  { animation-delay: 0.36s; }
+.diag-wrap.visible .diag-line:nth-child(5)  { animation-delay: 0.44s; }
+.diag-wrap.visible .diag-line:nth-child(6)  { animation-delay: 0.52s; }
+.diag-wrap.visible .diag-line:nth-child(7)  { animation-delay: 0.6s; }
+.diag-wrap.visible .diag-line:nth-child(8)  { animation-delay: 0.68s; }
+.diag-node { opacity: 0; transition: opacity 0.4s ease; }
+.diag-wrap.visible .diag-node { opacity: 1; }
+.diag-wrap.visible .diag-node:nth-child(9)  { transition-delay: 0.7s; }
+.diag-wrap.visible .diag-node:nth-child(10) { transition-delay: 0.78s; }
+.diag-wrap.visible .diag-node:nth-child(11) { transition-delay: 0.86s; }
+.diag-wrap.visible .diag-node:nth-child(12) { transition-delay: 0.94s; }
+.diag-wrap.visible .diag-node:nth-child(13) { transition-delay: 1.0s; }
+.diag-wrap.visible .diag-node:nth-child(14) { transition-delay: 1.06s; }
+.diag-wrap.visible .diag-node:nth-child(15) { transition-delay: 1.12s; }
+.diag-wrap.visible .diag-node:nth-child(16) { transition-delay: 1.18s; }
+
+/* ── ROLE TABLE ── */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--surface-b); border-radius: 6px; }
+.rtbl { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.rtbl thead th {
+  padding: 10px 14px; text-align: left; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  background: var(--surface); color: var(--ink-mid); white-space: nowrap;
+}
+.rtbl tbody td { padding: 11px 14px; border-bottom: 1px solid var(--surface); vertical-align: middle; transition: background 0.15s; }
+.rtbl tbody tr:last-child td { border-bottom: none; }
+.rtbl tbody tr:hover td { background: #EBF1F8; }
+.chip { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.ch-sa { background: #1A3050; color: #5B9FD4; }
+.ch-ba { background: #E2EDF8; color: #1A5A96; }
+.ch-dc { background: #E1F2F2; color: #2A7A7A; }
+.ch-sp { background: #FDF0E3; color: #A8601A; }
+.ch-nu { background: #F5E8EC; color: #9A2535; }
+.sy { color: #3AAA82; font-weight: 700; }
+.sp { color: var(--amber); font-weight: 700; }
+.sn { color: #AABCCC; }
+.sr { font-size: 11px; font-weight: 600; color: var(--blue); }
+
+/* ── FLOW STEPS ── */
+.flow-wrap { overflow-x: auto; }
+.flow-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  min-width: 660px; border: 1px solid var(--surface-b); border-radius: 8px; overflow: hidden;
+}
+.fstep {
+  border-right: 1px solid var(--surface-b); padding: 16px 14px;
+  display: flex; flex-direction: column; gap: 6px; min-height: 148px;
+  background: var(--white); transition: background 0.2s;
+}
+.fstep:hover { background: #F6F9FD; }
+.fstep:last-child { border-right: none; }
+.fstep-n { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted); }
+.fstep-a { font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.3; flex: 1; }
+.fstep-d { font-size: 11px; color: var(--ink-muted); line-height: 1.5; }
+.ftag { display: inline-block; padding: 2px 6px; border-radius: 2px; font-size: 9px; font-weight: 700; align-self: flex-start; }
+.ft-c { background: rgba(77,168,168,0.15); color: var(--teal); }
+.ft-s { background: rgba(45,111,168,0.12); color: var(--blue); }
+.ft-w { background: rgba(201,64,64,0.12); color: #C94040; }
+.ft-n { background: rgba(232,146,58,0.15); color: var(--amber); }
+
+/* ── NOTIFICATION CARDS ── */
+.nf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.nf-card {
+  background: var(--surface); border: 1px solid var(--surface-b); border-radius: 8px;
+  padding: 16px; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.nf-card:hover { border-color: #C8D8E8; box-shadow: 0 2px 12px rgba(45,111,168,0.08); }
+.nf-when { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 5px; }
+.nf-evt { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 10px; line-height: 1.3; }
+.nf-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid var(--surface-b); }
+.nf-who { flex: 0 0 95px; font-size: 12px; font-weight: 600; color: var(--ink-mid); }
+.chl { padding: 2px 6px; border-radius: 2px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.chl-wa { background: rgba(37,211,102,0.15); color: #1A9A50; }
+.chl-em { background: rgba(45,111,168,0.12); color: var(--blue); }
+.chl-ia { background: rgba(77,168,168,0.15); color: var(--teal); }
+.nf-note { font-size: 11px; color: var(--ink-muted); }
+
+/* ── V1 / V2 ── */
+.cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cmp-col { border-radius: 8px; overflow: hidden; border: 1px solid var(--surface-b); }
+.cmp-hd { padding: 13px 18px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; }
+.cmp-hd.v1 { background: #E6F4F1; color: #1C7060; }
+.cmp-hd.v2 { background: #FDF1E4; color: #A05818; }
+.cmp-bdg { padding: 2px 7px; border-radius: 2px; font-size: 11px; font-weight: 800; }
+.cmp-hd.v1 .cmp-bdg { background: var(--teal); color: #0C1C2C; }
+.cmp-hd.v2 .cmp-bdg { background: var(--amber); color: #0C1C2C; }
+.cmp-list { padding: 4px 18px 16px; background: var(--white); }
+.cmp-item { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--surface); font-size: 12.5px; color: var(--ink); line-height: 1.4; }
+.cmp-item:last-child { border-bottom: none; }
+.cmp-dot { flex-shrink: 0; width: 5px; height: 5px; border-radius: 50%; margin-top: 6px; }
+.v1 .cmp-dot { background: var(--teal); }
+.v2 .cmp-dot { background: var(--amber); }
+
+/* ── NEXT STEPS ── */
+.next-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.next-card { background: var(--surface); border: 1px solid var(--surface-b); border-radius: 8px; padding: 18px; }
+.next-who { font-size: 9px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px; }
+.next-card.you .next-who { color: var(--blue); }
+.next-card.them .next-who { color: var(--teal); }
+.next-item { display: flex; gap: 8px; padding: 7px 0; border-top: 1px solid var(--surface-b); font-size: 12.5px; color: var(--ink); line-height: 1.4; }
+.next-item:first-of-type { border-top: none; padding-top: 0; }
+.next-dot { flex-shrink: 0; width: 5px; height: 5px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.you .next-dot { background: var(--blue); }
+.them .next-dot { background: var(--teal); }
+
+/* ── DECISION LOG ── */
+.log-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.log-table thead th {
+  padding: 9px 14px; text-align: left; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  background: #FEF5E8; color: #A8601A;
+  border-bottom: 2px solid rgba(232,146,58,0.2);
+}
+.log-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--surface); vertical-align: top; transition: background 0.15s; }
+.log-table tbody tr:hover td { background: #FEF8F0; }
+.log-table tbody tr:last-child td { border-bottom: none; }
+.log-q { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.log-hint { font-size: 11px; color: var(--ink-muted); }
+.log-num { font-size: 10.5px; font-weight: 800; color: #C89840; background: #FEF0E0; padding: 2px 7px; border-radius: 2px; white-space: nowrap; display: inline-block; }
+.log-input {
+  width: 100%; border: none; border-bottom: 1.5px dashed rgba(232,146,58,0.35);
+  background: transparent; font-size: 13px; color: var(--ink); outline: none;
+  padding: 5px 0; font-family: inherit; transition: border-color 0.2s;
+}
+.log-input:focus { border-bottom-style: solid; border-color: var(--amber); }
+.log-input::placeholder { color: #D4A870; }
+.log-input.filled { border-bottom-style: solid; border-color: var(--teal); color: var(--ink); }
+
+/* ── RULE ── */
+.rule { height: 1px; background: var(--surface-b); margin: 20px 0; }
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  .block, .ag-item, .hdr, .hdr-top { animation: none; opacity: 1; transform: none; }
+  .block { transition: box-shadow 0.2s; }
+  .diag-line { animation: none; stroke-dashoffset: 0; }
+  .diag-node { opacity: 1; transition: none; }
+  .hdr::after { animation: none; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 760px) {
+  .hdr { padding: 32px 24px 0; }
+  .hdr-top { flex-direction: column; }
+  .page { padding: 20px 16px 60px; }
+  .block-body { padding: 18px 20px; }
+  .nf-grid, .cmp-grid, .next-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-top">
+    <div>
+      <p class="hdr-eye">Meeting Guide · Requirements Gathering</p>
+      <h1 class="hdr-title">Hospital Appointment System<br>— Requirements Meeting</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-self:flex-end">
+      <div class="hdr-meta">
+        <div class="meta-row">
+          <span class="meta-label">Date</span>
+          <input class="meta-input" placeholder="e.g. 3 July 2026">
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Present</span>
+          <input class="meta-input" placeholder="Names / roles">
+        </div>
+      </div>
+      <div class="counter-pill" id="counter-pill">
+        <span>Decisions captured</span>
+        <span class="counter-num" id="counter-num">0</span>
+        <span>/ 16</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="agenda-strip">
+    <a class="ag-item has-decision" href="#s1"><span class="ag-num">01</span><span class="ag-name">Context</span><span class="ag-time">5 min</span></a>
+    <a class="ag-item has-decision" href="#s2"><span class="ag-num">02</span><span class="ag-name">Structure</span><span class="ag-time">10 min</span></a>
+    <a class="ag-item has-decision" href="#s3"><span class="ag-num">03</span><span class="ag-name">Roles &amp; Access</span><span class="ag-time">10 min</span></a>
+    <a class="ag-item has-decision" href="#s4"><span class="ag-num">04</span><span class="ag-name">Booking Flow</span><span class="ag-time">10 min</span></a>
+    <a class="ag-item has-decision" href="#s5"><span class="ag-num">05</span><span class="ag-name">Schedules</span><span class="ag-time">10 min</span></a>
+    <a class="ag-item" href="#s6"><span class="ag-num">06</span><span class="ag-name">Notifications</span><span class="ag-time">5 min</span></a>
+    <a class="ag-item has-decision" href="#s7"><span class="ag-num">07</span><span class="ag-name">Patients</span><span class="ag-time">5 min</span></a>
+    <a class="ag-item has-decision" href="#s8"><span class="ag-num">08</span><span class="ag-name">Queue Display</span><span class="ag-time">5 min</span></a>
+    <a class="ag-item" href="#s9"><span class="ag-num">09</span><span class="ag-name">V1 Sign-off</span><span class="ag-time">5 min</span></a>
+    <a class="ag-item" href="#s10"><span class="ag-num">10</span><span class="ag-name">Next Steps</span><span class="ag-time">5 min</span></a>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- 01 -->
+  <div class="block" id="s1">
+    <div class="block-hd">
+      <div class="step-num">1</div>
+      <div class="block-hd-inner"><p class="block-eye">Opening</p><h2 class="block-title">What we're building — and what's already done</h2></div>
+      <span class="block-duration">5 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">We already have a working appointment system. This project extends it for a hospital context — the main additions are departments, doctor-owned scheduling, role-based staff access, and automated notifications. Core infrastructure (patient records, payments, WhatsApp, email) is already built and reusable.</p>
+      <div class="info">
+        <p class="info-label">Inform — no decision needed</p>
+        <p class="info-text"><strong>V1 scope:</strong> Coordinator creates and manages all appointments on behalf of patients. Patients call or WhatsApp the clinic — no patient-facing self-booking in V1.<br><br><strong>V2 (future):</strong> The system is designed so patients can eventually self-book via mobile app — same backend, no rework needed when the time comes.</p>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Warm-up question</p>
+        <p class="decision-q">Walk me through a typical appointment today — from patient contact to appointment confirmed.</p>
+        <p class="decision-context">Helps catch any workflow assumptions we may have missed. No wrong answer.</p>
+        <p class="decision-note-label">Notes</p>
+        <input class="note-input log-linked" data-log="0" placeholder="Their current process…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="block decision-block" id="s2">
+    <div class="block-hd">
+      <div class="step-num">2</div>
+      <div class="block-hd-inner"><p class="block-eye">Data Model</p><h2 class="block-title">How the system is structured — Department is the new layer</h2></div>
+      <span class="block-duration">10 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">The key structural change is inserting a Department layer between Branch and everything else. Each department owns its own doctors, services, and staff — this is what makes access isolation possible.</p>
+
+      <div class="diag-wrap">
+        <svg viewBox="0 0 880 462" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:600px;height:auto">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1,1.5 L8.5,5 L1,8.5" fill="none" stroke="#1F3D5A" stroke-width="1.5" stroke-linejoin="round"/></marker>
+            <marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1,1.5 L8.5,5 L1,8.5" fill="none" stroke="#2D6FA8" stroke-width="1.5" stroke-linejoin="round"/></marker>
+            <marker id="at" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1,1.5 L8.5,5 L1,8.5" fill="none" stroke="#4DA8A8" stroke-width="1.5" stroke-linejoin="round"/></marker>
+          </defs>
+          <!-- Lines (animated draw) -->
+          <line class="diag-line" x1="440" y1="78" x2="440" y2="126" stroke="#1F3D5A" stroke-width="1.5" marker-end="url(#ah)"/>
+          <path class="diag-line" d="M390,172 C340,204 225,228 185,248" fill="none" stroke="#1F3D5A" stroke-width="1.5" marker-end="url(#ah)"/>
+          <line class="diag-line" x1="440" y1="172" x2="440" y2="248" stroke="#1F3D5A" stroke-width="1.5" marker-end="url(#ah)"/>
+          <path class="diag-line" d="M490,172 C540,204 655,228 695,248" fill="none" stroke="#1F3D5A" stroke-width="1.5" marker-end="url(#ah)"/>
+          <line class="diag-line" x1="185" y1="292" x2="185" y2="364" stroke="#4DA8A8" stroke-width="1.5" marker-end="url(#at)"/>
+          <line class="diag-line" x1="440" y1="292" x2="440" y2="364" stroke="#1F3D5A" stroke-width="1.5" marker-end="url(#ah)"/>
+          <path class="diag-line" d="M272,276 C318,312 368,344 370,364" fill="none" stroke="#2D6FA8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ab)"/>
+          <line class="diag-line" x1="536" y1="386" x2="608" y2="386" stroke="#2D6FA8" stroke-width="1.5" marker-end="url(#ab)"/>
+          <!-- Nodes (fade in) -->
+          <g class="diag-node"><rect x="346" y="34" width="188" height="44" rx="4" fill="#152A40" stroke="#2D6FA8" stroke-width="1.5"/><text x="440" y="52" fill="#5B9FD4" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">BRANCH</text><text x="440" y="68" fill="#C8DCF0" font-size="13" font-weight="600" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Hospital Branch</text></g>
+          <g class="diag-node"><rect x="346" y="126" width="188" height="46" rx="4" fill="#1A3A50" stroke="#2D6FA8" stroke-width="2"/><text x="440" y="144" fill="#5B9FD4" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">DEPARTMENT — NEW</text><text x="440" y="161" fill="#EAF2FA" font-size="13" font-weight="700" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Ortho · Cardio · Gynae…</text></g>
+          <g class="diag-node"><rect x="91" y="248" width="188" height="44" rx="4" fill="#0E2030" stroke="#4DA8A8" stroke-width="1.5"/><text x="185" y="266" fill="#4DA8A8" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">DOCTORS</text><text x="185" y="282" fill="#C8DCF0" font-size="13" font-weight="600" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Specialist Roster</text></g>
+          <g class="diag-node"><rect x="346" y="248" width="188" height="44" rx="4" fill="#0E2030" stroke="#1F3D5A" stroke-width="1.5"/><text x="440" y="266" fill="#4A6A80" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">SERVICES</text><text x="440" y="282" fill="#C8DCF0" font-size="13" font-weight="600" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Dept-Specific</text></g>
+          <g class="diag-node"><rect x="601" y="248" width="188" height="44" rx="4" fill="#0E2030" stroke="#1F3D5A" stroke-width="1.5"/><text x="695" y="266" fill="#4A6A80" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">STAFF</text><text x="695" y="282" fill="#C8DCF0" font-size="13" font-weight="600" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Nurses · Coordinators</text></g>
+          <g class="diag-node"><rect x="91" y="364" width="188" height="44" rx="4" fill="#091520" stroke="#4DA8A8" stroke-width="1.5"/><text x="185" y="382" fill="#4DA8A8" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">DOCTOR SCHEDULE</text><text x="185" y="398" fill="#C8DCF0" font-size="13" font-weight="600" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Availability Slots</text></g>
+          <g class="diag-node"><rect x="346" y="364" width="188" height="44" rx="4" fill="#152A40" stroke="#2D6FA8" stroke-width="2.5"/><text x="440" y="382" fill="#5B9FD4" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">APPOINTMENT</text><text x="440" y="398" fill="#EAF2FA" font-size="13" font-weight="700" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Core Transaction</text></g>
+          <g class="diag-node"><rect x="601" y="364" width="188" height="44" rx="4" fill="#091520" stroke="#E8923A" stroke-width="1.5"/><text x="695" y="382" fill="#E8923A" font-size="7.5" font-weight="700" letter-spacing="2.2" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">PATIENT / NRIC</text><text x="695" y="398" fill="#C8DCF0" font-size="13" font-weight="600" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">Unique Identifier</text></g>
+          <!-- Legend -->
+          <line x1="44" y1="444" x2="76" y2="444" stroke="#1F3D5A" stroke-width="1.5" marker-end="url(#ah)"/>
+          <text x="82" y="448" fill="#4A6A80" font-size="10.5" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">owns / contains</text>
+          <line x1="224" y1="444" x2="256" y2="444" stroke="#2D6FA8" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ab)"/>
+          <text x="262" y="448" fill="#4A6A80" font-size="10.5" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">assigns / references</text>
+          <line x1="432" y1="444" x2="464" y2="444" stroke="#4DA8A8" stroke-width="1.5" marker-end="url(#at)"/>
+          <text x="470" y="448" fill="#4A6A80" font-size="10.5" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif">doctor-specific</text>
+        </svg>
+      </div>
+
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Are departments fixed units, or specialty-based?</p>
+        <p class="decision-context"><strong>Fixed departments</strong> (e.g. Orthopaedics, Cardiology) — each doctor belongs to one. Simpler. <strong>Specialty-based</strong> — a doctor has a specialty and can serve multiple departments. More flexible, more complex.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="1" placeholder="Fixed / Specialty-based — reason…">
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">What are all the department names in scope for this system?</p>
+        <p class="decision-context">List every department that will be using the portal. Needed to set up initial data.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="2" placeholder="e.g. Orthopaedics, Cardiology, Gynaecology, General…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="block decision-block" id="s3">
+    <div class="block-hd">
+      <div class="step-num">3</div>
+      <div class="block-hd-inner"><p class="block-eye">Access Control</p><h2 class="block-title">Who can access what — confirm this matches your org</h2></div>
+      <span class="block-duration">10 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">Five proposed roles. Walk through the table with them and confirm each row. The Specialist row is most important — it determines whether they need a portal login or just receive notifications.</p>
+      <div class="tbl-wrap" style="margin-bottom:20px">
+        <table class="rtbl">
+          <thead><tr><th>Role</th><th>Scope</th><th>Appointments</th><th>Doctors &amp; Schedules</th><th>Services</th><th>Other Depts</th><th>Queue</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip ch-sa">Superadmin</span></td><td style="font-size:11.5px;color:#5C7A96">All branches</td><td><span class="sy">✓</span> Full CRUD</td><td><span class="sy">✓</span> Full CRUD</td><td><span class="sy">✓</span> Full CRUD</td><td><span class="sy">✓</span> All visible</td><td><span class="sy">✓</span></td></tr>
+            <tr><td><span class="chip ch-ba">Branch Admin</span></td><td style="font-size:11.5px;color:#5C7A96">One branch, all depts</td><td><span class="sy">✓</span> Full CRUD</td><td><span class="sy">✓</span> Full CRUD</td><td><span class="sy">✓</span> Full CRUD</td><td><span class="sy">✓</span> Their branch</td><td><span class="sy">✓</span></td></tr>
+            <tr><td><span class="chip ch-dc">Dept Coordinator</span></td><td style="font-size:11.5px;color:#5C7A96">One department</td><td><span class="sy">✓</span> Their dept</td><td><span class="sp">~</span> Block dates only</td><td><span class="sr">Read</span></td><td><span class="sn">—</span> Hidden</td><td><span class="sy">✓</span></td></tr>
+            <tr style="background:#FFFBF5"><td><span class="chip ch-sp">Specialist</span></td><td style="font-size:11.5px;color:#5C7A96">Own schedule only</td><td><span class="sr">Read</span> Own only</td><td><span class="sn">—</span></td><td><span class="sn">—</span></td><td><span class="sn">—</span> Hidden</td><td><span class="sy">✓</span> Own queue</td></tr>
+            <tr><td><span class="chip ch-nu">Nurse / Support</span></td><td style="font-size:11.5px;color:#5C7A96">One department</td><td><span class="sr">Read</span> + check-in</td><td><span class="sn">—</span></td><td><span class="sn">—</span></td><td><span class="sn">—</span> Hidden</td><td><span class="sy">✓</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Does the Specialist need to log in to the portal, or just receive notifications?</p>
+        <p class="decision-context">If specialists only need to see their daily queue, a read-only shareable link works — no login needed. If they need to mark appointments completed or no-show themselves, they need an account.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="3" placeholder="Read-only link / Full portal login…">
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Is the Nurse / Support role needed, or does the Coordinator handle check-in too?</p>
+        <p class="decision-context">Some clinics have one person who books and manages, and a separate person at the front desk who checks patients in. Others have just one role doing both.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="4" placeholder="Separate nurse role / Coordinator handles check-in too…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="block decision-block" id="s4">
+    <div class="block-hd">
+      <div class="step-num">4</div>
+      <div class="block-hd-inner"><p class="block-eye">Process</p><h2 class="block-title">How a booking happens — confirm each step</h2></div>
+      <span class="block-duration">10 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">This is the proposed booking flow. Walk through it together and flag anything that doesn't match how they expect it to work in practice.</p>
+      <div class="flow-wrap" style="margin-bottom:20px">
+        <div class="flow-grid">
+          <div class="fstep"><span class="fstep-n">01</span><span class="fstep-a">Patient calls or WhatsApps clinic</span><span class="fstep-d">Coordinator receives and asks for NRIC.</span><span class="ftag ft-c">Coordinator</span></div>
+          <div class="fstep"><span class="fstep-n">02</span><span class="fstep-a">Look up patient by NRIC</span><span class="fstep-d">Existing record found, or new profile created on the spot.</span><span class="ftag ft-s">System</span></div>
+          <div class="fstep"><span class="fstep-n">03</span><span class="fstep-a">Select department → service</span><span class="fstep-d">Coordinator sees only their dept's services.</span><span class="ftag ft-c">Coordinator</span></div>
+          <div class="fstep"><span class="fstep-n">04</span><span class="fstep-a">Select doctor + available slot</span><span class="fstep-d">Doctor's calendar shown. Slot locked immediately on selection.</span><span class="ftag ft-w">Slot Lock</span></div>
+          <div class="fstep"><span class="fstep-n">05</span><span class="fstep-a">Appointment confirmed</span><span class="fstep-d">Record created, slot marked unavailable. Status: Scheduled.</span><span class="ftag ft-s">System</span></div>
+          <div class="fstep"><span class="fstep-n">06</span><span class="fstep-a">Notifications fire</span><span class="fstep-d">Doctor and patient both notified automatically.</span><span class="ftag ft-n">Notify</span></div>
+        </div>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Confirm or correct</p>
+        <p class="decision-q">Does this flow match how coordinators will actually use it? Any steps missing or out of order?</p>
+        <p class="decision-context">For example: does payment happen at booking time? Is there an approval step? Does the patient need to confirm a price first?</p>
+        <p class="decision-note-label">Notes / corrections</p>
+        <input class="note-input log-linked" data-log="5" placeholder="Missing steps, payment timing, approval requirements…">
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Can a coordinator book for any doctor in their department, or only doctors assigned to them?</p>
+        <p class="decision-context">If there's a 1-to-1 or 1-to-few relationship between coordinator and doctor, we can restrict booking scope accordingly.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="6" placeholder="Any doctor in dept / Assigned doctors only…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="block decision-block" id="s5">
+    <div class="block-hd">
+      <div class="step-num">5</div>
+      <div class="block-hd-inner"><p class="block-eye">Scheduling</p><h2 class="block-title">How doctor availability is managed</h2></div>
+      <span class="block-duration">10 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">The coordinator manages each doctor's availability schedule. The system then presents open slots when booking. Patients can only be booked into times the doctor is marked as available.</p>
+      <div class="info">
+        <p class="info-label">How it works</p>
+        <p class="info-text"><strong>Weekly schedule</strong> — Coordinator sets each doctor's regular hours (e.g. Dr. Ahmad: Mon–Wed 9am–5pm, 30-min slots).<br><br><strong>Exceptions</strong> — Coordinator blocks off individual dates for leave, conferences, or holidays.<br><br><strong>Live availability</strong> — When booking, system shows only open, unbooked slots for the selected doctor.</p>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">How long is each appointment slot — fixed duration, or different per service?</p>
+        <p class="decision-context">Simplest: every slot for a doctor is the same duration (e.g. 30 min) — easy to set up. Alternative: each service type has its own duration (consultation = 20 min, procedure = 60 min). Which fits better?</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="7" placeholder="Fixed ___ min / Variable per service…">
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Do doctors have the same schedule every week, or does it change often?</p>
+        <p class="decision-context">Consistent weekly schedule = set once, only update for exceptions. Frequently changing = coordinators need to adjust the schedule regularly.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="8" placeholder="Consistent weekly / Changes frequently…">
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">How far in advance can patients book — 2 weeks, 1 month, 3 months?</p>
+        <p class="decision-context">This controls how far out coordinators need to have schedules set up and ready.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="9" placeholder="2 weeks / 1 month / 3 months…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="block" id="s6">
+    <div class="block-hd">
+      <div class="step-num">6</div>
+      <div class="block-hd-inner"><p class="block-eye">Communication</p><h2 class="block-title">Notifications &amp; reminders — confirm channels and timing</h2></div>
+      <span class="block-duration">5 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">Proposed notifications for each trigger event. Infrastructure is already built — we need to confirm channels and whether timing feels right to them.</p>
+      <div class="nf-grid" style="margin-bottom:20px">
+        <div class="nf-card">
+          <p class="nf-when">When appointment is booked</p>
+          <p class="nf-evt">New appointment confirmed</p>
+          <div class="nf-row"><span class="nf-who">Doctor</span><span class="chl chl-wa">WhatsApp</span><span class="nf-note">or</span><span class="chl chl-em">Email</span></div>
+          <div class="nf-row"><span class="nf-who">Patient</span><span class="chl chl-wa">WhatsApp</span><span class="nf-note">confirmation</span></div>
+        </div>
+        <div class="nf-card">
+          <p class="nf-when">When cancelled or rescheduled</p>
+          <p class="nf-evt">Appointment changed</p>
+          <div class="nf-row"><span class="nf-who">Doctor</span><span class="chl chl-wa">WhatsApp</span><span class="nf-note">update</span></div>
+          <div class="nf-row"><span class="nf-who">Patient</span><span class="chl chl-wa">WhatsApp</span><span class="nf-note">with reason</span></div>
+        </div>
+        <div class="nf-card">
+          <p class="nf-when">Automated — evening before</p>
+          <p class="nf-evt">Day-before reminder</p>
+          <div class="nf-row"><span class="nf-who">Patient</span><span class="chl chl-wa">WhatsApp</span><span class="nf-note">automated</span></div>
+        </div>
+        <div class="nf-card">
+          <p class="nf-when">When patient arrives</p>
+          <p class="nf-evt">Patient checked in</p>
+          <div class="nf-row"><span class="nf-who">Doctor</span><span class="chl chl-ia">In-app queue</span><span class="nf-note">live</span></div>
+          <div class="nf-row"><span class="nf-who">Doctor (opt.)</span><span class="chl chl-wa">WhatsApp</span><span class="nf-note">if preferred</span></div>
+        </div>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Confirm</p>
+        <p class="decision-q">Does each doctor have a WhatsApp number, or do they prefer email for notifications?</p>
+        <p class="decision-context">We'll store a preferred channel per doctor. If most prefer WhatsApp, that's the default with email as fallback.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="10" placeholder="Mostly WhatsApp / Email / Per doctor preference…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="block decision-block" id="s7">
+    <div class="block-hd">
+      <div class="step-num">7</div>
+      <div class="block-hd-inner"><p class="block-eye">Patient Records</p><h2 class="block-title">New patients — what information do you need at registration?</h2></div>
+      <span class="block-duration">5 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">Patients are identified by their NRIC — each record is unique to the individual, no representative booking. When a new patient calls, the coordinator creates their profile before confirming the appointment.</p>
+      <div class="info">
+        <p class="info-label">Already in the system</p>
+        <p class="info-text">Patient profile stores: NRIC, full name, phone number, email, date of birth, address, and medical card info. Need to confirm which fields are <strong>required to proceed with booking</strong> vs. optional to fill in later.</p>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Minimum required fields before an appointment can be confirmed?</p>
+        <p class="decision-context">Proposal: NRIC + Full name + Phone is enough. Everything else (email, address, DOB) can be added later. Does this work, or are there fields you must have upfront?</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="11" placeholder="Minimum fields required…">
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Any medical information needed at registration (allergies, conditions, referring doctor)?</p>
+        <p class="decision-context">Some hospitals attach basic medical notes to the patient profile at registration. Others keep this in a separate clinical system. Does it belong here?</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="12" placeholder="Yes (which fields) / No (separate system)…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="block decision-block" id="s8">
+    <div class="block-hd">
+      <div class="step-num">8</div>
+      <div class="block-hd-inner"><p class="block-eye">Queue Management</p><h2 class="block-title">The live queue — how it looks and where it's displayed</h2></div>
+      <span class="block-duration">5 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">Each doctor has a live queue for today's appointments. Status moves: Scheduled → Checked In → In Consultation → Done / No-Show. Coordinator or nurse marks check-in when the patient arrives.</p>
+      <div class="info">
+        <p class="info-label">What the queue shows</p>
+        <p class="info-text"><strong>Now serving</strong> — patient currently in consultation<br><strong>Next up</strong> — next checked-in patient<br><strong>Upcoming</strong> — rest of today's schedule with times<br><strong>Summary</strong> — how many waiting, how many done</p>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Where is the queue displayed — wall screen, front-desk tablet, or doctor's own device?</p>
+        <p class="decision-context">Shared screens or multiple simultaneous devices need real-time WebSocket updates. A single coordinator's screen can use simple 30-second polling — much simpler to build.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="13" placeholder="Wall screen / Front desk tablet / Doctor device / Multiple…">
+      </div>
+      <div class="decision">
+        <p class="decision-label">Decision needed</p>
+        <p class="decision-q">Who marks a patient as checked in — the coordinator, or the specialist?</p>
+        <p class="decision-context">In most clinics, the receptionist/coordinator marks arrival. If specialists also update status (e.g. mark "in consultation" when they start), they need access to do so.</p>
+        <p class="decision-note-label">Their answer</p>
+        <input class="note-input log-linked" data-log="14" placeholder="Coordinator / Specialist / Both…">
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="block" id="s9">
+    <div class="block-hd">
+      <div class="step-num">9</div>
+      <div class="block-hd-inner"><p class="block-eye">Scope Confirmation</p><h2 class="block-title">V1 vs V2 — confirm what's in for the first release</h2></div>
+      <span class="block-duration">5 min</span>
+    </div>
+    <div class="block-body">
+      <p class="block-intro">Walk through this with them to confirm V1 scope and set clear expectations on what comes later.</p>
+      <div class="cmp-grid">
+        <div class="cmp-col">
+          <div class="cmp-hd v1"><span class="cmp-bdg">V1</span> First Release</div>
+          <div class="cmp-list v1">
+            <div class="cmp-item"><span class="cmp-dot"></span>Coordinator creates all appointments on behalf of patients</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Patient contacts clinic by phone or WhatsApp</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Coordinator manages doctor availability and schedule blocks</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>NRIC patient lookup, new profile created on first visit</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Appointment CRUD with department-scoped access per role</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Doctor notified via WhatsApp or email on new booking</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Patient receives WhatsApp confirmation + day-before reminder</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Live queue: checked-in → in consultation → done / no-show</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Superadmin: full CRUD across all departments and branches</div>
+          </div>
+        </div>
+        <div class="cmp-col">
+          <div class="cmp-hd v2"><span class="cmp-bdg">V2</span> Future Release</div>
+          <div class="cmp-list v2">
+            <div class="cmp-item"><span class="cmp-dot"></span>Patient self-books via mobile app (same API, no rework)</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Patient self-registers with NRIC, no coordinator needed</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Cancellation and rescheduling self-service for patients</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Appointment history in patient mobile app</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Patient-facing real-time slot availability</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Waitlist management for fully-booked slots</div>
+            <div class="cmp-item"><span class="cmp-dot"></span>Analytics and reports per department</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="block" id="s10">
+    <div class="block-hd">
+      <div class="step-num">10</div>
+      <div class="block-hd-inner"><p class="block-eye">Closing</p><h2 class="block-title">Next steps after this meeting</h2></div>
+      <span class="block-duration">5 min</span>
+    </div>
+    <div class="block-body">
+      <div class="next-grid" style="margin-bottom:20px">
+        <div class="next-card you">
+          <p class="next-who">You (developer)</p>
+          <div class="next-item"><span class="next-dot"></span>Finalise entity model based on dept structure decision</div>
+          <div class="next-item"><span class="next-dot"></span>Write database migration plan (new Department table + FK changes)</div>
+          <div class="next-item"><span class="next-dot"></span>Design new API endpoints (doctor schedule, slot availability, dept-filtered queries)</div>
+          <div class="next-item"><span class="next-dot"></span>Share updated scope doc and timeline estimate</div>
+        </div>
+        <div class="next-card them">
+          <p class="next-who">Hospital team</p>
+          <div class="next-item"><span class="next-dot"></span>Confirm final list of departments and their names</div>
+          <div class="next-item"><span class="next-dot"></span>Provide doctor roster per department with contact details</div>
+          <div class="next-item"><span class="next-dot"></span>Confirm staff roles — who is coordinator, specialist, nurse per dept</div>
+          <div class="next-item"><span class="next-dot"></span>Share any existing services list to pre-load per department</div>
+        </div>
+      </div>
+      <div class="decision">
+        <p class="decision-label">Before you leave</p>
+        <p class="decision-q">Any requirements not covered today that we should add to the list?</p>
+        <p class="decision-context">Open floor — anything they expected to discuss but wasn't covered, or edge cases from their daily workflow.</p>
+        <p class="decision-note-label">Notes</p>
+        <input class="note-input log-linked" data-log="15" placeholder="Additional requirements, edge cases, concerns…">
+      </div>
+    </div>
+  </div>
+
+  <!-- DECISION LOG -->
+  <div class="block" style="border-color:rgba(232,146,58,0.3)">
+    <div class="block-hd" style="background:#FEF5E8;border-bottom-color:rgba(232,146,58,0.2)">
+      <div class="step-num" style="background:#FEE8C8;border-color:rgba(232,146,58,0.35);color:#A8601A">D</div>
+      <div class="block-hd-inner">
+        <p class="block-eye" style="color:#C8801A">Summary</p>
+        <h2 class="block-title">Decision Log — answers captured here automatically</h2>
+      </div>
+    </div>
+    <div class="block-body">
+      <p class="block-intro" style="margin-bottom:20px">Everything you type in the decision fields above mirrors here. A quick reference to review at the end of the meeting or share afterwards.</p>
+      <div class="tbl-wrap">
+        <table class="log-table">
+          <thead><tr><th style="width:36px">#</th><th style="width:200px">Question</th><th>Answer</th></tr></thead>
+          <tbody id="log-tbody">
+            <tr><td><span class="log-num">D1</span></td><td><p class="log-q">Current booking process</p><p class="log-hint">Warm-up</p></td><td><input class="log-input" data-log-target="0" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D2</span></td><td><p class="log-q">Department model</p><p class="log-hint">Fixed or specialty-based?</p></td><td><input class="log-input" data-log-target="1" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D3</span></td><td><p class="log-q">Department names</p><p class="log-hint">All depts in scope</p></td><td><input class="log-input" data-log-target="2" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D4</span></td><td><p class="log-q">Specialist portal access</p><p class="log-hint">Login or read-only link?</p></td><td><input class="log-input" data-log-target="3" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D5</span></td><td><p class="log-q">Nurse role</p><p class="log-hint">Separate or combined?</p></td><td><input class="log-input" data-log-target="4" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D6</span></td><td><p class="log-q">Booking flow corrections</p><p class="log-hint">Any changes to the 6 steps?</p></td><td><input class="log-input" data-log-target="5" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D7</span></td><td><p class="log-q">Coordinator booking scope</p><p class="log-hint">Any doctor or assigned only?</p></td><td><input class="log-input" data-log-target="6" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D8</span></td><td><p class="log-q">Slot duration</p><p class="log-hint">Fixed or per service?</p></td><td><input class="log-input" data-log-target="7" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D9</span></td><td><p class="log-q">Schedule consistency</p><p class="log-hint">Same weekly or changes?</p></td><td><input class="log-input" data-log-target="8" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D10</span></td><td><p class="log-q">Booking window</p><p class="log-hint">How far in advance?</p></td><td><input class="log-input" data-log-target="9" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D11</span></td><td><p class="log-q">Doctor notification channel</p><p class="log-hint">WhatsApp or email?</p></td><td><input class="log-input" data-log-target="10" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D12</span></td><td><p class="log-q">Patient minimum fields</p><p class="log-hint">Required at registration</p></td><td><input class="log-input" data-log-target="11" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D13</span></td><td><p class="log-q">Medical info at registration</p><p class="log-hint">Needed here or separate?</p></td><td><input class="log-input" data-log-target="12" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D14</span></td><td><p class="log-q">Queue display location</p><p class="log-hint">Wall / tablet / device?</p></td><td><input class="log-input" data-log-target="13" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D15</span></td><td><p class="log-q">Check-in owner</p><p class="log-hint">Coordinator or specialist?</p></td><td><input class="log-input" data-log-target="14" placeholder="—"></td></tr>
+            <tr><td><span class="log-num">D16</span></td><td><p class="log-q">Additional requirements</p><p class="log-hint">Anything else?</p></td><td><input class="log-input" data-log-target="15" placeholder="—"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── SCROLL PROGRESS BAR ──
+const bar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+}, { passive: true });
+
+// ── BLOCK REVEAL ON SCROLL ──
+const blockObs = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.transitionDelay = '0s';
+      entry.target.classList.add('visible');
+      blockObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.block').forEach(el => blockObs.observe(el));
+
+// ── SVG DIAGRAM REVEAL ──
+const diagObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      diagObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.diag-wrap').forEach(el => {
+  // Set stroke-dasharray from actual path length where possible
+  el.querySelectorAll('line, path').forEach(path => {
+    try {
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = len;
+      path.style.strokeDashoffset = len;
+    } catch(e) {
+      path.style.strokeDasharray = 300;
+      path.style.strokeDashoffset = 300;
+    }
+  });
+  diagObs.observe(el);
+});
+
+// ── DECISION COUNTER + LOG SYNC ──
+const noteInputs = document.querySelectorAll('.note-input.log-linked');
+const logInputs  = document.querySelectorAll('.log-input[data-log-target]');
+const counterNum  = document.getElementById('counter-num');
+const counterPill = document.getElementById('counter-pill');
+
+function syncLog(index, value) {
+  logInputs.forEach(li => {
+    if (parseInt(li.dataset.logTarget) === index) {
+      li.value = value;
+      li.classList.toggle('filled', value.trim().length > 0);
+    }
+  });
+}
+
+function updateCounter() {
+  let filled = 0;
+  noteInputs.forEach(inp => { if (inp.value.trim()) filled++; });
+  counterNum.textContent = filled;
+  counterPill.classList.toggle('complete', filled === noteInputs.length);
+}
+
+noteInputs.forEach(inp => {
+  const idx = parseInt(inp.dataset.log);
+  inp.addEventListener('input', () => {
+    syncLog(idx, inp.value);
+    updateCounter();
+  });
+});
+
+// Allow editing from log too
+logInputs.forEach(li => {
+  const idx = parseInt(li.dataset.logTarget);
+  li.addEventListener('input', () => {
+    noteInputs.forEach(ni => {
+      if (parseInt(ni.dataset.log) === idx) {
+        ni.value = li.value;
+      }
+    });
+    updateCounter();
+  });
+});
+</script>
+</body>
+</html>
