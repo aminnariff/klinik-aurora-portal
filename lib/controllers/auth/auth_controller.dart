@@ -1,14 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
-
-const _secureStorage = FlutterSecureStorage();
 
 class AuthController extends ChangeNotifier {
   AuthResponse? _authenticationResponse;
@@ -166,7 +163,7 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<String> loadPassword() async {
-    return await _secureStorage.read(key: password) ?? '';
+    return prefs.getString(password) ?? '';
   }
 
   Future<void> setAuthenticationResponse(AuthResponse? response, {String? usernameValue, String? passwordValue}) async {
@@ -189,10 +186,10 @@ class AuthController extends ChangeNotifier {
 
         if (_rememberMe) {
           prefs.setString(username, usernameValue ?? "");
-          await _secureStorage.write(key: password, value: passwordValue ?? "");
+          await prefs.setString(password, passwordValue ?? "");
         } else {
           prefs.remove(username);
-          await _secureStorage.delete(key: password);
+          await prefs.remove(password);
         }
 
         await prefs.setString(authResponse, jsonEncode(data));
@@ -203,7 +200,7 @@ class AuthController extends ChangeNotifier {
       } else {
         prefs.remove(authResponse);
         prefs.remove(token);
-        await _secureStorage.delete(key: password);
+        await prefs.remove(password);
         _authenticationResponse = null;
         branchId = null;
         notifyListeners();
@@ -211,7 +208,7 @@ class AuthController extends ChangeNotifier {
     } catch (e) {
       prefs.remove(authResponse);
       prefs.remove(token);
-      await _secureStorage.delete(key: password);
+      await prefs.remove(password);
       _authenticationResponse = null;
       branchId = null;
       debugPrint("Auth save error: $e");
@@ -273,9 +270,8 @@ class AuthController extends ChangeNotifier {
         });
   }
 
-  void logout(BuildContext context) {
+  Future<void> logout(BuildContext context) async {
     prefs.remove(jwtResponse);
-    setAuthenticationResponse(null);
-    notifyListeners();
+    await setAuthenticationResponse(null);
   }
 }

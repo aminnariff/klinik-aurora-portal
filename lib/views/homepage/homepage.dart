@@ -191,9 +191,9 @@ class _HomepageState extends State<Homepage> {
     return Consumer<ActivityHandlerController>(
       builder: (context, snapshot, _) {
         if (snapshot.status) {
-          SchedulerBinding.instance.scheduleFrameCallback((_) {
-            context.read<AuthController>().logout(context);
-            context.goNamed(LoginPage.routeName);
+          SchedulerBinding.instance.scheduleFrameCallback((_) async {
+            await context.read<AuthController>().logout(context);
+            if (context.mounted) context.goNamed(LoginPage.routeName);
           });
         }
         return LayoutWidget(mobile: mobileView(context), tablet: mobileView(context), desktop: desktopView(context));
@@ -315,10 +315,10 @@ class _HomepageState extends State<Homepage> {
                     children: [
                       const SizedBox(height: 8),
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
                           try {
-                            context.read<AuthController>().logout(context);
-                            context.pushReplacementNamed(LoginPage.routeName, extra: true);
+                            await context.read<AuthController>().logout(context);
+                            if (context.mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
                           } catch (e) {
                             debugPrint(e.toString());
                           }
@@ -546,11 +546,11 @@ class _HomepageState extends State<Homepage> {
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.white),
                 title: const Text('Logout', style: TextStyle(color: Colors.white)),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(context).pop();
                   try {
-                    context.read<AuthController>().logout(context);
-                    context.pushReplacementNamed(LoginPage.routeName, extra: true);
+                    await context.read<AuthController>().logout(context);
+                    if (context.mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
                   } catch (e) {
                     debugPrint(e.toString());
                   }
@@ -565,11 +565,11 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  void _handleMenuSelection(String value) {
+  void _handleMenuSelection(String value) async {
     if (value == 'logout') {
       try {
-        context.read<AuthController>().logout(context);
-        context.pushReplacementNamed(LoginPage.routeName, extra: true);
+        await context.read<AuthController>().logout(context);
+        if (mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
       } catch (e) {
         debugPrint(e.toString());
       }

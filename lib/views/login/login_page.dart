@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final ValueNotifier<bool> isObscure = ValueNotifier<bool>(false);
-  bool loginSuccess = false;
+
 
   InputFieldAttribute emailAttribute = InputFieldAttribute(
     controller: TextEditingController(text: ''),
@@ -96,10 +96,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           await prefs.remove(authResponse);
           await prefs.remove(jwtResponse);
           await prefs.remove(token);
-          authController.logout(context);
+          await authController.logout(context);
         } else {
           final tokenStatus = await authController.checkDateTime();
-          if (tokenStatus == 'expired') authController.logout(context);
+          if (tokenStatus == 'expired') await authController.logout(context);
         }
       });
 
@@ -137,9 +137,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   controller.authenticationResponse?.data?.expiryDt ?? '',
                 ).difference(DateTime.now()).isNegative ==
                 false &&
-            (widget.resetUser != true || loginSuccess == true)) {
+            widget.resetUser != true) {
           Future.delayed(const Duration(milliseconds: 500), () {
-            context.replaceNamed(Homepage.routeName);
+            if (context.mounted) context.replaceNamed(Homepage.routeName);
           });
           return _loadingScreen();
         }
@@ -660,17 +660,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       ).then((value) async {
         dismissLoading();
         if (responseCode(value.code)) {
-          if (prefs.getBool(rememberMe) == true) {
-            prefs.setBool(rememberMe, true);
-            prefs.setString(username, usernameController.text);
-            prefs.setString(password, passwordController.text);
-          }
           await context.read<AuthController>().setAuthenticationResponse(
             value.data,
             usernameValue: usernameController.text,
             passwordValue: passwordController.text,
           );
-          setState(() => loginSuccess = true);
+          if (mounted) context.goNamed(Homepage.routeName);
         }
       });
     });
