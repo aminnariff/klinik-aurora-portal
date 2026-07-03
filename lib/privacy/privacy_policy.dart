@@ -307,7 +307,15 @@ class RefundPolicy extends StatelessWidget {
           ],
         ),
         _PolicySection(
-          title: '2. Booking Fee',
+          title: '2. Merchant Information',
+          children: [
+            const _BodyText(
+              'These services are provided by Aurora Medicare Sdn Bhd (Company/SSM Registration No: 201801020794), operating as Klinik Aurora, a licensed clinic based in Shah Alam, Selangor, Malaysia.',
+            ),
+          ],
+        ),
+        _PolicySection(
+          title: '3. Booking Fee',
           children: [
             const _BodyText(
               'Some appointments may require a booking fee or deposit to secure the appointment slot. The applicable amount will be displayed before payment confirmation.',
@@ -315,7 +323,7 @@ class RefundPolicy extends StatelessWidget {
           ],
         ),
         _PolicySection(
-          title: '3. Refund Eligibility',
+          title: '4. Refund Eligibility',
           children: [
             const _BodyText('Refunds may be considered in the following cases:'),
             const SizedBox(height: 8),
@@ -327,7 +335,7 @@ class RefundPolicy extends StatelessWidget {
           ],
         ),
         _PolicySection(
-          title: '4. Non-Refundable Situations',
+          title: '5. Non-Refundable Situations',
           children: [
             const _BodyText(
               'Booking fees may be non-refundable or only partially refundable in situations including but not limited to:',
@@ -341,7 +349,7 @@ class RefundPolicy extends StatelessWidget {
           ],
         ),
         _PolicySection(
-          title: '5. Cancellation by Patient',
+          title: '6. Cancellation by Patient',
           children: [
             const _BodyText(
               'To be considered for a refund, cancellation should be made at least 24 hours before the scheduled appointment time, unless otherwise stated by Klinik Aurora.',
@@ -349,7 +357,7 @@ class RefundPolicy extends StatelessWidget {
           ],
         ),
         _PolicySection(
-          title: '6. Cancellation by Klinik Aurora',
+          title: '7. Cancellation by Klinik Aurora',
           children: [
             const _BodyText(
               'If Klinik Aurora needs to cancel or reschedule an appointment due to doctor unavailability, emergencies, or operational reasons, patients may be offered a replacement slot, credit toward a future appointment, or a refund where applicable.',
@@ -357,15 +365,23 @@ class RefundPolicy extends StatelessWidget {
           ],
         ),
         _PolicySection(
-          title: '7. Refund Processing Time',
+          title: '8. Refund Processing Time',
           children: [
             const _BodyText(
-              'Where a refund is approved, it will be processed to the original payment method where possible. Approved refunds will generally be processed within 7 to 14 working days, subject to bank, card issuer, e-wallet provider, or payment gateway processing times.',
+              'Where a refund is approved, it will be processed in Malaysian Ringgit (MYR) to the original payment method used for the transaction, where possible. Approved refunds will generally be processed within 7 to 14 working days, subject to bank, card issuer, e-wallet provider, or payment gateway processing times. Refunds are not provided in cash and will not be transferred to a different payment method or third-party account.',
             ),
           ],
         ),
         _PolicySection(
-          title: '8. How to Request a Refund',
+          title: '9. Chargebacks and Payment Disputes',
+          children: [
+            const _BodyText(
+              'Patients are encouraged to contact Klinik Aurora directly to resolve any payment or refund concerns before initiating a chargeback or dispute with their bank, card issuer, or payment provider. Where a chargeback or dispute is filed, Klinik Aurora reserves the right to submit transaction, booking, and attendance records to the relevant bank or payment gateway to verify the validity of the charge.',
+            ),
+          ],
+        ),
+        _PolicySection(
+          title: '10. How to Request a Refund',
           children: [
             const _BodyText(
               'Refund requests may be submitted through the App where available or by contacting Klinik Aurora support. Please include the patient name, appointment date and time, payment reference, and reason for the refund request.',
@@ -373,7 +389,7 @@ class RefundPolicy extends StatelessWidget {
           ],
         ),
         const _ContactCard(
-          sectionTitle: '9. Contact Us',
+          sectionTitle: '11. Contact Us',
           intro: 'For refund or cancellation enquiries, please contact:',
         ),
         _RelatedPolicies(
