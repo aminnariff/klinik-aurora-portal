@@ -81,7 +81,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   int _selectedTabIndex = 0;
   bool _isCalendarView = false;
-  bool _isSideBySide = false;
   DropdownAttribute? _appointmentBranch;
   List<DropdownAttribute> branches = [];
   List<DropdownAttribute> serviceList = [];
@@ -575,13 +574,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   setState(() => _isCalendarView = !_isCalendarView);
                 },
               ),
-              if (_isCalendarView)
-                _ActionButton(
-                  icon: _isSideBySide ? Icons.view_column_rounded : Icons.view_agenda_rounded,
-                  tooltip: _isSideBySide ? 'Full Width' : 'Side by Side',
-                  color: const Color(0xFF7C3AED),
-                  onTap: () => setState(() => _isSideBySide = !_isSideBySide),
-                ),
               const SizedBox(width: 4),
               _ActionButton(
                 icon: Icons.menu_book_rounded,
@@ -618,8 +610,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         return AppointmentCalendarView(
           appointments: data,
           currentTabs: getAppointmentStatus(),
-          isSideBySide: _isSideBySide,
-          onToggleLayout: () => setState(() => _isSideBySide = !_isSideBySide),
           onRefresh: () {
             getDashboard();
             filtering();

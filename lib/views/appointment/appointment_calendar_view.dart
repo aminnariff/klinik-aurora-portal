@@ -12,18 +12,9 @@ import 'package:table_calendar/table_calendar.dart';
 class AppointmentCalendarView extends StatefulWidget {
   final List<Data> appointments;
   final List<String>? currentTabs;
-  final bool isSideBySide;
-  final VoidCallback? onToggleLayout;
   final VoidCallback? onRefresh;
 
-  const AppointmentCalendarView({
-    super.key,
-    required this.appointments,
-    this.currentTabs,
-    this.isSideBySide = false,
-    this.onToggleLayout,
-    this.onRefresh,
-  });
+  const AppointmentCalendarView({super.key, required this.appointments, this.currentTabs, this.onRefresh});
 
   @override
   State<AppointmentCalendarView> createState() => _AppointmentCalendarViewState();
@@ -34,7 +25,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   Map<DateTime, List<Data>> _grouped = {};
-  static const int _maxChipsPerCell = 3;
 
   @override
   void initState() {
@@ -69,30 +59,20 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    final calendarWidget = _buildCalendar();
-    final listWidget = Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDaySummary(),
-        Expanded(child: _buildDayAppointments()),
-      ],
-    );
-
-    if (widget.isSideBySide) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 2, child: calendarWidget),
-          const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
-          Expanded(flex: 3, child: listWidget),
-        ],
-      );
-    }
-
-    return Column(
-      children: [
-        Expanded(flex: 55, child: calendarWidget),
-        const Divider(height: 1, color: Color(0xFFE5E7EB)),
-        Expanded(flex: 45, child: listWidget),
+        Expanded(flex: 2, child: _buildCalendar()),
+        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+        Expanded(
+          flex: 3,
+          child: Column(
+            children: [
+              _buildDaySummary(),
+              Expanded(child: _buildDayAppointments()),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -140,9 +120,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           todayTextStyle: AppTypography.bodyMedium(
             context,
           ).copyWith(fontWeight: FontWeight.w700, color: secondaryColor),
-          markerDecoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
-          markerSize: 6,
-          markersMaxCount: 3,
           cellMargin: const EdgeInsets.all(2),
           defaultTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF374151), fontSize: 12),
           weekendTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF9CA3AF), fontSize: 12),
@@ -159,94 +136,55 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
     );
   }
 
+  /// Builds a simple day cell with a dot indicator for appointment count.
   Widget _buildDayCell(DateTime date, List<Data> dayAppointments) {
     final isSelected = isSameDay(date, _selectedDay);
     final isToday = isSameDay(date, DateTime.now());
     final isOutsideMonth = date.month != _focusedDay.month;
-
-    final dayNumber = Container(
-      alignment: Alignment.center,
-      margin: const EdgeInsets.symmetric(vertical: 2),
-      child: Container(
-        width: 24,
-        height: 24,
-        alignment: Alignment.center,
-        decoration: isToday ? const BoxDecoration(color: secondaryColor, shape: BoxShape.circle) : null,
-        child: Text(
-          '${date.day}',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
-            color: isToday
-                ? Colors.white
-                : isOutsideMonth
-                ? const Color(0xFFD1D5DB)
-                : const Color(0xFF374151),
-          ),
-        ),
-      ),
-    );
-
-    final chips = <Widget>[];
-    final visible = dayAppointments.take(_maxChipsPerCell).toList();
-    final overflow = dayAppointments.length - _maxChipsPerCell;
-
-    for (final apt in visible) {
-      final statusColor = appointmentStatusColors[apt.appointmentStatus] ?? Colors.grey;
-      final timeStr = _formatTime(apt.appointmentDatetime);
-      final name = (apt.user?.userFullName ?? '').split(' ').firstOrNull ?? '';
-
-      chips.add(
-        GestureDetector(
-          onTap: () => _openDetail(context, apt),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-            decoration: BoxDecoration(
-              color: statusColor.withAlpha(25),
-              borderRadius: BorderRadius.circular(3),
-              border: Border(left: BorderSide(color: statusColor, width: 2)),
-            ),
-            child: Text(
-              '$timeStr $name',
-              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: statusColor, height: 1.3),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (overflow > 0) {
-      chips.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3),
-          child: Text(
-            '+$overflow more',
-            style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
-          ),
-        ),
-      );
-    }
+    final count = dayAppointments.length;
 
     return Container(
       decoration: BoxDecoration(
         color: isSelected ? const Color(0xFFF0F5FF) : null,
         border: isSelected ? Border.all(color: secondaryColor.withAlpha(80), width: 1) : null,
       ),
-      child: Column(children: [dayNumber, if (chips.isNotEmpty) ...chips]),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 26,
+            height: 26,
+            alignment: Alignment.center,
+            decoration: isToday ? const BoxDecoration(color: secondaryColor, shape: BoxShape.circle) : null,
+            child: Text(
+              '${date.day}',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+                color: isToday
+                    ? Colors.white
+                    : isOutsideMonth
+                    ? const Color(0xFFD1D5DB)
+                    : const Color(0xFF374151),
+              ),
+            ),
+          ),
+          if (count > 0)
+            Container(
+              width: count > 9 ? null : 18,
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              decoration: BoxDecoration(color: secondaryColor, borderRadius: BorderRadius.circular(9)),
+              child: Text(
+                '$count',
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+            )
+          else
+            const SizedBox(height: 4),
+        ],
+      ),
     );
-  }
-
-  String _formatTime(String? datetimeStr) {
-    if (datetimeStr == null) return '';
-    try {
-      final dt = DateTime.parse(datetimeStr);
-      return DateFormat('h:mm').format(dt);
-    } catch (_) {
-      return '';
-    }
   }
 
   // ── Day summary bar ──────────────────────────────────────────────────
