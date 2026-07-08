@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
@@ -110,19 +111,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
             }
             branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-            if (mounted) {
-              setState(() => _branchesLoaded = true);
-
-              print('sini woiii');
-              print('sini woiii');
-              print('sini woiii');
-              print('sini woiii');
-              print('sini woiii');
-              print('sini woiii');
-              print('sini woiii');
-            }
+            if (mounted) setState(() => _branchesLoaded = true);
           }
         });
+      }
+      final savedView = prefs.getBool('calendarView');
+      if (savedView == true && mounted) {
+        setState(() {
+          _isCalendarView = true;
+        });
+        _initCalendarView();
       }
       _defaultThisMonth();
       getDashboard();
@@ -332,7 +330,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             children: [
               if (authController.isSuperAdmin) _buildBranchBar(),
               if (!_isCalendarView) _buildDateFilterBar(),
-              if (!_isCalendarView && authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
+              if (authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
                 _buildStatsStrip(authController),
               _buildTabAndActions(),
               Expanded(child: _isCalendarView ? _buildCalendarArea() : _buildTableArea()),
@@ -621,6 +619,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   setState(() {
                     final enteringCalendar = !_isCalendarView;
                     _isCalendarView = !_isCalendarView;
+                    prefs.setBool('calendarView', _isCalendarView);
                     if (enteringCalendar && _appointmentCounts.isEmpty) {
                       _initCalendarView();
                     }
