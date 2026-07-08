@@ -23,6 +23,7 @@ import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
+import 'package:klinik_aurora_portal/views/appointment/appointment_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
@@ -79,6 +80,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   final currencyFormatter = NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2);
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   int _selectedTabIndex = 0;
+  bool _isCalendarView = false;
   DropdownAttribute? _appointmentBranch;
   List<DropdownAttribute> branches = [];
   List<DropdownAttribute> serviceList = [];
@@ -318,8 +320,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               if (authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
                 _buildStatsStrip(authController),
               _buildTabAndActions(),
-              Expanded(child: _buildTableArea()),
-              _buildPaginationBar(),
+              Expanded(child: _isCalendarView ? _buildCalendarArea() : _buildTableArea()),
+              if (!_isCalendarView) _buildPaginationBar(),
             ],
           ),
         );
@@ -549,6 +551,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               ),
               const SizedBox(width: 4),
               _ActionButton(
+                icon: _isCalendarView ? Icons.table_chart_rounded : Icons.calendar_month_rounded,
+                tooltip: _isCalendarView ? 'Table View' : 'Calendar View',
+                color: const Color(0xFF7C3AED),
+                onTap: () => setState(() => _isCalendarView = !_isCalendarView),
+              ),
+              const SizedBox(width: 4),
+              _ActionButton(
                 icon: Icons.menu_book_rounded,
                 tooltip: 'Guideline',
                 color: const Color(0xFFDF6E98),
@@ -565,6 +574,30 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return TabBarView(
       controller: _tabController,
       children: [_buildTabContent(), _buildTabContent(), _buildTabContent(), _buildTabContent()],
+    );
+  }
+
+  Widget _buildCalendarArea() {
+    return Consumer2<AppointmentController, AuthController>(
+      builder: (context, apptController, authController, _) {
+        final data = apptController.appointmentResponse?.data?.data ?? [];
+        final isLoading = apptController.appointmentResponse == null;
+
+        if (isLoading) {
+          return const Center(child: CircularProgressIndicator(color: secondaryColor));
+        }
+
+        // In calendar mode, show all data (ignoring tab selection since it's already filtered by the API)
+        // but we pass data through the tab-filtered lens like the table does
+        return AppointmentCalendarView(
+          appointments: data,
+          currentTabs: getAppointmentStatus(),
+          onRefresh: () {
+            getDashboard();
+            filtering();
+          },
+        );
+      },
     );
   }
 
