@@ -555,7 +555,25 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 icon: _isCalendarView ? Icons.table_chart_rounded : Icons.calendar_month_rounded,
                 tooltip: _isCalendarView ? 'Table View' : 'Calendar View',
                 color: const Color(0xFF7C3AED),
-                onTap: () => setState(() => _isCalendarView = !_isCalendarView),
+                onTap: () {
+                  final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
+                  if (!_isCalendarView && isSuperAdmin && _appointmentBranch == null) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        title: const Text('Select Branch', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        content: const Text(
+                          'Please select a branch from the dropdown above before switching to Calendar view.',
+                          style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                        ),
+                        actions: [TextButton(onPressed: () => context.pop(), child: const Text('OK'))],
+                      ),
+                    );
+                    return;
+                  }
+                  setState(() => _isCalendarView = !_isCalendarView);
+                },
               ),
               if (_isCalendarView)
                 _ActionButton(

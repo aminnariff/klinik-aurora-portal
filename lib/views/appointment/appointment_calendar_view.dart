@@ -235,16 +235,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
         color: isSelected ? const Color(0xFFF0F5FF) : null,
         border: isSelected ? Border.all(color: secondaryColor.withAlpha(80), width: 1) : null,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          dayNumber,
-          if (chips.isNotEmpty)
-            Expanded(
-              child: Column(mainAxisSize: MainAxisSize.min, children: chips),
-            ),
-        ],
-      ),
+      child: Column(children: [dayNumber, if (chips.isNotEmpty) ...chips]),
     );
   }
 
