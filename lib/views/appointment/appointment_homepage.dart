@@ -334,7 +334,19 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   Widget _buildBranchBar() {
-    if (branches.isEmpty) return const SizedBox.shrink();
+    // Trigger branch loading if not yet loaded (e.g., auth loaded after initState)
+    if (branches.isEmpty && mounted) {
+      BranchController.getAll(context, 1, 100).then((value) {
+        if (responseCode(value.code) && mounted) {
+          context.read<BranchController>().branchAllResponse = value;
+          for (branch_model.Data item in value.data?.data ?? []) {
+            branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+          }
+          branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+          setState(() {});
+        }
+      });
+    }
     return Container(
       color: Colors.white,
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
