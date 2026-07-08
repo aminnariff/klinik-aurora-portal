@@ -10,11 +10,32 @@ import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class AppointmentCalendarView extends StatefulWidget {
-  final List<Data> appointments;
-  final List<String>? currentTabs;
+  /// Counts of appointments per date (ISO date string -> count) for the visible month.
+  final Map<String, int> appointmentCounts;
+
+  /// Full appointment data for the currently selected day (fetched on demand).
+  final List<Data> dayAppointments;
+
+  /// Called when the user navigates to a new month.
+  final void Function(DateTime firstOfMonth, DateTime lastOfMonth)? onMonthChanged;
+
+  /// Called when the user taps a day — triggers a fetch for that day's appointments.
+  final void Function(DateTime day)? onDaySelected;
+
+  /// Whether data for the selected day is currently loading.
+  final bool isLoadingDay;
+
   final VoidCallback? onRefresh;
 
-  const AppointmentCalendarView({super.key, required this.appointments, this.currentTabs, this.onRefresh});
+  const AppointmentCalendarView({
+    super.key,
+    required this.appointmentCounts,
+    this.dayAppointments = const [],
+    this.onMonthChanged,
+    this.onDaySelected,
+    this.isLoadingDay = false,
+    this.onRefresh,
+  });
 
   @override
   State<AppointmentCalendarView> createState() => _AppointmentCalendarViewState();
@@ -23,38 +44,18 @@ class AppointmentCalendarView extends StatefulWidget {
 class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
-  Map<DateTime, List<Data>> _grouped = {};
+  late DateTime _focusedDay;
 
   @override
   void initState() {
     super.initState();
-    _groupByDate();
+    _focusedDay = DateTime.now();
   }
 
-  @override
-  void didUpdateWidget(AppointmentCalendarView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.appointments != widget.appointments) {
-      _groupByDate();
-    }
-  }
-
-  void _groupByDate() {
-    final map = <DateTime, List<Data>>{};
-    for (final apt in widget.appointments) {
-      if (apt.appointmentDatetime == null) continue;
-      try {
-        final dt = DateTime.parse(apt.appointmentDatetime!);
-        final day = DateTime(dt.year, dt.month, dt.day);
-        map.putIfAbsent(day, () => []).add(apt);
-      } catch (_) {}
-    }
-    _grouped = map;
-  }
-
-  List<Data> _appointmentsForDay(DateTime day) {
-    return _grouped[DateTime(day.year, day.month, day.day)] ?? [];
+  void _notifyMonthChanged() {
+    final first = DateTime(_focusedDay.year, _focusedDay.month, 1);
+    final last = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
+    widget.onMonthChanged?.call(first, last);
   }
 
   @override
@@ -64,15 +65,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
       children: [
         Expanded(flex: 2, child: _buildCalendar()),
         const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
-        Expanded(
-          flex: 3,
-          child: Column(
-            children: [
-              _buildDaySummary(),
-              Expanded(child: _buildDayAppointments()),
-            ],
-          ),
-        ),
+        Expanded(flex: 3, child: _buildDayPanel()),
       ],
     );
   }
@@ -82,7 +75,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
   Widget _buildCalendar() {
     return Container(
       color: Colors.white,
-      child: TableCalendar<Data>(
+      child: TableCalendar(
         firstDay: DateTime(2020, 1, 1),
         lastDay: DateTime(2030, 12, 31),
         focusedDay: _focusedDay,
@@ -94,9 +87,17 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             _selectedDay = selected;
             _focusedDay = focused;
           });
+          widget.onDaySelected?.call(selected);
         },
-        onPageChanged: (focused) => _focusedDay = focused,
-        eventLoader: (day) => _appointmentsForDay(day),
+        onPageChanged: (focused) {
+          _focusedDay = focused;
+          _notifyMonthChanged();
+        },
+        eventLoader: (day) {
+          final key = DateFormat('yyyy-MM-dd').format(day);
+          final count = widget.appointmentCounts[key] ?? 0;
+          return List.generate(count, (_) => day);
+        },
         headerStyle: HeaderStyle(
           formatButtonVisible: true,
           titleTextFormatter: (date, locale) => DateFormat('MMMM yyyy').format(date),
@@ -111,9 +112,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           rightChevronIcon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6B7280)),
           headerPadding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
         ),
-        calendarBuilders: CalendarBuilders<Data>(
-          prioritizedBuilder: (context, date, focusedDay) => _buildDayCell(date, _appointmentsForDay(date)),
-        ),
+        calendarBuilders: CalendarBuilders(prioritizedBuilder: (context, date, focusedDay) => _buildDayCell(date)),
         calendarStyle: CalendarStyle(
           selectedDecoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
           todayDecoration: BoxDecoration(color: secondaryColor.withAlpha(40), shape: BoxShape.circle),
@@ -136,12 +135,12 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
     );
   }
 
-  /// Builds a simple day cell with a dot indicator for appointment count.
-  Widget _buildDayCell(DateTime date, List<Data> dayAppointments) {
+  Widget _buildDayCell(DateTime date) {
     final isSelected = isSameDay(date, _selectedDay);
     final isToday = isSameDay(date, DateTime.now());
     final isOutsideMonth = date.month != _focusedDay.month;
-    final count = dayAppointments.length;
+    final key = DateFormat('yyyy-MM-dd').format(date);
+    final count = widget.appointmentCounts[key] ?? 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -187,10 +186,18 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
     );
   }
 
-  // ── Day summary bar ──────────────────────────────────────────────────
+  // ── Day panel ─────────────────────────────────────────────────────────
+
+  Widget _buildDayPanel() {
+    return Column(
+      children: [
+        _buildDaySummary(),
+        Expanded(child: _buildDayAppointments()),
+      ],
+    );
+  }
 
   Widget _buildDaySummary() {
-    final count = _appointmentsForDay(_selectedDay).length;
     final now = DateTime.now();
     final isToday = isSameDay(_selectedDay, now);
 
@@ -205,6 +212,8 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
         label = DateFormat('EEEE, d MMM yyyy').format(_selectedDay);
       }
     }
+
+    final count = widget.dayAppointments.length;
 
     return Container(
       width: double.infinity,
@@ -236,10 +245,12 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
     );
   }
 
-  // ── Appointments for selected day ─────────────────────────────────────
-
   Widget _buildDayAppointments() {
-    final list = _appointmentsForDay(_selectedDay);
+    if (widget.isLoadingDay) {
+      return const Center(child: CircularProgressIndicator(color: secondaryColor));
+    }
+
+    final list = widget.dayAppointments;
 
     if (list.isEmpty) {
       return Center(
@@ -259,17 +270,13 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
                 context,
               ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Tap another date or adjust your filters',
-              style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
-            ),
           ],
         ),
       );
     }
 
-    list.sort((a, b) {
+    final sorted = List<Data>.from(list);
+    sorted.sort((a, b) {
       final aDt = DateTime.tryParse(a.appointmentDatetime ?? '') ?? DateTime(2000);
       final bDt = DateTime.tryParse(b.appointmentDatetime ?? '') ?? DateTime(2000);
       return aDt.compareTo(bDt);
@@ -277,9 +284,9 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      itemCount: list.length,
+      itemCount: sorted.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, index) => _buildAppointmentCard(context, list[index]),
+      itemBuilder: (context, index) => _buildAppointmentCard(context, sorted[index]),
     );
   }
 
@@ -396,8 +403,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
   void _openDetail(BuildContext context, Data apt) {
     showDialog(
       context: context,
-      builder: (ctx) =>
-          AppointmentDetails(type: 'update', appointment: apt, tabs: widget.currentTabs, refreshData: widget.onRefresh),
+      builder: (ctx) => AppointmentDetails(type: 'update', appointment: apt, tabs: [], refreshData: widget.onRefresh),
     );
   }
 }

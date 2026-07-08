@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -81,6 +82,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   int _selectedTabIndex = 0;
   bool _isCalendarView = false;
+  Map<String, int> _appointmentCounts = {};
+  List<Data> _selectedDayAppointments = [];
+  bool _isLoadingDay = false;
   DropdownAttribute? _appointmentBranch;
   List<DropdownAttribute> branches = [];
   List<DropdownAttribute> serviceList = [];
@@ -316,8 +320,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (authController.isSuperAdmin) _buildBranchBar(),
-              _buildDateFilterBar(),
-              if (authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
+              if (!_isCalendarView) _buildDateFilterBar(),
+              if (!_isCalendarView && authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
                 _buildStatsStrip(authController),
               _buildTabAndActions(),
               Expanded(child: _isCalendarView ? _buildCalendarArea() : _buildTableArea()),
@@ -571,7 +575,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     );
                     return;
                   }
-                  setState(() => _isCalendarView = !_isCalendarView);
+                  setState(() {
+                    final enteringCalendar = !_isCalendarView;
+                    _isCalendarView = !_isCalendarView;
+                    if (enteringCalendar && _appointmentCounts.isEmpty) {
+                      _initCalendarView();
+                    }
+                  });
                 },
               ),
               const SizedBox(width: 4),
@@ -596,27 +606,69 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   Widget _buildCalendarArea() {
-    return Consumer2<AppointmentController, AuthController>(
-      builder: (context, apptController, authController, _) {
-        final data = apptController.appointmentResponse?.data?.data ?? [];
-        final isLoading = apptController.appointmentResponse == null;
-
-        if (isLoading) {
-          return const Center(child: CircularProgressIndicator(color: secondaryColor));
-        }
-
-        // In calendar mode, show all data (ignoring tab selection since it's already filtered by the API)
-        // but we pass data through the tab-filtered lens like the table does
-        return AppointmentCalendarView(
-          appointments: data,
-          currentTabs: getAppointmentStatus(),
-          onRefresh: () {
-            getDashboard();
-            filtering();
-          },
-        );
+    return AppointmentCalendarView(
+      appointmentCounts: _appointmentCounts,
+      dayAppointments: _selectedDayAppointments,
+      isLoadingDay: _isLoadingDay,
+      onMonthChanged: (first, last) {
+        final branchId = context.read<AuthController>().isSuperAdmin ? _appointmentBranch?.key : null;
+        final start = DateFormat('yyyy-MM-dd').format(first);
+        final end = DateFormat('yyyy-MM-dd').format(last);
+        AppointmentController.getCounts(context, startDate: start, endDate: end, branchId: branchId).then((counts) {
+          if (mounted) setState(() => _appointmentCounts = counts);
+        });
+        // Also fetch today's appointments for the new month
+        _fetchDayAppointments(DateTime.now());
+      },
+      onDaySelected: (day) => _fetchDayAppointments(day),
+      onRefresh: () {
+        getDashboard();
+        filtering();
       },
     );
+  }
+
+  void _fetchDayAppointments(DateTime day) {
+    if (!mounted) return;
+    setState(() => _isLoadingDay = true);
+    final branchId = context.read<AuthController>().isSuperAdmin ? _appointmentBranch?.key : null;
+    final dateStr = DateFormat('yyyy-MM-dd').format(day);
+
+    AppointmentController()
+        .get(context, 1, 100, startDate: dateStr, endDate: dateStr, branchId: branchId)
+        .then((value) {
+          if (!mounted) return;
+          setState(() {
+            _selectedDayAppointments = value.data?.data ?? [];
+            _isLoadingDay = false;
+          });
+        })
+        .catchError((_) {
+          if (!mounted) return;
+          setState(() {
+            _selectedDayAppointments = [];
+            _isLoadingDay = false;
+          });
+        });
+  }
+
+  /// Called when calendar mode is first entered.
+  void _initCalendarView() {
+    final now = DateTime.now();
+    final first = DateTime(now.year, now.month, 1);
+    final last = DateTime(now.year, now.month + 1, 0);
+    final branchId = context.read<AuthController>().isSuperAdmin ? _appointmentBranch?.key : null;
+
+    AppointmentController.getCounts(
+      context,
+      startDate: DateFormat('yyyy-MM-dd').format(first),
+      endDate: DateFormat('yyyy-MM-dd').format(last),
+      branchId: branchId,
+    ).then((counts) {
+      if (mounted) setState(() => _appointmentCounts = counts);
+    });
+
+    _fetchDayAppointments(now);
   }
 
   Widget _buildTabContent() {
@@ -797,7 +849,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       ? 1
                       : (isBookingFeePaid(item.appointmentNote, payments: item.payment) ? 1 : 0),
                 )
-              : Text('–', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF))),
+              : _buildNoPaymentBadge(),
         ),
         DataCell(
           Column(
@@ -955,6 +1007,26 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           ),
         );
     }
+  }
+
+  Widget _buildNoPaymentBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: const Color(0xFFDBEAFE), borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.block_rounded, size: 18, color: Color(0xFF2563EB)),
+          const SizedBox(width: 4),
+          Text(
+            'No Payment',
+            style: AppTypography.bodyMedium(
+              context,
+            ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF1E40AF)),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildPaginationBar() {

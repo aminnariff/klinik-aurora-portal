@@ -124,4 +124,37 @@ class AppointmentController extends ChangeNotifier {
 
     return query.isNotEmpty ? '?${query.join('&')}' : '';
   }
+
+  /// Fetches appointment counts grouped by date for a date range.
+  /// Returns a Map<String, int> of date -> count.
+  static Future<Map<String, int>> getCounts(
+    BuildContext context, {
+    required String startDate,
+    required String endDate,
+    String? branchId,
+  }) async {
+    final params = <String, dynamic>{
+      'startDate': startDate,
+      'endDate': endDate,
+      if (branchId != null) 'branchId': branchId,
+    };
+    final queryString = _buildQueryString(params);
+    final endpoint = 'admin/appointment/counts$queryString';
+
+    return ApiController().call(context, method: Method.get, endpoint: endpoint).then((value) {
+      if (value.code != 200 || value.data == null) return <String, int>{};
+      final data = value.data['data'] as Map<String, dynamic>? ?? {};
+      return data.map((key, val) => MapEntry(key, (val as num).toInt()));
+    });
+  }
+
+  static String _buildQueryString(Map<String, dynamic> params) {
+    final List<String> query = [];
+    params.forEach((key, value) {
+      if (value != null) {
+        query.add('$key=${Uri.encodeQueryComponent(value.toString())}');
+      }
+    });
+    return query.isNotEmpty ? '?${query.join('&')}' : '';
+  }
 }
