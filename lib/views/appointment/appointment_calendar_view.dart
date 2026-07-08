@@ -93,11 +93,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           _focusedDay = focused;
           _notifyMonthChanged();
         },
-        eventLoader: (day) {
-          final key = DateFormat('yyyy-MM-dd').format(day);
-          final count = widget.appointmentCounts[key] ?? 0;
-          return List.generate(count, (_) => day);
-        },
         headerStyle: HeaderStyle(
           formatButtonVisible: true,
           titleTextFormatter: (date, locale) => DateFormat('MMMM yyyy').format(date),
@@ -172,10 +167,10 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             Container(
               width: count > 9 ? null : 18,
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              decoration: BoxDecoration(color: secondaryColor, borderRadius: BorderRadius.circular(9)),
+              decoration: BoxDecoration(color: secondaryColor.withAlpha(30), borderRadius: BorderRadius.circular(9)),
               child: Text(
                 '$count',
-                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Colors.white),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: secondaryColor),
                 textAlign: TextAlign.center,
               ),
             )
