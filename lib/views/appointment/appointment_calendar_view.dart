@@ -12,9 +12,18 @@ import 'package:table_calendar/table_calendar.dart';
 class AppointmentCalendarView extends StatefulWidget {
   final List<Data> appointments;
   final List<String>? currentTabs;
+  final bool isSideBySide;
+  final VoidCallback? onToggleLayout;
   final VoidCallback? onRefresh;
 
-  const AppointmentCalendarView({super.key, required this.appointments, this.currentTabs, this.onRefresh});
+  const AppointmentCalendarView({
+    super.key,
+    required this.appointments,
+    this.currentTabs,
+    this.isSideBySide = false,
+    this.onToggleLayout,
+    this.onRefresh,
+  });
 
   @override
   State<AppointmentCalendarView> createState() => _AppointmentCalendarViewState();
@@ -24,9 +33,8 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
-
-  /// Maps a normalized date (no time) → list of appointments on that day.
   Map<DateTime, List<Data>> _grouped = {};
+  static const int _maxChipsPerCell = 3;
 
   @override
   void initState() {
@@ -50,9 +58,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
         final dt = DateTime.parse(apt.appointmentDatetime!);
         final day = DateTime(dt.year, dt.month, dt.day);
         map.putIfAbsent(day, () => []).add(apt);
-      } catch (_) {
-        // skip unparseable dates
-      }
+      } catch (_) {}
     }
     _grouped = map;
   }
@@ -63,12 +69,30 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final calendarWidget = _buildCalendar();
+    final listWidget = Column(
       children: [
-        _buildCalendar(),
-        const Divider(height: 1, color: Color(0xFFE5E7EB)),
         _buildDaySummary(),
         Expanded(child: _buildDayAppointments()),
+      ],
+    );
+
+    if (widget.isSideBySide) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(flex: 2, child: calendarWidget),
+          const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+          Expanded(flex: 3, child: listWidget),
+        ],
+      );
+    }
+
+    return Column(
+      children: [
+        FractionallySizedBox(heightFactor: 0.55, child: calendarWidget),
+        const Divider(height: 1, color: Color(0xFFE5E7EB)),
+        Expanded(child: listWidget),
       ],
     );
   }
@@ -107,6 +131,9 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           rightChevronIcon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6B7280)),
           headerPadding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
         ),
+        calendarBuilders: CalendarBuilders<Data>(
+          prioritizedBuilder: (context, date, focusedDay) => _buildDayCell(date, _appointmentsForDay(date)),
+        ),
         calendarStyle: CalendarStyle(
           selectedDecoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
           todayDecoration: BoxDecoration(color: secondaryColor.withAlpha(40), shape: BoxShape.circle),
@@ -116,20 +143,119 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           markerDecoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
           markerSize: 6,
           markersMaxCount: 3,
-          cellMargin: const EdgeInsets.all(4),
-          defaultTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF374151)),
-          weekendTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF9CA3AF)),
+          cellMargin: const EdgeInsets.all(2),
+          defaultTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF374151), fontSize: 12),
+          weekendTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF9CA3AF), fontSize: 12),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
           weekdayStyle: AppTypography.bodyMedium(
             context,
-          ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
+          ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280), fontSize: 11),
           weekendStyle: AppTypography.bodyMedium(
             context,
-          ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF9CA3AF)),
+          ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF9CA3AF), fontSize: 11),
         ),
       ),
     );
+  }
+
+  Widget _buildDayCell(DateTime date, List<Data> dayAppointments) {
+    final isSelected = isSameDay(date, _selectedDay);
+    final isToday = isSameDay(date, DateTime.now());
+    final isOutsideMonth = date.month != _focusedDay.month;
+
+    final dayNumber = Container(
+      alignment: Alignment.center,
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      child: Container(
+        width: 24,
+        height: 24,
+        alignment: Alignment.center,
+        decoration: isToday ? const BoxDecoration(color: secondaryColor, shape: BoxShape.circle) : null,
+        child: Text(
+          '${date.day}',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+            color: isToday
+                ? Colors.white
+                : isOutsideMonth
+                ? const Color(0xFFD1D5DB)
+                : const Color(0xFF374151),
+          ),
+        ),
+      ),
+    );
+
+    final chips = <Widget>[];
+    final visible = dayAppointments.take(_maxChipsPerCell).toList();
+    final overflow = dayAppointments.length - _maxChipsPerCell;
+
+    for (final apt in visible) {
+      final statusColor = appointmentStatusColors[apt.appointmentStatus] ?? Colors.grey;
+      final timeStr = _formatTime(apt.appointmentDatetime);
+      final name = (apt.user?.userFullName ?? '').split(' ').firstOrNull ?? '';
+
+      chips.add(
+        GestureDetector(
+          onTap: () => _openDetail(context, apt),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+            decoration: BoxDecoration(
+              color: statusColor.withAlpha(25),
+              borderRadius: BorderRadius.circular(3),
+              border: Border(left: BorderSide(color: statusColor, width: 2)),
+            ),
+            child: Text(
+              '$timeStr $name',
+              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: statusColor, height: 1.3),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (overflow > 0) {
+      chips.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: Text(
+            '+$overflow more',
+            style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isSelected ? const Color(0xFFF0F5FF) : null,
+        border: isSelected ? Border.all(color: secondaryColor.withAlpha(80), width: 1) : null,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          dayNumber,
+          if (chips.isNotEmpty)
+            Expanded(
+              child: Column(mainAxisSize: MainAxisSize.min, children: chips),
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _formatTime(String? datetimeStr) {
+    if (datetimeStr == null) return '';
+    try {
+      final dt = DateTime.parse(datetimeStr);
+      return DateFormat('h:mm').format(dt);
+    } catch (_) {
+      return '';
+    }
   }
 
   // ── Day summary bar ──────────────────────────────────────────────────
@@ -194,7 +320,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             Container(
               width: 56,
               height: 56,
-              decoration: BoxDecoration(color: const Color(0xFFF3F4F6), shape: BoxShape.circle),
+              decoration: const BoxDecoration(color: Color(0xFFF3F4F6), shape: BoxShape.circle),
               child: const Icon(Icons.event_busy_rounded, size: 28, color: Color(0xFF9CA3AF)),
             ),
             const SizedBox(height: 12),
@@ -214,7 +340,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
       );
     }
 
-    // Sort by time
     list.sort((a, b) {
       final aDt = DateTime.tryParse(a.appointmentDatetime ?? '') ?? DateTime(2000);
       final bDt = DateTime.tryParse(b.appointmentDatetime ?? '') ?? DateTime(2000);
@@ -232,7 +357,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
   Widget _buildAppointmentCard(BuildContext context, Data apt) {
     final raw = convertUtcToMalaysiaTimeRange(apt.appointmentDatetime, apt.service?.serviceTime);
     final timeLabel = raw != null && raw.contains('\n') ? raw.split('\n')[1] : '—';
-
     final statusColor = appointmentStatusColors[apt.appointmentStatus] ?? Colors.grey;
     final initials = (apt.user?.userFullName ?? '')
         .trim()
@@ -256,7 +380,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Time column
               SizedBox(
                 width: 64,
                 child: Column(
@@ -278,14 +401,12 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
                 ),
               ),
               const SizedBox(width: 8),
-              // Status indicator line
               Container(
                 width: 3,
                 height: 48,
                 decoration: BoxDecoration(color: statusColor, borderRadius: BorderRadius.circular(2)),
               ),
               const SizedBox(width: 12),
-              // Patient info
               Expanded(
                 child: Row(
                   children: [
@@ -324,7 +445,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
                 ),
               ),
               const SizedBox(width: 8),
-              // Status badge + chevron
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -343,8 +463,6 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
       ),
     );
   }
-
-  // ── Open detail (same pattern as table view) ──────────────────────────
 
   void _openDetail(BuildContext context, Data apt) {
     showDialog(
