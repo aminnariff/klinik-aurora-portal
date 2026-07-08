@@ -109,7 +109,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
             }
             branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-            rebuildDropdown.add(DateTime.now());
+            if (mounted) setState(() {});
           }
         });
       }
@@ -334,44 +334,40 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   Widget _buildBranchBar() {
-    return StreamBuilder<DateTime>(
-      stream: rebuildDropdown.stream,
-      builder: (context, _) {
-        if (branches.isEmpty) return const SizedBox.shrink();
-        return Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
-          child: Row(
-            children: [
-              const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
-              const SizedBox(width: 8),
-              Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
-              const SizedBox(width: 12),
-              AppDropdown(
-                attributeList: DropdownAttributeList(
-                  branches,
-                  isEditable: true,
-                  value: _appointmentBranch?.name,
-                  onChanged: (p0) {
-                    _appointmentBranch = p0;
-                    context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
-                    serviceList = [];
-                    if (p0 != null) getServiceForBranch(p0.key);
-                    rebuildDropdown.add(DateTime.now());
-                    getDashboard();
-                    filtering();
-                    if (_isCalendarView && mounted) {
-                      // Refresh calendar counts with the new branch filter
-                      _refreshCalendarCounts();
-                    }
-                  },
-                  width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
-                ),
-              ),
-            ],
+    if (branches.isEmpty) return const SizedBox.shrink();
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
+      child: Row(
+        children: [
+          const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
+          const SizedBox(width: 8),
+          Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+          const SizedBox(width: 12),
+          AppDropdown(
+            key: ValueKey('branch_dropdown_${_appointmentBranch?.key ?? ''}'),
+            attributeList: DropdownAttributeList(
+              branches,
+              isEditable: true,
+              value: _appointmentBranch?.name,
+              onChanged: (p0) {
+                setState(() {
+                  _appointmentBranch = p0;
+                });
+                context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
+                serviceList = [];
+                if (p0 != null) getServiceForBranch(p0.key);
+                getDashboard();
+                filtering();
+                if (_isCalendarView && mounted) {
+                  _refreshCalendarCounts();
+                }
+              },
+              width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
