@@ -104,13 +104,23 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       }
       if (context.read<AuthController>().isSuperAdmin == true) {
         BranchController.getAll(context, 1, 100).then((value) {
-          if (responseCode(value.code)) {
+          if (responseCode(value.code) && mounted && !_branchesLoaded) {
             context.read<BranchController>().branchAllResponse = value;
             for (branch_model.Data item in value.data?.data ?? []) {
               branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
             }
             branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-            if (mounted) setState(() => _branchesLoaded = true);
+            if (mounted) {
+              setState(() => _branchesLoaded = true);
+
+              print('sini woiii');
+              print('sini woiii');
+              print('sini woiii');
+              print('sini woiii');
+              print('sini woiii');
+              print('sini woiii');
+              print('sini woiii');
+            }
           }
         });
       }
@@ -337,7 +347,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   Widget _buildBranchBar() {
     if (!_branchesLoaded && branches.isEmpty && mounted) {
       BranchController.getAll(context, 1, 100).then((value) {
-        if (responseCode(value.code) && mounted) {
+        if (responseCode(value.code) && mounted && !_branchesLoaded) {
           context.read<BranchController>().branchAllResponse = value;
           for (branch_model.Data item in value.data?.data ?? []) {
             branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
