@@ -86,6 +86,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   List<Data> _selectedDayAppointments = [];
   bool _isLoadingDay = false;
   DropdownAttribute? _appointmentBranch;
+  List<DropdownAttribute> branches = [];
   List<DropdownAttribute> serviceList = [];
   String? _sortBy;
   String? _sortOrder;
@@ -99,6 +100,18 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       );
       if (context.read<AuthController>().isSuperAdmin == false) {
         getService();
+      }
+      if (context.read<AuthController>().isSuperAdmin == true) {
+        BranchController.getAll(context, 1, 100).then((value) {
+          if (responseCode(value.code)) {
+            context.read<BranchController>().branchAllResponse = value;
+            for (branch_model.Data item in value.data?.data ?? []) {
+              branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+            }
+            branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+            rebuildDropdown.add(DateTime.now());
+          }
+        });
       }
       _defaultThisMonth();
       getDashboard();
@@ -321,19 +334,65 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   Widget _buildBranchBar() {
-    return _BranchDropdown(
-      onBranchChanged: (p0) {
-        _appointmentBranch = p0;
-        context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
-        serviceList = [];
-        if (p0 != null) getServiceForBranch(p0.key);
-        getDashboard();
-        filtering();
-        if (_isCalendarView && mounted) {
-          _refreshCalendarCounts();
+    return StreamBuilder<DateTime>(
+      stream: rebuildDropdown.stream,
+      builder: (context, _) {
+        if (branches.isEmpty) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 14),
+            child: Row(
+              children: [
+                const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
+                const SizedBox(width: 8),
+                Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+                const SizedBox(width: 12),
+                const SizedBox(
+                  height: 48,
+                  width: 200,
+                  child: Center(
+                    child: Text('Loading branches...', style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
+                  ),
+                ),
+              ],
+            ),
+          );
         }
+        return Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
+          child: Row(
+            children: [
+              const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
+              const SizedBox(width: 8),
+              Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+              const SizedBox(width: 12),
+              AppDropdown(
+                attributeList: DropdownAttributeList(
+                  branches,
+                  isEditable: true,
+                  value: _appointmentBranch?.name,
+                  onChanged: (p0) {
+                    setState(() {
+                      _appointmentBranch = p0;
+                    });
+                    rebuildDropdown.add(DateTime.now());
+                    context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
+                    serviceList = [];
+                    if (p0 != null) getServiceForBranch(p0.key);
+                    getDashboard();
+                    filtering();
+                    if (_isCalendarView && mounted) {
+                      _refreshCalendarCounts();
+                    }
+                  },
+                  width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
+                ),
+              ),
+            ],
+          ),
+        );
       },
-      selectedBranchName: _appointmentBranch?.name,
     );
   }
 
@@ -1541,104 +1600,6 @@ class _ActionButton extends StatelessWidget {
           decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(8)),
           child: Icon(icon, color: color, size: 18),
         ),
-      ),
-    );
-  }
-}
-
-/// Self-contained branch dropdown that loads branches independently.
-class _BranchDropdown extends StatefulWidget {
-  final void Function(DropdownAttribute? p0) onBranchChanged;
-  final String? selectedBranchName;
-
-  const _BranchDropdown({required this.onBranchChanged, this.selectedBranchName});
-
-  @override
-  State<_BranchDropdown> createState() => _BranchDropdownState();
-}
-
-class _BranchDropdownState extends State<_BranchDropdown> {
-  List<DropdownAttribute> _branches = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadBranches();
-  }
-
-  void _loadBranches() {
-    BranchController.getAll(context, 1, 100)
-        .then((value) {
-          if (!mounted) return;
-          if (responseCode(value.code)) {
-            context.read<BranchController>().branchAllResponse = value;
-            final list = <DropdownAttribute>[];
-            for (branch_model.Data item in value.data?.data ?? []) {
-              list.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
-            }
-            list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-            setState(() {
-              _branches = list;
-              _isLoading = false;
-            });
-          } else {
-            setState(() => _isLoading = false);
-          }
-        })
-        .catchError((_) {
-          if (mounted) setState(() => _isLoading = false);
-        });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Container(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 14),
-        child: Row(
-          children: [
-            const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
-            const SizedBox(width: 8),
-            Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
-            const SizedBox(width: 12),
-            const SizedBox(
-              height: 48,
-              width: 200,
-              child: Center(
-                child: Text('Loading branches...', style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (_branches.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
-      child: Row(
-        children: [
-          const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
-          const SizedBox(width: 8),
-          Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
-          const SizedBox(width: 12),
-          AppDropdown(
-            key: ValueKey('branch_dropdown_${widget.selectedBranchName ?? ''}'),
-            attributeList: DropdownAttributeList(
-              _branches,
-              isEditable: true,
-              value: widget.selectedBranchName,
-              onChanged: widget.onBranchChanged,
-              width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
-            ),
-          ),
-        ],
       ),
     );
   }
