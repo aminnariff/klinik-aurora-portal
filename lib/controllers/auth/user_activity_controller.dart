@@ -1,37 +1,28 @@
 import 'dart:async';
-import 'dart:html' as html;
 
-import 'package:shared_preferences/shared_preferences.dart';
-
+/// Monitors user activity by periodically checking [AuthController]'s
+/// persisted last-activity timestamp.  No longer depends on `dart:html`.
+///
+/// Kept for backward compatibility — the new approach uses
+/// [InactivityWatcher] widget + [AuthController]'s built-in periodic timer.
 class UserActivityHandler {
-  Timer? _inactivityTimer;
+  Timer? _checkTimer;
   final Duration timeout;
   final void Function() onTimeout;
+  final bool Function() isAuthenticated;
 
-  UserActivityHandler({required this.timeout, required this.onTimeout});
+  UserActivityHandler({required this.timeout, required this.onTimeout, required this.isAuthenticated});
 
-  Future<void> initialize() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-    if (token != null) {
-      _startListening();
-    }
-  }
-
-  void _startListening() {
-    html.window.onMouseDown.listen((_) => _resetTimer());
-    html.window.onKeyDown.listen((_) => _resetTimer());
-    html.window.onMouseMove.listen((_) => _resetTimer());
-    html.window.onTouchStart.listen((_) => _resetTimer());
-    _resetTimer();
-  }
-
-  void _resetTimer() {
-    _inactivityTimer?.cancel();
-    _inactivityTimer = Timer(timeout, onTimeout);
+  /// Start a periodic check that fires [onTimeout] when idle time exceeds [timeout].
+  void start({Duration interval = const Duration(seconds: 30)}) {
+    _checkTimer?.cancel();
+    _checkTimer = Timer.periodic(interval, (_) {
+      if (!isAuthenticated()) return;
+      onTimeout();
+    });
   }
 
   void dispose() {
-    _inactivityTimer?.cancel();
+    _checkTimer?.cancel();
   }
 }

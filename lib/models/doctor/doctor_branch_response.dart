@@ -35,6 +35,7 @@ class Data {
   String? doctorName;
   String? doctorPhone;
   String? branchId;
+  String? branchName;
   String? doctorImage;
   int? doctorStatus;
   String? createdDate;
@@ -46,6 +47,7 @@ class Data {
     this.doctorPhone,
     this.doctorImage,
     this.branchId,
+    this.branchName,
     this.doctorStatus,
     this.createdDate,
     this.modifiedDate,
@@ -57,6 +59,7 @@ class Data {
     doctorPhone = json['doctorPhone'];
     doctorImage = json['doctorImage'];
     branchId = json['branchId'];
+    branchName = json['branchName'];
     doctorStatus = json['doctorStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
@@ -69,6 +72,7 @@ class Data {
     data['doctorPhone'] = doctorPhone;
     data['doctorImage'] = doctorImage;
     data['branchId'] = branchId;
+    data['branchName'] = branchName;
     data['doctorStatus'] = doctorStatus;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;

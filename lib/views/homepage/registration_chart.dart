@@ -39,7 +39,12 @@ class _RegistrationChartState extends State<RegistrationChart> {
               _buildHeader(context),
               Divider(color: _dividerColor, height: 1),
               Padding(
-                padding: EdgeInsets.fromLTRB(screenPadding * 1.5, screenPadding, screenPadding * 1.5, screenPadding),
+                padding: EdgeInsets.fromLTRB(
+                  screenPadding * 1.5,
+                  screenPadding * 0.5,
+                  screenPadding * 1.5,
+                  screenPadding * 0.5,
+                ),
                 child: _showChart ? _buildChart(data) : _buildTable(data),
               ),
             ],
@@ -51,7 +56,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding * 0.75, screenPadding * 0.75),
+      padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.5, screenPadding * 0.75, screenPadding * 0.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -137,7 +142,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
     final maxY = _calcMaxY(values);
 
     return AspectRatio(
-      aspectRatio: isMobile ? 1.8 : 4,
+      aspectRatio: isMobile ? 1.8 : 5,
       child: LineChart(
         LineChartData(
           lineTouchData: _lineTouchData(getLabel: (spot) => '${spot.y.toInt()} registrations'),
@@ -186,7 +191,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
     final maxY = _calcMaxY(values);
 
     return AspectRatio(
-      aspectRatio: isMobile ? 1.8 : 4,
+      aspectRatio: isMobile ? 1.8 : 5,
       child: LineChart(
         LineChartData(
           lineTouchData: _lineTouchData(getLabel: (spot) => '${spot.y.toInt()} registrations'),

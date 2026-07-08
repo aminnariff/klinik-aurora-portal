@@ -18,6 +18,9 @@ const String jwtResponse = "jwtResponse";
 const String rememberMe = "rememberMe";
 const String username = "username";
 const String password = "password";
+const String lastActivityTimestamp = "lastActivityTimestamp";
+const Duration sessionInactivityTimeout = Duration(hours: 3);
+const Duration inactivityCheckInterval = Duration(seconds: 30);
 List<String> supportedExtensions = ['jpg', 'jpeg', 'pdf', 'png'];
 List<DropdownAttribute> withdrawReason = [
   DropdownAttribute('1', 'Change of Mind'),

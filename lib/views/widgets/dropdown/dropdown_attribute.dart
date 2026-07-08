@@ -45,10 +45,11 @@ class DropdownAttribute {
   final String? description;
   final String? logo;
 
-  DropdownAttribute(
-    this.key,
-    this.name, {
-    this.description,
-    this.logo,
-  });
+  DropdownAttribute(this.key, this.name, {this.description, this.logo});
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || (other is DropdownAttribute && other.key == key);
+
+  @override
+  int get hashCode => key.hashCode;
 }

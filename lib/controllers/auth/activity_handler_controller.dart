@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:klinik_aurora_portal/controllers/auth/user_activity_controller.dart';
 
-class ActivityHandlerController with ChangeNotifier {
-  late UserActivityHandler _handler;
+/// Bridges [AuthController.sessionExpiredByInactivity] to the widget tree.
+///
+/// The [Homepage] listens to [status] and redirects to the login page when
+/// it becomes `true`.  The actual inactivity detection runs inside
+/// [AuthController]'s periodic timer.
+class ActivityHandlerController extends ChangeNotifier {
   bool _status = false;
   bool get status => _status;
 
-  ActivityHandlerController() {
+  /// Called by [Homepage] when it detects [AuthController.sessionExpiredByInactivity].
+  void markInactive() {
+    if (!_status) {
+      _status = true;
+      notifyListeners();
+    }
+  }
+
+  /// Called after logout / redirect completes.
+  void reset() {
     _status = false;
-    _handler = UserActivityHandler(
-      timeout: const Duration(minutes: 30),
-      onTimeout: handleTimeout,
-    );
-    _handler.initialize();
-  }
-
-  void handleTimeout() {
-    _status = true;
     notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _handler.dispose();
-    super.dispose();
   }
 }

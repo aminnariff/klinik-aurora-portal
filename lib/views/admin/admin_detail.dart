@@ -54,6 +54,7 @@ class _AdminDetailState extends State<AdminDetail> {
   List<admin_permission.Data> currentPermissionList = [];
   List<String> selectedPermission = [];
   List<DropdownAttribute> branches = [];
+  final TextEditingController _permissionSearch = TextEditingController();
   final Map<String, List<String>> permissionBundles = {
     'Branch': [
       '1bda631e-ef17-11ee-bd1b-cc801b09db2f', //User Management
@@ -132,38 +133,123 @@ class _AdminDetailState extends State<AdminDetail> {
   }) {
     final Map<String, String> permissionIdToName = {for (var p in allPermissions) p.permissionId!: p.permissionName!};
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
       children: permissionBundles.entries.map((entry) {
         final bundleName = entry.key;
         final bundleIds = entry.value;
 
-        final permissionNames = bundleIds.map((id) => permissionIdToName[id] ?? 'Unknown').join(', ');
+        final permissionNames = bundleIds.map((id) => permissionIdToName[id] ?? 'Unknown');
+        final selectedCount = bundleIds.where((id) => selectedPermission.contains(id)).length;
+        final totalCount = bundleIds.length;
+        final isFullyChecked = selectedCount == totalCount;
+        final isPartiallyChecked = selectedCount > 0 && selectedCount < totalCount;
 
-        final isChecked = bundleIds.every((id) => selectedPermission.contains(id));
-
-        return Tooltip(
-          message: permissionNames,
-          child: Row(
+        return Container(
+          width: 260,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isFullyChecked
+                ? const Color(0xFFEEF2FF)
+                : isPartiallyChecked
+                ? const Color(0xFFF5F3FF)
+                : const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isFullyChecked
+                  ? const Color(0xFF6366F1)
+                  : isPartiallyChecked
+                  ? const Color(0xFFA78BFA)
+                  : const Color(0xFFE5E7EB),
+              width: isFullyChecked || isPartiallyChecked ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Checkbox(
-                value: isChecked,
-                onChanged: (bool? value) {
-                  final newSelected = [...selectedPermission];
-                  if (value == true) {
-                    for (final id in bundleIds) {
-                      if (!newSelected.contains(id)) {
-                        newSelected.add(id);
-                      }
-                    }
-                  } else {
-                    newSelected.removeWhere((id) => bundleIds.contains(id));
-                  }
-                  onPermissionChanged(newSelected);
-                },
+              Row(
+                children: [
+                  SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: Checkbox(
+                      value: isFullyChecked,
+                      tristate: isPartiallyChecked,
+                      onChanged: (bool? value) {
+                        final newSelected = [...selectedPermission];
+                        if (value == true || value == null) {
+                          for (final id in bundleIds) {
+                            if (!newSelected.contains(id)) {
+                              newSelected.add(id);
+                            }
+                          }
+                        } else {
+                          newSelected.removeWhere((id) => bundleIds.contains(id));
+                        }
+                        onPermissionChanged(newSelected);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      bundleName,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isFullyChecked
+                            ? const Color(0xFF4338CA)
+                            : isPartiallyChecked
+                            ? const Color(0xFF6D28D9)
+                            : const Color(0xFF374151),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isFullyChecked ? const Color(0xFF6366F1) : const Color(0xFFE5E7EB),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '$selectedCount/$totalCount',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: isFullyChecked ? Colors.white : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Text(bundleName),
+              if (permissionNames.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: permissionNames.map((name) {
+                    final id = bundleIds.elementAt(permissionNames.toList().indexOf(name));
+                    final isGranted = selectedPermission.contains(id);
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isGranted ? const Color(0xFFE0E7FF) : const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: isGranted ? const Color(0xFF4338CA) : const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ],
           ),
         );
@@ -382,7 +468,7 @@ class _AdminDetailState extends State<AdminDetail> {
                                 'Quick-select permission bundles:',
                                 style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               buildPermissionBundles(
                                 permissionBundles: permissionBundles,
                                 selectedPermission: selectedPermission,
@@ -393,7 +479,120 @@ class _AdminDetailState extends State<AdminDetail> {
                                   });
                                 },
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 16),
+                              // ── Permissions search + grid ─────────────────
+                              Row(
+                                children: [
+                                  Text(
+                                    'All Permissions',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF374151),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEEF2FF),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      '${selectedPermission.length}/${context.read<PermissionController>().permissionAllResponse?.data?.length ?? 0} selected',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF6366F1),
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  SizedBox(
+                                    height: 28,
+                                    child: TextButton.icon(
+                                      style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      icon: const Icon(Icons.select_all_rounded, size: 14, color: Color(0xFF6366F1)),
+                                      label: const Text(
+                                        'Select All',
+                                        style: TextStyle(fontSize: 11, color: Color(0xFF6366F1)),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedPermission =
+                                              (context
+                                                  .read<PermissionController>()
+                                                  .permissionAllResponse
+                                                  ?.data
+                                                  ?.map((p) => p.permissionId!)
+                                                  .toList() ??
+                                              []);
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 28,
+                                    child: TextButton.icon(
+                                      style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      icon: const Icon(Icons.deselect_rounded, size: 14, color: Color(0xFF9CA3AF)),
+                                      label: const Text(
+                                        'Clear',
+                                        style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedPermission.clear();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              TextField(
+                                controller: _permissionSearch,
+                                decoration: InputDecoration(
+                                  hintText: 'Search permissions…',
+                                  hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
+                                  prefixIcon: const Icon(Icons.search_rounded, size: 18, color: Color(0xFF9CA3AF)),
+                                  suffixIcon: _permissionSearch.text.isNotEmpty
+                                      ? IconButton(
+                                          icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
+                                          onPressed: () {
+                                            _permissionSearch.clear();
+                                            setState(() {});
+                                          },
+                                        )
+                                      : null,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  filled: true,
+                                  fillColor: const Color(0xFFF9FAFB),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                                  ),
+                                ),
+                                style: const TextStyle(fontSize: 13),
+                                onChanged: (_) => setState(() {}),
+                              ),
+                              const SizedBox(height: 8),
                               Container(
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFF9FAFB),
@@ -401,51 +600,98 @@ class _AdminDetailState extends State<AdminDetail> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                child: Wrap(
-                                  spacing: 4,
-                                  runSpacing: 4,
-                                  children: List.generate(
-                                    context.read<PermissionController>().permissionAllResponse?.data?.length ?? 0,
-                                    (index) {
-                                      final permission = context
-                                          .read<PermissionController>()
-                                          .permissionAllResponse!
-                                          .data![index];
+                                child: () {
+                                  final allPermissions = context
+                                      .read<PermissionController>()
+                                      .permissionAllResponse
+                                      ?.data;
+                                  if (allPermissions == null || allPermissions.isEmpty) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 24),
+                                      child: Center(
+                                        child: Text(
+                                          'No permissions available',
+                                          style: TextStyle(fontSize: 12, color: const Color(0xFF9CA3AF)),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  final query = _permissionSearch.text.toLowerCase().trim();
+                                  final filtered = query.isEmpty
+                                      ? allPermissions
+                                      : allPermissions
+                                            .where((p) => (p.permissionName ?? '').toLowerCase().contains(query))
+                                            .toList();
+
+                                  if (filtered.isEmpty) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 24),
+                                      child: Center(
+                                        child: Text(
+                                          'No permissions match "$query"',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: const Color(0xFF9CA3AF),
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return Wrap(
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: filtered.map((permission) {
                                       final isChecked = selectedPermission.contains(permission.permissionId);
-                                      return SizedBox(
-                                        width: 180,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Checkbox(
-                                              value: isChecked,
-                                              onChanged: (value) {
-                                                try {
-                                                  setState(() {
-                                                    if (value == true) {
-                                                      selectedPermission.add(permission.permissionId!);
-                                                    } else {
-                                                      selectedPermission.remove(permission.permissionId!);
-                                                    }
-                                                  });
-                                                } catch (e) {
-                                                  showDialogError(context, e.toString());
-                                                }
-                                              },
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                permission.permissionName ?? '',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: Theme.of(context).textTheme.bodyMedium,
+                                      return Container(
+                                        height: 34,
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          color: isChecked ? const Color(0xFFEEF2FF) : Colors.white,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: isChecked ? const Color(0xFF6366F1) : const Color(0xFFE5E7EB),
+                                          ),
+                                        ),
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(8),
+                                          onTap: () {
+                                            setState(() {
+                                              if (isChecked) {
+                                                selectedPermission.remove(permission.permissionId);
+                                              } else {
+                                                selectedPermission.add(permission.permissionId!);
+                                              }
+                                            });
+                                          },
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                isChecked
+                                                    ? Icons.check_box_rounded
+                                                    : Icons.check_box_outline_blank_rounded,
+                                                size: 18,
+                                                color: isChecked ? const Color(0xFF6366F1) : const Color(0xFFD1D5DB),
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                permission.permissionName ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: isChecked ? FontWeight.w600 : FontWeight.w400,
+                                                  color: isChecked ? const Color(0xFF4338CA) : const Color(0xFF374151),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       );
-                                    },
-                                  ),
-                                ),
+                                    }).toList(),
+                                  );
+                                }(),
                               ),
                               const SizedBox(height: 8),
                               Text(

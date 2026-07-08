@@ -14,6 +14,7 @@ import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/homepage/dashboard.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
 import 'package:klinik_aurora_portal/views/payment/branch_summary_homepage.dart';
@@ -37,6 +38,7 @@ final router = GoRouter(
 
     // 1. Allow public routes
     if (uri == LoginPage.routeName ||
+        uri == NoPermission.routeName ||
         uri == AdminPasswordRecoveryPage.routeName ||
         uri == PrivacyPolicy.routeName ||
         uri == TermsAndConditions.routeName ||
@@ -48,6 +50,22 @@ final router = GoRouter(
     final rawAuth = prefs.getString(authResponse);
     if (rawAuth == null || rawAuth.isEmpty) {
       return LoginPage.routeName;
+    }
+
+    // 2b. Check inactivity timeout (3h) — redirect to login if exceeded.
+    //     This check is synchronous (reads from SecurePrefs cache) so it
+    //     works on every navigation, including page reloads.
+    final lastActiveRaw = prefs.getString(lastActivityTimestamp);
+    if (lastActiveRaw != null && lastActiveRaw.isNotEmpty) {
+      final lastActive = DateTime.tryParse(lastActiveRaw);
+      if (lastActive != null) {
+        final elapsed = DateTime.now().difference(lastActive);
+        if (elapsed >= sessionInactivityTimeout) {
+          prefs.remove(authResponse);
+          prefs.remove(token);
+          return LoginPage.routeName;
+        }
+      }
     }
 
     // 3. Synchronously unpack the token payload to check for permissions
@@ -71,7 +89,7 @@ final router = GoRouter(
       ];
 
       if (requiresSuperAdmin.contains(uri) && !isSuperAdmin) {
-        return Homepage.routeName; // Standard deflect to dashboard
+        return NoPermission.routeName;
       }
 
       // 5. Checking exact UUID permission constraints
@@ -87,11 +105,17 @@ final router = GoRouter(
         RewardHomepage.routeName: '6e0fe1f8-2f1f-11ef-8db9-6677d190faa2',
         ServiceHomepage.routeName: '0699ac1c-ac52-11ef-a1b7-bc24115a1342',
         PaymentSummaryPage.routeName: 'f57576c4-4d15-11f0-b054-1ff6746392b2',
+        AppointmentHomepage.routeName: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
       };
 
       final requiredPermission = permissionMap[uri];
       if (requiredPermission != null && !permissions.contains(requiredPermission)) {
-        return Homepage.routeName; // Standard deflect to dashboard
+        // Sonographer UUID grants access to Appointment page
+        final isSonographerOnAppointment =
+            uri == AppointmentHomepage.routeName && permissions.contains('c54a2d91-499c-11f0-9169-bc24115a1342');
+        if (!isSonographerOnAppointment) {
+          return NoPermission.routeName;
+        }
       }
     } catch (e) {
       return LoginPage.routeName; // Deflect to login heavily if JSON parsing fails (corrupted)
@@ -142,6 +166,13 @@ final router = GoRouter(
       builder: (BuildContext context, GoRouterState state) {
         bool? resetUser = state.extra as bool?;
         return LoginPage(resetUser: resetUser);
+      },
+    ),
+    GoRoute(
+      name: NoPermission.routeName,
+      path: NoPermission.routeName,
+      builder: (BuildContext context, GoRouterState state) {
+        return const NoPermission();
       },
     ),
     ShellRoute(

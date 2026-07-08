@@ -1,0 +1,104 @@
+<h2>Which layout direction?</h2>
+<p class="subtitle">Both use Google Calendar-style month cells with appointment chips. Which overall page structure?</p>
+
+<div class="cards">
+  <div class="card" data-choice="full-calendar" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>Option 1: Full-width Calendar</h3>
+      <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 12px; margin: 12px 0;">
+        <div style="background: #fff; border-radius: 6px; overflow: hidden;">
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); background: #f1f5f9; padding: 4px 0; font-size: 10px; text-align: center; color: #475569;">
+            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e2e8f0;">
+            <div style="background: #fff; min-height: 56px; padding: 2px;">
+              <span style="font-size: 10px; color: #94a3b8;">1</span>
+            </div>
+            <div style="background: #fff; min-height: 56px; padding: 2px;">
+              <span style="font-size: 10px; color: #111827;">2</span>
+              <div style="background: #dbeafe; border-radius: 3px; padding: 1px 3px; margin-top: 1px; font-size: 8px; color: #1d4ed8; white-space: nowrap; overflow: hidden;">10am · Ali</div>
+              <div style="background: #fef3c7; border-radius: 3px; padding: 1px 3px; margin-top: 1px; font-size: 8px; color: #92400e; white-space: nowrap; overflow: hidden;">2pm · Sara</div>
+            </div>
+            <div style="background: #fff; min-height: 56px; padding: 2px;">
+              <span style="font-size: 10px; color: #94a3b8;">3</span>
+            </div>
+            <div style="background: #fff; min-height: 56px; padding: 2px;">
+              <span style="font-size: 10px; color: #111827;">4</span>
+            </div>
+            <div style="background: #e0f2fe; min-height: 56px; padding: 2px;">
+              <span style="font-size: 10px; font-weight: 600; color: #0284c7;">5</span>
+              <div style="background: #dbeafe; border-radius: 3px; padding: 1px 3px; margin-top: 1px; font-size: 8px; color: #1d4ed8; white-space: nowrap; overflow: hidden;">9am · Bob</div>
+            </div>
+            <div style="background: #fff; min-height: 56px; padding: 2px;">
+              <span style="font-size: 10px; color: #111827;">6</span>
+            </div>
+            <div style="background: #fff; min-height: 56px; padding: 2px;">
+              <span style="font-size: 10px; color: #94a3b8;">7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: #374151;">↕ Calendar takes ~60% of screen height. Appointment list below for selected day. Same vertical flow as now but denser.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="side-by-side" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>Option 2: Side-by-Side</h3>
+      <div style="display: flex; gap: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin: 12px 0; min-height: 180px;">
+        <div style="flex: 0 0 55%; background: #fff; border-radius: 6px; padding: 8px;">
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); background: #f1f5f9; padding: 2px 0; font-size: 9px; text-align: center; color: #475569;">
+            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e2e8f0;">
+            <div style="background: #fff; min-height: 36px; padding: 1px;">
+              <span style="font-size: 8px; color: #94a3b8;">1</span>
+            </div>
+            <div style="background: #fff; min-height: 36px; padding: 1px;">
+              <span style="font-size: 8px; color: #111827;">2</span>
+              <div style="background: #dbeafe; border-radius: 2px; padding: 0 2px; font-size: 7px; color: #1d4ed8;">Ali</div>
+            </div>
+            <div style="background: #fff; min-height: 36px; padding: 1px;">
+              <span style="font-size: 8px; color: #111827;">3</span>
+            </div>
+            <div style="background: #fff; min-height: 36px; padding: 1px;">
+              <span style="font-size: 8px; color: #111827;">4</span>
+            </div>
+            <div style="background: #e0f2fe; min-height: 36px; padding: 1px;">
+              <span style="font-size: 8px; font-weight: 600; color: #0284c7;">5</span>
+              <div style="background: #dbeafe; border-radius: 2px; padding: 0 2px; font-size: 7px; color: #1d4ed8;">Bob</div>
+            </div>
+            <div style="background: #fff; min-height: 36px; padding: 1px;">
+              <span style="font-size: 8px; color: #111827;">6</span>
+            </div>
+            <div style="background: #fff; min-height: 36px; padding: 1px;">
+              <span style="font-size: 8px; color: #94a3b8;">7</span>
+            </div>
+          </div>
+        </div>
+        <div style="flex: 1; background: #fff; border-radius: 6px; padding: 8px; border-left: 3px solid #22c55e;">
+          <div style="font-size: 10px; font-weight: 600; color: #111827;">Tue, 5 Jul 2026</div>
+          <div style="font-size: 9px; color: #6b7280; margin-bottom: 6px;">3 appointments</div>
+          <div style="display: flex; align-items: center; gap: 6px; padding: 6px; background: #f8fafc; border-radius: 4px; margin-bottom: 4px;">
+            <div style="width: 3px; height: 24px; background: #3b82f6; border-radius: 2px;"></div>
+            <div style="width: 20px; height: 20px; background: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #1d4ed8; font-weight: 600;">AB</div>
+            <div style="flex: 1;"><div style="font-size: 9px; font-weight: 600; color: #111827;">Ali Baba</div><div style="font-size: 8px; color: #6b7280;">Consultation</div></div>
+            <div style="font-size: 8px; color: #6b7280;">9:00</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; padding: 6px; background: #f8fafc; border-radius: 4px;">
+            <div style="width: 3px; height: 24px; background: #f59e0b; border-radius: 2px;"></div>
+            <div style="width: 20px; height: 20px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #92400e; font-weight: 600;">SM</div>
+            <div style="flex: 1;"><div style="font-size: 9px; font-weight: 600; color: #111827;">Sara Ma...</div><div style="font-size: 8px; color: #6b7280;">Follow-up</div></div>
+            <div style="font-size: 8px; color: #6b7280;">2:00</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: #374151;">↔ Compact calendar (~40%) on left, appointment list on right. Both visible at once — ideal for wider screens/tablets.</p>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top: 24px;">WhatsApp in Detail Dialog</h3>
+<div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px;">
+  <p style="margin: 0; font-size: 13px; color: #374151;">The appointment detail dialog (opened by tapping any appointment chip/card) will get a WhatsApp icon button, so users can message patients even when in calendar view.</p>
+</div>

@@ -1,0 +1,61 @@
+<h2>Which layout direction?</h2>
+<p class="subtitle">Both use Google Calendar-style month cells with appointment chips (time + name). Which overall page structure?</p>
+
+<div class="cards">
+  <div class="card" data-choice="full-calendar" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>Option 1: Full-width Calendar</h3>
+      <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 12px 0; font-size: 12px; line-height: 1.5; font-family: monospace;">
+        ┌─────────────────────────────────┐<br>
+        │ [Stats Bar]                     │<br>
+        │ [Tabs] [Table|☰] [Refresh]      │<br>
+        ├─────────────────────────────────┤<br>
+        │  📅 Full-width Month Calendar   │<br>
+        │  ┌───┬───┬───┬───┬───┬───┬───┐│<br>
+        │  │   │   │   │   │ 1 │ 2 │ 3 ││<br>
+        │  │   │   │   │   │10a│10a│   ││<br>
+        │  │   │   │   │   │Jo  │Sa  │   ││<br>
+        │  ├───┼───┼───┼───┼───┼───┼───┤│<br>
+        │  │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │10 ││<br>
+        │  │ 9a│   │11a│   │ 2p│10a│   ││<br>
+        │  │Ali│   │Bo  │   │Ni  │Sa  │   ││<br>
+        │  └───┴───┴───┴───┴───┴───┴───┘│<br>
+        │ Selected day summary bar         │<br>
+        ├─────────────────────────────────┤<br>
+        │ 📋 Appointment list for day     │<br>
+        │ [Card] [Card] [Card]...         │<br>
+        └─────────────────────────────────┘<br>
+      </div>
+      <p><strong>Calendar takes ~60%</strong>, appointments below. Like current layout but denser month cells with chips.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="side-by-side" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>Option 2: Side-by-Side (Split View)</h3>
+      <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 12px 0; font-size: 12px; line-height: 1.5; font-family: monospace;">
+        ┌──────────────────────────────────────────┐<br>
+        │ [Stats Bar]                              │<br>
+        │ [Tabs] [Table|☰] [Refresh]               │<br>
+        ├───────────────────┬──────────────────────┤<br>
+        │ 📅 Compact Cal    │ 📋 Day Appointments  │<br>
+        │ ┌──┬──┬──┬──┬──┐ │ [Card]               │<br>
+        │ │  │  │  │  │ 1│ │ [Card]               │<br>
+        │ │  │  │  │  │10a│ │ [Card]               │<br>
+        │ │  │  │  │  │Jo  │ │ [Card]               │<br>
+        │ ├──┼──┼──┼──┼──┤ │ [Card]               │<br>
+        │ │ 4│ 5│ 6│ 7│ 8│ │ ...                  │<br>
+        │ │ 9a│  │11a│  │ 2p│ │                      │<br>
+        │ │Ali│  │Bo  │  │Ni  │ │                      │<br>
+        │ └──┴──┴──┴──┴──┘ │                      │<br>
+        │                   │                      │<br>
+        └───────────────────┴──────────────────────┘<br>
+      </div>
+      <p><strong>Compact calendar (~35%) on left</strong>, appointment list on right. Both visible without scrolling. Ideal for wider screens.</p>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:16px; padding:12px; background:#F0FDF4; border-radius:8px; border:1px solid #BBF7D0;">
+  <strong>Note:</strong> In both options, tapping an appointment chip/card opens the detail dialog — which will include the WhatsApp icon.
+</div>

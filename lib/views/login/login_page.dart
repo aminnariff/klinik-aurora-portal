@@ -43,7 +43,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final TextEditingController passwordController = TextEditingController();
   final ValueNotifier<bool> isObscure = ValueNotifier<bool>(false);
 
-
   InputFieldAttribute emailAttribute = InputFieldAttribute(
     controller: TextEditingController(text: ''),
     hintText: 'information'.tr(gender: 'email'),
@@ -89,20 +88,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       });
 
       final authController = context.read<AuthController>();
-      authController.init(context).then((controller) async {
-        if (controller == null) return;
-        final expiryDt = controller.data?.expiryDt;
-        if (expiryDt != null && DateTime.parse(expiryDt).difference(DateTime.now()).isNegative) {
-          await prefs.remove(authResponse);
-          await prefs.remove(jwtResponse);
-          await prefs.remove(token);
-          await authController.logout(context);
-        } else {
-          final tokenStatus = await authController.checkDateTime();
-          if (tokenStatus == 'expired') await authController.logout(context);
-        }
-      });
+      await authController.init(context);
 
+      // Load remember-me credentials (runs regardless of init result)
       final rememberMeCredentials = authController.getRememberMeCredentials();
       final remember = prefs.getBool(rememberMe) ?? false;
       context.read<AuthController>().remember = remember;

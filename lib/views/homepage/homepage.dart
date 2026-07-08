@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -52,6 +53,11 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   void initState() {
+    super.initState();
+    _initSidebar();
+  }
+
+  void _initSidebar() {
     sideBarAttribute = [
       SidebarXItem(
         iconBuilder: (selected, hovered) {
@@ -181,6 +187,9 @@ class _HomepageState extends State<Homepage> {
             sideBarAttribute.removeWhere((element) => element.label == 'Dashboard');
             context.goNamed(AppointmentHomepage.routeName);
           }
+          if (sideBarAttribute.isEmpty) {
+            context.goNamed(NoPermission.routeName);
+          }
         }
       });
     });
@@ -189,14 +198,31 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ActivityHandlerController>(
-      builder: (context, snapshot, _) {
-        if (snapshot.status) {
+      builder: (context, activityHandler, _) {
+        // Check BOTH the legacy ActivityHandlerController.status AND the
+        // new AuthController.sessionExpiredByInactivity flag.
+        final authCtrl = context.read<AuthController>();
+        final sessionExpired = activityHandler.status || authCtrl.sessionExpiredByInactivity;
+
+        if (sessionExpired) {
+          if (authCtrl.sessionExpiredByInactivity) {
+            activityHandler.markInactive();
+          }
           SchedulerBinding.instance.scheduleFrameCallback((_) async {
-            await context.read<AuthController>().logout(context);
+            await authCtrl.logout(context);
+            activityHandler.reset();
             if (context.mounted) context.goNamed(LoginPage.routeName);
           });
+          return const SizedBox.shrink();
         }
-        return LayoutWidget(mobile: mobileView(context), tablet: mobileView(context), desktop: desktopView(context));
+
+        // Start/renew the inactivity monitor whenever the homepage renders
+        // while the user is authenticated.
+        authCtrl.startInactivityMonitor();
+
+        return InactivityWatcher(
+          child: LayoutWidget(mobile: mobileView(context), tablet: mobileView(context), desktop: desktopView(context)),
+        );
       },
     );
   }
@@ -297,7 +323,11 @@ class _HomepageState extends State<Homepage> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
-                                        auth.isSuperAdmin ? 'Super Admin' : 'Admin',
+                                        auth.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')
+                                            ? 'Sonographer'
+                                            : auth.isSuperAdmin
+                                            ? 'Super Admin'
+                                            : 'Admin',
                                         style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 11),
                                       ),
                                     ],
@@ -422,7 +452,11 @@ class _HomepageState extends State<Homepage> {
                           style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                         ),
                         Text(
-                          authController.isSuperAdmin ? 'Super Admin' : 'Admin',
+                          authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')
+                              ? 'Sonographer'
+                              : authController.isSuperAdmin
+                              ? 'Super Admin'
+                              : 'Admin',
                           style: AppTypography.bodyMedium(
                             context,
                           ).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -2),
@@ -645,6 +679,47 @@ class _DrawerItem extends StatelessWidget {
       horizontalTitleGap: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       hoverColor: Colors.black26,
+    );
+  }
+}
+
+/// Wraps protected UI and records user activity (pointer + keyboard events)
+/// via [AuthController.trackActivity] so the inactivity timer is reset on
+/// every interaction.  Place this as the outermost child of the homepage ShellRoute.
+class InactivityWatcher extends StatefulWidget {
+  final Widget child;
+  const InactivityWatcher({super.key, required this.child});
+
+  @override
+  State<InactivityWatcher> createState() => _InactivityWatcherState();
+}
+
+class _InactivityWatcherState extends State<InactivityWatcher> {
+  void _onActivity() {
+    // Safe guard: controller may not be available during hot-reload
+    if (!mounted) return;
+    try {
+      context.read<AuthController>().trackActivity();
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          _onActivity();
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Listener(
+        onPointerDown: (_) => _onActivity(),
+        onPointerMove: (_) => _onActivity(),
+        onPointerUp: (_) => _onActivity(),
+        onPointerSignal: (_) => _onActivity(),
+        child: widget.child,
+      ),
     );
   }
 }
