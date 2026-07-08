@@ -86,7 +86,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   List<Data> _selectedDayAppointments = [];
   bool _isLoadingDay = false;
   DropdownAttribute? _appointmentBranch;
-  List<DropdownAttribute> branches = [];
+  final ValueNotifier<List<DropdownAttribute>> branches = ValueNotifier([]);
   List<DropdownAttribute> serviceList = [];
   String? _sortBy;
   String? _sortOrder;
@@ -326,17 +326,22 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   Widget _buildBranchBar() {
     // Trigger branch loading if not yet loaded (e.g., auth loaded after initState)
-    if (branches.isEmpty && mounted) {
+    if (branches.value.isEmpty && mounted) {
       BranchController.getAll(context, 1, 100).then((value) {
         if (responseCode(value.code) && mounted) {
           context.read<BranchController>().branchAllResponse = value;
+          final list = <DropdownAttribute>[];
           for (branch_model.Data item in value.data?.data ?? []) {
-            branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+            list.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
           }
-          branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-          setState(() {});
+          list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+          branches.value = list;
+          if (mounted) setState(() {});
         }
       });
+    }
+
+    if (branches.value.isEmpty) {
       return Container(
         color: Colors.white,
         padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 14),
@@ -369,7 +374,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           AppDropdown(
             key: ValueKey('branch_dropdown_${_appointmentBranch?.key ?? ''}'),
             attributeList: DropdownAttributeList(
-              branches,
+              branches.value,
               isEditable: true,
               value: _appointmentBranch?.name,
               onChanged: (p0) {
