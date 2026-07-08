@@ -90,9 +90,9 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
     return Column(
       children: [
-        FractionallySizedBox(heightFactor: 0.55, child: calendarWidget),
+        Expanded(flex: 55, child: calendarWidget),
         const Divider(height: 1, color: Color(0xFFE5E7EB)),
-        Expanded(child: listWidget),
+        Expanded(flex: 45, child: listWidget),
       ],
     );
   }
