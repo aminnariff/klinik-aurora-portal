@@ -4,12 +4,14 @@ class BranchAllResponse {
   int? totalPage;
   int? totalCount;
 
-  BranchAllResponse({
-    this.message,
-    this.data,
-    this.totalPage,
-    this.totalCount,
-  });
+  BranchAllResponse({this.message, this.data, this.totalPage, this.totalCount});
+
+  static int? _parseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
 
   BranchAllResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
@@ -19,8 +21,8 @@ class BranchAllResponse {
         data!.add(Data.fromJson(v));
       });
     }
-    totalPage = json['totalPage'];
-    totalCount = json['totalCount'];
+    totalPage = _parseInt(json['totalPage']);
+    totalCount = _parseInt(json['totalCount']);
   }
 
   Map<String, dynamic> toJson() {
