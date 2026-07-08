@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
@@ -17,6 +18,7 @@ import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
@@ -25,6 +27,7 @@ import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_response.dart'
     as service_branch_available_model;
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
+import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
@@ -308,6 +311,40 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
                                 tooltip: 'Copy Appointment Details',
                               ),
+                            if (widget.type == 'update') ...[
+                              const SizedBox(width: 4),
+                              IconButton(
+                                onPressed: () {
+                                  final apt = widget.appointment;
+                                  if (apt == null) return;
+                                  final serviceController = context.read<ServiceController>();
+                                  final services = serviceController.servicesResponse?.data;
+                                  List<String> templates = [];
+                                  if (services != null && services.isNotEmpty) {
+                                    final service = services.firstWhere(
+                                      (e) => e.serviceId == apt.service?.serviceId,
+                                      orElse: () => services.first,
+                                    );
+                                    templates = service.serviceTemplate ?? [];
+                                  }
+                                  showWhatsAppTemplateDialog(
+                                    context: context,
+                                    templates: templates,
+                                    name: apt.user?.userFullName ?? '',
+                                    phone: apt.user?.userPhone ?? '',
+                                    service: apt.service?.serviceName ?? '',
+                                    branchName: apt.branch?.branchName ?? '',
+                                    branchPhone: apt.branch?.branchPhone ?? '',
+                                    dateTime: DateTime.tryParse(apt.appointmentDatetime ?? '') ?? DateTime.now(),
+                                  );
+                                },
+                                icon: const Icon(FontAwesomeIcons.whatsapp, size: 18),
+                                color: const Color(0xFF25D366),
+                                tooltip: 'WhatsApp',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                              ),
+                            ],
                             const SizedBox(width: 4),
                             CloseButton(onPressed: () => context.pop()),
                           ],
