@@ -102,16 +102,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         getService();
       }
       if (context.read<AuthController>().isSuperAdmin == true) {
-        BranchController.getAll(context, 1, 100).then((value) {
-          if (responseCode(value.code)) {
-            context.read<BranchController>().branchAllResponse = value;
-            for (branch_model.Data item in value.data?.data ?? []) {
-              branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
-            }
-            branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-            if (mounted) setState(() {});
-          }
-        });
+        // Branches will be loaded on demand from _buildBranchBar()
       }
       _defaultThisMonth();
       getDashboard();
@@ -346,6 +337,25 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           setState(() {});
         }
       });
+      return Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 14),
+        child: Row(
+          children: [
+            const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
+            const SizedBox(width: 8),
+            Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+            const SizedBox(width: 12),
+            const SizedBox(
+              height: 48,
+              width: 200,
+              child: Center(
+                child: Text('Loading branches...', style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
+              ),
+            ),
+          ],
+        ),
+      );
     }
     return Container(
       color: Colors.white,
