@@ -337,6 +337,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return StreamBuilder<DateTime>(
       stream: rebuildDropdown.stream,
       builder: (context, _) {
+        if (branches.isEmpty) return const SizedBox.shrink();
         return Container(
           color: Colors.white,
           padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
@@ -359,6 +360,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     rebuildDropdown.add(DateTime.now());
                     getDashboard();
                     filtering();
+                    if (_isCalendarView && mounted) {
+                      // Refresh calendar counts with the new branch filter
+                      _refreshCalendarCounts();
+                    }
                   },
                   width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
                 ),
@@ -669,6 +674,27 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     });
 
     _fetchDayAppointments(now);
+  }
+
+  /// Re-fetches calendar counts and day appointments for the currently visible month.
+  void _refreshCalendarCounts() {
+    // We don't have direct access to the calendar's focusedDay here,
+    // so use the current month based on today.
+    final now = DateTime.now();
+    final first = DateTime(now.year, now.month, 1);
+    final last = DateTime(now.year, now.month + 1, 0);
+    final branchId = context.read<AuthController>().isSuperAdmin ? _appointmentBranch?.key : null;
+
+    AppointmentController.getCounts(
+      context,
+      startDate: DateFormat('yyyy-MM-dd').format(first),
+      endDate: DateFormat('yyyy-MM-dd').format(last),
+      branchId: branchId,
+    ).then((counts) {
+      if (mounted) setState(() => _appointmentCounts = counts);
+    });
+
+    _fetchDayAppointments(DateTime.now());
   }
 
   Widget _buildTabContent() {
