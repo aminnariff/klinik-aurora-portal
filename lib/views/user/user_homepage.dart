@@ -91,6 +91,7 @@ class _UserHomepageState extends State<UserHomepage> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _userPhoneController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
+  final TextEditingController _userNricController = TextEditingController();
   DropdownAttribute? _selectedBranch;
   DropdownAttribute? _selectedUserStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
@@ -623,6 +624,8 @@ class _UserHomepageState extends State<UserHomepage> {
                           const SizedBox(height: 12),
                           _filterField(_userEmailController, 'Email'),
                           const SizedBox(height: 12),
+                          _filterField(_userNricController, 'ID Number (NRIC/Passport)'),
+                          const SizedBox(height: 12),
                           StreamBuilder<DateTime>(
                             stream: rebuildDropdown.stream,
                             builder: (context, _) => Column(
@@ -826,6 +829,7 @@ class _UserHomepageState extends State<UserHomepage> {
       userName: _userNameController.text,
       userPhone: _userPhoneController.text,
       userEmail: _userEmailController.text,
+      userNric: _userNricController.text,
       branchId: _selectedBranch?.key,
       userStatus: _selectedUserStatus != null
           ? _selectedUserStatus?.key == '1'
@@ -849,6 +853,7 @@ class _UserHomepageState extends State<UserHomepage> {
     _userNameController.text = '';
     _userPhoneController.text = '';
     _userEmailController.text = '';
+    _userNricController.text = '';
     _selectedBranch = null;
     _selectedUserStatus = null;
     rebuildDropdown.add(DateTime.now());

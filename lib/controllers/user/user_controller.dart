@@ -35,6 +35,7 @@ class UserController extends ChangeNotifier {
     String? userName,
     String? userPhone,
     String? userEmail,
+    String? userNric,
     String? branchId,
     int? userStatus,
   }) async {
@@ -47,6 +48,7 @@ class UserController extends ChangeNotifier {
             if (notNullOrEmptyString(userName)) 'userName': userName,
             if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
             if (notNullOrEmptyString(userEmail)) 'userEmail': userEmail,
+            if (notNullOrEmptyString(userNric)) 'userNric': userNric,
             if (notNullOrEmptyString(branchId)) 'branchId': branchId,
             'userStatus': ?userStatus,
             'page': page,

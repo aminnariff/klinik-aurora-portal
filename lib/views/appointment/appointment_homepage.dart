@@ -1418,6 +1418,27 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         body: 'Click "Refresh" in the top-right or use the date filter to reload the latest appointments.',
       ),
       _GuidelineSection(
+        icon: Icons.person_add_rounded,
+        iconColor: const Color(0xFF0891B2),
+        title: 'Booking an Appointment',
+        body:
+            '1. Check whether the patient has an account or not.\n2. Patients can create an account themselves via the app, or we can book for them.\n3. If we book for them, collect the booking fee (if applicable) and insert the receipt/reference number, or add a remark if it\'s a cash payment.',
+      ),
+      _GuidelineSection(
+        icon: Icons.attach_money_rounded,
+        iconColor: const Color(0xFFEF4444),
+        title: 'Refunded Appointments',
+        body:
+            'For refunded appointments, the system will auto-update the text. It is editable, so you can add more details if needed.',
+      ),
+      _GuidelineSection(
+        icon: Icons.transfer_within_a_station_rounded,
+        iconColor: const Color(0xFF7C3AED),
+        title: 'Transferring to Other Branch',
+        body:
+            '1. Contact the other clinic for availability.\n2. Ask the other branch to add a new appointment for the patient.\n3. Update the appointment status on your branch to "Transferred".',
+      ),
+      _GuidelineSection(
         icon: Icons.swap_horiz_rounded,
         iconColor: const Color(0xFF2196F3),
         title: 'Rescheduling Appointments',
@@ -1436,20 +1457,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         iconColor: const Color(0xFF7C3AED),
         title: 'Changing Appointment Service',
         body: '1. Process a refund.\n2. Create a new appointment with the desired service.',
-      ),
-      _GuidelineSection(
-        icon: Icons.person_add_rounded,
-        iconColor: const Color(0xFF0891B2),
-        title: 'Patients Without Accounts',
-        body:
-            'Create an internal user account (do not inform the patient). Make the appointment from the Users tab. Upload proof of payment if booking fee applies.',
-      ),
-      _GuidelineSection(
-        icon: Icons.attach_money_rounded,
-        iconColor: const Color(0xFFEF4444),
-        title: 'Cancellation vs Refund',
-        body:
-            'Mark as "Cancelled" only if the service has no booking fee.\nIf payment was made, use "Refunded" instead.',
       ),
       _GuidelineSection(
         icon: FontAwesomeIcons.whatsapp,
