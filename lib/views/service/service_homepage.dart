@@ -574,14 +574,20 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Tooltip(
-                message: (description != null && description.isNotEmpty) ? description : null,
-                child: Text(
-                  name ?? '—',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+              (description != null && description.isNotEmpty)
+                  ? Tooltip(
+                      message: description,
+                      child: Text(
+                        name ?? '—',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : Text(
+                      name ?? '—',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                      overflow: TextOverflow.ellipsis,
+                    ),
             ],
           ),
         ),

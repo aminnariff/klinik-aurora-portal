@@ -37,8 +37,7 @@ class StickyHeader extends StatelessWidget {
             expandedHeight: expandedHeight,
             collapsedHeight: collapsedHeight,
             shrink: shrink,
-            backgroundColor: backgroundColor ??
-                Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
             background: background,
             padding: headerPadding ?? const EdgeInsets.symmetric(horizontal: 16),
           ),
@@ -69,27 +68,20 @@ class StickyHeaderSliver extends SliverPersistentHeaderDelegate {
   double get maxExtent => expandedHeight;
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     final progress = (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
     return Container(
-      color: (backgroundColor ?? Theme.of(context).scaffoldBackgroundColor)
-          .withValues(alpha: 0.95),
+      color: (backgroundColor ?? Theme.of(context).scaffoldBackgroundColor).withValues(alpha: 0.95),
       child: Opacity(
         opacity: 1 - progress * 0.3,
-        child: Transform.scale(
-          scale: 1 - progress * 0.05,
-          alignment: Alignment.centerLeft,
-          child: child,
-        ),
+        child: Transform.scale(scale: 1 - progress * 0.05, alignment: Alignment.centerLeft, child: child),
       ),
     );
   }
 
   @override
   bool shouldRebuild(StickyHeaderSliver old) =>
-      old.expandedHeight != expandedHeight ||
-      old.collapsedHeight != collapsedHeight;
+      old.expandedHeight != expandedHeight || old.collapsedHeight != collapsedHeight;
 }
 
 class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
@@ -117,23 +109,18 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => shrink ? expandedHeight : collapsedHeight;
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final progress =
-        ((shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0));
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final progress = ((shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0));
     return Container(
       color: backgroundColor.withValues(alpha: 0.97),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (background != null) background!,
+          ?background,
           Padding(
             padding: padding,
             child: Align(
-              alignment: AlignmentTween(
-                begin: Alignment.bottomLeft,
-                end: Alignment.centerLeft,
-              ).lerp(progress),
+              alignment: AlignmentTween(begin: Alignment.bottomLeft, end: Alignment.centerLeft).lerp(progress),
               child: child,
             ),
           ),
@@ -143,6 +130,5 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(_StickyHeaderDelegate old) =>
-      old.expandedHeight != expandedHeight || old.shrink != shrink;
+  bool shouldRebuild(_StickyHeaderDelegate old) => old.expandedHeight != expandedHeight || old.shrink != shrink;
 }

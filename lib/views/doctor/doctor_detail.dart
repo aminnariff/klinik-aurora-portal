@@ -458,7 +458,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 
   Future<void> addPicture() async {
     documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.pickFiles();
 
     if (result != null) {
       PlatformFile file = result.files.first;

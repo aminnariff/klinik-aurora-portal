@@ -209,7 +209,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                                     fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
                                                     action: () async {
                                                       documentErrorMessage.add(null);
-                                                      FilePickerResult? result = await FilePicker.platform.pickFiles();
+                                                      FilePickerResult? result = await FilePicker.pickFiles();
                                                       if (result != null) {
                                                         PlatformFile file = result.files.first;
                                                         if (supportedExtensions.contains(file.extension)) {

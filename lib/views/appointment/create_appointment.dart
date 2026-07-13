@@ -338,7 +338,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     dateTime: DateTime.tryParse(apt.appointmentDatetime ?? '') ?? DateTime.now(),
                                   );
                                 },
-                                icon: const Icon(FontAwesomeIcons.whatsapp, size: 18),
+                                icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
                                 color: const Color(0xFF25D366),
                                 tooltip: 'WhatsApp',
                                 padding: EdgeInsets.zero,

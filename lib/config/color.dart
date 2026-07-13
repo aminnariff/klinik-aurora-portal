@@ -61,8 +61,8 @@ List<Color> colorOptions(String color) {
   }
 }
 
-Color statusColor(status) {
-  if (status.contains('ERROR')) {
+Color statusColor(String? status) {
+  if (status?.contains('ERROR') == true) {
     return const Color(0XFFDF184A);
   } else {
     switch (status) {

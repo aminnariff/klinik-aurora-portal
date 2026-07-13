@@ -716,7 +716,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
 
   Future<void> addPicture() async {
     documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.pickFiles();
 
     if (result != null) {
       PlatformFile file = result.files.first;

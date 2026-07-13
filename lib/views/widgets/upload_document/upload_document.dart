@@ -60,10 +60,11 @@ class UploadDocumentsField extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   children: [
                     DottedBorder(
-                      radius: const Radius.circular(12),
-                      strokeWidth: 0.5,
-                      borderType: BorderType.RRect,
-                      dashPattern: const [3, 4],
+                      options: const RoundedRectDottedBorderOptions(
+                        radius: Radius.circular(12),
+                        strokeWidth: 0.5,
+                        dashPattern: [3, 4],
+                      ),
                       child: InkWell(
                         onTap: action,
                         radius: 15,

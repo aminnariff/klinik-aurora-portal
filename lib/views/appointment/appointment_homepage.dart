@@ -964,7 +964,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     dateTime: DateTime.parse(item.appointmentDatetime ?? ''),
                   );
                 },
-                icon: const Icon(FontAwesomeIcons.whatsapp, size: 24),
+                icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 24),
                 color: const Color(0xFF25D366),
                 tooltip: 'WhatsApp',
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
@@ -1311,7 +1311,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                     itemCount: serviceList.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                    separatorBuilder: (_, _) => const Divider(height: 1, color: Color(0xFFF3F4F6)),
                     itemBuilder: (context, i) {
                       final item = serviceList[i];
                       return ListTile(
@@ -1459,7 +1459,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         body: '1. Process a refund.\n2. Create a new appointment with the desired service.',
       ),
       _GuidelineSection(
-        icon: FontAwesomeIcons.whatsapp,
+        icon: Icons.chat_bubble_rounded,
         iconColor: const Color(0xFF25D366),
         title: 'Contacting Patients via WhatsApp',
         body: 'Click the WhatsApp icon beside an appointment to send reminders, follow-ups, or assist with changes.',

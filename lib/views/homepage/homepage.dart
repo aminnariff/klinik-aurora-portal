@@ -109,7 +109,7 @@ class _HomepageState extends State<Homepage> {
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(FontAwesomeIcons.userDoctor, color: Colors.white);
+          return FaIcon(FontAwesomeIcons.userDoctor, color: Colors.white);
         },
         label: DoctorHomepage.displayName,
       ),

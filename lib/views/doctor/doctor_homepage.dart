@@ -52,9 +52,14 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   static const List<Color> _avatarColors = [
-    Color(0xFF6AD1E3), Color(0xFFDF6E98), Color(0xFF7E57C2),
-    Color(0xFF26A69A), Color(0xFFEF5350), Color(0xFF42A5F5),
-    Color(0xFFFF7043), Color(0xFF66BB6A),
+    Color(0xFF6AD1E3),
+    Color(0xFFDF6E98),
+    Color(0xFF7E57C2),
+    Color(0xFF26A69A),
+    Color(0xFFEF5350),
+    Color(0xFF42A5F5),
+    Color(0xFFFF7043),
+    Color(0xFF66BB6A),
   ];
 
   Color _avatarColor(String name) =>
@@ -72,8 +77,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      Provider.of<TopBarController>(context, listen: false).pageValue =
-          Homepage.getPageId(DoctorHomepage.displayName);
+      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(DoctorHomepage.displayName);
       if (context.read<BranchController>().branchAllResponse == null) {
         BranchController.getAll(context, 1, 1000).then((value) {
           if (responseCode(value.code)) context.read<BranchController>().branchAllResponse = value;
@@ -85,9 +89,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
-
+  Widget build(BuildContext context) => LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
 
   Widget _mobileView() {
     return Consumer<DoctorController>(
@@ -123,8 +125,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       margin: const EdgeInsets.only(bottom: 10),
       elevation: 0,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0xFFE5E7EB))),
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE5E7EB)),
+      ),
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -136,11 +139,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(doc.doctorName ?? 'N/A',
-                      style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
+                  Text(doc.doctorName ?? 'N/A', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
                   const SizedBox(height: 2),
-                  Text(doc.doctorPhone ?? '—',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                  Text(doc.doctorPhone ?? '—', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
                   const SizedBox(height: 4),
                   _statusChip(doc.doctorStatus == 1),
                 ],
@@ -152,7 +153,6 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       ),
     );
   }
-
 
   Widget _desktopView() {
     return Scaffold(
@@ -178,12 +178,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
-          Expanded(
-            child: SizedBox(
-              height: 40,
-              child: _searchInput(_nameController, 'Search by PIC name…'),
-            ),
-          ),
+          Expanded(child: SizedBox(height: 40, child: _searchInput(_nameController, 'Search by PIC name…'))),
           const SizedBox(width: 12),
           OutlinedButton.icon(
             onPressed: _showFilterPanel,
@@ -198,7 +193,10 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
           ),
           const SizedBox(width: 8),
           IconButton(
-            onPressed: () { _resetFilters(); filtering(enableDebounce: false, page: 1); },
+            onPressed: () {
+              _resetFilters();
+              filtering(enableDebounce: false, page: 1);
+            },
             icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
@@ -208,8 +206,10 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
           ),
           const SizedBox(width: 12),
           ElevatedButton.icon(
-            onPressed: () =>
-                showDialog(context: context, builder: (_) => const DoctorDetails(type: 'create')),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => const DoctorDetails(type: 'create'),
+            ),
             icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
             label: const Text('Add PIC', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
@@ -234,8 +234,11 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         final docs = snapshot.doctorBranchResponse?.data ?? [];
         if (docs.isEmpty) {
           return Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE5E7EB))),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
             child: const Center(child: NoRecordsWidget()),
           );
         }
@@ -270,43 +273,71 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       dataRowHeight: 64,
       dividerThickness: 1,
       columns: const [
-        DataColumn2(label: Text('Person In Charge', style: headerStyle), size: ColumnSize.M),
-        DataColumn2(label: Text('Contact', style: headerStyle), size: ColumnSize.S),
-        DataColumn2(label: Text('Branch', style: headerStyle), size: ColumnSize.M),
+        DataColumn2(
+          label: Text('Person In Charge', style: headerStyle),
+          size: ColumnSize.M,
+        ),
+        DataColumn2(
+          label: Text('Contact', style: headerStyle),
+          size: ColumnSize.S,
+        ),
+        DataColumn2(
+          label: Text('Branch', style: headerStyle),
+          size: ColumnSize.M,
+        ),
         DataColumn2(label: Text('Status', style: headerStyle), fixedWidth: 90),
-        DataColumn2(label: Text('Joined', style: headerStyle), size: ColumnSize.S),
+        DataColumn2(
+          label: Text('Joined', style: headerStyle),
+          size: ColumnSize.S,
+        ),
         DataColumn2(label: Text('', style: headerStyle), fixedWidth: 56),
       ],
-      rows: docs.map((doc) => DataRow2(
-        color: WidgetStateProperty.all(Colors.white),
-        cells: [
-          // Name + avatar
-          DataCell(Row(
-            children: [
-              _avatar(doc),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(doc.doctorName ?? 'N/A',
-                    style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                    overflow: TextOverflow.ellipsis),
-              ),
-            ],
-          )),
-          // Phone
-          DataCell(Text(doc.doctorPhone ?? '—',
-              style: const TextStyle(fontSize: 13, color: Color(0xFF374151)))),
-          // Branch
-          DataCell(Text(_branchName(doc.branchId ?? '') ?? '—',
-              style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis)),
-          // Status
-          DataCell(_statusChip(doc.doctorStatus == 1)),
-          // Created
-          DataCell(Text(dateConverter(doc.createdDate) ?? '—',
-              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)))),
-          // Actions
-          DataCell(_actionMenu(doc)),
-        ],
-      )).toList(),
+      rows: docs
+          .map(
+            (doc) => DataRow2(
+              color: WidgetStateProperty.all(Colors.white),
+              cells: [
+                // Name + avatar
+                DataCell(
+                  Row(
+                    children: [
+                      _avatar(doc),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          doc.doctorName ?? 'N/A',
+                          style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Phone
+                DataCell(Text(doc.doctorPhone ?? '—', style: const TextStyle(fontSize: 13, color: Color(0xFF374151)))),
+                // Branch
+                DataCell(
+                  Text(
+                    _branchName(doc.branchId ?? '') ?? '—',
+                    style: const TextStyle(fontSize: 13),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Status
+                DataCell(_statusChip(doc.doctorStatus == 1)),
+                // Created
+                DataCell(
+                  Text(
+                    dateConverter(doc.createdDate) ?? '—',
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                  ),
+                ),
+                // Actions
+                DataCell(_actionMenu(doc)),
+              ],
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -316,7 +347,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       return CircleAvatar(
         radius: 20,
         backgroundImage: NetworkImage('${Environment.imageUrl}${doc.doctorImage}'),
-        onBackgroundImageError: (_, __) {},
+        onBackgroundImageError: (_, _) {},
         backgroundColor: color.withAlpha(40),
         child: null,
       );
@@ -324,8 +355,10 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     return CircleAvatar(
       radius: 20,
       backgroundColor: color.withAlpha(40),
-      child: Text(_initials(doc.doctorName),
-          style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13)),
+      child: Text(
+        _initials(doc.doctorName),
+        style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13),
+      ),
     );
   }
 
@@ -358,23 +391,30 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       itemBuilder: (_) => [
         PopupMenuItem<String>(
           value: 'update',
-          child: Row(children: const [
-            Icon(Icons.edit_outlined, size: 16, color: Color(0xFF6B7280)),
-            SizedBox(width: 10),
-            Text('Update', style: TextStyle(fontSize: 13)),
-          ]),
+          child: Row(
+            children: const [
+              Icon(Icons.edit_outlined, size: 16, color: Color(0xFF6B7280)),
+              SizedBox(width: 10),
+              Text('Update', style: TextStyle(fontSize: 13)),
+            ],
+          ),
         ),
         PopupMenuItem<String>(
           value: 'enableDisable',
-          child: Row(children: [
-            Icon(doc.doctorStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
-                size: 16, color: doc.doctorStatus == 1 ? Colors.red : Colors.green),
-            const SizedBox(width: 10),
-            Text(doc.doctorStatus == 1 ? 'Deactivate' : 'Re-Activate',
-                style: TextStyle(
-                    fontSize: 13,
-                    color: doc.doctorStatus == 1 ? Colors.red : Colors.green)),
-          ]),
+          child: Row(
+            children: [
+              Icon(
+                doc.doctorStatus == 1 ? Icons.block_rounded : Icons.check_circle_outline_rounded,
+                size: 16,
+                color: doc.doctorStatus == 1 ? Colors.red : Colors.green,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                doc.doctorStatus == 1 ? 'Deactivate' : 'Re-Activate',
+                style: TextStyle(fontSize: 13, color: doc.doctorStatus == 1 ? Colors.red : Colors.green),
+              ),
+            ],
+          ),
         ),
       ],
       child: Container(
@@ -394,21 +434,22 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       child: Row(
         children: [
           Expanded(child: _pagination()),
-          Row(children: [
-            const Text('Rows: ', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
-            _perPage(),
-            const SizedBox(width: 16),
-            if (!isMobile && !isTablet)
-              Text(
-                '${(_page * _pageSize) - _pageSize + 1}–${(_page * _pageSize < _totalCount) ? _page * _pageSize : _totalCount} of $_totalCount',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-              ),
-          ]),
+          Row(
+            children: [
+              const Text('Rows: ', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+              _perPage(),
+              const SizedBox(width: 16),
+              if (!isMobile && !isTablet)
+                Text(
+                  '${(_page * _pageSize) - _pageSize + 1}–${(_page * _pageSize < _totalCount) ? _page * _pageSize : _totalCount} of $_totalCount',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                ),
+            ],
+          ),
         ],
       ),
     );
   }
-
 
   void _showFilterPanel() {
     showDialog(
@@ -456,7 +497,10 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                         SizedBox(
                           width: double.infinity,
                           child: OutlinedButton(
-                            onPressed: () { _resetFilters(); filtering(enableDebounce: false, page: 1); },
+                            onPressed: () {
+                              _resetFilters();
+                              filtering(enableDebounce: false, page: 1);
+                            },
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Color(0xFFD1D5DB)),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -469,7 +513,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                     ),
                   ),
                   Positioned(
-                    top: 8, right: 8,
+                    top: 8,
+                    right: 8,
                     child: IconButton(
                       icon: const Icon(Icons.close_rounded, size: 20),
                       onPressed: () => Navigator.pop(context),
@@ -484,11 +529,13 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     );
   }
 
-
   Widget _searchInput(TextEditingController ctrl, String hint) {
     return TextField(
       controller: ctrl,
-      onChanged: (_) { setState(() {}); filtering(page: 1); },
+      onChanged: (_) {
+        setState(() {});
+        filtering(page: 1);
+      },
       style: const TextStyle(fontSize: 13),
       decoration: InputDecoration(
         hintText: hint,
@@ -497,14 +544,28 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         suffixIcon: ctrl.text.isNotEmpty
             ? IconButton(
                 icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
-                onPressed: () { ctrl.clear(); filtering(enableDebounce: false, page: 1); setState(() {}); })
+                onPressed: () {
+                  ctrl.clear();
+                  filtering(enableDebounce: false, page: 1);
+                  setState(() {});
+                },
+              )
             : null,
         filled: true,
         fillColor: const Color(0xFFF9FAFB),
         contentPadding: const EdgeInsets.symmetric(vertical: 0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+        ),
       ),
     );
   }
@@ -520,16 +581,28 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         filled: true,
         fillColor: const Color(0xFFF9FAFB),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: secondaryColor, width: 1.5)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+        ),
       ),
     );
   }
 
   void _handleMenu(String value, Data doc) async {
     if (value == 'update') {
-      showDialog(context: context, builder: (_) => DoctorDetails(doctor: doc, type: 'update'));
+      showDialog(
+        context: context,
+        builder: (_) => DoctorDetails(doctor: doc, type: 'update'),
+      );
     } else if (value == 'enableDisable') {
       try {
         if (await showConfirmDialog(
@@ -542,30 +615,40 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             DoctorController.update(
               context,
               UpdateDoctorRequest(
-                doctorId: doc.doctorId, doctorName: doc.doctorName,
-                branchId: doc.branchId, doctorPhone: doc.doctorPhone,
+                doctorId: doc.doctorId,
+                doctorName: doc.doctorName,
+                branchId: doc.branchId,
+                doctorPhone: doc.doctorPhone,
                 doctorStatus: doc.doctorStatus == 1 ? 0 : 1,
               ),
             ).then((value) {
               if (responseCode(value.code)) {
                 filtering();
-                showDialogSuccess(context,
-                    'PIC ${doc.doctorStatus == 1 ? 'deactivated' : 'activated'} successfully.');
+                showDialogSuccess(context, 'PIC ${doc.doctorStatus == 1 ? 'deactivated' : 'activated'} successfully.');
               } else {
                 showDialogError(context, value.message ?? value.data?.message ?? '');
               }
             });
           });
         }
-      } catch (e) { debugPrint(e.toString()); }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     }
   }
 
   String? _branchName(String branchId) {
     try {
-      return context.read<BranchController>().branchAllResponse?.data?.data!
-          .firstWhere((e) => e.branchId == branchId).branchName;
-    } catch (_) { return null; }
+      return context
+          .read<BranchController>()
+          .branchAllResponse
+          ?.data
+          ?.data!
+          .firstWhere((e) => e.branchId == branchId)
+          .branchName;
+    } catch (_) {
+      return null;
+    }
   }
 
   void filtering({bool enableDebounce = true, int? page}) {
@@ -576,14 +659,18 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     showLoading();
     if (page != null) _page = page;
     DoctorController.get(
-      context, _page, _pageSize,
+      context,
+      _page,
+      _pageSize,
       branchId: context.read<AuthController>().isSuperAdmin
           ? null
           : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
       doctorName: _nameController.text,
       doctorPhone: _phoneController.text,
       doctorStatus: _selectedStatus != null
-          ? _selectedStatus?.key == '1' ? 1 : 0
+          ? _selectedStatus?.key == '1'
+                ? 1
+                : 0
           : null,
     ).then((value) {
       dismissLoading();
@@ -603,16 +690,24 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   Widget _perPage() {
-    return PerPageWidget(_pageSize.toString(), DropdownAttributeList([], onChanged: (selected) {
-      _pageSize = int.parse((selected as DropdownAttribute).key);
-      filtering(enableDebounce: false);
-    }));
+    return PerPageWidget(
+      _pageSize.toString(),
+      DropdownAttributeList(
+        [],
+        onChanged: (selected) {
+          _pageSize = int.parse((selected as DropdownAttribute).key);
+          filtering(enableDebounce: false);
+        },
+      ),
+    );
   }
 
   Widget _pagination() {
     return Pagination(
-      numOfPages: _totalPage, selectedPage: _page,
-      pagesVisible: isMobile ? 3 : 5, spacing: 10,
+      numOfPages: _totalPage,
+      selectedPage: _page,
+      pagesVisible: isMobile ? 3 : 5,
+      spacing: 10,
       onPageChanged: (page) => filtering(page: page, enableDebounce: false),
     );
   }

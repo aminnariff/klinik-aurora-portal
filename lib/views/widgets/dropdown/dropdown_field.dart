@@ -82,7 +82,7 @@ class _AppDropdownState extends State<AppDropdown> {
                 ),
                 items: widget.attributeList.items
                     .map(
-                      (item) => DropdownMenuItem<DropdownAttribute>(
+                      (item) => DropdownItem<DropdownAttribute>(
                         value: item,
                         child: Text(
                           widget.attributeList.titleCase == true
@@ -161,7 +161,6 @@ class _AppDropdownState extends State<AppDropdown> {
                   ),
                 ),
                 menuItemStyleData: MenuItemStyleData(
-                  height: 40,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   selectedMenuItemBuilder: (context, child) => Container(
                     color: secondaryColor.withAlpha(20),

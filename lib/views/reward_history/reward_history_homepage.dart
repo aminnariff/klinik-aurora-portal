@@ -53,8 +53,9 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
-      Provider.of<TopBarController>(context, listen: false).pageValue =
-          Homepage.getPageId(RewardHistoryHomepage.displayName);
+      Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(
+        RewardHistoryHomepage.displayName,
+      );
     });
     filtering();
     super.initState();
@@ -76,7 +77,6 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
   }
 
-
   Widget _desktopView() {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
@@ -91,13 +91,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(13),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.black.withAlpha(13), blurRadius: 8, offset: const Offset(0, 2))],
                 ),
                 child: _historyTable(),
               ),
@@ -131,10 +125,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                   filled: true,
                   fillColor: const Color(0xFFF5F6FA),
                   contentPadding: EdgeInsets.zero,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                 ),
               ),
             ),
@@ -189,10 +180,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
           alignment: Alignment.centerRight,
           child: Material(
             color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              bottomLeft: Radius.circular(16),
-            ),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
             elevation: 8,
             child: SizedBox(
               width: 320,
@@ -209,8 +197,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                           children: [
                             Text(
                               'Filter',
-                              style: AppTypography.bodyLarge(context)
-                                  .copyWith(fontWeight: FontWeight.w700),
+                              style: AppTypography.bodyLarge(context).copyWith(fontWeight: FontWeight.w700),
                             ),
                             IconButton(
                               onPressed: () => Navigator.pop(ctx),
@@ -241,15 +228,12 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                         const SizedBox(height: 6),
                         StreamBuilder<DateTime>(
                           stream: rebuildDropdown.stream,
-                          builder: (context, __) {
+                          builder: (context, _) {
                             return Column(
                               children: [
                                 AppDropdown(
                                   attributeList: DropdownAttributeList(
-                                    [
-                                      DropdownAttribute('1', 'In-Progress'),
-                                      DropdownAttribute('0', 'Completed'),
-                                    ],
+                                    [DropdownAttribute('1', 'In-Progress'), DropdownAttribute('0', 'Completed')],
                                     labelText: 'Redemption Status',
                                     value: _rewardHistoryStatus?.name,
                                     onChanged: (p0) {
@@ -263,10 +247,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                 const SizedBox(height: 10),
                                 AppDropdown(
                                   attributeList: DropdownAttributeList(
-                                    [
-                                      DropdownAttribute('1', 'Active'),
-                                      DropdownAttribute('0', 'Inactive'),
-                                    ],
+                                    [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
                                     labelText: 'Reward Status',
                                     value: _rewardStatus?.name,
                                     onChanged: (p0) {
@@ -293,8 +274,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                             },
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                             child: const Text('Clear Filters'),
                           ),
@@ -314,8 +294,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   Widget _filterLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
     );
   }
 
@@ -331,15 +310,11 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
           filled: true,
           fillColor: const Color(0xFFF5F6FA),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
         ),
       ),
     );
   }
-
 
   Widget _historyTable() {
     return Consumer<RewardHistoryController>(
@@ -349,10 +324,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
         }
         final items = snapshot.rewardHistoryResponse?.data?.data ?? [];
         if (items.isEmpty) {
-          return const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [NoRecordsWidget()],
-          );
+          return const Column(mainAxisAlignment: MainAxisAlignment.center, children: [NoRecordsWidget()]);
         }
         return Column(
           children: [
@@ -367,10 +339,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                 headingRowHeight: 48,
                 dataRowHeight: 64,
                 decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                 ),
                 columns: [
                   _col('Patient', ColumnSize.L),
@@ -384,9 +353,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(
-                        i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC),
-                      ),
+                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
                       cells: [
                         DataCell(_patientCell(items[i])),
                         DataCell(_rewardCell(items[i])),
@@ -408,19 +375,12 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                           ),
                         ),
                         DataCell(
-                          _iconBtn(
-                            Icons.edit_outlined,
-                            const Color(0xFF6366F1),
-                            () {
-                              showDialog(
-                                context: context,
-                                builder: (_) => RewardHistoryDetail(
-                                  data: items[i],
-                                  type: 'update',
-                                ),
-                              );
-                            },
-                          ),
+                          _iconBtn(Icons.edit_outlined, const Color(0xFF6366F1), () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => RewardHistoryDetail(data: items[i], type: 'update'),
+                            );
+                          }),
                         ),
                       ],
                     ),
@@ -440,25 +400,14 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       size: size,
       label: Text(
         label,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF6B7280),
-          letterSpacing: 0.3,
-        ),
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280), letterSpacing: 0.3),
       ),
     );
   }
 
   Widget _patientCell(Data item) {
     final name = item.userFullname ?? '—';
-    final initials = name
-        .trim()
-        .split(' ')
-        .where((w) => w.isNotEmpty)
-        .take(2)
-        .map((w) => w[0].toUpperCase())
-        .join();
+    final initials = name.trim().split(' ').where((w) => w.isNotEmpty).take(2).map((w) => w[0].toUpperCase()).join();
     final colors = [
       const Color(0xFF6366F1),
       const Color(0xFF06B6D4),
@@ -477,11 +426,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
           backgroundColor: color.withAlpha(40),
           child: Text(
             initials,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
           ),
         ),
         const SizedBox(width: 10),
@@ -492,18 +437,11 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             children: [
               Text(
                 name,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF111827),
-                ),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
                 overflow: TextOverflow.ellipsis,
               ),
               if (item.userPhone != null && item.userPhone!.isNotEmpty)
-                Text(
-                  item.userPhone!,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
-                ),
+                Text(item.userPhone!, style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF))),
             ],
           ),
         ),
@@ -518,11 +456,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       children: [
         Text(
           item.rewardName ?? '—',
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF111827),
-          ),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF111827)),
           overflow: TextOverflow.ellipsis,
         ),
         if (item.rewardDescription != null && item.rewardDescription!.isNotEmpty)
@@ -545,11 +479,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       ),
       child: Text(
         '${points ?? 0} pts',
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF0369A1),
-        ),
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0369A1)),
       ),
     );
   }
@@ -561,17 +491,10 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     final textColor = isInProgress ? const Color(0xFFC2410C) : const Color(0xFF15803D);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: textColor,
-        ),
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textColor),
       ),
     );
   }
@@ -582,10 +505,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(6),
-        ),
+        decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(6)),
         child: Icon(icon, size: 16, color: color),
       ),
     );
@@ -612,10 +532,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!isMobile && !isTablet)
-                Text(
-                  'Rows per page: ',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
+                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
               PerPageWidget(
                 _pageSize.toString(),
                 DropdownAttributeList(
@@ -640,7 +557,6 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     );
   }
 
-
   Widget _mobileView() {
     return Consumer<RewardHistoryController>(
       builder: (context, snapshot, _) {
@@ -660,10 +576,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                   prefixIcon: const Icon(Icons.search, size: 20),
                   filled: true,
                   fillColor: const Color(0xFFF5F6FA),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 ),
               ),
@@ -715,12 +628,9 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             if (item.userPhone != null) _mobileRow('Phone', item.userPhone!),
             _mobileRow(
               'Updated',
-              dateConverter(item.rewardHistoryModifiedDate) ??
-                  dateConverter(item.rewardHistoryCreatedDate) ??
-                  '—',
+              dateConverter(item.rewardHistoryModifiedDate) ?? dateConverter(item.rewardHistoryCreatedDate) ?? '—',
             ),
-            if (item.rewardHistoryDescription != null &&
-                item.rewardHistoryDescription!.isNotEmpty)
+            if (item.rewardHistoryDescription != null && item.rewardHistoryDescription!.isNotEmpty)
               _mobileRow('Remark', item.rewardHistoryDescription!),
             const SizedBox(height: 8),
             _iconBtn(Icons.edit_outlined, const Color(0xFF6366F1), () {
@@ -743,27 +653,18 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
         children: [
           SizedBox(
             width: 70,
-            child: Text(
-              label,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-            ),
+            child: Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
-            ),
+            child: Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
           ),
         ],
       ),
     );
   }
 
-
   void filtering({bool enableDebounce = true, int? page}) {
-    enableDebounce
-        ? _debouncer.run(() => runFiltering(page: page))
-        : runFiltering(page: page);
+    enableDebounce ? _debouncer.run(() => runFiltering(page: page)) : runFiltering(page: page);
   }
 
   void runFiltering({bool enableDebounce = true, int? page}) {
@@ -774,30 +675,28 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       _page,
       _pageSize,
       customerName: _customerNameController.text.isNotEmpty ? _customerNameController.text : null,
-      customerUsername:
-          _customerUserNameController.text.isNotEmpty ? _customerUserNameController.text : null,
+      customerUsername: _customerUserNameController.text.isNotEmpty ? _customerUserNameController.text : null,
       userPhone: _customerPhoneController.text.isNotEmpty ? _customerPhoneController.text : null,
       rewardName: _rewardNameController.text.isNotEmpty ? _rewardNameController.text : null,
       rewardHistoryStatus: _rewardHistoryStatus != null
           ? _rewardHistoryStatus?.key == '1'
-              ? 1
-              : _rewardHistoryStatus?.key == '0'
-                  ? 0
-                  : null
+                ? 1
+                : _rewardHistoryStatus?.key == '0'
+                ? 0
+                : null
           : null,
       rewardStatus: _rewardStatus != null
           ? _rewardStatus?.key == '1'
-              ? 1
-              : _rewardStatus?.key == '0'
-                  ? 0
-                  : null
+                ? 1
+                : _rewardStatus?.key == '0'
+                ? 0
+                : null
           : null,
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         _totalCount = value.data?.totalCount ?? 0;
-        _totalPage =
-            value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<RewardHistoryController>().rewardHistoryResponse = value;
       }
       return null;

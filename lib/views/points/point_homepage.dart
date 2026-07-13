@@ -226,7 +226,7 @@ class _PointHomepageState extends State<PointHomepage> {
                           child: ListView.separated(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             itemCount: patients.length,
-                            separatorBuilder: (_, __) => const Divider(height: 1, indent: 16, endIndent: 16),
+                            separatorBuilder: (_, _) => const Divider(height: 1, indent: 16, endIndent: 16),
                             itemBuilder: (context, index) {
                               final item = patients[index];
                               return _patientTile(item);
@@ -364,7 +364,6 @@ class _PointHomepageState extends State<PointHomepage> {
       ),
     );
   }
-
 
   Widget _howItWorksBanner() {
     return Container(
@@ -535,7 +534,7 @@ class _PointHomepageState extends State<PointHomepage> {
                     : ListView.separated(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         itemCount: items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 2),
+                        separatorBuilder: (_, _) => const SizedBox(height: 2),
                         itemBuilder: (_, index) => _historyCard(items[index]),
                       ),
               ),

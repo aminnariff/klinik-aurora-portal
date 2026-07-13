@@ -239,7 +239,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         // Animated decorative blobs
         AnimatedBuilder(
           animation: _pulse,
-          builder: (_, __) => Stack(
+          builder: (_, _) => Stack(
             children: [
               Positioned(top: -90, right: -90, child: _decorCircle(280, _pulse.value * 0.16)),
               Positioned(bottom: -70, left: -110, child: _decorCircle(320, _pulse.value * 0.12)),
@@ -398,7 +398,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       right: rightFactor != null ? screenW * rightFactor : null,
       child: AnimatedBuilder(
         animation: _pulse,
-        builder: (_, __) => Container(
+        builder: (_, _) => Container(
           width: size,
           height: size,
           decoration: BoxDecoration(
