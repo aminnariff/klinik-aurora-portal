@@ -60,9 +60,15 @@ class AppointmentController extends ChangeNotifier {
     String? endDate,
     String? sortBy,
     String? sortOrder,
+    String? search,
+    String? customerName,
+    String? customerPhone,
+    String? customerNric,
+    String? appointmentId,
   }) async {
     final queryParams = {
       'appointmentStatus': status,
+      'appointmentId': ?appointmentId,
       'userId': ?userId,
       'branchId': ?branchId,
       'serviceBranchId': ?serviceBranchId,
@@ -70,6 +76,10 @@ class AppointmentController extends ChangeNotifier {
       'endDate': ?endDate,
       'sortBy': ?sortBy,
       'sortOrder': ?sortOrder,
+      'search': ?search,
+      'customerName': ?customerName,
+      'customerPhone': ?customerPhone,
+      'customerNric': ?customerNric,
       'page': page,
       'pageSize': pageSize,
     };

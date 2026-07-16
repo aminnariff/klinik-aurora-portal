@@ -12,8 +12,9 @@ class DateRange {
 
 class DateFilterDropdown extends StatefulWidget {
   final Function(DateRange) onSelected;
+  final DateRange? initial;
 
-  const DateFilterDropdown({super.key, required this.onSelected});
+  const DateFilterDropdown({super.key, required this.onSelected, this.initial});
 
   @override
   State<DateFilterDropdown> createState() => _DateFilterDropdownState();
@@ -26,7 +27,7 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
   @override
   void initState() {
     super.initState();
-    _selected = _defaultThisMonth();
+    _selected = widget.initial ?? _defaultThisMonth();
   }
 
   DateRange _defaultThisMonth() {

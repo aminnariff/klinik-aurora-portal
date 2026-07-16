@@ -8,13 +8,21 @@ import 'package:provider/provider.dart';
 
 /// Ranks services by appointment volume (last 30 days) so admins can see
 /// which services attract the most customers and which are underperforming.
-class ServicePerformanceChart extends StatelessWidget {
+class ServicePerformanceChart extends StatefulWidget {
   const ServicePerformanceChart({super.key});
 
   static const _bgColor = Color(0xff232d37);
   static const _dividerColor = Color(0xff37434d);
   static const _mutedColor = Color(0xff68737d);
   static const _barBgColor = Color(0xff2a3a4a);
+
+  @override
+  State<ServicePerformanceChart> createState() => _ServicePerformanceChartState();
+}
+
+class _ServicePerformanceChartState extends State<ServicePerformanceChart> {
+  static const _collapsedCount = 6;
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +32,10 @@ class ServicePerformanceChart extends StatelessWidget {
         final isLoading = controller.servicePerformanceResponse == null;
 
         return Container(
-          decoration: const BoxDecoration(color: _bgColor, borderRadius: BorderRadius.all(Radius.circular(18))),
+          decoration: const BoxDecoration(
+            color: ServicePerformanceChart._bgColor,
+            borderRadius: BorderRadius.all(Radius.circular(18)),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -39,25 +50,34 @@ class ServicePerformanceChart extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Service Performance', style: AppTypography.displayMedium(context).apply(color: Colors.white)),
-                    const Text('Last 30 days', style: TextStyle(color: _mutedColor, fontSize: 12)),
+                    const Text(
+                      'Last 30 days',
+                      style: TextStyle(color: ServicePerformanceChart._mutedColor, fontSize: 12),
+                    ),
                   ],
                 ),
               ),
-              const Divider(color: _dividerColor, height: 1),
+              const Divider(color: ServicePerformanceChart._dividerColor, height: 1),
               Padding(
                 padding: EdgeInsets.all(screenPadding),
                 child: isLoading
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(24),
-                          child: Text('Loading...', style: TextStyle(color: _mutedColor, fontSize: 13)),
+                          child: Text(
+                            'Loading...',
+                            style: TextStyle(color: ServicePerformanceChart._mutedColor, fontSize: 13),
+                          ),
                         ),
                       )
                     : services.isEmpty
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(24),
-                          child: Text('No service data available', style: TextStyle(color: _mutedColor, fontSize: 13)),
+                          child: Text(
+                            'No service data available',
+                            style: TextStyle(color: ServicePerformanceChart._mutedColor, fontSize: 13),
+                          ),
                         ),
                       )
                     : _buildRanking(services),
@@ -73,12 +93,38 @@ class ServicePerformanceChart extends StatelessWidget {
     final maxBookings = services
         .map((s) => s.totalBookings ?? 0)
         .fold<int>(0, (prev, e) => e > prev ? e : prev);
+    final hasMore = services.length > _collapsedCount;
+    final visibleCount = _expanded || !hasMore ? services.length : _collapsedCount;
+    final hiddenCount = services.length - visibleCount;
 
     return Column(
       children: [
-        for (int i = 0; i < services.length; i++) ...[
-          _ServiceRow(rank: i + 1, item: services[i], maxBookings: maxBookings),
-          if (i != services.length - 1) const SizedBox(height: 12),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: Column(
+            children: [
+              for (int i = 0; i < visibleCount; i++) ...[
+                _ServiceRow(rank: i + 1, item: services[i], maxBookings: maxBookings),
+                if (i != visibleCount - 1) const SizedBox(height: 12),
+              ],
+            ],
+          ),
+        ),
+        if (hasMore) ...[
+          const SizedBox(height: 8),
+          Center(
+            child: TextButton.icon(
+              onPressed: () => setState(() => _expanded = !_expanded),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xff6ad1e3),
+                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              ),
+              icon: Icon(_expanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 18),
+              label: Text(_expanded ? 'Show less' : 'Show more ($hiddenCount)'),
+            ),
+          ),
         ],
       ],
     );

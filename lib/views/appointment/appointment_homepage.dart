@@ -78,6 +78,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   final _debouncer = Debouncer(milliseconds: 1200);
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _serviceNameController = TextEditingController();
+  final TextEditingController _customerNameController = TextEditingController();
+  final TextEditingController _customerPhoneController = TextEditingController();
+  final TextEditingController _customerNricController = TextEditingController();
+  final TextEditingController _appointmentIdController = TextEditingController();
   ValueNotifier<bool> isNoRecords = ValueNotifier<bool>(false);
   final currencyFormatter = NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2);
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
@@ -93,6 +97,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   List<DropdownAttribute> serviceList = [];
   String? _sortBy;
   String? _sortOrder;
+  DateRange? _currentDateRange;
 
   @override
   void initState() {
@@ -211,12 +216,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     final endOfMonth = DateTime(now.year, now.month + 1, 0);
     startDate = getDateOnly(startOfMonth.toString());
     endDate = getDateOnly(endOfMonth.toString());
-    return DateRange(
+    _currentDateRange = DateRange(
       label: 'This month (${DateFormat('MMMM yyyy').format(now)})',
       shortLabel: 'This Month',
       start: startOfMonth,
       end: endOfMonth,
     );
+    return _currentDateRange!;
   }
 
   String getDateOnly(String value) {
@@ -244,6 +250,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   void runFiltering({bool enableDebounce = true, int? page}) {
     showLoading();
     if (page != null) _page = page;
+    final searchText = _searchController.text.trim();
     context.read<AppointmentController>().appointmentResponse = null;
     AppointmentController()
         .get(
@@ -257,10 +264,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               ? null
               : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
           serviceBranchId: _selectedServiceBranchId(),
-          startDate: startDate,
-          endDate: endDate,
+          // When searching, ignore the date range so results aren't hidden by it
+          startDate: searchText.isEmpty ? startDate : null,
+          endDate: searchText.isEmpty ? endDate : null,
           sortBy: _sortBy,
           sortOrder: _sortOrder,
+          search: searchText.isEmpty ? null : searchText,
+          customerName: _customerNameController.text.trim().isEmpty ? null : _customerNameController.text.trim(),
+          customerPhone: _customerPhoneController.text.trim().isEmpty ? null : _customerPhoneController.text.trim(),
+          customerNric: _customerNricController.text.trim().isEmpty ? null : _customerNricController.text.trim(),
+          appointmentId: _appointmentIdController.text.trim().isEmpty ? null : _appointmentIdController.text.trim(),
         )
         .then((value) {
           dismissLoading();
@@ -290,6 +303,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   void resetAllFilter() {
     _serviceNameController.text = '';
     _searchController.text = '';
+    _customerNameController.text = '';
+    _customerPhoneController.text = '';
+    _customerNricController.text = '';
+    _appointmentIdController.text = '';
     rebuildDropdown.add(DateTime.now());
   }
 
@@ -425,16 +442,260 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       child: Row(
         children: [
           DateFilterDropdown(
-            onSelected: (range) {
-              startDate = range.start != null ? getDateOnly('${range.start}') : null;
-              endDate = range.end != null ? getDateOnly('${range.end}') : null;
-              getDashboard();
-              filtering();
-            },
+            key: ValueKey('bar-${_currentDateRange?.label}'),
+            initial: _currentDateRange,
+            onSelected: _onDateRangeSelected,
           ),
-          const SizedBox(width: 12),
-          _buildServiceFilter(),
+          const SizedBox(width: 12), 
+          Spacer(),
+          // Expanded(child: _buildSearchField()),
+          // const SizedBox(width: 12),
+          OutlinedButton.icon(
+            onPressed: _showFilterPanel,
+            icon: const Icon(Icons.tune_rounded, size: 16),
+            label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 13)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: _hasActiveFilters() ? secondaryColor : const Color(0xFF374151),
+              side: BorderSide(color: _hasActiveFilters() ? secondaryColor : const Color(0xFFD1D5DB)),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            onPressed: _resetFilters,
+            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            tooltip: 'Reset filters',
+            style: IconButton.styleFrom(
+              backgroundColor: const Color(0xFFF3F4F6),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  bool _hasActiveFilters() {
+    return _appointmentService != null ||
+        _customerNameController.text.trim().isNotEmpty ||
+        _customerPhoneController.text.trim().isNotEmpty ||
+        _customerNricController.text.trim().isNotEmpty ||
+        _appointmentIdController.text.trim().isNotEmpty;
+  }
+
+  void _onDateRangeSelected(DateRange range) {
+    _currentDateRange = range;
+    startDate = range.start != null ? getDateOnly('${range.start}') : null;
+    endDate = range.end != null ? getDateOnly('${range.end}') : null;
+    setState(() {});
+    getDashboard();
+    filtering();
+  }
+
+  String _dateRangeSummary() {
+    final range = _currentDateRange;
+    if (range == null || range.start == null || range.end == null) return 'All dates';
+    final df = DateFormat('dd MMM yyyy');
+    final start = df.format(range.start!);
+    final end = df.format(range.end!);
+    return start == end ? start : '$start – $end';
+  }
+
+  void _resetFilters() {
+    resetAllFilter();
+    _appointmentService = null;
+    _defaultThisMonth();
+    setState(() {});
+    getDashboard();
+    filtering(enableDebounce: false, page: 1);
+  }
+
+  void _showFilterPanel() {
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setDialogState) => Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Material(
+              color: Colors.white,
+              elevation: 8,
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+              child: SizedBox(
+                width: 320,
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 56, 20, 20),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Filter Appointments',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: secondaryColor.withAlpha(18),
+                                border: Border.all(color: secondaryColor.withAlpha(90)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.event_rounded, size: 15, color: secondaryColor),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          _currentDateRange?.shortLabel ?? 'All Time',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                            color: secondaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 21),
+                                    child: Text(
+                                      _dateRangeSummary(),
+                                      style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  DateFilterDropdown(
+                                    key: ValueKey('panel-${_currentDateRange?.label}'),
+                                    initial: _currentDateRange,
+                                    onSelected: (range) {
+                                      _onDateRangeSelected(range);
+                                      setDialogState(() {});
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _filterField(_appointmentIdController, 'Appointment ID'),
+                            const SizedBox(height: 12),
+                            _filterField(_customerNameController, 'Patient Name'),
+                            const SizedBox(height: 12),
+                            _filterField(_customerPhoneController, 'Mobile Number'),
+                            const SizedBox(height: 12),
+                            _filterField(_customerNricController, 'IC Number (NRIC/Passport)'),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Service',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                            ),
+                            const SizedBox(height: 8),
+                            _buildServiceFilter(),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  setState(() {});
+                                  filtering(enableDebounce: false, page: 1);
+                                  if (_isCalendarView && mounted) {
+                                    _refreshCalendarCounts();
+                                  }
+                                },
+                                icon: const Icon(Icons.search_rounded, size: 16),
+                                label: const Text('Apply Filters', style: TextStyle(fontWeight: FontWeight.w600)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: secondaryColor,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  _resetFilters();
+                                  Navigator.of(context).pop();
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFFD1D5DB)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: const Text('Clear Filters'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Positioned(top: 8, right: 8, child: CloseButton()),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  Widget _buildSearchField() {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 420),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (_) {
+          setState(() {});
+          filtering(page: 1);
+        },
+        style: AppTypography.bodyMedium(context),
+        decoration: InputDecoration(
+          hintText: 'Search appointment ID, patient name or phone…',
+          hintStyle: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
+          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 20),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF9CA3AF)),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {});
+                    filtering(enableDebounce: false, page: 1);
+                  },
+                )
+              : null,
+          filled: true,
+          fillColor: Colors.white,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+          ),
+        ),
       ),
     );
   }
@@ -443,34 +704,54 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return StreamBuilder<DateTime>(
       stream: rebuildDropdown.stream,
       builder: (context, snapshot) {
-        return Row(
-          children: [
-            const Icon(Icons.medical_services_rounded, size: 16, color: Color(0xFF6B7280)),
-            const SizedBox(width: 8),
-            Text('Service', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
-            const SizedBox(width: 12),
-            AppDropdown(
-              attributeList: DropdownAttributeList(
-                [DropdownAttribute('', 'All Services'), ...serviceList],
-                isEditable: true,
-                hintText: 'All Services',
-                value: _appointmentService?.name,
-                onChanged: (p0) {
-                  setState(() {
-                    _appointmentService = (p0 == null || p0.key.isEmpty) ? null : p0;
-                  });
-                  _page = 1;
-                  filtering(enableDebounce: false);
-                  if (_isCalendarView && mounted) {
-                    _refreshCalendarCounts();
-                  }
-                },
-                width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
-              ),
-            ),
-          ],
+        return AppDropdown(
+          attributeList: DropdownAttributeList(
+            [DropdownAttribute('', 'All Services'), ...serviceList],
+            isEditable: true,
+            hintText: 'All Services',
+            value: _appointmentService?.name,
+            onChanged: (p0) {
+              // Applied on "Apply Filters" — no query fired here
+              setState(() {
+                _appointmentService = (p0 == null || p0.key.isEmpty) ? null : p0;
+              });
+              rebuildDropdown.add(DateTime.now());
+            },
+            width: 280,
+          ),
         );
       },
+    );
+  }
+
+  Widget _filterField(TextEditingController controller, String label) {
+    return TextField(
+      controller: controller,
+      onSubmitted: (_) {
+        Navigator.of(context).pop();
+        setState(() {});
+        filtering(enableDebounce: false, page: 1);
+      },
+      style: const TextStyle(fontSize: 13),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 13),
+        filled: true,
+        fillColor: const Color(0xFFF9FAFB),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+        ),
+      ),
     );
   }
 
@@ -846,48 +1127,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       },
     );
   }
-
-  // Widget _buildSearchToolbar() {
-  //   return Container(
-  //     color: const Color(0xFFF5F6FA),
-  //     padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 10),
-  //     child: TextField(
-  //       controller: _searchController,
-  //       onChanged: (_) => filtering(page: 1),
-  //       style: AppTypography.bodyMedium(context),
-  //       decoration: InputDecoration(
-  //         hintText: 'Search by patient name…',
-  //         hintStyle: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
-  //         prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 20),
-  //         suffixIcon: _searchController.text.isNotEmpty
-  //             ? IconButton(
-  //                 icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF9CA3AF)),
-  //                 onPressed: () {
-  //                   _searchController.clear();
-  //                   filtering(enableDebounce: false, page: 1);
-  //                   setState(() {});
-  //                 },
-  //               )
-  //             : null,
-  //         filled: true,
-  //         fillColor: Colors.white,
-  //         contentPadding: const EdgeInsets.symmetric(vertical: 10),
-  //         border: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(10),
-  //           borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-  //         ),
-  //         enabledBorder: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(10),
-  //           borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-  //         ),
-  //         focusedBorder: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(10),
-  //           borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildEmptyState() {
     return Center(
