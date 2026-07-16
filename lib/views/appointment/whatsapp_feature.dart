@@ -52,7 +52,7 @@ void showWhatsAppTemplateDialog({
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.15), shape: BoxShape.circle),
                       child: const Icon(Icons.chat_rounded, color: Colors.green, size: 28),
                     ),
                     const SizedBox(width: 16),
@@ -132,7 +132,7 @@ void showWhatsAppTemplateDialog({
                                         Container(
                                           padding: const EdgeInsets.all(8),
                                           decoration: BoxDecoration(
-                                            color: primary.withOpacity(0.1),
+                                            color: primary.withValues(alpha: 0.1),
                                             shape: BoxShape.circle,
                                           ),
                                           child: Icon(Icons.send_rounded, color: primary, size: 20),
@@ -216,7 +216,7 @@ void showWhatsAppTemplateDialog({
                                     selection: TextSelection.collapsed(offset: newText.length),
                                   );
                                 },
-                                backgroundColor: primary.withOpacity(0.1),
+                                backgroundColor: primary.withValues(alpha: 0.1),
                                 side: const BorderSide(color: Colors.transparent),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),

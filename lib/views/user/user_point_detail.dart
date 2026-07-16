@@ -94,7 +94,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                   Container(
                     width: 48,
                     height: 48,
-                    decoration: BoxDecoration(color: primary.withOpacity(0.1), shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: primary.withValues(alpha: 0.1), shape: BoxShape.circle),
                     child: Center(
                       child: Text(
                         (widget.user.userFullname ?? 'U')[0].toUpperCase(),
@@ -227,7 +227,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                               decoration: BoxDecoration(
-                                                color: _getTypeColor(item.pointType).withOpacity(0.1),
+                                                color: _getTypeColor(item.pointType).withValues(alpha: 0.1),
                                                 borderRadius: BorderRadius.circular(6),
                                               ),
                                               child: Text(
@@ -288,15 +288,15 @@ class _UserPointDetailState extends State<UserPointDetail> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.05),
+          color: color.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.1)),
+          border: Border.all(color: color.withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
               child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(width: 16),

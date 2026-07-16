@@ -51,7 +51,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: secondaryColor.withOpacity(0.1),
+                    backgroundColor: secondaryColor.withValues(alpha: 0.1),
                     child: Text(
                       _initials(widget.patient?.userFullname),
                       style: TextStyle(color: secondaryColor, fontWeight: FontWeight.bold, fontSize: 18),
@@ -124,7 +124,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade100),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Material(
         color: Colors.transparent,
@@ -139,7 +139,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                 Container(
                   width: 60,
                   height: 60,
-                  decoration: BoxDecoration(color: primary.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: primary.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(12)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

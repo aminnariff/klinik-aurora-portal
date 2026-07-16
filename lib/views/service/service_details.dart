@@ -724,7 +724,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         debugPrint(bytesToMB(file.size).toString());
         debugPrint(file.name);
         if (bytesToMB(file.size) < 1.0) {
-          Uint8List? fileBytes = result.files.first.bytes;
+          Uint8List? fileBytes = await result.files.first.readAsBytes();
           String fileName = result.files.first.name;
 
           selectedFile = FileAttribute(name: fileName, value: fileBytes);

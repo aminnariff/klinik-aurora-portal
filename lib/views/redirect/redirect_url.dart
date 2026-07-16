@@ -1,4 +1,4 @@
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -44,7 +44,7 @@ class _PlatformRedirectPageState extends State<PlatformRedirectPage> {
   void redirectToPlatformUrl() async {
     String? url;
 
-    final userAgent = html.window.navigator.userAgent.toLowerCase();
+    final userAgent = web.window.navigator.userAgent.toLowerCase();
 
     if (userAgent.contains('iphone') || userAgent.contains('ipad') || userAgent.contains('ios')) {
       url = iosUrl;
@@ -58,7 +58,7 @@ class _PlatformRedirectPageState extends State<PlatformRedirectPage> {
 
     if (url != null) {
       await Future.delayed(const Duration(seconds: 1));
-      html.window.location.href = url;
+      web.window.location.href = url;
     } else {
       setState(() {
         isLoading = false;

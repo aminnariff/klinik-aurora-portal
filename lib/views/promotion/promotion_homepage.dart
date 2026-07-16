@@ -529,7 +529,7 @@ class _PromotionCardState extends State<_PromotionCard> {
             ? Image.network(
                 '${Environment.imageUrl}${images.first.path}',
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                errorBuilder: (_, _, _) => _buildPlaceholder(),
                 loadingBuilder: (_, child, progress) {
                   if (progress == null) return child;
                   return _buildPlaceholder(loading: true);
@@ -810,7 +810,7 @@ class _PromotionFormDialog extends StatelessWidget {
                         PlatformFile file = result.files.first;
                         if (supportedExtensions.contains(file.extension)) {
                           if (bytesToMB(file.size) < 1.0) {
-                            selectedFiles.add(FileAttribute(name: file.name, value: result.files.first.bytes));
+                            selectedFiles.add(FileAttribute(name: file.name, value: await result.files.first.readAsBytes()));
                             fileRebuild.add(DateTime.now());
                           } else {
                             showDialogError(

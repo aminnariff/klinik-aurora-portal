@@ -446,7 +446,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             initial: _currentDateRange,
             onSelected: _onDateRangeSelected,
           ),
-          const SizedBox(width: 12), 
+          const SizedBox(width: 12),
           Spacer(),
           // Expanded(child: _buildSearchField()),
           // const SizedBox(width: 12),
@@ -653,51 +653,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     ).then((_) {
       if (mounted) setState(() {});
     });
-  }
-
-  Widget _buildSearchField() {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 420),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (_) {
-          setState(() {});
-          filtering(page: 1);
-        },
-        style: AppTypography.bodyMedium(context),
-        decoration: InputDecoration(
-          hintText: 'Search appointment ID, patient name or phone…',
-          hintStyle: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
-          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 20),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF9CA3AF)),
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() {});
-                    filtering(enableDebounce: false, page: 1);
-                  },
-                )
-              : null,
-          filled: true,
-          fillColor: Colors.white,
-          isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildServiceFilter() {

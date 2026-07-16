@@ -29,16 +29,6 @@ class _ServiceBranchState extends State<ServiceBranch> {
 
   @override
   void initState() {
-    // if (context.read<BranchController>().branchAllResponse == null) {
-    //   BranchController.getAll(context, 1, 100).then((value) {
-    //     if (responseCode(value.code)) {
-    //       context.read<BranchController>().branchAllResponse = value;
-    //       setState(() {});
-    //     } else {
-    //       //TODO: show error to retry
-    //     }
-    //   });
-    // }
     widget.serviceBranch?.data?.sort((a, b) {
       final nameA = a.branchName?.toLowerCase() ?? '';
       final nameB = b.branchName?.toLowerCase() ?? '';

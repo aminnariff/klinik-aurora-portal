@@ -157,7 +157,7 @@ class _PointDetailState extends State<PointDetail> {
                                               onChanged: (selected) {
                                                 setState(() {
                                                   _selectedType = selected;
-                                                  print('_selectedType?.key ${_selectedType?.key}');
+                                                  debugPrint('_selectedType?.key ${_selectedType?.key}');
                                                   selectedReward;
                                                   _selectedVoucher = null;
                                                   selectedVoucher = null;

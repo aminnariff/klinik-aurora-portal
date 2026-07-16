@@ -136,7 +136,6 @@ class AppointmentController extends ChangeNotifier {
   }
 
   /// Fetches appointment counts grouped by date for a date range.
-  /// Returns a Map<String, int> of date -> count.
   static Future<Map<String, int>> getCounts(
     BuildContext context, {
     required String startDate,

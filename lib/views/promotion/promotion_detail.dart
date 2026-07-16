@@ -217,7 +217,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                                             selectedFiles.add(
                                                               FileAttribute(
                                                                 name: result.files.first.name,
-                                                                value: result.files.first.bytes,
+                                                                value: await result.files.first.readAsBytes(),
                                                               ),
                                                             );
                                                             fileRebuild.add(DateTime.now());

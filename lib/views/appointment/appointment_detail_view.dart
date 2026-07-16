@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
-import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
@@ -9,7 +8,6 @@ import 'package:klinik_aurora_portal/models/appointment/appointment_detail_respo
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
-import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
@@ -207,11 +205,6 @@ class AppointmentDetailsView extends StatelessWidget {
 
   Widget _appointmentSection(BuildContext context, Data? data) {
     final statusCode = data?.appointmentStatus ?? 0;
-    final statusEntry = appointmentStatus.firstWhere(
-      (e) => statusCode.toString() == e.key,
-      orElse: () => DropdownAttribute('0', 'Unknown'),
-    );
-    final statusColor = appointmentStatusColors[statusCode] ?? Colors.grey;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
