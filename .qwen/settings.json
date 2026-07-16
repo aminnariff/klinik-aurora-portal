@@ -10,7 +10,8 @@
       "Bash(eof)",
       "Bash(/users/aminariff/documents/github/klinik-aurora-portal/.fvm/flutter_sdk/bin/dart *)",
       "Bash(/opt/homebrew/bin/fvm *)",
-      "Bash(bash *)"
+      "Bash(bash *)",
+      "Bash(/users/aminariff/fvm/versions/3.44.1/bin/dart *)"
     ]
   },
   "$version": 4

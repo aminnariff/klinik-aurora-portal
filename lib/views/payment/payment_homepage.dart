@@ -27,6 +27,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   String selectedFilter = 'Yesterday';
   late DateTime startDate;
   late DateTime endDate;
+  bool _channelExpanded = false;
+  bool _branchExpanded = false;
   static const Color _dateAccent = Color(0xFF2196F3);
 
   static const _bgDark = Color(0xff232d37);
@@ -58,17 +60,19 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   void exportData() {
     showLoading();
     PaymentController.exportCsvDownload(
-      fileName: 'payment-report',
-      startDate: DateFormat('yyyy-MM-dd').format(startDate),
-      endDate: DateFormat('yyyy-MM-dd').format(endDate),
-      branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-    ).then((_) {
-      dismissLoading();
-      AppToast.snackbar(context, 'CSV exported successfully.');
-    }).catchError((_) {
-      dismissLoading();
-      AppToast.snackbar(context, 'Export failed. Please try again.');
-    });
+          fileName: 'payment-report',
+          startDate: DateFormat('yyyy-MM-dd').format(startDate),
+          endDate: DateFormat('yyyy-MM-dd').format(endDate),
+          branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+        )
+        .then((_) {
+          dismissLoading();
+          AppToast.snackbar(context, 'CSV exported successfully.');
+        })
+        .catchError((_) {
+          dismissLoading();
+          AppToast.snackbar(context, 'Export failed. Please try again.');
+        });
   }
 
   void applyDateFilter() {
@@ -182,18 +186,23 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 _buildFilterRow(),
                 SizedBox(height: screenPadding),
                 _buildSummaryCards(controller),
-                if (channels.isNotEmpty) ...[
+                if (channels.isNotEmpty || (isSuperAdmin && branchCount >= 2)) ...[
                   SizedBox(height: screenPadding),
-                  _buildChannelBreakdown(controller),
+                  if (channels.isNotEmpty && isSuperAdmin && branchCount >= 2)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _buildChannelBreakdown(controller)),
+                        SizedBox(width: screenPadding),
+                        Expanded(child: _buildBranchOverview(controller)),
+                      ],
+                    )
+                  else if (channels.isNotEmpty)
+                    _buildChannelBreakdown(controller)
+                  else
+                    _buildBranchOverview(controller),
                 ],
-                if (isSuperAdmin && branchCount >= 2) ...[
-                  SizedBox(height: screenPadding),
-                  _buildBranchOverview(controller),
-                ],
-                if (dateCount >= 2) ...[
-                  SizedBox(height: screenPadding),
-                  _buildChart(controller),
-                ],
+                if (dateCount >= 2) ...[SizedBox(height: screenPadding), _buildChart(controller)],
                 SizedBox(height: screenPadding),
                 _buildTable(controller),
               ],
@@ -209,8 +218,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     final isSuperAdmin = auth.isSuperAdmin;
     final branchName = !isSuperAdmin
         ? (controller.paymentReportResponse?.data?.isNotEmpty == true
-            ? controller.paymentReportResponse!.data!.first.branchName
-            : null)
+              ? controller.paymentReportResponse!.data!.first.branchName
+              : null)
         : null;
 
     return Row(
@@ -224,10 +233,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               const SizedBox(height: 2),
               Row(
                 children: [
-                  Text(
-                    getFormattedDateRange(),
-                    style: AppTypography.bodyMedium(context).apply(color: _muted),
-                  ),
+                  Text(getFormattedDateRange(), style: AppTypography.bodyMedium(context).apply(color: _muted)),
                   if (!isSuperAdmin) ...[
                     const SizedBox(width: 8),
                     Container(
@@ -244,11 +250,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           const SizedBox(width: 4),
                           Text(
                             branchName ?? 'Your Branch',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1565C0),
-                            ),
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1565C0)),
                           ),
                         ],
                       ),
@@ -311,16 +313,14 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       decoration: BoxDecoration(
                         color: selected ? const Color(0xFF2196F3) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
-                        ),
+                        border: Border.all(color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB)),
                         boxShadow: selected
                             ? [
                                 BoxShadow(
                                   color: const Color(0xFF2196F3).withAlpha(51),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
-                                )
+                                ),
                               ]
                             : null,
                       ),
@@ -460,6 +460,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     if (channels.isEmpty) return const SizedBox();
 
     final totalCount = channels.fold<int>(0, (sum, c) => sum + (c.count ?? 0));
+    final displayChannels = _channelExpanded ? channels : channels.take(6).toList();
 
     IconData channelIcon(String? ch) {
       switch (ch) {
@@ -521,78 +522,98 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           Padding(
             padding: EdgeInsets.all(screenPadding * 0.75),
             child: Column(
-              children: channels.asMap().entries.map((entry) {
-                final i = entry.key;
-                final c = entry.value;
-                final color = channelColors[i % channelColors.length];
-                final count = c.count ?? 0;
-                final fraction = totalCount > 0 ? count / totalCount : 0.0;
-                final amount = double.tryParse(c.totalAmount ?? '0') ?? 0.0;
+              children: [
+                ...displayChannels.asMap().entries.map((entry) {
+                  final i = entry.key;
+                  final c = entry.value;
+                  final color = channelColors[i % channelColors.length];
+                  final count = c.count ?? 0;
+                  final fraction = totalCount > 0 ? count / totalCount : 0.0;
+                  final amount = double.tryParse(c.totalAmount ?? '0') ?? 0.0;
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(color: color.withAlpha(25), borderRadius: BorderRadius.circular(8)),
-                            child: Icon(channelIcon(c.channel), size: 14, color: color),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              c.channelLabel,
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: color.withAlpha(25),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(channelIcon(c.channel), size: 14, color: color),
                             ),
-                          ),
-                          Text(
-                            '$count txn${count != 1 ? 's' : ''}',
-                            style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(width: 12),
-                          SizedBox(
-                            width: 90,
-                            child: Text(
-                              'RM ${amount.toStringAsFixed(2)}',
-                              textAlign: TextAlign.right,
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF374151)),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const SizedBox(width: 38),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: fraction,
-                                minHeight: 6,
-                                backgroundColor: color.withAlpha(20),
-                                valueColor: AlwaysStoppedAnimation<Color>(color),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                c.channelLabel,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF111827),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: 38,
-                            child: Text(
-                              '${(fraction * 100).toStringAsFixed(0)}%',
-                              style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                            Text(
+                              '$count txn${count != 1 ? 's' : ''}',
+                              style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(width: 12),
+                            SizedBox(
+                              width: 90,
+                              child: Text(
+                                'RM ${amount.toStringAsFixed(2)}',
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF374151),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const SizedBox(width: 38),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: fraction,
+                                  minHeight: 6,
+                                  backgroundColor: color.withAlpha(20),
+                                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 38,
+                              child: Text(
+                                '${(fraction * 100).toStringAsFixed(0)}%',
+                                style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                if (channels.length > 6)
+                  _buildShowMoreButton(
+                    expanded: _channelExpanded,
+                    count: channels.length,
+                    label: 'channel',
+                    onToggle: () => setState(() => _channelExpanded = !_channelExpanded),
                   ),
-                );
-              }).toList(),
+              ],
             ),
           ),
         ],
@@ -601,9 +622,16 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   }
 
   static const List<Color> _branchColors = [
-    Color(0xFF2196F3), Color(0xFFDF6E98), Color(0xFF4CAF50), Color(0xFFFF9800),
-    Color(0xFF9C27B0), Color(0xFF00BCD4), Color(0xFFFF5722), Color(0xFF8BC34A),
-    Color(0xFFE91E63), Color(0xFF607D8B),
+    Color(0xFF2196F3),
+    Color(0xFFDF6E98),
+    Color(0xFF4CAF50),
+    Color(0xFFFF9800),
+    Color(0xFF9C27B0),
+    Color(0xFF00BCD4),
+    Color(0xFFFF5722),
+    Color(0xFF8BC34A),
+    Color(0xFFE91E63),
+    Color(0xFF607D8B),
   ];
 
   Widget _buildBranchOverview(PaymentController controller) {
@@ -627,6 +655,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     final branches = agg.values.toList()..sort((a, b) => b.revenue.compareTo(a.revenue));
     final maxRevenue = branches.first.revenue;
+    final displayBranches = _branchExpanded ? branches : branches.take(6).toList();
 
     return Container(
       decoration: BoxDecoration(
@@ -645,10 +674,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 const SizedBox(width: 8),
                 Text('Branch Overview', style: AppTypography.displayMedium(context)),
                 const Spacer(),
-                Text(
-                  '${branches.length} branches',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
-                ),
+                Text('${branches.length} branches', style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
               ],
             ),
           ),
@@ -656,72 +682,88 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           Padding(
             padding: EdgeInsets.all(screenPadding * 0.75),
             child: Column(
-              children: branches.asMap().entries.map((entry) {
-                final i = entry.key;
-                final b = entry.value;
-                final color = _branchColors[i % _branchColors.length];
-                final fraction = maxRevenue > 0 ? b.revenue / maxRevenue : 0.0;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 8, height: 8,
-                            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              b.branchName,
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+              children: [
+                ...displayBranches.asMap().entries.map((entry) {
+                  final i = entry.key;
+                  final b = entry.value;
+                  final color = _branchColors[i % _branchColors.length];
+                  final fraction = maxRevenue > 0 ? b.revenue / maxRevenue : 0.0;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
                             ),
-                          ),
-                          _miniStatChip('✓ ${b.successful}', const Color(0xFFD1FAE5), const Color(0xFF065F46)),
-                          const SizedBox(width: 6),
-                          _miniStatChip('✗ ${b.failed}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 100,
-                            child: Text(
-                              'RM ${b.revenue.toStringAsFixed(2)}',
-                              textAlign: TextAlign.right,
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: fraction,
-                                minHeight: 6,
-                                backgroundColor: color.withAlpha(20),
-                                valueColor: AlwaysStoppedAnimation<Color>(color),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                b.branchName,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF111827),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: 38,
-                            child: Text(
-                              '${(fraction * 100).toStringAsFixed(0)}%',
-                              style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                            _miniStatChip('✓ ${b.successful}', const Color(0xFFD1FAE5), const Color(0xFF065F46)),
+                            const SizedBox(width: 6),
+                            _miniStatChip('✗ ${b.failed}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
+                            const SizedBox(width: 10),
+                            SizedBox(
+                              width: 100,
+                              child: Text(
+                                'RM ${b.revenue.toStringAsFixed(2)}',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: fraction,
+                                  minHeight: 6,
+                                  backgroundColor: color.withAlpha(20),
+                                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 38,
+                              child: Text(
+                                '${(fraction * 100).toStringAsFixed(0)}%',
+                                style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                if (branches.length > 6)
+                  _buildShowMoreButton(
+                    expanded: _branchExpanded,
+                    count: branches.length,
+                    label: 'branch',
+                    onToggle: () {
+                      setState(() => _branchExpanded = !_branchExpanded);
+                    },
                   ),
-                );
-              }).toList(),
+              ],
             ),
           ),
         ],
@@ -733,7 +775,39 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
-      child: Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg),
+      ),
+    );
+  }
+
+  Widget _buildShowMoreButton({
+    required bool expanded,
+    required int count,
+    required String label,
+    required VoidCallback onToggle,
+  }) {
+    return GestureDetector(
+      onTap: onToggle,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+              size: 16,
+              color: const Color(0xFF2196F3),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              expanded ? 'Show less' : 'Show all $count $label${count != 1 ? 's' : ''}',
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF2196F3)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -755,23 +829,14 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     final maxY = values.reduce((a, b) => a > b ? a : b);
 
     return Container(
-      decoration: BoxDecoration(
-        color: _bgDark,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: _bgDark, borderRadius: BorderRadius.circular(16)),
       padding: EdgeInsets.all(screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Net Revenue by Date',
-            style: AppTypography.displayMedium(context).apply(color: Colors.white),
-          ),
+          Text('Net Revenue by Date', style: AppTypography.displayMedium(context).apply(color: Colors.white)),
           const SizedBox(height: 4),
-          Text(
-            getFormattedDateRange(),
-            style: const TextStyle(color: _muted, fontSize: 11),
-          ),
+          Text(getFormattedDateRange(), style: const TextStyle(color: _muted, fontSize: 11)),
           SizedBox(height: screenPadding),
           AspectRatio(
             aspectRatio: isMobile ? 1.8 : 4,
@@ -798,10 +863,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       reservedSize: 50,
                       getTitlesWidget: (value, meta) {
                         if (value == meta.max || value == 0) return const SizedBox();
-                        return Text(
-                          'RM ${value.toInt()}',
-                          style: const TextStyle(color: _muted, fontSize: 10),
-                        );
+                        return Text('RM ${value.toInt()}', style: const TextStyle(color: _muted, fontSize: 10));
                       },
                     ),
                   ),
@@ -909,10 +971,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 4),
-            Text(
-              'Try selecting a different date range',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-            ),
+            Text('Try selecting a different date range', style: TextStyle(fontSize: 12, color: Colors.grey.shade400)),
           ],
         ),
       ),
@@ -932,9 +991,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
-      border: TableBorder(
-        horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1),
-      ),
+      border: TableBorder(horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1)),
       children: [
         TableRow(
           decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
@@ -951,9 +1008,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         ),
         for (int i = 0; i < data.length; i++)
           TableRow(
-            decoration: BoxDecoration(
-              color: i.isEven ? Colors.white : const Color(0xFFFAFAFA),
-            ),
+            decoration: BoxDecoration(color: i.isEven ? Colors.white : const Color(0xFFFAFAFA)),
             children: [
               if (isSuperAdmin)
                 Padding(
@@ -1022,10 +1077,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFEE2E2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(12)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -1033,11 +1085,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       const SizedBox(width: 4),
                       Text(
                         data[i].failedPayments ?? '0',
-                        style: const TextStyle(
-                          color: Color(0xFF991B1B),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
+                        style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w600, fontSize: 12),
                       ),
                     ],
                   ),
@@ -1062,10 +1110,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Text(
                   data[i].netRevenue ?? '0.00',
-                  style: cellStyle.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF0891B2),
-                  ),
+                  style: cellStyle.copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF0891B2)),
                 ),
               ),
             ],
@@ -1133,21 +1178,14 @@ class _SummaryCard extends StatelessWidget {
               Container(
                 width: 4,
                 height: 32,
-                decoration: BoxDecoration(
-                  color: config.accent,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+                decoration: BoxDecoration(color: config.accent, borderRadius: BorderRadius.circular(2)),
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
             config.value,
-            style: TextStyle(
-              fontSize: isMobile ? 16 : 20,
-              fontWeight: FontWeight.bold,
-              color: config.valueColor,
-            ),
+            style: TextStyle(fontSize: isMobile ? 16 : 20, fontWeight: FontWeight.bold, color: config.valueColor),
           ),
           const SizedBox(height: 2),
           Text(
