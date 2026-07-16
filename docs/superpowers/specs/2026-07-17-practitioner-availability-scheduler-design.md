@@ -37,8 +37,12 @@ shared window using that service's own interval.
 - **Conflict rule:** **replace within period, keep the rest.** Applying a schedule
   for a period wipes each target service's existing slots inside that period and
   replaces them; slots outside the period are untouched.
-- **No backend changes.** The feature is a smarter front door over the existing
+- **Bulk save on the backend.** Instead of the frontend looping N create/update
+  calls, the backend exposes one bulk endpoint that saves all target services in
+  a single request (see "Save (bulk fan-out)"). Reads still use the existing
   `admin/service-branch` and `admin/service-available-datetime` endpoints.
+- **Period = explicit available/expiry dates.** Staff picks a start ("available
+  from") date and an end ("available until" / expiry) date, not a month count.
 - The existing per-service calendar dialog remains available for one-off edits.
 
 ## User flow
@@ -55,8 +59,10 @@ permission UUID; access is inherited from the Service page.
 - **Practitioner type:** dropdown built from the `doctorType` enum in
   `lib/views/widgets/global/global.dart` (1 Doctor, 2 Sonographer, 3 Therapist,
   4 Spa Therapist, 5 Dietitian).
-- **Period:** start month + number of months (1–3), matching the existing 3-month
-  slot horizon.
+- **Period:** explicit date range — **"Available from"** date and **"Available
+  until" (expiry)** date pickers. Defaults: today → end of the month two months
+  ahead (matching the existing 3-month slot horizon). The expiry date bounds slot
+  generation and defines the replace-within-period window.
 
 ### Step 2 — Availability pattern
 
@@ -83,20 +89,49 @@ shows:
 - amber warning when the service already has slots inside the period:
   "existing &lt;period&gt; slots will be replaced"
 
-### Save (fan-out)
+### Save (bulk fan-out)
 
-For each ticked service, sequentially with progress feedback:
+Client side, for each ticked service:
 
-1. Expand pattern × service interval × period → new datetimes
-   (UTC ISO-8601, past dates filtered — same rule as `filterPastMonths`).
+1. Expand pattern × service interval × period (available → expiry date) → new
+   datetimes (UTC ISO-8601, past dates filtered — same rule as `filterPastMonths`).
 2. `GET admin/service-available-datetime?serviceBranchId=...` → keep existing
-   datetimes **outside** the period, drop those inside.
-3. Merged list → existing `create` / `update` endpoint (create when no
-   `serviceBranchAvailableDatetimeId` exists, update otherwise) — same call pattern
-   as the current sync loop.
+   datetimes **outside** the period, drop those inside, merge with the new slots.
 
-Finish with a per-service success/failure summary (not just a count) so a failed
-service is visible and can be retried.
+Then **one** API call to a new bulk endpoint:
+
+```
+POST admin/service-available-datetime/bulk-upsert
+{
+  "items": [
+    {
+      "serviceBranchId": "...",
+      "availableDatetimes": ["2026-08-03T01:00:00Z", ...]
+    },
+    ...
+  ]
+}
+```
+
+Backend contract:
+
+- Upsert semantics per item: update the service's existing
+  `service_branch_available_datetime` record if one exists, otherwise create it —
+  identical outcome to today's per-service create/update, just batched.
+- **Writes into the same records/tables as the existing endpoints.** The patient
+  booking flow (`admin/service-available-datetime/available`) and every other
+  admin read remain completely unchanged — no patient-side or admin-side rework.
+- Response reports per-item success/failure so the UI can show which services
+  failed and offer retry; the whole batch should run in one transaction where
+  practical.
+
+The wizard finishes with that per-service success/failure summary (not just a
+count).
+
+**Fallback:** the client-side helper is written so that, until the bulk endpoint
+ships, the same merged payloads can be saved via the existing per-service
+create/update loop behind a flag. This keeps frontend and backend work
+independently deliverable.
 
 Expected behavior note: because each service keeps its own interval, slot *times*
 will differ across services within the same window (09:00/09:45/10:30 for a 45-min
@@ -114,15 +149,21 @@ service vs 09:00/10:00/11:00 for a 60-min one). This is intended.
   source of truth for the pattern UI.
 - `lib/controllers/practitioner_schedule/practitioner_schedule_helper.dart`
   — pure functions: pattern → slot expansion, and replace-within-period merge.
-  I/O reuses `ServiceBranchController` and `ServiceBranchAvailableDtController`;
+  Reads reuse `ServiceBranchController` and `ServiceBranchAvailableDtController`;
   no new `ChangeNotifier` provider is required.
+- `ServiceBranchAvailableDtController` gains one static method
+  `bulkUpsert(context, List<BulkSlotItem> items)` →
+  `POST admin/service-available-datetime/bulk-upsert`, following the existing
+  static-method + `ApiResponse<T>` controller pattern. A small request/response
+  model pair is added under `lib/models/service/`.
 
 ## Error handling
 
 - Empty pattern or zero targets → save disabled with inline explanation.
-- Fan-out failures are collected per service and shown in the summary; successes
-  are not rolled back (each service is an independent record, matching current
-  sync behavior).
+- Expiry date before available date, or range fully in the past → validation
+  error before Step 2.
+- Bulk-save failures are reported per item by the backend and shown in the
+  summary with a retry option for failed items only.
 - All datetimes stored as UTC ISO-8601, consistent with
   `_getAllDateTimeValues()` in the existing calendar.
 
@@ -132,7 +173,7 @@ Unit tests on `practitioner_schedule_helper.dart`:
 
 - expansion for intervals 30/45/60/90 within a window
 - breaks excluded from generated slots
-- month/period boundaries (slots strictly inside the selected period)
+- period boundaries (slots strictly between available and expiry dates, inclusive)
 - local→UTC conversion round-trip
 - merge rule: slots outside the period preserved, inside replaced
 - past-date filtering
@@ -143,5 +184,8 @@ summary).
 ## Out of scope (explicitly)
 
 - Per-individual-practitioner schedules (no doctorId–slot link).
-- Server-side schedule storage / backend endpoint changes (future Option C).
+- Any change to the slot **data model** — no new schedule entity, no patient-app
+  or admin-read changes. The only backend addition is the bulk-upsert endpoint
+  writing to the existing structure (server-side schedule storage stays a future
+  Option C).
 - Changes to the existing per-service calendar or its sync dialog.
