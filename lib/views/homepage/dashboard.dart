@@ -5,10 +5,12 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/branch_performance_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dashboard/service_performance_controller.dart';
 import 'package:klinik_aurora_portal/models/dashboard/dashboard_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/branch_performance_chart.dart';
 import 'package:klinik_aurora_portal/views/homepage/dashboard_stats.dart';
 import 'package:klinik_aurora_portal/views/homepage/registration_chart.dart';
+import 'package:klinik_aurora_portal/views/homepage/service_performance_chart.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:provider/provider.dart';
@@ -71,8 +73,20 @@ class _MainDashboardState extends State<MainDashboard> {
                 totalUser: value.data?.data?.totalUser,
                 totalRegistrationByMonth: lastThreeMonths,
                 totalRegistrationByDay: last7days,
+                totalAppointmentsToday: value.data?.data?.totalAppointmentsToday,
+                totalAppointmentsThisMonth: value.data?.data?.totalAppointmentsThisMonth,
+                revenueThisMonth: value.data?.data?.revenueThisMonth,
+                revenueByMonth: value.data?.data?.revenueByMonth,
+                totalPointsExpiring30Days: value.data?.data?.totalPointsExpiring30Days,
+                branchId: value.data?.data?.branchId,
               ),
             );
+          }
+        });
+
+        ServicePerformanceController.get(context).then((value) {
+          if (responseCode(value.code) && mounted) {
+            context.read<ServicePerformanceController>().servicePerformanceResponse = value.data;
           }
         });
       }
@@ -98,6 +112,12 @@ class _MainDashboardState extends State<MainDashboard> {
             width: contentWidth,
             margin: EdgeInsets.symmetric(horizontal: screenPadding),
             child: const RegistrationChart(),
+          ),
+          AppPadding.vertical(denominator: 2),
+          Container(
+            width: contentWidth,
+            margin: EdgeInsets.symmetric(horizontal: screenPadding),
+            child: const ServicePerformanceChart(),
           ),
           AppPadding.vertical(denominator: 2),
           if (context.read<AuthController>().isSuperAdmin) ...[
@@ -126,6 +146,11 @@ class _MainDashboardState extends State<MainDashboard> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenPadding),
             child: const RegistrationChart(),
+          ),
+          AppPadding.vertical(denominator: 2),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenPadding),
+            child: const ServicePerformanceChart(),
           ),
           AppPadding.vertical(denominator: 2),
           Padding(

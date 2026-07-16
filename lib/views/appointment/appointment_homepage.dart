@@ -87,6 +87,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   List<Data> _selectedDayAppointments = [];
   bool _isLoadingDay = false;
   DropdownAttribute? _appointmentBranch;
+  DropdownAttribute? _appointmentService;
   List<DropdownAttribute> branches = [];
   bool _branchesLoaded = false;
   List<DropdownAttribute> serviceList = [];
@@ -223,6 +224,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return DateFormat('yyyy-MM-dd').format(dt);
   }
 
+  String? _selectedServiceBranchId() {
+    if (_appointmentService == null || _appointmentService!.key.isEmpty) return null;
+    return _appointmentService!.key;
+  }
+
   List<String>? getAppointmentStatus() {
     if (_tabs[_selectedTabIndex] == 'Upcoming') return ['1', '3', '4'];
     if (_tabs[_selectedTabIndex] == 'Completed') return ['5'];
@@ -250,6 +256,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               : context.read<AuthController>().authenticationResponse?.data?.user?.isSuperadmin == true
               ? null
               : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+          serviceBranchId: _selectedServiceBranchId(),
           startDate: startDate,
           endDate: endDate,
           sortBy: _sortBy,
@@ -393,6 +400,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               onChanged: (p0) {
                 setState(() {
                   _appointmentBranch = p0;
+                  _appointmentService = null;
                 });
                 context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
                 serviceList = [];
@@ -414,14 +422,55 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   Widget _buildDateFilterBar() {
     return Container(
       padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 10),
-      child: DateFilterDropdown(
-        onSelected: (range) {
-          startDate = range.start != null ? getDateOnly('${range.start}') : null;
-          endDate = range.end != null ? getDateOnly('${range.end}') : null;
-          getDashboard();
-          filtering();
-        },
+      child: Row(
+        children: [
+          DateFilterDropdown(
+            onSelected: (range) {
+              startDate = range.start != null ? getDateOnly('${range.start}') : null;
+              endDate = range.end != null ? getDateOnly('${range.end}') : null;
+              getDashboard();
+              filtering();
+            },
+          ),
+          const SizedBox(width: 12),
+          _buildServiceFilter(),
+        ],
       ),
+    );
+  }
+
+  Widget _buildServiceFilter() {
+    return StreamBuilder<DateTime>(
+      stream: rebuildDropdown.stream,
+      builder: (context, snapshot) {
+        return Row(
+          children: [
+            const Icon(Icons.medical_services_rounded, size: 16, color: Color(0xFF6B7280)),
+            const SizedBox(width: 8),
+            Text('Service', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+            const SizedBox(width: 12),
+            AppDropdown(
+              attributeList: DropdownAttributeList(
+                [DropdownAttribute('', 'All Services'), ...serviceList],
+                isEditable: true,
+                hintText: 'All Services',
+                value: _appointmentService?.name,
+                onChanged: (p0) {
+                  setState(() {
+                    _appointmentService = (p0 == null || p0.key.isEmpty) ? null : p0;
+                  });
+                  _page = 1;
+                  filtering(enableDebounce: false);
+                  if (_isCalendarView && mounted) {
+                    _refreshCalendarCounts();
+                  }
+                },
+                width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -656,7 +705,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         final branchId = context.read<AuthController>().isSuperAdmin ? _appointmentBranch?.key : null;
         final start = DateFormat('yyyy-MM-dd').format(first);
         final end = DateFormat('yyyy-MM-dd').format(last);
-        AppointmentController.getCounts(context, startDate: start, endDate: end, branchId: branchId).then((counts) {
+        AppointmentController.getCounts(
+          context,
+          startDate: start,
+          endDate: end,
+          branchId: branchId,
+          serviceBranchId: _selectedServiceBranchId(),
+        ).then((counts) {
           if (mounted) setState(() => _appointmentCounts = counts);
         });
         // Also fetch today's appointments for the new month
@@ -677,7 +732,15 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     final dateStr = DateFormat('yyyy-MM-dd').format(day);
 
     AppointmentController()
-        .get(context, 1, 100, startDate: dateStr, endDate: dateStr, branchId: branchId)
+        .get(
+          context,
+          1,
+          100,
+          startDate: dateStr,
+          endDate: dateStr,
+          branchId: branchId,
+          serviceBranchId: _selectedServiceBranchId(),
+        )
         .then((value) {
           if (!mounted) return;
           setState(() {
@@ -706,6 +769,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       startDate: DateFormat('yyyy-MM-dd').format(first),
       endDate: DateFormat('yyyy-MM-dd').format(last),
       branchId: branchId,
+      serviceBranchId: _selectedServiceBranchId(),
     ).then((counts) {
       if (mounted) setState(() => _appointmentCounts = counts);
     });
@@ -727,6 +791,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       startDate: DateFormat('yyyy-MM-dd').format(first),
       endDate: DateFormat('yyyy-MM-dd').format(last),
       branchId: branchId,
+      serviceBranchId: _selectedServiceBranchId(),
     ).then((counts) {
       if (mounted) setState(() => _appointmentCounts = counts);
     });

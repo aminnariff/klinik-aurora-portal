@@ -10,6 +10,13 @@ import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 
 class AuthController extends ChangeNotifier {
+  /// Hydrate persisted auth synchronously on construction so the session is
+  /// available to route guards / early API calls immediately after a page
+  /// reload, before the async [init] flow completes.
+  AuthController() {
+    _hydrateFromStorage();
+  }
+
   AuthResponse? _authenticationResponse;
   AuthResponse? get authenticationResponse => _authenticationResponse;
 
@@ -116,9 +123,40 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  /// Synchronously load the persisted auth response into memory.
+  /// Reads come from the SecurePrefs in-memory cache, so this is safe to run
+  /// in the constructor. Never clears storage — [init] owns validation.
+  void _hydrateFromStorage() {
+    try {
+      final rawAuth = prefs.getString(authResponse);
+      if (rawAuth == null || rawAuth.trim().isEmpty) return;
+      final decoded = json.decode(rawAuth);
+      if (decoded is! Map<String, dynamic>) return;
+      final parsed = AuthResponse.fromJson(decoded);
+      _authenticationResponse = parsed;
+      _branchId = parsed.data?.user?.branchId;
+      _rememberMe = prefs.getBool(rememberMe) ?? false;
+    } catch (e) {
+      debugPrint("Failed to hydrate auth from storage: $e");
+    }
+  }
+
+  /// In-flight refresh call, shared so concurrent API calls (e.g. several
+  /// requests fired on page load) trigger only one refresh request.
+  Future<bool>? _refreshInFlight;
+
   /// Try to refresh the access token using the stored refresh token.
   /// Returns `true` if refresh succeeded, `false` otherwise.
-  Future<bool> tryRefreshToken(BuildContext context) async {
+  /// Concurrent callers await the same in-flight request.
+  Future<bool> tryRefreshToken(BuildContext context) {
+    final inFlight = _refreshInFlight;
+    if (inFlight != null) return inFlight;
+    final future = _refreshTokenCall(context).whenComplete(() => _refreshInFlight = null);
+    _refreshInFlight = future;
+    return future;
+  }
+
+  Future<bool> _refreshTokenCall(BuildContext context) async {
     final refreshToken = _authenticationResponse?.data?.refreshToken;
     if (refreshToken == null || refreshToken.isEmpty) {
       debugPrint("No refresh token available.");

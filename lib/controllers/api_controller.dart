@@ -10,9 +10,7 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
-import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
-import 'package:klinik_aurora_portal/controllers/refresh_token/refresh_token_controller.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/dialog_attribute.dart';
@@ -88,21 +86,12 @@ class ApiController {
         debugPrint('tokenStatus : $tokenStatus');
         debugPrint('expiredAt : ${context.read<AuthController>().authenticationResponse?.data?.expiryDt}');
         if (tokenStatus == 'refresh') {
-          final refreshToken = context.read<AuthController>().authenticationResponse?.data?.refreshToken;
-          if (refreshToken == null || refreshToken.isEmpty) return false;
-          return await RefreshTokenController.refresh(context, refreshToken: refreshToken).then((tokenRenewResponse) {
-            if (responseCode(tokenRenewResponse.code)) {
-              if (tokenRenewResponse.data != null) {
-                context.read<AuthController>().setAuthenticationResponse(tokenRenewResponse.data);
-                return true;
-              } else {
-                return false;
-              }
-            } else {
-              return false;
-            }
-          });
+          return await context.read<AuthController>().tryRefreshToken(context);
         } else if (tokenStatus == 'expired') {
+          // Access token expired (or not yet hydrated) — try the refresh
+          // token before asking the user to re-login.
+          final refreshed = await context.read<AuthController>().tryRefreshToken(context);
+          if (refreshed) return true;
           if (isSessionExpiredDialogOpen == false && context.mounted) {
             isSessionExpiredDialogOpen = true;
             dismissLoading();
@@ -222,23 +211,19 @@ class ApiController {
                 showDialogError(context, e.response?.data?['message'] ?? '');
               });
             } else if (e.response?.statusCode == 401 && isAuthenticated && !hasRetriedAfterRefresh) {
-              final refreshToken = context.read<AuthController>().authenticationResponse?.data?.refreshToken;
-              if (refreshToken != null && refreshToken.isNotEmpty) {
-                final tokenRenewResponse = await RefreshTokenController.refresh(context, refreshToken: refreshToken);
-                if (responseCode(tokenRenewResponse.code) && tokenRenewResponse.data != null) {
-                  await context.read<AuthController>().setAuthenticationResponse(tokenRenewResponse.data);
-                  return call(
-                    context,
-                    baseUrl: baseUrl,
-                    method: method,
-                    endpoint: endpoint,
-                    queryParameters: queryParameters,
-                    data: data,
-                    headers: headers,
-                    isAuthenticated: isAuthenticated,
-                    hasRetriedAfterRefresh: true,
-                  );
-                }
+              final refreshed = await context.read<AuthController>().tryRefreshToken(context);
+              if (refreshed) {
+                return call(
+                  context,
+                  baseUrl: baseUrl,
+                  method: method,
+                  endpoint: endpoint,
+                  queryParameters: queryParameters,
+                  data: data,
+                  headers: headers,
+                  isAuthenticated: isAuthenticated,
+                  hasRetriedAfterRefresh: true,
+                );
               }
               if (isSessionExpiredDialogOpen == false && context.mounted) {
                 isSessionExpiredDialogOpen = true;
@@ -367,6 +352,7 @@ class ApiController {
     await showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
+      barrierColor: dialogBarrierColor,
       builder: (BuildContext context) {
         return AppDialog(
           DialogAttribute(

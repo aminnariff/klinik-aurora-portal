@@ -42,8 +42,188 @@
     <title>Klinik Aurora Admin</title>
     <!-- <title>Klinik Aurora</title> -->
     <link rel="manifest" href="manifest.json" />
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background-color: #ffffff;
+      }
+
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        background-color: #ffffff;
+        transition: opacity 0.4s ease-out;
+      }
+
+      #splash.splash-hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #splash .splash-logo {
+        width: 96px;
+        height: 96px;
+        border-radius: 20px;
+        animation: splash-pulse 1.8s ease-in-out infinite;
+      }
+
+      #splash .splash-word {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #7e2d40;
+        user-select: none;
+      }
+
+      #splash .splash-word span {
+        display: inline-block;
+        animation: splash-letter 1.8s ease-in-out infinite;
+        animation-delay: calc(var(--i) * 0.08s);
+      }
+
+      #splash .splash-word .splash-space {
+        width: 0.45em;
+      }
+
+      #splash .splash-ekg {
+        width: 220px;
+        height: 44px;
+        overflow: visible;
+      }
+
+      #splash .splash-ekg .ekg-track {
+        fill: none;
+        stroke: rgba(223, 110, 152, 0.18);
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      #splash .splash-ekg .ekg-pulse {
+        fill: none;
+        stroke: #df6e98;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 28 72;
+        stroke-dashoffset: 100;
+        animation: splash-ekg 2.2s linear infinite;
+      }
+
+      #splash .splash-loading {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(126, 45, 64, 0.55);
+      }
+
+      #splash .splash-loading .dot {
+        display: inline-block;
+        animation: splash-dot 1.4s ease-in-out infinite;
+        animation-delay: calc(var(--i) * 0.2s);
+      }
+
+      @keyframes splash-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.06);
+          opacity: 0.85;
+        }
+      }
+
+      @keyframes splash-letter {
+        0%,
+        40%,
+        100% {
+          transform: translateY(0);
+          color: #7e2d40;
+          opacity: 1;
+        }
+        20% {
+          transform: translateY(-8px);
+          color: #df6e98;
+          opacity: 0.95;
+        }
+      }
+
+      @keyframes splash-ekg {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes splash-dot {
+        0%,
+        60%,
+        100% {
+          opacity: 0.25;
+          transform: translateY(0);
+        }
+        30% {
+          opacity: 1;
+          transform: translateY(-3px);
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="splash">
+      <img class="splash-logo" src="favicon.png" alt="Klinik Aurora" />
+      <div class="splash-word" aria-label="Klinik Aurora">
+        <span style="--i: 0">K</span><span style="--i: 1">l</span
+        ><span style="--i: 2">i</span><span style="--i: 3">n</span
+        ><span style="--i: 4">i</span><span style="--i: 5">k</span
+        ><span class="splash-space"></span><span style="--i: 6">A</span
+        ><span style="--i: 7">u</span><span style="--i: 8">r</span
+        ><span style="--i: 9">o</span><span style="--i: 10">r</span
+        ><span style="--i: 11">a</span>
+      </div>
+      <svg class="splash-ekg" viewBox="0 0 220 44" aria-hidden="true">
+        <path
+          class="ekg-track"
+          d="M0 22 H58 l6 -8 l6 8 h14 l7 -16 l9 30 l7 -14 h24 l5 -6 l5 6 H220"
+        />
+        <path
+          class="ekg-pulse"
+          pathLength="100"
+          d="M0 22 H58 l6 -8 l6 8 h14 l7 -16 l9 30 l7 -14 h24 l5 -6 l5 6 H220"
+        />
+      </svg>
+      <div class="splash-loading">
+        Loading<span class="dot" style="--i: 0">.</span
+        ><span class="dot" style="--i: 1">.</span
+        ><span class="dot" style="--i: 2">.</span>
+      </div>
+    </div>
+
+    <script>
+      window.addEventListener("flutter-first-frame", function () {
+        var splash = document.getElementById("splash");
+        if (!splash) return;
+        splash.classList.add("splash-hidden");
+        splash.addEventListener("transitionend", function () {
+          splash.remove();
+        });
+      });
+    </script>
     <script src="flutter_bootstrap.js" async></script>
   </body>
 </html>

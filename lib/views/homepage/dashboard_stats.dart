@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/branch_performance_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
 import 'package:klinik_aurora_portal/models/dashboard/dashboard_response.dart';
@@ -36,36 +37,75 @@ class _DesktopStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormatter = NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2);
     return Container(
-      height: 160,
       margin: EdgeInsets.symmetric(horizontal: screenPadding),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Column(
         children: [
-          _UserDonutCard(data: data),
-          SizedBox(width: screenPadding / 2),
-          _StatCard(
-            label: 'Active Branches',
-            value: data?.totalActiveBranch,
-            icon: Icons.store_outlined,
-            accent: const Color(0xFFDF6E98),
-            bg: const Color(0xFF2A0D18),
+          SizedBox(
+            height: 160,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _UserDonutCard(data: data),
+                SizedBox(width: screenPadding / 2),
+                _StatCard(
+                  label: 'Active Branches',
+                  value: data?.totalActiveBranch,
+                  icon: Icons.store_outlined,
+                  accent: const Color(0xFFDF6E98),
+                  bg: const Color(0xFF2A0D18),
+                ),
+                SizedBox(width: screenPadding / 2),
+                _StatCard(
+                  label: 'Active Promotions',
+                  value: data?.totalActivePromotion,
+                  icon: Icons.local_offer_outlined,
+                  accent: const Color(0xFFFFB74D),
+                  bg: const Color(0xFF2A1D0D),
+                ),
+                SizedBox(width: screenPadding / 2),
+                _StatCard(
+                  label: 'Appointments This Month',
+                  value: data?.totalAppointmentsThisMonth ?? thisMonthAppointments,
+                  icon: Icons.calendar_month_outlined,
+                  accent: const Color(0xFF7C3AED),
+                  bg: const Color(0xFF1A0D2E),
+                ),
+              ],
+            ),
           ),
-          SizedBox(width: screenPadding / 2),
-          _StatCard(
-            label: 'Active Promotions',
-            value: data?.totalActivePromotion,
-            icon: Icons.local_offer_outlined,
-            accent: const Color(0xFFFFB74D),
-            bg: const Color(0xFF2A1D0D),
-          ),
-          SizedBox(width: screenPadding / 2),
-          _StatCard(
-            label: 'Appointments This Month',
-            value: thisMonthAppointments,
-            icon: Icons.calendar_month_outlined,
-            accent: const Color(0xFF7C3AED),
-            bg: const Color(0xFF1A0D2E),
+          SizedBox(height: screenPadding / 2),
+          SizedBox(
+            height: 110,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _StatCard(
+                  label: "Today's Appointments",
+                  value: data?.totalAppointmentsToday,
+                  icon: Icons.today_outlined,
+                  accent: const Color(0xFF2196F3),
+                  bg: const Color(0xFF0D1A2E),
+                ),
+                SizedBox(width: screenPadding / 2),
+                _StatCard(
+                  label: 'Revenue This Month',
+                  valueText: data?.revenueThisMonth != null ? currencyFormatter.format(data!.revenueThisMonth) : null,
+                  icon: Icons.payments_outlined,
+                  accent: const Color(0xFF02D39A),
+                  bg: const Color(0xFF0D2A1D),
+                ),
+                SizedBox(width: screenPadding / 2),
+                _StatCard(
+                  label: 'Points Expiring (30 Days)',
+                  value: data?.totalPointsExpiring30Days?.toInt(),
+                  icon: Icons.hourglass_bottom_rounded,
+                  accent: const Color(0xFFEF4444),
+                  bg: const Color(0xFF2A0D0D),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -121,10 +161,45 @@ class _MobileStats extends StatelessWidget {
               children: [
                 _StatCard(
                   label: 'Appts This Month',
-                  value: thisMonthAppointments,
+                  value: data?.totalAppointmentsThisMonth ?? thisMonthAppointments,
                   icon: Icons.calendar_month_outlined,
                   accent: const Color(0xFF7C3AED),
                   bg: const Color(0xFF1A0D2E),
+                ),
+                SizedBox(width: gap),
+                _StatCard(
+                  label: 'Appts Today',
+                  value: data?.totalAppointmentsToday,
+                  icon: Icons.today_outlined,
+                  accent: const Color(0xFF2196F3),
+                  bg: const Color(0xFF0D1A2E),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: gap),
+          SizedBox(
+            height: 90,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _StatCard(
+                  label: 'Revenue This Month',
+                  valueText: data?.revenueThisMonth != null
+                      ? NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2)
+                            .format(data!.revenueThisMonth)
+                      : null,
+                  icon: Icons.payments_outlined,
+                  accent: const Color(0xFF02D39A),
+                  bg: const Color(0xFF0D2A1D),
+                ),
+                SizedBox(width: gap),
+                _StatCard(
+                  label: 'Points Expiring (30d)',
+                  value: data?.totalPointsExpiring30Days?.toInt(),
+                  icon: Icons.hourglass_bottom_rounded,
+                  accent: const Color(0xFFEF4444),
+                  bg: const Color(0xFF2A0D0D),
                 ),
               ],
             ),
@@ -232,11 +307,19 @@ class _UserDonutCard extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   final String label;
   final int? value;
+  final String? valueText;
   final IconData icon;
   final Color accent;
   final Color bg;
 
-  const _StatCard({required this.label, required this.value, required this.icon, required this.accent, required this.bg});
+  const _StatCard({
+    required this.label,
+    this.value,
+    this.valueText,
+    required this.icon,
+    required this.accent,
+    required this.bg,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -275,8 +358,9 @@ class _StatCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  value != null ? '$value' : '—',
+                  valueText ?? (value != null ? '$value' : '—'),
                   style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, height: 1),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Container(height: 3, width: 28, decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(2))),

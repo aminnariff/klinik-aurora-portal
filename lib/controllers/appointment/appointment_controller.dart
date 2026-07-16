@@ -132,8 +132,14 @@ class AppointmentController extends ChangeNotifier {
     required String startDate,
     required String endDate,
     String? branchId,
+    String? serviceBranchId,
   }) async {
-    final params = <String, dynamic>{'startDate': startDate, 'endDate': endDate, 'branchId': ?branchId};
+    final params = <String, dynamic>{
+      'startDate': startDate,
+      'endDate': endDate,
+      'branchId': ?branchId,
+      'serviceBranchId': ?serviceBranchId,
+    };
     final queryString = _buildQueryString(params);
     final endpoint = 'admin/appointment/counts$queryString';
 

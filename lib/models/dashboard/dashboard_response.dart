@@ -1,3 +1,9 @@
+num? _asNum(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value;
+  return num.tryParse(value.toString());
+}
+
 class DashboardResponse {
   String? message;
   Data? data;
@@ -26,6 +32,12 @@ class Data {
   int? totalActivePromotion;
   List<TotalRegistrationByDay>? totalRegistrationByDay;
   List<TotalRegistrationByMonth>? totalRegistrationByMonth;
+  int? totalAppointmentsToday;
+  int? totalAppointmentsThisMonth;
+  num? revenueThisMonth;
+  List<RevenueByMonth>? revenueByMonth;
+  num? totalPointsExpiring30Days;
+  String? branchId;
 
   Data(
       {this.totalUser,
@@ -33,7 +45,13 @@ class Data {
       this.totalActiveBranch,
       this.totalActivePromotion,
       this.totalRegistrationByDay,
-      this.totalRegistrationByMonth});
+      this.totalRegistrationByMonth,
+      this.totalAppointmentsToday,
+      this.totalAppointmentsThisMonth,
+      this.revenueThisMonth,
+      this.revenueByMonth,
+      this.totalPointsExpiring30Days,
+      this.branchId});
 
   Data.fromJson(Map<String, dynamic> json) {
     totalUser = json['totalUser'];
@@ -52,6 +70,17 @@ class Data {
         totalRegistrationByMonth!.add(TotalRegistrationByMonth.fromJson(v));
       });
     }
+    totalAppointmentsToday = json['totalAppointmentsToday'];
+    totalAppointmentsThisMonth = json['totalAppointmentsThisMonth'];
+    revenueThisMonth = _asNum(json['revenueThisMonth']);
+    if (json['revenueByMonth'] != null) {
+      revenueByMonth = <RevenueByMonth>[];
+      json['revenueByMonth'].forEach((v) {
+        revenueByMonth!.add(RevenueByMonth.fromJson(v));
+      });
+    }
+    totalPointsExpiring30Days = _asNum(json['totalPointsExpiring30Days']);
+    branchId = json['branchId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -66,6 +95,36 @@ class Data {
     if (totalRegistrationByMonth != null) {
       data['totalRegistrationByMonth'] = totalRegistrationByMonth!.map((v) => v.toJson()).toList();
     }
+    data['totalAppointmentsToday'] = totalAppointmentsToday;
+    data['totalAppointmentsThisMonth'] = totalAppointmentsThisMonth;
+    data['revenueThisMonth'] = revenueThisMonth;
+    if (revenueByMonth != null) {
+      data['revenueByMonth'] = revenueByMonth!.map((v) => v.toJson()).toList();
+    }
+    data['totalPointsExpiring30Days'] = totalPointsExpiring30Days;
+    data['branchId'] = branchId;
+    return data;
+  }
+}
+
+class RevenueByMonth {
+  int? year;
+  int? month;
+  num? revenueByMonth;
+
+  RevenueByMonth({this.year, this.month, this.revenueByMonth});
+
+  RevenueByMonth.fromJson(Map<String, dynamic> json) {
+    year = json['year'];
+    month = json['month'];
+    revenueByMonth = _asNum(json['revenueByMonth']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['year'] = year;
+    data['month'] = month;
+    data['revenueByMonth'] = revenueByMonth;
     return data;
   }
 }

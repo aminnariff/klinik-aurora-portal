@@ -24,6 +24,7 @@ import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.
 import 'package:klinik_aurora_portal/controllers/dashboard/appointment_dashboard_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/branch_performance_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dashboard/service_performance_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/permission/permission_controller.dart';
@@ -68,7 +69,7 @@ Future<void> main() async {
       await EasyLocalization.ensureInitialized();
       environment = Flavor.production;
       if (kDebugMode) {
-        environment = Flavor.production;
+        environment = Flavor.staging;
       }
       AppVersion.init();
       AppLoading.init();
@@ -140,6 +141,7 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
             ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),
             ChangeNotifierProvider<DashboardController>(create: (_) => DashboardController()),
+            ChangeNotifierProvider<ServicePerformanceController>(create: (_) => ServicePerformanceController()),
             ChangeNotifierProvider<DoctorController>(create: (_) => DoctorController()),
             ChangeNotifierProvider<DarkModeController>(create: (_) => DarkModeController()),
             ChangeNotifierProvider<PaymentController>(create: (_) => PaymentController()),
