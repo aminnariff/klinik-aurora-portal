@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
+import 'package:klinik_aurora_portal/models/practitioner_schedule/weekly_pattern.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+
+// Kept so existing importers of slot_generator.dart still see TimeRange.
+export 'package:klinik_aurora_portal/models/practitioner_schedule/weekly_pattern.dart' show TimeRange;
 
 class WeeklySlotGenerator extends StatefulWidget {
   final int? initInterval;
@@ -1171,19 +1175,5 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
         ],
       ),
     );
-  }
-}
-
-class TimeRange {
-  TimeOfDay start;
-  TimeOfDay end;
-  TimeRange({required this.start, required this.end});
-
-  bool overlapsWith(TimeRange other) {
-    final s1 = start.hour * 60 + start.minute;
-    final e1 = end.hour * 60 + end.minute;
-    final s2 = other.start.hour * 60 + other.start.minute;
-    final e2 = other.end.hour * 60 + other.end.minute;
-    return s1 < e2 && s2 < e1;
   }
 }
