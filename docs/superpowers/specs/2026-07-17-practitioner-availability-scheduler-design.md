@@ -184,6 +184,31 @@ Consequences, surfaced in the UI:
   static-method + `ApiResponse<T>` controller pattern. A small request/response
   model pair is added under `lib/models/service/`.
 
+## Usability & production readiness
+
+The wizard must be self-explanatory for non-technical clinic staff:
+
+- **In-app help guide:** a Help button on each wizard step (reusing the
+  `_showHelpGuide` pattern from the existing calendar) with a short illustrated
+  walkthrough: what a "gap" is and why it's editable, what the pattern does, what
+  "replace within period" means. Plain language, no jargon ("gap between
+  appointments", not "interval").
+- **Step indicator** across the top (1 Practitioner & services → 2 Timing →
+  3 Confirm) so staff always know where they are and can go back without losing
+  input.
+- **Confirmation summary before applying:** a final review screen listing every
+  affected service, its gap, its new slot count, and the period being replaced —
+  the save button is on this screen, not on the editor.
+- **States:** loading skeletons while services load; clear empty state when a
+  type has no active services ("No active Doctor services at this branch");
+  save button disabled with an inline reason whenever input is incomplete.
+- **Safety:** inputs disabled during save; wizard cannot be dismissed mid-save;
+  a failed bulk save shows exactly which services failed with a one-tap
+  "Retry failed" that resends only those items.
+- **Staff guide document:** `docs/guides/practitioner-schedule.md` — a short
+  step-by-step usage guide with screenshots placeholders, written for clinic
+  staff, delivered with the feature.
+
 ## Error handling
 
 - Empty pattern or zero targets → save disabled with inline explanation.
