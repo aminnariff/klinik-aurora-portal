@@ -142,6 +142,28 @@ Expected behavior note: because each service keeps its own interval, slot *times
 will differ across services within the same window (09:00/09:45/10:30 for a 45-min
 service vs 09:00/10:00/11:00 for a 60-min one). This is intended.
 
+## Editing flow
+
+Two edit paths coexist:
+
+1. **Standalone (per service):** the existing per-service calendar dialog,
+   unchanged — for one-off fixes affecting a single service.
+2. **Practitioner-level (re-run the wizard):** reopening Practitioner Schedule for
+   the same branch + type preloads the last saved pattern, manual overrides, and
+   per-service gap overrides. Staff adjusts and re-applies; the replace-within-
+   period rule makes editing equivalent to re-applying.
+
+Consequences, surfaced in the UI:
+
+- Re-applying **overwrites standalone per-service tweaks inside the period**. The
+  Step 2 warning states this explicitly: "existing slots in this period,
+  including manual per-service edits, will be replaced."
+- The saved pattern is device-local. Fallback (included in v1): a **"Load from
+  existing service"** action in Step 2 that reconstructs the editable schedule
+  from one target service's current slots (grouped by weekday/time, same
+  mechanism the per-service calendar uses for `initialDateTimes`). Breaks/ranges
+  are inferred, marked as reconstructed, and editable before re-applying.
+
 ## Code layout
 
 - `lib/views/practitioner_schedule/practitioner_schedule_wizard.dart`
