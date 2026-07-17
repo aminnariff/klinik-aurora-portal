@@ -52,42 +52,47 @@ Entry: a **"Practitioner Schedule"** button on the Service page toolbar
 (same presentation as the existing `MultiTimeCalendarPage` dialog). No new route or
 permission UUID; access is inherited from the Service page.
 
-### Step 1 — Scope
+### Step 1 — Practitioner & target services
 
 - **Branch:** defaulted from the logged-in user's `branchId`; a branch dropdown is
   shown only when the user is not branch-bound (HQ).
 - **Practitioner type:** dropdown built from the `doctorType` enum in
   `lib/views/widgets/global/global.dart` (1 Doctor, 2 Sonographer, 3 Therapist,
   4 Spa Therapist, 5 Dietitian).
-- **Period:** explicit date range — **"Available from"** date and **"Available
-  until" (expiry)** date pickers. Defaults: today → end of the month two months
-  ahead (matching the existing 3-month slot horizon). The expiry date bounds slot
-  generation and defines the replace-within-period window.
+- Selecting a type immediately lists **all active services of that type at the
+  branch** (`ServiceBranchController.getAll(branchId: ...)` filtered client-side
+  to `serviceBranchStatus == 1 && doctorType == selectedType`). Each row shows:
+  - checkbox (default ticked)
+  - service name
+  - **gap/interval field prefilled from that service's `serviceTime`** (via the
+    existing `convertToMinutes` logic), **editable per row**. This override is a
+    deliberate feature, not a convenience: branches intentionally stretch e.g. a
+    45-minute service to 60-minute gaps to buffer walk-in patients and late
+    arrivals. The override affects generated slots only — it does not modify the
+    service's `serviceTime`.
 
-### Step 2 — Availability pattern
+### Step 2 — Availability timing
 
-Weekly availability window: which days, one or more time ranges per day, breaks,
-with the existing "Master Timing" weekday/weekend shortcut. **No interval at this
-step** — the window only.
+- **Period:** **"Available from"** and **"Available until" (expiry)** date
+  pickers. Defaults: today → end of the month two months ahead (matching the
+  existing 3-month slot horizon). The range bounds slot generation and defines
+  the replace-within-period window.
+- **Weekly pattern:** which days, one or more time ranges per day, breaks, with
+  the existing "Master Timing" weekday/weekend shortcut. **No interval at this
+  step** — the window only; gaps were set per service in Step 1.
+- **Manual editing:** below the pattern editor, a calendar preview of the period
+  where staff can manually adjust the generated schedule before applying —
+  exclude specific dates (public holiday, practitioner leave) or tweak a single
+  date's time ranges. Manual edits act on the shared **window**, then each
+  service's slots are generated from (pattern + manual overrides) × its own gap.
+- Live per-service slot count preview, plus an amber warning on services that
+  already have slots inside the period: "existing &lt;period&gt; slots will be
+  replaced".
 
 The last-used pattern is persisted per branch + practitioner type in
 `SharedPreferences` under `practitioner_pattern_<branchId>_<doctorType>` and
 preloaded on the next visit. (Device-local; this is the piece that would move
 server-side in a future backend iteration.)
-
-### Step 3 — Targets & preview
-
-Targets are loaded via `ServiceBranchController.getAll(branchId: ...)` and filtered
-client-side to `serviceBranchStatus == 1 && doctorType == selectedType`. Each row
-shows:
-
-- checkbox (default ticked)
-- service name
-- **interval field prefilled from that service's `serviceTime`** (via the existing
-  `convertToMinutes` logic), editable per row
-- live preview slot count (pattern × interval × period)
-- amber warning when the service already has slots inside the period:
-  "existing &lt;period&gt; slots will be replaced"
 
 ### Save (bulk fan-out)
 
@@ -172,7 +177,10 @@ service vs 09:00/10:00/11:00 for a 60-min one). This is intended.
 Unit tests on `practitioner_schedule_helper.dart`:
 
 - expansion for intervals 30/45/60/90 within a window
+- per-service gap overrides produce differing slot times from one shared window
 - breaks excluded from generated slots
+- manual overrides: excluded dates yield no slots; per-date tweaked ranges win
+  over the weekly pattern for that date
 - period boundaries (slots strictly between available and expiry dates, inclusive)
 - local→UTC conversion round-trip
 - merge rule: slots outside the period preserved, inside replaced
