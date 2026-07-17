@@ -69,7 +69,7 @@ Future<void> main() async {
       await EasyLocalization.ensureInitialized();
       environment = Flavor.production;
       if (kDebugMode) {
-        environment = Flavor.production;
+        environment = Flavor.staging;
       }
       AppVersion.init();
       AppLoading.init();

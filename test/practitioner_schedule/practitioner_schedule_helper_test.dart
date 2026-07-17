@@ -21,6 +21,9 @@ void main() {
       expect(parseServiceTimeToMinutes('soon'), 30);
       expect(parseServiceTimeToMinutes(null), 30);
     });
+    test('honors a custom fallback', () {
+      expect(parseServiceTimeToMinutes('bad', fallback: 15), 15);
+    });
   });
 
   group('expandSchedule', () {
@@ -99,6 +102,38 @@ void main() {
       final slots = expandSchedule(schedule, 60, now: DateTime(2026, 8, 10, 23, 0));
       expect(slots.first, DateTime(2026, 8, 10, 9, 0)); // today kept even though 9:00 < 23:00
       expect(slots.any((d) => d.day < 10), isFalse);
+    });
+
+    test('overlapping ranges do not emit duplicate slots', () {
+      final schedule = AvailabilitySchedule(
+        pattern: WeeklyPattern(dayRanges: {'Mon': [range(9, 0, 11, 0), range(10, 0, 12, 0)]}),
+        availableFrom: DateTime(2026, 8, 3),
+        availableUntil: DateTime(2026, 8, 3),
+      );
+      final slots = expandSchedule(schedule, 60, now: past);
+      expect(slots, [
+        DateTime(2026, 8, 3, 9, 0),
+        DateTime(2026, 8, 3, 10, 0),
+        DateTime(2026, 8, 3, 11, 0),
+      ]);
+    });
+
+    test('degenerate range (start >= end) yields no slots', () {
+      final schedule = AvailabilitySchedule(
+        pattern: WeeklyPattern(dayRanges: {'Mon': [range(9, 0, 9, 0), range(14, 0, 13, 0)]}),
+        availableFrom: DateTime(2026, 8, 3),
+        availableUntil: DateTime(2026, 8, 3),
+      );
+      expect(expandSchedule(schedule, 30, now: past), isEmpty);
+    });
+
+    test('inverted period (from after until) returns empty', () {
+      final schedule = AvailabilitySchedule(
+        pattern: mondayOnly,
+        availableFrom: DateTime(2026, 8, 17),
+        availableUntil: DateTime(2026, 8, 3),
+      );
+      expect(expandSchedule(schedule, 30, now: past), isEmpty);
     });
 
     test('zero or negative gap returns empty rather than looping forever', () {

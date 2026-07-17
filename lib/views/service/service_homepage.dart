@@ -17,6 +17,7 @@ import 'package:klinik_aurora_portal/models/service/update_service_request.dart'
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/practitioner_schedule/practitioner_schedule_wizard.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/service/service_details.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
@@ -134,6 +135,13 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             ),
           ),
           const SizedBox(width: 12),
+          _toolbarButton(
+            icon: Icons.schedule_rounded,
+            label: 'Practitioner Schedule',
+            color: secondaryColor,
+            onTap: _openPractitionerSchedule,
+          ),
+          const SizedBox(width: 8),
           if (isSuperAdmin) ...[
             _toolbarButton(
               icon: Icons.filter_list_rounded,
@@ -925,6 +933,18 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         debugPrint(e.toString());
       }
     }
+  }
+
+  void _openPractitionerSchedule() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PractitionerScheduleWizard(
+        branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+      ),
+    ).then((changed) {
+      if (changed == true) filtering();
+    });
   }
 
   void _handleAdminMenuSelection(String value, service_branch_model.Data serviceBranch) async {

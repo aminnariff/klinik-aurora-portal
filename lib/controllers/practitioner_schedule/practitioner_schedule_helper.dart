@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/models/practitioner_schedule/weekly_pattern.dart';
 
 /// Canonical 'yyyy-MM-dd' key used by dateOverrides and the override calendar.
@@ -49,6 +50,94 @@ List<DateTime> expandSchedule(AvailabilitySchedule schedule, int gapMinutes, {Da
     }
     day = DateTime(day.year, day.month, day.day + 1); // calendar-day step, DST-safe
   }
-  result.sort();
-  return result;
+  // Overlapping ranges on the same day can emit the same slot twice — dedupe.
+  final deduped = result.toSet().toList()..sort();
+  return deduped;
+}
+
+/// Server storage format, matching MultiTimeCalendarPage._getAllDateTimeValues.
+List<String> toUtcIsoList(List<DateTime> localSlots) =>
+    localSlots.map((d) => d.toUtc().toIso8601String()).toList();
+
+/// The "replace within period, keep the rest" rule: existing UTC ISO slots
+/// whose LOCAL date falls inside [from, until] (inclusive, whole days) are
+/// dropped; everything else is kept and merged with [replacement].
+///
+/// Precondition: entries must be canonical UTC 'Z' ISO-8601 strings as
+/// produced by [toUtcIsoList] — offset or naive strings are not supported
+/// (dedupe is by string identity and the final sort is lexical).
+/// Unparseable existing entries are silently dropped.
+List<String> mergeReplacePeriod({
+  required List<String> existing,
+  required List<String> replacement,
+  required DateTime from,
+  required DateTime until,
+}) {
+  final fromDay = DateTime(from.year, from.month, from.day);
+  final untilExclusive = DateTime(until.year, until.month, until.day + 1);
+  final kept = existing.where((iso) {
+    final dt = DateTime.tryParse(iso)?.toLocal();
+    if (dt == null) return false;
+    return dt.isBefore(fromDay) || !dt.isBefore(untilExclusive);
+  });
+  // All entries are UTC 'Z' strings, so lexical sort == chronological sort.
+  return {...kept, ...replacement}.toList()..sort();
+}
+
+/// Best-effort inverse of expandSchedule, for "Load from existing service"
+/// when the saved pattern isn't on this device. Groups a service's stored
+/// slots by weekday, then folds slot times spaced <= gapMinutes apart into
+/// ranges (range end = last slot + gap, capped at 23:59). Result is marked
+/// for editing, not assumed exact: when the same weekday has different
+/// times across weeks, their union is applied to every occurrence of that
+/// weekday, and a range's tail may overstate the true window by up to one
+/// gap.
+AvailabilitySchedule reconstructSchedule(
+  List<String> utcIso, {
+  required DateTime from,
+  required DateTime until,
+  required int gapMinutes,
+}) {
+  final fromDay = DateTime(from.year, from.month, from.day);
+  final untilDay = DateTime(until.year, until.month, until.day);
+  final byWeekday = <int, Set<int>>{};
+  for (final iso in utcIso) {
+    final dt = DateTime.tryParse(iso)?.toLocal();
+    if (dt == null) continue;
+    final day = DateTime(dt.year, dt.month, dt.day);
+    if (day.isBefore(fromDay) || day.isAfter(untilDay)) continue;
+    byWeekday.putIfAbsent(dt.weekday, () => <int>{}).add(dt.hour * 60 + dt.minute);
+  }
+
+  TimeOfDay fromMinutes(int m) {
+    final capped = m > 23 * 60 + 59 ? 23 * 60 + 59 : m;
+    return TimeOfDay(hour: capped ~/ 60, minute: capped % 60);
+  }
+
+  final dayRanges = <String, List<TimeRange>>{};
+  byWeekday.forEach((weekday, minuteSet) {
+    final sorted = minuteSet.toList()..sort();
+    final ranges = <TimeRange>[];
+    int? rangeStart;
+    int? prev;
+    for (final m in sorted) {
+      if (rangeStart == null) {
+        rangeStart = m;
+      } else if (m - prev! > gapMinutes) {
+        ranges.add(TimeRange(start: fromMinutes(rangeStart), end: fromMinutes(prev + gapMinutes)));
+        rangeStart = m;
+      }
+      prev = m;
+    }
+    if (rangeStart != null) {
+      ranges.add(TimeRange(start: fromMinutes(rangeStart), end: fromMinutes(prev! + gapMinutes)));
+    }
+    dayRanges[weekDayKeys[weekday - 1]] = ranges;
+  });
+
+  return AvailabilitySchedule(
+    pattern: WeeklyPattern(dayRanges: dayRanges),
+    availableFrom: from,
+    availableUntil: until,
+  );
 }

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
+import 'package:klinik_aurora_portal/models/practitioner_schedule/bulk_upsert_response.dart';
+import 'package:klinik_aurora_portal/models/practitioner_schedule/schedule_payload.dart';
 import 'package:klinik_aurora_portal/models/service/service_branch_available_dt_response.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_timing_response.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_response.dart';
@@ -114,6 +116,33 @@ class ServiceBranchAvailableDtController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: UpdateServiceResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  /// Batched create-or-update. Backend contract:
+  /// POST admin/service-available-datetime/bulk-upsert
+  /// {"items": [{"serviceBranchId": ..., "availableDatetimes": [...]}, ...]}
+  /// Writes into the same records as create/update; response lists
+  /// per-item success/failure.
+  static Future<ApiResponse<BulkUpsertAvailableDtResponse>> bulkUpsert(
+    BuildContext context,
+    List<SchedulePayload> payloads,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.post,
+          endpoint: 'admin/service-available-datetime/bulk-upsert',
+          data: {
+            'items': payloads.map((p) => p.toBulkItemJson()).toList(),
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: BulkUpsertAvailableDtResponse.fromJson(value.data));
           } catch (e) {
             return ApiResponse(code: 400, message: e.toString());
           }
