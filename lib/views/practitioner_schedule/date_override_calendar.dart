@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -60,8 +62,10 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
       children: [
         Row(
           children: [
-            Text(DateFormat('MMMM yyyy').format(_month),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(
+              DateFormat('MMMM yyyy').format(_month),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
             const Spacer(),
             IconButton(
               icon: const Icon(Icons.chevron_left_rounded, size: 20),
@@ -78,8 +82,10 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
             for (final d in weekDayKeys)
               Expanded(
                 child: Center(
-                  child: Text(d,
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey[500])),
+                  child: Text(
+                    d,
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey[500]),
+                  ),
                 ),
               ),
           ],
@@ -109,7 +115,8 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
   Widget _cell(int dayNumber, int daysInMonth) {
     if (dayNumber < 1 || dayNumber > daysInMonth) return const SizedBox(height: 34);
     final date = DateTime(_month.year, _month.month, dayNumber);
-    final inPeriod = !date.isBefore(DateTime(widget.from.year, widget.from.month, widget.from.day)) &&
+    final inPeriod =
+        !date.isBefore(DateTime(widget.from.year, widget.from.month, widget.from.day)) &&
         !date.isAfter(DateTime(widget.until.year, widget.until.month, widget.until.day));
     final key = dateKey(date);
     final overridden = widget.dateOverrides.containsKey(key);
@@ -156,7 +163,11 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3))),
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+        ),
         const SizedBox(width: 4),
         Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
       ],
@@ -165,10 +176,9 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
 
   /// The ranges currently in effect for [date]: its override when one
   /// exists (null = excluded), otherwise the weekly pattern.
-  List<TimeRange>? _effectiveRanges(String key, DateTime date) =>
-      widget.dateOverrides.containsKey(key)
-          ? widget.dateOverrides[key]
-          : widget.pattern().rangesForWeekday(date.weekday);
+  List<TimeRange>? _effectiveRanges(String key, DateTime date) => widget.dateOverrides.containsKey(key)
+      ? widget.dateOverrides[key]
+      : widget.pattern().rangesForWeekday(date.weekday);
 
   Future<void> _editDate(DateTime date) async {
     final key = dateKey(date);
@@ -194,87 +204,87 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
 
     final hoursLabel = (effective == null || effective.isEmpty)
         ? null
-        : effective
-            .map((r) => '${_formatTime(context, r.start)} – ${_formatTime(context, r.end)}')
-            .join(', ');
+        : effective.map((r) => '${_formatTime(context, r.start)} – ${_formatTime(context, r.end)}').join(', ');
 
     final action = await showDialog<String>(
       context: context,
       builder: (ctx) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
-          width: 420,
+          width: math.min(420, MediaQuery.of(ctx).size.width * 0.92),
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                DateFormat('EEEE, d MMM yyyy').format(date),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: statusColor.withAlpha(20),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      statusLabel,
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
-                    ),
-                  ),
-                  if (hoursLabel != null) ...[
-                    const SizedBox(width: 8),
-                    Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  DateFormat('EEEE, d MMM yyyy').format(date),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: statusColor.withAlpha(20),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
                       child: Text(
-                        hoursLabel,
-                        style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                        overflow: TextOverflow.ellipsis,
+                        statusLabel,
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
                       ),
                     ),
+                    if (hoursLabel != null) ...[
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          hoursLabel,
+                          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
-              ),
-              const SizedBox(height: 20),
-              if (!excluded)
+                ),
+                const SizedBox(height: 20),
+                if (!excluded)
+                  _dateActionTile(
+                    ctx,
+                    icon: Icons.event_busy_rounded,
+                    color: const Color(0xFFDC2626),
+                    title: 'No slots this day',
+                    subtitle: 'Public holiday, leave, or day off — no appointments can be booked.',
+                    result: 'exclude',
+                  ),
                 _dateActionTile(
                   ctx,
-                  icon: Icons.event_busy_rounded,
-                  color: const Color(0xFFDC2626),
-                  title: 'No slots this day',
-                  subtitle: 'Public holiday, leave, or day off — no appointments can be booked.',
-                  result: 'exclude',
+                  icon: Icons.edit_calendar_rounded,
+                  color: const Color(0xFFB45309),
+                  title: excluded ? 'Set hours for this day' : 'Custom hours for this day only',
+                  subtitle: 'Different working hours just for this date — other days are unaffected.',
+                  result: 'custom',
                 ),
-              _dateActionTile(
-                ctx,
-                icon: Icons.edit_calendar_rounded,
-                color: const Color(0xFFB45309),
-                title: excluded ? 'Set hours for this day' : 'Custom hours for this day only',
-                subtitle: 'Different working hours just for this date — other days are unaffected.',
-                result: 'custom',
-              ),
-              if (overridden)
-                _dateActionTile(
-                  ctx,
-                  icon: Icons.restart_alt_rounded,
-                  color: const Color(0xFF16A34A),
-                  title: 'Reset to weekly pattern',
-                  subtitle: 'Remove this day\'s exception and follow the normal weekly hours.',
-                  result: 'reset',
+                if (overridden)
+                  _dateActionTile(
+                    ctx,
+                    icon: Icons.restart_alt_rounded,
+                    color: const Color(0xFF16A34A),
+                    title: 'Reset to weekly pattern',
+                    subtitle: 'Remove this day\'s exception and follow the normal weekly hours.',
+                    result: 'reset',
+                  ),
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text('Cancel', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+                  ),
                 ),
-              const SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text('Cancel', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -285,7 +295,8 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
     } else if (action == 'reset') {
       widget.dateOverrides.remove(key);
     } else if (action == 'custom') {
-      final initial = widget.dateOverrides[key] ??
+      final initial =
+          widget.dateOverrides[key] ??
           widget.pattern().rangesForWeekday(date.weekday).map((r) => TimeRange(start: r.start, end: r.end)).toList();
       final edited = await _editRanges(date, initial);
       if (edited == null) return;
@@ -306,7 +317,7 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text('Hours for ${DateFormat('d MMM').format(date)}', style: const TextStyle(fontSize: 15)),
           content: SizedBox(
-            width: 380,
+            width: math.min(380, MediaQuery.of(ctx).size.width * 0.92),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -330,12 +341,11 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
                     ),
                   ),
                 TextButton.icon(
-                  onPressed: () => setDialogState(() => working.add(
-                        TimeRange(
-                          start: const TimeOfDay(hour: 9, minute: 0),
-                          end: const TimeOfDay(hour: 17, minute: 0),
-                        ),
-                      )),
+                  onPressed: () => setDialogState(
+                    () => working.add(
+                      TimeRange(start: const TimeOfDay(hour: 9, minute: 0), end: const TimeOfDay(hour: 17, minute: 0)),
+                    ),
+                  ),
                   icon: const Icon(Icons.add_rounded, size: 16),
                   label: const Text('Add range', style: TextStyle(fontSize: 12)),
                 ),
@@ -366,8 +376,7 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
     );
   }
 
-  bool _isRangeValid(TimeRange r) =>
-      r.start.hour * 60 + r.start.minute < r.end.hour * 60 + r.end.minute;
+  bool _isRangeValid(TimeRange r) => r.start.hour * 60 + r.start.minute < r.end.hour * 60 + r.end.minute;
 
   String _formatTime(BuildContext ctx, TimeOfDay t) => t.format(ctx);
 
@@ -394,10 +403,7 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withAlpha(20),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(10)),
                 child: Icon(icon, size: 20, color: color),
               ),
               const SizedBox(width: 12),
@@ -407,10 +413,7 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
                   children: [
                     Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600], height: 1.3),
-                    ),
+                    Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey[600], height: 1.3)),
                   ],
                 ),
               ),

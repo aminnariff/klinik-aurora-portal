@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -6,6 +8,7 @@ import 'package:klinik_aurora_portal/models/practitioner_schedule/weekly_pattern
 import 'package:klinik_aurora_portal/views/practitioner_schedule/date_override_calendar.dart';
 import 'package:klinik_aurora_portal/views/practitioner_schedule/schedule_target.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/weekly_availability_editor.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class ScheduleStepTiming extends StatefulWidget {
   final WeeklyAvailabilityEditorController editor;
@@ -41,65 +44,80 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
 
   @override
   Widget build(BuildContext context) {
+    final left = _leftColumn();
+    final right = _rightColumn();
+    if (isMobile) {
+      // Two side-by-side flexed columns would squeeze the weekly editor and
+      // the calendar preview into unusable slivers on a phone — stack them
+      // full-width instead.
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [left, const SizedBox(height: 20), right],
+        ),
+      );
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Left (flex 3): period pickers + pattern editor, in a SingleChildScrollView
-        Expanded(
-          flex: 3,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _periodRow(),
-                const SizedBox(height: 16),
-                WeeklyAvailabilityEditor(controller: widget.editor, expandDayList: false),
-              ],
-            ),
-          ),
-        ),
+        Expanded(flex: 3, child: SingleChildScrollView(child: left)),
         const SizedBox(width: 20),
         // Right (flex 2): override calendar + per-service preview, in a SingleChildScrollView
-        Expanded(
-          flex: 2,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text('Calendar preview & day overrides',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    ),
-                    TextButton.icon(
-                      onPressed: _loadFromExistingService,
-                      icon: const Icon(Icons.download_rounded, size: 14),
-                      label: const Text('Load from existing service', style: TextStyle(fontSize: 11)),
-                    ),
-                  ],
-                ),
-                Text('Tap a date to exclude it (holiday, leave) or set custom hours.',
-                    style: TextStyle(fontSize: 11, color: Colors.grey[500])),
-                const SizedBox(height: 8),
-                ListenableBuilder(
-                  listenable: widget.editor,
-                  builder: (context, _) => DateOverrideCalendar(
-                    from: widget.availableFrom,
-                    until: widget.availableUntil,
-                    pattern: () => widget.editor.pattern,
-                    dateOverrides: widget.dateOverrides,
-                    onChanged: widget.onOverridesChanged,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text('Slots that will be created', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                const SizedBox(height: 8),
-                ListenableBuilder(listenable: widget.editor, builder: (context, _) => _previewList()),
-              ],
+        Expanded(flex: 2, child: SingleChildScrollView(child: right)),
+      ],
+    );
+  }
+
+  Widget _leftColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _periodRow(),
+        const SizedBox(height: 16),
+        WeeklyAvailabilityEditor(controller: widget.editor, expandDayList: false),
+      ],
+    );
+  }
+
+  Widget _rightColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: Text(
+                'Calendar preview & day overrides',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
             ),
+            TextButton.icon(
+              onPressed: _loadFromExistingService,
+              icon: const Icon(Icons.download_rounded, size: 14),
+              label: const Text('Load from existing service', style: TextStyle(fontSize: 11)),
+            ),
+          ],
+        ),
+        Text(
+          'Tap a date to exclude it (holiday, leave) or set custom hours.',
+          style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+        ),
+        const SizedBox(height: 8),
+        ListenableBuilder(
+          listenable: widget.editor,
+          builder: (context, _) => DateOverrideCalendar(
+            from: widget.availableFrom,
+            until: widget.availableUntil,
+            pattern: () => widget.editor.pattern,
+            dateOverrides: widget.dateOverrides,
+            onChanged: widget.onOverridesChanged,
           ),
         ),
+        const SizedBox(height: 16),
+        const Text('Slots that will be created', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        const SizedBox(height: 8),
+        ListenableBuilder(listenable: widget.editor, builder: (context, _) => _previewList()),
       ],
     );
   }
@@ -129,11 +147,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
     );
   }
 
-  Widget _dateField({
-    required String label,
-    required DateTime value,
-    required ValueChanged<DateTime> onPicked,
-  }) {
+  Widget _dateField({required String label, required DateTime value, required ValueChanged<DateTime> onPicked}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -293,13 +307,9 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
     // Reconstruction only reads slots inside the selected period, so a
     // service whose slots all fall outside it would rebuild an empty week.
     final fromDay = DateTime(widget.availableFrom.year, widget.availableFrom.month, widget.availableFrom.day);
-    final untilEnd =
-        DateTime(widget.availableUntil.year, widget.availableUntil.month, widget.availableUntil.day + 1);
-    final localDates = target.existingDatetimes
-        .map((iso) => DateTime.tryParse(iso)?.toLocal())
-        .whereType<DateTime>()
-        .toList()
-      ..sort();
+    final untilEnd = DateTime(widget.availableUntil.year, widget.availableUntil.month, widget.availableUntil.day + 1);
+    final localDates =
+        target.existingDatetimes.map((iso) => DateTime.tryParse(iso)?.toLocal()).whereType<DateTime>().toList()..sort();
     final inPeriod = localDates.where((d) => !d.isBefore(fromDay) && d.isBefore(untilEnd)).length;
     final usable = inPeriod > 0;
     final rangeLabel = localDates.isEmpty
@@ -349,7 +359,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
                     Text(
                       usable
                           ? '$inPeriod of ${target.existingDatetimes.length} slots inside the selected period'
-                            '${rangeLabel != null ? ' · $rangeLabel' : ''}'
+                                '${rangeLabel != null ? ' · $rangeLabel' : ''}'
                           : 'No slots inside the selected period — nothing to rebuild from',
                       style: TextStyle(fontSize: 11, color: Colors.grey[usable ? 600 : 400], height: 1.3),
                     ),
@@ -367,9 +377,9 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
   Future<void> _loadFromExistingService() async {
     final candidates = widget.targets.where((t) => t.existingDatetimes.isNotEmpty).toList();
     if (candidates.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('None of the selected services have existing slots to load from.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('None of the selected services have existing slots to load from.')));
       return;
     }
     final chosen = await showDialog<ScheduleTarget>(
@@ -377,7 +387,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
       builder: (ctx) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
-          width: 460,
+          width: math.min(460, MediaQuery.of(ctx).size.width * 0.92),
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -412,9 +422,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 340),
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [for (final t in candidates) _candidateTile(ctx, t)],
-                  ),
+                  child: Column(children: [for (final t in candidates) _candidateTile(ctx, t)]),
                 ),
               ),
               const SizedBox(height: 4),

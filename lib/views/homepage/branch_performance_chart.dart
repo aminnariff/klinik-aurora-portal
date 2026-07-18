@@ -79,18 +79,19 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
   }
 
   Widget _buildHeader(BuildContext context, List<String> branches) {
+    final title = Text(
+      'Branch Performance – Past 7 Days',
+      style: AppTypography.displayMedium(context).apply(color: Colors.white),
+    );
+
     return Padding(
       padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding * 0.75, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Branch Performance – Past 7 Days',
-            style: AppTypography.displayMedium(context).apply(color: Colors.white),
-          ),
-          _buildToggle(),
-        ],
-      ),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [title, const SizedBox(height: 8), _buildToggle()],
+            )
+          : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [title, _buildToggle()]),
     );
   }
 
@@ -132,40 +133,43 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
         border: Border.symmetric(horizontal: BorderSide(color: _dividerColor, width: 1)),
       ),
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
-      child: Row(
-        children: [
-          const Text(
-            'Monthly Total',
-            style: TextStyle(color: _mutedColor, fontSize: 11, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(width: 16),
-          ...months.map((month) {
-            return Container(
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xff2a3a4a),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: _dividerColor),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    '${month.mmm ?? ''} ${month.yyyy ?? ''}',
-                    style: const TextStyle(color: _mutedColor, fontSize: 10),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${month.total ?? 0}',
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const Text('appointments', style: TextStyle(color: _mutedColor, fontSize: 9)),
-                ],
-              ),
-            );
-          }),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            const Text(
+              'Monthly Total',
+              style: TextStyle(color: _mutedColor, fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(width: 16),
+            ...months.map((month) {
+              return Container(
+                margin: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xff2a3a4a),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _dividerColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${month.mmm ?? ''} ${month.yyyy ?? ''}',
+                      style: const TextStyle(color: _mutedColor, fontSize: 10),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${month.total ?? 0}',
+                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const Text('appointments', style: TextStyle(color: _mutedColor, fontSize: 9)),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }

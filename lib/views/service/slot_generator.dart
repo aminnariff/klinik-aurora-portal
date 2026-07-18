@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +10,7 @@ import 'package:klinik_aurora_portal/models/practitioner_schedule/weekly_pattern
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/weekly_availability_editor.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
 // Kept so existing importers of slot_generator.dart still see TimeRange.
@@ -96,7 +98,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
-          width: 550,
+          width: math.min(550, MediaQuery.of(context).size.width * 0.9),
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -236,29 +238,32 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    _templateBtn(
-                      icon: Icons.help_outline_rounded,
-                      label: 'Help',
-                      onTap: () => _showHelpGuide(context),
-                      color: Colors.orange[700]!,
-                    ),
-                    const SizedBox(width: 8),
-                    _templateBtn(
-                      icon: Icons.save_alt_rounded,
-                      label: 'Save',
-                      onTap: _saveAllSlotsToPrefs,
-                      color: const Color(0xFF6366F1),
-                    ),
-                    const SizedBox(width: 8),
-                    _templateBtn(
-                      icon: Icons.unarchive_rounded,
-                      label: 'Load',
-                      onTap: _loadAllSlotsFromPrefs,
-                      color: Colors.grey[600]!,
-                    ),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _templateBtn(
+                        icon: Icons.help_outline_rounded,
+                        label: 'Help',
+                        onTap: () => _showHelpGuide(context),
+                        color: Colors.orange[700]!,
+                      ),
+                      const SizedBox(width: 8),
+                      _templateBtn(
+                        icon: Icons.save_alt_rounded,
+                        label: 'Save',
+                        onTap: _saveAllSlotsToPrefs,
+                        color: const Color(0xFF6366F1),
+                      ),
+                      const SizedBox(width: 8),
+                      _templateBtn(
+                        icon: Icons.unarchive_rounded,
+                        label: 'Load',
+                        onTap: _loadAllSlotsFromPrefs,
+                        color: Colors.grey[600]!,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -341,9 +346,13 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
-              child: Row(
+              child: Wrap(
+                spacing: screenPadding,
+                runSpacing: screenPaddingVertical(),
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -358,7 +367,6 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                       ),
                     ],
                   ),
-                  const Spacer(),
                   SizedBox(
                     height: 48,
                     child: Button(canGenerate ? _generateSlots : null, actionText: 'Generate All Slots'),

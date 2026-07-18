@@ -163,8 +163,10 @@ class _RewardDetailState extends State<RewardDetail> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Wrap(
+                                spacing: screenPadding,
+                                runSpacing: screenPaddingVertical(),
+                                crossAxisAlignment: WrapCrossAlignment.start,
                                 children: [
                                   // Left: Reward Info + Schedule
                                   SizedBox(
@@ -288,7 +290,6 @@ class _RewardDetailState extends State<RewardDetail> {
                                       ],
                                     ),
                                   ),
-                                  AppPadding.horizontal(),
                                   // Right: Image
                                   SizedBox(
                                     width: screenWidth1728(30),

@@ -55,15 +55,20 @@ class _RegistrationChartState extends State<RegistrationChart> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final title = Text('Registrations', style: AppTypography.displayMedium(context).apply(color: Colors.white));
+    final controls = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [if (_showChart) _buildPeriodToggle(), const SizedBox(width: 8), _buildViewToggle()],
+    );
+
     return Padding(
       padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.5, screenPadding * 0.75, screenPadding * 0.5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('Registrations', style: AppTypography.displayMedium(context).apply(color: Colors.white)),
-          Row(children: [if (_showChart) _buildPeriodToggle(), const SizedBox(width: 8), _buildViewToggle()]),
-        ],
-      ),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [title, const SizedBox(height: 8), controls],
+            )
+          : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [title, controls]),
     );
   }
 

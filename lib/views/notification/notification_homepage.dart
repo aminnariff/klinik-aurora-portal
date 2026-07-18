@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -42,6 +43,9 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
 
   @override
   Widget build(BuildContext context) {
+    final maxDialogWidth = math.min(700.0, MediaQuery.of(context).size.width * 0.92);
+    final minDialogWidth = math.min(500.0, maxDialogWidth);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -52,99 +56,113 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              constraints: BoxConstraints(maxWidth: 700, minWidth: 500),
+              constraints: BoxConstraints(
+                maxWidth: maxDialogWidth,
+                minWidth: minDialogWidth,
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
+              ),
               child: CardContainer(
                 Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Announcement Channel', style: AppTypography.displayMedium(context)),
-                      const SizedBox(height: 16),
-                      StreamBuilder(
-                        stream: rebuildDropdown.stream,
-                        builder: (context, asyncSnapshot) {
-                          return AppDropdown(
-                            attributeList: DropdownAttributeList(
-                              notificationChannel,
-                              labelText: 'notification'.tr(gender: 'channel'),
-                              value: _channel?.name,
-                              onChanged: (p0) {
-                                _channel = p0;
-                                rebuildDropdown.add(DateTime.now());
+                  padding: EdgeInsets.all(isMobile ? 16.0 : 32.0),
+                  child: SingleChildScrollView(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final fieldWidth = isMobile ? constraints.maxWidth : screenWidthByBreakpoint(90, 70, 26);
+                        final dropdownWidth = isMobile
+                            ? constraints.maxWidth
+                            : screenWidthByBreakpoint(90, 70, 250, useAbsoluteValueDesktop: true);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Announcement Channel', style: AppTypography.displayMedium(context)),
+                            const SizedBox(height: 16),
+                            StreamBuilder(
+                              stream: rebuildDropdown.stream,
+                              builder: (context, asyncSnapshot) {
+                                return AppDropdown(
+                                  attributeList: DropdownAttributeList(
+                                    notificationChannel,
+                                    labelText: 'notification'.tr(gender: 'channel'),
+                                    value: _channel?.name,
+                                    onChanged: (p0) {
+                                      _channel = p0;
+                                      rebuildDropdown.add(DateTime.now());
+                                    },
+                                    width: dropdownWidth,
+                                  ),
+                                );
                               },
-                              width: screenWidthByBreakpoint(90, 70, 250, useAbsoluteValueDesktop: true),
                             ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      InputField(
-                        field: InputFieldAttribute(
-                          controller: titleController,
-                          labelText: 'notification'.tr(gender: 'title'),
-                          isEditableColor: const Color(0xFFEEF3F7),
-                        ),
-                        width: screenWidthByBreakpoint(90, 70, 26),
-                      ),
-                      const SizedBox(height: 16),
-                      InputField(
-                        field: InputFieldAttribute(
-                          controller: contentController,
-                          labelText: 'notification'.tr(gender: 'content'),
-                          isEditableColor: const Color(0xFFEEF3F7),
-                          lineNumber: 2,
-                          maxCharacter: 200,
-                        ),
-                        width: screenWidthByBreakpoint(90, 70, 26),
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                          SizedBox(width: 16),
-                          Button(
-                            () {
-                              final category = _channel!;
-                              final title = titleController.text;
-                              final content = contentController.text;
+                            const SizedBox(height: 16),
+                            InputField(
+                              field: InputFieldAttribute(
+                                controller: titleController,
+                                labelText: 'notification'.tr(gender: 'title'),
+                                isEditableColor: const Color(0xFFEEF3F7),
+                              ),
+                              width: fieldWidth,
+                            ),
+                            const SizedBox(height: 16),
+                            InputField(
+                              field: InputFieldAttribute(
+                                controller: contentController,
+                                labelText: 'notification'.tr(gender: 'content'),
+                                isEditableColor: const Color(0xFFEEF3F7),
+                                lineNumber: 2,
+                                maxCharacter: 200,
+                              ),
+                              width: fieldWidth,
+                            ),
+                            const SizedBox(height: 32),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                                SizedBox(width: 16),
+                                Button(
+                                  () {
+                                    final category = _channel!;
+                                    final title = titleController.text;
+                                    final content = contentController.text;
 
-                              debugPrint('Sending notification...');
-                              showConfirmDialog(
-                                context,
-                                'Are you sure you want to send this notification to ${category.name}? This action cannot be undone.',
-                              ).then((confirmed) {
-                                if (confirmed) {
-                                  NotificationController.send(
-                                    context,
-                                    topic: category.key,
-                                    title: title,
-                                    body: content,
-                                  ).then((value) {
-                                    if (responseCode(value.code)) {
-                                      Navigator.pop(context);
-                                      showDialogSuccess(
-                                        context,
-                                        'Notification successfully sent to ${category.name}. They should receive it within a few minutes.',
-                                      );
-                                    } else {
-                                      showDialogError(
-                                        context,
-                                        'Unable to send the notification at the moment. Please try again later. If the issue persists, contact the app developer.',
-                                      );
-                                    }
-                                  });
-                                }
-                              });
-                            },
-                            actionText: 'Send',
-                            color: secondaryColor,
-                          ),
-                        ],
-                      ),
-                    ],
+                                    debugPrint('Sending notification...');
+                                    showConfirmDialog(
+                                      context,
+                                      'Are you sure you want to send this notification to ${category.name}? This action cannot be undone.',
+                                    ).then((confirmed) {
+                                      if (confirmed) {
+                                        NotificationController.send(
+                                          context,
+                                          topic: category.key,
+                                          title: title,
+                                          body: content,
+                                        ).then((value) {
+                                          if (responseCode(value.code)) {
+                                            Navigator.pop(context);
+                                            showDialogSuccess(
+                                              context,
+                                              'Notification successfully sent to ${category.name}. They should receive it within a few minutes.',
+                                            );
+                                          } else {
+                                            showDialogError(
+                                              context,
+                                              'Unable to send the notification at the moment. Please try again later. If the issue persists, contact the app developer.',
+                                            );
+                                          }
+                                        });
+                                      }
+                                    });
+                                  },
+                                  actionText: 'Send',
+                                  color: secondaryColor,
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -36,7 +38,10 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 600, maxHeight: MediaQuery.of(context).size.height * 0.8),
+        constraints: BoxConstraints(
+          maxWidth: math.min(600, MediaQuery.of(context).size.width * 0.9),
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,

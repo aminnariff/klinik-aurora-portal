@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -259,7 +260,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                constraints: const BoxConstraints(maxWidth: 840),
+                constraints: BoxConstraints(maxWidth: math.min(840, MediaQuery.of(context).size.width - 16)),
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -357,11 +358,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                constraints: const BoxConstraints(maxWidth: 760, minWidth: 580),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Consumer<ServiceBranchController>(
+                                constraints: BoxConstraints(
+                                  maxWidth: isMobile ? MediaQuery.of(context).size.width - 32 : 760,
+                                  minWidth: isMobile ? 0 : 580,
+                                ),
+                                child: Builder(
+                                  builder: (context) {
+                                    final leftColumn = Consumer<ServiceBranchController>(
                                       builder: (context, serviceBranchController, _) {
                                         return StreamBuilder<DateTime>(
                                           stream: rebuild.stream,
@@ -838,9 +841,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           },
                                         );
                                       },
-                                    ),
-                                    AppPadding.horizontal(),
-                                    Expanded(
+                                    );
+                                    final rightColumn = Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         mainAxisAlignment: MainAxisAlignment.start,
@@ -907,7 +909,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 rebuildDropdown.add(DateTime.now());
                                                               }
                                                             },
-                                                            width: 331,
+                                                            width: isMobile
+                                                                ? MediaQuery.of(context).size.width - 112
+                                                                : 331,
                                                           ),
                                                         ),
                                                       ],
@@ -936,7 +940,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                         Expanded(
                                                           child: AppDropdown(
                                                             attributeList: DropdownAttributeList(
-                                                              width: 331,
+                                                              width: isMobile
+                                                                ? MediaQuery.of(context).size.width - 112
+                                                                : 331,
                                                               serviceList,
                                                               labelText: 'appointmentPage'.tr(gender: 'service'),
                                                               value: _service?.name,
@@ -1066,7 +1072,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                   rebuild.add(DateTime.now());
                                                                   rebuildDropdown.add(DateTime.now());
                                                                 },
-                                                                width: 331,
+                                                                width: isMobile
+                                                                ? MediaQuery.of(context).size.width - 112
+                                                                : 331,
                                                               ),
                                                             ),
                                                     ],
@@ -1333,8 +1341,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           ],
                                         ],
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                    return isMobile
+                                        ? Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [leftColumn, AppPadding.vertical(), rightColumn],
+                                          )
+                                        : Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [leftColumn, AppPadding.horizontal(), rightColumn],
+                                          );
+                                  },
                                 ),
                               ),
                               const Divider(color: Color(0xFFF3F4F6), height: 1),

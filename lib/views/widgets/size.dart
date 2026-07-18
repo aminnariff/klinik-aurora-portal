@@ -1,12 +1,16 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 
-double screenPadding = screenPaddingCalculate();
-double textSize = textSizeCalculate();
-bool isMobile = breakpoint() == Breakpoint.mobile;
-bool isTablet = breakpoint() == Breakpoint.tablet;
-bool isDekstop = breakpoint() == Breakpoint.desktop;
+// Getters so these recompute on every read — the previous top-level variables
+// were evaluated once and went stale when the window resized or rotated.
+double get screenPadding => screenPaddingCalculate();
+double get textSize => textSizeCalculate();
+bool get isMobile => breakpoint() == Breakpoint.mobile;
+bool get isTablet => breakpoint() == Breakpoint.tablet;
+bool get isDekstop => breakpoint() == Breakpoint.desktop;
 
 class SizeWidget extends StatelessWidget {
   const SizeWidget({super.key});
@@ -122,12 +126,15 @@ Widget breakpointWidget(LayoutWidget layout) {
   }
 }
 
+// Fixed 1728×829 design-size helpers, clamped to the actual viewport so the
+// values can never exceed what fits on small screens (mobile browsers).
 double screenWidth1728(double width) {
-  return 1728 * (width / 100);
+  final double cap = ScreenUtil().screenWidth * ((isMobile || isTablet) ? 0.7 : 0.9);
+  return math.min(1728 * (width / 100), cap);
 }
 
 double screenHeight829(double height) {
-  return 829 * (height / 100);
+  return math.min(829 * (height / 100), ScreenUtil().screenHeight * 0.8);
 }
 
 enum Breakpoint { mobile, tablet, desktop, ultra }

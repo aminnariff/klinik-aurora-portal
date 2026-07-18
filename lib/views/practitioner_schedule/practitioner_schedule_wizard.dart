@@ -135,22 +135,24 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
     showLoading();
     List<String> failed = [];
     try {
-      await Future.wait(pending.map((target) async {
-        final result = await ServiceBranchAvailableDtController.get(
-          context,
-          1,
-          100,
-          serviceBranchId: target.service.serviceBranchId,
-        );
-        if (!responseCode(result.code)) {
-          failed.add(target.service.serviceName ?? target.service.serviceBranchId ?? 'Unknown service');
-          return;
-        }
-        final record = result.data?.data?.isNotEmpty == true ? result.data!.data!.first : null;
-        target.existingRecordId = record?.serviceBranchAvailableDatetimeId;
-        target.existingDatetimes = record?.availableDatetimes ?? [];
-        target.existingLoaded = true;
-      }));
+      await Future.wait(
+        pending.map((target) async {
+          final result = await ServiceBranchAvailableDtController.get(
+            context,
+            1,
+            100,
+            serviceBranchId: target.service.serviceBranchId,
+          );
+          if (!responseCode(result.code)) {
+            failed.add(target.service.serviceName ?? target.service.serviceBranchId ?? 'Unknown service');
+            return;
+          }
+          final record = result.data?.data?.isNotEmpty == true ? result.data!.data!.first : null;
+          target.existingRecordId = record?.serviceBranchAvailableDatetimeId;
+          target.existingDatetimes = record?.availableDatetimes ?? [];
+          target.existingLoaded = true;
+        }),
+      );
     } finally {
       dismissLoading();
     }
@@ -228,8 +230,10 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
       final currentSchedule = schedule;
       final emptyByGap = <int, bool>{};
       for (final t in _selectedTargets) {
-        final isEmpty =
-            emptyByGap.putIfAbsent(t.gapMinutes, () => expandSchedule(currentSchedule, t.gapMinutes).isEmpty);
+        final isEmpty = emptyByGap.putIfAbsent(
+          t.gapMinutes,
+          () => expandSchedule(currentSchedule, t.gapMinutes).isEmpty,
+        );
         if (isEmpty) {
           return 'No slots would be created for "${t.service.serviceName ?? 'a ticked service'}". '
               'Adjust the hours or its gap, or untick it in step 1.';
@@ -307,7 +311,7 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(isMobile ? screenPadding : 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -375,7 +379,13 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
         );
       }
     }
-    return Row(children: chips);
+    // Horizontally scrollable so 3 chips + separators never overflow on
+    // narrow phones; on desktop the content already fits so this scrolls
+    // nowhere and renders pixel-identical.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(children: chips),
+    );
   }
 
   Widget _stepChip(String label, int index) {
@@ -443,13 +453,22 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (widget.branchId == null) ...[Expanded(child: _branchDropdown()), const SizedBox(width: 16)],
-              Expanded(child: _typeDropdown()),
-            ],
-          ),
+          if (isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.branchId == null) ...[_branchDropdown(), const SizedBox(height: 16)],
+                _typeDropdown(),
+              ],
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.branchId == null) ...[Expanded(child: _branchDropdown()), const SizedBox(width: 16)],
+                Expanded(child: _typeDropdown()),
+              ],
+            ),
           const SizedBox(height: 20),
           if (_loadingTargets)
             const Padding(
@@ -657,10 +676,8 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
   Widget _footer() {
     final reason = _stepBlockReason;
     final bool allSuccess = _outcomes != null && _outcomes!.isNotEmpty && _outcomes!.every((o) => o.success);
-    return Row(
-      children: [
-        if (_step > 0 && _outcomes == null)
-          OutlinedButton(
+    final Widget? backButton = (_step > 0 && _outcomes == null)
+        ? OutlinedButton(
             onPressed: _saving ? null : () => setState(() => _step--),
             style: OutlinedButton.styleFrom(
               foregroundColor: _textColor,
@@ -669,7 +686,37 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             child: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold)),
+          )
+        : null;
+    final Widget primaryButton = _primaryFooterButton(allSuccess: allSuccess, blocked: reason != null);
+
+    if (isMobile) {
+      // Stack vertically: the block-reason text and both buttons are too
+      // cramped side-by-side on a narrow phone.
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (reason != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                reason,
+                style: const TextStyle(fontSize: 12.5, color: Color(0xFFB45309), fontWeight: FontWeight.w500),
+              ),
+            ),
+          Row(
+            children: [
+              if (backButton != null) ...[backButton, const SizedBox(width: 12)],
+              Expanded(child: primaryButton),
+            ],
           ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        ?backButton,
         const Spacer(),
         if (reason != null)
           Flexible(
@@ -682,7 +729,7 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
               ),
             ),
           ),
-        _primaryFooterButton(allSuccess: allSuccess, blocked: reason != null),
+        primaryButton,
       ],
     );
   }

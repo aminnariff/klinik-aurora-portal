@@ -23,7 +23,6 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
@@ -198,8 +197,10 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Wrap(
+                                spacing: screenPadding,
+                                runSpacing: screenPaddingVertical(),
+                                crossAxisAlignment: WrapCrossAlignment.start,
                                 children: [
                                   // Left: Order Info + Action
                                   SizedBox(
@@ -296,7 +297,6 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                                       ],
                                     ),
                                   ),
-                                  AppPadding.horizontal(),
                                   // Right: Image + Audit
                                   SizedBox(
                                     width: screenWidth1728(30),

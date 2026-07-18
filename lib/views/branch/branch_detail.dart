@@ -183,8 +183,10 @@ class _BranchDetailState extends State<BranchDetail> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Wrap(
+                                spacing: screenPadding,
+                                runSpacing: screenPaddingVertical(),
+                                crossAxisAlignment: WrapCrossAlignment.start,
                                 children: [
                                   // ── Left Column: Basic Info + Location ───────
                                   SizedBox(
@@ -285,7 +287,6 @@ class _BranchDetailState extends State<BranchDetail> {
                                       ],
                                     ),
                                   ),
-                                  AppPadding.horizontal(),
                                   // ── Right Column: Media + Operations ─────────
                                   SizedBox(
                                     width: screenWidth1728(30),

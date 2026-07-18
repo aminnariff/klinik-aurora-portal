@@ -355,8 +355,10 @@ class _AdminDetailState extends State<AdminDetail> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // ── Row 1: Account Info + Assignment ────────────
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Wrap(
+                                spacing: screenPadding,
+                                runSpacing: screenPaddingVertical(),
+                                crossAxisAlignment: WrapCrossAlignment.start,
                                 children: [
                                   // Left: Account Information
                                   SizedBox(
@@ -401,7 +403,6 @@ class _AdminDetailState extends State<AdminDetail> {
                                       ],
                                     ),
                                   ),
-                                  AppPadding.horizontal(),
                                   // Right: Branch Assignment
                                   SizedBox(
                                     width: screenWidth1728(30),

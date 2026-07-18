@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -142,7 +143,7 @@ class _TimeListManagerState extends State<TimeListManager> {
                                 children: [IconButton(onPressed: _pickTime, icon: const Icon(Icons.add))],
                               ),
                             ),
-                            width: 300,
+                            width: math.min(300, MediaQuery.of(context).size.width * 0.9),
                           ),
                           // Text("Selected Time: ${selectedTime?.format(context) ?? ''}"),
                           // AppPadding.horizontal(),

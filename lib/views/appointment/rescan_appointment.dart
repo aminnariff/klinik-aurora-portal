@@ -52,8 +52,8 @@ class _RescanAppointmentState extends State<RescanAppointment> {
             children: [
               CardContainer(
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 32),
-                  width: screenWidth(40),
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: isMobile ? 16 : 32),
+                  width: screenWidthByBreakpoint(90, 70, 40, useAbsoluteValueDesktop: false),
                   child: StreamBuilder(
                     stream: rebuild.stream,
                     builder: (context, asyncSnapshot) {
@@ -124,12 +124,14 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                           _infoRow(widget.appointment?.data?.appointmentNote ?? '-'),
                           SizedBox(height: 16),
                           _infoLabel("Slot"),
-                          Row(
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 16,
+                            runSpacing: 8,
                             children: [
                               (notNullOrEmptyString(_selectedDateTime))
                                   ? _infoRow('$_selectedDateTime')
                                   : _infoRow('-'),
-                              SizedBox(width: 16),
                               ElevatedButton.icon(
                                 style: ButtonStyle(
                                   padding: WidgetStateProperty.all(

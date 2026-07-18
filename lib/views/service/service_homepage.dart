@@ -770,10 +770,11 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   Widget _mobileList(List<Widget> cards) {
+    final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
           child: TextField(
             controller: _searchController,
             onChanged: (val) {
@@ -788,6 +789,65 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.symmetric(vertical: 10),
             ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _MobileActionButton(
+                        icon: Icons.schedule_rounded,
+                        tooltip: 'Practitioner Schedule',
+                        color: secondaryColor,
+                        onTap: _openPractitionerSchedule,
+                      ),
+                      if (isSuperAdmin) ...[
+                        const SizedBox(width: 8),
+                        _MobileActionButton(
+                          icon: Icons.filter_list_rounded,
+                          tooltip: 'Filter',
+                          color: const Color(0xFF6366F1),
+                          onTap: _showFilterPanel,
+                        ),
+                      ],
+                      const SizedBox(width: 8),
+                      _MobileActionButton(
+                        icon: Icons.refresh_rounded,
+                        tooltip: isSuperAdmin ? 'Reset' : 'Refresh',
+                        color: Colors.grey[600]!,
+                        onTap: () {
+                          if (isSuperAdmin) {
+                            _searchController.clear();
+                            resetAllFilter();
+                          }
+                          filtering(enableDebounce: false, page: 1);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (isSuperAdmin) ...[
+                const SizedBox(width: 8),
+                _MobileActionButton(
+                  icon: Icons.add_rounded,
+                  tooltip: 'Add Service',
+                  color: Colors.white,
+                  background: primary,
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => const ServiceDetails(type: 'create'),
+                    );
+                  },
+                ),
+              ],
+            ],
           ),
         ),
         Expanded(
@@ -1095,5 +1155,39 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     _serviceNameController.text = '';
     _selectedServiceStatus = null;
     rebuildDropdown.add(DateTime.now());
+  }
+}
+
+class _MobileActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final Color? background;
+  final VoidCallback onTap;
+  const _MobileActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.onTap,
+    this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: background ?? color.withAlpha(20),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+      ),
+    );
   }
 }

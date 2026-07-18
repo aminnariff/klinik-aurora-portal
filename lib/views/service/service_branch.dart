@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  width: 500,
+                  width: math.min(500, MediaQuery.of(context).size.width * 0.9),
                   child: CardContainer(
                     Column(
                       children: [

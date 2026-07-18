@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -60,6 +61,15 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
   @override
   Widget build(BuildContext context) {
+    if (isMobile || isTablet) {
+      return Column(
+        children: [
+          SizedBox(height: screenHeight(45), child: _buildCalendar()),
+          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Expanded(child: _buildDayPanel()),
+        ],
+      );
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

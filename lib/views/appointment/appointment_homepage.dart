@@ -409,26 +409,30 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           const SizedBox(width: 8),
           Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
           const SizedBox(width: 12),
-          AppDropdown(
-            attributeList: DropdownAttributeList(
-              branches,
-              isEditable: true,
-              value: _appointmentBranch?.name,
-              onChanged: (p0) {
-                setState(() {
-                  _appointmentBranch = p0;
-                  _appointmentService = null;
-                });
-                context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
-                serviceList = [];
-                if (p0 != null) getServiceForBranch(p0.key);
-                getDashboard();
-                filtering();
-                if (_isCalendarView && mounted) {
-                  _refreshCalendarCounts();
-                }
-              },
-              width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
+          Flexible(
+            child: AppDropdown(
+              attributeList: DropdownAttributeList(
+                branches,
+                isEditable: true,
+                value: _appointmentBranch?.name,
+                onChanged: (p0) {
+                  setState(() {
+                    _appointmentBranch = p0;
+                    _appointmentService = null;
+                  });
+                  context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
+                  serviceList = [];
+                  if (p0 != null) getServiceForBranch(p0.key);
+                  getDashboard();
+                  filtering();
+                  if (_isCalendarView && mounted) {
+                    _refreshCalendarCounts();
+                  }
+                },
+                width: isMobile
+                    ? MediaQuery.of(context).size.width - (screenPadding * 2) - 86
+                    : screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
+              ),
             ),
           ),
         ],
@@ -441,13 +445,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 10),
       child: Row(
         children: [
-          DateFilterDropdown(
-            key: ValueKey('bar-${_currentDateRange?.label}'),
-            initial: _currentDateRange,
-            onSelected: _onDateRangeSelected,
+          Expanded(
+            child: DateFilterDropdown(
+              key: ValueKey('bar-${_currentDateRange?.label}'),
+              initial: _currentDateRange,
+              onSelected: _onDateRangeSelected,
+            ),
           ),
           const SizedBox(width: 12),
-          Spacer(),
           // Expanded(child: _buildSearchField()),
           // const SizedBox(width: 12),
           OutlinedButton.icon(
@@ -523,7 +528,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               elevation: 8,
               borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
               child: SizedBox(
-                width: 320,
+                width: math.min(320, MediaQuery.of(context).size.width * 0.92),
                 child: Stack(
                   children: [
                     Padding(
@@ -1057,6 +1062,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       : data.isEmpty
                       ? _buildEmptyState()
                       : DataTable2(
+                          minWidth: 760,
                           columnSpacing: 12,
                           horizontalMargin: 16,
                           isHorizontalScrollBarVisible: true,
@@ -1515,7 +1521,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: SizedBox(
-            width: 500,
+            width: math.min(500, MediaQuery.of(context).size.width * 0.92),
             height: screenHeight(80),
             child: Column(
               children: [

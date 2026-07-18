@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -203,8 +204,10 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Wrap(
+                                spacing: screenPadding,
+                                runSpacing: screenPaddingVertical(),
+                                crossAxisAlignment: WrapCrossAlignment.start,
                                 children: [
                                   // ── Left column ───────────────────────────────
                                   SizedBox(
@@ -249,7 +252,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                                   _doctorType = p0;
                                                   rebuildDropdown.add(DateTime.now());
                                                 },
-                                                width: screenWidthByBreakpoint(90, 70, 26),
+                                                width: math.min(screenWidthByBreakpoint(90, 70, 26), screenWidth1728(26)),
                                               ),
                                             );
                                           },
@@ -261,7 +264,6 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                       ],
                                     ),
                                   ),
-                                  AppPadding.horizontal(),
                                   // ── Right column ──────────────────────────────
                                   SizedBox(
                                     width: screenWidth1728(30),

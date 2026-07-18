@@ -101,6 +101,40 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               padding: EdgeInsets.fromLTRB(screenPadding, screenPadding, screenPadding, 0),
               child: _searchInput(_nameController, 'Search by name…'),
             ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 4),
+              child: Row(
+                children: [
+                  _MobileActionButton(
+                    icon: Icons.tune_rounded,
+                    tooltip: 'Filter',
+                    color: const Color(0xFF374151),
+                    onTap: _showFilterPanel,
+                  ),
+                  const SizedBox(width: 8),
+                  _MobileActionButton(
+                    icon: Icons.refresh_rounded,
+                    tooltip: 'Reset filters',
+                    color: const Color(0xFF6B7280),
+                    onTap: () {
+                      _resetFilters();
+                      filtering(enableDebounce: false, page: 1);
+                    },
+                  ),
+                  const Spacer(),
+                  _MobileActionButton(
+                    icon: Icons.person_add_alt_1_rounded,
+                    tooltip: 'Add PIC',
+                    color: Colors.white,
+                    background: secondaryColor,
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (_) => const DoctorDetails(type: 'create'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: docs.isEmpty
                   ? const Center(child: NoRecordsWidget())
@@ -709,6 +743,40 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       pagesVisible: isMobile ? 3 : 5,
       spacing: 10,
       onPageChanged: (page) => filtering(page: page, enableDebounce: false),
+    );
+  }
+}
+
+class _MobileActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final Color? background;
+  final VoidCallback onTap;
+  const _MobileActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.onTap,
+    this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: background ?? color.withAlpha(20),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+      ),
     );
   }
 }

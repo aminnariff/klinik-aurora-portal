@@ -24,7 +24,6 @@ import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -223,8 +222,10 @@ class _UserDetailState extends State<UserDetail> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  Wrap(
+                                    spacing: screenPadding,
+                                    runSpacing: screenPaddingVertical(),
+                                    crossAxisAlignment: WrapCrossAlignment.start,
                                     children: [
                                       // Left: Personal Info
                                       SizedBox(
@@ -307,7 +308,6 @@ class _UserDetailState extends State<UserDetail> {
                                           ],
                                         ),
                                       ),
-                                      AppPadding.horizontal(),
                                       // Right: Contact & Branch
                                       SizedBox(
                                         width: screenWidth1728(30),
@@ -391,7 +391,9 @@ class _UserDetailState extends State<UserDetail> {
                                                 color: status ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
                                               ),
                                               const SizedBox(width: 10),
-                                              const Text('Account Status', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151))),
+                                              const Flexible(
+                                                child: Text('Account Status', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151))),
+                                              ),
                                               const Spacer(),
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

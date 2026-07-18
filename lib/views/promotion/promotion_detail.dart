@@ -157,8 +157,10 @@ class _PromotionDetailState extends State<PromotionDetail> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Wrap(
+                                spacing: screenPadding,
+                                runSpacing: screenPaddingVertical(),
+                                crossAxisAlignment: WrapCrossAlignment.start,
                                 children: [
                                   // Left: Content
                                   SizedBox(
@@ -188,7 +190,6 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                       ],
                                     ),
                                   ),
-                                  AppPadding.horizontal(),
                                   // Right: Media + Schedule
                                   SizedBox(
                                     width: screenWidth1728(30),

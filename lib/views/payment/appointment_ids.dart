@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -40,7 +41,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 500,
+                width: math.min(500, MediaQuery.of(context).size.width * 0.92),
                 child: CardContainer(
                   SingleChildScrollView(
                     child: Column(

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -13,6 +15,7 @@ import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class AppointmentDetailsView extends StatelessWidget {
   final AppointmentDetailResponse? response;
@@ -32,7 +35,7 @@ class AppointmentDetailsView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                constraints: const BoxConstraints(maxWidth: 840),
+                constraints: BoxConstraints(maxWidth: math.min(840, MediaQuery.of(context).size.width - 16)),
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -51,26 +54,44 @@ class AppointmentDetailsView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Main info row
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: _patientSection(context, data)),
-                                const SizedBox(width: 20),
-                                Expanded(child: _appointmentSection(context, data)),
-                              ],
-                            ),
+                            isMobile
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      _patientSection(context, data),
+                                      const SizedBox(height: 20),
+                                      _appointmentSection(context, data),
+                                    ],
+                                  )
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(child: _patientSection(context, data)),
+                                      const SizedBox(width: 20),
+                                      Expanded(child: _appointmentSection(context, data)),
+                                    ],
+                                  ),
                             const SizedBox(height: 20),
                             const Divider(color: Color(0xFFF3F4F6), height: 1),
                             const SizedBox(height: 20),
                             // Fee row
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: _feeSection(context, data)),
-                                const SizedBox(width: 20),
-                                Expanded(child: _metaSection(context, data)),
-                              ],
-                            ),
+                            isMobile
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      _feeSection(context, data),
+                                      const SizedBox(height: 20),
+                                      _metaSection(context, data),
+                                    ],
+                                  )
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(child: _feeSection(context, data)),
+                                      const SizedBox(width: 20),
+                                      Expanded(child: _metaSection(context, data)),
+                                    ],
+                                  ),
                             // Rating / feedback (conditional)
                             if (data?.appointmentRating != null ||
                                 (data?.appointmentFeedback != null && data!.appointmentFeedback!.isNotEmpty)) ...[

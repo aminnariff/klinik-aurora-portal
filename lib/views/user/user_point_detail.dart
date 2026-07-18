@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -78,7 +80,10 @@ class _UserPointDetailState extends State<UserPointDetail> {
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 900, maxHeight: MediaQuery.of(context).size.height * 0.85),
+        constraints: BoxConstraints(
+          maxWidth: math.min(900, MediaQuery.of(context).size.width * 0.9),
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -101,8 +101,10 @@ class _PointDetailState extends State<PointDetail> {
                           ],
                         ),
                         AppPadding.vertical(denominator: 2),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Wrap(
+                          spacing: screenPadding,
+                          runSpacing: screenPaddingVertical(),
+                          crossAxisAlignment: WrapCrossAlignment.start,
                           children: [
                             SizedBox(
                               width: screenWidth1728(26),
@@ -135,7 +137,6 @@ class _PointDetailState extends State<PointDetail> {
                                 ],
                               ),
                             ),
-                            AppPadding.horizontal(),
                             SizedBox(
                               width: screenWidth1728(30),
                               child: Column(

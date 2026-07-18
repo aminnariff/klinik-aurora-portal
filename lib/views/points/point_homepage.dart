@@ -13,7 +13,6 @@ import 'package:klinik_aurora_portal/models/point_management/create_point_reques
 import 'package:klinik_aurora_portal/models/point_management/user_points_response.dart' as user_model;
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/mobile_view/mobile_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -69,7 +68,24 @@ class _PointHomepageState extends State<PointHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: const MobileView(), desktop: desktopView());
+    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
+  }
+
+  Widget mobileView() {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(vertical: screenPaddingVertical()),
+          child: Column(
+            children: [
+              SizedBox(height: screenHeight(70), child: _recordPaymentPanel()),
+              SizedBox(height: screenHeight(70), child: _pointsHistoryPanel()),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget desktopView() {
@@ -242,7 +258,9 @@ class _PointHomepageState extends State<PointHomepage> {
           ],
         ),
       ),
-      margin: EdgeInsets.fromLTRB(screenPadding, screenPadding, 0, screenPadding),
+      margin: isMobile
+          ? EdgeInsets.all(screenPadding)
+          : EdgeInsets.fromLTRB(screenPadding, screenPadding, 0, screenPadding),
     );
   }
 

@@ -67,16 +67,18 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
   void exportData() {
     showLoading();
     PaymentController.exportCsvDownload(
-      fileName: 'branch-payment-summary',
-      startDate: DateFormat('yyyy-MM-dd').format(startDate),
-      endDate: DateFormat('yyyy-MM-dd').format(endDate),
-    ).then((_) {
-      dismissLoading();
-      AppToast.snackbar(context, 'CSV exported successfully.');
-    }).catchError((_) {
-      dismissLoading();
-      AppToast.snackbar(context, 'Export failed. Please try again.');
-    });
+          fileName: 'branch-payment-summary',
+          startDate: DateFormat('yyyy-MM-dd').format(startDate),
+          endDate: DateFormat('yyyy-MM-dd').format(endDate),
+        )
+        .then((_) {
+          dismissLoading();
+          AppToast.snackbar(context, 'CSV exported successfully.');
+        })
+        .catchError((_) {
+          dismissLoading();
+          AppToast.snackbar(context, 'Export failed. Please try again.');
+        });
   }
 
   void applyDateFilter() {
@@ -208,17 +210,11 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
               const SizedBox(height: 2),
               Row(
                 children: [
-                  Text(
-                    getFormattedDateRange(),
-                    style: AppTypography.bodyMedium(context).apply(color: _muted),
-                  ),
+                  Text(getFormattedDateRange(), style: AppTypography.bodyMedium(context).apply(color: _muted)),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF3F4F6),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+                    decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
                     child: const Text(
                       'All Branches',
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
@@ -246,84 +242,85 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
 
   Widget _buildFilterRow() {
     final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Custom'];
+    final chips = filters.map((f) {
+      final selected = selectedFilter == f;
+      return GestureDetector(
+        onTap: () async {
+          if (f == 'Custom') {
+            final picked = await _showCustomDateRangePicker();
+            if (picked != null) {
+              setState(() {
+                selectedFilter = 'Custom';
+                startDate = picked.start;
+                endDate = picked.end;
+              });
+              getData();
+            }
+          } else {
+            setState(() {
+              selectedFilter = f;
+              applyDateFilter();
+            });
+            getData();
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF2196F3) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB)),
+            boxShadow: selected
+                ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(51), blurRadius: 8, offset: const Offset(0, 2))]
+                : null,
+          ),
+          child: Text(
+            f,
+            style: AppTypography.bodyMedium(
+              context,
+            ).apply(color: selected ? Colors.white : const Color(0xFF374151), fontWeightDelta: selected ? 1 : 0),
+          ),
+        ),
+      );
+    }).toList();
+
+    final exportButton = SizedBox(
+      height: 38,
+      child: OutlinedButton.icon(
+        onPressed: exportData,
+        icon: const Icon(Icons.download_rounded, size: 16),
+        label: const Text('Export CSV'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(0xFF059669),
+          side: const BorderSide(color: Color(0xFF059669)),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        ),
+      ),
+    );
+
+    if (isMobile) {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [...chips, exportButton],
+      );
+    }
+
     return Row(
       children: [
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: filters.map((f) {
-                final selected = selectedFilter == f;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: GestureDetector(
-                    onTap: () async {
-                      if (f == 'Custom') {
-                        final picked = await _showCustomDateRangePicker();
-                        if (picked != null) {
-                          setState(() {
-                            selectedFilter = 'Custom';
-                            startDate = picked.start;
-                            endDate = picked.end;
-                          });
-                          getData();
-                        }
-                      } else {
-                        setState(() {
-                          selectedFilter = f;
-                          applyDateFilter();
-                        });
-                        getData();
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: selected ? const Color(0xFF2196F3) : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
-                        ),
-                        boxShadow: selected
-                            ? [
-                                BoxShadow(
-                                  color: const Color(0xFF2196F3).withAlpha(51),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]
-                            : null,
-                      ),
-                      child: Text(
-                        f,
-                        style: AppTypography.bodyMedium(context).apply(
-                          color: selected ? Colors.white : const Color(0xFF374151),
-                          fontWeightDelta: selected ? 1 : 0,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+              children: chips.map((chip) => Padding(padding: const EdgeInsets.only(right: 8), child: chip)).toList(),
             ),
           ),
         ),
         const SizedBox(width: 8),
-        SizedBox(
-          height: 38,
-          child: OutlinedButton.icon(
-            onPressed: exportData,
-            icon: const Icon(Icons.download_rounded, size: 16),
-            label: const Text('Export CSV'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF059669),
-              side: const BorderSide(color: Color(0xFF059669)),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-        ),
+        exportButton,
       ],
     );
   }
@@ -434,18 +431,12 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
     final maxVal = revenues.isEmpty ? 10.0 : revenues.reduce((a, b) => a > b ? a : b);
 
     return Container(
-      decoration: BoxDecoration(
-        color: _bgDark,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: _bgDark, borderRadius: BorderRadius.circular(16)),
       padding: EdgeInsets.all(screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Net Revenue by Branch',
-            style: AppTypography.displayMedium(context).apply(color: Colors.white),
-          ),
+          Text('Net Revenue by Branch', style: AppTypography.displayMedium(context).apply(color: Colors.white)),
           const SizedBox(height: 4),
           Text(getFormattedDateRange(), style: const TextStyle(color: _muted, fontSize: 11)),
           SizedBox(height: screenPadding),
@@ -474,10 +465,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                       reservedSize: 50,
                       getTitlesWidget: (value, meta) {
                         if (value == meta.max || value == 0) return const SizedBox();
-                        return Text(
-                          'RM ${value.toInt()}',
-                          style: const TextStyle(color: _muted, fontSize: 10),
-                        );
+                        return Text('RM ${value.toInt()}', style: const TextStyle(color: _muted, fontSize: 10));
                       },
                     ),
                   ),
@@ -534,7 +522,11 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                    ),
                     const SizedBox(width: 6),
                     Text(branches[i], style: const TextStyle(color: _muted, fontSize: 11)),
                   ],
@@ -575,10 +567,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
           const Divider(height: 1, color: Color(0xFFE5E7EB)),
           data.isEmpty
               ? _buildEmptyState()
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: _buildDataTable(data),
-                ),
+              : SingleChildScrollView(scrollDirection: Axis.horizontal, child: _buildDataTable(data)),
         ],
       ),
     );
@@ -597,10 +586,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
               style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 4),
-            Text(
-              'Try selecting a different date range',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-            ),
+            Text('Try selecting a different date range', style: TextStyle(fontSize: 12, color: Colors.grey.shade400)),
           ],
         ),
       ),
@@ -620,9 +606,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
 
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
-      border: TableBorder(
-        horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1),
-      ),
+      border: TableBorder(horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1)),
       children: [
         TableRow(
           decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
@@ -648,10 +632,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: _branchColors[i % _branchColors.length],
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: _branchColors[i % _branchColors.length], shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 8),
                     Text(data[i].branchName ?? '—', style: cellStyle.copyWith(fontWeight: FontWeight.w500)),
@@ -666,10 +647,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD1FAE5),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  decoration: BoxDecoration(color: const Color(0xFFD1FAE5), borderRadius: BorderRadius.circular(12)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -677,11 +655,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                       const SizedBox(width: 4),
                       Text(
                         '${data[i].successfulPayments ?? 0}',
-                        style: const TextStyle(
-                          color: Color(0xFF065F46),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
+                        style: const TextStyle(color: Color(0xFF065F46), fontWeight: FontWeight.w600, fontSize: 12),
                       ),
                     ],
                   ),
@@ -691,10 +665,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFEE2E2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(12)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -702,11 +673,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                       const SizedBox(width: 4),
                       Text(
                         '${data[i].failedPayments ?? 0}',
-                        style: const TextStyle(
-                          color: Color(0xFF991B1B),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
+                        style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w600, fontSize: 12),
                       ),
                     ],
                   ),
@@ -731,10 +698,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Text(
                   data[i].netRevenue ?? '0.00',
-                  style: cellStyle.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF0891B2),
-                  ),
+                  style: cellStyle.copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF0891B2)),
                 ),
               ),
             ],
@@ -797,11 +761,7 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             config.value,
-            style: TextStyle(
-              fontSize: isMobile ? 16 : 20,
-              fontWeight: FontWeight.bold,
-              color: config.valueColor,
-            ),
+            style: TextStyle(fontSize: isMobile ? 16 : 20, fontWeight: FontWeight.bold, color: config.valueColor),
           ),
           const SizedBox(height: 2),
           Text(

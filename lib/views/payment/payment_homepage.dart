@@ -189,14 +189,23 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 if (channels.isNotEmpty || (isSuperAdmin && branchCount >= 2)) ...[
                   SizedBox(height: screenPadding),
                   if (channels.isNotEmpty && isSuperAdmin && branchCount >= 2)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(child: _buildChannelBreakdown(controller)),
-                        SizedBox(width: screenPadding),
-                        Expanded(child: _buildBranchOverview(controller)),
-                      ],
-                    )
+                    isMobile
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildChannelBreakdown(controller),
+                              SizedBox(height: screenPadding),
+                              _buildBranchOverview(controller),
+                            ],
+                          )
+                        : Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _buildChannelBreakdown(controller)),
+                              SizedBox(width: screenPadding),
+                              Expanded(child: _buildBranchOverview(controller)),
+                            ],
+                          )
                   else if (channels.isNotEmpty)
                     _buildChannelBreakdown(controller)
                   else
@@ -278,82 +287,85 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
   Widget _buildFilterRow() {
     final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Custom'];
+    final chips = filters.map((f) {
+      final selected = selectedFilter == f;
+      return GestureDetector(
+        onTap: () async {
+          if (f == 'Custom') {
+            final picked = await _showCustomDateRangePicker();
+            if (picked != null) {
+              setState(() {
+                selectedFilter = 'Custom';
+                startDate = picked.start;
+                endDate = picked.end;
+              });
+              getData();
+            }
+          } else {
+            setState(() {
+              selectedFilter = f;
+              applyDateFilter();
+            });
+            getData();
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF2196F3) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB)),
+            boxShadow: selected
+                ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(51), blurRadius: 8, offset: const Offset(0, 2))]
+                : null,
+          ),
+          child: Text(
+            f,
+            style: AppTypography.bodyMedium(
+              context,
+            ).apply(color: selected ? Colors.white : const Color(0xFF374151), fontWeightDelta: selected ? 1 : 0),
+          ),
+        ),
+      );
+    }).toList();
+
+    final exportButton = SizedBox(
+      height: 38,
+      child: OutlinedButton.icon(
+        onPressed: exportData,
+        icon: const Icon(Icons.download_rounded, size: 16),
+        label: const Text('Export CSV'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(0xFF059669),
+          side: const BorderSide(color: Color(0xFF059669)),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        ),
+      ),
+    );
+
+    if (isMobile) {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [...chips, exportButton],
+      );
+    }
+
     return Row(
       children: [
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: filters.map((f) {
-                final selected = selectedFilter == f;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: GestureDetector(
-                    onTap: () async {
-                      if (f == 'Custom') {
-                        final picked = await _showCustomDateRangePicker();
-                        if (picked != null) {
-                          setState(() {
-                            selectedFilter = 'Custom';
-                            startDate = picked.start;
-                            endDate = picked.end;
-                          });
-                          getData();
-                        }
-                      } else {
-                        setState(() {
-                          selectedFilter = f;
-                          applyDateFilter();
-                        });
-                        getData();
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: selected ? const Color(0xFF2196F3) : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB)),
-                        boxShadow: selected
-                            ? [
-                                BoxShadow(
-                                  color: const Color(0xFF2196F3).withAlpha(51),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Text(
-                        f,
-                        style: AppTypography.bodyMedium(context).apply(
-                          color: selected ? Colors.white : const Color(0xFF374151),
-                          fontWeightDelta: selected ? 1 : 0,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+              children: chips.map((chip) => Padding(padding: const EdgeInsets.only(right: 8), child: chip)).toList(),
             ),
           ),
         ),
         const SizedBox(width: 8),
-        SizedBox(
-          height: 38,
-          child: OutlinedButton.icon(
-            onPressed: exportData,
-            icon: const Icon(Icons.download_rounded, size: 16),
-            label: const Text('Export CSV'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF059669),
-              side: const BorderSide(color: Color(0xFF059669)),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-        ),
+        exportButton,
       ],
     );
   }

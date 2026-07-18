@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/models/practitioner_schedule/weekly_pattern.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 /// Owns the weekly pattern state (selected days + per-day time ranges) so
 /// hosts can read/set it programmatically while [WeeklyAvailabilityEditor]
@@ -13,10 +14,12 @@ class WeeklyAvailabilityEditorController extends ChangeNotifier {
   final Map<String, bool> selectedDays = {for (final d in weekDayKeys) d: false};
   final Map<String, List<TimeRange>> timeRanges = {for (final d in weekDayKeys) d: []};
 
-  WeeklyPattern get pattern => WeeklyPattern(dayRanges: {
-        for (final d in weekDayKeys)
-          if (selectedDays[d] == true && timeRanges[d]!.isNotEmpty) d: List.of(timeRanges[d]!),
-      });
+  WeeklyPattern get pattern => WeeklyPattern(
+    dayRanges: {
+      for (final d in weekDayKeys)
+        if (selectedDays[d] == true && timeRanges[d]!.isNotEmpty) d: List.of(timeRanges[d]!),
+    },
+  );
 
   void setPattern(WeeklyPattern pattern) {
     for (final d in weekDayKeys) {
@@ -337,9 +340,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                             _dayActionBtn(
                               icon: Icons.paste_rounded,
                               tooltip: 'Paste timing',
-                              onTap: copiedFromDay != null && copiedFromDay != day
-                                  ? () => _pasteSlots(day)
-                                  : null,
+                              onTap: copiedFromDay != null && copiedFromDay != day ? () => _pasteSlots(day) : null,
                               color: const Color(0xFF6366F1),
                             ),
                           ],
@@ -360,11 +361,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                                 padding: const EdgeInsets.symmetric(vertical: 8),
                                 child: Text(
                                   'No time ranges defined yet.',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[400],
-                                    fontStyle: FontStyle.italic,
-                                  ),
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[400], fontStyle: FontStyle.italic),
                                 ),
                               ),
                             )
@@ -384,9 +381,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                                   decoration: BoxDecoration(
                                     color: itemInvalid ? Colors.red.withAlpha(10) : const Color(0xFFF3F4F6),
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: itemInvalid ? Colors.red.shade200 : Colors.transparent,
-                                    ),
+                                    border: Border.all(color: itemInvalid ? Colors.red.shade200 : Colors.transparent),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -400,11 +395,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                                       }),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 6),
-                                        child: Icon(
-                                          Icons.arrow_forward_rounded,
-                                          size: 14,
-                                          color: Colors.grey[400],
-                                        ),
+                                        child: Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.grey[400]),
                                       ),
                                       _compactTimeChip('End', range.end, () async {
                                         final picked = await _showTimePicker(range.end);
@@ -421,11 +412,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                                             _notify();
                                           }
                                         },
-                                        child: const Icon(
-                                          Icons.cancel_rounded,
-                                          size: 18,
-                                          color: Colors.redAccent,
-                                        ),
+                                        child: const Icon(Icons.cancel_rounded, size: 18, color: Colors.redAccent),
                                       ),
                                     ],
                                   ),
@@ -444,10 +431,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                               _notify();
                             },
                             icon: const Icon(Icons.add_rounded, size: 16),
-                            label: const Text(
-                              'Add Range',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
+                            label: const Text('Add Range', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             style: TextButton.styleFrom(
                               foregroundColor: secondaryColor,
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -473,222 +457,20 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ─── Quick Select & Master ───
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF9FAFB),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Quick Select Days',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
-                        ),
-                        const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 8,
-                          children: [
-                            _quickSelectBtn('All', () => _selectAll(true)),
-                            _quickSelectBtn('Weekdays', _selectWeekdays),
-                            _quickSelectBtn('Weekends', _selectWeekends),
-                            _quickSelectBtn('None', () => _selectAll(false), isClear: true),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [secondaryColor, secondaryColor.withAlpha(200)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(color: secondaryColor.withAlpha(60), blurRadius: 10, offset: const Offset(0, 4)),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.bolt_rounded, color: Colors.white, size: 16),
-                            const SizedBox(width: 6),
-                            const Text(
-                              'Master Timing',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                            const Spacer(),
-                            InkWell(
-                              onTap: () => setState(() => isWeekdayMasterMode = !isWeekdayMasterMode),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withAlpha(50),
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.white24),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      isWeekdayMasterMode ? 'WEEKDAY' : 'WEEKEND',
-                                      style: const TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    const Icon(Icons.swap_horiz_rounded, size: 12, color: Colors.white),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _masterTimeField('Start', masterStart, (v) {
-                                setState(() {
-                                  if (isWeekdayMasterMode) {
-                                    weekdayMasterStart = v;
-                                  } else {
-                                    weekendMasterStart = v;
-                                  }
-                                });
-                              }),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _masterTimeField('End', masterEnd, (v) {
-                                setState(() {
-                                  if (isWeekdayMasterMode) {
-                                    weekdayMasterEnd = v;
-                                  } else {
-                                    weekendMasterEnd = v;
-                                  }
-                                });
-                              }),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: Checkbox(
-                                value: hasMasterBreak,
-                                activeColor: Colors.white,
-                                checkColor: secondaryColor,
-                                side: const BorderSide(color: Colors.white70),
-                                onChanged: (v) => setState(() => hasMasterBreak = v!),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Include Break Time',
-                              style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                        if (hasMasterBreak) ...[
-                          const SizedBox(height: 8),
-                          ...masterBreaks.asMap().entries.map((entry) {
-                            final idx = entry.key;
-                            final b = entry.value;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: _masterTimeField('Break Start', b.start, (v) => setState(() => b.start = v)),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: _masterTimeField('Break End', b.end, (v) => setState(() => b.end = v)),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  InkWell(
-                                    onTap: () => setState(() => masterBreaks.removeAt(idx)),
-                                    child: const Icon(
-                                      Icons.remove_circle_outline_rounded,
-                                      color: Colors.white70,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                          TextButton.icon(
-                            onPressed: () => setState(
-                              () => masterBreaks.add(
-                                TimeRange(
-                                  start: const TimeOfDay(hour: 13, minute: 0),
-                                  end: const TimeOfDay(hour: 14, minute: 0),
-                                ),
-                              ),
-                            ),
-                            icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 14),
-                            label: const Text(
-                              'Add Break Interval',
-                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                            style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 20)),
-                          ),
-                        ],
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _syncMasterToSelected,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: secondaryColor,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              elevation: 0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.sync_rounded, size: 16),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Push to ${isWeekdayMasterMode ? 'Weekdays' : 'Weekends'}',
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            if (isMobile)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [_quickSelectPanel(), const SizedBox(height: 16), _masterTimingPanel()],
+              )
+            else
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 3, child: _quickSelectPanel()),
+                  const SizedBox(width: 16),
+                  Expanded(flex: 2, child: _masterTimingPanel()),
+                ],
+              ),
             const SizedBox(height: 20),
 
             // ─── Day Rows ───
@@ -696,6 +478,203 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
           ],
         );
       },
+    );
+  }
+
+  Widget _quickSelectPanel() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Quick Select Days',
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            children: [
+              _quickSelectBtn('All', () => _selectAll(true)),
+              _quickSelectBtn('Weekdays', _selectWeekdays),
+              _quickSelectBtn('Weekends', _selectWeekends),
+              _quickSelectBtn('None', () => _selectAll(false), isClear: true),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _masterTimingPanel() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [secondaryColor, secondaryColor.withAlpha(200)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: secondaryColor.withAlpha(60), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.bolt_rounded, color: Colors.white, size: 16),
+              const SizedBox(width: 6),
+              const Text(
+                'Master Timing',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const Spacer(),
+              InkWell(
+                onTap: () => setState(() => isWeekdayMasterMode = !isWeekdayMasterMode),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(50),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.white24),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isWeekdayMasterMode ? 'WEEKDAY' : 'WEEKEND',
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.swap_horiz_rounded, size: 12, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _masterTimeField('Start', masterStart, (v) {
+                  setState(() {
+                    if (isWeekdayMasterMode) {
+                      weekdayMasterStart = v;
+                    } else {
+                      weekendMasterStart = v;
+                    }
+                  });
+                }),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _masterTimeField('End', masterEnd, (v) {
+                  setState(() {
+                    if (isWeekdayMasterMode) {
+                      weekdayMasterEnd = v;
+                    } else {
+                      weekendMasterEnd = v;
+                    }
+                  });
+                }),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: Checkbox(
+                  value: hasMasterBreak,
+                  activeColor: Colors.white,
+                  checkColor: secondaryColor,
+                  side: const BorderSide(color: Colors.white70),
+                  onChanged: (v) => setState(() => hasMasterBreak = v!),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Include Break Time',
+                style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          if (hasMasterBreak) ...[
+            const SizedBox(height: 8),
+            ...masterBreaks.asMap().entries.map((entry) {
+              final idx = entry.key;
+              final b = entry.value;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Expanded(child: _masterTimeField('Break Start', b.start, (v) => setState(() => b.start = v))),
+                    const SizedBox(width: 8),
+                    Expanded(child: _masterTimeField('Break End', b.end, (v) => setState(() => b.end = v))),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: () => setState(() => masterBreaks.removeAt(idx)),
+                      child: const Icon(Icons.remove_circle_outline_rounded, color: Colors.white70, size: 20),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            TextButton.icon(
+              onPressed: () => setState(
+                () => masterBreaks.add(
+                  TimeRange(start: const TimeOfDay(hour: 13, minute: 0), end: const TimeOfDay(hour: 14, minute: 0)),
+                ),
+              ),
+              icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 14),
+              label: const Text(
+                'Add Break Interval',
+                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+              style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 20)),
+            ),
+          ],
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _syncMasterToSelected,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: secondaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.sync_rounded, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Push to ${isWeekdayMasterMode ? 'Weekdays' : 'Weekends'}',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -49,7 +49,14 @@ class _ServicePerformanceChartState extends State<ServicePerformanceChart> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Service Performance', style: AppTypography.displayMedium(context).apply(color: Colors.white)),
+                    Expanded(
+                      child: Text(
+                        'Service Performance',
+                        style: AppTypography.displayMedium(context).apply(color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     const Text(
                       'Last 30 days',
                       style: TextStyle(color: ServicePerformanceChart._mutedColor, fontSize: 12),

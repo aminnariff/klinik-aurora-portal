@@ -178,8 +178,10 @@ class _VoucherDetailState extends State<VoucherDetail> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Wrap(
+                                spacing: screenPadding,
+                                runSpacing: screenPaddingVertical(),
+                                crossAxisAlignment: WrapCrossAlignment.start,
                                 children: [
                                   // Left: Voucher Details
                                   SizedBox(
@@ -238,15 +240,17 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                                 }
                                                 return Row(
                                                   children: [
-                                                    AppDropdown(
-                                                      attributeList: DropdownAttributeList(
-                                                        rewards,
-                                                        hintText: 'Select Reward (Optional)',
-                                                        value: selectedReward?.name,
-                                                        onChanged: (a) {
-                                                          if (a != null) setState(() => selectedReward = a);
-                                                        },
-                                                        width: screenWidth1728(23),
+                                                    Flexible(
+                                                      child: AppDropdown(
+                                                        attributeList: DropdownAttributeList(
+                                                          rewards,
+                                                          hintText: 'Select Reward (Optional)',
+                                                          value: selectedReward?.name,
+                                                          onChanged: (a) {
+                                                            if (a != null) setState(() => selectedReward = a);
+                                                          },
+                                                          width: isMobile ? screenWidth1728(26) - 42 : screenWidth1728(23),
+                                                        ),
                                                       ),
                                                     ),
                                                     const Tooltip(
