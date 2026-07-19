@@ -81,68 +81,123 @@ class _AdminHomepageState extends State<AdminHomepage> {
   }
 
   Widget mobileView() {
-    return Column(
-      children: [
-        searchField(controller: _userNameController, hintText: 'Search'),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                for (int index = 0; index < (2); index++)
+    return Consumer<AdminController>(
+      builder: (context, snapshot, _) {
+        final items = snapshot.adminAllResponse?.data ?? [];
+        return Column(
+          children: [
+            searchField(controller: _userNameController, hintText: 'Search admins...'),
+            Padding(
+              padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, screenPadding / 2),
+              child: Row(
+                children: [
+                  _MobileActionButton(
+                    icon: Icons.filter_list_rounded,
+                    tooltip: 'Filter',
+                    color: const Color(0xFF6366F1),
+                    onTap: _showFilterPanel,
+                  ),
+                  const SizedBox(width: 8),
+                  _MobileActionButton(
+                    icon: Icons.refresh_rounded,
+                    tooltip: 'Reset',
+                    color: Colors.grey[600]!,
+                    onTap: () {
+                      _searchController.clear();
+                      resetAllFilter();
+                      filtering(enableDebounce: false, page: 1);
+                    },
+                  ),
+                  const Spacer(),
+                  _MobileActionButton(
+                    icon: Icons.add_rounded,
+                    tooltip: 'Add Admin',
+                    color: Colors.white,
+                    background: primary,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const AdminDetail(type: 'create');
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: snapshot.adminAllResponse == null
+                  ? const Center(child: CircularProgressIndicator(color: secondaryColor))
+                  : items.isEmpty
+                      ? const Center(child: NoRecordsWidget())
+                      : ListView.builder(
+                          padding: EdgeInsets.symmetric(horizontal: screenPadding),
+                          itemCount: items.length,
+                          itemBuilder: (_, i) => mobileCard(items[i]),
+                        ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: screenPadding),
+              child: pagination(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget mobileCard(Data data) {
+    return Card(
+      margin: EdgeInsets.only(bottom: screenPadding / 2),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE5E7EB)),
+      ),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   GestureDetector(
                     onTap: () {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Card(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: screenPadding * 1.5,
-                                    horizontal: screenPadding,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      mobileText('Central Office', 'N/A'),
-                                      mobileText('Serving Cabinet', 'N/A'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
+                          return AdminDetail(user: data, type: 'update');
                         },
                       );
                     },
-                    child: Card(
-                      margin: EdgeInsets.symmetric(vertical: screenPadding / 2, horizontal: screenPadding),
-                      child: Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('N/A'),
-                            Text('N/A'),
-                            Row(children: [Text('N/A')]),
-                            Text('aaaaa'),
-                          ],
-                        ),
+                    child: Text(
+                      data.userFullname ?? data.userName ?? 'N/A',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF111827),
                       ),
                     ),
                   ),
-              ],
+                  const SizedBox(height: 8),
+                  mobileText('Email', data.userEmail ?? 'N/A'),
+                  const SizedBox(height: 4),
+                  mobileText('Contact', data.userPhone ?? 'N/A'),
+                  const SizedBox(height: 4),
+                  mobileText('Created', dateConverter(data.createdDate) ?? '—'),
+                  const SizedBox(height: 8),
+                  _statusChip(data.userStatus == 1),
+                ],
+              ),
             ),
-          ),
+            _actionsMenu(data),
+          ],
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        ),
-      ],
+      ),
     );
   }
 
@@ -745,5 +800,39 @@ class _AdminHomepageState extends State<AdminHomepage> {
 
   void _movePage(int page) {
     filtering(page: page, enableDebounce: false);
+  }
+}
+
+class _MobileActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final Color? background;
+  final VoidCallback onTap;
+  const _MobileActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.onTap,
+    this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: background ?? color.withAlpha(20),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+      ),
+    );
   }
 }

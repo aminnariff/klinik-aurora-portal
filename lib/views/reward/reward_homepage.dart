@@ -645,7 +645,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
               child: TextField(
                 controller: _searchController,
                 onChanged: (val) {
@@ -663,6 +663,43 @@ class _RewardHomepageState extends State<RewardHomepage> {
                   ),
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              child: Row(
+                children: [
+                  _MobileActionButton(
+                    icon: Icons.filter_list_rounded,
+                    tooltip: 'Filter',
+                    color: const Color(0xFF6366F1),
+                    onTap: _showFilterPanel,
+                  ),
+                  const SizedBox(width: 8),
+                  _MobileActionButton(
+                    icon: Icons.refresh_rounded,
+                    tooltip: 'Reset',
+                    color: Colors.grey[600]!,
+                    onTap: () {
+                      _searchController.clear();
+                      resetAllFilter();
+                      filtering(enableDebounce: false, page: 1);
+                    },
+                  ),
+                  const Spacer(),
+                  _MobileActionButton(
+                    icon: Icons.add_rounded,
+                    tooltip: 'Add Reward',
+                    color: Colors.white,
+                    background: primary,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const RewardDetail(reward: null, type: 'create'),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -796,5 +833,39 @@ class _RewardHomepageState extends State<RewardHomepage> {
     _rewardNameController.text = '';
     _rewardStatus = null;
     rebuildDropdown.add(DateTime.now());
+  }
+}
+
+class _MobileActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final Color? background;
+  final VoidCallback onTap;
+  const _MobileActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.onTap,
+    this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: background ?? color.withAlpha(20),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+      ),
+    );
   }
 }

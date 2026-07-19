@@ -76,35 +76,190 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
   // ── Mobile ──────────────────────────────────────────────────────────────────
 
   Widget _mobileView() {
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                for (int index = 0; index < 2; index++)
-                  Card(
-                    margin: EdgeInsets.symmetric(
-                      vertical: screenPadding / 2,
-                      horizontal: screenPadding,
+    return Consumer<VoucherController>(
+      builder: (context, snapshot, _) {
+        final items = snapshot.voucherAllResponse?.data?.data ?? [];
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  _voucherNameController.text = val;
+                  filtering(page: 1);
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search vouchers...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              child: Row(
+                children: [
+                  _MobileActionButton(
+                    icon: Icons.filter_list_rounded,
+                    tooltip: 'Filter',
+                    color: const Color(0xFF6366F1),
+                    onTap: _showFilterPanel,
+                  ),
+                  const SizedBox(width: 8),
+                  _MobileActionButton(
+                    icon: Icons.refresh_rounded,
+                    tooltip: 'Reset',
+                    color: Colors.grey[600]!,
+                    onTap: () {
+                      _searchController.clear();
+                      resetAllFilter();
+                      filtering(enableDebounce: false, page: 1);
+                    },
+                  ),
+                  const Spacer(),
+                  _MobileActionButton(
+                    icon: Icons.add_rounded,
+                    tooltip: 'Add Voucher',
+                    color: Colors.white,
+                    background: primary,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const VoucherDetail(type: 'create'),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: snapshot.voucherAllResponse == null
+                  ? const Center(child: CircularProgressIndicator(color: secondaryColor))
+                  : items.isEmpty
+                      ? const Center(child: NoRecordsWidget())
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          itemCount: items.length,
+                          itemBuilder: (_, i) => _mobileCard(items[i]),
+                        ),
+            ),
+            _tableFooter(),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _mobileCard(Data voucher) {
+    final isActive =
+        voucher.voucherStatus == 1 && checkEndDate(voucher.voucherEndDate);
+    final start = dateConverter(voucher.voucherStartDate);
+    final end = dateConverter(voucher.voucherEndDate);
+    return GestureDetector(
+      onTap: () => showDialog(
+        context: context,
+        builder: (_) => VoucherDetail(type: 'update', voucher: voucher),
+      ),
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 10),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: primary.withAlpha(30),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(screenPadding),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [Text('N/A'), Text('N/A')],
-                      ),
+                    child: const Icon(
+                      Icons.confirmation_number_rounded,
+                      size: 18,
+                      color: primary,
                     ),
                   ),
-              ],
-            ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      voucher.voucherName ?? '—',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    ),
+                  ),
+                  _statusChip(isActive),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _mobileRow('Code', _codeCell(voucher.voucherCode)),
+              _mobileRow('Points', Text(
+                '${voucher.voucherPoint ?? 0}',
+                style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+              )),
+              if (voucher.rewardId != null && voucher.rewardId!.isNotEmpty)
+                _mobileRow('Reward', Text(
+                  voucher.rewardId!,
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                  overflow: TextOverflow.ellipsis,
+                )),
+              if (start != null || end != null)
+                _mobileRow('Period', Text(
+                  '${start ?? '—'} → ${end ?? '—'}',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                )),
+              _mobileRow('Created', Text(
+                dateConverter(voucher.createdDate) ?? '—',
+                style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+              )),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  _iconBtn(Icons.edit_outlined, const Color(0xFF6366F1), () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => VoucherDetail(type: 'update', voucher: voucher),
+                    );
+                  }),
+                ],
+              ),
+            ],
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        ),
-      ],
+      ),
+    );
+  }
+
+  Widget _mobileRow(String label, Widget value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            ),
+          ),
+          Expanded(child: value),
+        ],
+      ),
     );
   }
 
@@ -683,4 +838,53 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
   }
 
   void _movePage(int page) => filtering(page: page, enableDebounce: false);
+
+  Widget _iconBtn(IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: color.withAlpha(20),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Icon(icon, size: 16, color: color),
+      ),
+    );
+  }
+}
+
+class _MobileActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final Color? background;
+  final VoidCallback onTap;
+  const _MobileActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.onTap,
+    this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: background ?? color.withAlpha(20),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+      ),
+    );
+  }
 }

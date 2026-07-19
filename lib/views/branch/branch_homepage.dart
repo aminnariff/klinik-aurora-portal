@@ -66,79 +66,242 @@ class _BranchHomepageState extends State<BranchHomepage> {
   }
 
   Widget mobileView() {
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                for (int index = 0; index < (2); index++)
-                  GestureDetector(
+    return Consumer<BranchController>(
+      builder: (context, snapshot, _) {
+        final items = snapshot.branchAllResponse?.data?.data ?? [];
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  _branchNameController.text = val;
+                  filtering(page: 1);
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search branches...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              child: Row(
+                children: [
+                  _MobileActionButton(
+                    icon: Icons.filter_list_rounded,
+                    tooltip: 'Filter',
+                    color: const Color(0xFF6366F1),
+                    onTap: _showFilterPanel,
+                  ),
+                  const SizedBox(width: 8),
+                  _MobileActionButton(
+                    icon: Icons.refresh_rounded,
+                    tooltip: 'Reset',
+                    color: Colors.grey[600]!,
+                    onTap: () {
+                      _searchController.clear();
+                      resetAllFilter();
+                      filtering(enableDebounce: false, page: 1);
+                    },
+                  ),
+                  const Spacer(),
+                  _MobileActionButton(
+                    icon: Icons.add_rounded,
+                    tooltip: 'Add Branch',
+                    color: Colors.white,
+                    background: primary,
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (BuildContext context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Card(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: screenPadding * 1.5,
-                                    horizontal: screenPadding,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      mobileText('Central Office', 'N/A'),
-                                      mobileText('Serving Cabinet', 'N/A'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                        builder: (_) => const BranchDetail(type: 'create'),
                       );
                     },
-                    child: Card(
-                      margin: EdgeInsets.symmetric(vertical: screenPadding / 2, horizontal: screenPadding),
-                      child: Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('N/A'),
-                            Text('N/A'),
-                            Row(children: [Text('N/A')]),
-                            Text('aaaaa'),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenPadding),
-          child: pagination(),
-        ),
-      ],
+            Expanded(
+              child: snapshot.branchAllResponse == null
+                  ? const Center(child: CircularProgressIndicator(color: secondaryColor))
+                  : items.isEmpty
+                      ? const Center(child: NoRecordsWidget())
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          itemCount: items.length,
+                          itemBuilder: (_, i) => mobileCard(items[i]),
+                        ),
+            ),
+            _tableFooter(),
+          ],
+        );
+      },
     );
   }
 
-  Widget mobileText(String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('$title:', style: Theme.of(context).textTheme.bodyMedium),
-        const SizedBox(width: 8),
-        Expanded(child: Text(value, style: Theme.of(context).textTheme.bodyMedium)),
-      ],
+  Widget mobileCard(Data branch) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE5E7EB)),
+      ),
+      color: Colors.white,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (_) => BranchDetail(branch: branch, type: 'update'),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: primary.withAlpha(30),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.storefront_rounded, size: 18, color: primary),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      branch.branchName ?? '—',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  _statusChip(branch.branchStatus == 1),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _mobileRow('Address', branch.address ?? '—'),
+              _mobileRow(
+                'City/State',
+                '${branch.city ?? '—'}, ${branch.state ?? '—'}',
+              ),
+              _mobileRow('Phone', branch.phoneNumber ?? '—'),
+              _mobileRow('Created', dateConverter(branch.createdDate) ?? '—'),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  _iconBtn(Icons.people_rounded, const Color(0xFF6B7280), () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => DoctorList(branch: branch),
+                    );
+                  }),
+                  const SizedBox(width: 4),
+                  _iconBtn(Icons.edit_outlined, const Color(0xFF6366F1), () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => BranchDetail(branch: branch, type: 'update'),
+                    );
+                  }),
+                  const SizedBox(width: 4),
+                  _iconBtn(
+                    branch.branchStatus == 1 ? Icons.toggle_on_rounded : Icons.toggle_off_rounded,
+                    branch.branchStatus == 1 ? const Color(0xFF16A34A) : Colors.grey,
+                    () async {
+                      try {
+                        if (await showConfirmDialog(
+                          context,
+                          branch.branchStatus == 1
+                              ? 'Are you certain you wish to deactivate this user account? Please note, this action can be reversed at a later time.'
+                              : 'Are you certain you wish to activate this user account? Please note, this action can be reversed at a later time.',
+                        )) {
+                          Future.delayed(Duration.zero, () {
+                            BranchController.update(
+                              UpdateBranchRequest(
+                                branchId: branch.branchId ?? '',
+                                branchCode: branch.branchCode ?? '',
+                                branchName: branch.branchName ?? '',
+                                phoneNumber: branch.phoneNumber ?? '',
+                                branchOpeningHours: branch.branchOpeningHours ?? '',
+                                branchClosingHours: branch.branchClosingHours ?? '',
+                                branchLaunchDate: branch.branchLaunchDate ?? '',
+                                address: branch.address ?? '',
+                              ),
+                            ).then((value) {
+                              if (responseCode(value.code)) {
+                                filtering();
+                                showDialogSuccess(
+                                  context,
+                                  'The user account has been successfully ${branch.branchStatus == 1 ? 'deactivated' : 'activated'}.',
+                                );
+                              } else {
+                                showDialogError(context, value.message ?? value.data?.message ?? '');
+                              }
+                            });
+                          });
+                        }
+                      } catch (e) {
+                        debugPrint(e.toString());
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mobileRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _iconBtn(IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: color.withAlpha(20),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Icon(icon, size: 16, color: color),
+      ),
     );
   }
 
@@ -709,5 +872,39 @@ class _BranchHomepageState extends State<BranchHomepage> {
 
   void _movePage(int page) {
     filtering(page: page, enableDebounce: false);
+  }
+}
+
+class _MobileActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final Color? background;
+  final VoidCallback onTap;
+  const _MobileActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.color,
+    required this.onTap,
+    this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: background ?? color.withAlpha(20),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+      ),
+    );
   }
 }
