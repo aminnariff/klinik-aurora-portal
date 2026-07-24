@@ -381,6 +381,11 @@ class AppointmentDetailsView extends StatelessWidget {
 
     // Find the most recent paid online transaction (has a paymentGateway)
     final Payment? txn = data?.payment?.where((p) => p.paymentGateway != null).lastOrNull;
+    // Manually-collected booking fee (cash/on-site) — paymentType 1 (Appointment)
+    // with no gateway attached, e.g. collected at the counter or waived on transfer.
+    final Payment? manualPayment = data?.payment
+        ?.where((p) => p.paymentType == 1 && p.paymentGateway == null)
+        .lastOrNull;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,6 +423,16 @@ class AppointmentDetailsView extends StatelessWidget {
                 ? Icons.check_circle_outline_rounded
                 : Icons.account_balance_wallet_outlined,
             color: isCompleted || (isPaid && balance == 0) ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+            fullWidth: true,
+          ),
+        ],
+        if (manualPayment != null && notNullOrEmptyString(manualPayment.receiptNo) == true) ...[
+          const SizedBox(height: 10),
+          _feeCard(
+            label: 'Receipt / Reference No.',
+            value: manualPayment.receiptNo!,
+            icon: Icons.receipt_outlined,
+            color: const Color(0xFF15803D),
             fullWidth: true,
           ),
         ],
@@ -556,10 +571,50 @@ class AppointmentDetailsView extends StatelessWidget {
         const SizedBox(height: 10),
         _metaRow(Icons.add_circle_outline, 'Created', dateConverter(data?.createdDate) ?? '—'),
         const SizedBox(height: 8),
+        _metaRow(
+          Icons.person_outline_rounded,
+          'Created By',
+          data?.createdBy?.name ?? data?.createdBy?.email ?? 'Patient (self-booked)',
+        ),
+        const SizedBox(height: 8),
         _metaRow(Icons.edit_outlined, 'Last Updated', dateConverter(data?.modifiedDate) ?? '—'),
         if (data?.appointmentId != null) ...[
           const SizedBox(height: 8),
           _metaRow(Icons.tag_rounded, 'Appointment ID', data!.appointmentId!.toUpperCase()),
+        ],
+        if (notNullOrEmptyString(data?.adminRemark) == true) ...[
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9FAFB),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.lock_outline_rounded, size: 12, color: Color(0xFF6B7280)),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'ADMIN REMARK (INTERNAL)',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF6B7280),
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(data!.adminRemark!, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+              ],
+            ),
+          ),
         ],
       ],
     );

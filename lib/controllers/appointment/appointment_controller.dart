@@ -65,6 +65,7 @@ class AppointmentController extends ChangeNotifier {
     String? customerPhone,
     String? customerNric,
     String? appointmentId,
+    String? doctorType,
   }) async {
     final queryParams = {
       'appointmentStatus': status,
@@ -80,6 +81,7 @@ class AppointmentController extends ChangeNotifier {
       'customerName': ?customerName,
       'customerPhone': ?customerPhone,
       'customerNric': ?customerNric,
+      'doctorType': ?doctorType,
       'page': page,
       'pageSize': pageSize,
     };
@@ -142,12 +144,14 @@ class AppointmentController extends ChangeNotifier {
     required String endDate,
     String? branchId,
     String? serviceBranchId,
+    String? doctorType,
   }) async {
     final params = <String, dynamic>{
       'startDate': startDate,
       'endDate': endDate,
       'branchId': ?branchId,
       'serviceBranchId': ?serviceBranchId,
+      'doctorType': ?doctorType,
     };
     final queryString = _buildQueryString(params);
     final endpoint = 'admin/appointment/counts$queryString';

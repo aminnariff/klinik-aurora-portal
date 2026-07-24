@@ -92,6 +92,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   bool _isLoadingDay = false;
   DropdownAttribute? _appointmentBranch;
   DropdownAttribute? _appointmentService;
+  DropdownAttribute? _appointmentDoctorType;
+  static final List<DropdownAttribute> doctorTypeList = [
+    DropdownAttribute('1', doctorType(1)),
+    DropdownAttribute('2', doctorType(2)),
+    DropdownAttribute('3', doctorType(3)),
+    DropdownAttribute('4', doctorType(4)),
+    DropdownAttribute('5', doctorType(5)),
+  ];
   List<DropdownAttribute> branches = [];
   bool _branchesLoaded = false;
   List<DropdownAttribute> serviceList = [];
@@ -274,6 +282,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           customerPhone: _customerPhoneController.text.trim().isEmpty ? null : _customerPhoneController.text.trim(),
           customerNric: _customerNricController.text.trim().isEmpty ? null : _customerNricController.text.trim(),
           appointmentId: _appointmentIdController.text.trim().isEmpty ? null : _appointmentIdController.text.trim(),
+          doctorType: _appointmentDoctorType?.key,
         )
         .then((value) {
           dismissLoading();
@@ -483,6 +492,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   bool _hasActiveFilters() {
     return _appointmentService != null ||
+        _appointmentDoctorType != null ||
         _customerNameController.text.trim().isNotEmpty ||
         _customerPhoneController.text.trim().isNotEmpty ||
         _customerNricController.text.trim().isNotEmpty ||
@@ -510,10 +520,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   void _resetFilters() {
     resetAllFilter();
     _appointmentService = null;
+    _appointmentDoctorType = null;
     _defaultThisMonth();
     setState(() {});
     getDashboard();
     filtering(enableDebounce: false, page: 1);
+    if (_isCalendarView && mounted) {
+      _refreshCalendarCounts();
+    }
   }
 
   void _showFilterPanel() {
@@ -604,6 +618,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             ),
                             const SizedBox(height: 8),
                             _buildServiceFilter(),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Doctor Type',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                            ),
+                            const SizedBox(height: 8),
+                            _buildDoctorTypeFilter(),
                             const SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
@@ -674,6 +695,30 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               // Applied on "Apply Filters" — no query fired here
               setState(() {
                 _appointmentService = (p0 == null || p0.key.isEmpty) ? null : p0;
+              });
+              rebuildDropdown.add(DateTime.now());
+            },
+            width: 280,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDoctorTypeFilter() {
+    return StreamBuilder<DateTime>(
+      stream: rebuildDropdown.stream,
+      builder: (context, snapshot) {
+        return AppDropdown(
+          attributeList: DropdownAttributeList(
+            [DropdownAttribute('', 'All Doctor Types'), ...doctorTypeList],
+            isEditable: true,
+            hintText: 'All Doctor Types',
+            value: _appointmentDoctorType?.name,
+            onChanged: (p0) {
+              // Applied on "Apply Filters" — no query fired here
+              setState(() {
+                _appointmentDoctorType = (p0 == null || p0.key.isEmpty) ? null : p0;
               });
               rebuildDropdown.add(DateTime.now());
             },
@@ -952,6 +997,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           endDate: end,
           branchId: branchId,
           serviceBranchId: _selectedServiceBranchId(),
+          doctorType: _appointmentDoctorType?.key,
         ).then((counts) {
           if (mounted) setState(() => _appointmentCounts = counts);
         });
@@ -981,6 +1027,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           endDate: dateStr,
           branchId: branchId,
           serviceBranchId: _selectedServiceBranchId(),
+          doctorType: _appointmentDoctorType?.key,
         )
         .then((value) {
           if (!mounted) return;

@@ -44,6 +44,8 @@ class Data {
   int? appointmentStatus;
   String? createdDate;
   String? modifiedDate;
+  String? adminRemark;
+  CreatedBy? createdBy;
   User? user;
   Service? service;
   List<Payment>? payment;
@@ -61,6 +63,8 @@ class Data {
     this.appointmentStatus,
     this.createdDate,
     this.modifiedDate,
+    this.adminRemark,
+    this.createdBy,
     this.user,
     this.service,
     this.payment,
@@ -79,6 +83,8 @@ class Data {
     appointmentStatus = json['appointmentStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
+    adminRemark = json['adminRemark'];
+    createdBy = json['createdBy'] != null ? CreatedBy.fromJson(json['createdBy']) : null;
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     service = json['service'] != null ? Service.fromJson(json['service']) : null;
     if (json['payment'] != null) {
@@ -103,6 +109,10 @@ class Data {
     data['appointmentStatus'] = appointmentStatus;
     data['createdDate'] = createdDate;
     data['modifiedDate'] = modifiedDate;
+    data['adminRemark'] = adminRemark;
+    if (createdBy != null) {
+      data['createdBy'] = createdBy!.toJson();
+    }
     if (user != null) {
       data['user'] = user!.toJson();
     }
@@ -115,6 +125,28 @@ class Data {
     if (branch != null) {
       data['branch'] = branch!.toJson();
     }
+    return data;
+  }
+}
+
+class CreatedBy {
+  String? adminId;
+  String? name;
+  String? email;
+
+  CreatedBy({this.adminId, this.name, this.email});
+
+  CreatedBy.fromJson(Map<String, dynamic> json) {
+    adminId = json['adminId'];
+    name = json['name'];
+    email = json['email'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['adminId'] = adminId;
+    data['name'] = name;
+    data['email'] = email;
     return data;
   }
 }

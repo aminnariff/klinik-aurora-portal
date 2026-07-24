@@ -96,8 +96,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
   List<FileAttribute> selectedFiles = [];
   bool _bookingFeeCollected = false;
+  // Fee intentionally not collected (e.g. patient already paid at another
+  // branch and is being transferred in) — bypasses the "fee collected"
+  // requirement below as long as an admin remark explains why.
+  bool _feeWaived = false;
   final TextEditingController _receiptNumberController = TextEditingController();
-  final TextEditingController _paymentRemarkController = TextEditingController();
+  // Staff-only note — never shown to the patient. Used for booking-fee
+  // context (e.g. branch-transfer waiver) or any other internal remark.
+  final TextEditingController _adminRemarkController = TextEditingController();
   final TextEditingController _attachmentUrlController = TextEditingController();
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   List<DropdownAttribute> serviceList = [];
@@ -173,23 +179,38 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         );
 
         final note = widget.appointment?.appointmentNote ?? '';
-        if (isBookingFeePaid(note)) {
+        _adminRemarkController.text = widget.appointment?.adminRemark ?? '';
+
+        Payment? existingBookingFeePayment;
+        for (final p in widget.appointment?.payment ?? <Payment>[]) {
+          if (p.paymentType == 1) {
+            existingBookingFeePayment = p;
+            break;
+          }
+        }
+
+        if (existingBookingFeePayment != null) {
+          // Structured payment record — this is the source of truth going forward.
           _bookingFeeCollected = true;
-          // Extract receipt and remark if they exist
+          _receiptNumberController.text = existingBookingFeePayment.receiptNo ?? '';
+        } else if (isBookingFeePaid(note)) {
+          // Legacy appointment created before receipt/remark were structured
+          // fields — fall back to parsing them out of the note text.
+          _bookingFeeCollected = true;
           final lines = note.split('\n');
           for (var line in lines) {
             final l = line.trim();
             if (l.toLowerCase().startsWith('receipt no:')) {
               _receiptNumberController.text = l.substring(l.indexOf(':') + 1).trim();
-            } else if (l.toLowerCase().startsWith('remark:')) {
-              _paymentRemarkController.text = l.substring(l.indexOf(':') + 1).trim();
+            } else if (l.toLowerCase().startsWith('remark:') && _adminRemarkController.text.isEmpty) {
+              _adminRemarkController.text = l.substring(l.indexOf(':') + 1).trim();
             }
           }
-          // Clean the main note controller to show only base note
-          final paymentMarker = '[Booking Fee Collected';
-          if (note.contains(paymentMarker)) {
-            appointmentNoteController.controller.text = note.split(paymentMarker)[0].trim();
-          }
+        }
+        // Clean the main note controller of any legacy payment marker text.
+        final paymentMarker = '[Booking Fee Collected';
+        if (note.contains(paymentMarker)) {
+          appointmentNoteController.controller.text = note.split(paymentMarker)[0].trim();
         }
 
         rebuildDropdown.add(DateTime.now());
@@ -403,6 +424,54 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             : SizedBox()
                                                       : InputField(field: appointmentNoteController),
                                                   AppPadding.vertical(denominator: 2),
+                                                  // Staff-only note — never shown to the patient. Covers rare cases
+                                                  // like branch transfers ("transferred from/to Branch X").
+                                                  _isLocked
+                                                      ? (widget.appointment?.adminRemark ?? '') != ''
+                                                            ? labelValue(
+                                                                'Admin Remark (internal)',
+                                                                widget.appointment?.adminRemark ?? '',
+                                                              )
+                                                            : SizedBox()
+                                                      : TextField(
+                                                          controller: _adminRemarkController,
+                                                          style: const TextStyle(fontSize: 13),
+                                                          maxLines: 3,
+                                                          decoration: InputDecoration(
+                                                            labelText: 'Admin Remark (internal — not shown to patient)',
+                                                            labelStyle: const TextStyle(
+                                                              fontSize: 12,
+                                                              color: Color(0xFF6B7280),
+                                                            ),
+                                                            prefixIcon: const Padding(
+                                                              padding: EdgeInsets.only(bottom: 40),
+                                                              child: Icon(
+                                                                Icons.lock_outline_rounded,
+                                                                size: 16,
+                                                                color: Color(0xFF6B7280),
+                                                              ),
+                                                            ),
+                                                            filled: true,
+                                                            fillColor: const Color(0xFFF9FAFB),
+                                                            contentPadding: const EdgeInsets.symmetric(
+                                                              horizontal: 12,
+                                                              vertical: 10,
+                                                            ),
+                                                            border: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(8),
+                                                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                                            ),
+                                                            enabledBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(8),
+                                                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                                            ),
+                                                            focusedBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(8),
+                                                              borderSide: const BorderSide(color: Color(0xFF6B7280)),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                  AppPadding.vertical(denominator: 2),
                                                   if ((widget.appointment?.service?.dueDateToggle == 1) ||
                                                       selectedService?.dueDateToggle == 1)
                                                     _isLocked
@@ -539,12 +608,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 Container(
                                                                   margin: const EdgeInsets.only(top: 4),
                                                                   decoration: BoxDecoration(
-                                                                    color: _bookingFeeCollected
+                                                                    color: _feeWaived
+                                                                        ? const Color(0xFFEFF6FF)
+                                                                        : _bookingFeeCollected
                                                                         ? const Color(0xFFF0FDF4)
                                                                         : const Color(0xFFFFF7ED),
                                                                     borderRadius: BorderRadius.circular(10),
                                                                     border: Border.all(
-                                                                      color: _bookingFeeCollected
+                                                                      color: _feeWaived
+                                                                          ? const Color(0xFF93C5FD)
+                                                                          : _bookingFeeCollected
                                                                           ? const Color(0xFF86EFAC)
                                                                           : const Color(0xFFFB923C).withAlpha(80),
                                                                     ),
@@ -552,13 +625,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                   child: Column(
                                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                                     children: [
-                                                                      // Checkbox row
+                                                                      // Checkbox row — fee collected
                                                                       InkWell(
                                                                         borderRadius: const BorderRadius.vertical(
                                                                           top: Radius.circular(10),
                                                                         ),
                                                                         onTap: () {
                                                                           _bookingFeeCollected = !_bookingFeeCollected;
+                                                                          if (_bookingFeeCollected) _feeWaived = false;
                                                                           fileRebuild.add(DateTime.now());
                                                                         },
                                                                         child: Padding(
@@ -575,6 +649,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                                   value: _bookingFeeCollected,
                                                                                   onChanged: (v) {
                                                                                     _bookingFeeCollected = v ?? false;
+                                                                                    if (_bookingFeeCollected) {
+                                                                                      _feeWaived = false;
+                                                                                    }
                                                                                     fileRebuild.add(DateTime.now());
                                                                                   },
                                                                                   activeColor: const Color(0xFF16A34A),
@@ -615,8 +692,55 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                           ),
                                                                         ),
                                                                       ),
-                                                                      // Expanded fields when checked
-                                                                      if (_bookingFeeCollected) ...[
+                                                                      const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                                                                      // Checkbox row — fee waived (e.g. branch transfer)
+                                                                      InkWell(
+                                                                        onTap: () {
+                                                                          _feeWaived = !_feeWaived;
+                                                                          if (_feeWaived) _bookingFeeCollected = false;
+                                                                          fileRebuild.add(DateTime.now());
+                                                                        },
+                                                                        child: Padding(
+                                                                          padding: const EdgeInsets.symmetric(
+                                                                            horizontal: 12,
+                                                                            vertical: 10,
+                                                                          ),
+                                                                          child: Row(
+                                                                            children: [
+                                                                              SizedBox(
+                                                                                width: 20,
+                                                                                height: 20,
+                                                                                child: Checkbox(
+                                                                                  value: _feeWaived,
+                                                                                  onChanged: (v) {
+                                                                                    _feeWaived = v ?? false;
+                                                                                    if (_feeWaived) {
+                                                                                      _bookingFeeCollected = false;
+                                                                                    }
+                                                                                    fileRebuild.add(DateTime.now());
+                                                                                  },
+                                                                                  activeColor: const Color(0xFF2563EB),
+                                                                                  materialTapTargetSize:
+                                                                                      MaterialTapTargetSize.shrinkWrap,
+                                                                                  visualDensity: VisualDensity.compact,
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(width: 10),
+                                                                              const Expanded(
+                                                                                child: Text(
+                                                                                  'No payment required (e.g. transferred from another branch/clinic — already paid there)',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 13,
+                                                                                    color: Color(0xFF374151),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      // Expanded fields when either checkbox is checked
+                                                                      if (_bookingFeeCollected || _feeWaived) ...[
                                                                         const Divider(
                                                                           height: 1,
                                                                           color: Color(0xFFBBF7D0),
@@ -632,109 +756,61 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                             crossAxisAlignment:
                                                                                 CrossAxisAlignment.start,
                                                                             children: [
-                                                                              TextField(
-                                                                                controller: _receiptNumberController,
-                                                                                style: const TextStyle(fontSize: 13),
-                                                                                decoration: InputDecoration(
-                                                                                  labelText:
-                                                                                      'Receipt / Reference No. (optional)',
-                                                                                  labelStyle: const TextStyle(
-                                                                                    fontSize: 12,
-                                                                                    color: Color(0xFF6B7280),
-                                                                                  ),
-                                                                                  prefixIcon: const Icon(
-                                                                                    Icons.receipt_outlined,
-                                                                                    size: 16,
-                                                                                    color: Color(0xFF6B7280),
-                                                                                  ),
-                                                                                  filled: true,
-                                                                                  fillColor: Colors.white,
-                                                                                  contentPadding:
-                                                                                      const EdgeInsets.symmetric(
-                                                                                        horizontal: 12,
-                                                                                        vertical: 10,
-                                                                                      ),
-                                                                                  border: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.circular(
-                                                                                      8,
+                                                                              if (_bookingFeeCollected)
+                                                                                TextField(
+                                                                                  controller: _receiptNumberController,
+                                                                                  style: const TextStyle(fontSize: 13),
+                                                                                  decoration: InputDecoration(
+                                                                                    labelText:
+                                                                                        'Receipt / Reference No. (optional)',
+                                                                                    labelStyle: const TextStyle(
+                                                                                      fontSize: 12,
+                                                                                      color: Color(0xFF6B7280),
                                                                                     ),
-                                                                                    borderSide: const BorderSide(
-                                                                                      color: Color(0xFFD1FAE5),
-                                                                                    ),
-                                                                                  ),
-                                                                                  enabledBorder: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.circular(
-                                                                                      8,
-                                                                                    ),
-                                                                                    borderSide: const BorderSide(
-                                                                                      color: Color(0xFFD1FAE5),
-                                                                                    ),
-                                                                                  ),
-                                                                                  focusedBorder: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.circular(
-                                                                                      8,
-                                                                                    ),
-                                                                                    borderSide: const BorderSide(
-                                                                                      color: Color(0xFF16A34A),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              const SizedBox(height: 8),
-                                                                              TextField(
-                                                                                controller: _paymentRemarkController,
-                                                                                style: const TextStyle(fontSize: 13),
-                                                                                maxLines: 3,
-                                                                                decoration: InputDecoration(
-                                                                                  labelText:
-                                                                                      'Remarks (visible to patient & admin)',
-                                                                                  labelStyle: const TextStyle(
-                                                                                    fontSize: 12,
-                                                                                    color: Color(0xFF6B7280),
-                                                                                  ),
-                                                                                  prefixIcon: const Padding(
-                                                                                    padding: EdgeInsets.only(
-                                                                                      bottom: 40,
-                                                                                    ),
-                                                                                    child: Icon(
-                                                                                      Icons.notes_rounded,
+                                                                                    prefixIcon: const Icon(
+                                                                                      Icons.receipt_outlined,
                                                                                       size: 16,
                                                                                       color: Color(0xFF6B7280),
                                                                                     ),
-                                                                                  ),
-                                                                                  filled: true,
-                                                                                  fillColor: Colors.white,
-                                                                                  contentPadding:
-                                                                                      const EdgeInsets.symmetric(
-                                                                                        horizontal: 12,
-                                                                                        vertical: 10,
+                                                                                    filled: true,
+                                                                                    fillColor: Colors.white,
+                                                                                    contentPadding:
+                                                                                        const EdgeInsets.symmetric(
+                                                                                          horizontal: 12,
+                                                                                          vertical: 10,
+                                                                                        ),
+                                                                                    border: OutlineInputBorder(
+                                                                                      borderRadius:
+                                                                                          BorderRadius.circular(8),
+                                                                                      borderSide: const BorderSide(
+                                                                                        color: Color(0xFFD1FAE5),
                                                                                       ),
-                                                                                  border: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.circular(
-                                                                                      8,
                                                                                     ),
-                                                                                    borderSide: const BorderSide(
-                                                                                      color: Color(0xFFD1FAE5),
+                                                                                    enabledBorder: OutlineInputBorder(
+                                                                                      borderRadius:
+                                                                                          BorderRadius.circular(8),
+                                                                                      borderSide: const BorderSide(
+                                                                                        color: Color(0xFFD1FAE5),
+                                                                                      ),
                                                                                     ),
-                                                                                  ),
-                                                                                  enabledBorder: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.circular(
-                                                                                      8,
-                                                                                    ),
-                                                                                    borderSide: const BorderSide(
-                                                                                      color: Color(0xFFD1FAE5),
-                                                                                    ),
-                                                                                  ),
-                                                                                  focusedBorder: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.circular(
-                                                                                      8,
-                                                                                    ),
-                                                                                    borderSide: const BorderSide(
-                                                                                      color: Color(0xFF16A34A),
+                                                                                    focusedBorder: OutlineInputBorder(
+                                                                                      borderRadius:
+                                                                                          BorderRadius.circular(8),
+                                                                                      borderSide: const BorderSide(
+                                                                                        color: Color(0xFF16A34A),
+                                                                                      ),
                                                                                     ),
                                                                                   ),
                                                                                 ),
-                                                                              ),
+                                                                              if (_feeWaived)
+                                                                                const Text(
+                                                                                  'Explain why in the Admin Remark field below (internal — not shown to patient).',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 12,
+                                                                                    color: Color(0xFF6B7280),
+                                                                                    fontStyle: FontStyle.italic,
+                                                                                  ),
+                                                                                ),
                                                                             ],
                                                                           ),
                                                                         ),
@@ -1845,20 +1921,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     );
   }
 
-  String _buildNoteWithPayment() {
-    final base = appointmentNoteController.controller.text.trim();
-    final fee = widget.appointment?.service?.serviceBookingFee ?? selectedService?.serviceBookingFee;
-    if (_bookingFeeCollected && _service != null && notNullOrEmptyString(fee) == true) {
-      final lines = <String>['[Booking Fee Collected — RM $fee]'];
-      final receipt = _receiptNumberController.text.trim();
-      final remark = _paymentRemarkController.text.trim();
-      if (receipt.isNotEmpty) lines.add('Receipt No: $receipt');
-      if (remark.isNotEmpty) lines.add('Remark: $remark');
-      final paymentNote = lines.join('\n');
-      return base.isNotEmpty ? '$base\n\n$paymentNote' : paymentNote;
-    }
-    return base;
-  }
+  // Patient-visible note only — receipt no. and admin remark are sent as
+  // their own structured fields (see button()) so they never leak here.
+  String _buildNote() => appointmentNoteController.controller.text.trim();
 
   List<String> removePastDates(List<String> dateList) {
     return dateList.where((dateStr) {
@@ -1895,7 +1960,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   userId: widget.appointment?.user?.userId,
                   serviceBranchId: _service?.key,
                   appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
-                  appointmentNote: _buildNoteWithPayment(),
+                  appointmentNote: _buildNote(),
                   appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
                   customerDueDate: (() {
                     try {
@@ -1907,6 +1972,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     }
                   })(),
                   appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
+                  adminRemark: _adminRemarkController.text.trim().isEmpty
+                      ? null
+                      : _adminRemarkController.text.trim(),
+                  bookingFeeCollected: _bookingFeeCollected,
+                  receiptNo: _receiptNumberController.text.trim().isEmpty
+                      ? null
+                      : _receiptNumberController.text.trim(),
                 ),
               ).then((value) {
                 dismissLoading();
@@ -2004,7 +2076,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   userId: widget.appointment?.user?.userId,
                   appointmentDateTime: newUtcStr,
                   serviceBranchId: _service?.key,
-                  appointmentNote: _buildNoteWithPayment(),
+                  appointmentNote: _buildNote(),
                   appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
                   customerDueDate: (() {
                     try {
@@ -2016,6 +2088,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     }
                   })(),
                   appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
+                  adminRemark: _adminRemarkController.text.trim().isEmpty
+                      ? null
+                      : _adminRemarkController.text.trim(),
+                  bookingFeeCollected: _bookingFeeCollected,
+                  receiptNo: _receiptNumberController.text.trim().isEmpty
+                      ? null
+                      : _receiptNumberController.text.trim(),
                 ),
               ).then((value) {
                 dismissLoading();
@@ -2101,12 +2180,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     if (widget.type == 'create' &&
         _service != null &&
         notNullOrEmptyString(selectedService?.serviceBookingFee) == true) {
-      if (!_bookingFeeCollected) {
+      if (!_bookingFeeCollected && !_feeWaived) {
         temp = false;
-        showDialogError(context, 'Please confirm that the booking fee has been collected from the patient.');
-      } else if (_receiptNumberController.text.trim().isEmpty && _paymentRemarkController.text.trim().isEmpty) {
+        showDialogError(
+          context,
+          'Please confirm that the booking fee has been collected, or mark it as waived (e.g. branch transfer) with a remark explaining why.',
+        );
+      } else if (_feeWaived && _adminRemarkController.text.trim().isEmpty) {
         temp = false;
-        showDialogError(context, 'Either a receipt number or a remark must be provided for the booking fee.');
+        showDialogError(context, 'Please explain in the Admin Remark why the booking fee is waived.');
       }
     }
     setState(() {});

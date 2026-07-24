@@ -332,16 +332,16 @@ String? extractDobFromNric(String nric) {
 }
 
 bool isBookingFeePaid(String? note, {List<Payment>? payments}) {
-  bool paidInNote = false;
-  if (note != null && note.isNotEmpty) {
-    final lowercaseNote = note.toLowerCase();
-    paidInNote = lowercaseNote.contains('booking fee collected') || lowercaseNote.contains('receipt no:');
-  }
-
-  if (paidInNote) return true;
-
+  // Structured payment records take precedence — fall back to sniffing the
+  // (patient-visible) note only for legacy appointments created before
+  // booking-fee collection was tracked as its own payment row.
   if (payments != null && payments.isNotEmpty) {
     return payments.any((e) => e.paymentStatus == 1);
+  }
+
+  if (note != null && note.isNotEmpty) {
+    final lowercaseNote = note.toLowerCase();
+    return lowercaseNote.contains('booking fee collected') || lowercaseNote.contains('receipt no:');
   }
 
   return false;
@@ -351,6 +351,7 @@ class Payment {
   String? paymentId;
   int? paymentType;
   String? paymentAsset;
+  String? receiptNo;
   String? paymentAmount;
   int? paymentStatus;
   String? createdDate;
@@ -367,6 +368,7 @@ class Payment {
     this.paymentId,
     this.paymentType,
     this.paymentAsset,
+    this.receiptNo,
     this.paymentAmount,
     this.paymentStatus,
     this.createdDate,
@@ -383,6 +385,7 @@ class Payment {
     paymentId        = json['paymentId'];
     paymentType      = json['paymentType'];
     paymentAsset     = json['paymentAsset'];
+    receiptNo        = json['receiptNo'];
     paymentAmount    = json['paymentAmount'];
     paymentStatus    = json['paymentStatus'];
     createdDate      = json['createdDate'];
@@ -400,6 +403,7 @@ class Payment {
     data['paymentId']        = paymentId;
     data['paymentType']      = paymentType;
     data['paymentAsset']     = paymentAsset;
+    data['receiptNo']        = receiptNo;
     data['paymentAmount']    = paymentAmount;
     data['paymentStatus']    = paymentStatus;
     data['createdDate']      = createdDate;
