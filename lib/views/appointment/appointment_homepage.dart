@@ -620,7 +620,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             _buildServiceFilter(),
                             const SizedBox(height: 16),
                             const Text(
-                              'Doctor Type',
+                              'Practitioner Type',
                               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
                             ),
                             const SizedBox(height: 8),
@@ -711,9 +711,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       builder: (context, snapshot) {
         return AppDropdown(
           attributeList: DropdownAttributeList(
-            [DropdownAttribute('', 'All Doctor Types'), ...doctorTypeList],
+            [DropdownAttribute('', 'All Practitioner Types'), ...doctorTypeList],
             isEditable: true,
-            hintText: 'All Doctor Types',
+            hintText: 'All Practitioner Types',
             value: _appointmentDoctorType?.name,
             onChanged: (p0) {
               // Applied on "Apply Filters" — no query fired here
