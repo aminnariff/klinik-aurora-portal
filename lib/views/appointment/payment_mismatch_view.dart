@@ -422,6 +422,32 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
     );
   }
 
+  Widget _actionsCell(PaymentMismatchData item) {
+    final isResolving = _resolvingAppointmentId == item.appointmentId;
+    return SizedBox(
+      height: 32,
+      child: OutlinedButton.icon(
+        onPressed: isResolving ? null : () => _reclaimSlot(item),
+        icon: isResolving
+            ? const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF059669)),
+              )
+            : const Icon(Icons.event_available_rounded, size: 15, color: Color(0xFF059669)),
+        label: Text(
+          isResolving ? 'Working…' : 'Reclaim',
+          style: const TextStyle(fontSize: 12, color: Color(0xFF059669), fontWeight: FontWeight.w600),
+        ),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          side: const BorderSide(color: Color(0xFFA7F3D0)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+    );
+  }
+
   Widget _footer() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
