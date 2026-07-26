@@ -28,6 +28,7 @@ import 'package:klinik_aurora_portal/models/service_branch/service_branch_respon
 import 'package:klinik_aurora_portal/views/appointment/appointment_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
+import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
@@ -967,6 +968,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 tooltip: 'Guideline',
                 color: const Color(0xFFDF6E98),
                 onTap: () => showAppointmentGuidelineDialog(context),
+              ),
+              const SizedBox(width: 4),
+              _ActionButton(
+                icon: Icons.warning_amber_rounded,
+                tooltip: 'Payment Issues (paid but not in schedule)',
+                color: const Color(0xFFEF4444),
+                onTap: () => context.pushNamed(PaymentMismatchPage.routeName),
               ),
             ],
           ),

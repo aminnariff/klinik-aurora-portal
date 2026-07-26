@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/models/appointment/appointment_detail_respo
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_response.dart';
+import 'package:klinik_aurora_portal/models/appointment/payment_mismatch_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/service/create_service_response.dart';
 
@@ -114,6 +115,68 @@ class AppointmentController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: AppointmentDetailResponse.fromJson(value.data));
+          } catch (e) {
+            debugPrint(e.toString());
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  /// Appointments where the payment succeeded but the appointment is
+  /// soft-deleted — i.e. the patient paid but the booking isn't actually in
+  /// the schedule. See admin/appointment/get-payment-mismatch.ts.
+  static Future<ApiResponse<PaymentMismatchResponse>> getPaymentMismatch(
+    BuildContext context,
+    int page,
+    int pageSize, {
+    String? branchId,
+    String? startDate,
+    String? endDate,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/appointment/payment-mismatch',
+          queryParameters: {
+            'branchId': ?branchId,
+            'startDate': ?startDate,
+            'endDate': ?endDate,
+            'page': page,
+            'pageSize': pageSize,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: PaymentMismatchResponse.fromJson(value.data));
+          } catch (e) {
+            debugPrint(e.toString());
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  /// Manual recovery for a payment-mismatch row: re-checks slot availability
+  /// and, if free, books the slot for the patient and clears
+  /// appointment_is_deleted. See admin/appointment/resolve-payment-mismatch.ts.
+  static Future<ApiResponse<Map<String, dynamic>>> resolvePaymentMismatch(
+    BuildContext context,
+    String appointmentId,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.post,
+          endpoint: 'admin/appointment/payment-mismatch/resolve',
+          data: {'appointmentId': appointmentId},
+        )
+        .then((value) {
+          try {
+            return ApiResponse<Map<String, dynamic>>(
+              code: value.code,
+              message: value.data?['message'],
+              data: value.data is Map<String, dynamic> ? value.data as Map<String, dynamic> : null,
+            );
           } catch (e) {
             debugPrint(e.toString());
             return ApiResponse(code: 400, message: e.toString());

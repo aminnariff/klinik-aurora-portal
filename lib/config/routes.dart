@@ -8,6 +8,7 @@ import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 import 'package:klinik_aurora_portal/privacy/privacy_policy.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
+import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
 import 'package:klinik_aurora_portal/views/delete_account/delete_account.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
@@ -106,6 +107,10 @@ final router = GoRouter(
         ServiceHomepage.routeName: '0699ac1c-ac52-11ef-a1b7-bc24115a1342',
         PaymentSummaryPage.routeName: 'f57576c4-4d15-11f0-b054-1ff6746392b2',
         AppointmentHomepage.routeName: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
+        // Reuses the Appointment permission — this page is a troubleshooting
+        // view over appointment/payment data, not a separately-permissioned
+        // module.
+        PaymentMismatchPage.routeName: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
       };
 
       final requiredPermission = permissionMap[uri];
@@ -254,6 +259,14 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return const NoTransitionPage(child: Scaffold(body: AppointmentHomepage()));
+          },
+        ),
+        GoRoute(
+          name: PaymentMismatchPage.routeName,
+          path: PaymentMismatchPage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(child: Scaffold(body: PaymentMismatchPage()));
           },
         ),
         GoRoute(
