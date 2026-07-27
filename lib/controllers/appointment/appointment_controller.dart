@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/models/appointment/appointment_detail_respo
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_response.dart';
+import 'package:klinik_aurora_portal/models/appointment/fiuu_audit_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/payment_mismatch_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/service/create_service_response.dart';
@@ -149,6 +150,47 @@ class AppointmentController extends ChangeNotifier {
         .then((value) {
           try {
             return ApiResponse(code: value.code, data: PaymentMismatchResponse.fromJson(value.data));
+          } catch (e) {
+            debugPrint(e.toString());
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  /// One batch of the Fiuu reconciliation audit — checks every Fiuu
+  /// transaction we have recorded as NOT paid against Fiuu's own status API.
+  /// Paginated via offset/limit; the caller loops (see FiuuAuditDialog) to
+  /// cover either a recent window (BAU) or the full history (first run).
+  /// Each row costs a real network round-trip to Fiuu, so this uses a longer
+  /// timeout than the app's default 15s.
+  /// See admin/appointment/audit-fiuu-payments.ts.
+  static Future<ApiResponse<FiuuAuditResponse>> auditFiuu(
+    BuildContext context, {
+    String? startDate,
+    String? endDate,
+    int limit = 40,
+    int offset = 0,
+  }) async {
+    final options = (await ApiController().getHeaders(BaseUrl.portal, true)).copyWith(
+      sendTimeout: const Duration(seconds: 45),
+      receiveTimeout: const Duration(seconds: 45),
+    );
+    return ApiController()
+        .call(
+          context,
+          method: Method.post,
+          endpoint: 'admin/appointment/payment-mismatch/audit-fiuu',
+          data: {
+            'startDate': ?startDate,
+            'endDate': ?endDate,
+            'limit': limit,
+            'offset': offset,
+          },
+          headers: options,
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: FiuuAuditResponse.fromJson(value.data));
           } catch (e) {
             debugPrint(e.toString());
             return ApiResponse(code: 400, message: e.toString());

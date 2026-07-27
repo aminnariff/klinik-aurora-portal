@@ -55,6 +55,7 @@ class PaymentMismatchData {
   String? branchPhone;
   String? serviceName;
   String? paymentId;
+  int? paymentStatus;
   String? paymentAmount;
   String? paymentReceiptNo;
   String? paymentCreatedDate;
@@ -102,6 +103,7 @@ class PaymentMismatchData {
     branchPhone = json['branchPhone'];
     serviceName = json['serviceName'];
     paymentId = json['paymentId'];
+    paymentStatus = json['paymentStatus'];
     paymentAmount = json['paymentAmount']?.toString();
     paymentReceiptNo = json['paymentReceiptNo'];
     paymentCreatedDate = json['paymentCreatedDate'];
@@ -127,6 +129,7 @@ class PaymentMismatchData {
     json['branchPhone'] = branchPhone;
     json['serviceName'] = serviceName;
     json['paymentId'] = paymentId;
+    json['paymentStatus'] = paymentStatus;
     json['paymentAmount'] = paymentAmount;
     json['paymentReceiptNo'] = paymentReceiptNo;
     json['paymentCreatedDate'] = paymentCreatedDate;
@@ -136,6 +139,14 @@ class PaymentMismatchData {
     json['paymentTransactionState'] = paymentTransactionState;
     return json;
   }
+
+  /// True when the linked payment row's own status disagrees with the fact
+  /// that appointment_status is Booked (Booked only ever gets set once a
+  /// payment succeeds) — i.e. a later stale/duplicate-bill callback has
+  /// corrupted payment_status after the fact. Worth flagging distinctly in
+  /// the UI since it means the payment record itself can't be trusted at
+  /// face value.
+  bool get paymentStatusCorrupted => paymentStatus != null && paymentStatus != 1;
 
   String get gatewayLabel {
     if (paymentGateway == 'fiuu_1' || paymentGateway == 'fiuu_2') return 'Fiuu';

@@ -14,6 +14,7 @@ import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart
 import 'package:klinik_aurora_portal/models/appointment/payment_mismatch_response.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
+import 'package:klinik_aurora_portal/views/appointment/fiuu_audit_dialog.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -226,6 +227,12 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
               ],
             ),
           ),
+          if (context.watch<AuthController>().isSuperAdmin)
+            IconButton(
+              onPressed: () => showDialog(context: context, builder: (_) => const FiuuAuditDialog()),
+              icon: const Icon(Icons.fact_check_rounded),
+              tooltip: 'Audit Fiuu Payments',
+            ),
           IconButton(
             onPressed: () => _fetch(page: 1),
             icon: const Icon(Icons.refresh_rounded),
@@ -418,6 +425,20 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
           style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
           overflow: TextOverflow.ellipsis,
         ),
+        if (item.paymentStatusCorrupted)
+          Tooltip(
+            message:
+                'The appointment was Booked (payment succeeded), but this payment record now shows a non-success status — a later duplicate/stale gateway callback overwrote it. Verify with the gateway directly before assuming this payment failed.',
+            child: Container(
+              margin: const EdgeInsets.only(top: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(10)),
+              child: const Text(
+                '⚠ record shows Failed',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),
+              ),
+            ),
+          ),
       ],
     );
   }
