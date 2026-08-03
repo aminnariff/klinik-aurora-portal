@@ -370,7 +370,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                         DataCell(_pointsBadge(items[i].rewardPoint)),
                         DataCell(
                           Text(
-                            '${items[i].totalReward ?? 0}',
+                            _stockLabel(items[i]),
                             style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
                           ),
                         ),
@@ -755,7 +755,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
             ),
             const SizedBox(height: 10),
             _mobileRow('Points', '${reward.rewardPoint ?? 0} pts'),
-            _mobileRow('Total', '${reward.totalReward ?? 0}'),
+            _mobileRow('Total', _stockLabel(reward)),
             _mobileRow('Created', dateConverter(reward.createdDate) ?? '—'),
             const SizedBox(height: 10),
             Row(
@@ -772,6 +772,13 @@ class _RewardHomepageState extends State<RewardHomepage> {
         ),
       ),
     );
+  }
+
+  String _stockLabel(Data reward) {
+    final int total = reward.totalReward ?? 0;
+    if (total == 0) return '∞'; // unlimited
+    final int? remaining = reward.remaining;
+    return remaining == null ? '$total left' : '$remaining left';
   }
 
   Widget _mobileRow(String label, String value) {

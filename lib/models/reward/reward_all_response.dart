@@ -41,6 +41,7 @@ class Data {
   String? rewardDescription;
   int? rewardPoint;
   int? totalReward;
+  int? remaining;
   String? rewardImage;
   String? rewardStartDate;
   String? rewardEndDate;
@@ -54,6 +55,7 @@ class Data {
       this.rewardDescription,
       this.rewardPoint,
       this.totalReward,
+      this.remaining,
       this.rewardImage,
       this.rewardStartDate,
       this.rewardEndDate,
@@ -67,6 +69,7 @@ class Data {
     rewardDescription = json['rewardDescription'];
     rewardPoint = json['rewardPoint'];
     totalReward = json['totalReward'];
+    remaining = json['remaining'];
     rewardImage = json['rewardImage'];
     rewardStartDate = json['rewardStartDate'];
     rewardEndDate = json['rewardEndDate'];
@@ -82,6 +85,7 @@ class Data {
     data['rewardDescription'] = rewardDescription;
     data['rewardPoint'] = rewardPoint;
     data['totalReward'] = totalReward;
+    data['remaining'] = remaining;
     data['rewardImage'] = rewardImage;
     data['rewardStartDate'] = rewardStartDate;
     data['rewardEndDate'] = rewardEndDate;
