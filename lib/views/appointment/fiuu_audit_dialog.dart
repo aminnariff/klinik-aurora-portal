@@ -6,15 +6,16 @@ import 'package:klinik_aurora_portal/controllers/appointment/appointment_control
 import 'package:klinik_aurora_portal/models/appointment/fiuu_audit_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
-enum _AuditMode { last48h, fullHistory }
+enum _AuditMode { recent, fullHistory }
 
 /// Loops POST admin/appointment/payment-mismatch/audit-fiuu, one small batch
 /// at a time (each row costs a real network call to Fiuu), until the whole
-/// requested range has been checked. "Last 48h" is for routine spot-checks —
-/// the reconcile-fiuu-payments cron already self-heals that window on its
-/// own. "Full History" has no date floor at all, for the one-time sweep back
-/// to when Fiuu was first integrated, since nothing else ever re-checks
-/// transactions older than 48h once they're marked terminal.
+/// requested range has been checked. "Last 3 hours" is for routine
+/// spot-checks — the reconcile-fiuu-payments cron already self-heals that
+/// window on its own, repeatedly, every cycle. "Full History" has no date
+/// floor at all, for the one-time sweep back to when Fiuu was first
+/// integrated, since nothing else ever re-checks transactions older than 3h
+/// once they're marked terminal — that's what this manual scan is for.
 class FiuuAuditDialog extends StatefulWidget {
   const FiuuAuditDialog({super.key});
 
@@ -23,7 +24,7 @@ class FiuuAuditDialog extends StatefulWidget {
 }
 
 class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
-  _AuditMode _mode = _AuditMode.last48h;
+  _AuditMode _mode = _AuditMode.recent;
   bool _running = false;
   bool _cancelRequested = false;
   bool _done = false;
@@ -48,8 +49,12 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
       _discrepancies.clear();
     });
 
-    final String? startDate = _mode == _AuditMode.last48h
-        ? DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(hours: 48)))
+    // Full datetime precision, in UTC to match created_date's storage — the
+    // backend uses this value as-is (no day-boundary padding), so "3 hours
+    // ago" means exactly that, not "since midnight today" nor off-by-8h from
+    // mixing local (MYT, UTC+8) and UTC timestamps.
+    final String? startDate = _mode == _AuditMode.recent
+        ? DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now().toUtc().subtract(const Duration(hours: 3)))
         : null;
 
     int offset = 0;
@@ -130,15 +135,15 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
               const SizedBox(height: 16),
               if (!_running && !_done) ...[
                 _modeOption(
-                  _AuditMode.last48h,
-                  'Last 48 hours',
-                  'Routine spot-check. The reconcile cron already self-heals this window automatically — use this to check right now instead of waiting.',
+                  _AuditMode.recent,
+                  'Last 3 hours',
+                  'Routine spot-check. The reconcile cron already self-heals this window automatically, every cycle — use this to check right now instead of waiting.',
                 ),
                 const SizedBox(height: 8),
                 _modeOption(
                   _AuditMode.fullHistory,
                   'Full history (first run)',
-                  'No date limit — scans everything since Fiuu was first integrated. Use this once to catch anything older than 48h that nothing else ever re-checks. Can take a while.',
+                  'No date limit — scans everything since Fiuu was first integrated. Use this once to catch anything older than 3h that nothing else ever re-checks. Can take a while.',
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
