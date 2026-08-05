@@ -5,27 +5,15 @@ ThemeData theme(BuildContext context) {
   final baseScheme = ColorScheme.fromSeed(seedColor: primary);
   return ThemeData(
     useMaterial3: true,
-    colorScheme: baseScheme.copyWith(
-      surface: Colors.white,
-      surfaceTint: Colors.transparent,
-    ),
+    colorScheme: baseScheme.copyWith(surface: Colors.white, surfaceTint: Colors.transparent),
     brightness: Brightness.light,
     canvasColor: Colors.white,
     primaryColor: primary,
     visualDensity: VisualDensity.adaptivePlatformDensity,
-    fontFamily: 'Proxima',
-    dialogTheme: const DialogThemeData(
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.transparent,
-    ),
-    popupMenuTheme: const PopupMenuThemeData(
-      color: Colors.white,
-      surfaceTintColor: Colors.transparent,
-    ),
-    cardTheme: const CardThemeData(
-      color: Colors.white,
-      surfaceTintColor: Colors.transparent,
-    ),
+    fontFamily: 'Figtree',
+    dialogTheme: const DialogThemeData(backgroundColor: Colors.white, surfaceTintColor: Colors.transparent),
+    popupMenuTheme: const PopupMenuThemeData(color: Colors.white, surfaceTintColor: Colors.transparent),
+    cardTheme: const CardThemeData(color: Colors.white, surfaceTintColor: Colors.transparent),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         textStyle: const TextStyle(color: Colors.white),
@@ -46,7 +34,7 @@ ThemeData theme(BuildContext context) {
           ).createShader(const Rect.fromLTWH(0.0, 0.0, 500.0, 70.0)),
       ),
       bodyLarge: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: textPrimaryColor),
-      bodyMedium: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500, color: textPrimaryColor),
+      bodyMedium: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal, color: textPrimaryColor),
       titleLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.normal, color: textPrimaryColor),
       titleMedium: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.normal, color: textPrimaryColor),
       titleSmall: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600, color: textPrimaryColor),
@@ -82,7 +70,7 @@ ThemeData darkThemeData(BuildContext context) {
           ).createShader(const Rect.fromLTWH(0.0, 0.0, 500.0, 70.0)),
       ),
       bodyLarge: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
-      bodyMedium: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500, color: Colors.white),
+      bodyMedium: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.white),
       titleLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.normal, color: Colors.white),
       titleMedium: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.normal, color: Colors.white),
       titleSmall: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600, color: Colors.white),

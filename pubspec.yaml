@@ -69,25 +69,22 @@ flutter:
     - assets/icons/success/
     - assets/images/status/
     - assets/translations/
-    - assets/typography/proxima/
 
   fonts:
-    - family: Proxima
+    - family: Figtree
       fonts:
-        - asset: assets/typography/proxima/Proxima-Nova-Regular.ttf
-        - asset: assets/typography/proxima/Proxima-Nova-Extrabold.ttf
+        - asset: assets/typography/figtree/Figtree-Regular.ttf
+        - asset: assets/typography/figtree/Figtree-Black.ttf
           weight: 900
-        - asset: assets/typography/proxima/Proxima-Nova-Black.ttf
+        - asset: assets/typography/figtree/Figtree-ExtraBold.ttf
           weight: 800
-        - asset: assets/typography/proxima/Proxima-Nova-Bold.ttf
+        - asset: assets/typography/figtree/Figtree-Bold.ttf
           weight: 700
-        - asset: assets/typography/proxima/Proxima-Nova-Semibold.ttf
+        - asset: assets/typography/figtree/Figtree-SemiBold.ttf
           weight: 600
-        - asset: assets/typography/proxima/Proxima-Nova-Medium.ttf
+        - asset: assets/typography/figtree/Figtree-Medium.ttf
           weight: 500
-        - asset: assets/typography/proxima/Proxima-Nova-Regular.ttf
+        - asset: assets/typography/figtree/Figtree-Regular.ttf
           weight: 400
-        - asset: assets/typography/proxima/Proxima-Nova-Light.ttf
+        - asset: assets/typography/figtree/Figtree-Light.ttf
           weight: 300
-        - asset: assets/typography/proxima/Proxima-Nova-Thin.ttf
-          weight: 200
