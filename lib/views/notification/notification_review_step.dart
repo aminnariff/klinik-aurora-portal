@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_preview.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -10,24 +8,14 @@ class NotificationReviewStep extends StatelessWidget {
   final String title;
   final String body;
 
-  const NotificationReviewStep({
-    super.key,
-    required this.channel,
-    required this.title,
-    required this.body,
-  });
+  const NotificationReviewStep({super.key, required this.channel, required this.title, required this.body});
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final narrow = constraints.maxWidth < 472;
-        final summaryWidth = narrow ? constraints.maxWidth : math.max(constraints.maxWidth - 272, 200.0);
-        final preview = NotificationPreview(
-          title: title,
-          body: body,
-          width: narrow ? constraints.maxWidth : 240,
-        );
+        final preview = NotificationPreview(title: title, body: body, width: narrow ? constraints.maxWidth : 240);
         final summary = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -40,7 +28,10 @@ class NotificationReviewStep extends StatelessWidget {
         );
 
         return narrow
-            ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [summary, const SizedBox(height: 16), preview])
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [summary, const SizedBox(height: 16), preview],
+              )
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
