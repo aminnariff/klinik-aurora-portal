@@ -20,6 +20,7 @@ import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
 import 'package:klinik_aurora_portal/views/payment/branch_summary_homepage.dart';
 import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
+import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart';
 import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
@@ -87,6 +88,10 @@ final router = GoRouter(
         BranchHomepage.routeName,
         PromotionHomepage.routeName,
         BranchPaymentSummaryPage.routeName,
+        // Reconfigures app-wide behaviour — campaigns re-skin every patient's
+        // app and modifiers change how points are earned — so it sits alongside
+        // the other superadmin-only marketing controls.
+        MarketingHomepage.routeName,
       ];
 
       if (requiresSuperAdmin.contains(uri) && !isSuperAdmin) {
@@ -243,6 +248,14 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return const NoTransitionPage(child: Scaffold(body: RewardHistoryHomepage()));
+          },
+        ),
+        GoRoute(
+          name: MarketingHomepage.routeName,
+          path: MarketingHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(child: Scaffold(body: MarketingHomepage()));
           },
         ),
         GoRoute(

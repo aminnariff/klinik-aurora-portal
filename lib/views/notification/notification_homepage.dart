@@ -8,8 +8,10 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/notification/notification_controller.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_channel_step.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_compose_step.dart';
+import 'package:klinik_aurora_portal/views/notification/notification_delivery_field.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_history_tab.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_review_step.dart';
+import 'package:klinik_aurora_portal/views/notification/notification_scheduled_tab.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -26,9 +28,15 @@ class NotificationHomepage extends StatefulWidget {
 
 class _NotificationHomepageState extends State<NotificationHomepage> {
   int _step = 1;
-  bool _showHistory = false;
+
+  /// 0 = compose wizard, 1 = scheduled queue, 2 = sent history.
+  int _tab = 0;
   bool _sending = false;
   DropdownAttribute? _channel;
+
+  /// When set, the review step queues for this time instead of sending now.
+  DateTime? _scheduledFor;
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
@@ -51,7 +59,13 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
 
   bool get _canProceed {
     if (_step == 1) return _channel != null;
-    if (_step == 2) return _titleController.text.trim().isNotEmpty;
+    if (_step == 2) {
+      if (_titleController.text.trim().isEmpty) return false;
+      // A schedule already in the past would be fired by the cron on its very
+      // next tick, so block it here rather than letting it reach review.
+      final scheduled = _scheduledFor;
+      return scheduled == null || scheduled.isAfter(DateTime.now());
+    }
     return true;
   }
 
@@ -63,6 +77,7 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
     setState(() {
       _step = 1;
       _channel = null;
+      _scheduledFor = null;
       _titleController.clear();
       _contentController.clear();
     });
@@ -110,6 +125,44 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
     }
   }
 
+  Future<void> _schedule() async {
+    final channel = _channel;
+    final when = _scheduledFor;
+    if (channel == null || when == null) return;
+
+    // Re-checked at submit rather than only at pick time: the dialog can sit
+    // open long enough for a near-future time to slip into the past, and the
+    // cron would then fire it on its very next tick.
+    if (!when.isAfter(DateTime.now())) {
+      showDialogError(context, 'That time has already passed. Pick a time in the future.');
+      return;
+    }
+
+    setState(() => _sending = true);
+
+    final value = await NotificationController.schedule(
+      context,
+      topic: channel.key,
+      title: _titleController.text.trim(),
+      body: _contentController.text.trim(),
+      triggerDateTime: when,
+    );
+    if (!mounted) return;
+    setState(() => _sending = false);
+
+    if (responseCode(value.code)) {
+      showDialogSuccess(context, 'Scheduled for ${_formatDateTime(when)}. You can cancel it any time before then.');
+      _resetWizard();
+      setState(() => _tab = 1);
+    } else {
+      showDialogError(context, value.message ?? 'Unable to schedule this notification.');
+    }
+  }
+
+  static String _formatDateTime(DateTime value) {
+    return '${formatDeliveryDate(value)} at ${formatDeliveryTime(value)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final maxDialogWidth = math.min(760.0, MediaQuery.of(context).size.width * 0.92);
@@ -141,17 +194,16 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _SegmentedControl(
-                  selected: _showHistory ? 1 : 0,
-                  onChanged: (index) => setState(() => _showHistory = index == 1),
-                ),
+                _SegmentedControl(selected: _tab, onChanged: (index) => setState(() => _tab = index)),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: _showHistory
-                      ? NotificationHistoryTab(fetch: () => NotificationController.fetchHistory(context))
-                      : _buildWizard(context),
+                  child: switch (_tab) {
+                    1 => const NotificationScheduledTab(),
+                    2 => NotificationHistoryTab(fetch: () => NotificationController.fetchHistory(context)),
+                    _ => _buildWizard(context),
+                  },
                 ),
-                if (!_showHistory) ...[const SizedBox(height: 16), _buildFooter()],
+                if (_tab == 0) ...[const SizedBox(height: 16), _buildFooter()],
               ],
             ),
           ),
@@ -182,12 +234,15 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
                   titleController: _titleController,
                   contentController: _contentController,
                   onChanged: () => setState(() {}),
+                  scheduledFor: _scheduledFor,
+                  onScheduleChanged: (value) => setState(() => _scheduledFor = value),
                 ),
                 _ => NotificationReviewStep(
                   key: const ValueKey('step-3'),
                   channel: _channel ?? notificationChannel.first,
                   title: _titleController.text,
                   body: _contentController.text,
+                  scheduledFor: _scheduledFor,
                 ),
               },
             ),
@@ -207,10 +262,16 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
           const SizedBox.shrink(),
         if (_step < 3)
           Button(_canProceed && !_sending ? _next : null, actionText: 'Next', color: secondaryColor)
+        else if (_scheduledFor != null)
+          Button(
+            _sending ? null : _schedule,
+            actionText: _sending ? 'Scheduling…' : 'Schedule Announcement',
+            color: secondaryColor,
+          )
         else
           Button(
             _sending ? null : _send,
-            actionText: _sending ? 'Sending…' : 'Send Announcement',
+            actionText: _sending ? 'Sending…' : 'Send Now',
             color: secondaryColor,
           ),
       ],
@@ -285,7 +346,9 @@ class _SegmentedControl extends StatelessWidget {
         children: [
           _Segment(label: 'Compose', isSelected: selected == 0, onTap: () => onChanged(0)),
           const SizedBox(width: 4),
-          _Segment(label: 'History', isSelected: selected == 1, onTap: () => onChanged(1)),
+          _Segment(label: 'Scheduled', isSelected: selected == 1, onTap: () => onChanged(1)),
+          const SizedBox(width: 4),
+          _Segment(label: 'History', isSelected: selected == 2, onTap: () => onChanged(2)),
         ],
       ),
     );

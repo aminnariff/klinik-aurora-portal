@@ -7,9 +7,11 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/point_management/point_management_controller.dart';
+import 'package:klinik_aurora_portal/controllers/point_management/point_modifier_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/point_management/create_point_request.dart';
+import 'package:klinik_aurora_portal/models/point_management/point_modifier.dart';
 import 'package:klinik_aurora_portal/models/point_management/user_points_response.dart' as user_model;
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
@@ -55,6 +57,44 @@ class _PointHomepageState extends State<PointHomepage> {
   );
   bool _showHowItWorks = false;
 
+  /// Bonus rules configured under Point Modifiers, fetched from the API.
+  ///
+  /// Empty when none are configured or the request failed — awarding base
+  /// points keeps working either way.
+  List<PointModifier> _availableModifiers = [];
+  final Set<String> _selectedModifiers = {};
+
+  void _fetchModifiers() {
+    PointModifierController.getActive(context).then((value) {
+      if (!mounted) return;
+      if (responseCode(value.code)) {
+        setState(() => _availableModifiers = value.data ?? []);
+      } else {
+        debugPrint('[Points] Could not load modifiers: ${value.message}');
+      }
+    });
+  }
+
+  /// On-screen estimate only.
+  ///
+  /// The server recalculates from the amount and the selected modifier IDs, and
+  /// will award more than this if a campaign multiplier is live — the portal
+  /// has no way to read that multiplier, so this is labelled an estimate.
+  int _calculateTotalPoints(String amountStr) {
+    final basePoints = calculateCustomerPoints(amountStr);
+    if (basePoints == 0) return 0;
+
+    var finalPoints = basePoints;
+    for (final id in _selectedModifiers) {
+      final modifier = _availableModifiers.where((m) => m.id == id).firstOrNull;
+      // A modifier deleted or expired since page load simply drops out here;
+      // the server would ignore it too.
+      if (modifier == null) continue;
+      finalPoints += modifier.bonusFor(basePoints);
+    }
+    return finalPoints;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -63,6 +103,7 @@ class _PointHomepageState extends State<PointHomepage> {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(PointHomepage.displayName);
       runFiltering();
       context.read<UserController>().userAllResponse = null;
+      _fetchModifiers();
     });
   }
 
@@ -174,6 +215,8 @@ class _PointHomepageState extends State<PointHomepage> {
                 _pointsPreviewChip(),
               ],
             ),
+            const SizedBox(height: 12),
+            _buildModifiersSection(),
             const SizedBox(height: 16),
 
             // ── Step 2: Search Patient ──
@@ -264,6 +307,59 @@ class _PointHomepageState extends State<PointHomepage> {
     );
   }
 
+  Widget _buildModifiersSection() {
+    if (_availableModifiers.isEmpty) return const SizedBox();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          'Qualifying Items (Bonus Points)',
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _availableModifiers.map((modifier) {
+            final isSelected = _selectedModifiers.contains(modifier.id);
+            return FilterChip(
+              label: Text(
+                '${modifier.itemName} '
+                '(${modifier.summary})',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected ? secondaryColor : Colors.grey.shade700,
+                ),
+              ),
+              selected: isSelected,
+              selectedColor: secondaryColor.withAlpha(30),
+              checkmarkColor: secondaryColor,
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: isSelected ? secondaryColor : const Color(0xFFE0E0E0),
+                ),
+              ),
+              onSelected: (selected) {
+                setState(() {
+                  if (selected) {
+                    _selectedModifiers.add(modifier.id);
+                  } else {
+                    _selectedModifiers.remove(modifier.id);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   Widget _stepHeader(int step, String title, IconData icon) {
     return Row(
       children: [
@@ -291,7 +387,7 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget _pointsPreviewChip() {
     final amount = _amount.controller.text;
-    final points = amount.isNotEmpty ? calculateCustomerPoints(amount) : 0;
+    final points = amount.isNotEmpty ? _calculateTotalPoints(amount) : 0;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -326,7 +422,7 @@ class _PointHomepageState extends State<PointHomepage> {
   }
 
   Widget _patientTile(UserResponse item) {
-    final int previewPoints = calculateCustomerPoints(_amount.controller.text);
+    final int previewPoints = _calculateTotalPoints(_amount.controller.text);
 
     return Material(
       color: Colors.transparent,
@@ -675,7 +771,7 @@ class _PointHomepageState extends State<PointHomepage> {
       return;
     }
 
-    if (calculateCustomerPoints(_amount.controller.text) <= 0) {
+    if (_calculateTotalPoints(_amount.controller.text) <= 0) {
       setState(() {
         _amount.errorMessage = 'Please enter a valid amount (minimum RM 1)';
       });
@@ -694,25 +790,32 @@ class _PointHomepageState extends State<PointHomepage> {
   }
 
   Future<void> _confirmAwardPoints(UserResponse item, int totalPoint) async {
+    final selected = _availableModifiers.where((m) => _selectedModifiers.contains(m.id)).toList();
+    final bonusLine = selected.isEmpty ? '' : '\n\nBonuses: ${selected.map((m) => m.itemName).join(', ')}';
+
     if (await showConfirmDialog(
       context,
-      'Award $totalPoint point${totalPoint == 1 ? '' : 's'} to ${item.userFullname} for RM ${_amount.controller.text} payment?',
+      'Award $totalPoint point${totalPoint == 1 ? '' : 's'} to ${item.userFullname} for RM ${_amount.controller.text} payment?$bonusLine',
     )) {
       PointManagementController.create(
         context,
         CreatePointRequest(
           userId: item.userId,
           totalPoint: totalPoint,
+          // Sending the amount hands the calculation to the server, which
+          // re-reads each modifier and applies any live campaign multiplier.
+          // Without it the server trusts this screen's arithmetic instead.
+          amount: double.tryParse(_amount.controller.text),
+          modifierIds: selected.map((m) => m.id).toList(),
           pointDescription:
-              'Earned $totalPoint point${totalPoint == 1 ? '' : 's'} for RM ${_amount.controller.text} payment',
+              'Earned $totalPoint point${totalPoint == 1 ? '' : 's'} for RM ${_amount.controller.text} payment${selected.isNotEmpty ? ' (Includes bonuses)' : ''}',
         ),
       ).then((value) {
         dismissLoading();
         if (responseCode(value.code)) {
-          showDialogSuccess(
-            context,
-            'Successfully awarded $totalPoint point${totalPoint == 1 ? '' : 's'} to ${item.userFullname}.',
-          );
+          // No figure quoted: the server may have applied a campaign multiplier
+          // on top, and naming a number risks contradicting what was awarded.
+          showDialogSuccess(context, 'Points awarded to ${item.userFullname}.');
           _amount.controller.text = '';
           _msisdn.controller.text = '';
           context.read<UserController>().userAllResponse = null;

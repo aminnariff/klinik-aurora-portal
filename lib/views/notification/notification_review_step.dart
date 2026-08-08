@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/notification/notification_delivery_field.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_preview.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
@@ -8,7 +9,16 @@ class NotificationReviewStep extends StatelessWidget {
   final String title;
   final String body;
 
-  const NotificationReviewStep({super.key, required this.channel, required this.title, required this.body});
+  /// Mirrors the choice made on the compose step; `null` means immediate.
+  final DateTime? scheduledFor;
+
+  const NotificationReviewStep({
+    super.key,
+    required this.channel,
+    required this.title,
+    required this.body,
+    required this.scheduledFor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +34,13 @@ class NotificationReviewStep extends StatelessWidget {
             _SummaryRow(label: 'Title', value: title),
             const SizedBox(height: 12),
             _SummaryRow(label: 'Content', value: body.isEmpty ? '—' : body, maxLines: 6),
+            const SizedBox(height: 12),
+            _SummaryRow(
+              label: 'Delivery',
+              value: scheduledFor == null
+                  ? 'Immediately'
+                  : '${formatDeliveryDate(scheduledFor!)} at ${formatDeliveryTime(scheduledFor!)}',
+            ),
           ],
         );
 

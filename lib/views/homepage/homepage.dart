@@ -17,6 +17,7 @@ import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart';
 import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
+import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart';
 import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
@@ -137,6 +138,13 @@ class _HomepageState extends State<Homepage> {
         },
         label: RewardHistoryHomepage.displayName,
       ),
+      // Campaigns and Point Modifiers share one entry — see MarketingHomepage.
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.celebration_rounded, color: Colors.white);
+        },
+        label: MarketingHomepage.displayName,
+      ),
     ];
     getAuthController();
     super.initState();
@@ -181,6 +189,11 @@ class _HomepageState extends State<Homepage> {
           }
           if (context.read<AuthController>().hasPermission('f57576c4-4d15-11f0-b054-1ff6746392b2') == false) {
             sideBarAttribute.removeWhere((element) => element.label == PaymentSummaryPage.displayName);
+          }
+          // Mirrors the superadmin gate on these two routes in routes.dart —
+          // without this the entries would show but bounce to No Permission.
+          if (context.read<AuthController>().isSuperAdmin == false) {
+            sideBarAttribute.removeWhere((element) => element.label == MarketingHomepage.displayName);
           }
           context.read<TopBarController>().pageValue = 0;
           if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')) {
@@ -647,6 +660,8 @@ class _HomepageState extends State<Homepage> {
         context.go(RewardHistoryHomepage.routeName);
       case PaymentSummaryPage.displayName:
         context.go(PaymentSummaryPage.routeName);
+      case MarketingHomepage.displayName:
+        context.go(MarketingHomepage.routeName);
     }
   }
 

@@ -35,6 +35,10 @@ class PointManagementController extends ChangeNotifier {
             if (request.pointType == 2) "voucherId": request.voucherId,
             // requred when point type = 3
             if (request.pointType == 3) "rewardId": request.rewardId,
+            // Spending only: hands the calculation to the server so the live
+            // campaign multiplier and the selected modifiers are applied there.
+            if (request.amount != null) "amount": request.amount,
+            if (request.modifierIds != null && request.modifierIds!.isNotEmpty) "modifierIds": request.modifierIds,
           },
         )
         .then((value) {

@@ -36,7 +36,15 @@ const Color errorColor = Color(0XFFDF184A);
 
 //Text
 const textPrimaryColor = Colors.black;
+
+/// White — for text sitting on a **dark** surface, such as the sidebar.
+///
+/// Not the muted body colour: on a white card this is invisible. Use
+/// [textMutedColor] for secondary text on light surfaces.
 Color? textSecondaryColor = Colors.white;
+
+/// Muted grey for secondary text on light surfaces (cards, dialogs, forms).
+const textMutedColor = Color(0xFF637381);
 const textTertiaryColor = Color(0XFF1C61AC);
 const Color contentColorBlack = Colors.black;
 const Color contentColorWhite = Colors.white;

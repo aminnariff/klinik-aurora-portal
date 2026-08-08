@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/notification/notification_delivery_field.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_preview.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -11,11 +12,17 @@ class NotificationComposeStep extends StatelessWidget {
   final TextEditingController contentController;
   final VoidCallback onChanged;
 
+  /// When the announcement should go out; `null` sends immediately.
+  final DateTime? scheduledFor;
+  final ValueChanged<DateTime?> onScheduleChanged;
+
   const NotificationComposeStep({
     super.key,
     required this.titleController,
     required this.contentController,
     required this.onChanged,
+    required this.scheduledFor,
+    required this.onScheduleChanged,
   });
 
   @override
@@ -67,6 +74,13 @@ class NotificationComposeStep extends StatelessWidget {
             Text(
               '${contentController.text.length}/200',
               style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -3),
+            ),
+            const SizedBox(height: 20),
+            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: formWidth,
+              child: NotificationDeliveryField(value: scheduledFor, onChanged: onScheduleChanged),
             ),
           ],
         );

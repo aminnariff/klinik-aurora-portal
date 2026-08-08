@@ -66,6 +66,17 @@ List<DropdownAttribute> notificationChannel = [
   DropdownAttribute('authorised-user-announcements', 'Signed In Users'),
 ];
 
+/// How often the server runs `/admin/cron/send-scheduled-notification`.
+///
+/// **Must match the crontab entry on the VPS** — see
+/// `membership-api/docs/scheduled-notifications.md`. Two things derive from it:
+///
+///  * the minute options offered when scheduling, so the picker never promises
+///    a send time the cron cannot actually hit;
+///  * how late a pending notification must be before the queue flags it as
+///    overdue, which would otherwise false-alarm on every run.
+const Duration scheduledNotificationInterval = Duration(minutes: 30);
+
 double fileSizeLimit = 1.0;
 
 

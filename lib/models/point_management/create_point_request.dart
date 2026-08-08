@@ -7,6 +7,15 @@ class CreatePointRequest {
   String? rewardId;
   String? pointDescription;
 
+  /// Ringgit paid. When present on a spending transaction the server
+  /// recalculates the award itself — applying the live campaign multiplier and
+  /// any [modifierIds] — and ignores [totalPoint].
+  double? amount;
+
+  /// Point modifiers selected by the operator, resolved and re-validated
+  /// server-side so an expired or deleted one cannot be applied.
+  List<String>? modifierIds;
+
   CreatePointRequest({
     this.userId,
     this.pointType,
@@ -15,6 +24,8 @@ class CreatePointRequest {
     this.voucherId,
     this.rewardId,
     this.pointDescription,
+    this.amount,
+    this.modifierIds,
   });
 
   CreatePointRequest.fromJson(Map<String, dynamic> json) {
@@ -25,6 +36,8 @@ class CreatePointRequest {
     voucherId = json['voucherId'];
     rewardId = json['rewardId'];
     pointDescription = json['pointDescription'];
+    amount = (json['amount'] as num?)?.toDouble();
+    modifierIds = json['modifierIds'] != null ? List<String>.from(json['modifierIds']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -36,6 +49,12 @@ class CreatePointRequest {
     data['voucherId'] = voucherId;
     data['rewardId'] = rewardId;
     data['pointDescription'] = pointDescription;
+    if (amount != null) {
+      data['amount'] = amount;
+    }
+    if (modifierIds != null && modifierIds!.isNotEmpty) {
+      data['modifierIds'] = modifierIds;
+    }
     return data;
   }
 }
