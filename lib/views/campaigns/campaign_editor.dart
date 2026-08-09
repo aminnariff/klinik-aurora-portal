@@ -78,17 +78,17 @@ class _CampaignEditorState extends State<CampaignEditor> {
   );
   final InputFieldAttribute _splash = InputFieldAttribute(
     controller: TextEditingController(),
-    labelText: 'Splash image URL',
+    labelText: 'Splash image URL (Optional)',
     hintText: 'https://…/splash.png',
   );
   final InputFieldAttribute _banner = InputFieldAttribute(
     controller: TextEditingController(),
-    labelText: 'Banner image URL',
+    labelText: 'Banner image URL (Optional)',
     hintText: 'https://…/banner.png',
   );
   final InputFieldAttribute _backgroundImage = InputFieldAttribute(
     controller: TextEditingController(),
-    labelText: 'Background image URL',
+    labelText: 'Background image URL (Optional)',
     hintText: 'https://…/bg.png',
   );
 

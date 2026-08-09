@@ -12,12 +12,12 @@ import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
+import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart';
 import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
-import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart';
 import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
@@ -114,6 +114,13 @@ class _HomepageState extends State<Homepage> {
         },
         label: DoctorHomepage.displayName,
       ),
+      // Campaigns and Point Modifiers share one entry — see MarketingHomepage.
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return Icon(Icons.celebration_rounded, color: Colors.white);
+        },
+        label: MarketingHomepage.displayName,
+      ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return Icon(Icons.campaign_rounded, color: Colors.white);
@@ -137,13 +144,6 @@ class _HomepageState extends State<Homepage> {
           return Icon(Icons.history_rounded, color: Colors.white);
         },
         label: RewardHistoryHomepage.displayName,
-      ),
-      // Campaigns and Point Modifiers share one entry — see MarketingHomepage.
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.celebration_rounded, color: Colors.white);
-        },
-        label: MarketingHomepage.displayName,
       ),
     ];
     getAuthController();
