@@ -164,7 +164,9 @@ class _CampaignEditorState extends State<CampaignEditor> {
   String? _validate() {
     if (_name.controller.text.trim().isEmpty) return 'Give the campaign a name.';
     if (_startDate == null || _endDate == null) return 'Pick both a start and an end date.';
-    if (!_endDate!.isAfter(_startDate!)) return 'The end date must come after the start date.';
+    final startDay = DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+    final endDay = DateTime(_endDate!.year, _endDate!.month, _endDate!.day);
+    if (endDay.isBefore(startDay)) return 'The end date must come after the start date.';
 
     for (final entry in {
       'Primary colour': _primary.controller.text,

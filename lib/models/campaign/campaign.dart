@@ -43,7 +43,9 @@ class Campaign {
   bool get isLive {
     if (!isActive || startDate == null || endDate == null) return false;
     final now = DateTime.now();
-    return !now.isBefore(startDate!) && !now.isAfter(endDate!);
+    final start = DateTime(startDate!.year, startDate!.month, startDate!.day);
+    final end = DateTime(endDate!.year, endDate!.month, endDate!.day, 23, 59, 59);
+    return !now.isBefore(start) && !now.isAfter(end);
   }
 
   bool overlaps(Campaign other) {

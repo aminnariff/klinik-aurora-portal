@@ -49,14 +49,28 @@ class PointModifier {
   bool get isAvailableNow {
     if (!isActive) return false;
     final now = DateTime.now();
-    if (startDate != null && now.isBefore(startDate!)) return false;
-    if (endDate != null && now.isAfter(endDate!)) return false;
+    if (startDate != null) {
+      final start = DateTime(startDate!.year, startDate!.month, startDate!.day);
+      if (now.isBefore(start)) return false;
+    }
+    if (endDate != null) {
+      final end = DateTime(endDate!.year, endDate!.month, endDate!.day, 23, 59, 59);
+      if (now.isAfter(end)) return false;
+    }
     return true;
   }
 
-  bool get hasExpired => endDate != null && DateTime.now().isAfter(endDate!);
+  bool get hasExpired {
+    if (endDate == null) return false;
+    final end = DateTime(endDate!.year, endDate!.month, endDate!.day, 23, 59, 59);
+    return DateTime.now().isAfter(end);
+  }
 
-  bool get isScheduled => startDate != null && DateTime.now().isBefore(startDate!);
+  bool get isScheduled {
+    if (startDate == null) return false;
+    final start = DateTime(startDate!.year, startDate!.month, startDate!.day);
+    return DateTime.now().isBefore(start);
+  }
 
   /// Human description of the window, e.g. "Until 31 Aug 2026".
   String get windowLabel {

@@ -89,14 +89,12 @@ class PointModifierController {
     );
   }
 
-  /// Local time without a zone suffix: the column is a zone-less MySQL DATETIME
-  /// compared against the server's NOW(), so converting to UTC would shift the
-  /// window by the timezone offset.
+  /// Local date formatted as ISO with time hardcoded to 00:00:00 to prevent
+  /// timezone shifts when saving/updating point modifiers.
   static String? _localIso(DateTime? value) {
     if (value == null) return null;
     String two(int n) => n.toString().padLeft(2, '0');
-    return '${value.year}-${two(value.month)}-${two(value.day)}'
-        'T${two(value.hour)}:${two(value.minute)}:${two(value.second)}';
+    return '${value.year}-${two(value.month)}-${two(value.day)}T00:00:00';
   }
 
   static Future<ApiResponse> delete(BuildContext context, String id) {

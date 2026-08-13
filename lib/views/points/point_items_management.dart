@@ -367,8 +367,12 @@ class _ModifierEditorState extends State<_ModifierEditor> {
       return 'This modifier would award nothing. Set a multiplier above 1, a fixed bonus, or both.';
     }
 
-    if (_start != null && _end != null && !_end!.isAfter(_start!)) {
-      return 'The "available until" date must come after the "available from" date.';
+    if (_start != null && _end != null) {
+      final startDay = DateTime(_start!.year, _start!.month, _start!.day);
+      final endDay = DateTime(_end!.year, _end!.month, _end!.day);
+      if (endDay.isBefore(startDay)) {
+        return 'The "available until" date must come after the "available from" date.';
+      }
     }
 
     return null;

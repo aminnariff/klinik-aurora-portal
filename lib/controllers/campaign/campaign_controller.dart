@@ -22,6 +22,11 @@ class CampaignController {
     });
   }
 
+  static String _formatDateZeroTime(DateTime value) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${value.year}-${two(value.month)}-${two(value.day)}T00:00:00';
+  }
+
   static Future<ApiResponse> create(
     BuildContext context, {
     required String name,
@@ -37,8 +42,8 @@ class CampaignController {
       endpoint: 'admin/campaigns',
       data: {
         'name': name,
-        'start_date': startDate.toIso8601String(),
-        'end_date': endDate.toIso8601String(),
+        'start_date': _formatDateZeroTime(startDate),
+        'end_date': _formatDateZeroTime(endDate),
         'global_point_multiplier': globalPointMultiplier,
         'theme_config': theme.toJson(),
         'is_active': isActive,
@@ -62,8 +67,8 @@ class CampaignController {
       endpoint: 'admin/campaigns/$id',
       data: {
         'name': name,
-        'start_date': startDate.toIso8601String(),
-        'end_date': endDate.toIso8601String(),
+        'start_date': _formatDateZeroTime(startDate),
+        'end_date': _formatDateZeroTime(endDate),
         'global_point_multiplier': globalPointMultiplier,
         'theme_config': theme.toJson(),
         'is_active': isActive,
