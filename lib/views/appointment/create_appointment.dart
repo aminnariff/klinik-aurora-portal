@@ -342,12 +342,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   final serviceController = context.read<ServiceController>();
                                   final services = serviceController.servicesResponse?.data;
                                   List<String> templates = [];
+                                  String? matchedServiceTime;
                                   if (services != null && services.isNotEmpty) {
                                     final service = services.firstWhere(
                                       (e) => e.serviceId == apt.service?.serviceId,
                                       orElse: () => services.first,
                                     );
                                     templates = service.serviceTemplate ?? [];
+                                    matchedServiceTime = service.serviceTime;
                                   }
                                   showWhatsAppTemplateDialog(
                                     context: context,
@@ -358,6 +360,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     branchName: apt.branch?.branchName ?? '',
                                     branchPhone: apt.branch?.branchPhone ?? '',
                                     dateTime: DateTime.tryParse(apt.appointmentDatetime ?? '') ?? DateTime.now(),
+                                    serviceTime: apt.service?.serviceTime ?? matchedServiceTime,
                                   );
                                 },
                                 icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),

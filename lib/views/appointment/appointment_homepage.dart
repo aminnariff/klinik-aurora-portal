@@ -1264,15 +1264,15 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       context.read<ServiceController>().servicesResponse = value.data;
                     });
                   }
-                  List<String>? templates = context
+                  final matchedService = context
                       .read<ServiceController>()
                       .servicesResponse
                       ?.data
                       ?.firstWhere(
                         (element) => element.serviceId == item.service?.serviceId,
                         orElse: () => context.read<ServiceController>().servicesResponse!.data!.first,
-                      )
-                      .serviceTemplate;
+                      );
+                  List<String>? templates = matchedService?.serviceTemplate;
                   showWhatsAppTemplateDialog(
                     context: context,
                     templates: templates ?? [],
@@ -1282,6 +1282,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     branchName: item.branch?.branchName ?? '',
                     branchPhone: item.branch?.branchPhone ?? '',
                     dateTime: DateTime.parse(item.appointmentDatetime ?? ''),
+                    serviceTime: item.service?.serviceTime ?? matchedService?.serviceTime,
                   );
                 },
                 icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 24),
