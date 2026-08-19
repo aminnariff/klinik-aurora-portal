@@ -149,7 +149,7 @@ class PromotionController extends ChangeNotifier {
     formData.fields.add(MapEntry('promotionId', promotionId));
 
     try {
-      return dio
+      return await dio
           .put(
             '${Environment.appUrl}admin/promotion/upload',
             options: Options(

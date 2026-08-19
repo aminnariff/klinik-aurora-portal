@@ -24,6 +24,8 @@ void main() {
                   changed++;
                   setState(() {});
                 },
+                scheduledFor: null,
+                onScheduleChanged: (_) {},
               ),
             ),
           ),

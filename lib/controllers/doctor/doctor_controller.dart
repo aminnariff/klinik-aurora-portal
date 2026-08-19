@@ -107,7 +107,7 @@ class DoctorController extends ChangeNotifier {
     formData.fields.add(MapEntry('doctorId', promotionId));
 
     try {
-      return dio
+      return await dio
           .put(
             '${Environment.appUrl}admin/doctor/upload',
             options: Options(

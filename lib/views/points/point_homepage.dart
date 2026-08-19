@@ -56,6 +56,7 @@ class _PointHomepageState extends State<PointHomepage> {
     labelText: 'Patient Contact Number',
   );
   bool _showHowItWorks = false;
+  int _selectedMobileTab = 0;
 
   /// Bonus rules configured under Point Modifiers, fetched from the API.
   ///
@@ -116,14 +117,124 @@ class _PointHomepageState extends State<PointHomepage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: screenPaddingVertical()),
-          child: Column(
-            children: [
-              SizedBox(height: screenHeight(70), child: _recordPaymentPanel()),
-              SizedBox(height: screenHeight(70), child: _pointsHistoryPanel()),
-            ],
-          ),
+        child: Column(
+          children: [
+            // ── Mobile Header & Segmented Tab Switcher ──
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 12),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Points Management', style: AppTypography.titleLarge(context).apply(fontWeightDelta: 2)),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _selectedMobileTab = 0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: _selectedMobileTab == 0 ? Colors.white : Colors.transparent,
+                                borderRadius: BorderRadius.circular(9),
+                                boxShadow: _selectedMobileTab == 0
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.06),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : [],
+                              ),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.receipt_long_rounded,
+                                    size: 18,
+                                    color: _selectedMobileTab == 0 ? secondaryColor : Colors.grey.shade600,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Record Payment',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: _selectedMobileTab == 0 ? FontWeight.w600 : FontWeight.w500,
+                                      color: _selectedMobileTab == 0 ? secondaryColor : Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _selectedMobileTab = 1),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: _selectedMobileTab == 1 ? Colors.white : Colors.transparent,
+                                borderRadius: BorderRadius.circular(9),
+                                boxShadow: _selectedMobileTab == 1
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.06),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : [],
+                              ),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.history_rounded,
+                                    size: 18,
+                                    color: _selectedMobileTab == 1 ? const Color(0xFF7C3AED) : Colors.grey.shade600,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Points History',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: _selectedMobileTab == 1 ? FontWeight.w600 : FontWeight.w500,
+                                      color: _selectedMobileTab == 1 ? const Color(0xFF7C3AED) : Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+
+            // ── Tab Body ──
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(screenPadding),
+                child: _selectedMobileTab == 0
+                    ? _recordPaymentPanel(isMobileLayout: true)
+                    : _pointsHistoryPanel(isMobileLayout: true),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -157,12 +268,13 @@ class _PointHomepageState extends State<PointHomepage> {
   //  LEFT PANEL — Record Payment
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Widget _recordPaymentPanel() {
+  Widget _recordPaymentPanel({bool isMobileLayout = false}) {
     return CardContainer(
       Padding(
         padding: EdgeInsets.all(screenPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: isMobileLayout ? MainAxisSize.min : MainAxisSize.max,
           children: [
             // ── Title row ──
             Row(
@@ -227,6 +339,7 @@ class _PointHomepageState extends State<PointHomepage> {
                 controller: _msisdn.controller,
                 labelText: _msisdn.labelText,
                 maxCharacter: 12,
+                onFieldSubmitted: (_) => _handleSearch(),
                 suffixWidget: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -262,6 +375,42 @@ class _PointHomepageState extends State<PointHomepage> {
               builder: (context, snapshot, _) {
                 final patients = snapshot.userAllResponse ?? [];
                 if (patients.isEmpty) return const SizedBox();
+
+                final resultsList = Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    _stepHeader(3, 'Select Patient to Award Points', Icons.how_to_reg_outlined),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${patients.length} patient${patients.length == 1 ? '' : 's'} found',
+                      style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade600, fontSizeDelta: -1),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FB),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE8ECF1)),
+                      ),
+                      child: ListView.separated(
+                        shrinkWrap: isMobileLayout,
+                        physics: isMobileLayout ? const NeverScrollableScrollPhysics() : null,
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        itemCount: patients.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1, indent: 16, endIndent: 16),
+                        itemBuilder: (context, index) {
+                          final item = patients[index];
+                          return _patientTile(item);
+                        },
+                      ),
+                    ),
+                  ],
+                );
+
+                if (isMobileLayout) {
+                  return resultsList;
+                }
 
                 return Expanded(
                   child: Column(
@@ -301,9 +450,11 @@ class _PointHomepageState extends State<PointHomepage> {
           ],
         ),
       ),
-      margin: isMobile
-          ? EdgeInsets.all(screenPadding)
-          : EdgeInsets.fromLTRB(screenPadding, screenPadding, 0, screenPadding),
+      margin: isMobileLayout
+          ? EdgeInsets.zero
+          : (isMobile
+              ? EdgeInsets.all(screenPadding)
+              : EdgeInsets.fromLTRB(screenPadding, screenPadding, 0, screenPadding)),
     );
   }
 
@@ -431,48 +582,109 @@ class _PointHomepageState extends State<PointHomepage> {
         onTap: () => _confirmAwardPoints(item, previewPoints),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(color: secondaryColor.withAlpha(20), borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.person_outline_rounded, color: secondaryColor, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 360;
+              if (isNarrow) {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.userFullname ?? 'N/A', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${item.userPhone ?? 'N/A'}  ·  ${item.totalPoint ?? 0} points',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                    Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(color: secondaryColor.withAlpha(20), borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.person_outline_rounded, color: secondaryColor, size: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(item.userFullname ?? 'N/A', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${item.userPhone ?? 'N/A'}  ·  ${item.totalPoint ?? 0} pts',
+                                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: secondaryColor.withAlpha(18),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: secondaryColor.withAlpha(50)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.add_circle_outline, color: secondaryColor, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Award $previewPoints pts',
+                              style: const TextStyle(color: secondaryColor, fontSize: 13, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: secondaryColor.withAlpha(18),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: secondaryColor.withAlpha(50)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.add_circle_outline, color: secondaryColor, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Award $previewPoints pts',
-                      style: const TextStyle(color: secondaryColor, fontSize: 12, fontWeight: FontWeight.w600),
+                );
+              }
+
+              return Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(color: secondaryColor.withAlpha(20), borderRadius: BorderRadius.circular(10)),
+                    child: const Icon(Icons.person_outline_rounded, color: secondaryColor, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.userFullname ?? 'N/A', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${item.userPhone ?? 'N/A'}  ·  ${item.totalPoint ?? 0} points',
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: secondaryColor.withAlpha(18),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: secondaryColor.withAlpha(50)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.add_circle_outline, color: secondaryColor, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Award $previewPoints pts',
+                          style: const TextStyle(color: secondaryColor, fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -500,11 +712,13 @@ class _PointHomepageState extends State<PointHomepage> {
                   const Expanded(
                     child: Text('How Points Work', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   ),
-                  // Quick conversion pills always visible
-                  _conversionPill('RM 100', '10 pts'),
-                  const SizedBox(width: 8),
-                  _conversionPill('10 pts', 'RM 1'),
-                  const SizedBox(width: 8),
+                  if (!isMobile) ...[
+                    // Quick conversion pills on desktop
+                    _conversionPill('RM 100', '10 pts'),
+                    const SizedBox(width: 8),
+                    _conversionPill('10 pts', 'RM 1'),
+                    const SizedBox(width: 8),
+                  ],
                   Icon(_showHowItWorks ? Icons.expand_less : Icons.expand_more, color: Colors.grey.shade600, size: 22),
                 ],
               ),
@@ -598,7 +812,7 @@ class _PointHomepageState extends State<PointHomepage> {
   //  RIGHT PANEL — Points History
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Widget _pointsHistoryPanel() {
+  Widget _pointsHistoryPanel({bool isMobileLayout = false}) {
     return CardContainer(
       Consumer<PointManagementController>(
         builder: (context, snapshot, _) {
@@ -606,6 +820,7 @@ class _PointHomepageState extends State<PointHomepage> {
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: isMobileLayout ? MainAxisSize.min : MainAxisSize.max,
             children: [
               // ── Header ──
               Padding(
@@ -642,16 +857,27 @@ class _PointHomepageState extends State<PointHomepage> {
               const Divider(height: 1),
 
               // ── History list ──
-              Expanded(
-                child: items.isEmpty
-                    ? _emptyHistoryState()
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        itemCount: items.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 2),
-                        itemBuilder: (_, index) => _historyCard(items[index]),
-                      ),
-              ),
+              isMobileLayout
+                  ? (items.isEmpty
+                      ? SizedBox(height: 200, child: _emptyHistoryState())
+                      : ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: items.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 2),
+                          itemBuilder: (_, index) => _historyCard(items[index]),
+                        ))
+                  : Expanded(
+                      child: items.isEmpty
+                          ? _emptyHistoryState()
+                          : ListView.separated(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              itemCount: items.length,
+                              separatorBuilder: (_, _) => const SizedBox(height: 2),
+                              itemBuilder: (_, index) => _historyCard(items[index]),
+                            ),
+                    ),
 
               // ── Pagination ──
               const Divider(height: 1),
@@ -661,6 +887,11 @@ class _PointHomepageState extends State<PointHomepage> {
           );
         },
       ),
+      margin: isMobileLayout
+          ? EdgeInsets.zero
+          : (isMobile
+              ? EdgeInsets.all(screenPadding)
+              : EdgeInsets.fromLTRB(0, screenPadding, screenPadding, screenPadding)),
     );
   }
 

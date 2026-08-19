@@ -107,7 +107,7 @@ class _PointDetailState extends State<PointDetail> {
                           crossAxisAlignment: WrapCrossAlignment.start,
                           children: [
                             SizedBox(
-                              width: screenWidth1728(26),
+                              width: isMobile ? screenWidth(80) : screenWidth1728(26),
                               child: Column(
                                 children: [
                                   InputField(
@@ -138,7 +138,7 @@ class _PointDetailState extends State<PointDetail> {
                               ),
                             ),
                             SizedBox(
-                              width: screenWidth1728(30),
+                              width: isMobile ? screenWidth(80) : screenWidth1728(30),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
@@ -167,7 +167,7 @@ class _PointDetailState extends State<PointDetail> {
                                               },
                                               hintText: 'Select an action',
                                               value: _selectedType?.name,
-                                              width: screenWidth1728(30),
+                                              width: isMobile ? screenWidth(80) : screenWidth1728(30),
                                             ),
                                           );
                                         },

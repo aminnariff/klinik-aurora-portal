@@ -505,7 +505,7 @@ class _RewardDetailState extends State<RewardDetail> {
 
   Future<void> addPicture() async {
     documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       PlatformFile file = result.files.first;
@@ -513,7 +513,7 @@ class _RewardDetailState extends State<RewardDetail> {
         debugPrint(bytesToMB(file.size).toString());
         debugPrint(file.name);
         if (bytesToMB(file.size) < 1.0) {
-          Uint8List? fileBytes = await result.files.first.readAsBytes();
+          Uint8List? fileBytes = result.files.first.bytes;
           String fileName = result.files.first.name;
 
           selectedFile = FileAttribute(name: fileName, value: fileBytes);

@@ -141,7 +141,7 @@ class RewardHistoryController extends ChangeNotifier {
     formData.fields.add(MapEntry('rewardHistoryId', rewardId));
 
     try {
-      return dio
+      return await dio
           .put(
             '${Environment.appUrl}admin/reward-history/upload',
             options: Options(

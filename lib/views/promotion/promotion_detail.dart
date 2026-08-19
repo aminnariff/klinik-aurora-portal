@@ -210,7 +210,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                                     fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
                                                     action: () async {
                                                       documentErrorMessage.add(null);
-                                                      FilePickerResult? result = await FilePicker.pickFiles();
+                                                      FilePickerResult? result = await FilePicker.platform.pickFiles();
                                                       if (result != null) {
                                                         PlatformFile file = result.files.first;
                                                         if (supportedExtensions.contains(file.extension)) {
@@ -218,7 +218,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                                             selectedFiles.add(
                                                               FileAttribute(
                                                                 name: result.files.first.name,
-                                                                value: await result.files.first.readAsBytes(),
+                                                                value: result.files.first.bytes,
                                                               ),
                                                             );
                                                             fileRebuild.add(DateTime.now());

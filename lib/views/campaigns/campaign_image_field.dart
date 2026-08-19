@@ -40,9 +40,9 @@ class _CampaignImageFieldState extends State<CampaignImageField> {
     // which leaves `bytes` null on web and forces `readAsBytes()` to fetch the
     // blob: URL instead — that fetch fails here. With no arguments, `withData`
     // defaults to `kIsWeb`, so the bytes are already in hand on the portal.
-    final result = await FilePicker.pickFiles();
+    final result = await FilePicker.platform.pickFiles();
     final file = result?.files.firstOrNull;
-    if (file == null) return;
+    if (file == null || file.bytes == null) return;
 
     // Extension is checked after picking rather than via FileType.custom, again
     // matching the existing uploads — the custom filter behaves inconsistently
@@ -57,15 +57,7 @@ class _CampaignImageFieldState extends State<CampaignImageField> {
 
     setState(() => _uploading = true);
 
-    final Uint8List bytes;
-    try {
-      bytes = await file.readAsBytes();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _uploading = false);
-      showDialogError(context, 'Could not read that file: $e');
-      return;
-    }
+    final Uint8List bytes = file.bytes!;
 
     // Mirrors the server's own 5 MB multer limit, so an oversized file is
     // rejected before spending time uploading it.

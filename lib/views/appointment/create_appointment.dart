@@ -388,13 +388,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 ),
                                 child: Builder(
                                   builder: (context) {
+                                    Widget wrapExpanded(Widget child) => isMobile ? child : Expanded(child: child);
                                     final leftColumn = Consumer<ServiceBranchController>(
                                       builder: (context, serviceBranchController, _) {
                                         return StreamBuilder<DateTime>(
                                           stream: rebuild.stream,
                                           builder: (context, snapshot) {
-                                            return Expanded(
-                                              child: Column(
+                                            return wrapExpanded(
+                                              Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   _extraSectionLabel('Patient', Icons.person_rounded),
@@ -592,7 +593,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               true))
                                                     Container(
                                                       padding: EdgeInsets.only(bottom: 8),
-                                                      width: screenWidth1728(30),
+                                                      width: isMobile ? double.infinity : screenWidth1728(30),
                                                       child: StreamBuilder<DateTime>(
                                                         stream: fileRebuild.stream,
                                                         builder: (context, snapshot) {
@@ -921,336 +922,379 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         );
                                       },
                                     );
-                                    final rightColumn = Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          _extraSectionLabel('Appointment Details', Icons.event_note_rounded),
-                                          const SizedBox(height: 10),
-                                          if (widget.type == 'update')
-                                            labelValue(
-                                              'Branch',
-                                              widget.appointment?.branch?.branchName ?? '',
-                                              alignStart: true,
-                                            ),
-                                          if (widget.type == 'create')
-                                            StreamBuilder<DateTime>(
-                                              stream: rebuildDropdown.stream,
-                                              builder: (context, snapshot) {
-                                                return Consumer<AuthController>(
-                                                  builder: (context, authController, _) {
-                                                    return Column(
-                                                      children: [
-                                                        AppDropdown(
-                                                          attributeList: DropdownAttributeList(
-                                                            authController.isSuperAdmin ? branches : [],
-                                                            labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                                            isEditable: authController.isSuperAdmin,
-                                                            fieldColor: authController.isSuperAdmin
-                                                                ? null
-                                                                : textFormFieldUneditableColor,
-                                                            value: _appointmentBranch?.name,
-                                                            onChanged: (p0) {
-                                                              _appointmentBranch = p0;
-                                                              _service = null;
-                                                              serviceList = [];
-                                                              availableDateTime = [];
-                                                              dateTimeController.clear();
-                                                              if (_appointmentBranch != null) {
-                                                                ServiceBranchController.available(
-                                                                  context,
-                                                                  branchId: _appointmentBranch?.key,
-                                                                ).then((value) {
-                                                                  if (responseCode(value.code)) {
-                                                                    context
-                                                                            .read<ServiceBranchController>()
-                                                                            .serviceBranchAvailableResponse =
-                                                                        value.data;
-                                                                    if (value.data != null) {
-                                                                      for (service_branch_available_model.Data item
-                                                                          in value.data?.data ?? []) {
-                                                                        serviceList.add(
-                                                                          DropdownAttribute(
-                                                                            item.serviceBranchId ?? '',
-                                                                            item.serviceName ?? '',
-                                                                          ),
-                                                                        );
-                                                                      }
+                                    final rightColumnContent = Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        _extraSectionLabel('Appointment Details', Icons.event_note_rounded),
+                                        const SizedBox(height: 10),
+                                        if (widget.type == 'update')
+                                          labelValue(
+                                            'Branch',
+                                            widget.appointment?.branch?.branchName ?? '',
+                                            alignStart: true,
+                                          ),
+                                        if (widget.type == 'create')
+                                          StreamBuilder<DateTime>(
+                                            stream: rebuildDropdown.stream,
+                                            builder: (context, snapshot) {
+                                              return Consumer<AuthController>(
+                                                builder: (context, authController, _) {
+                                                  return Column(
+                                                    children: [
+                                                      AppDropdown(
+                                                        attributeList: DropdownAttributeList(
+                                                          authController.isSuperAdmin ? branches : [],
+                                                          labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                                          isEditable: authController.isSuperAdmin,
+                                                          fieldColor: authController.isSuperAdmin
+                                                              ? null
+                                                              : textFormFieldUneditableColor,
+                                                          value: _appointmentBranch?.name,
+                                                          onChanged: (p0) {
+                                                            _appointmentBranch = p0;
+                                                            _service = null;
+                                                            serviceList = [];
+                                                            availableDateTime = [];
+                                                            dateTimeController.clear();
+                                                            if (_appointmentBranch != null) {
+                                                              ServiceBranchController.available(
+                                                                context,
+                                                                branchId: _appointmentBranch?.key,
+                                                              ).then((value) {
+                                                                if (responseCode(value.code)) {
+                                                                  context
+                                                                          .read<ServiceBranchController>()
+                                                                          .serviceBranchAvailableResponse =
+                                                                      value.data;
+                                                                  if (value.data != null) {
+                                                                    for (service_branch_available_model.Data item
+                                                                        in value.data?.data ?? []) {
+                                                                      serviceList.add(
+                                                                        DropdownAttribute(
+                                                                          item.serviceBranchId ?? '',
+                                                                          item.serviceName ?? '',
+                                                                        ),
+                                                                      );
                                                                     }
-                                                                    serviceList.sort(
-                                                                      (a, b) => a.name.compareTo(b.name),
-                                                                    );
-                                                                    rebuildDropdown.add(DateTime.now());
                                                                   }
-                                                                });
-                                                              } else {
-                                                                rebuildDropdown.add(DateTime.now());
-                                                              }
-                                                            },
-                                                            width: isMobile
-                                                                ? MediaQuery.of(context).size.width - 112
-                                                                : 331,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                          AppPadding.vertical(denominator: 2),
-                                          if (widget.type == 'update') ...[
-                                            labelValue(
-                                              'Service',
-                                              widget.appointment?.service?.serviceName ?? '',
-                                              alignStart: true,
-                                            ),
-                                            AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
-                                          ],
-                                          if (widget.type == 'create')
-                                            StreamBuilder<DateTime>(
-                                              stream: rebuildDropdown.stream,
-                                              builder: (context, snapshot) {
-                                                return Consumer<ServiceBranchController>(
-                                                  builder: (context, serviceBranchController, _) {
-                                                    return Row(
-                                                      children: [
-                                                        Expanded(
-                                                          child: AppDropdown(
-                                                            attributeList: DropdownAttributeList(
-                                                              width: isMobile
-                                                                ? MediaQuery.of(context).size.width - 112
-                                                                : 331,
-                                                              serviceList,
-                                                              labelText: 'appointmentPage'.tr(gender: 'service'),
-                                                              value: _service?.name,
-                                                              fieldColor: widget.type == 'update'
-                                                                  ? textFormFieldUneditableColor
-                                                                  : null,
-                                                              isEditable: widget.type == 'create',
-                                                              onChanged: (p0) {
-                                                                _service = p0;
-                                                                rebuild.add(DateTime.now());
-                                                                try {
-                                                                  _status = appointmentStatus.firstWhere(
-                                                                    (element) => element.key == '1',
+                                                                  serviceList.sort(
+                                                                    (a, b) => a.name.compareTo(b.name),
                                                                   );
-                                                                  try {
-                                                                    selectedService = context
-                                                                        .read<ServiceBranchController>()
-                                                                        .serviceBranchAvailableResponse
-                                                                        ?.data
-                                                                        ?.firstWhere(
-                                                                          (e) => e.serviceBranchId == p0?.key,
-                                                                        );
-                                                                    rebuild.add(DateTime.now());
-                                                                  } catch (e) {
-                                                                    debugPrint(e.toString());
-                                                                  }
-                                                                } catch (e) {
-                                                                  debugPrint(e.toString());
+                                                                  rebuildDropdown.add(DateTime.now());
                                                                 }
-                                                                ServiceBranchAvailableDtController.getAvailableSlot(
-                                                                  context,
-                                                                  serviceBranchId: _service?.key,
-                                                                ).then((value) {
-                                                                  if (responseCode(value.code)) {
-                                                                    context
-                                                                            .read<ServiceBranchAvailableDtController>()
-                                                                            .serviceBranchAvailableTimingResponse =
-                                                                        value.data;
-                                                                    availableDateTime = value.data?.slots ?? [];
-                                                                    rebuild.add(DateTime.now());
-                                                                    rebuildDropdown.add(DateTime.now());
-                                                                  }
-                                                                });
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-
-                                          StreamBuilder(
-                                            stream: rebuild.stream,
-                                            builder: (context, _) {
-                                              return Consumer<ServiceBranchController>(
-                                                builder: (context, serviceBranchController, _) {
-                                                  if (_service != null &&
-                                                      notNullOrEmptyString(selectedService?.serviceBookingFee) ==
-                                                          true) {
-                                                    return Container(
-                                                      margin: const EdgeInsets.only(top: 6),
-                                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                      decoration: BoxDecoration(
-                                                        color: const Color(0xFFFFF7ED),
-                                                        borderRadius: BorderRadius.circular(8),
-                                                        border: Border.all(
-                                                          color: const Color(0xFFFB923C).withAlpha(80),
+                                                              });
+                                                            } else {
+                                                              rebuildDropdown.add(DateTime.now());
+                                                            }
+                                                          },
+                                                          width: isMobile
+                                                              ? MediaQuery.of(context).size.width - 112
+                                                              : 331,
                                                         ),
                                                       ),
-                                                      child: const Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons.info_outline_rounded,
-                                                            size: 14,
-                                                            color: Color(0xFFEA580C),
-                                                          ),
-                                                          SizedBox(width: 6),
-                                                          Flexible(
-                                                            child: Text(
-                                                              'Booking fee required — upload payment proof below',
-                                                              style: TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    return const SizedBox();
-                                                  }
+                                                    ],
+                                                  );
                                                 },
                                               );
                                             },
                                           ),
-                                          AppPadding.vertical(denominator: 2),
+                                        AppPadding.vertical(denominator: 2),
+                                        if (widget.type == 'update') ...[
+                                          labelValue(
+                                            'Service',
+                                            widget.appointment?.service?.serviceName ?? '',
+                                            alignStart: true,
+                                          ),
+                                          AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
+                                        ],
+                                        if (widget.type == 'create')
                                           StreamBuilder<DateTime>(
                                             stream: rebuildDropdown.stream,
                                             builder: (context, snapshot) {
-                                              return Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
+                                              return Consumer<ServiceBranchController>(
+                                                builder: (context, serviceBranchController, _) {
+                                                  return Row(
                                                     children: [
-                                                      _isLocked
-                                                          ? labelValue('Status', _status?.name ?? '')
-                                                          : AppDropdown(
-                                                              attributeList: DropdownAttributeList(
-                                                                widget.type == 'update' ? getAppointmentStatus() : [],
-                                                                isEditable: widget.type == 'update',
-                                                                fieldColor: widget.type == 'update'
-                                                                    ? null
-                                                                    : textFormFieldUneditableColor,
-                                                                labelText: 'appointmentPage'.tr(gender: 'status'),
-                                                                value: _status?.name,
-                                                                onChanged: (p0) {
-                                                                  _status = p0;
-                                                                  if (_status?.key == '6' &&
-                                                                      appointmentNoteController
-                                                                          .controller
-                                                                          .text
-                                                                          .isEmpty) {
-                                                                    appointmentNoteController.controller.text =
-                                                                        "Refund request has been submitted to HQ for processing. Please allow approximately 7-14 business days for completion.";
-                                                                  }
+                                                      Expanded(
+                                                        child: AppDropdown(
+                                                          attributeList: DropdownAttributeList(
+                                                            width: isMobile
+                                                              ? MediaQuery.of(context).size.width - 112
+                                                              : 331,
+                                                            serviceList,
+                                                            labelText: 'appointmentPage'.tr(gender: 'service'),
+                                                            value: _service?.name,
+                                                            fieldColor: widget.type == 'update'
+                                                                ? textFormFieldUneditableColor
+                                                                : null,
+                                                            isEditable: widget.type == 'create',
+                                                            onChanged: (p0) {
+                                                              _service = p0;
+                                                              rebuild.add(DateTime.now());
+                                                              try {
+                                                                _status = appointmentStatus.firstWhere(
+                                                                  (element) => element.key == '1',
+                                                                );
+                                                                try {
+                                                                  selectedService = context
+                                                                      .read<ServiceBranchController>()
+                                                                      .serviceBranchAvailableResponse
+                                                                      ?.data
+                                                                      ?.firstWhere(
+                                                                        (e) => e.serviceBranchId == p0?.key,
+                                                                      );
+                                                                  rebuild.add(DateTime.now());
+                                                                } catch (e) {
+                                                                  debugPrint(e.toString());
+                                                                }
+                                                              } catch (e) {
+                                                                debugPrint(e.toString());
+                                                              }
+                                                              ServiceBranchAvailableDtController.getAvailableSlot(
+                                                                context,
+                                                                serviceBranchId: _service?.key,
+                                                              ).then((value) {
+                                                                if (responseCode(value.code)) {
+                                                                  context
+                                                                          .read<ServiceBranchAvailableDtController>()
+                                                                          .serviceBranchAvailableTimingResponse =
+                                                                      value.data;
+                                                                  availableDateTime = value.data?.slots ?? [];
                                                                   rebuild.add(DateTime.now());
                                                                   rebuildDropdown.add(DateTime.now());
-                                                                },
-                                                                width: isMobile
-                                                                ? MediaQuery.of(context).size.width - 112
-                                                                : 331,
-                                                              ),
-                                                            ),
-                                                    ],
-                                                  ),
-                                                  if (_status?.key == '2' || _status?.key == '6') ...[
-                                                    const SizedBox(height: 10),
-                                                    Container(
-                                                      padding: const EdgeInsets.all(12),
-                                                      decoration: BoxDecoration(
-                                                        color: const Color(0xFFFFF7ED),
-                                                        borderRadius: BorderRadius.circular(8),
-                                                        border: Border.all(
-                                                          color: const Color(0xFFFB923C).withAlpha(80),
+                                                                }
+                                                              });
+                                                            },
+                                                          ),
                                                         ),
                                                       ),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              const Icon(
-                                                                Icons.policy_outlined,
-                                                                size: 14,
-                                                                color: Color(0xFFEA580C),
-                                                              ),
-                                                              const SizedBox(width: 6),
-                                                              Text(
-                                                                _status?.key == '6'
-                                                                    ? 'Refund Policy'
-                                                                    : 'Cancellation Policy',
-                                                                style: const TextStyle(
-                                                                  fontSize: 12,
-                                                                  fontWeight: FontWeight.w700,
-                                                                  color: Color(0xFF9A3412),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(height: 6),
-                                                          const Text(
-                                                            '• Each appointment may only be rescheduled once.\n'
-                                                            '• Refunds, if approved, are processed within 5–7 business days.\n'
-                                                            '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
-                                                            style: TextStyle(
-                                                              fontSize: 11.5,
-                                                              color: Color(0xFF9A3412),
-                                                              height: 1.6,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ],
+                                                    ],
+                                                  );
+                                                },
                                               );
                                             },
                                           ),
-                                          AppPadding.vertical(),
-                                          Consumer<ServiceBranchAvailableDtController>(
-                                            builder: (context, snapshot, _) {
-                                              return _isLocked
-                                                  ? labelValue('Slots', dateTimeController.text)
-                                                  : GestureDetector(
-                                                      onTap: () async {
-                                                        if (context.read<AuthController>().hasPermission(
-                                                              'c54a2d91-499c-11f0-9169-bc24115a1342',
-                                                            ) ==
-                                                            false) {
-                                                          if (context.read<AuthController>().isSuperAdmin &&
-                                                              _appointmentBranch == null) {
-                                                            showDialogError(
-                                                              context,
-                                                              ErrorMessage.required(
-                                                                field: 'appointmentPage'.tr(gender: 'branch'),
+
+                                        StreamBuilder(
+                                          stream: rebuild.stream,
+                                          builder: (context, _) {
+                                            return Consumer<ServiceBranchController>(
+                                              builder: (context, serviceBranchController, _) {
+                                                if (_service != null &&
+                                                    notNullOrEmptyString(selectedService?.serviceBookingFee) ==
+                                                        true) {
+                                                  return Container(
+                                                    margin: const EdgeInsets.only(top: 6),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFFFF7ED),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(
+                                                        color: const Color(0xFFFB923C).withAlpha(80),
+                                                      ),
+                                                    ),
+                                                    child: const Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.info_outline_rounded,
+                                                          size: 14,
+                                                          color: Color(0xFFEA580C),
+                                                        ),
+                                                        SizedBox(width: 6),
+                                                        Flexible(
+                                                          child: Text(
+                                                            'Booking fee required — upload payment proof below',
+                                                            style: TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return const SizedBox();
+                                                }
+                                              },
+                                            );
+                                          },
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        StreamBuilder<DateTime>(
+                                          stream: rebuildDropdown.stream,
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    _isLocked
+                                                        ? labelValue('Status', _status?.name ?? '')
+                                                        : AppDropdown(
+                                                            attributeList: DropdownAttributeList(
+                                                              widget.type == 'update' ? getAppointmentStatus() : [],
+                                                              isEditable: widget.type == 'update',
+                                                              fieldColor: widget.type == 'update'
+                                                                  ? null
+                                                                  : textFormFieldUneditableColor,
+                                                              labelText: 'appointmentPage'.tr(gender: 'status'),
+                                                              value: _status?.name,
+                                                              onChanged: (p0) {
+                                                                _status = p0;
+                                                                if (_status?.key == '6' &&
+                                                                    appointmentNoteController
+                                                                        .controller
+                                                                        .text
+                                                                        .isEmpty) {
+                                                                  appointmentNoteController.controller.text =
+                                                                      "Refund request has been submitted to HQ for processing. Please allow approximately 7-14 business days for completion.";
+                                                                }
+                                                                rebuild.add(DateTime.now());
+                                                                rebuildDropdown.add(DateTime.now());
+                                                              },
+                                                              width: isMobile
+                                                              ? MediaQuery.of(context).size.width - 112
+                                                              : 331,
+                                                            ),
+                                                          ),
+                                                  ],
+                                                ),
+                                                if (_status?.key == '2' || _status?.key == '6') ...[
+                                                  const SizedBox(height: 10),
+                                                  Container(
+                                                    padding: const EdgeInsets.all(12),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFFFF7ED),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(
+                                                        color: const Color(0xFFFB923C).withAlpha(80),
+                                                      ),
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            const Icon(
+                                                              Icons.policy_outlined,
+                                                              size: 14,
+                                                              color: Color(0xFFEA580C),
+                                                            ),
+                                                            const SizedBox(width: 6),
+                                                            Text(
+                                                              _status?.key == '6'
+                                                                  ? 'Refund Policy'
+                                                                  : 'Cancellation Policy',
+                                                              style: const TextStyle(
+                                                                fontSize: 12,
+                                                                fontWeight: FontWeight.w700,
+                                                                color: Color(0xFF9A3412),
                                                               ),
-                                                            );
-                                                          } else if (_appointmentBranch != null &&
-                                                              (availableDateTime.isNotEmpty)) {
-                                                            DateTime now = DateTime.now();
-                                                            availableDateTime = removePastDates(availableDateTime);
-                                                            availableDateTime.sort(
-                                                              (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
-                                                            );
-                                                            String? selectedDateTime = await showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext context) {
-                                                                return Row(
-                                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                                  children: [
-                                                                    Column(
-                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                      children: [
-                                                                        Container(
-                                                                          constraints: BoxConstraints(
-                                                                            maxWidth: screenWidth(80),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 6),
+                                                        const Text(
+                                                          '• Each appointment may only be rescheduled once.\n'
+                                                          '• Refunds, if approved, are processed within 5–7 business days.\n'
+                                                          '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
+                                                          style: TextStyle(
+                                                            fontSize: 11.5,
+                                                            color: Color(0xFF9A3412),
+                                                            height: 1.6,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                        AppPadding.vertical(),
+                                        Consumer<ServiceBranchAvailableDtController>(
+                                          builder: (context, snapshot, _) {
+                                            return _isLocked
+                                                ? labelValue('Slots', dateTimeController.text)
+                                                : GestureDetector(
+                                                    onTap: () async {
+                                                      if (context.read<AuthController>().hasPermission(
+                                                            'c54a2d91-499c-11f0-9169-bc24115a1342',
+                                                          ) ==
+                                                          false) {
+                                                        if (context.read<AuthController>().isSuperAdmin &&
+                                                            _appointmentBranch == null) {
+                                                          showDialogError(
+                                                            context,
+                                                            ErrorMessage.required(
+                                                              field: 'appointmentPage'.tr(gender: 'branch'),
+                                                            ),
+                                                          );
+                                                        } else if (_appointmentBranch != null &&
+                                                            (availableDateTime.isNotEmpty)) {
+                                                          DateTime now = DateTime.now();
+                                                          availableDateTime = removePastDates(availableDateTime);
+                                                          availableDateTime.sort(
+                                                            (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
+                                                          );
+                                                          String? selectedDateTime = await showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return Row(
+                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                children: [
+                                                                  Column(
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                    children: [
+                                                                      Container(
+                                                                        constraints: BoxConstraints(
+                                                                          maxWidth: screenWidth(80),
+                                                                        ),
+                                                                        child: CardContainer(
+                                                                          Padding(
+                                                                            padding: EdgeInsets.all(screenPadding),
+                                                                            child: SelectionCalendarView(
+                                                                              startMonth: now.month,
+                                                                              year: now.year,
+                                                                              initialDateTimes: availableDateTime,
+                                                                            ),
                                                                           ),
-                                                                          child: CardContainer(
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                          dateTimeController.text =
+                                                              formatDateTimeToDisplay(selectedDateTime) ??
+                                                              dateConverter(
+                                                                widget.appointment?.appointmentDatetime,
+                                                                format: 'yyyy-MM-dd HH:mm',
+                                                              ) ??
+                                                              '';
+                                                          calculateGestational();
+                                                        } else if (widget.type == 'update' &&
+                                                            availableDateTime.isEmpty) {
+                                                          ServiceBranchAvailableDtController.getAvailableSlot(
+                                                            context,
+                                                            serviceBranchId: widget.appointment?.serviceBranchId,
+                                                          ).then((value) async {
+                                                            if (responseCode(value.code)) {
+                                                              availableDateTime = value.data?.slots ?? [];
+                                                              DateTime now = DateTime.now();
+                                                              availableDateTime = removePastDates(availableDateTime);
+                                                              String? selectedDateTime = await showDialog(
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  return Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                    children: [
+                                                                      Column(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        children: [
+                                                                          CardContainer(
                                                                             Padding(
                                                                               padding: EdgeInsets.all(screenPadding),
                                                                               child: SelectionCalendarView(
@@ -1260,167 +1304,124 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                               ),
                                                                             ),
                                                                           ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                );
-                                                              },
-                                                            );
-                                                            dateTimeController.text =
-                                                                formatDateTimeToDisplay(selectedDateTime) ??
-                                                                dateConverter(
-                                                                  widget.appointment?.appointmentDatetime,
-                                                                  format: 'yyyy-MM-dd HH:mm',
-                                                                ) ??
-                                                                '';
-                                                            calculateGestational();
-                                                          } else if (widget.type == 'update' &&
-                                                              availableDateTime.isEmpty) {
-                                                            ServiceBranchAvailableDtController.getAvailableSlot(
-                                                              context,
-                                                              serviceBranchId: widget.appointment?.serviceBranchId,
-                                                            ).then((value) async {
-                                                              if (responseCode(value.code)) {
-                                                                availableDateTime = value.data?.slots ?? [];
-                                                                DateTime now = DateTime.now();
-                                                                availableDateTime = removePastDates(availableDateTime);
-                                                                String? selectedDateTime = await showDialog(
-                                                                  context: context,
-                                                                  builder: (BuildContext context) {
-                                                                    return Row(
-                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                      children: [
-                                                                        Column(
-                                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                                          children: [
-                                                                            CardContainer(
-                                                                              Padding(
-                                                                                padding: EdgeInsets.all(screenPadding),
-                                                                                child: SelectionCalendarView(
-                                                                                  startMonth: now.month,
-                                                                                  year: now.year,
-                                                                                  initialDateTimes: availableDateTime,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                );
-                                                                dateTimeController.text =
-                                                                    formatDateTimeToDisplay(selectedDateTime) ??
-                                                                    dateConverter(
-                                                                      widget.appointment?.appointmentDatetime,
-                                                                      format: 'yyyy-MM-dd HH:mm',
-                                                                    ) ??
-                                                                    '';
-                                                                calculateGestational();
-                                                                rebuildDropdown.add(DateTime.now());
-                                                              }
-                                                            });
-                                                          } else if (_service == null) {
-                                                            showDialogError(
-                                                              context,
-                                                              ErrorMessage.required(
-                                                                field: 'appointmentPage'.tr(gender: 'service'),
-                                                              ),
-                                                            );
-                                                          } else if (availableDateTime.isEmpty) {
-                                                            showDialogError(context, 'No available slots');
-                                                          } else {
-                                                            showDialogError(
-                                                              context,
-                                                              ErrorMessage.required(
-                                                                field: 'appointmentPage'.tr(gender: 'branch'),
-                                                              ),
-                                                            );
-                                                          }
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              );
+                                                              dateTimeController.text =
+                                                                  formatDateTimeToDisplay(selectedDateTime) ??
+                                                                  dateConverter(
+                                                                    widget.appointment?.appointmentDatetime,
+                                                                    format: 'yyyy-MM-dd HH:mm',
+                                                                  ) ??
+                                                                  '';
+                                                              calculateGestational();
+                                                              rebuildDropdown.add(DateTime.now());
+                                                            }
+                                                          });
+                                                        } else if (_service == null) {
+                                                          showDialogError(
+                                                            context,
+                                                            ErrorMessage.required(
+                                                              field: 'appointmentPage'.tr(gender: 'service'),
+                                                            ),
+                                                          );
+                                                        } else if (availableDateTime.isEmpty) {
+                                                          showDialogError(context, 'No available slots');
+                                                        } else {
+                                                          showDialogError(
+                                                            context,
+                                                            ErrorMessage.required(
+                                                              field: 'appointmentPage'.tr(gender: 'branch'),
+                                                            ),
+                                                          );
                                                         }
-                                                      },
-                                                      child: ReadOnly(
-                                                        isEditable: false,
-                                                        InputField(
-                                                          field: InputFieldAttribute(
-                                                            controller: dateTimeController,
-                                                            labelText: 'appointmentPage'.tr(
-                                                              gender: 'appointmentDateTime',
-                                                            ),
-                                                            isEditable: false,
-                                                            uneditableColor: textFormFieldEditableColor,
-                                                            suffixWidget: Row(
-                                                              mainAxisSize: MainAxisSize.min,
-                                                              children: [Icon(Icons.date_range)],
-                                                            ),
+                                                      }
+                                                    },
+                                                    child: ReadOnly(
+                                                      isEditable: false,
+                                                      InputField(
+                                                        field: InputFieldAttribute(
+                                                          controller: dateTimeController,
+                                                          labelText: 'appointmentPage'.tr(
+                                                            gender: 'appointmentDateTime',
                                                           ),
-                                                          width: screenWidthByBreakpoint(90, 70, 30),
+                                                          isEditable: false,
+                                                          uneditableColor: textFormFieldEditableColor,
+                                                          suffixWidget: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [Icon(Icons.date_range)],
+                                                          ),
                                                         ),
+                                                        width: screenWidthByBreakpoint(90, 70, 30),
                                                       ),
-                                                    );
-                                            },
-                                          ),
-                                          AppPadding.vertical(denominator: 2),
-                                          if (_status?.key != '6') ...[
-                                            _extraSectionLabel('Attachment', Icons.attach_file_rounded),
-                                            const SizedBox(height: 8),
-                                            TextField(
-                                              controller: _attachmentUrlController,
-                                              style: const TextStyle(fontSize: 13),
-                                              decoration: InputDecoration(
-                                                labelText: 'Attachment URL (optional)',
-                                                labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                                                hintText: 'https://',
-                                                hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
-                                                prefixIcon: const Icon(
-                                                  Icons.link_rounded,
-                                                  size: 16,
-                                                  color: Color(0xFF6B7280),
-                                                ),
-                                                filled: true,
-                                                fillColor: const Color(0xFFF9FAFB),
-                                                contentPadding: const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 10,
-                                                ),
-                                                border: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                                                ),
-                                                enabledBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  borderSide: const BorderSide(color: Color(0xFF6366F1)),
-                                                ),
+                                                    ),
+                                                  );
+                                          },
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
+                                        if (_status?.key != '6') ...[
+                                          _extraSectionLabel('Attachment', Icons.attach_file_rounded),
+                                          const SizedBox(height: 8),
+                                          TextField(
+                                            controller: _attachmentUrlController,
+                                            style: const TextStyle(fontSize: 13),
+                                            decoration: InputDecoration(
+                                              labelText: 'Attachment URL (optional)',
+                                              labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                                              hintText: 'https://',
+                                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
+                                              prefixIcon: const Icon(
+                                                Icons.link_rounded,
+                                                size: 16,
+                                                color: Color(0xFF6B7280),
+                                              ),
+                                              filled: true,
+                                              fillColor: const Color(0xFFF9FAFB),
+                                              contentPadding: const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 10,
+                                              ),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                                borderSide: const BorderSide(color: Color(0xFF6366F1)),
                                               ),
                                             ),
-                                            const SizedBox(height: 6),
-                                            Row(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: const [
-                                                Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
-                                                SizedBox(width: 4),
-                                                Flexible(
-                                                  child: Text(
-                                                    'Documents linked here are stored for 6 months to 1 year and may be deleted thereafter. Patients are advised to save their own copy.',
-                                                    style: TextStyle(
-                                                      fontSize: 10.5,
-                                                      color: Color(0xFF9CA3AF),
-                                                      height: 1.4,
-                                                    ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: const [
+                                              Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
+                                              SizedBox(width: 4),
+                                              Flexible(
+                                                child: Text(
+                                                  'Documents linked here are stored for 6 months to 1 year and may be deleted thereafter. Patients are advised to save their own copy.',
+                                                  style: TextStyle(
+                                                    fontSize: 10.5,
+                                                    color: Color(0xFF9CA3AF),
+                                                    height: 1.4,
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                            AppPadding.vertical(denominator: 2),
-                                          ],
+                                              ),
+                                            ],
+                                          ),
+                                          AppPadding.vertical(denominator: 2),
                                         ],
-                                      ),
+                                      ],
                                     );
+                                    final rightColumn = isMobile ? rightColumnContent : Expanded(child: rightColumnContent);
+
                                     return isMobile
                                         ? Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,

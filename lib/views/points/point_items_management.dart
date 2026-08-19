@@ -93,35 +93,60 @@ class _PointItemsManagementState extends State<PointItemsManagement> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(isMobile ? 12 : 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: widget.showHeader
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Point Modifiers', style: AppTypography.displayMedium(context)),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Bonuses branch staff can apply when awarding points.',
-                              style: AppTypography.bodyMedium(context).apply(color: textMutedColor),
-                            ),
-                          ],
-                        )
-                      : const SizedBox.shrink(),
-                ),
-                Button(
-                  _loading ? null : () => _openEditor(),
-                  actionText: 'New Modifier',
-                  color: secondaryColor,
-                  icon: const Icon(Icons.add_rounded, color: Colors.white, size: 18),
-                ),
-              ],
-            ),
+            if (isMobile)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.showHeader) ...[
+                    Text('Point Modifiers', style: AppTypography.displayMedium(context)),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Bonuses branch staff can apply when awarding points.',
+                      style: AppTypography.bodyMedium(context).apply(color: textMutedColor),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: Button(
+                      _loading ? null : () => _openEditor(),
+                      actionText: 'New Modifier',
+                      color: secondaryColor,
+                      icon: const Icon(Icons.add_rounded, color: Colors.white, size: 18),
+                    ),
+                  ),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    child: widget.showHeader
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Point Modifiers', style: AppTypography.displayMedium(context)),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Bonuses branch staff can apply when awarding points.',
+                                style: AppTypography.bodyMedium(context).apply(color: textMutedColor),
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  Button(
+                    _loading ? null : () => _openEditor(),
+                    actionText: 'New Modifier',
+                    color: secondaryColor,
+                    icon: const Icon(Icons.add_rounded, color: Colors.white, size: 18),
+                  ),
+                ],
+              ),
             const SizedBox(height: 20),
             Expanded(child: _buildBody()),
           ],
@@ -159,29 +184,30 @@ class _PointItemsManagementState extends State<PointItemsManagement> {
         return CardContainer(
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: modifier.isActive ? secondaryColor.withAlpha(30) : const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.auto_awesome_rounded,
-                    size: 20,
-                    color: modifier.isActive ? secondaryColor : const Color(0xFF9CA3AF),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 450;
+                if (isNarrow) {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Flexible(
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: modifier.isActive ? secondaryColor.withAlpha(30) : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 20,
+                              color: modifier.isActive ? secondaryColor : const Color(0xFF9CA3AF),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
                             child: Text(
                               modifier.itemName,
                               style: AppTypography.bodyLarge(context),
@@ -192,12 +218,9 @@ class _PointItemsManagementState extends State<PointItemsManagement> {
                           _StatusChip(modifier: modifier),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      // Three labelled facts rather than a run-on sentence: what
-                      // it awards, when staff can use it, and what that means on
-                      // a real transaction.
+                      const SizedBox(height: 12),
                       Wrap(
-                        spacing: 20,
+                        spacing: 16,
                         runSpacing: 6,
                         children: [
                           _Fact(icon: Icons.add_circle_outline_rounded, label: 'Awards', value: modifier.summary),
@@ -213,22 +236,100 @@ class _PointItemsManagementState extends State<PointItemsManagement> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(Icons.edit_outlined, size: 16),
+                            label: const Text('Edit'),
+                            style: TextButton.styleFrom(foregroundColor: secondaryColor),
+                            onPressed: () => _openEditor(modifier: modifier),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                            label: const Text('Delete'),
+                            style: TextButton.styleFrom(foregroundColor: const Color(0xFFD32F2F)),
+                            onPressed: () => _delete(modifier),
+                          ),
+                        ],
+                      ),
                     ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  color: secondaryColor,
-                  tooltip: 'Edit',
-                  onPressed: () => _openEditor(modifier: modifier),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded),
-                  color: const Color(0xFFD32F2F),
-                  tooltip: 'Delete',
-                  onPressed: () => _delete(modifier),
-                ),
-              ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: modifier.isActive ? secondaryColor.withAlpha(30) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.auto_awesome_rounded,
+                        size: 20,
+                        color: modifier.isActive ? secondaryColor : const Color(0xFF9CA3AF),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  modifier.itemName,
+                                  style: AppTypography.bodyLarge(context),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              _StatusChip(modifier: modifier),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 20,
+                            runSpacing: 6,
+                            children: [
+                              _Fact(icon: Icons.add_circle_outline_rounded, label: 'Awards', value: modifier.summary),
+                              _Fact(
+                                icon: Icons.event_available_outlined,
+                                label: 'Available',
+                                value: modifier.windowLabel,
+                              ),
+                              _Fact(
+                                icon: Icons.calculate_outlined,
+                                label: 'Example',
+                                value: '100 pts → ${100 + modifier.bonusFor(100)} pts',
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined),
+                      color: secondaryColor,
+                      tooltip: 'Edit',
+                      onPressed: () => _openEditor(modifier: modifier),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      color: const Color(0xFFD32F2F),
+                      tooltip: 'Delete',
+                      onPressed: () => _delete(modifier),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         );

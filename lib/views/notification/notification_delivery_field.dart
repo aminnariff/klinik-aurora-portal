@@ -107,11 +107,11 @@ class _ModeToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(10)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Wrap(
+        spacing: 4,
+        runSpacing: 4,
         children: [
           _ToggleOption(label: 'Send now', icon: Icons.send_rounded, isSelected: !isScheduled, onTap: onSendNow),
-          const SizedBox(width: 4),
           _ToggleOption(
             label: 'Schedule for later',
             icon: Icons.schedule_rounded,

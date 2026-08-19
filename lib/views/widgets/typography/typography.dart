@@ -31,4 +31,8 @@ class AppTypography extends StatelessWidget {
   static TextStyle displayMedium(BuildContext context) {
     return Theme.of(context).textTheme.displayMedium!.apply(fontSizeDelta: textSize);
   }
+
+  static TextStyle titleLarge(BuildContext context) {
+    return Theme.of(context).textTheme.titleLarge!.apply(fontSizeDelta: textSize);
+  }
 }

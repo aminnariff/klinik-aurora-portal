@@ -180,7 +180,7 @@ class PaymentController extends ChangeNotifier {
     formData.fields.add(MapEntry('paymentAmount', paymentAmount.toString()));
 
     try {
-      return dio
+      return await dio
           .put(
             '${Environment.appUrl}admin/payment/upload',
             options: Options(

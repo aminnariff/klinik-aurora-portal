@@ -131,7 +131,7 @@ class RewardController extends ChangeNotifier {
     formData.fields.add(MapEntry('rewardId', rewardId));
 
     try {
-      return dio
+      return await dio
           .put(
             '${Environment.appUrl}admin/reward-management/upload',
             options: Options(

@@ -89,7 +89,7 @@ class BranchController extends ChangeNotifier {
     debugPrint(formData.files[0].value.filename);
     debugPrint(formData.files.toString());
     try {
-      return dio
+      return await dio
           .post(
             '${Environment.appUrl}admin/branch',
             options: Options(
@@ -145,7 +145,7 @@ class BranchController extends ChangeNotifier {
     formData.fields.add(MapEntry('is24Hours', '${request.is24Hours}'));
     formData.fields.add(MapEntry('branchLaunchDate', request.branchLaunchDate));
     try {
-      return dio
+      return await dio
           .put(
             '${Environment.appUrl}admin/branch',
             options: Options(

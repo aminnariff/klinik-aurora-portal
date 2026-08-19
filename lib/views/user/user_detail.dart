@@ -229,7 +229,7 @@ class _UserDetailState extends State<UserDetail> {
                                     children: [
                                       // Left: Personal Info
                                       SizedBox(
-                                        width: screenWidth1728(26),
+                                        width: isMobile ? (MediaQuery.of(context).size.width * 0.85) : screenWidth1728(26),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
@@ -251,7 +251,10 @@ class _UserDetailState extends State<UserDetail> {
                                                     lastDate: DateTime.now(),
                                                     calendarViewMode: CalendarDatePicker2Mode.year,
                                                   ),
-                                                  dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
+                                                  dialogSize: Size(
+                                                    isMobile ? (MediaQuery.of(context).size.width * 0.88) : screenWidth1728(60),
+                                                    screenHeight829(60),
+                                                  ),
                                                   borderRadius: BorderRadius.circular(15),
                                                 );
                                                 if (results != null) {
@@ -310,7 +313,7 @@ class _UserDetailState extends State<UserDetail> {
                                       ),
                                       // Right: Contact & Branch
                                       SizedBox(
-                                        width: screenWidth1728(30),
+                                        width: isMobile ? (MediaQuery.of(context).size.width * 0.85) : screenWidth1728(30),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
@@ -345,7 +348,7 @@ class _UserDetailState extends State<UserDetail> {
                                                     },
                                                     value: _selectedBranch?.name,
                                                     hintText: 'Branch',
-                                                    width: screenWidth1728(30),
+                                                    width: isMobile ? (MediaQuery.of(context).size.width * 0.85) : screenWidth1728(30),
                                                     errorMessage: branchIdAttribute.errorMessage,
                                                   ),
                                                 );

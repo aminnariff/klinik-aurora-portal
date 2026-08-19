@@ -122,7 +122,7 @@ class ServiceController extends ChangeNotifier {
     formData.fields.add(MapEntry('serviceId', serviceId));
 
     try {
-      return dio
+      return await dio
           .put(
             '${Environment.appUrl}admin/service/upload',
             options: Options(

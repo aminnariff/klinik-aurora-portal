@@ -805,12 +805,12 @@ class _PromotionFormDialog extends StatelessWidget {
                     title: 'promotionPage'.tr(gender: 'browseFile'),
                     fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
                     action: () async {
-                      FilePickerResult? result = await FilePicker.pickFiles();
+                      FilePickerResult? result = await FilePicker.platform.pickFiles();
                       if (result != null) {
                         PlatformFile file = result.files.first;
                         if (supportedExtensions.contains(file.extension)) {
                           if (bytesToMB(file.size) < 1.0) {
-                            selectedFiles.add(FileAttribute(name: file.name, value: await result.files.first.readAsBytes()));
+                            selectedFiles.add(FileAttribute(name: file.name, value: result.files.first.bytes));
                             fileRebuild.add(DateTime.now());
                           } else {
                             showDialogError(
