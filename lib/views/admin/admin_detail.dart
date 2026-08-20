@@ -87,7 +87,7 @@ class _AdminDetailState extends State<AdminDetail> {
       _userName.text = widget.user?.userName ?? '';
       _userFullname.text = widget.user?.userFullname ?? '';
       _branchId.text = widget.user?.branchId ?? '';
-      _userPhone.text = widget.user?.userPhone?.substring(1, widget.user?.userPhone?.length) ?? '';
+      _userPhone.text = widget.user?.userPhone ?? '';
       _userEmail.text = widget.user?.userEmail ?? '';
       _userStatus.value = widget.user?.userStatus == 1;
     }
@@ -734,7 +734,7 @@ class _AdminDetailState extends State<AdminDetail> {
                 userId: widget.user?.userId,
                 userFullname: _userFullname.text,
                 branchId: _selectedBranch?.key,
-                userPhone: '0${_userPhone.text}',
+                userPhone: _userPhone.text.trim(),
                 userStatus: _userStatus.value ? 1 : 0,
               ),
             ).then((value) {
@@ -769,7 +769,7 @@ class _AdminDetailState extends State<AdminDetail> {
               CreateAdminRequest(
                 userName: _userName.text,
                 userFullname: _userFullname.text,
-                userPhone: '0${_userPhone.text}',
+                userPhone: _userPhone.text.trim(),
                 userEmail: _userEmail.text,
                 userPassword: _password.text,
                 userRetypePassword: _password.text,

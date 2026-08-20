@@ -50,20 +50,6 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     controller: TextEditingController(),
     labelText: 'doctorPage'.tr(gender: 'phoneNo'),
     isNumber: true,
-    maxCharacter: 10,
-    prefixIcon: Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
-          child: const Text(
-            '+60',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0, color: textPrimaryColor),
-          ),
-        ),
-      ],
-    ),
   );
   final InputFieldAttribute _branchId = InputFieldAttribute(controller: TextEditingController());
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
@@ -78,8 +64,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     try {
       if (widget.type == 'update') {
         _doctorName.controller.text = widget.doctor?.doctorName ?? '';
-        _doctorPhone.controller.text =
-            widget.doctor?.doctorPhone?.substring(1, widget.doctor?.doctorPhone?.length) ?? '';
+        _doctorPhone.controller.text = widget.doctor?.doctorPhone ?? '';
         _branchId.controller.text = widget.doctor?.branchId ?? '';
         selectedFile = FileAttribute(path: widget.doctor?.doctorImage, name: widget.doctor?.doctorImage);
         _selectedBranch = DropdownAttribute(widget.doctor?.branchId ?? '', widget.doctor?.branchName ?? '');
@@ -378,9 +363,8 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 context,
                 CreateDoctorRequest(
                   doctorName: _doctorName.controller.text,
-                  doctorPhone: '0${_doctorPhone.controller.text}',
+                  doctorPhone: _doctorPhone.controller.text.trim(),
                   branchId: _selectedBranch?.key,
-                  // doctorImage: selectedFile,
                 ),
               ).then((value) {
                 dismissLoading();
@@ -404,7 +388,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 UpdateDoctorRequest(
                   doctorId: widget.doctor?.doctorId,
                   doctorName: _doctorName.controller.text,
-                  doctorPhone: '0${_doctorPhone.controller.text}',
+                  doctorPhone: _doctorPhone.controller.text.trim(),
                   doctorStatus: widget.doctor?.doctorStatus,
                   branchId: _selectedBranch?.key,
                 ),
