@@ -452,38 +452,41 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   Widget _buildDateFilterBar() {
     return Container(
-      padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 10),
+      padding: EdgeInsets.fromLTRB(screenPadding, 8, screenPadding, 8),
       child: Row(
         children: [
-          Expanded(
-            child: DateFilterDropdown(
-              key: ValueKey('bar-${_currentDateRange?.label}'),
-              initial: _currentDateRange,
-              onSelected: _onDateRangeSelected,
+          if (!isMobile) ...[
+            Expanded(
+              child: DateFilterDropdown(
+                key: ValueKey('bar-${_currentDateRange?.label}'),
+                initial: _currentDateRange,
+                onSelected: _onDateRangeSelected,
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          // Expanded(child: _buildSearchField()),
-          // const SizedBox(width: 12),
+            const SizedBox(width: 12),
+          ],
+          if (isMobile) const Spacer(),
           OutlinedButton.icon(
             onPressed: _showFilterPanel,
             icon: const Icon(Icons.tune_rounded, size: 16),
-            label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 13)),
+            label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             style: OutlinedButton.styleFrom(
               foregroundColor: _hasActiveFilters() ? secondaryColor : const Color(0xFF374151),
               side: BorderSide(color: _hasActiveFilters() ? secondaryColor : const Color(0xFFD1D5DB)),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 14, vertical: isMobile ? 10 : 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
           const SizedBox(width: 8),
           IconButton(
             onPressed: _resetFilters,
-            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            icon: const Icon(Icons.rotate_left_rounded, size: 18),
+            color: const Color(0xFF6B7280),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F4F6),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.all(12),
             ),
           ),
         ],
@@ -686,6 +689,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return StreamBuilder<DateTime>(
       stream: rebuildDropdown.stream,
       builder: (context, snapshot) {
+        final panelWidth = math.min(320.0, MediaQuery.of(context).size.width * 0.92) - 40;
         return AppDropdown(
           attributeList: DropdownAttributeList(
             [DropdownAttribute('', 'All Services'), ...serviceList],
@@ -699,7 +703,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               });
               rebuildDropdown.add(DateTime.now());
             },
-            width: 280,
+            width: isMobile ? panelWidth : 280,
           ),
         );
       },
@@ -710,6 +714,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return StreamBuilder<DateTime>(
       stream: rebuildDropdown.stream,
       builder: (context, snapshot) {
+        final panelWidth = math.min(320.0, MediaQuery.of(context).size.width * 0.92) - 40;
         return AppDropdown(
           attributeList: DropdownAttributeList(
             [DropdownAttribute('', 'All Practitioner Types'), ...doctorTypeList],
@@ -723,7 +728,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               });
               rebuildDropdown.add(DateTime.now());
             },
-            width: 280,
+            width: isMobile ? panelWidth : 280,
           ),
         );
       },
@@ -854,6 +859,141 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         final dash = dashController.appointmentDashboardResponse?.data;
         final counts = [dash?.totalUpcoming, dash?.totalCompleted, dash?.totalNoShow, dash?.totalCanceled];
 
+        final actionButtons = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _ActionButton(
+              icon: Icons.refresh_rounded,
+              tooltip: 'Refresh',
+              color: const Color(0xFF2196F3),
+              onTap: () {
+                resetAllFilter();
+                filtering(enableDebounce: false, page: 1);
+              },
+            ),
+            const SizedBox(width: 4),
+            _ActionButton(
+              icon: Icons.calendar_month_rounded,
+              tooltip: 'Check Slots',
+              color: const Color(0xFF059669),
+              onTap: checkSlots,
+            ),
+            const SizedBox(width: 4),
+            _ActionButton(
+              icon: _isCalendarView ? Icons.table_chart_rounded : Icons.calendar_month_rounded,
+              tooltip: _isCalendarView ? 'Table View' : 'Calendar View',
+              color: const Color(0xFF7C3AED),
+              onTap: () {
+                final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
+                if (!_isCalendarView && isSuperAdmin && _appointmentBranch == null) {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      title: const Text('Select Branch', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      content: const Text(
+                        'Please select a branch from the dropdown above before switching to Calendar view.',
+                        style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                      ),
+                      actions: [TextButton(onPressed: () => context.pop(), child: const Text('OK'))],
+                    ),
+                  );
+                  return;
+                }
+                setState(() {
+                  final enteringCalendar = !_isCalendarView;
+                  _isCalendarView = !_isCalendarView;
+                  prefs.setBool('calendarView', _isCalendarView);
+                  if (enteringCalendar && _appointmentCounts.isEmpty) {
+                    _initCalendarView();
+                  }
+                });
+              },
+            ),
+            const SizedBox(width: 4),
+            _ActionButton(
+              icon: Icons.menu_book_rounded,
+              tooltip: 'Guideline',
+              color: const Color(0xFFDF6E98),
+              onTap: () => showAppointmentGuidelineDialog(context),
+            ),
+            const SizedBox(width: 4),
+            _ActionButton(
+              icon: Icons.warning_amber_rounded,
+              tooltip: 'Payment Issues (paid but not in schedule)',
+              color: const Color(0xFFEF4444),
+              onTap: () => context.pushNamed(PaymentMismatchPage.routeName),
+            ),
+          ],
+        );
+
+        if (isMobile) {
+          return Container(
+            padding: EdgeInsets.fromLTRB(screenPadding, 6, screenPadding, 6),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Row(
+                    children: List.generate(_tabs.length, (i) {
+                      final selected = _selectedTabIndex == i;
+                      final color = _tabColors[i];
+                      final count = counts[i];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: GestureDetector(
+                          onTap: () => _tabController.animateTo(i),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: selected ? color : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: selected ? color : const Color(0xFFE5E7EB)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _tabs[i],
+                                  style: AppTypography.bodyMedium(context).copyWith(
+                                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                                    color: selected ? Colors.white : const Color(0xFF6B7280),
+                                  ),
+                                ),
+                                if (count != null) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: selected ? Colors.white.withAlpha(60) : color.withAlpha(25),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      '$count',
+                                      style: AppTypography.bodyMedium(
+                                        context,
+                                      ).copyWith(fontWeight: FontWeight.bold, color: selected ? Colors.white : color),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(height: 20, width: 1, color: const Color(0xFFE5E7EB)),
+                  const SizedBox(width: 8),
+                  actionButtons,
+                ],
+              ),
+            ),
+          );
+        }
+
         return Container(
           padding: EdgeInsets.fromLTRB(screenPadding, 10, screenPadding, 10),
           child: Row(
@@ -914,68 +1054,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 ),
               ),
               const SizedBox(width: 8),
-              _ActionButton(
-                icon: Icons.refresh_rounded,
-                tooltip: 'Refresh',
-                color: const Color(0xFF2196F3),
-                onTap: () {
-                  resetAllFilter();
-                  filtering(enableDebounce: false, page: 1);
-                },
-              ),
-              const SizedBox(width: 4),
-              _ActionButton(
-                icon: Icons.calendar_month_rounded,
-                tooltip: 'Check Slots',
-                color: const Color(0xFF059669),
-                onTap: checkSlots,
-              ),
-              const SizedBox(width: 4),
-              _ActionButton(
-                icon: _isCalendarView ? Icons.table_chart_rounded : Icons.calendar_month_rounded,
-                tooltip: _isCalendarView ? 'Table View' : 'Calendar View',
-                color: const Color(0xFF7C3AED),
-                onTap: () {
-                  final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
-                  if (!_isCalendarView && isSuperAdmin && _appointmentBranch == null) {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        title: const Text('Select Branch', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                        content: const Text(
-                          'Please select a branch from the dropdown above before switching to Calendar view.',
-                          style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
-                        ),
-                        actions: [TextButton(onPressed: () => context.pop(), child: const Text('OK'))],
-                      ),
-                    );
-                    return;
-                  }
-                  setState(() {
-                    final enteringCalendar = !_isCalendarView;
-                    _isCalendarView = !_isCalendarView;
-                    prefs.setBool('calendarView', _isCalendarView);
-                    if (enteringCalendar && _appointmentCounts.isEmpty) {
-                      _initCalendarView();
-                    }
-                  });
-                },
-              ),
-              const SizedBox(width: 4),
-              _ActionButton(
-                icon: Icons.menu_book_rounded,
-                tooltip: 'Guideline',
-                color: const Color(0xFFDF6E98),
-                onTap: () => showAppointmentGuidelineDialog(context),
-              ),
-              const SizedBox(width: 4),
-              _ActionButton(
-                icon: Icons.warning_amber_rounded,
-                tooltip: 'Payment Issues (paid but not in schedule)',
-                color: const Color(0xFFEF4444),
-                onTap: () => context.pushNamed(PaymentMismatchPage.routeName),
-              ),
+              actionButtons,
             ],
           ),
         );
@@ -1108,14 +1187,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isMobile ? Colors.transparent : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: isMobile ? null : Border.all(color: const Color(0xFFE5E7EB)),
                   ),
                   child: isLoading
                       ? const Center(child: CircularProgressIndicator(color: secondaryColor))
                       : data.isEmpty
                       ? _buildEmptyState()
+                      : isMobile
+                      ? _buildMobileAppointmentList(context, data, authController)
                       : DataTable2(
                           minWidth: 760,
                           columnSpacing: 12,
@@ -1141,6 +1222,207 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           ],
         );
       },
+    );
+  }
+
+  Widget _buildMobileAppointmentList(BuildContext context, List<Data> data, AuthController authController) {
+    return RefreshIndicator(
+      color: secondaryColor,
+      onRefresh: () async => filtering(),
+      child: ListView.builder(
+        padding: const EdgeInsets.only(top: 4, bottom: 24),
+        itemCount: data.length,
+        itemBuilder: (context, i) {
+          return _mobileAppointmentCard(context, data[i], i, authController);
+        },
+      ),
+    );
+  }
+
+  Color _getStatusAccentColor(int? status) {
+    switch (status) {
+      case 1:
+      case 3:
+      case 4:
+        return const Color(0xFF3B82F6);
+      case 5:
+        return const Color(0xFF10B981);
+      case 7:
+        return const Color(0xFF6B7280);
+      case 2:
+      case 6:
+        return const Color(0xFFEF4444);
+      case 8:
+        return const Color(0xFF8B5CF6);
+      default:
+        return const Color(0xFF9CA3AF);
+    }
+  }
+
+  Widget _mobileAppointmentCard(BuildContext context, Data apt, int index, AuthController authController) {
+    final statusColor = _getStatusAccentColor(apt.appointmentStatus);
+    final patientName = notNullOrEmptyString(apt.user?.userFullName)
+        ? apt.user!.userFullName!.titleCase()
+        : (apt.user?.userName ?? '—');
+    final serviceName = apt.service?.serviceName ?? '—';
+    final branchName = apt.branch?.branchName ?? '—';
+    final rawTime = convertUtcToMalaysiaTimeRange(apt.appointmentDatetime, apt.service?.serviceTime);
+    final dateDisplay = rawTime != null ? rawTime.replaceAll('\n', '  •  ') : (dateConverter(apt.appointmentDatetime, format: 'dd MMM yyyy HH:mm') ?? '—');
+    final bookingFee = apt.service?.serviceBookingFee;
+    final hasBookingFee = bookingFee != null && (double.tryParse(bookingFee) ?? 0) > 0;
+    final isFeePaid = apt.appointmentStatus == 5 || isBookingFeePaid(apt.appointmentNote, payments: apt.payment);
+    final appointmentId = apt.appointmentId != null
+        ? '#${apt.appointmentId!.substring(0, math.min(8, apt.appointmentId!.length)).toUpperCase()}'
+        : '';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: () => _handleMenuSelection('update', apt),
+          borderRadius: BorderRadius.circular(14),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    width: 5,
+                    color: statusColor,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  patientName,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF111827),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (appointmentId.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF3F4F6),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    appointmentId,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Color(0xFF6B7280),
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(Icons.event_rounded, size: 14, color: Color(0xFF6B7280)),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  dateDisplay,
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: Color(0xFF374151),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.medical_services_outlined, size: 14, color: Color(0xFF6B7280)),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  serviceName,
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: Color(0xFF4B5563),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF6B7280)),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  branchName,
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              _buildStatusBadge(apt.appointmentStatus),
+                              if (hasBookingFee) ...[
+                                const SizedBox(width: 8),
+                                _buildPaymentBadge(isFeePaid ? 1 : 0),
+                              ],
+                              const Spacer(),
+                              const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFF9CA3AF)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -1423,8 +1705,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             child: Pagination(
               numOfPages: _totalPage,
               selectedPage: _page,
-              pagesVisible: 5,
-              spacing: 8,
+              pagesVisible: isMobile ? 3 : 5,
+              spacing: isMobile ? 4 : 8,
               onPageChanged: _movePage,
             ),
           ),

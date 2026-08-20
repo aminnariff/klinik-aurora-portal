@@ -281,7 +281,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                constraints: BoxConstraints(maxWidth: math.min(840, MediaQuery.of(context).size.width - 16)),
+                constraints: BoxConstraints(
+                  maxWidth: math.min(840, MediaQuery.of(context).size.width - 16),
+                  maxHeight: MediaQuery.of(context).size.height - (isMobile ? 32 : 64),
+                ),
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -304,74 +307,86 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           children: [
                             const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
                             const SizedBox(width: 8),
-                            Text(
-                              widget.type == 'create' ? 'New Appointment' : 'Update Appointment',
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                            ),
-                            if (widget.appointment?.appointmentId != null) ...[
-                              const SizedBox(width: 10),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF3F4F6),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  '#${widget.appointment!.appointmentId!.substring(0, 8).toUpperCase()}',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0xFF6B7280),
-                                    fontFamily: 'monospace',
+                            Expanded(
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: [
+                                  Text(
+                                    widget.type == 'create' ? 'New Appointment' : 'Update Appointment',
+                                    style: TextStyle(fontSize: isMobile ? 14 : 15, fontWeight: FontWeight.w700),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
+                                  if (widget.appointment?.appointmentId != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF3F4F6),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '#${widget.appointment!.appointmentId!.substring(0, math.min(8, widget.appointment!.appointmentId!.length)).toUpperCase()}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFF6B7280),
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
-                            ],
-                            const Spacer(),
-                            if (widget.type == 'update')
-                              CopyButton(
-                                textToCopy:
-                                    'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
-                                tooltip: 'Copy Appointment Details',
-                              ),
-                            if (widget.type == 'update') ...[
-                              const SizedBox(width: 4),
-                              IconButton(
-                                onPressed: () {
-                                  final apt = widget.appointment;
-                                  if (apt == null) return;
-                                  final serviceController = context.read<ServiceController>();
-                                  final services = serviceController.servicesResponse?.data;
-                                  List<String> templates = [];
-                                  String? matchedServiceTime;
-                                  if (services != null && services.isNotEmpty) {
-                                    final service = services.firstWhere(
-                                      (e) => e.serviceId == apt.service?.serviceId,
-                                      orElse: () => services.first,
-                                    );
-                                    templates = service.serviceTemplate ?? [];
-                                    matchedServiceTime = service.serviceTime;
-                                  }
-                                  showWhatsAppTemplateDialog(
-                                    context: context,
-                                    templates: templates,
-                                    name: apt.user?.userFullName ?? '',
-                                    phone: apt.user?.userPhone ?? '',
-                                    service: apt.service?.serviceName ?? '',
-                                    branchName: apt.branch?.branchName ?? '',
-                                    branchPhone: apt.branch?.branchPhone ?? '',
-                                    dateTime: DateTime.tryParse(apt.appointmentDatetime ?? '') ?? DateTime.now(),
-                                    serviceTime: apt.service?.serviceTime ?? matchedServiceTime,
-                                  );
-                                },
-                                icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
-                                color: const Color(0xFF25D366),
-                                tooltip: 'WhatsApp',
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                              ),
-                            ],
-                            const SizedBox(width: 4),
-                            CloseButton(onPressed: () => context.pop()),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (widget.type == 'update')
+                                  CopyButton(
+                                    textToCopy:
+                                        'Appointment Details\n\n${patientNameController.controller.text}${notNullOrEmptyString(widget.appointment?.user?.userNric) ? '\n${widget.appointment?.user?.userNric}' : ''}\n${patientContactNoController.controller.text}\n${patientEmailController.controller.text}\n${widget.appointment?.service?.serviceName}\n${formatToDisplayDate(dateTimeController.text)}\n${formatToDisplayTime(dateTimeController.text)}\n${widget.appointment?.branch?.branchName}\nCreated Date : ${dateConverter(widget.appointment?.createdDate)}\n',
+                                    tooltip: 'Copy Appointment Details',
+                                  ),
+                                if (widget.type == 'update') ...[
+                                  const SizedBox(width: 2),
+                                  IconButton(
+                                    onPressed: () {
+                                      final apt = widget.appointment;
+                                      if (apt == null) return;
+                                      final serviceController = context.read<ServiceController>();
+                                      final services = serviceController.servicesResponse?.data;
+                                      List<String> templates = [];
+                                      String? matchedServiceTime;
+                                      if (services != null && services.isNotEmpty) {
+                                        final service = services.firstWhere(
+                                          (e) => e.serviceId == apt.service?.serviceId,
+                                          orElse: () => services.first,
+                                        );
+                                        templates = service.serviceTemplate ?? [];
+                                        matchedServiceTime = service.serviceTime;
+                                      }
+                                      showWhatsAppTemplateDialog(
+                                        context: context,
+                                        templates: templates,
+                                        name: apt.user?.userFullName ?? '',
+                                        phone: apt.user?.userPhone ?? '',
+                                        service: apt.service?.serviceName ?? '',
+                                        branchName: apt.branch?.branchName ?? '',
+                                        branchPhone: apt.branch?.branchPhone ?? '',
+                                        dateTime: DateTime.tryParse(apt.appointmentDatetime ?? '') ?? DateTime.now(),
+                                        serviceTime: apt.service?.serviceTime ?? matchedServiceTime,
+                                      );
+                                    },
+                                    icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 16),
+                                    color: const Color(0xFF25D366),
+                                    tooltip: 'WhatsApp',
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                                  ),
+                                ],
+                                const SizedBox(width: 2),
+                                CloseButton(onPressed: () => Navigator.of(context, rootNavigator: true).pop()),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -1504,7 +1519,27 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   );
                                 },
                               ),
-                              if (!_isLocked || _canSubmitWhenLockedCompleted) Center(child: button()),
+                              Center(
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 12,
+                                  runSpacing: 10,
+                                  children: [
+                                    if (!_isLocked || _canSubmitWhenLockedCompleted) button(),
+                                    OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        side: const BorderSide(color: Color(0xFFD1D5DB)),
+                                      ),
+                                      icon: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF374151)),
+                                      label: const Text('Close', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
+                                      onPressed: () => Navigator.of(context).pop(),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),

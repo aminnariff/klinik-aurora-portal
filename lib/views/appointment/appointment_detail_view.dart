@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
@@ -25,82 +24,88 @@ class AppointmentDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = response?.data;
-    return SingleChildScrollView(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
+    final maxH = MediaQuery.of(context).size.height - (isMobile ? 32 : 64);
+    final maxW = math.min(840.0, MediaQuery.of(context).size.width - 16);
+
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(maxWidth: maxW, maxHeight: maxH),
+        margin: EdgeInsets.all(isMobile ? 8 : 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                constraints: BoxConstraints(maxWidth: math.min(840, MediaQuery.of(context).size.width - 16)),
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+              _headerBar(context, data),
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(isMobile ? 14 : 24),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _headerBar(context, data),
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Main info row
-                            isMobile
-                                ? Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _patientSection(context, data),
-                                      const SizedBox(height: 20),
-                                      _appointmentSection(context, data),
-                                    ],
-                                  )
-                                : Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(child: _patientSection(context, data)),
-                                      const SizedBox(width: 20),
-                                      Expanded(child: _appointmentSection(context, data)),
-                                    ],
-                                  ),
-                            const SizedBox(height: 20),
-                            const Divider(color: Color(0xFFF3F4F6), height: 1),
-                            const SizedBox(height: 20),
-                            // Fee row
-                            isMobile
-                                ? Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _feeSection(context, data),
-                                      const SizedBox(height: 20),
-                                      _metaSection(context, data),
-                                    ],
-                                  )
-                                : Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(child: _feeSection(context, data)),
-                                      const SizedBox(width: 20),
-                                      Expanded(child: _metaSection(context, data)),
-                                    ],
-                                  ),
-                            // Rating / feedback (conditional)
-                            if (data?.appointmentRating != null ||
-                                (data?.appointmentFeedback != null && data!.appointmentFeedback!.isNotEmpty)) ...[
-                              const SizedBox(height: 20),
-                              const Divider(color: Color(0xFFF3F4F6), height: 1),
-                              const SizedBox(height: 20),
-                              _feedbackSection(context, data),
-                            ],
-                          ],
+                      // Main info row
+                      isMobile
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _patientSection(context, data),
+                                const SizedBox(height: 20),
+                                _appointmentSection(context, data),
+                              ],
+                            )
+                          : Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: _patientSection(context, data)),
+                                const SizedBox(width: 20),
+                                Expanded(child: _appointmentSection(context, data)),
+                              ],
+                            ),
+                      const SizedBox(height: 20),
+                      const Divider(color: Color(0xFFF3F4F6), height: 1),
+                      const SizedBox(height: 20),
+                      // Fee row
+                      isMobile
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _feeSection(context, data),
+                                const SizedBox(height: 20),
+                                _metaSection(context, data),
+                              ],
+                            )
+                          : Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: _feeSection(context, data)),
+                                const SizedBox(width: 20),
+                                Expanded(child: _metaSection(context, data)),
+                              ],
+                            ),
+                      // Rating / feedback (conditional)
+                      if (data?.appointmentRating != null ||
+                          (data?.appointmentFeedback != null && data!.appointmentFeedback!.isNotEmpty)) ...[
+                        const SizedBox(height: 20),
+                        const Divider(color: Color(0xFFF3F4F6), height: 1),
+                        const SizedBox(height: 20),
+                        _feedbackSection(context, data),
+                      ],
+                      const SizedBox(height: 24),
+                      Center(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            side: const BorderSide(color: Color(0xFFD1D5DB)),
+                          ),
+                          icon: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF374151)),
+                          label: const Text('Close', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
+                          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
                         ),
                       ),
                     ],
@@ -109,14 +114,14 @@ class AppointmentDetailsView extends StatelessWidget {
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _headerBar(BuildContext context, Data? data) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+      padding: EdgeInsets.fromLTRB(isMobile ? 12 : 20, 14, 8, 14),
       decoration: const BoxDecoration(
         color: Color(0xFFF9FAFB),
         border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
@@ -125,26 +130,40 @@ class AppointmentDetailsView extends StatelessWidget {
         children: [
           const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
           const SizedBox(width: 8),
-          const Text('Appointment Details', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-          if (data?.appointmentId != null) ...[
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
-              child: Text(
-                '#${data!.appointmentId!.substring(0, 8).toUpperCase()}',
-                style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontFamily: 'monospace'),
-              ),
+          Expanded(
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                const Text(
+                  'Appointment Details',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                ),
+                if (data?.appointmentId != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
+                    child: Text(
+                      '#${data!.appointmentId!.substring(0, math.min(8, data.appointmentId!.length)).toUpperCase()}',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontFamily: 'monospace'),
+                    ),
+                  ),
+              ],
             ),
-          ],
-          const Spacer(),
-          CopyButton(
-            textToCopy:
-                'Appointment Details\n\n${data?.user?.userFullName}\n${data?.user?.userPhone}\n${data?.user?.userEmail}\n${data?.service?.serviceName}\n${formatToDisplayDate(data?.appointmentDatetime ?? '')}\n${formatToDisplayTime(data?.appointmentDatetime ?? '')}\n${data?.branch?.branchName ?? ''}\nCreated: ${dateConverter(data?.createdDate ?? '')}\n',
-            tooltip: 'Copy Appointment Details',
           ),
-          const SizedBox(width: 4),
-          CloseButton(onPressed: () => context.pop()),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CopyButton(
+                textToCopy:
+                    'Appointment Details\n\n${data?.user?.userFullName}\n${data?.user?.userPhone}\n${data?.user?.userEmail}\n${data?.service?.serviceName}\n${formatToDisplayDate(data?.appointmentDatetime ?? '')}\n${formatToDisplayTime(data?.appointmentDatetime ?? '')}\n${data?.branch?.branchName ?? ''}\nCreated: ${dateConverter(data?.createdDate ?? '')}\n',
+                tooltip: 'Copy Appointment Details',
+              ),
+              const SizedBox(width: 2),
+              CloseButton(onPressed: () => Navigator.of(context, rootNavigator: true).pop()),
+            ],
+          ),
         ],
       ),
     );
@@ -392,28 +411,49 @@ class AppointmentDetailsView extends StatelessWidget {
       children: [
         _sectionLabel('Fees', Icons.receipt_long_outlined),
         const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _feeCard(
-                label: 'Service Price',
-                value: price != null ? 'RM ${price.toStringAsFixed(2)}' : '—',
-                icon: Icons.receipt_long_outlined,
-                color: const Color(0xFF6366F1),
+        isMobile
+            ? Column(
+                children: [
+                  _feeCard(
+                    label: 'Service Price',
+                    value: price != null ? 'RM ${price.toStringAsFixed(2)}' : '—',
+                    icon: Icons.receipt_long_outlined,
+                    color: const Color(0xFF6366F1),
+                    fullWidth: true,
+                  ),
+                  const SizedBox(height: 10),
+                  _feeCard(
+                    label: 'Booking Fee',
+                    value: bookingFee != null ? 'RM ${bookingFee.toStringAsFixed(2)}' : '—',
+                    icon: isPaid ? Icons.check_circle_outline_rounded : Icons.payments_outlined,
+                    color: isPaid ? const Color(0xFF15803D) : const Color(0xFF0369A1),
+                    badge: showPaymentStatus(context, isPaid ? 1 : 0),
+                    fullWidth: true,
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: _feeCard(
+                      label: 'Service Price',
+                      value: price != null ? 'RM ${price.toStringAsFixed(2)}' : '—',
+                      icon: Icons.receipt_long_outlined,
+                      color: const Color(0xFF6366F1),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _feeCard(
+                      label: 'Booking Fee',
+                      value: bookingFee != null ? 'RM ${bookingFee.toStringAsFixed(2)}' : '—',
+                      icon: isPaid ? Icons.check_circle_outline_rounded : Icons.payments_outlined,
+                      color: isPaid ? const Color(0xFF15803D) : const Color(0xFF0369A1),
+                      badge: showPaymentStatus(context, isPaid ? 1 : 0),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _feeCard(
-                label: 'Booking Fee',
-                value: bookingFee != null ? 'RM ${bookingFee.toStringAsFixed(2)}' : '—',
-                icon: isPaid ? Icons.check_circle_outline_rounded : Icons.payments_outlined,
-                color: isPaid ? const Color(0xFF15803D) : const Color(0xFF0369A1),
-                badge: showPaymentStatus(context, isPaid ? 1 : 0),
-              ),
-            ),
-          ],
-        ),
         if (balance != null) ...[
           const SizedBox(height: 10),
           _feeCard(
@@ -496,18 +536,22 @@ class AppointmentDetailsView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(row.icon, size: 13, color: row.color),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(row.icon, size: 13, color: row.color),
+          ),
           const SizedBox(width: 8),
           SizedBox(
-            width: 90,
+            width: isMobile ? 85 : 95,
             child: Text(
               row.label,
               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
             ),
           ),
           Expanded(
-            child: Text(
+            child: AppSelectableText(
               row.value,
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: row.color),
             ),
@@ -541,13 +585,16 @@ class AppointmentDetailsView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 6,
+                  runSpacing: 2,
                   children: [
                     Text(
                       label,
                       style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
                     ),
-                    if (badge != null) ...[const SizedBox(width: 6), badge],
+                    ?badge,
                   ],
                 ),
                 const SizedBox(height: 2),
