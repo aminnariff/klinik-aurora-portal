@@ -674,90 +674,193 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   void forgotPassword() {
     final StreamController<DateTime> rebuild = StreamController.broadcast();
+    emailAttribute.errorMessage = null;
+
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
-        return StreamBuilder<DateTime>(
-          stream: rebuild.stream,
-          builder: (context, snapshot) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: StreamBuilder<DateTime>(
+            stream: rebuild.stream,
+            builder: (context, snapshot) {
+              return ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Container(
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1A000000),
+                        offset: Offset(0, 10),
+                        blurRadius: 30,
+                      ),
+                    ],
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () => FocusScope.of(context).unfocus(),
-                        child: CardContainer(
-                          Padding(
-                            padding: EdgeInsets.all(screenPadding),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'loginPage'.tr(gender: 'forgotPassword'),
-                                  style: AppTypography.displayMedium(context),
-                                ),
-                                AppPadding.vertical(),
-                                Text(
-                                  'loginPage'.tr(gender: 'enterEmailAddress'),
-                                  style: AppTypography.bodyMedium(context),
-                                ),
-                                AppPadding.vertical(),
-                                SizedBox(
-                                  width: screenWidthByBreakpoint(80, 60, 20),
-                                  child: InputField(field: emailAttribute),
-                                ),
-                                AppPadding.vertical(),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Flexible(
-                                      child: Button(() {
-                                        if (emailAttribute.controller.text.isEmpty) {
-                                          emailAttribute.errorMessage = ErrorMessage.required(
-                                            field: emailAttribute.hintText,
-                                          );
-                                          rebuild.add(DateTime.now());
-                                        } else if (!RegExp(
-                                          r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
-                                        ).hasMatch(emailAttribute.controller.text)) {
-                                          emailAttribute.errorMessage = 'Invalid ${emailAttribute.hintText}';
-                                          rebuild.add(DateTime.now());
-                                        } else {
-                                          showLoading();
-                                          PasswordRecoveryController.forgotPassword(
-                                            context,
-                                            emailAttribute.controller.text,
-                                          ).then((value) {
-                                            if (responseCode(value.code)) {
-                                              dismissLoading();
-                                              context.pop();
-                                              context.pushNamed(
-                                                AdminPasswordRecoveryPage.routeName,
-                                                extra: value.data?.data?.token ?? '',
-                                              );
-                                            } else {
-                                              showDialogError(context, value.message ?? value.data?.message ?? '');
-                                            }
-                                          });
-                                        }
-                                      }),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                      // Header Row with Icon & Close Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: secondaryColor.withAlpha(25),
+                              borderRadius: BorderRadius.circular(12),
                             ),
+                            child: const Icon(
+                              Icons.lock_reset_rounded,
+                              color: secondaryColor,
+                              size: 24,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => context.pop(),
+                            icon: const Icon(Icons.close_rounded, color: Color(0xFF9CA3AF), size: 22),
+                            splashRadius: 20,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      // Title & Description
+                      const Text(
+                        'Forgot password?',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF111827),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Enter the email address registered with your staff account and we will send you a 6-digit verification code.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      // Input Field Label & Field
+                      const Text(
+                        'Staff Email',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      InputField(
+                        field: InputFieldAttribute(
+                          controller: emailAttribute.controller,
+                          hintText: 'e.g. staff@klinikaurora.com',
+                          isEmail: true,
+                          errorMessage: emailAttribute.errorMessage,
+                          isEditableColor: const Color(0xFFF9FAFB),
+                          onChanged: (_) {
+                            if (emailAttribute.errorMessage != null) {
+                              emailAttribute.errorMessage = null;
+                              rebuild.add(DateTime.now());
+                            }
+                          },
+                          prefixIcon: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(width: 12),
+                              Icon(Icons.mail_outline_rounded, color: Colors.grey.shade400, size: 20),
+                              const SizedBox(width: 8),
+                            ],
+                          ),
+                        ),
+                        width: double.infinity,
+                      ),
+                      const SizedBox(height: 24),
+                      // Submit Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: Button(
+                          () {
+                            final email = emailAttribute.controller.text.trim();
+                            if (email.isEmpty) {
+                              emailAttribute.errorMessage = 'Please enter your email address';
+                              rebuild.add(DateTime.now());
+                            } else if (!RegExp(
+                              r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
+                            ).hasMatch(email)) {
+                              emailAttribute.errorMessage = 'Please enter a valid email address';
+                              rebuild.add(DateTime.now());
+                            } else {
+                              showLoading();
+                              PasswordRecoveryController.forgotPassword(
+                                context,
+                                email,
+                              ).then((value) {
+                                dismissLoading();
+                                if (responseCode(value.code)) {
+                                  context.pop();
+                                  context.pushNamed(
+                                    AdminPasswordRecoveryPage.routeName,
+                                    extra: {
+                                      'token': value.data?.data?.token ?? '',
+                                      'email': email,
+                                    },
+                                  );
+                                } else {
+                                  showDialogError(context, value.message ?? value.data?.message ?? 'Email not found');
+                                }
+                              });
+                            }
+                          },
+                          color: secondaryColor,
+                          actionText: 'Send Verification Code',
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      // Back to Sign In Link
+                      Center(
+                        child: TextButton(
+                          onPressed: () => context.pop(),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.arrow_back_rounded, size: 16, color: Colors.grey.shade600),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Back to Sign In',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

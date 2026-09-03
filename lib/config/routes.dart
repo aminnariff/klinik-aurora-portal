@@ -138,8 +138,16 @@ final router = GoRouter(
       name: AdminPasswordRecoveryPage.routeName,
       path: AdminPasswordRecoveryPage.routeName,
       builder: (BuildContext context, GoRouterState state) {
-        final String? token = state.extra as String?;
-        return AdminPasswordRecoveryPage(token: token);
+        String? token;
+        String? email;
+        if (state.extra is Map<String, dynamic>) {
+          final map = state.extra as Map<String, dynamic>;
+          token = map['token'] as String?;
+          email = map['email'] as String?;
+        } else if (state.extra is String) {
+          token = state.extra as String;
+        }
+        return AdminPasswordRecoveryPage(token: token, email: email);
       },
     ),
     GoRoute(

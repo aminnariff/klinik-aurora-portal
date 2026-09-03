@@ -42,25 +42,25 @@ class PasswordRecoveryController extends ChangeNotifier {
         headers: {
           Headers.acceptHeader: '*/*',
           Headers.contentTypeHeader: 'application/json',
-          'Host': 'srv495548.hstgr.cloud',
           'Authorization': 'Bearer $token',
         },
       ),
       data: {
         "userPassword": password,
         "userRetypePassword": retypePassword,
-        "userOTP": otp,
+        "userOTP": otp.trim(),
       },
     ).then((value) {
       try {
         return ApiResponse(
           code: value.code,
-          data: ChangePasswordResponse.fromJson(value.data),
+          message: value.message ?? (value.data is Map ? value.data['message'] : null),
+          data: value.data != null ? ChangePasswordResponse.fromJson(value.data) : null,
         );
       } catch (e) {
         return ApiResponse(
-          code: 400,
-          message: e.toString(),
+          code: value.code ?? 400,
+          message: value.message ?? e.toString(),
         );
       }
     });
