@@ -147,6 +147,8 @@ final router = GoRouter(
         } else if (state.extra is String) {
           token = state.extra as String;
         }
+        token ??= state.uri.queryParameters['token'];
+        email ??= state.uri.queryParameters['email'];
         return AdminPasswordRecoveryPage(token: token, email: email);
       },
     ),
