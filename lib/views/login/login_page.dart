@@ -24,6 +24,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 bool isSessionExpiredDialogOpen = false;
+final ValueNotifier<bool> sessionExpiredNotice = ValueNotifier<bool>(false);
 
 class LoginPage extends StatefulWidget {
   final bool? resetUser;
@@ -99,6 +100,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
     dismissLoading();
     isSessionExpiredDialogOpen = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      dismissLoading();
+      if (mounted) {
+        final nav = Navigator.of(context, rootNavigator: true);
+        if (nav.canPop()) {
+          nav.popUntil((route) => route.isFirst);
+        }
+      }
+    });
   }
 
   @override
@@ -435,6 +445,44 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Session Expired Banner (Non-blocking alert)
+            ValueListenableBuilder<bool>(
+              valueListenable: sessionExpiredNotice,
+              builder: (context, hasExpired, _) {
+                if (!hasExpired) return const SizedBox.shrink();
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFBEB),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFFDE68A)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline_rounded, color: Color(0xFFD97706), size: 18),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text(
+                          'Your session has expired. Please sign in again to continue.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFB45309),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => sessionExpiredNotice.value = false,
+                        borderRadius: BorderRadius.circular(4),
+                        child: const Icon(Icons.close_rounded, size: 16, color: Color(0xFFB45309)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+
             // Portal label
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

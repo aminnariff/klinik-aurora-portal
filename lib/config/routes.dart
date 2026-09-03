@@ -65,6 +65,7 @@ final router = GoRouter(
         if (elapsed >= sessionInactivityTimeout) {
           prefs.remove(authResponse);
           prefs.remove(token);
+          sessionExpiredNotice.value = true;
           return LoginPage.routeName;
         }
       }

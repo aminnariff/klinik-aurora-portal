@@ -9,6 +9,7 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/config/routes.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
@@ -79,6 +80,56 @@ class ApiController {
     );
   }
 
+  static bool _isHandlingSessionExpired = false;
+
+  /// Centralized session expiry handler: closes orphaned dialogs, clears auth,
+  /// displays non-blocking notice on LoginPage, and smoothly redirects.
+  static void handleSessionExpired([BuildContext? callerContext]) {
+    if (_isHandlingSessionExpired) return;
+    _isHandlingSessionExpired = true;
+
+    dismissLoading();
+    isSessionExpiredDialogOpen = false;
+
+    // 1. Pop any open dialogs on root navigator so nothing is orphaned or frozen
+    try {
+      final nav = rootNavigatorKey.currentState;
+      if (nav != null && nav.canPop()) {
+        nav.popUntil((route) => route.isFirst);
+      }
+    } catch (e) {
+      debugPrint("Error popping dialogs on session expired: $e");
+    }
+
+    // 2. Clear authentication state
+    try {
+      final ctx = rootNavigatorKey.currentContext ?? callerContext;
+      if (ctx != null && ctx.mounted) {
+        ctx.read<AuthController>().logout(ctx);
+      } else {
+        prefs.remove(authResponse);
+        prefs.remove(token);
+      }
+    } catch (e) {
+      prefs.remove(authResponse);
+      prefs.remove(token);
+    }
+
+    // 3. Mark session expired on LoginPage so it displays a clean, non-blocking banner
+    sessionExpiredNotice.value = true;
+
+    // 4. Redirect cleanly to login page
+    try {
+      router.goNamed(LoginPage.routeName);
+    } catch (e) {
+      debugPrint("Error navigating to login: $e");
+    }
+
+    Future.delayed(const Duration(seconds: 1), () {
+      _isHandlingSessionExpired = false;
+    });
+  }
+
   Future<bool> checkToken(BuildContext context, bool isAuthenticated) async {
     if (isAuthenticated) {
       return await context.read<AuthController>().checkDateTime().then((value) async {
@@ -88,28 +139,9 @@ class ApiController {
         if (tokenStatus == 'refresh') {
           return await context.read<AuthController>().tryRefreshToken(context);
         } else if (tokenStatus == 'expired') {
-          // Access token expired (or not yet hydrated) — try the refresh
-          // token before asking the user to re-login.
           final refreshed = await context.read<AuthController>().tryRefreshToken(context);
           if (refreshed) return true;
-          if (isSessionExpiredDialogOpen == false && context.mounted) {
-            isSessionExpiredDialogOpen = true;
-            dismissLoading();
-            await promptDialog(
-              context,
-              action: () {
-                Navigator.of(context, rootNavigator: true).pop();
-                isSessionExpiredDialogOpen = false;
-                context.read<AuthController>().logout(context);
-                context.goNamed(LoginPage.routeName);
-              },
-              text: 'error'.tr(gender: 'sessionExpired'),
-              buttonColor: secondaryColor,
-              type: DialogType.info,
-              buttonText: 'button'.tr(gender: 'reLogin'),
-            );
-            isSessionExpiredDialogOpen = false;
-          }
+          handleSessionExpired(context);
           return false;
         } else {
           return true;
@@ -225,44 +257,13 @@ class ApiController {
                   hasRetriedAfterRefresh: true,
                 );
               }
-              if (isSessionExpiredDialogOpen == false && context.mounted) {
-                isSessionExpiredDialogOpen = true;
-                dismissLoading();
-                await promptDialog(
-                  context,
-                  action: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    isSessionExpiredDialogOpen = false;
-                    context.read<AuthController>().logout(context);
-                    context.goNamed(LoginPage.routeName);
-                  },
-                  text: 'error'.tr(gender: 'sessionExpired'),
-                  buttonColor: secondaryColor,
-                  buttonText: 'button'.tr(gender: 'reLogin'),
-                );
-                isSessionExpiredDialogOpen = false;
-              }
+              handleSessionExpired(context);
               return ApiResponse(code: 401, message: 'Session Expired');
             } else if (e.response?.statusCode == 401 ||
                 e.response?.statusCode == 403 ||
                 e.response?.statusCode == 410) {
-              if (isSessionExpiredDialogOpen == false && context.mounted) {
-                isSessionExpiredDialogOpen = true;
-                dismissLoading();
-                await promptDialog(
-                  context,
-                  action: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    isSessionExpiredDialogOpen = false;
-                    context.read<AuthController>().logout(context);
-                    context.goNamed(LoginPage.routeName);
-                  },
-                  text: 'error'.tr(gender: 'sessionExpired'),
-                  buttonColor: secondaryColor,
-                  buttonText: 'button'.tr(gender: 'reLogin'),
-                );
-                isSessionExpiredDialogOpen = false;
-              }
+              handleSessionExpired(context);
+              return ApiResponse(code: e.response?.statusCode ?? 401, message: 'Session Expired');
             } else if (e.response?.statusCode == 500 || e.response?.statusCode == 503) {
               try {
                 Future.delayed(Duration.zero, () {
@@ -345,21 +346,32 @@ class ApiController {
     required String? buttonText,
     Color? buttonColor,
     DialogType type = DialogType.info,
-    bool barrierDismissible = false,
+    bool barrierDismissible = true,
   }) async {
     await Future.delayed(Duration.zero);
-    if (!context.mounted) return;
+    final targetContext = rootNavigatorKey.currentContext ?? context;
+    if (!targetContext.mounted) return;
     await showDialog(
-      context: context,
+      context: targetContext,
       barrierDismissible: barrierDismissible,
       barrierColor: dialogBarrierColor,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AppDialog(
           DialogAttribute(
             text: text,
             type: type,
             buttonAttributes: [
-              if (buttonText != null) DialogButtonAttribute(action, text: buttonText, color: buttonColor ?? errorColor),
+              if (buttonText != null)
+                DialogButtonAttribute(() {
+                  try {
+                    Navigator.of(dialogContext).pop();
+                  } catch (_) {}
+                  try {
+                    action();
+                  } catch (e) {
+                    debugPrint("Dialog action error: $e");
+                  }
+                }, text: buttonText, color: buttonColor ?? errorColor),
             ],
           ),
         );

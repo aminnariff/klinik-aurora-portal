@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
+import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
@@ -222,9 +223,8 @@ class _HomepageState extends State<Homepage> {
             activityHandler.markInactive();
           }
           SchedulerBinding.instance.scheduleFrameCallback((_) async {
-            await authCtrl.logout(context);
             activityHandler.reset();
-            if (context.mounted) context.goNamed(LoginPage.routeName);
+            ApiController.handleSessionExpired(context);
           });
           return const SizedBox.shrink();
         }
