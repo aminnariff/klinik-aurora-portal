@@ -938,52 +938,16 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.lock_open_rounded, size: 18, color: Colors.white),
-                          SizedBox(width: 8),
-                          Text(
-                            'Reset Password & Sign In',
-                            style: TextStyle(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                        ],
+                    : const Text(
+                        'Reset Password',
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.2,
+                        ),
                       ),
               ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // Cancel / Back to Login
-        Center(
-          child: TextButton(
-            onPressed: () => context.goNamed(LoginPage.routeName),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.arrow_back_rounded, size: 15, color: Colors.grey.shade600),
-                const SizedBox(width: 6),
-                Text(
-                  'Cancel and Back to Sign In',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-              ],
             ),
           ),
         ),
@@ -1095,20 +1059,13 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Continue to Sign In',
-                        style: TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
-                    ],
+                  child: Text(
+                    'Continue to Sign In',
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

@@ -1059,50 +1059,16 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Send Verification Code',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                        letterSpacing: 0.2,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
-                                  ],
+                              : const Text(
+                                  'Send Verification Code',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: 0.2,
+                                  ),
                                 ),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Back to Sign In Link
-                  Center(
-                    child: TextButton(
-                      onPressed: () => context.pop(),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.arrow_back_rounded, size: 16, color: Colors.grey.shade600),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Back to Sign In',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ),
