@@ -63,16 +63,20 @@ class BranchController extends ChangeNotifier {
     Dio dio = Dio();
     FormData formData = FormData();
 
-    formData.files.add(
-      MapEntry(
-        "branchImage",
-        MultipartFile.fromBytes(
-          request.branchImage.value!,
-          filename: request.branchImage.name,
-          contentType: MediaType("image", request.branchImage.name.toString().split(".").last),
+    if (request.branchImage?.value != null) {
+      formData.files.add(
+        MapEntry(
+          "branchImage",
+          MultipartFile.fromBytes(
+            request.branchImage!.value!,
+            filename: request.branchImage!.name,
+            contentType: MediaType("image", request.branchImage!.name.toString().split(".").last),
+          ),
         ),
-      ),
-    );
+      );
+    } else if (request.branchImageUrl != null && request.branchImageUrl!.isNotEmpty) {
+      formData.fields.add(MapEntry('branchImage', request.branchImageUrl!));
+    }
 
     formData.fields.add(MapEntry('branchName', request.branchName));
     formData.fields.add(MapEntry('branchCode', request.branchCode));
@@ -86,7 +90,6 @@ class BranchController extends ChangeNotifier {
     formData.fields.add(MapEntry('is24Hours', '${request.is24Hours}'));
     formData.fields.add(MapEntry('branchLaunchDate', request.branchLaunchDate));
     debugPrint(formData.fields.toString());
-    debugPrint(formData.files[0].value.filename);
     debugPrint(formData.files.toString());
     try {
       return await dio
@@ -140,6 +143,8 @@ class BranchController extends ChangeNotifier {
           ),
         ),
       );
+    } else if (request.branchImageUrl != null && request.branchImageUrl!.isNotEmpty) {
+      formData.fields.add(MapEntry('branchImage', request.branchImageUrl!));
     }
 
     formData.fields.add(MapEntry('branchId', request.branchId));

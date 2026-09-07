@@ -12,7 +12,8 @@ class CreateBranchRequest {
   final String branchOpeningHours;
   final String branchClosingHours;
   final String branchLaunchDate;
-  FileAttribute branchImage;
+  FileAttribute? branchImage;
+  String? branchImageUrl;
 
   CreateBranchRequest({
     required this.branchName,
@@ -26,6 +27,7 @@ class CreateBranchRequest {
     required this.branchOpeningHours,
     required this.branchClosingHours,
     required this.branchLaunchDate,
-    required this.branchImage,
+    this.branchImage,
+    this.branchImageUrl,
   });
 }

@@ -14,6 +14,7 @@ class UpdateBranchRequest {
   final String branchClosingHours;
   final String branchLaunchDate;
   FileAttribute? branchImage;
+  String? branchImageUrl;
 
   UpdateBranchRequest({
     required this.branchId,
@@ -29,5 +30,6 @@ class UpdateBranchRequest {
     required this.branchClosingHours,
     required this.branchLaunchDate,
     this.branchImage,
+    this.branchImageUrl,
   });
 }

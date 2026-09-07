@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
@@ -23,12 +20,12 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.d
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class BranchDetail extends StatefulWidget {
@@ -55,6 +52,11 @@ class _BranchDetailState extends State<BranchDetail> {
   final ValueNotifier<bool> _is24Hours = ValueNotifier(false);
   final TextEditingController _openingHours = TextEditingController();
   final TextEditingController _closingHours = TextEditingController();
+  final InputFieldAttribute _branchImage = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'branchPage'.tr(gender: 'branchImage'),
+    hintText: 'https://... or upload photo',
+  );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
@@ -77,6 +79,7 @@ class _BranchDetailState extends State<BranchDetail> {
       _openingHours.text = widget.branch?.branchOpeningHours ?? '';
       _closingHours.text = widget.branch?.branchClosingHours ?? '';
       _launchDate.text = dateConverter(widget.branch?.branchLaunchDate, format: 'dd-MM-yyyy') ?? '';
+      _branchImage.controller.text = widget.branch?.branchImage ?? '';
       selectedFile = FileAttribute(path: widget.branch?.branchImage, name: widget.branch?.branchImage);
     }
     super.initState();
@@ -293,83 +296,13 @@ class _BranchDetailState extends State<BranchDetail> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        // Media
-                                        _sectionLabel('Branch Image', Icons.image_outlined),
+                                        _sectionLabel('branchPage'.tr(gender: 'branchImage'), Icons.image_outlined),
                                         const SizedBox(height: 12),
-                                        StreamBuilder<DateTime>(
-                                          stream: fileRebuild.stream,
-                                          builder: (context, snapshot) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                if (widget.type == 'create') ...[
-                                                  selectedFile.value == null
-                                                      ? UploadDocumentsField(
-                                                          title: 'branchPage'.tr(gender: 'browseFile'),
-                                                          fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                          action: () => addPicture(),
-                                                          cancelAction: () {},
-                                                        )
-                                                      : Stack(
-                                                          alignment: Alignment.topRight,
-                                                          children: [
-                                                            ClipRRect(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                              child: GestureDetector(
-                                                                onTap: () => addPicture(),
-                                                                child: Image.memory(selectedFile.value as Uint8List),
-                                                              ),
-                                                            ),
-                                                            IconButton(
-                                                              onPressed: () {
-                                                                selectedFile = FileAttribute();
-                                                                fileRebuild.add(DateTime.now());
-                                                              },
-                                                              icon: const Icon(Icons.close),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                ],
-                                                if (widget.type == 'update')
-                                                  widget.branch?.branchImage == null
-                                                      ? selectedFile.name != null
-                                                            ? Stack(
-                                                                alignment: Alignment.topRight,
-                                                                children: [
-                                                                  ClipRRect(
-                                                                    borderRadius: BorderRadius.circular(10),
-                                                                    child: GestureDetector(
-                                                                      onTap: () => addPicture(),
-                                                                      child: Image.memory(selectedFile.value as Uint8List),
-                                                                    ),
-                                                                  ),
-                                                                  IconButton(
-                                                                    onPressed: () {
-                                                                      selectedFile = FileAttribute();
-                                                                      fileRebuild.add(DateTime.now());
-                                                                    },
-                                                                    icon: const Icon(Icons.close),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            : UploadDocumentsField(
-                                                                title: 'branchImage'.tr(gender: 'browseFile'),
-                                                                fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                                action: () => addPicture(),
-                                                                cancelAction: () {},
-                                                              )
-                                                      : ClipRRect(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                          child: GestureDetector(
-                                                            onTap: () => addPicture(),
-                                                            child: Image.network(
-                                                              '${Environment.imageUrl}${widget.branch?.branchImage}',
-                                                            ),
-                                                          ),
-                                                        ),
-                                              ],
-                                            );
-                                          },
+                                        AppImageField(
+                                          field: _branchImage,
+                                          folder: 'branch',
+                                          previewHeight: 180,
+                                          previewWidth: 260,
                                         ),
                                         const SizedBox(height: 24),
                                         // Operating Hours
@@ -564,6 +497,9 @@ class _BranchDetailState extends State<BranchDetail> {
         Button(() {
           if (validate()) {
             showLoading();
+            final imageVal = _branchImage.controller.text.trim();
+            final finalBranchImage = imageVal.isEmpty ? null : imageVal;
+
             if (widget.type == 'create') {
               BranchController.create(
                 CreateBranchRequest(
@@ -578,7 +514,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   branchOpeningHours: _openingHours.text,
                   branchClosingHours: _closingHours.text,
                   branchLaunchDate: convertStringToDate(_launchDate.text),
-                  branchImage: selectedFile,
+                  branchImageUrl: finalBranchImage,
                 ),
               ).then((value) {
                 if (responseCode(value.code)) {
@@ -618,7 +554,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   branchOpeningHours: _openingHours.text,
                   branchClosingHours: _closingHours.text,
                   branchLaunchDate: convertStringToDate(_launchDate.text),
-                  branchImage: selectedFile,
+                  branchImageUrl: finalBranchImage,
                 ),
               ).then((value) {
                 if (responseCode(value.code)) {
@@ -648,38 +584,6 @@ class _BranchDetailState extends State<BranchDetail> {
         }, actionText: 'button'.tr(gender: widget.type)),
       ],
     );
-  }
-
-  Future<void> addPicture() async {
-    documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      if (supportedExtensions.contains(file.extension)) {
-        debugPrint(bytesToMB(file.size).toString());
-        debugPrint(file.name);
-        if (bytesToMB(file.size) < 1.0) {
-          Uint8List? fileBytes = result.files.first.bytes;
-          String fileName = result.files.first.name;
-
-          selectedFile = FileAttribute(name: fileName, value: fileBytes);
-          fileRebuild.add(DateTime.now());
-        } else {
-          showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
-        }
-      } else {
-        showDialogError(context, 'error'.tr(gender: 'err-22', args: [fileSizeLimit.toStringAsFixed(0)]));
-      }
-    } else {
-      // User canceled the picker
-    }
-  }
-
-  double bytesToMB(int bytes) {
-    double megabytes = bytes / 1048576.0;
-    // double sizeInGB = sizeInBytes / 1073741824.0;
-    return megabytes;
   }
 
   bool validate() {
