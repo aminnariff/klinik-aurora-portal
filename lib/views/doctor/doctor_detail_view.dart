@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/models/doctor/doctor_branch_response.dart';
+import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -124,7 +124,7 @@ class DoctorDetailView extends StatelessWidget {
                                           ClipRRect(
                                             borderRadius: BorderRadius.circular(12),
                                             child: Image.network(
-                                              '${Environment.imageUrl}${doctor.doctorImage}',
+                                              resolveImageUrl(doctor.doctorImage),
                                               height: 360,
                                               width: double.infinity,
                                               fit: BoxFit.cover,

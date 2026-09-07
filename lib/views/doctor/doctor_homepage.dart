@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
@@ -13,6 +12,7 @@ import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/doctor/doctor_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/doctor/doctor_branch_response.dart';
+import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/models/doctor/update_doctor_request.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
@@ -380,7 +380,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     if (doc.doctorImage != null) {
       return CircleAvatar(
         radius: 20,
-        backgroundImage: NetworkImage('${Environment.imageUrl}${doc.doctorImage}'),
+        backgroundImage: NetworkImage(resolveImageUrl(doc.doctorImage)),
         onBackgroundImageError: (_, _) {},
         backgroundColor: color.withAlpha(40),
         child: null,

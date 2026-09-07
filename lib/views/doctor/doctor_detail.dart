@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
@@ -25,11 +22,11 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class DoctorDetails extends StatefulWidget {
@@ -51,6 +48,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     labelText: 'doctorPage'.tr(gender: 'phoneNo'),
     isNumber: true,
   );
+  final InputFieldAttribute _doctorImage = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'doctorPage'.tr(gender: 'doctorImage'),
+    hintText: 'https://... or upload photo',
+  );
   final InputFieldAttribute _branchId = InputFieldAttribute(controller: TextEditingController());
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   DropdownAttribute? _selectedBranch;
@@ -66,6 +68,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         _doctorName.controller.text = widget.doctor?.doctorName ?? '';
         _doctorPhone.controller.text = widget.doctor?.doctorPhone ?? '';
         _branchId.controller.text = widget.doctor?.branchId ?? '';
+        _doctorImage.controller.text = widget.doctor?.doctorImage ?? '';
         selectedFile = FileAttribute(path: widget.doctor?.doctorImage, name: widget.doctor?.doctorImage);
         _selectedBranch = DropdownAttribute(widget.doctor?.branchId ?? '', widget.doctor?.branchName ?? '');
         rebuildDropdown.add(DateTime.now());
@@ -205,122 +208,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                   ),
                                   SizedBox(
                                     width: screenWidth1728(30),
-                                    child: StreamBuilder<DateTime>(
-                                      stream: fileRebuild.stream,
-                                      builder: (context, snapshot) {
-                                        return Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            if (widget.type == 'create') ...[
-                                              selectedFile.value == null
-                                                  ? UploadDocumentsField(
-                                                      title: 'doctorPage'.tr(gender: 'browseFile'),
-                                                      fieldTitle: 'doctorPage'.tr(gender: 'doctorImage'),
-                                                      action: () {
-                                                        addPicture();
-                                                      },
-                                                      cancelAction: () {},
-                                                    )
-                                                  : Stack(
-                                                      alignment: Alignment.topRight,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            addPicture();
-                                                          },
-                                                          child: Image.memory(
-                                                            selectedFile.value as Uint8List,
-                                                            height: 410,
-                                                          ),
-                                                        ),
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            selectedFile = FileAttribute();
-                                                            fileRebuild.add(DateTime.now());
-                                                          },
-                                                          icon: const Icon(Icons.close),
-                                                        ),
-                                                      ],
-                                                    ),
-                                            ],
-                                            if (widget.type == 'update')
-                                              widget.doctor?.doctorImage == null
-                                                  ? selectedFile.name != null
-                                                        ? Stack(
-                                                            alignment: Alignment.topRight,
-                                                            children: [
-                                                              GestureDetector(
-                                                                onTap: () {
-                                                                  addPicture();
-                                                                },
-                                                                child: Image.memory(
-                                                                  selectedFile.value as Uint8List,
-                                                                  height: 410,
-                                                                ),
-                                                              ),
-                                                              IconButton(
-                                                                onPressed: () {
-                                                                  selectedFile = FileAttribute();
-                                                                  fileRebuild.add(DateTime.now());
-                                                                },
-                                                                icon: const Icon(Icons.close),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : UploadDocumentsField(
-                                                            title: 'doctorPage'.tr(gender: 'browseFile'),
-                                                            fieldTitle: 'bdoctorPage'.tr(gender: 'doctorImage'),
-                                                            action: () {
-                                                              addPicture();
-                                                            },
-                                                            cancelAction: () {},
-                                                          )
-                                                  : GestureDetector(
-                                                      onTap: () {
-                                                        addPicture();
-                                                      },
-                                                      child: Image.network(
-                                                        '${Environment.imageUrl}${widget.doctor?.doctorImage}',
-                                                        height: 410,
-                                                        loadingBuilder:
-                                                            (
-                                                              BuildContext context,
-                                                              Widget child,
-                                                              ImageChunkEvent? loadingProgress,
-                                                            ) {
-                                                              if (loadingProgress == null) return child;
-                                                              return Center(
-                                                                child: CircularProgressIndicator(
-                                                                  value: loadingProgress.expectedTotalBytes != null
-                                                                      ? loadingProgress.cumulativeBytesLoaded /
-                                                                            (loadingProgress.expectedTotalBytes ?? 1)
-                                                                      : null,
-                                                                ),
-                                                              );
-                                                            },
-                                                        errorBuilder:
-                                                            (
-                                                              BuildContext context,
-                                                              Object error,
-                                                              StackTrace? stackTrace,
-                                                            ) {
-                                                              return Container(
-                                                                padding: EdgeInsets.all(screenPadding),
-                                                                decoration: BoxDecoration(
-                                                                  borderRadius: BorderRadius.circular(12),
-                                                                  color: disabledColor,
-                                                                ),
-                                                                child: const Center(
-                                                                  child: Icon(Icons.error, color: errorColor),
-                                                                ),
-                                                              );
-                                                            },
-                                                      ),
-                                                    ),
-                                            AppPadding.vertical(denominator: 2),
-                                          ],
-                                        );
-                                      },
+                                    child: AppImageField(
+                                      field: _doctorImage,
+                                      folder: 'doctor',
+                                      previewHeight: 180,
+                                      previewWidth: 180,
                                     ),
                                   ),
                                 ],
@@ -358,6 +250,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         Button(() {
           if (validate()) {
             showLoading();
+            final imageVal = _doctorImage.controller.text.trim();
+            final finalDoctorImage = imageVal.isEmpty ? null : imageVal;
+
             if (widget.type == 'create') {
               DoctorController.create(
                 context,
@@ -365,26 +260,12 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                   doctorName: _doctorName.controller.text,
                   doctorPhone: _doctorPhone.controller.text.trim(),
                   branchId: _selectedBranch?.key,
+                  doctorImage: finalDoctorImage,
                 ),
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  if (selectedFile.value != null) {
-                    showLoading();
-                    DoctorController.upload(context, value.data!.id!, selectedFile).then((value) {
-                      dismissLoading();
-                      if (responseCode(value.code)) {
-                        getLatestData();
-                      } else {
-                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                      }
-                    }).catchError((e) {
-                      dismissLoading();
-                      showDialogError(context, e.toString());
-                    });
-                  } else {
-                    getLatestData();
-                  }
+                  getLatestData();
                 } else {
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -401,26 +282,12 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                   doctorPhone: _doctorPhone.controller.text.trim(),
                   doctorStatus: widget.doctor?.doctorStatus,
                   branchId: _selectedBranch?.key,
+                  doctorImage: finalDoctorImage,
                 ),
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  if (selectedFile.value != null) {
-                    showLoading();
-                    DoctorController.upload(context, widget.doctor!.doctorId!, selectedFile).then((value) {
-                      dismissLoading();
-                      if (responseCode(value.code)) {
-                        getLatestData();
-                      } else {
-                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                      }
-                    }).catchError((e) {
-                      dismissLoading();
-                      showDialogError(context, e.toString());
-                    });
-                  } else {
-                    getLatestData();
-                  }
+                  getLatestData();
                 } else {
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -457,38 +324,6 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     });
   }
 
-  Future<void> addPicture() async {
-    documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      if (supportedExtensions.contains(file.extension)) {
-        debugPrint(bytesToMB(file.size).toString());
-        debugPrint(file.name);
-        if (bytesToMB(file.size) < 1.0) {
-          Uint8List? fileBytes = result.files.first.bytes;
-          String fileName = result.files.first.name;
-
-          selectedFile = FileAttribute(name: fileName, value: fileBytes);
-          fileRebuild.add(DateTime.now());
-        } else {
-          showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
-        }
-      } else {
-        showDialogError(context, 'error'.tr(gender: 'err-22', args: [fileSizeLimit.toStringAsFixed(0)]));
-      }
-    } else {
-      // User canceled the picker
-    }
-  }
-
-  double bytesToMB(int bytes) {
-    double megabytes = bytes / 1048576.0;
-    // double sizeInGB = sizeInBytes / 1073741824.0;
-    return megabytes;
-  }
-
   bool validate() {
     bool temp = true;
     if (_doctorName.controller.text == '') {
@@ -504,9 +339,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       _branchId.errorMessage = ErrorMessage.required(field: _branchId.labelText);
     }
     if (widget.type == 'create') {
-      if (selectedFile.value == null) {
+      if (_doctorImage.controller.text.trim().isEmpty) {
         temp = false;
-        showDialogError(context, 'Please upload an image for the person in charge (PIC).');
+        showDialogError(context, 'Please upload or provide an image for the person in charge (PIC).');
       }
     }
     setState(() {});
