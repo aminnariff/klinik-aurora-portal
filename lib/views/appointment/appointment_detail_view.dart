@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
@@ -121,7 +122,54 @@ class AppointmentDetailsView extends StatelessWidget {
     );
   }
 
+  bool _isEligibleForRescan(String? serviceName) {
+    if (serviceName == null) return false;
+    final name = serviceName.toLowerCase();
+    return (name.contains('scan') || name.contains('screening')) && !name.contains('rescan');
+  }
+
+  String? _extractParentAppointmentId(Data? data) {
+    if (data == null) return null;
+    if (data.adminRemark != null) {
+      final match = RegExp(r'Parent Appointment ID:\s*([a-zA-Z0-9\-]+)', caseSensitive: false)
+          .firstMatch(data.adminRemark!);
+      if (match != null && match.group(1) != null && match.group(1)!.isNotEmpty) {
+        return match.group(1)!.trim();
+      }
+    }
+    if (data.appointmentNote != null) {
+      final match = RegExp(r'Rescan for Appt #([a-zA-Z0-9\-]+)', caseSensitive: false)
+          .firstMatch(data.appointmentNote!);
+      if (match != null && match.group(1) != null && match.group(1)!.isNotEmpty) {
+        return match.group(1)!.trim();
+      }
+    }
+    return null;
+  }
+
+  void _openParentAppointment(BuildContext context, String parentId) {
+    showLoading();
+    AppointmentController.detail(context, appointmentId: parentId).then((value) {
+      dismissLoading();
+      if (responseCode(value.code) && value.data != null) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AppointmentDetailsView(response: value.data);
+          },
+        );
+      } else {
+        showDialogError(context, value.message ?? 'Failed to load original appointment details');
+      }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
+    });
+  }
+
   Widget _headerBar(BuildContext context, Data? data) {
+    final parentAppointmentId = _extractParentAppointmentId(data);
+
     return Container(
       padding: EdgeInsets.fromLTRB(isMobile ? 12 : 20, 14, 8, 14),
       decoration: const BoxDecoration(
@@ -149,6 +197,35 @@ class AppointmentDetailsView extends StatelessWidget {
                     child: Text(
                       '#${data!.appointmentId!.substring(0, math.min(8, data.appointmentId!.length)).toUpperCase()}',
                       style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontFamily: 'monospace'),
+                    ),
+                  ),
+                if (parentAppointmentId != null)
+                  InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () => _openParentAppointment(context, parentAppointmentId),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFBFDBFE)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.link_rounded, size: 13, color: Color(0xFF2563EB)),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Original: #${parentAppointmentId.substring(0, math.min(8, parentAppointmentId.length)).toUpperCase()}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2563EB),
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],
@@ -300,8 +377,8 @@ class AppointmentDetailsView extends StatelessWidget {
                 ],
               ),
             ),
-            // Rescan button (for screening services)
-            if (data?.service?.serviceName?.toLowerCase().contains('screening') == true)
+            // Rescan button (for scan / screening services)
+            if (_isEligibleForRescan(data?.service?.serviceName))
               TextButton.icon(
                 onPressed: () {
                   showLoading();
@@ -315,6 +392,7 @@ class AppointmentDetailsView extends StatelessWidget {
                         builder: (_) => RescanAppointment(
                           appointment: AppointmentDetailResponse(data: data),
                           serviceBranchId: value.data!.serviceBranchId!,
+                          rescanServiceTime: value.data?.serviceTime,
                         ),
                       );
                     } else {
@@ -637,6 +715,37 @@ class AppointmentDetailsView extends StatelessWidget {
         if (data?.appointmentId != null) ...[
           const SizedBox(height: 8),
           _metaRow(Icons.tag_rounded, 'Appointment ID', data!.appointmentId!.toUpperCase()),
+        ],
+        if (_extractParentAppointmentId(data) != null) ...[
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.link_rounded, size: 14, color: Color(0xFF2563EB)),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 140,
+                child: Text(
+                  'Original Appt',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () => _openParentAppointment(context, _extractParentAppointmentId(data)!),
+                  child: Text(
+                    '#${_extractParentAppointmentId(data)!.toUpperCase()}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2563EB),
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
         if (notNullOrEmptyString(data?.adminRemark) == true) ...[
           const SizedBox(height: 12),

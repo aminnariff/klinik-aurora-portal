@@ -26,7 +26,13 @@ import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 class RescanAppointment extends StatefulWidget {
   final AppointmentDetailResponse? appointment;
   final String? serviceBranchId;
-  const RescanAppointment({super.key, required this.appointment, required this.serviceBranchId});
+  final String? rescanServiceTime;
+  const RescanAppointment({
+    super.key,
+    required this.appointment,
+    required this.serviceBranchId,
+    this.rescanServiceTime,
+  });
 
   @override
   State<RescanAppointment> createState() => _RescanAppointmentState();
@@ -40,6 +46,14 @@ class _RescanAppointmentState extends State<RescanAppointment> {
   String? selectedTime;
   String? _selectedDateTime;
   GestationalController? gestationalResult;
+
+  @override
+  void dispose() {
+    noteController.dispose();
+    rebuild.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -73,7 +87,9 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                             _infoRow(widget.appointment?.data?.branch?.branchName ?? ''),
                             const SizedBox(height: 12),
                             _infoLabel("Service"),
-                            _infoRow('Rescan - ${widget.appointment?.data?.service?.serviceName}\nRM 0.00'),
+                            _infoRow(
+                              'Rescan - ${widget.appointment?.data?.service?.serviceName ?? ''}${widget.rescanServiceTime != null ? ' (${widget.rescanServiceTime} mins)' : ''}\nRM 0.00',
+                            ),
                           ]),
                           const SizedBox(height: 12),
                           if (widget.appointment?.data?.service?.dueDateToggle == 1) ...[
@@ -119,10 +135,39 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                               ),
                             ],
                           ],
+                          if (notNullOrEmptyString(widget.appointment?.data?.appointmentNote)) ...[
+                            AppPadding.vertical(),
+                            _infoLabel("Original Appointment Note"),
+                            _infoRow(widget.appointment?.data?.appointmentNote ?? '-'),
+                          ],
                           AppPadding.vertical(),
-                          _infoLabel("Note"),
-                          _infoRow(widget.appointment?.data?.appointmentNote ?? '-'),
-                          SizedBox(height: 16),
+                          _infoLabel("Rescan Reason / Note"),
+                          const SizedBox(height: 4),
+                          TextField(
+                            controller: noteController,
+                            style: const TextStyle(fontSize: 13),
+                            maxLines: 2,
+                            decoration: InputDecoration(
+                              hintText: 'e.g. Baby position uncooperative, reschedule for better view',
+                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                              filled: true,
+                              fillColor: const Color(0xFFF9FAFB),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: secondaryColor),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
                           _infoLabel("Slot"),
                           Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
@@ -202,6 +247,14 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                               ).then((value) {
                                 if (value) {
                                   showLoading();
+                                  final parentId = widget.appointment?.data?.appointmentId ?? '';
+                                  final reason = noteController.text.trim();
+                                  final shortId = parentId.length > 8 ? parentId.substring(0, 8) : parentId;
+                                  final fullNote = reason.isNotEmpty
+                                      ? (shortId.isNotEmpty ? 'Rescan for Appt #$shortId: $reason' : reason)
+                                      : (shortId.isNotEmpty ? 'Rescan for Appt #$shortId' : 'Rescan');
+                                  final adminRemark = parentId.isNotEmpty ? 'Parent Appointment ID: $parentId' : null;
+
                                   AppointmentController.create(
                                     context,
                                     CreateAppointmentRequest(
@@ -211,7 +264,8 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                         _selectedDateTime.toString(),
                                         plainFormat: true,
                                       ),
-                                      appointmentNote: '',
+                                      appointmentNote: fullNote,
+                                      adminRemark: adminRemark,
                                       customerDueDate: dateConverter(
                                         widget.appointment?.data?.customerDueDate,
                                         format: 'dd-MM-yyyy',
@@ -224,7 +278,12 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                       context.pop();
                                       showDialogSuccess(context, "Rescan appointment successfully created.");
                                     } else {
-                                      showDialogError(context, createResponse.message ?? createResponse.data?.message ?? 'Failed to create rescan appointment');
+                                      showDialogError(
+                                        context,
+                                        createResponse.message ??
+                                            createResponse.data?.message ??
+                                            'Failed to create rescan appointment',
+                                      );
                                     }
                                   }).catchError((e) {
                                     dismissLoading();
