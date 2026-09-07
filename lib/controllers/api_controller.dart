@@ -326,9 +326,13 @@ class ApiController {
                 debugPrint('$error');
               }
             } else {
+              String? serverMessage;
+              if (e.response?.data is Map && e.response?.data['message'] != null) {
+                serverMessage = e.response?.data['message']?.toString();
+              }
               return ApiResponse(
                 code: e.response?.statusCode,
-                message: e.response?.statusMessage,
+                message: serverMessage ?? e.response?.statusMessage,
                 data: e.response?.data,
               );
             }

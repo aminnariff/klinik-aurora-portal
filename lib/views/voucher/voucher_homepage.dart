@@ -804,6 +804,8 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
         context.read<VoucherController>().voucherAllResponse = value;
       } else if (value.code == 404) {}
       return null;
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

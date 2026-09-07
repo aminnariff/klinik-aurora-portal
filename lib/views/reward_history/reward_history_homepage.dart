@@ -700,6 +700,8 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
         context.read<RewardHistoryController>().rewardHistoryResponse = value;
       }
       return null;
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

@@ -713,6 +713,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<DoctorController>().doctorBranchResponse = value.data;
       }
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

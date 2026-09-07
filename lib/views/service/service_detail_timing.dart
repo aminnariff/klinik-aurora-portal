@@ -226,6 +226,9 @@ class _TimeListManagerState extends State<TimeListManager> {
       dismissLoading();
       context.read<ServiceBranchController>().serviceBranchResponse = value.data;
       showDialogSuccess(context, 'Timing for ${widget.serviceBranch?.branchName} has been successfully updated.');
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
     });
   }
 }

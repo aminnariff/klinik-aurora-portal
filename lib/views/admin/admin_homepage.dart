@@ -761,6 +761,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
         context.read<AdminController>().adminAllResponse = value.data;
       } else if (value.code == 404) {}
       return null;
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

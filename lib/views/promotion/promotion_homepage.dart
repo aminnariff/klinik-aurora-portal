@@ -403,11 +403,17 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                     } else {
                       showDialogError(ctx, uploadValue.message ?? 'Upload failed');
                     }
+                  }).catchError((e) {
+                    dismissLoading();
+                    showDialogError(ctx, e.toString());
                   });
                 }
               } else {
                 showDialogError(ctx, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
               }
+            }).catchError((e) {
+              dismissLoading();
+              showDialogError(ctx, e.toString());
             });
           }
         },
@@ -456,6 +462,8 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
         context.read<PromotionController>().promotionAllResponse = value;
         rebuild.add(DateTime.now());
       }
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

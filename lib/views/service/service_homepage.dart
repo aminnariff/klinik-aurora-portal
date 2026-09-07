@@ -1061,6 +1061,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             ],
           ),
         );
+      }).catchError((e) {
+        dismissLoading();
+        showDialogError(context, e.toString());
       });
     } else if (value == 'enableDisable') {
       try {
@@ -1074,31 +1077,36 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             ServiceBranchController.update(
               context,
               UpdateServiceBranchRequest(
-                serviceBranchId: serviceBranch.serviceBranchId,
-                serviceBranchAvailableTime: serviceBranch.serviceBranchAvailableTime,
-                serviceBranchStatus: serviceBranch.serviceBranchStatus == 1 ? 0 : 1,
-              ),
-            ).then((value) {
-              if (responseCode(value.code)) {
-                showLoading();
-                ServiceBranchController.getAll(
+              serviceBranchId: serviceBranch.serviceBranchId,
+              serviceBranchAvailableTime: serviceBranch.serviceBranchAvailableTime,
+              serviceBranchStatus: serviceBranch.serviceBranchStatus == 1 ? 0 : 1,
+            ),
+          ).then((value) {
+            if (responseCode(value.code)) {
+              showLoading();
+              ServiceBranchController.getAll(
+                context,
+                1,
+                100,
+                branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+              ).then((value) {
+                dismissLoading();
+                context.read<ServiceBranchController>().serviceBranchResponse = value.data;
+                showDialogSuccess(
                   context,
-                  1,
-                  100,
-                  branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-                ).then((value) {
-                  dismissLoading();
-                  context.read<ServiceBranchController>().serviceBranchResponse = value.data;
-                  showDialogSuccess(
-                    context,
-                    '${serviceBranch.serviceName} has been successfully ${serviceBranch.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${serviceBranch.branchName}.',
-                  );
-                });
-              } else {
-                showDialogError(context, value.message ?? value.data?.message ?? '');
-              }
-            });
+                  '${serviceBranch.serviceName} has been successfully ${serviceBranch.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${serviceBranch.branchName}.',
+                );
+              }).catchError((e) {
+                dismissLoading();
+                showDialogError(context, e.toString());
+              });
+            } else {
+              showDialogError(context, value.message ?? value.data?.message ?? '');
+            }
+          }).catchError((e) {
+            showDialogError(context, e.toString());
           });
+        });
         }
       } catch (e) {
         debugPrint(e.toString());
@@ -1126,6 +1134,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           _totalCount = value.data?.totalCount ?? 0;
           _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         }
+      }).catchError((e) {
+        dismissLoading();
       });
     } else {
       ServiceController.getAll(
@@ -1147,6 +1157,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
           context.read<ServiceController>().servicesResponse = value.data;
         }
+      }).catchError((e) {
+        dismissLoading();
       });
     }
   }

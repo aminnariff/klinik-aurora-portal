@@ -490,9 +490,12 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                                     } else {
                                                       showDialogError(
                                                         context,
-                                                        value.data?.message ?? 'ERROR : ${value.code}',
+                                                        value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
                                                       );
                                                     }
+                                                  }).catchError((e) {
+                                                    dismissLoading();
+                                                    showDialogError(context, e.toString());
                                                   });
                                                 } else if (i == selectedFiles.length - 1) {
                                                   context.pop();
@@ -515,6 +518,9 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                             value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
                                           );
                                         }
+                                      }).catchError((e) {
+                                        dismissLoading();
+                                        showDialogError(context, e.toString());
                                       });
                                     }
                                   }, actionText: 'button'.tr(gender: 'update')),

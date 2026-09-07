@@ -316,11 +316,15 @@ class _PointDetailState extends State<PointDetail> {
                                     if (_selectedType?.key == '3') {}
                                     postAction();
                                   } else {
+                                    dismissLoading();
                                     showDialogError(
                                       context,
                                       value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
                                     );
                                   }
+                                }).catchError((e) {
+                                  dismissLoading();
+                                  showDialogError(context, e.toString());
                                 });
                               }
                             }, actionText: 'button'.tr(gender: 'create')),

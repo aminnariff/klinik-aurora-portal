@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/views/error/error.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
@@ -218,7 +217,6 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                 FocusScope.of(context).unfocus();
                 validateField().then((value) {
                   if (value == true) {
-                    showLoading();
                     // PasswordRecoveryController.changePassword(
                     //   context,
                     //   passwordAttribute.controller.text,

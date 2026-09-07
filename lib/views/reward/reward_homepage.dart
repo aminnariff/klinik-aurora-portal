@@ -833,6 +833,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
         context.read<RewardController>().rewardAllResponse = value;
       }
       return null;
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

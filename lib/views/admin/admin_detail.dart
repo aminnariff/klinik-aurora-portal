@@ -754,14 +754,24 @@ class _AdminDetailState extends State<AdminDetail> {
                         context.pop();
                         showDialogSuccess(context, 'Successfully updated admin information');
                       }
+                    }).catchError((e) {
+                      dismissLoading();
                     });
                   } else {
+                    dismissLoading();
                     showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                   }
+                }).catchError((e) {
+                  dismissLoading();
+                  showDialogError(context, e.toString());
                 });
               } else {
-                showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                dismissLoading();
+                showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
               }
+            }).catchError((e) {
+              dismissLoading();
+              showDialogError(context, e.toString());
             });
           } else {
             AdminController.create(
@@ -777,14 +787,13 @@ class _AdminDetailState extends State<AdminDetail> {
               ),
             ).then((value) {
               if (responseCode(value.code)) {
-                if (responseCode(value.code)) {
+                final createdId = value.data?.id;
+                if (createdId != null) {
                   AdminController.updatePermission(
                     context,
-                    UpdatePermissionAdminRequest(userId: widget.user!.userId, permissionIds: selectedPermission),
+                    UpdatePermissionAdminRequest(userId: createdId, permissionIds: selectedPermission),
                   ).then((updateResponse) {
-                    dismissLoading();
                     if (responseCode(updateResponse.code)) {
-                      showLoading();
                       AdminController.getAll(context, 1, pageSize).then((adminResponse) {
                         dismissLoading();
                         if (responseCode(adminResponse.code)) {
@@ -795,15 +804,29 @@ class _AdminDetailState extends State<AdminDetail> {
                           context.pop();
                           showDialogSuccess(context, 'Successfully created admin');
                         }
+                      }).catchError((e) {
+                        dismissLoading();
                       });
                     } else {
-                      showDialogError(context, updateResponse.data?.message ?? 'ERROR : ${updateResponse.code}');
+                      dismissLoading();
+                      showDialogError(context, updateResponse.message ?? updateResponse.data?.message ?? 'ERROR : ${updateResponse.code}');
                     }
+                  }).catchError((e) {
+                    dismissLoading();
+                    showDialogError(context, e.toString());
                   });
+                } else {
+                  dismissLoading();
+                  context.pop();
+                  showDialogSuccess(context, 'Successfully created admin');
                 }
               } else {
-                showDialogError(context, value.data?.message ?? 'ERROR : ${value.code}');
+                dismissLoading();
+                showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
               }
+            }).catchError((e) {
+              dismissLoading();
+              showDialogError(context, e.toString());
             });
           }
         }, actionText: 'button'.tr(gender: widget.type)),

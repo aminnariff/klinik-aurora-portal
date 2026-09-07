@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
-import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
@@ -166,7 +165,6 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                 FocusScope.of(context).unfocus();
                 validateField().then((value) {
                   if (value == true) {
-                    showLoading();
                     // PasswordRecoveryController.changePassword(context, passwordAttribute.controller.text).then((value) {
                     //   dismissLoading();
                     //   if (responseCode(value.code)) {

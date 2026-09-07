@@ -749,7 +749,12 @@ class _UserHomepageState extends State<UserHomepage> {
             context: context,
             builder: (_) => UserAppointmentIds(response: value.data, patient: user),
           );
+        } else {
+          showDialogError(context, value.message ?? 'Failed to load appointment history');
         }
+      }).catchError((e) {
+        dismissLoading();
+        showDialogError(context, e.toString());
       });
     } else if (value == 'managePoints') {
       showDialog(
@@ -845,6 +850,8 @@ class _UserHomepageState extends State<UserHomepage> {
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<UserController>().userAllResponse = value.data?.data;
       }
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

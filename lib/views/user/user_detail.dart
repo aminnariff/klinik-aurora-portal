@@ -449,10 +449,16 @@ class _UserDetailState extends State<UserDetail> {
                                                     context.pop();
                                                     showDialogSuccess(context, 'Successfully updated customer information');
                                                   }
+                                                }).catchError((e) {
+                                                  dismissLoading();
                                                 });
                                               } else {
+                                                dismissLoading();
                                                 showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                                               }
+                                            }).catchError((e) {
+                                              dismissLoading();
+                                              showDialogError(context, e.toString());
                                             });
                                           } else {
                                             UserController.create(
@@ -479,10 +485,16 @@ class _UserDetailState extends State<UserDetail> {
                                                     context.pop();
                                                     showDialogSuccess(context, 'Successfully created customer information');
                                                   }
+                                                }).catchError((e) {
+                                                  dismissLoading();
                                                 });
                                               } else {
+                                                dismissLoading();
                                                 showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                                               }
+                                            }).catchError((e) {
+                                              dismissLoading();
+                                              showDialogError(context, e.toString());
                                             });
                                           }
                                         }

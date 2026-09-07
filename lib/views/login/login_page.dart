@@ -15,6 +15,7 @@ import 'package:klinik_aurora_portal/controllers/password_recovery/password_reco
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -699,7 +700,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             passwordValue: passwordController.text,
           );
           if (mounted) context.goNamed(Homepage.routeName);
+        } else {
+          showDialogError(context, value.message ?? value.data?.message ?? 'Login failed. Please check your credentials.');
         }
+      }).catchError((e) {
+        dismissLoading();
+        showDialogError(context, e.toString());
       });
     });
   }

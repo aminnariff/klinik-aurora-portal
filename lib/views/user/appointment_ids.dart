@@ -9,6 +9,7 @@ import 'package:klinik_aurora_portal/controllers/appointment/appointment_control
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/models/user/user_appointment_response.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_detail_view.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
@@ -202,7 +203,12 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
             return AppointmentDetailsView(response: value.data);
           },
         );
+      } else {
+        showDialogError(context, value.message ?? 'Failed to load details');
       }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
     });
   }
 }

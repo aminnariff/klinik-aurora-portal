@@ -20,12 +20,13 @@ class PasswordRecoveryController extends ChangeNotifier {
       try {
         return ApiResponse(
           code: value.code,
-          data: ForgotPasswordResponse.fromJson(value.data),
+          message: value.message ?? (value.data is Map ? value.data['message'] : null),
+          data: value.data != null ? ForgotPasswordResponse.fromJson(value.data) : null,
         );
       } catch (e) {
         return ApiResponse(
-          code: 400,
-          message: e.toString(),
+          code: value.code,
+          message: value.message ?? e.toString(),
         );
       }
     });

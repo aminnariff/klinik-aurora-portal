@@ -8,6 +8,7 @@ import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
 import 'package:klinik_aurora_portal/models/payment/payment_report_response.dart';
 import 'package:klinik_aurora_portal/views/payment/appointment_ids.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
@@ -54,6 +55,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       if (responseCode(response.code)) {
         context.read<PaymentController>().paymentReportResponse = response.data;
       }
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 
@@ -1051,7 +1054,12 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           context: context,
                           builder: (ctx) => AppointmentIds(response: value.data),
                         );
+                      } else {
+                        showDialogError(context, value.message ?? 'Failed to load appointments');
                       }
+                    }).catchError((e) {
+                      dismissLoading();
+                      showDialogError(context, e.toString());
                     });
                   },
                   child: Row(

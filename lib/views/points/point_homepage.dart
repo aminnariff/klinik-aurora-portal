@@ -1017,6 +1017,9 @@ class _PointHomepageState extends State<PointHomepage> {
       } else {
         showDialogError(context, 'No patients found. Please check the contact number and try again.');
       }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
     });
   }
 
@@ -1028,6 +1031,7 @@ class _PointHomepageState extends State<PointHomepage> {
       context,
       'Award $totalPoint point${totalPoint == 1 ? '' : 's'} to ${item.userFullname} for RM ${_amount.controller.text} payment?$bonusLine',
     )) {
+      showLoading();
       PointManagementController.create(
         context,
         CreatePointRequest(
@@ -1052,8 +1056,11 @@ class _PointHomepageState extends State<PointHomepage> {
           context.read<UserController>().userAllResponse = null;
           runFiltering();
         } else {
-          showDialogError(context, value.data?.message ?? 'error'.tr(gender: 'err-7'));
+          showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'err-7'));
         }
+      }).catchError((e) {
+        dismissLoading();
+        showDialogError(context, e.toString());
       });
     }
   }
@@ -1242,6 +1249,8 @@ class _PointHomepageState extends State<PointHomepage> {
       } else {
         showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'generic'));
       }
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 }

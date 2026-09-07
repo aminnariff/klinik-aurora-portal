@@ -150,18 +150,17 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                       ),
                                                     ],
                                                   );
-                                                  // return TimeListManager(
-                                                  //   onChanged: () {
-                                                  //     rebuild.add(DateTime.now());
-                                                  //   },
-                                                  //   serviceBranch: serviceBranch(
-                                                  //     item?.branchId ?? ' ',
-                                                  //     item?.serviceId ?? '',
-                                                  //   ),
-                                                  // );
                                                 },
                                               );
+                                            } else {
+                                              showDialogError(
+                                                context,
+                                                value.message ?? value.data?.message ?? 'Failed to load time slots',
+                                              );
                                             }
+                                          }).catchError((e) {
+                                            dismissLoading();
+                                            showDialogError(context, e.toString());
                                           });
                                         },
                                         title: Text('${item?.branchName}', style: AppTypography.bodyMedium(context)),
@@ -200,6 +199,9 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                           context,
                                                           '${item?.serviceName} has been successfully ${item?.serviceBranchStatus == 1 ? 'deactivated' : 'activated'} for ${item?.branchName}.',
                                                         );
+                                                      }).catchError((e) {
+                                                        dismissLoading();
+                                                        showDialogError(context, e.toString());
                                                       });
                                                     } else {
                                                       showDialogError(
@@ -207,6 +209,8 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                         value.message ?? value.data?.message ?? '',
                                                       );
                                                     }
+                                                  }).catchError((e) {
+                                                    showDialogError(context, e.toString());
                                                   });
                                                 });
                                               }

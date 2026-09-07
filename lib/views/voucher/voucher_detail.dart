@@ -389,13 +389,18 @@ class _VoucherDetailState extends State<VoucherDetail> {
                                                 context.pop();
                                                 showDialogSuccess(context, 'Successfully updated voucher');
                                               }
+                                            }).catchError((e) {
+                                              dismissLoading();
                                             });
                                           } else {
+                                            dismissLoading();
                                             showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                                           }
+                                        }).catchError((e) {
+                                          dismissLoading();
+                                          showDialogError(context, e.toString());
                                         });
                                       } else {
-                                        showLoading();
                                         VoucherController.create(
                                           context,
                                           CreateVoucherRequest(

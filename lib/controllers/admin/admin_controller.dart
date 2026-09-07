@@ -65,14 +65,19 @@ class AdminController extends ChangeNotifier {
             "userRetypePassword": request.userPassword,
             "userFullname": request.userFullname,
             if (request.branchId != null) "branchId": request.branchId,
+            if (request.userPhone != null) "userPhone": request.userPhone,
           },
           endpoint: 'admin/admin-management/create',
         )
         .then((value) {
           try {
-            return ApiResponse(code: value.code, data: CreateAdminResponse.fromJson(value.data));
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: value.data != null ? CreateAdminResponse.fromJson(value.data) : null,
+            );
           } catch (e) {
-            return ApiResponse(code: 400, message: e.toString());
+            return ApiResponse(code: value.code, message: value.message ?? e.toString());
           }
         });
   }
@@ -92,9 +97,13 @@ class AdminController extends ChangeNotifier {
         )
         .then((value) {
           try {
-            return ApiResponse(code: value.code, data: UpdateAdminResponse.fromJson(value.data));
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: value.data != null ? UpdateAdminResponse.fromJson(value.data) : null,
+            );
           } catch (e) {
-            return ApiResponse(code: 400, message: e.toString());
+            return ApiResponse(code: value.code, message: value.message ?? e.toString());
           }
         });
   }
@@ -109,9 +118,13 @@ class AdminController extends ChangeNotifier {
         )
         .then((value) {
           try {
-            return ApiResponse(code: value.code, data: PermissionAdminResponse.fromJson(value.data));
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: value.data != null ? PermissionAdminResponse.fromJson(value.data) : null,
+            );
           } catch (e) {
-            return ApiResponse(code: 400, message: e.toString());
+            return ApiResponse(code: value.code, message: value.message ?? e.toString());
           }
         });
   }
@@ -132,9 +145,13 @@ class AdminController extends ChangeNotifier {
         )
         .then((value) {
           try {
-            return ApiResponse(code: value.code, data: UpdatePermissionAdminResponse.fromJson(value.data));
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: value.data != null ? UpdatePermissionAdminResponse.fromJson(value.data) : null,
+            );
           } catch (e) {
-            return ApiResponse(code: 400, message: e.toString());
+            return ApiResponse(code: value.code, message: value.message ?? e.toString());
           }
         });
   }

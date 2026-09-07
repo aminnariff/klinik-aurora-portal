@@ -834,6 +834,8 @@ class _BranchHomepageState extends State<BranchHomepage> {
         context.read<BranchController>().branchAllResponse = value;
       } else if (value.code == 404) {}
       return null;
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

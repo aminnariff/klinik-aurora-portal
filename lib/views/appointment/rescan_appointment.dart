@@ -224,8 +224,11 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                       context.pop();
                                       showDialogSuccess(context, "Rescan appointment successfully created.");
                                     } else {
-                                      showDialogError(context, createResponse.message ?? '');
+                                      showDialogError(context, createResponse.message ?? createResponse.data?.message ?? 'Failed to create rescan appointment');
                                     }
+                                  }).catchError((e) {
+                                    dismissLoading();
+                                    showDialogError(context, e.toString());
                                   });
                                 }
                               });

@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/models/payment/payment_success_response.dar
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/views/appointment/appointment_detail_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
@@ -93,7 +94,12 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                                                 return AppointmentDetailsView(response: value.data);
                                               },
                                             );
+                                          } else {
+                                            showDialogError(context, value.message ?? 'Failed to load details');
                                           }
+                                        }).catchError((e) {
+                                          dismissLoading();
+                                          showDialogError(context, e.toString());
                                         });
                                       },
                                       title: Text('$item', style: AppTypography.bodyMedium(context)),

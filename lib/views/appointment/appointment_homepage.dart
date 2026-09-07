@@ -292,6 +292,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             _totalPage = value.data?.totalPage ?? 0;
             _totalCount = value.data?.totalCount ?? 0;
           });
+        }).catchError((e) {
+          dismissLoading();
         });
   }
 
@@ -1993,11 +1995,20 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                       ],
                                     ),
                                   );
+                                } else {
+                                  showDialogError(context, value.message ?? 'Failed to load schedule exceptions');
                                 }
+                              }).catchError((e) {
+                                dismissLoading();
+                                showDialogError(context, e.toString());
                               });
                             } else {
                               dismissLoading();
+                              showDialogError(context, value.message ?? 'Failed to load available slots');
                             }
+                          }).catchError((e) {
+                            dismissLoading();
+                            showDialogError(context, e.toString());
                           });
                         },
                       );

@@ -369,18 +369,28 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  showLoading();
-                  DoctorController.upload(context, value.data!.id!, selectedFile).then((value) {
-                    dismissLoading();
-                    if (responseCode(value.code)) {
-                      getLatestData();
-                    } else {
-                      showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                    }
-                  });
+                  if (selectedFile.value != null) {
+                    showLoading();
+                    DoctorController.upload(context, value.data!.id!, selectedFile).then((value) {
+                      dismissLoading();
+                      if (responseCode(value.code)) {
+                        getLatestData();
+                      } else {
+                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                      }
+                    }).catchError((e) {
+                      dismissLoading();
+                      showDialogError(context, e.toString());
+                    });
+                  } else {
+                    getLatestData();
+                  }
                 } else {
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
+              }).catchError((e) {
+                dismissLoading();
+                showDialogError(context, e.toString());
               });
             } else {
               DoctorController.update(
@@ -395,8 +405,8 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  showLoading();
                   if (selectedFile.value != null) {
+                    showLoading();
                     DoctorController.upload(context, widget.doctor!.doctorId!, selectedFile).then((value) {
                       dismissLoading();
                       if (responseCode(value.code)) {
@@ -404,6 +414,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                       } else {
                         showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                       }
+                    }).catchError((e) {
+                      dismissLoading();
+                      showDialogError(context, e.toString());
                     });
                   } else {
                     getLatestData();
@@ -411,6 +424,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 } else {
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
+              }).catchError((e) {
+                dismissLoading();
+                showDialogError(context, e.toString());
               });
             }
           }

@@ -2029,11 +2029,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     showDialogSuccess(context, 'Appointment successfully created for the user');
                   }
                 } else {
-                  dismissLoading();
-                  if (value.code != 500) {
-                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                  }
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
+              }).catchError((e) {
+                dismissLoading();
+                showDialogError(context, e.toString());
               });
             } else {
               // ── Completion check for unpaid booking fee ──
@@ -2139,7 +2139,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 dismissLoading();
                 if (responseCode(value.code)) {
                   if (widget.refreshData != null) {
-                    dismissLoading();
                     widget.refreshData!();
                   }
                   context.pop();
@@ -2149,10 +2148,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     showDialogSuccess(context, 'Successfully created new appointment');
                   }
                 } else {
-                  if (value.code != 500) {
-                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                  }
+                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
+              }).catchError((e) {
+                dismissLoading();
+                showDialogError(context, e.toString());
               });
             }
           }

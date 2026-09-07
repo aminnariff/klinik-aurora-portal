@@ -3,12 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
@@ -307,13 +309,20 @@ class AppointmentDetailsView extends StatelessWidget {
                     value,
                   ) {
                     dismissLoading();
-                    showDialog(
-                      context: context,
-                      builder: (_) => RescanAppointment(
-                        appointment: AppointmentDetailResponse(data: data),
-                        serviceBranchId: value.data?.serviceBranchId ?? '',
-                      ),
-                    );
+                    if (responseCode(value.code) && value.data?.serviceBranchId != null) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => RescanAppointment(
+                          appointment: AppointmentDetailResponse(data: data),
+                          serviceBranchId: value.data!.serviceBranchId!,
+                        ),
+                      );
+                    } else {
+                      showDialogError(context, value.message ?? 'Rescan service branch not found');
+                    }
+                  }).catchError((e) {
+                    dismissLoading();
+                    showDialogError(context, e.toString());
                   });
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 14),

@@ -61,6 +61,8 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
       if (responseCode(response.code)) {
         context.read<PaymentController>().branchPaymentReportResponse = response.data;
       }
+    }).catchError((e) {
+      dismissLoading();
     });
   }
 

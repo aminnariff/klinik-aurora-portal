@@ -172,6 +172,16 @@ class PromotionController extends ChangeNotifier {
             }
           });
     } catch (e) {
+      if (e is DioException) {
+        String? message;
+        if (e.response?.data is Map) {
+          message = e.response?.data['message']?.toString();
+        }
+        return ApiResponse(
+          code: e.response?.statusCode ?? 400,
+          message: message ?? e.message ?? e.toString(),
+        );
+      }
       return ApiResponse(code: 400, message: e.toString());
     }
   }
