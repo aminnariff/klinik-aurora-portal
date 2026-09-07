@@ -1,18 +1,12 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
-import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
-import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/service/create_service_request.dart';
 import 'package:klinik_aurora_portal/models/service/services_response.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_request.dart';
@@ -23,11 +17,11 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.d
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class ServiceDetails extends StatefulWidget {
@@ -68,11 +62,12 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     controller: TextEditingController(),
     labelText: 'servicesHomepage'.tr(gender: 'serviceCategory'),
   );
+  final InputFieldAttribute _serviceImage = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'servicesHomepage'.tr(gender: 'serviceImage'),
+  );
   DropdownAttribute? _doctorType;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
-  StreamController<String?> documentErrorMessage = StreamController.broadcast();
-  StreamController<DateTime> fileRebuild = StreamController.broadcast();
-  FileAttribute selectedFile = FileAttribute();
   final List<TextEditingController> whatsappTemplateControllers = List.generate(6, (_) => TextEditingController());
   int _activeTemplate = 0;
   final StreamController<DateTime> templateRebuild = StreamController.broadcast();
@@ -85,7 +80,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       serviceBookingFeeController.controller.text = widget.service?.serviceBookingFee ?? '';
       serviceTimeController.controller.text = widget.service?.serviceTime ?? '';
       serviceCategoryController.controller.text = widget.service?.serviceCategory ?? '';
-      selectedFile = FileAttribute(path: widget.service?.serviceImage, name: widget.service?.serviceImage);
+      _serviceImage.controller.text = widget.service?.serviceImage ?? '';
       if (widget.service?.serviceTemplate != null) {
         for (int i = 0; i < widget.service!.serviceTemplate!.length && i < 3; i++) {
           whatsappTemplateControllers[i].text = widget.service!.serviceTemplate![i];
@@ -267,134 +262,34 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                                   // ── Right column ──────────────────────────────
                                   SizedBox(
                                     width: screenWidth1728(30),
-                                    child: StreamBuilder<DateTime>(
-                                      stream: fileRebuild.stream,
-                                      builder: (context, snapshot) {
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            _sectionLabel('Service Image', Icons.image_outlined),
-                                            const SizedBox(height: 12),
-                                            if (widget.type == 'create') ...[
-                                              selectedFile.value == null
-                                                  ? UploadDocumentsField(
-                                                      title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                                      fieldTitle: 'servicesHomepage'.tr(gender: 'doctorImage'),
-                                                      action: () => addPicture(),
-                                                      cancelAction: () {},
-                                                    )
-                                                  : Stack(
-                                                      alignment: Alignment.topRight,
-                                                      children: [
-                                                        ClipRRect(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                          child: GestureDetector(
-                                                            onTap: addPicture,
-                                                            child: Image.memory(
-                                                              selectedFile.value as Uint8List,
-                                                              height: 300,
-                                                              width: double.infinity,
-                                                              fit: BoxFit.cover,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            selectedFile = FileAttribute();
-                                                            fileRebuild.add(DateTime.now());
-                                                          },
-                                                          icon: const Icon(Icons.close),
-                                                        ),
-                                                      ],
-                                                    ),
-                                            ],
-                                            if (widget.type == 'update') ...[
-                                              widget.service?.serviceImage == null
-                                                  ? selectedFile.name != null
-                                                        ? Stack(
-                                                            alignment: Alignment.topRight,
-                                                            children: [
-                                                              ClipRRect(
-                                                                borderRadius: BorderRadius.circular(10),
-                                                                child: GestureDetector(
-                                                                  onTap: addPicture,
-                                                                  child: Image.memory(
-                                                                    selectedFile.value as Uint8List,
-                                                                    height: 300,
-                                                                    width: double.infinity,
-                                                                    fit: BoxFit.cover,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              IconButton(
-                                                                onPressed: () {
-                                                                  selectedFile = FileAttribute();
-                                                                  fileRebuild.add(DateTime.now());
-                                                                },
-                                                                icon: const Icon(Icons.close),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : UploadDocumentsField(
-                                                            title: 'servicesHomepage'.tr(gender: 'browseFile'),
-                                                            fieldTitle: 'bservicesHomepage'.tr(gender: 'doctorImage'),
-                                                            action: addPicture,
-                                                            cancelAction: () {},
-                                                          )
-                                                  : ClipRRect(
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      child: GestureDetector(
-                                                        onTap: addPicture,
-                                                        child: Image.network(
-                                                          '${Environment.imageUrl}${widget.service?.serviceImage}',
-                                                          height: 300,
-                                                          width: double.infinity,
-                                                          fit: BoxFit.cover,
-                                                          loadingBuilder: (context, child, loadingProgress) {
-                                                            if (loadingProgress == null) return child;
-                                                            return SizedBox(
-                                                              height: 300,
-                                                              child: Center(
-                                                                child: CircularProgressIndicator(
-                                                                  value: loadingProgress.expectedTotalBytes != null
-                                                                      ? loadingProgress.cumulativeBytesLoaded /
-                                                                            (loadingProgress.expectedTotalBytes ?? 1)
-                                                                      : null,
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          errorBuilder: (context, error, stackTrace) => Container(
-                                                            height: 300,
-                                                            decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                              color: disabledColor,
-                                                            ),
-                                                            child: const Center(
-                                                              child: Icon(Icons.error, color: errorColor),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                              const SizedBox(height: 20),
-                                              _sectionLabel('Record Info', Icons.info_outline_rounded),
-                                              const SizedBox(height: 12),
-                                              _metaRow(
-                                                Icons.add_circle_outline,
-                                                'Created Date',
-                                                '${dateConverter(widget.service?.createdDate)}',
-                                              ),
-                                              const SizedBox(height: 8),
-                                              _metaRow(
-                                                Icons.edit_outlined,
-                                                'Last Updated',
-                                                '${dateConverter(widget.service?.modifiedDate)}',
-                                              ),
-                                            ],
-                                          ],
-                                        );
-                                      },
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _sectionLabel('Service Image', Icons.image_outlined),
+                                        const SizedBox(height: 12),
+                                        AppImageField(
+                                          field: _serviceImage,
+                                          folder: 'service',
+                                          previewHeight: 180,
+                                          previewWidth: 260,
+                                        ),
+                                        if (widget.type == 'update') ...[
+                                          const SizedBox(height: 20),
+                                          _sectionLabel('Record Info', Icons.info_outline_rounded),
+                                          const SizedBox(height: 12),
+                                          _metaRow(
+                                            Icons.add_circle_outline,
+                                            'Created Date',
+                                            '${dateConverter(widget.service?.createdDate)}',
+                                          ),
+                                          const SizedBox(height: 8),
+                                          _metaRow(
+                                            Icons.edit_outlined,
+                                            'Last Updated',
+                                            '${dateConverter(widget.service?.modifiedDate)}',
+                                          ),
+                                        ],
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -604,6 +499,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         Button(() {
           if (validate()) {
             showLoading();
+            final imageVal = _serviceImage.controller.text.trim().isEmpty ? null : _serviceImage.controller.text.trim();
             if (widget.type == 'create') {
               ServiceController.create(
                 context,
@@ -618,6 +514,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                       : double.parse(serviceBookingFeeController.controller.text),
                   serviceTime: serviceTimeController.controller.text,
                   serviceCategory: serviceCategoryController.controller.text,
+                  serviceImage: imageVal,
                   serviceStatus: 1,
                   doctorType: int.parse(_doctorType?.key ?? "1"),
                   serviceTemplate: whatsappTemplateControllers
@@ -628,19 +525,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  showLoading();
-                  if (selectedFile.name != null) {
-                    ServiceController.upload(context, value.data!.id!, selectedFile).then((value) {
-                      dismissLoading();
-                      if (responseCode(value.code)) {
-                        getLatestData();
-                      } else {
-                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                      }
-                    });
-                  } else {
-                    getLatestData();
-                  }
+                  getLatestData();
                 } else {
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -661,6 +546,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                       : double.parse(serviceBookingFeeController.controller.text),
                   serviceTime: serviceTimeController.controller.text,
                   serviceCategory: serviceCategoryController.controller.text,
+                  serviceImage: imageVal,
                   doctorType: int.parse(_doctorType?.key ?? "1"),
                   serviceTemplate: whatsappTemplateControllers
                       .map((c) => c.text.trim())
@@ -670,19 +556,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
               ).then((value) {
                 dismissLoading();
                 if (responseCode(value.code)) {
-                  showLoading();
-                  if (selectedFile.value != null) {
-                    ServiceController.upload(context, widget.service!.serviceId!, selectedFile).then((value) {
-                      dismissLoading();
-                      if (responseCode(value.code)) {
-                        getLatestData();
-                      } else {
-                        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                      }
-                    });
-                  } else {
-                    getLatestData();
-                  }
+                  getLatestData();
                 } else {
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
@@ -714,38 +588,6 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         }
       }
     });
-  }
-
-  Future<void> addPicture() async {
-    documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      if (supportedExtensions.contains(file.extension)) {
-        debugPrint(bytesToMB(file.size).toString());
-        debugPrint(file.name);
-        if (bytesToMB(file.size) < 1.0) {
-          Uint8List? fileBytes = result.files.first.bytes;
-          String fileName = result.files.first.name;
-
-          selectedFile = FileAttribute(name: fileName, value: fileBytes);
-          fileRebuild.add(DateTime.now());
-        } else {
-          showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
-        }
-      } else {
-        showDialogError(context, 'error'.tr(gender: 'err-22'));
-      }
-    } else {
-      // User canceled the picker
-    }
-  }
-
-  double bytesToMB(int bytes) {
-    double megabytes = bytes / 1048576.0;
-    // double sizeInGB = sizeInBytes / 1073741824.0;
-    return megabytes;
   }
 
   bool validate() {

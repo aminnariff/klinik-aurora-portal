@@ -84,6 +84,7 @@ class ServiceController extends ChangeNotifier {
             "serviceCategory": request.serviceCategory,
             "serviceStatus": request.serviceStatus, // 1 = active, 2 = inactive
             "serviceTemplate": request.serviceTemplate,
+            "serviceImage": request.serviceImage,
           },
         )
         .then((value) {

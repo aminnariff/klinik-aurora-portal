@@ -7,6 +7,7 @@ class UpdateServiceRequest {
   int? doctorType;
   String? serviceTime;
   String? serviceCategory;
+  String? serviceImage;
   int? serviceStatus;
   List<String>? serviceTemplate;
 
@@ -19,6 +20,7 @@ class UpdateServiceRequest {
     this.doctorType,
     this.serviceTime,
     this.serviceCategory,
+    this.serviceImage,
     this.serviceStatus,
     this.serviceTemplate,
   });
@@ -32,6 +34,7 @@ class UpdateServiceRequest {
     doctorType = json['doctorType'];
     serviceTime = json['serviceTime'];
     serviceCategory = json['serviceCategory'];
+    serviceImage = json['serviceImage'];
     serviceStatus = json['serviceStatus'];
     serviceTemplate = json['serviceTemplate'];
   }
@@ -45,6 +48,7 @@ class UpdateServiceRequest {
     data['doctorType'] = doctorType;
     data['serviceTime'] = serviceTime;
     data['serviceCategory'] = serviceCategory;
+    if (serviceImage != null) data['serviceImage'] = serviceImage;
     data['serviceStatus'] = serviceStatus;
     data['serviceTemplate'] =
         serviceTemplate == null ? [] : serviceTemplate!.where((e) => e.trim().isNotEmpty).toList();
