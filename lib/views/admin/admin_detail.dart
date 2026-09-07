@@ -391,6 +391,15 @@ class _AdminDetailState extends State<AdminDetail> {
                                             isEditable: allowEditableField,
                                           ),
                                         ),
+                                        AppPadding.vertical(denominator: 2),
+                                        InputField(
+                                          field: InputFieldAttribute(
+                                            controller: _userPhone,
+                                            labelText: 'information'.tr(gender: 'phoneNo'),
+                                            hintText: 'e.g. 0123456789',
+                                            isNumber: true,
+                                          ),
+                                        ),
                                         if (widget.type == 'create') ...[
                                           AppPadding.vertical(denominator: 2),
                                           InputField(
@@ -720,6 +729,20 @@ class _AdminDetailState extends State<AdminDetail> {
     );
   }
 
+  String _cleanPhone(String phone) {
+    String cleaned = phone.trim().replaceAll(RegExp(r'[^\d+]'), '');
+    if (cleaned.startsWith('+60')) {
+      cleaned = '0${cleaned.substring(3)}';
+    } else if (cleaned.startsWith('60') && cleaned.length > 8) {
+      cleaned = '0${cleaned.substring(2)}';
+    }
+    cleaned = cleaned.replaceFirst(RegExp(r'^0+'), '0');
+    if (cleaned.startsWith('1') && (cleaned.length == 9 || cleaned.length == 10)) {
+      cleaned = '0$cleaned';
+    }
+    return cleaned;
+  }
+
   Widget button() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -734,7 +757,7 @@ class _AdminDetailState extends State<AdminDetail> {
                 userId: widget.user?.userId,
                 userFullname: _userFullname.text,
                 branchId: _selectedBranch?.key,
-                userPhone: _userPhone.text.trim(),
+                userPhone: _cleanPhone(_userPhone.text),
                 userStatus: _userStatus.value ? 1 : 0,
               ),
             ).then((value) {
@@ -779,7 +802,7 @@ class _AdminDetailState extends State<AdminDetail> {
               CreateAdminRequest(
                 userName: _userName.text,
                 userFullname: _userFullname.text,
-                userPhone: _userPhone.text.trim(),
+                userPhone: _cleanPhone(_userPhone.text),
                 userEmail: _userEmail.text,
                 userPassword: _password.text,
                 userRetypePassword: _password.text,
