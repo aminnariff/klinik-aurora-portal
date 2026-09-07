@@ -22,12 +22,15 @@ import 'package:klinik_aurora_portal/controllers/service/service_branch_controll
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
+import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart' as detail_model;
 import 'package:klinik_aurora_portal/models/appointment/update_appointment_request.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_response.dart'
     as service_branch_available_model;
+import 'package:klinik_aurora_portal/views/appointment/appointment_detail_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
+import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
@@ -264,12 +267,61 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     }
   }
 
+  bool _isEligibleForRescan(String? serviceName) {
+    if (serviceName == null) return false;
+    final name = serviceName.toLowerCase();
+    return (name.contains('scan') || name.contains('screening')) && !name.contains('rescan');
+  }
+
+  String? _extractParentAppointmentId(String? adminRemark, String? appointmentNote) {
+    if (adminRemark != null) {
+      final match = RegExp(r'Parent Appointment ID:\s*([a-zA-Z0-9\-]+)', caseSensitive: false)
+          .firstMatch(adminRemark);
+      if (match != null && match.group(1) != null && match.group(1)!.isNotEmpty) {
+        return match.group(1)!.trim();
+      }
+    }
+    if (appointmentNote != null) {
+      final match = RegExp(r'Rescan for Appt #([a-zA-Z0-9\-]+)', caseSensitive: false)
+          .firstMatch(appointmentNote);
+      if (match != null && match.group(1) != null && match.group(1)!.isNotEmpty) {
+        return match.group(1)!.trim();
+      }
+    }
+    return null;
+  }
+
+  void _openParentAppointment(BuildContext context, String parentId) {
+    showLoading();
+    AppointmentController.detail(context, appointmentId: parentId).then((value) {
+      dismissLoading();
+      if (responseCode(value.code) && value.data != null) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AppointmentDetailsView(response: value.data);
+          },
+        );
+      } else {
+        showDialogError(context, value.message ?? 'Failed to load original appointment details');
+      }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return editBranch();
   }
 
   Widget editBranch() {
+    final parentAppointmentId = _extractParentAppointmentId(
+      widget.appointment?.adminRemark,
+      widget.appointment?.appointmentNote,
+    );
+
     return SingleChildScrollView(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -331,6 +383,35 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           fontSize: 11,
                                           color: Color(0xFF6B7280),
                                           fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ),
+                                  if (parentAppointmentId != null)
+                                    InkWell(
+                                      borderRadius: BorderRadius.circular(6),
+                                      onTap: () => _openParentAppointment(context, parentAppointmentId),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEFF6FF),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: const Color(0xFFBFDBFE)),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.link_rounded, size: 13, color: Color(0xFF2563EB)),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'Original: #${parentAppointmentId.substring(0, math.min(8, parentAppointmentId.length)).toUpperCase()}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFF2563EB),
+                                                fontFamily: 'monospace',
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -1016,12 +1097,67 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           ),
                                         AppPadding.vertical(denominator: 2),
                                         if (widget.type == 'update') ...[
-                                          labelValue(
-                                            'Service',
-                                            widget.appointment?.service?.serviceName ?? '',
-                                            alignStart: true,
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    labelValue(
+                                                      'Service',
+                                                      widget.appointment?.service?.serviceName ?? '',
+                                                      alignStart: true,
+                                                    ),
+                                                    AppSelectableText(
+                                                        'RM ${widget.appointment?.service?.servicePrice ?? 0}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              if (_isEligibleForRescan(widget.appointment?.service?.serviceName))
+                                                TextButton.icon(
+                                                  onPressed: () {
+                                                    showLoading();
+                                                    ServiceBranchController.rescanServiceBranchId(
+                                                      context,
+                                                      branchId: widget.appointment?.branch?.branchId,
+                                                    ).then((value) {
+                                                      dismissLoading();
+                                                      if (responseCode(value.code) &&
+                                                          value.data?.serviceBranchId != null) {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (_) => RescanAppointment(
+                                                            appointment: detail_model.AppointmentDetailResponse(
+                                                              data: widget.appointment != null
+                                                                  ? detail_model.Data.fromJson(
+                                                                      widget.appointment!.toJson(),
+                                                                    )
+                                                                  : null,
+                                                            ),
+                                                            serviceBranchId: value.data!.serviceBranchId!,
+                                                            rescanServiceTime: value.data?.serviceTime,
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        showDialogError(
+                                                          context,
+                                                          value.message ?? 'Rescan service branch not found',
+                                                        );
+                                                      }
+                                                    }).catchError((e) {
+                                                      dismissLoading();
+                                                      showDialogError(context, e.toString());
+                                                    });
+                                                  },
+                                                  icon: const Icon(Icons.refresh_rounded, size: 14),
+                                                  label: const Text('Rescan', style: TextStyle(fontSize: 12)),
+                                                  style: TextButton.styleFrom(
+                                                    foregroundColor: Colors.blue,
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                          AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
                                         ],
                                         if (widget.type == 'create')
                                           StreamBuilder<DateTime>(
