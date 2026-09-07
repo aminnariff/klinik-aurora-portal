@@ -34,8 +34,54 @@ class AppImageField extends StatefulWidget {
 
 class _AppImageFieldState extends State<AppImageField> {
   bool _uploading = false;
+  late String _initialValue;
 
   static const _allowedExtensions = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+
+  @override
+  void initState() {
+    super.initState();
+    _initialValue = widget.field.controller.text.trim();
+  }
+
+  Future<void> _handleReplace() async {
+    final hasValue = widget.field.controller.text.trim().isNotEmpty;
+    if (hasValue) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Color(0xFFD97706), size: 22),
+              SizedBox(width: 10),
+              Text('Replace Image?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            ],
+          ),
+          content: const Text(
+            'Uploading a new image will stage it for this record. Remember to click "Update" or "Create" at the bottom to save your changes to the database.',
+            style: TextStyle(fontSize: 13, color: Color(0xFF4B5563)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Choose File'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+    await _pickAndUpload();
+  }
 
   Future<void> _pickAndUpload() async {
     final result = await FilePicker.platform.pickFiles();
@@ -63,7 +109,6 @@ class _AppImageFieldState extends State<AppImageField> {
     final response = await AppAssetController.upload(
       bytes: bytes,
       filename: file.name,
-      previousUrl: widget.field.controller.text,
       folder: widget.folder,
     );
 
@@ -79,13 +124,42 @@ class _AppImageFieldState extends State<AppImageField> {
   }
 
   Future<void> _clear() async {
-    final current = widget.field.controller.text.trim();
-    widget.field.controller.clear();
-    widget.onChanged?.call();
-    setState(() {});
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 22),
+            SizedBox(width: 10),
+            Text('Remove Image?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          ],
+        ),
+        content: const Text(
+          'This will remove the image from this record. Click "Update" or "Create" at the bottom to save your changes to the database.',
+          style: TextStyle(fontSize: 13, color: Color(0xFF4B5563)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
 
-    if (current.isNotEmpty && (current.contains('storage.googleapis.com') || current.contains('firebasestorage.googleapis.com'))) {
-      AppAssetController.delete(current);
+    if (confirmed == true) {
+      widget.field.controller.clear();
+      widget.onChanged?.call();
+      setState(() {});
     }
   }
 
@@ -93,6 +167,7 @@ class _AppImageFieldState extends State<AppImageField> {
   Widget build(BuildContext context) {
     final value = widget.field.controller.text.trim();
     final hasValue = value.isNotEmpty;
+    final isModified = value != _initialValue;
     final resolvedUrl = resolveImageUrl(value);
 
     return Column(
@@ -126,7 +201,7 @@ class _AppImageFieldState extends State<AppImageField> {
                         Tooltip(
                           message: hasValue ? 'Replace image' : 'Upload image',
                           child: InkWell(
-                            onTap: _pickAndUpload,
+                            onTap: _handleReplace,
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               width: 48,
@@ -169,6 +244,30 @@ class _AppImageFieldState extends State<AppImageField> {
             ),
           ],
         ),
+        if (isModified) ...[
+          Container(
+            margin: const EdgeInsets.only(top: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF3C7),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: const Color(0xFFFDE68A)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFD97706)),
+                SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    'Image modified — click Update/Create to apply changes.',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF92400E)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         if (hasValue) ...[
           const SizedBox(height: 8),
           Row(

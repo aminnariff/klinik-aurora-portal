@@ -27,9 +27,6 @@ class AppAssetController {
         ),
       ),
     );
-    if (previousUrl != null && previousUrl.trim().isNotEmpty) {
-      formData.fields.add(MapEntry('previousUrl', previousUrl.trim()));
-    }
     if (folder != null && folder.trim().isNotEmpty) {
       formData.fields.add(MapEntry('folder', folder.trim()));
     }
