@@ -592,10 +592,16 @@ class _BranchDetailState extends State<BranchDetail> {
                       context.pop();
                       showDialogSuccess(context, 'Successfully created new branch');
                     }
+                  }).catchError((e) {
+                    dismissLoading();
                   });
                 } else {
+                  dismissLoading();
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
+              }).catchError((e) {
+                dismissLoading();
+                showDialogError(context, e.toString());
               });
             } else {
               BranchController.update(
@@ -626,10 +632,16 @@ class _BranchDetailState extends State<BranchDetail> {
                       context.pop();
                       showDialogSuccess(context, 'Successfully updated ${_branchName.text}');
                     }
+                  }).catchError((e) {
+                    dismissLoading();
                   });
                 } else {
+                  dismissLoading();
                   showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
                 }
+              }).catchError((e) {
+                dismissLoading();
+                showDialogError(context, e.toString());
               });
             }
           }
