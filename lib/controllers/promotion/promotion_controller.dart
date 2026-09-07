@@ -122,6 +122,30 @@ class PromotionController extends ChangeNotifier {
         });
   }
 
+  static Future<ApiResponse<UpdatePromotionResponse>> uploadUrls(
+    BuildContext context,
+    String promotionId,
+    List<String> imageUrls,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.put,
+          endpoint: 'admin/promotion/upload',
+          data: {
+            "promotionId": promotionId,
+            "promotionImage": imageUrls,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UpdatePromotionResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
   static Future<ApiResponse<UpdatePromotionResponse>> upload(
     BuildContext context,
     String promotionId,

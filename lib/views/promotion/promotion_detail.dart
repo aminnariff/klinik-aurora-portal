@@ -2,15 +2,12 @@ import 'dart:async';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
-import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/promotion/promotion_all_response.dart';
 import 'package:klinik_aurora_portal/models/promotion/update_promotion_request.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
@@ -19,12 +16,12 @@ import 'package:klinik_aurora_portal/views/widgets/checkbox/checkbox.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_multi_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class PromotionDetail extends StatefulWidget {
@@ -44,10 +41,9 @@ class _PromotionDetailState extends State<PromotionDetail> {
   final TextEditingController _endDate = TextEditingController();
   final ValueNotifier<bool> _showOnStart = ValueNotifier(false);
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
-  StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
-  StreamController<DateTime> fileRebuild = StreamController.broadcast();
-  List<FileAttribute> selectedFiles = [];
+  List<String> _imageUrls = [];
+  final List<String> _initialImagePaths = [];
 
   @override
   void initState() {
@@ -56,10 +52,12 @@ class _PromotionDetailState extends State<PromotionDetail> {
     _promotionTnc.text = widget.promotion.promotionTnc ?? '';
     _startDate.text = dateConverter(widget.promotion.promotionStartDate, format: 'dd-MM-yyyy') ?? '';
     _endDate.text = dateConverter(widget.promotion.promotionEndDate, format: 'dd-MM-yyyy') ?? '';
-    _promotionName.text = widget.promotion.promotionName ?? '';
     _showOnStart.value = widget.promotion.showOnStart == 1;
     for (PromotionImage item in widget.promotion.promotionImage ?? []) {
-      selectedFiles.add(FileAttribute(path: item.path, name: item.id));
+      if (item.path != null && item.path!.isNotEmpty) {
+        _imageUrls.add(item.path!);
+        _initialImagePaths.add(item.path!);
+      }
     }
     super.initState();
   }
@@ -196,143 +194,26 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        _sectionLabel('Images (max 3)', Icons.image_outlined),
-                                        const SizedBox(height: 12),
-                                        StreamBuilder<DateTime>(
-                                          stream: fileRebuild.stream,
-                                          builder: (context, snapshot) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                if (selectedFiles.length < 3)
-                                                  UploadDocumentsField(
-                                                    title: 'promotionPage'.tr(gender: 'browseFile'),
-                                                    fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
-                                                    action: () async {
-                                                      documentErrorMessage.add(null);
-                                                      FilePickerResult? result = await FilePicker.platform.pickFiles();
-                                                      if (result != null) {
-                                                        PlatformFile file = result.files.first;
-                                                        if (supportedExtensions.contains(file.extension)) {
-                                                          if (bytesToMB(file.size) < 1.0) {
-                                                            selectedFiles.add(
-                                                              FileAttribute(
-                                                                name: result.files.first.name,
-                                                                value: result.files.first.bytes,
-                                                              ),
-                                                            );
-                                                            fileRebuild.add(DateTime.now());
-                                                          } else {
-                                                            showDialogError(
-                                                              context,
-                                                              'error'.tr(
-                                                                gender: 'err-21',
-                                                                args: [fileSizeLimit.toStringAsFixed(0)],
-                                                              ),
-                                                            );
-                                                          }
-                                                        } else {
-                                                          showDialogError(
-                                                            context,
-                                                            'error'.tr(
-                                                              gender: 'err-22',
-                                                              args: [fileSizeLimit.toStringAsFixed(0)],
-                                                            ),
-                                                          );
-                                                        }
-                                                      }
-                                                    },
-                                                    cancelAction: () {},
-                                                  ),
-                                                const SizedBox(height: 8),
-                                                for (int index = 0; index < selectedFiles.length; index++)
-                                                  Container(
-                                                    margin: const EdgeInsets.only(bottom: 6),
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(0xFFF9FAFB),
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      border: Border.all(color: const Color(0xFFF3F4F6)),
-                                                    ),
-                                                    child: Row(
-                                                      children: [
-                                                        const Icon(
-                                                          Icons.image_outlined,
-                                                          size: 16,
-                                                          color: Color(0xFF9CA3AF),
-                                                        ),
-                                                        const SizedBox(width: 8),
-                                                        Expanded(
-                                                          child: GestureDetector(
-                                                            onTap: () {
-                                                              if (selectedFiles[index].path != null ||
-                                                                  selectedFiles[index].value != null) {
-                                                                showDialog(
-                                                                  context: context,
-                                                                  builder: (_) => GestureDetector(
-                                                                    onTap: () => context.pop(),
-                                                                    child: Row(
-                                                                      mainAxisSize: MainAxisSize.min,
-                                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                                      children: [
-                                                                        Flexible(
-                                                                          child: CardContainer(
-                                                                            selectedFiles[index].value != null
-                                                                                ? Image.memory(
-                                                                                    selectedFiles[index].value!,
-                                                                                  )
-                                                                                : selectedFiles[index].path != null
-                                                                                ? Padding(
-                                                                                    padding: EdgeInsets.all(
-                                                                                      screenPadding,
-                                                                                    ),
-                                                                                    child: Image.network(
-                                                                                      '${Environment.imageUrl}${selectedFiles[index].path}',
-                                                                                    ),
-                                                                                  )
-                                                                                : const SizedBox(),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              }
-                                                            },
-                                                            child: Text(
-                                                              '${index + 1}. ${selectedFiles[index].name ?? ''}',
-                                                              style: const TextStyle(
-                                                                fontSize: 12,
-                                                                color: Color(0xFF6366F1),
-                                                              ),
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        IconButton(
-                                                          icon: const Icon(Icons.close, size: 16),
-                                                          tooltip: 'button'.tr(gender: 'remove'),
-                                                          visualDensity: VisualDensity.compact,
-                                                          onPressed: () {
-                                                            PromotionController.remove(
-                                                              context,
-                                                              selectedFiles[index].name ?? '',
-                                                            ).then((value) {
-                                                              if (responseCode(value.code)) {
-                                                                selectedFiles.removeAt(index);
-                                                                fileRebuild.add(DateTime.now());
-                                                              } else {
-                                                                showDialogError(context, 'Unable to delete image');
-                                                              }
-                                                            });
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                              ],
-                                            );
+                                        AppMultiImageField(
+                                          images: _imageUrls,
+                                          onChanged: (updated) {
+                                            for (final initial in List<String>.from(_initialImagePaths)) {
+                                              if (!updated.contains(initial)) {
+                                                _initialImagePaths.remove(initial);
+                                                for (final img in widget.promotion.promotionImage ?? []) {
+                                                  if (img.path == initial && img.id != null) {
+                                                    PromotionController.remove(context, img.id!);
+                                                    break;
+                                                  }
+                                                }
+                                              }
+                                            }
+                                            setState(() {
+                                              _imageUrls = updated;
+                                            });
                                           },
+                                          folder: 'promotion',
+                                          maxImages: 3,
                                         ),
                                         const SizedBox(height: 20),
                                         _sectionLabel('Schedule', Icons.schedule_outlined),
@@ -456,60 +337,44 @@ class _PromotionDetailState extends State<PromotionDetail> {
                                       ).then((value) {
                                         dismissLoading();
                                         if (responseCode(value.code)) {
-                                          if (isAnyFileChange()) {
-                                            bool showError = false;
-                                            for (FileAttribute item in selectedFiles) {
-                                              if (item.name!.contains('images/promotion')) {
-                                                showError = true;
-                                                break;
+                                          final newImages = _imageUrls
+                                              .where((url) => !_initialImagePaths.contains(url))
+                                              .toList();
+                                          if (newImages.isNotEmpty) {
+                                            showLoading();
+                                            PromotionController.uploadUrls(
+                                              context,
+                                              widget.promotion.promotionId!,
+                                              newImages,
+                                            ).then((uploadVal) {
+                                              dismissLoading();
+                                              if (responseCode(uploadVal.code)) {
+                                                context.pop();
+                                                PromotionController.getAll(context, 1, pageSize).then(
+                                                  (allVal) =>
+                                                      context.read<PromotionController>().promotionAllResponse =
+                                                          allVal,
+                                                );
+                                                showDialogSuccess(context, 'Promotion updated successfully!');
+                                              } else {
+                                                showDialogError(
+                                                  context,
+                                                  uploadVal.message ??
+                                                      uploadVal.data?.message ??
+                                                      'ERROR : ${uploadVal.code}',
+                                                );
                                               }
-                                            }
-                                            if (showError) {
-                                              showDialogError(
-                                                context,
-                                                'Please delete the outdated images and upload the updated versions.',
-                                              );
-                                            } else {
-                                              showLoading();
-                                              for (int i = 0; i < selectedFiles.length; i++) {
-                                                if (selectedFiles[i].value != null) {
-                                                  PromotionController.upload(context, widget.promotion.promotionId!, [
-                                                    selectedFiles[i],
-                                                  ]).then((value) {
-                                                    dismissLoading();
-                                                    if (responseCode(value.code)) {
-                                                      if (i == selectedFiles.length - 1) {
-                                                        context.pop();
-                                                        PromotionController.getAll(context, 1, pageSize).then(
-                                                          (value) =>
-                                                              context.read<PromotionController>().promotionAllResponse =
-                                                                  value,
-                                                        );
-                                                        showDialogSuccess(context, 'Promotion updated successfully!');
-                                                      }
-                                                    } else {
-                                                      showDialogError(
-                                                        context,
-                                                        value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                                      );
-                                                    }
-                                                  }).catchError((e) {
-                                                    dismissLoading();
-                                                    showDialogError(context, e.toString());
-                                                  });
-                                                } else if (i == selectedFiles.length - 1) {
-                                                  context.pop();
-                                                  PromotionController.getAll(context, 1, pageSize).then(
-                                                    (value) =>
-                                                        context.read<PromotionController>().promotionAllResponse =
-                                                            value,
-                                                  );
-                                                  showDialogSuccess(context, 'Promotion updated successfully!');
-                                                }
-                                              }
-                                            }
+                                            }).catchError((e) {
+                                              dismissLoading();
+                                              showDialogError(context, e.toString());
+                                            });
                                           } else {
                                             context.pop();
+                                            PromotionController.getAll(context, 1, pageSize).then(
+                                              (allVal) =>
+                                                  context.read<PromotionController>().promotionAllResponse =
+                                                      allVal,
+                                            );
                                             showDialogSuccess(context, 'Promotion updated successfully!');
                                           }
                                         } else {
@@ -539,24 +404,6 @@ class _PromotionDetailState extends State<PromotionDetail> {
         ),
       ],
     );
-  }
-
-  bool isAnyFileChange() {
-    bool temp = false;
-
-    for (FileAttribute item in selectedFiles) {
-      if (item.value != null) {
-        temp = true;
-        break;
-      }
-    }
-    return temp;
-  }
-
-  double bytesToMB(int bytes) {
-    double megabytes = bytes / 1048576.0;
-    // double sizeInGB = sizeInBytes / 1073741824.0;
-    return megabytes;
   }
 
   bool validate() {

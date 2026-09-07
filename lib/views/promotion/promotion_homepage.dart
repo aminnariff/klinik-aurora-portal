@@ -2,20 +2,18 @@ import 'dart:async';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/promotion/promotion_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/promotion/create_promotion_request.dart';
 import 'package:klinik_aurora_portal/models/promotion/promotion_all_response.dart';
+import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
@@ -25,6 +23,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_multi_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
@@ -34,7 +33,6 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
-import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class PromotionHomepage extends StatefulWidget {
@@ -65,8 +63,6 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   final TextEditingController _endDate = TextEditingController();
   final ValueNotifier<bool> _showOnStart = ValueNotifier(false);
   StreamController<DateTime> rebuild = StreamController.broadcast();
-  StreamController<DateTime> fileRebuild = StreamController.broadcast();
-  List<FileAttribute> selectedFiles = [];
 
   @override
   void initState() {
@@ -362,7 +358,6 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
     _startDate.clear();
     _endDate.clear();
     _showOnStart.value = false;
-    selectedFiles.clear();
 
     showDialog(
       context: context,
@@ -374,9 +369,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
         startDate: _startDate,
         endDate: _endDate,
         showOnStart: _showOnStart,
-        fileRebuild: fileRebuild,
-        selectedFiles: selectedFiles,
-        onSave: () {
+        onSave: (imageUrls) {
           if (_validateForm(ctx)) {
             showLoading();
             PromotionController.create(
@@ -393,20 +386,26 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
               dismissLoading();
               if (responseCode(value.code)) {
                 if (value.data?.id != null) {
-                  showLoading();
-                  PromotionController.upload(ctx, value.data!.id!, selectedFiles).then((uploadValue) {
-                    dismissLoading();
-                    if (responseCode(uploadValue.code)) {
-                      filtering();
-                      Navigator.of(ctx).pop();
-                      showDialogSuccess(context, 'Promotion created successfully!');
-                    } else {
-                      showDialogError(ctx, uploadValue.message ?? 'Upload failed');
-                    }
-                  }).catchError((e) {
-                    dismissLoading();
-                    showDialogError(ctx, e.toString());
-                  });
+                  if (imageUrls.isNotEmpty) {
+                    showLoading();
+                    PromotionController.uploadUrls(ctx, value.data!.id!, imageUrls).then((uploadValue) {
+                      dismissLoading();
+                      if (responseCode(uploadValue.code)) {
+                        filtering();
+                        Navigator.of(ctx).pop();
+                        showDialogSuccess(context, 'Promotion created successfully!');
+                      } else {
+                        showDialogError(ctx, uploadValue.message ?? 'Upload failed');
+                      }
+                    }).catchError((e) {
+                      dismissLoading();
+                      showDialogError(ctx, e.toString());
+                    });
+                  } else {
+                    filtering();
+                    Navigator.of(ctx).pop();
+                    showDialogSuccess(context, 'Promotion created successfully!');
+                  }
                 }
               } else {
                 showDialogError(ctx, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
@@ -535,7 +534,7 @@ class _PromotionCardState extends State<_PromotionCard> {
         // Image or placeholder
         hasImage
             ? Image.network(
-                '${Environment.imageUrl}${images.first.path}',
+                resolveImageUrl(images.first.path),
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => _buildPlaceholder(),
                 loadingBuilder: (_, child, progress) {
@@ -648,7 +647,7 @@ class _PromotionCardState extends State<_PromotionCard> {
   }
 }
 
-class _PromotionFormDialog extends StatelessWidget {
+class _PromotionFormDialog extends StatefulWidget {
   final String title;
   final TextEditingController promotionName;
   final TextEditingController promotionDescription;
@@ -656,9 +655,7 @@ class _PromotionFormDialog extends StatelessWidget {
   final TextEditingController startDate;
   final TextEditingController endDate;
   final ValueNotifier<bool> showOnStart;
-  final StreamController<DateTime> fileRebuild;
-  final List<FileAttribute> selectedFiles;
-  final VoidCallback onSave;
+  final void Function(List<String> imageUrls) onSave;
 
   const _PromotionFormDialog({
     required this.title,
@@ -668,12 +665,15 @@ class _PromotionFormDialog extends StatelessWidget {
     required this.startDate,
     required this.endDate,
     required this.showOnStart,
-    required this.fileRebuild,
-    required this.selectedFiles,
     required this.onSave,
   });
 
-  double bytesToMB(int bytes) => bytes / 1048576.0;
+  @override
+  State<_PromotionFormDialog> createState() => _PromotionFormDialogState();
+}
+
+class _PromotionFormDialogState extends State<_PromotionFormDialog> {
+  List<String> _imageUrls = [];
 
   @override
   Widget build(BuildContext context) {
@@ -716,7 +716,7 @@ class _PromotionFormDialog extends StatelessWidget {
             child: const Icon(Icons.local_offer_rounded, color: primary, size: 18),
           ),
           const SizedBox(width: 12),
-          Text(title, style: AppTypography.bodyLarge(context)),
+          Text(widget.title, style: AppTypography.bodyLarge(context)),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 20),
@@ -740,8 +740,8 @@ class _PromotionFormDialog extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Button(
-            onSave,
-            actionText: title == 'New Promotion' ? 'button'.tr(gender: 'create') : 'button'.tr(gender: 'update'),
+            () => widget.onSave(_imageUrls),
+            actionText: widget.title == 'New Promotion' ? 'button'.tr(gender: 'create') : 'button'.tr(gender: 'update'),
           ),
         ],
       ),
@@ -776,20 +776,20 @@ class _PromotionFormDialog extends StatelessWidget {
         _sectionLabel(context, 'Promotion Details'),
         const SizedBox(height: 12),
         InputField(
-          field: InputFieldAttribute(controller: promotionName, labelText: 'Name'),
+          field: InputFieldAttribute(controller: widget.promotionName, labelText: 'Name'),
         ),
         AppPadding.vertical(denominator: 2),
         TextField(
           maxLines: 4,
           style: Theme.of(context).textTheme.bodyMedium,
-          controller: promotionDescription,
+          controller: widget.promotionDescription,
           decoration: appInputDecoration(context, 'Description'),
         ),
         AppPadding.vertical(denominator: 2),
         TextField(
           maxLines: 4,
           style: Theme.of(context).textTheme.bodyMedium,
-          controller: promotionTnc,
+          controller: widget.promotionTnc,
           decoration: appInputDecoration(context, 'Terms & Conditions'),
         ),
       ],
@@ -802,48 +802,14 @@ class _PromotionFormDialog extends StatelessWidget {
       children: [
         _sectionLabel(context, 'Images & Schedule'),
         const SizedBox(height: 12),
-        StreamBuilder<DateTime>(
-          stream: fileRebuild.stream,
-          builder: (context, _) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (selectedFiles.length < 3)
-                  UploadDocumentsField(
-                    title: 'promotionPage'.tr(gender: 'browseFile'),
-                    fieldTitle: 'promotionPage'.tr(gender: 'promotionImage'),
-                    action: () async {
-                      FilePickerResult? result = await FilePicker.platform.pickFiles();
-                      if (result != null) {
-                        PlatformFile file = result.files.first;
-                        if (supportedExtensions.contains(file.extension)) {
-                          if (bytesToMB(file.size) < 1.0) {
-                            selectedFiles.add(FileAttribute(name: file.name, value: result.files.first.bytes));
-                            fileRebuild.add(DateTime.now());
-                          } else {
-                            showDialogError(
-                              context,
-                              'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]),
-                            );
-                          }
-                        } else {
-                          showDialogError(
-                            context,
-                            'error'.tr(gender: 'err-22', args: [fileSizeLimit.toStringAsFixed(0)]),
-                          );
-                        }
-                      }
-                    },
-                    cancelAction: () {},
-                  ),
-                if (selectedFiles.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  ...List.generate(selectedFiles.length, (index) {
-                    return _buildFileItem(context, index);
-                  }),
-                ],
-              ],
-            );
+        AppMultiImageField(
+          title: 'promotionPage'.tr(gender: 'promotionImage'),
+          images: _imageUrls,
+          maxImages: 3,
+          onChanged: (urls) {
+            setState(() {
+              _imageUrls = urls;
+            });
           },
         ),
         AppPadding.vertical(),
@@ -855,12 +821,12 @@ class _PromotionFormDialog extends StatelessWidget {
               dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
               borderRadius: BorderRadius.circular(15),
             );
-            startDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+            widget.startDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
           },
           child: ReadOnly(
             InputField(
               field: InputFieldAttribute(
-                controller: startDate,
+                controller: widget.startDate,
                 isEditable: false,
                 labelText: 'promotionPage'.tr(gender: 'startDate'),
                 suffixWidget: const Row(
@@ -881,12 +847,12 @@ class _PromotionFormDialog extends StatelessWidget {
               dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
               borderRadius: BorderRadius.circular(15),
             );
-            endDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
+            widget.endDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
           },
           child: ReadOnly(
             InputField(
               field: InputFieldAttribute(
-                controller: endDate,
+                controller: widget.endDate,
                 isEditable: false,
                 labelText: 'promotionPage'.tr(gender: 'endDate'),
                 suffixWidget: const Row(
@@ -900,13 +866,13 @@ class _PromotionFormDialog extends StatelessWidget {
         ),
         AppPadding.vertical(denominator: 2),
         ValueListenableBuilder<bool>(
-          valueListenable: showOnStart,
+          valueListenable: widget.showOnStart,
           builder: (context, value, _) {
             return GestureDetector(
-              onTap: () => showOnStart.value = !value,
+              onTap: () => widget.showOnStart.value = !value,
               child: Row(
                 children: [
-                  CheckBoxWidget((p0) => showOnStart.value = !value, value: value),
+                  CheckBoxWidget((p0) => widget.showOnStart.value = !value, value: value),
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text('promotionPage'.tr(gender: 'showOnStart'), style: AppTypography.bodyMedium(context)),
@@ -917,56 +883,6 @@ class _PromotionFormDialog extends StatelessWidget {
           },
         ),
       ],
-    );
-  }
-
-  Widget _buildFileItem(BuildContext context, int index) {
-    final file = selectedFiles[index];
-    final hasPreview = file.value != null;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Row(
-        children: [
-          if (hasPreview)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Image.memory(file.value!, width: 36, height: 36, fit: BoxFit.cover),
-            )
-          else
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(color: primary.withAlpha(25), borderRadius: BorderRadius.circular(6)),
-              child: const Icon(Icons.image_rounded, size: 18, color: primary),
-            ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              file.name ?? 'Image ${index + 1}',
-              style: AppTypography.bodyMedium(context),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, size: 18),
-            color: const Color(0xFFEF4444),
-            tooltip: 'Remove',
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              selectedFiles.removeAt(index);
-              fileRebuild.add(DateTime.now());
-            },
-          ),
-        ],
-      ),
     );
   }
 
