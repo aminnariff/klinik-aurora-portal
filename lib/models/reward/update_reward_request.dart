@@ -7,6 +7,7 @@ class UpdateRewardRequest {
   int? totalReward;
   String? rewardStartDate;
   String? rewardEndDate;
+  String? rewardImage;
 
   UpdateRewardRequest(
       {this.rewardId,
@@ -16,7 +17,8 @@ class UpdateRewardRequest {
       this.rewardStatus,
       this.totalReward,
       this.rewardStartDate,
-      this.rewardEndDate});
+      this.rewardEndDate,
+      this.rewardImage});
 
   UpdateRewardRequest.fromJson(Map<String, dynamic> json) {
     rewardId = json['rewardId'];
@@ -27,6 +29,7 @@ class UpdateRewardRequest {
     totalReward = json['totalReward'];
     rewardStartDate = json['rewardStartDate'];
     rewardEndDate = json['rewardEndDate'];
+    rewardImage = json['rewardImage'];
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +42,7 @@ class UpdateRewardRequest {
     data['totalReward'] = totalReward;
     data['rewardStartDate'] = rewardStartDate;
     data['rewardEndDate'] = rewardEndDate;
+    if (rewardImage != null) data['rewardImage'] = rewardImage;
     return data;
   }
 }

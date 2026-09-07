@@ -5,6 +5,7 @@ class CreateRewardRequest {
   int? totalReward;
   String? rewardStartDate;
   String? rewardEndDate;
+  String? rewardImage;
 
   CreateRewardRequest(
       {this.rewardName,
@@ -12,7 +13,8 @@ class CreateRewardRequest {
       this.rewardPoint,
       this.totalReward,
       this.rewardStartDate,
-      this.rewardEndDate});
+      this.rewardEndDate,
+      this.rewardImage});
 
   CreateRewardRequest.fromJson(Map<String, dynamic> json) {
     rewardName = json['rewardName'];
@@ -21,6 +23,7 @@ class CreateRewardRequest {
     totalReward = json['totalReward'];
     rewardStartDate = json['rewardStartDate'];
     rewardEndDate = json['rewardEndDate'];
+    rewardImage = json['rewardImage'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +34,7 @@ class CreateRewardRequest {
     data['totalReward'] = totalReward;
     data['rewardStartDate'] = rewardStartDate;
     data['rewardEndDate'] = rewardEndDate;
+    if (rewardImage != null) data['rewardImage'] = rewardImage;
     return data;
   }
 }

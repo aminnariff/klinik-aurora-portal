@@ -67,6 +67,7 @@ class RewardController extends ChangeNotifier {
             "rewardEndDate": request.rewardEndDate, // set null or "" for no restrict date
             "totalReward": request.totalReward, // set 0 to set for unlimited item
             "rewardPoint": request.rewardPoint,
+            "rewardImage": request.rewardImage,
           },
         )
         .then((value) {
@@ -93,6 +94,7 @@ class RewardController extends ChangeNotifier {
             "totalReward": request.totalReward,
             "rewardStatus": request.rewardStatus,
             "rewardPoint": request.rewardPoint, // set 0 to set for unlimited item
+            "rewardImage": request.rewardImage,
           },
         )
         .then((value) {

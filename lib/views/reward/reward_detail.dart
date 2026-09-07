@@ -1,17 +1,13 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
-import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/reward/reward_controller.dart';
-import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/reward/create_reward_request.dart';
 import 'package:klinik_aurora_portal/models/reward/reward_all_response.dart';
 import 'package:klinik_aurora_portal/models/reward/update_reward_request.dart';
@@ -19,12 +15,12 @@ import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
-import 'package:klinik_aurora_portal/views/widgets/upload_document/upload_document.dart';
 import 'package:provider/provider.dart';
 
 class RewardDetail extends StatefulWidget {
@@ -45,11 +41,12 @@ class _RewardDetailState extends State<RewardDetail> {
   final TextEditingController _startDate = TextEditingController();
   final TextEditingController _endDate = TextEditingController();
   final TextEditingController _rewardTotal = TextEditingController();
+  final InputFieldAttribute _rewardImageField = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'rewardPage'.tr(gender: 'rewardImage'),
+  );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
-  StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> validateRebuild = StreamController.broadcast();
-  StreamController<DateTime> fileRebuild = StreamController.broadcast();
-  FileAttribute? selectedFile;
 
   @override
   void initState() {
@@ -60,7 +57,7 @@ class _RewardDetailState extends State<RewardDetail> {
       _startDate.text = dateConverter(widget.reward?.rewardStartDate, format: 'dd-MM-yyyy') ?? '';
       _endDate.text = dateConverter(widget.reward?.rewardEndDate, format: 'dd-MM-yyyy') ?? '';
       _rewardTotal.text = widget.reward!.totalReward.toString();
-      selectedFile = FileAttribute(path: widget.reward?.rewardImage, name: widget.reward?.rewardImage);
+      _rewardImageField.controller.text = widget.reward?.rewardImage ?? '';
     }
     super.initState();
   }
@@ -298,87 +295,11 @@ class _RewardDetailState extends State<RewardDetail> {
                                       children: [
                                         _sectionLabel('Reward Image', Icons.image_outlined),
                                         const SizedBox(height: 12),
-                                        StreamBuilder<DateTime>(
-                                          stream: fileRebuild.stream,
-                                          builder: (context, snapshot) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                if (widget.type == 'create') ...[
-                                                  selectedFile?.value == null
-                                                      ? UploadDocumentsField(
-                                                          title: 'rewardPage'.tr(gender: 'browseFile'),
-                                                          fieldTitle: 'rewardPage'.tr(gender: 'rewardImage'),
-                                                          action: () => addPicture(),
-                                                          cancelAction: () {},
-                                                        )
-                                                      : Stack(
-                                                          alignment: Alignment.topRight,
-                                                          children: [
-                                                            ClipRRect(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                              child: GestureDetector(
-                                                                onTap: () => addPicture(),
-                                                                child: Image.memory(
-                                                                  selectedFile?.value as Uint8List,
-                                                                  height: 300,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            IconButton(
-                                                              onPressed: () {
-                                                                selectedFile = FileAttribute();
-                                                                fileRebuild.add(DateTime.now());
-                                                              },
-                                                              icon: const Icon(Icons.close),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                ],
-                                                if (widget.type == 'update')
-                                                  widget.reward?.rewardImage == null
-                                                      ? selectedFile?.name != null
-                                                            ? Stack(
-                                                                alignment: Alignment.topRight,
-                                                                children: [
-                                                                  ClipRRect(
-                                                                    borderRadius: BorderRadius.circular(10),
-                                                                    child: GestureDetector(
-                                                                      onTap: () => addPicture(),
-                                                                      child: Image.memory(
-                                                                        selectedFile?.value as Uint8List,
-                                                                        height: 300,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  IconButton(
-                                                                    onPressed: () {
-                                                                      selectedFile = FileAttribute();
-                                                                      fileRebuild.add(DateTime.now());
-                                                                    },
-                                                                    icon: const Icon(Icons.close),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            : UploadDocumentsField(
-                                                                title: 'branchImage'.tr(gender: 'browseFile'),
-                                                                fieldTitle: 'branchPage'.tr(gender: 'branchImage'),
-                                                                action: () => addPicture(),
-                                                                cancelAction: () {},
-                                                              )
-                                                      : ClipRRect(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                          child: GestureDetector(
-                                                            onTap: () => addPicture(),
-                                                            child: Image.network(
-                                                              '${Environment.imageUrl}${widget.reward?.rewardImage}',
-                                                              height: 300,
-                                                            ),
-                                                          ),
-                                                        ),
-                                              ],
-                                            );
-                                          },
+                                        AppImageField(
+                                          field: _rewardImageField,
+                                          folder: 'reward',
+                                          previewHeight: 180,
+                                          previewWidth: 260,
                                         ),
                                       ],
                                     ),
@@ -391,6 +312,9 @@ class _RewardDetailState extends State<RewardDetail> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Button(() {
+                                    final imgVal = _rewardImageField.controller.text.trim().isEmpty
+                                        ? null
+                                        : _rewardImageField.controller.text.trim();
                                     if (widget.type == 'update') {
                                       RewardController.update(
                                         context,
@@ -403,28 +327,12 @@ class _RewardDetailState extends State<RewardDetail> {
                                           rewardEndDate: convertStringToDate(_endDate.text),
                                           totalReward: int.parse(_rewardTotal.text),
                                           rewardStatus: widget.reward?.rewardStatus,
+                                          rewardImage: imgVal,
                                         ),
                                       ).then((value) {
                                         if (responseCode(value.code)) {
-                                          if (selectedFile?.value != null) {
-                                            RewardController.upload(
-                                              context,
-                                              widget.reward!.rewardId!,
-                                              selectedFile!,
-                                            ).then((value) {
-                                              if (responseCode(value.code)) {
-                                                getLatestData();
-                                              } else {
-                                                showDialogError(
-                                                  context,
-                                                  value.message ?? value.data?.message ?? 'ERROR : ${value.code}',
-                                                );
-                                              }
-                                            });
-                                          } else {
-                                            context.pop();
-                                            getLatestData();
-                                          }
+                                          context.pop();
+                                          getLatestData();
                                         } else {
                                           showDialogError(
                                             context,
@@ -442,15 +350,12 @@ class _RewardDetailState extends State<RewardDetail> {
                                           rewardStartDate: convertStringToDate(_startDate.text),
                                           rewardEndDate: convertStringToDate(_endDate.text),
                                           totalReward: _rewardTotal.text != '' ? int.parse(_rewardTotal.text) : null,
+                                          rewardImage: imgVal,
                                         ),
                                       ).then((value) {
                                         if (responseCode(value.code)) {
                                           context.pop();
-                                          RewardController.upload(context, value.data!.id!, selectedFile!).then((
-                                            value,
-                                          ) {
-                                            if (responseCode(value.code)) getLatestData();
-                                          });
+                                          getLatestData();
                                         } else {
                                           showDialogError(
                                             context,
@@ -501,37 +406,5 @@ class _RewardDetailState extends State<RewardDetail> {
         }
       }
     });
-  }
-
-  Future<void> addPicture() async {
-    documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      if (supportedExtensions.contains(file.extension)) {
-        debugPrint(bytesToMB(file.size).toString());
-        debugPrint(file.name);
-        if (bytesToMB(file.size) < 1.0) {
-          Uint8List? fileBytes = result.files.first.bytes;
-          String fileName = result.files.first.name;
-
-          selectedFile = FileAttribute(name: fileName, value: fileBytes);
-          fileRebuild.add(DateTime.now());
-        } else {
-          showDialogError(context, 'error'.tr(gender: 'err-21', args: [fileSizeLimit.toStringAsFixed(0)]));
-        }
-      } else {
-        showDialogError(context, 'error'.tr(gender: 'err-22'));
-      }
-    } else {
-      // User canceled the picker
-    }
-  }
-
-  double bytesToMB(int bytes) {
-    double megabytes = bytes / 1048576.0;
-    // double sizeInGB = sizeInBytes / 1073741824.0;
-    return megabytes;
   }
 }
