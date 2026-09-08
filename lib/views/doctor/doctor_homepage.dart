@@ -14,6 +14,7 @@ import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart
 import 'package:klinik_aurora_portal/models/doctor/doctor_branch_response.dart';
 import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/models/doctor/update_doctor_request.dart';
+import 'package:klinik_aurora_portal/views/doctor/branch_roster_dialog.dart';
 import 'package:klinik_aurora_portal/views/doctor/doctor_detail.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
@@ -48,7 +49,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  DropdownAttribute? _selectedStatus;
+  DropdownAttribute? _selectedStatus = DropdownAttribute('1', 'Active');
+  DropdownAttribute? _selectedDoctorType;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
 
   static const List<Color> _avatarColors = [
@@ -123,6 +125,18 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                   ),
                   const Spacer(),
                   _MobileActionButton(
+                    icon: Icons.calendar_month_rounded,
+                    tooltip: 'Branch Roster',
+                    color: primary,
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (_) => BranchRosterDialog(
+                        initialBranchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _MobileActionButton(
                     icon: Icons.person_add_alt_1_rounded,
                     tooltip: 'Add PIC',
                     color: Colors.white,
@@ -176,8 +190,15 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                   Text(doc.doctorName ?? 'N/A', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
                   const SizedBox(height: 2),
                   Text(doc.doctorPhone ?? '—', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
-                  const SizedBox(height: 4),
-                  _statusChip(doc.doctorStatus == 1),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      _doctorTypeChip(doc.doctorType),
+                      _statusChip(doc.doctorStatus == 1),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -235,6 +256,23 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F4F6),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => BranchRosterDialog(
+                initialBranchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+              ),
+            ),
+            icon: const Icon(Icons.calendar_month_rounded, size: 16),
+            label: const Text('Branch Roster', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: primary,
+              side: const BorderSide(color: primary),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
@@ -338,10 +376,18 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                       _avatar(doc),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
-                          doc.doctorName ?? 'N/A',
-                          style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                          overflow: TextOverflow.ellipsis,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              doc.doctorName ?? 'N/A',
+                              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            _doctorTypeChip(doc.doctorType),
+                          ],
                         ),
                       ),
                     ],
@@ -414,6 +460,49 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     );
   }
 
+  Widget _doctorTypeChip(int? type) {
+    final label = doctorType(type);
+    Color bg = const Color(0xFFEFF6FF);
+    Color fg = const Color(0xFF1D4ED8);
+    switch (type) {
+      case 2:
+        bg = const Color(0xFFF3E8FF);
+        fg = const Color(0xFF7E22CE);
+        break;
+      case 3:
+        bg = const Color(0xFFECFDF5);
+        fg = const Color(0xFF047857);
+        break;
+      case 4:
+        bg = const Color(0xFFFFF1F2);
+        fg = const Color(0xFFBE123C);
+        break;
+      case 5:
+        bg = const Color(0xFFFEF3C7);
+        fg = const Color(0xFFB45309);
+        break;
+      default:
+        bg = const Color(0xFFEFF6FF);
+        fg = const Color(0xFF1D4ED8);
+        break;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: fg,
+          fontWeight: FontWeight.w600,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
   Widget _actionMenu(Data doc) {
     return PopupMenuButton<String>(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -423,6 +512,16 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       tooltip: '',
       onSelected: (value) => _handleMenu(value, doc),
       itemBuilder: (_) => [
+        PopupMenuItem<String>(
+          value: 'roster',
+          child: Row(
+            children: const [
+              Icon(Icons.calendar_month_rounded, size: 16, color: primary),
+              SizedBox(width: 10),
+              Text('Manage Shifts', style: TextStyle(fontSize: 13, color: primary, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
         PopupMenuItem<String>(
           value: 'update',
           child: Row(
@@ -520,6 +619,29 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                               value: _selectedStatus?.name,
                               onChanged: (p0) {
                                 _selectedStatus = p0;
+                                rebuildDropdown.add(DateTime.now());
+                                filtering(page: 1);
+                              },
+                              width: 260,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        StreamBuilder<DateTime>(
+                          stream: rebuildDropdown.stream,
+                          builder: (context, _) => AppDropdown(
+                            attributeList: DropdownAttributeList(
+                              [
+                                DropdownAttribute('1', doctorType(1)),
+                                DropdownAttribute('2', doctorType(2)),
+                                DropdownAttribute('3', doctorType(3)),
+                                DropdownAttribute('4', doctorType(4)),
+                                DropdownAttribute('5', doctorType(5)),
+                              ],
+                              labelText: 'Practitioner Type',
+                              value: _selectedDoctorType?.name,
+                              onChanged: (p0) {
+                                _selectedDoctorType = p0;
                                 rebuildDropdown.add(DateTime.now());
                                 filtering(page: 1);
                               },
@@ -632,7 +754,15 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   void _handleMenu(String value, Data doc) async {
-    if (value == 'update') {
+    if (value == 'roster') {
+      showDialog(
+        context: context,
+        builder: (_) => BranchRosterDialog(
+          initialBranchId: doc.branchId,
+          initialDoctorId: doc.doctorId,
+        ),
+      );
+    } else if (value == 'update') {
       showDialog(
         context: context,
         builder: (_) => DoctorDetails(doctor: doc, type: 'update'),
@@ -653,6 +783,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                 doctorName: doc.doctorName,
                 branchId: doc.branchId,
                 doctorPhone: doc.doctorPhone,
+                doctorType: doc.doctorType,
                 doctorStatus: doc.doctorStatus == 1 ? 0 : 1,
               ),
             ).then((value) {
@@ -701,6 +832,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
           : context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
       doctorName: _nameController.text,
       doctorPhone: _phoneController.text,
+      doctorType: int.tryParse(_selectedDoctorType?.key ?? ''),
       doctorStatus: _selectedStatus != null
           ? _selectedStatus?.key == '1'
                 ? 1
@@ -721,7 +853,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   void _resetFilters() {
     _nameController.text = '';
     _phoneController.text = '';
-    _selectedStatus = null;
+    _selectedStatus = DropdownAttribute('1', 'Active');
+    _selectedDoctorType = null;
     rebuildDropdown.add(DateTime.now());
   }
 

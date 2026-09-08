@@ -84,9 +84,9 @@ class _AppImageFieldState extends State<AppImageField> {
   }
 
   Future<void> _pickAndUpload() async {
-    final result = await FilePicker.platform.pickFiles();
-    final file = result?.files.firstOrNull;
-    if (file == null || file.bytes == null) return;
+    final files = await FilePicker.pickFiles();
+    final file = files.firstOrNull;
+    if (file == null) return;
 
     final extension = (file.extension ?? '').toLowerCase();
     if (!_allowedExtensions.contains(extension)) {
@@ -98,7 +98,7 @@ class _AppImageFieldState extends State<AppImageField> {
 
     setState(() => _uploading = true);
 
-    final Uint8List bytes = file.bytes!;
+    final Uint8List bytes = await file.readAsBytes();
     if (bytes.lengthInBytes > 5 * 1024 * 1024) {
       if (!mounted) return;
       setState(() => _uploading = false);

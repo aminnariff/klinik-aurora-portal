@@ -74,8 +74,9 @@ class _SelectionCalendarDateOnlyViewState extends State<SelectionCalendarDateOnl
           final date = DateTime(displayYear, displayMonth, dayCounter);
           final key = DateFormat('yyyy-MM-dd').format(date);
           final isToday = today.year == date.year && today.month == date.month && today.day == date.day;
+          final isPast = DateUtils.dateOnly(date).isBefore(DateUtils.dateOnly(today));
           final allowAll = availableDates.isEmpty;
-          final isDisabled = !allowAll && !availableDates.contains(key);
+          final isDisabled = isPast || (!allowAll && !availableDates.contains(key));
           final isSelected = selectedDate == key;
 
           weekRow.add(

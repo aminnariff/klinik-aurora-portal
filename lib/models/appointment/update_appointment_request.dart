@@ -14,6 +14,8 @@ class UpdateAppointmentRequest {
   bool? bookingFeeCollected;
   String? receiptNo;
 
+  String? serviceTime;
+
   UpdateAppointmentRequest({
     this.appointmentId,
     this.userId,
@@ -29,6 +31,7 @@ class UpdateAppointmentRequest {
     this.adminRemark,
     this.bookingFeeCollected,
     this.receiptNo,
+    this.serviceTime,
   });
 
   UpdateAppointmentRequest.fromJson(Map<String, dynamic> json) {
@@ -46,6 +49,7 @@ class UpdateAppointmentRequest {
     adminRemark = json['adminRemark'];
     bookingFeeCollected = json['bookingFeeCollected'];
     receiptNo = json['receiptNo'];
+    serviceTime = json['serviceTime'];
   }
 
   Map<String, dynamic> toJson() {
@@ -64,6 +68,9 @@ class UpdateAppointmentRequest {
     data['adminRemark'] = adminRemark;
     data['bookingFeeCollected'] = bookingFeeCollected;
     data['receiptNo'] = receiptNo;
+    if (serviceTime != null) {
+      data['serviceTime'] = serviceTime;
+    }
     return data;
   }
 }

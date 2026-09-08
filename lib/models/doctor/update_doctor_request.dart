@@ -3,6 +3,7 @@ class UpdateDoctorRequest {
   String? doctorName;
   String? branchId;
   int? doctorStatus;
+  int? doctorType;
   String? doctorPhone;
   String? doctorImage;
 
@@ -11,6 +12,7 @@ class UpdateDoctorRequest {
     this.doctorName,
     this.branchId,
     this.doctorStatus,
+    this.doctorType,
     this.doctorPhone,
     this.doctorImage,
   });
@@ -20,6 +22,7 @@ class UpdateDoctorRequest {
     doctorName = json['doctorName'];
     branchId = json['branchId'];
     doctorStatus = json['doctorStatus'];
+    doctorType = json['doctorType'];
     doctorPhone = json['doctorPhone'];
     doctorImage = json['doctorImage'];
   }
@@ -30,6 +33,7 @@ class UpdateDoctorRequest {
     data['doctorName'] = doctorName;
     data['branchId'] = branchId;
     data['doctorStatus'] = doctorStatus;
+    data['doctorType'] = doctorType;
     data['doctorPhone'] = doctorPhone;
     data['doctorImage'] = doctorImage;
     return data;

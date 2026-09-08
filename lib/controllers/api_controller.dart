@@ -239,9 +239,15 @@ class ApiController {
           } else {
             dismissLoading();
             if (e.response?.statusCode == 401 && isAuthenticated == false) {
-              Future.delayed(Duration.zero, () {
-                showDialogError(context, e.response?.data?['message'] ?? '');
-              });
+              String? serverMessage;
+              if (e.response?.data is Map && e.response?.data['message'] != null) {
+                serverMessage = e.response?.data['message']?.toString();
+              }
+              return ApiResponse(
+                code: 401,
+                message: serverMessage ?? e.response?.statusMessage ?? 'Invalid credentials',
+                data: e.response?.data,
+              );
             } else if (e.response?.statusCode == 401 && isAuthenticated && !hasRetriedAfterRefresh) {
               final refreshed = await context.read<AuthController>().tryRefreshToken(context);
               if (refreshed) {
@@ -259,9 +265,10 @@ class ApiController {
               }
               handleSessionExpired(context);
               return ApiResponse(code: 401, message: 'Session Expired');
-            } else if (e.response?.statusCode == 401 ||
-                e.response?.statusCode == 403 ||
-                e.response?.statusCode == 410) {
+            } else if ((e.response?.statusCode == 401 ||
+                    e.response?.statusCode == 403 ||
+                    e.response?.statusCode == 410) &&
+                isAuthenticated) {
               handleSessionExpired(context);
               return ApiResponse(code: e.response?.statusCode ?? 401, message: 'Session Expired');
             } else if (e.response?.statusCode == 500 || e.response?.statusCode == 503) {

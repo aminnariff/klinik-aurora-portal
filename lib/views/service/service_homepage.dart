@@ -16,6 +16,7 @@ import 'package:klinik_aurora_portal/models/service/services_response.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_request.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
+import 'package:klinik_aurora_portal/views/doctor/branch_roster_dialog.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/practitioner_schedule/practitioner_schedule_wizard.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
@@ -140,6 +141,18 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             label: 'Practitioner Schedule',
             color: secondaryColor,
             onTap: _openPractitionerSchedule,
+          ),
+          const SizedBox(width: 8),
+          _toolbarButton(
+            icon: Icons.calendar_month_rounded,
+            label: 'Branch Roster',
+            color: primary,
+            onTap: () => showDialog(
+              context: context,
+              builder: (_) => BranchRosterDialog(
+                initialBranchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+              ),
+            ),
           ),
           const SizedBox(width: 8),
           if (isSuperAdmin) ...[
@@ -805,6 +818,18 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                         tooltip: 'Practitioner Schedule',
                         color: secondaryColor,
                         onTap: _openPractitionerSchedule,
+                      ),
+                      const SizedBox(width: 8),
+                      _MobileActionButton(
+                        icon: Icons.calendar_month_rounded,
+                        tooltip: 'Branch Roster',
+                        color: primary,
+                        onTap: () => showDialog(
+                          context: context,
+                          builder: (_) => BranchRosterDialog(
+                            initialBranchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+                          ),
+                        ),
                       ),
                       if (isSuperAdmin) ...[
                         const SizedBox(width: 8),

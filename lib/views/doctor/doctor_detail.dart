@@ -22,6 +22,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -53,9 +54,22 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     labelText: 'doctorPage'.tr(gender: 'doctorImage'),
     hintText: 'https://... or upload photo',
   );
-  final InputFieldAttribute _branchId = InputFieldAttribute(controller: TextEditingController());
+  final InputFieldAttribute _branchId = InputFieldAttribute(
+    controller: TextEditingController(),
+    labelText: 'Branch',
+  );
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
   DropdownAttribute? _selectedBranch;
+  DropdownAttribute? _selectedDoctorType;
+
+  static final List<DropdownAttribute> doctorTypeList = [
+    DropdownAttribute('1', doctorType(1)),
+    DropdownAttribute('2', doctorType(2)),
+    DropdownAttribute('3', doctorType(3)),
+    DropdownAttribute('4', doctorType(4)),
+    DropdownAttribute('5', doctorType(5)),
+  ];
+
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   StreamController<DateTime> fileRebuild = StreamController.broadcast();
   FileAttribute selectedFile = FileAttribute();
@@ -71,20 +85,33 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         _doctorImage.controller.text = widget.doctor?.doctorImage ?? '';
         selectedFile = FileAttribute(path: widget.doctor?.doctorImage, name: widget.doctor?.doctorImage);
         _selectedBranch = DropdownAttribute(widget.doctor?.branchId ?? '', widget.doctor?.branchName ?? '');
+        final docTypeVal = widget.doctor?.doctorType ?? 1;
+        _selectedDoctorType = DropdownAttribute(docTypeVal.toString(), doctorType(docTypeVal));
         rebuildDropdown.add(DateTime.now());
+      } else {
+        _selectedDoctorType = DropdownAttribute('1', doctorType(1));
       }
 
       SchedulerBinding.instance.scheduleFrameCallback((_) {
         try {
-          if (context.read<AuthController>().isSuperAdmin == false && widget.type == 'create') {
-            branch_model.Data? item = context.read<BranchController>().branchAllResponse?.data?.data?.firstWhere(
-              (element) =>
-                  element.branchId == context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-            );
-            if (item != null) {
-              _selectedBranch = DropdownAttribute(item.branchId ?? '', item.branchName ?? '');
-              rebuildDropdown.add(DateTime.now());
+          final auth = context.read<AuthController>();
+          final isSuper = auth.isSuperAdmin;
+          final userBranchId = auth.authenticationResponse?.data?.user?.branchId;
+
+          if (!isSuper && widget.type == 'create' && userBranchId != null) {
+            final branches = context.read<BranchController>().branchAllResponse?.data?.data ?? [];
+            branch_model.Data? item;
+            for (final b in branches) {
+              if (b.branchId == userBranchId) {
+                item = b;
+                break;
+              }
             }
+            final branchName = item?.branchName ?? 'Branch';
+            _selectedBranch = DropdownAttribute(userBranchId, branchName);
+            _branchId.controller.text = userBranchId;
+            _branchId.errorMessage = null;
+            rebuildDropdown.add(DateTime.now());
           }
         } catch (e) {
           debugPrint('DoctorDetails scheduleFrameCallback error: $e');
@@ -169,6 +196,23 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                 return Consumer<BranchController>(
                                                   builder: (context, branchCtrl, _) {
                                                     final branches = branchCtrl.branchAllResponse?.data?.data ?? [];
+                                                    final isSuper = context.read<AuthController>().isSuperAdmin;
+                                                    final userBranchId = context.read<AuthController>().authenticationResponse?.data?.user?.branchId;
+
+                                                    if (!isSuper && _selectedBranch == null && userBranchId != null) {
+                                                      branch_model.Data? item;
+                                                      for (final b in branches) {
+                                                        if (b.branchId == userBranchId) {
+                                                          item = b;
+                                                          break;
+                                                        }
+                                                      }
+                                                      final branchName = item?.branchName ?? 'Branch';
+                                                      _selectedBranch = DropdownAttribute(userBranchId, branchName);
+                                                      _branchId.controller.text = userBranchId;
+                                                      _branchId.errorMessage = null;
+                                                    }
+
                                                     return AppDropdown(
                                                       attributeList: DropdownAttributeList(
                                                         branches
@@ -179,16 +223,14 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                               ),
                                                             )
                                                             .toList(),
-                                                        isEditable: context.read<AuthController>().isSuperAdmin,
-                                                        fieldColor: context.read<AuthController>().isSuperAdmin
+                                                        isEditable: isSuper,
+                                                        fieldColor: isSuper
                                                             ? textFormFieldEditableColor
                                                             : textFormFieldUneditableColor,
                                                         onChanged: (selected) {
-                                                          if (_branchId.errorMessage != null) {
-                                                            _branchId.errorMessage = null;
-                                                          }
+                                                          _branchId.errorMessage = null;
                                                           _selectedBranch = selected;
-                                                          _branchId.controller.text = selected!.name;
+                                                          _branchId.controller.text = selected?.key ?? '';
                                                           rebuildDropdown.add(DateTime.now());
                                                         },
                                                         errorMessage: _branchId.errorMessage,
@@ -197,6 +239,29 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                       ),
                                                     );
                                                   },
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            StreamBuilder<DateTime>(
+                                              stream: rebuildDropdown.stream,
+                                              builder: (context, snapshot) {
+                                                return AppDropdown(
+                                                  attributeList: DropdownAttributeList(
+                                                    doctorTypeList,
+                                                    labelText: 'Practitioner Type',
+                                                    isEditable: true,
+                                                    fieldColor: textFormFieldEditableColor,
+                                                    onChanged: (selected) {
+                                                      _selectedDoctorType = selected;
+                                                      rebuildDropdown.add(DateTime.now());
+                                                    },
+                                                    value: _selectedDoctorType?.name,
+                                                    width: screenWidth1728(26),
+                                                  ),
                                                 );
                                               },
                                             ),
@@ -253,13 +318,22 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             final imageVal = _doctorImage.controller.text.trim();
             final finalDoctorImage = imageVal.isEmpty ? null : imageVal;
 
+            final isSuper = context.read<AuthController>().isSuperAdmin;
+            final userBranchId = context.read<AuthController>().authenticationResponse?.data?.user?.branchId;
+            final effectiveBranchId = (_selectedBranch?.key.trim().isNotEmpty == true)
+                ? _selectedBranch!.key.trim()
+                : (_branchId.controller.text.trim().isNotEmpty
+                    ? _branchId.controller.text.trim()
+                    : (!isSuper ? userBranchId : null));
+
             if (widget.type == 'create') {
               DoctorController.create(
                 context,
                 CreateDoctorRequest(
-                  doctorName: _doctorName.controller.text,
+                  doctorName: _doctorName.controller.text.trim(),
                   doctorPhone: _doctorPhone.controller.text.trim(),
-                  branchId: _selectedBranch?.key,
+                  doctorType: int.tryParse(_selectedDoctorType?.key ?? '1') ?? 1,
+                  branchId: effectiveBranchId,
                   doctorImage: finalDoctorImage,
                 ),
               ).then((value) {
@@ -278,10 +352,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                 context,
                 UpdateDoctorRequest(
                   doctorId: widget.doctor?.doctorId,
-                  doctorName: _doctorName.controller.text,
+                  doctorName: _doctorName.controller.text.trim(),
                   doctorPhone: _doctorPhone.controller.text.trim(),
+                  doctorType: int.tryParse(_selectedDoctorType?.key ?? '1') ?? 1,
                   doctorStatus: widget.doctor?.doctorStatus,
-                  branchId: _selectedBranch?.key,
+                  branchId: effectiveBranchId,
                   doctorImage: finalDoctorImage,
                 ),
               ).then((value) {
@@ -303,7 +378,16 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   }
 
   void getLatestData() {
-    DoctorController.get(context, 1, pageSize).then((value) {
+    final isSuper = context.read<AuthController>().isSuperAdmin;
+    final userBranchId = context.read<AuthController>().authenticationResponse?.data?.user?.branchId;
+
+    DoctorController.get(
+      context,
+      1,
+      pageSize,
+      branchId: isSuper ? null : userBranchId,
+      doctorStatus: 1,
+    ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {
         context.read<DoctorController>().doctorBranchResponse = value.data;
@@ -326,18 +410,30 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 
   bool validate() {
     bool temp = true;
-    if (_doctorName.controller.text == '') {
+    if (_doctorName.controller.text.trim().isEmpty) {
       temp = false;
       _doctorName.errorMessage = ErrorMessage.required(field: _doctorName.labelText);
     }
-    if (_doctorPhone.controller.text == '') {
+    if (_doctorPhone.controller.text.trim().isEmpty) {
       temp = false;
       _doctorPhone.errorMessage = ErrorMessage.required(field: _doctorPhone.labelText);
     }
-    if (_branchId.controller.text == '') {
+
+    final isSuper = context.read<AuthController>().isSuperAdmin;
+    final userBranchId = context.read<AuthController>().authenticationResponse?.data?.user?.branchId;
+    final selectedBranchId = _selectedBranch?.key.trim().isNotEmpty == true
+        ? _selectedBranch!.key.trim()
+        : _branchId.controller.text.trim();
+    final effectiveBranchId = selectedBranchId.isNotEmpty ? selectedBranchId : (!isSuper ? userBranchId : null);
+
+    if (effectiveBranchId == null || effectiveBranchId.isEmpty) {
       temp = false;
       _branchId.errorMessage = ErrorMessage.required(field: _branchId.labelText);
+    } else {
+      _branchId.errorMessage = null;
+      _branchId.controller.text = effectiveBranchId;
     }
+
     if (widget.type == 'create') {
       if (_doctorImage.controller.text.trim().isEmpty) {
         temp = false;

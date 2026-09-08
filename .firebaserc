@@ -4,6 +4,17 @@
     "password-recovery": "klinik-aurora-recovery",
     "get-klinik-aurora": "get-klinik-aurora"
   },
-  "targets": {},
+  "targets": {
+    "klinik-aurora": {
+      "hosting": {
+        "staging": [
+          "stg-klinik-aurora"
+        ],
+        "production": [
+          "klinik-aurora"
+        ]
+      }
+    }
+  },
   "etags": {}
 }

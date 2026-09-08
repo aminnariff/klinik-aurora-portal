@@ -1501,9 +1501,20 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
-            child: Text(
-              doctorType(item.service?.doctorType),
-              style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -1, color: const Color(0xFF374151)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  doctorType(item.service?.doctorType),
+                  style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -1, color: const Color(0xFF374151)),
+                ),
+                if (notNullOrEmptyString(item.doctor?.doctorName))
+                  Text(
+                    item.doctor!.doctorName!,
+                    style: const TextStyle(color: primary, fontWeight: FontWeight.w600, fontSize: 11),
+                  ),
+              ],
             ),
           ),
         ),

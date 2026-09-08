@@ -12,6 +12,7 @@ class CreateAppointmentRequest {
   String? adminRemark;
   bool? bookingFeeCollected;
   String? receiptNo;
+  String? serviceTime;
 
   CreateAppointmentRequest({
     this.userId,
@@ -27,6 +28,7 @@ class CreateAppointmentRequest {
     this.adminRemark,
     this.bookingFeeCollected,
     this.receiptNo,
+    this.serviceTime,
   });
 
   CreateAppointmentRequest.fromJson(Map<String, dynamic> json) {
@@ -43,6 +45,7 @@ class CreateAppointmentRequest {
     adminRemark = json['adminRemark'];
     bookingFeeCollected = json['bookingFeeCollected'];
     receiptNo = json['receiptNo'];
+    serviceTime = json['serviceTime'];
   }
 
   Map<String, dynamic> toJson() {
@@ -60,6 +63,9 @@ class CreateAppointmentRequest {
     data['adminRemark'] = adminRemark;
     data['bookingFeeCollected'] = bookingFeeCollected;
     data['receiptNo'] = receiptNo;
+    if (serviceTime != null) {
+      data['serviceTime'] = serviceTime;
+    }
     return data;
   }
 }

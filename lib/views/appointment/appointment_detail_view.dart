@@ -8,6 +8,8 @@ import 'package:klinik_aurora_portal/controllers/appointment/appointment_control
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
+import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart' as appt_resp;
+import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
@@ -99,17 +101,48 @@ class AppointmentDetailsView extends StatelessWidget {
                         _feedbackSection(context, data),
                       ],
                       const SizedBox(height: 24),
-                      Center(
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            side: const BorderSide(color: Color(0xFFD1D5DB)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (data?.appointmentStatus == 1 || data?.appointmentStatus == 3) ...[
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: secondaryColor,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              icon: const Icon(Icons.edit_calendar_rounded, size: 16, color: Colors.white),
+                              label: const Text(
+                                'Reschedule / Edit',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context, rootNavigator: true).pop();
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AppointmentDetails(
+                                      type: 'update',
+                                      appointment: data != null ? appt_resp.Data.fromJson(data.toJson()) : null,
+                                      tabs: [],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              side: const BorderSide(color: Color(0xFFD1D5DB)),
+                            ),
+                            icon: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF374151)),
+                            label: const Text('Close', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
+                            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
                           ),
-                          icon: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF374151)),
-                          label: const Text('Close', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
-                          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-                        ),
+                        ],
                       ),
                     ],
                   ),
@@ -138,7 +171,7 @@ class AppointmentDetailsView extends StatelessWidget {
       }
     }
     if (data.appointmentNote != null) {
-      final match = RegExp(r'Rescan for Appt #([a-zA-Z0-9\-]+)', caseSensitive: false)
+      final match = RegExp(r'(?:Rescan for .*?)?Appt #([a-zA-Z0-9\-]+)', caseSensitive: false)
           .firstMatch(data.appointmentNote!);
       if (match != null && match.group(1) != null && match.group(1)!.isNotEmpty) {
         return match.group(1)!.trim();
@@ -412,6 +445,18 @@ class AppointmentDetailsView extends StatelessWidget {
               ),
           ],
         ),
+        if (data?.doctor != null && notNullOrEmptyString(data?.doctor?.doctorName)) ...[
+          const SizedBox(height: 12),
+          _fieldLabel('Attending Practitioner'),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const Icon(Icons.medical_services_outlined, size: 15, color: primary),
+              const SizedBox(width: 6),
+              _valueText(data!.doctor!.doctorName!),
+            ],
+          ),
+        ],
         const SizedBox(height: 12),
         _fieldLabel('Status'),
         const SizedBox(height: 6),

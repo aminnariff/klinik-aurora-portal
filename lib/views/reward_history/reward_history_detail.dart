@@ -545,16 +545,17 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
 
   Future<void> addPicture() async {
     documentErrorMessage.add(null);
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    final List<PlatformFile> files = await FilePicker.pickFiles();
 
-    if (result != null) {
-      PlatformFile file = result.files.first;
+    if (files.isNotEmpty) {
+      PlatformFile file = files.first;
       if (supportedExtensions.contains(file.extension)) {
-        debugPrint(bytesToMB(file.size).toString());
+        final Uint8List fileBytes = await file.readAsBytes();
+        final int fileSize = fileBytes.length;
+        debugPrint(bytesToMB(fileSize).toString());
         debugPrint(file.name);
-        if (bytesToMB(file.size) < 1.0) {
-          Uint8List? fileBytes = result.files.first.bytes;
-          String fileName = result.files.first.name;
+        if (bytesToMB(fileSize) < 1.0) {
+          String fileName = file.name;
 
           selectedFile = FileAttribute(name: fileName, value: fileBytes);
           fileRebuild.add(DateTime.now());

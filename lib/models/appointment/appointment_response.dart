@@ -50,6 +50,7 @@ class Data {
   Service? service;
   List<Payment>? payment;
   Branch? branch;
+  Doctor? doctor;
 
   Data({
     this.appointmentId,
@@ -69,6 +70,7 @@ class Data {
     this.service,
     this.payment,
     this.branch,
+    this.doctor,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -87,6 +89,7 @@ class Data {
     createdBy = json['createdBy'] != null ? CreatedBy.fromJson(json['createdBy']) : null;
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     service = json['service'] != null ? Service.fromJson(json['service']) : null;
+    doctor = json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null;
     if (json['payment'] != null) {
       payment = <Payment>[];
       json['payment'].forEach((v) {
@@ -257,6 +260,25 @@ class Branch {
     data['branchCode'] = branchCode;
     data['branchName'] = branchName;
     data['branchPhone'] = branchPhone;
+    return data;
+  }
+}
+
+class Doctor {
+  String? doctorId;
+  String? doctorName;
+
+  Doctor({this.doctorId, this.doctorName});
+
+  Doctor.fromJson(Map<String, dynamic> json) {
+    doctorId = json['doctorId'];
+    doctorName = json['doctorName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['doctorId'] = doctorId;
+    data['doctorName'] = doctorName;
     return data;
   }
 }

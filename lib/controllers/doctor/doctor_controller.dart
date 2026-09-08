@@ -32,6 +32,7 @@ class DoctorController extends ChangeNotifier {
     String? doctorName,
     String? doctorPhone,
     int? doctorStatus,
+    int? doctorType,
   }) async {
     return ApiController()
         .call(
@@ -43,6 +44,7 @@ class DoctorController extends ChangeNotifier {
             if (notNullOrEmptyString(doctorName)) 'doctorName': doctorName,
             if (notNullOrEmptyString(doctorPhone)) 'doctorPhone': doctorPhone,
             'doctorStatus': ?doctorStatus,
+            'doctorType': ?doctorType,
             'page': page,
             'pageSize': pageSize,
           },

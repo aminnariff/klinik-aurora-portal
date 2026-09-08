@@ -69,7 +69,13 @@ Future<void> main() async {
       await EasyLocalization.ensureInitialized();
       environment = Flavor.production;
       if (kDebugMode) {
-        environment = Flavor.production;
+        environment = Flavor.staging;
+      }
+      if (kIsWeb) {
+        final host = Uri.base.host.toLowerCase();
+        if (host.contains('stg') || host.contains('staging') || host.contains('localhost')) {
+          environment = Flavor.staging;
+        }
       }
       AppVersion.init();
       AppLoading.init();

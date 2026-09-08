@@ -41,6 +41,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final ValueNotifier<bool> isObscure = ValueNotifier<bool>(false);
+  bool _isLoggingIn = false;
 
   InputFieldAttribute emailAttribute = InputFieldAttribute(
     controller: TextEditingController(text: ''),
@@ -685,8 +686,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   void _handleLogin() {
+    if (_isLoggingIn) return;
     validateField().then((valid) {
       if (!valid) return;
+      setState(() => _isLoggingIn = true);
       showLoading();
       AuthController.logIn(
         context,
@@ -706,6 +709,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       }).catchError((e) {
         dismissLoading();
         showDialogError(context, e.toString());
+      }).whenComplete(() {
+        if (mounted) setState(() => _isLoggingIn = false);
       });
     });
   }

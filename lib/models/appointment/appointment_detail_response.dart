@@ -38,6 +38,7 @@ class Data {
   User? user;
   Service? service;
   Branch? branch;
+  Doctor? doctor;
   String? serviceBranchId;
   List<Payment>? payment;
 
@@ -58,6 +59,7 @@ class Data {
     this.user,
     this.service,
     this.branch,
+    this.doctor,
     this.serviceBranchId,
     this.payment,
   });
@@ -79,6 +81,7 @@ class Data {
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     service = json['service'] != null ? Service.fromJson(json['service']) : null;
     branch = json['branch'] != null ? Branch.fromJson(json['branch']) : null;
+    doctor = json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null;
     serviceBranchId = json['serviceBranchId'];
     if (json['payment'] != null) {
       payment = <Payment>[];
@@ -113,6 +116,9 @@ class Data {
     }
     if (branch != null) {
       data['branch'] = branch!.toJson();
+    }
+    if (doctor != null) {
+      data['doctor'] = doctor!.toJson();
     }
     data['serviceBranchId'] = serviceBranchId;
     if (payment != null) {
@@ -242,4 +248,24 @@ class Branch {
     return data;
   }
 }
+
+class Doctor {
+  String? doctorId;
+  String? doctorName;
+
+  Doctor({this.doctorId, this.doctorName});
+
+  Doctor.fromJson(Map<String, dynamic> json) {
+    doctorId = json['doctorId'];
+    doctorName = json['doctorName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['doctorId'] = doctorId;
+    data['doctorName'] = doctorName;
+    return data;
+  }
+}
+
 

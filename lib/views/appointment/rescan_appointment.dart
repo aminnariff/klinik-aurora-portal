@@ -46,6 +46,23 @@ class _RescanAppointmentState extends State<RescanAppointment> {
   String? selectedTime;
   String? _selectedDateTime;
   GestationalController? gestationalResult;
+  int _selectedDuration = 20;
+  final List<int> _durationOptions = [15, 20, 30, 45, 60];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.rescanServiceTime != null) {
+      final parsed = int.tryParse(widget.rescanServiceTime!.replaceAll(RegExp(r'[^0-9]'), ''));
+      if (parsed != null && parsed > 0) {
+        if (!_durationOptions.contains(parsed)) {
+          _durationOptions.add(parsed);
+          _durationOptions.sort();
+        }
+        _selectedDuration = parsed;
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -88,7 +105,42 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                             const SizedBox(height: 12),
                             _infoLabel("Service"),
                             _infoRow(
-                              'Rescan - ${widget.appointment?.data?.service?.serviceName ?? ''}${widget.rescanServiceTime != null ? ' (${widget.rescanServiceTime} mins)' : ''}\nRM 0.00',
+                              'Rescan for ${widget.appointment?.data?.service?.serviceName ?? 'Scan'}\nRM 0.00',
+                            ),
+                            const SizedBox(height: 12),
+                            _infoLabel("Rescan Duration"),
+                            const SizedBox(height: 4),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _durationOptions.map((mins) {
+                                final isSelected = _selectedDuration == mins;
+                                return ChoiceChip(
+                                  label: Text('$mins mins'),
+                                  selected: isSelected,
+                                  selectedColor: secondaryColor,
+                                  backgroundColor: const Color(0xFFF3F4F6),
+                                  labelStyle: TextStyle(
+                                    color: isSelected ? Colors.white : const Color(0xFF374151),
+                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                    fontSize: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: BorderSide(
+                                      color: isSelected ? secondaryColor : const Color(0xFFE5E7EB),
+                                    ),
+                                  ),
+                                  onSelected: (selected) {
+                                    if (selected) {
+                                      setState(() {
+                                        _selectedDuration = mins;
+                                      });
+                                      rebuild.add(DateTime.now());
+                                    }
+                                  },
+                                );
+                              }).toList(),
                             ),
                           ]),
                           const SizedBox(height: 12),
@@ -141,14 +193,14 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                             _infoRow(widget.appointment?.data?.appointmentNote ?? '-'),
                           ],
                           AppPadding.vertical(),
-                          _infoLabel("Rescan Reason / Note"),
+                          _infoLabel("Rescan Reason / Note (Optional)"),
                           const SizedBox(height: 4),
                           TextField(
                             controller: noteController,
                             style: const TextStyle(fontSize: 13),
                             maxLines: 2,
                             decoration: InputDecoration(
-                              hintText: 'e.g. Baby position uncooperative, reschedule for better view',
+                              hintText: 'e.g. Baby position uncooperative (Optional)',
                               hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
                               filled: true,
                               fillColor: const Color(0xFFF9FAFB),
@@ -249,10 +301,12 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   showLoading();
                                   final parentId = widget.appointment?.data?.appointmentId ?? '';
                                   final reason = noteController.text.trim();
+                                  final parentServiceName = widget.appointment?.data?.service?.serviceName ?? 'Scan';
                                   final shortId = parentId.length > 8 ? parentId.substring(0, 8) : parentId;
-                                  final fullNote = reason.isNotEmpty
-                                      ? (shortId.isNotEmpty ? 'Rescan for Appt #$shortId: $reason' : reason)
-                                      : (shortId.isNotEmpty ? 'Rescan for Appt #$shortId' : 'Rescan');
+                                  final notePrefix = shortId.isNotEmpty
+                                      ? 'Rescan for $parentServiceName (Appt #$shortId)'
+                                      : 'Rescan for $parentServiceName';
+                                  final fullNote = reason.isNotEmpty ? '$notePrefix: $reason' : notePrefix;
                                   final adminRemark = parentId.isNotEmpty ? 'Parent Appointment ID: $parentId' : null;
 
                                   AppointmentController.create(
@@ -271,6 +325,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                         format: 'dd-MM-yyyy',
                                       ),
                                       appointmentStatus: 1,
+                                      serviceTime: '$_selectedDuration minutes',
                                     ),
                                   ).then((createResponse) {
                                     dismissLoading();

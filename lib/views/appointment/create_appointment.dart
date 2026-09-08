@@ -34,6 +34,7 @@ import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/calendar/date_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -120,6 +121,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       widget.appointment?.appointmentStatus == 5 ||
       widget.appointment?.appointmentStatus == 8;
   bool get _canSubmitWhenLockedCompleted => widget.type == 'update' && widget.appointment?.appointmentStatus == 5;
+  bool get _isCurrentRescan =>
+      widget.appointment?.service?.serviceName?.toLowerCase().contains('rescan') == true ||
+      (widget.appointment?.appointmentNote != null &&
+          widget.appointment!.appointmentNote!.toLowerCase().contains('rescan'));
+  int _rescanDuration = 20;
+  final List<int> _rescanDurationOptions = [15, 20, 30, 45, 60];
+
+  String formatTimeOfDay(TimeOfDay time) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return DateFormat('HH:mm').format(dt);
+  }
 
   @override
   void initState() {
@@ -129,6 +142,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     appointmentNoteController.controller.text = widget.appointment?.appointmentNote ?? '';
     dueDateController.controller.text = dateConverter(widget.appointment?.customerDueDate, format: 'dd-MM-yyyy') ?? '';
     _attachmentUrlController.text = widget.appointment?.appointmentAttachmentUrl ?? '';
+
+    if (_isCurrentRescan && widget.appointment?.service?.serviceTime != null) {
+      final parsed = int.tryParse(widget.appointment!.service!.serviceTime!.replaceAll(RegExp(r'[^0-9]'), ''));
+      if (parsed != null && parsed > 0) {
+        if (!_rescanDurationOptions.contains(parsed)) {
+          _rescanDurationOptions.add(parsed);
+          _rescanDurationOptions.sort();
+        }
+        _rescanDuration = parsed;
+      }
+    }
 
     if (widget.appointment?.appointmentDatetime != null) {
       dateTimeController.text =
@@ -282,7 +306,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       }
     }
     if (appointmentNote != null) {
-      final match = RegExp(r'Rescan for Appt #([a-zA-Z0-9\-]+)', caseSensitive: false)
+      final match = RegExp(r'(?:Rescan for .*?)?Appt #([a-zA-Z0-9\-]+)', caseSensitive: false)
           .firstMatch(appointmentNote);
       if (match != null && match.group(1) != null && match.group(1)!.isNotEmpty) {
         return match.group(1)!.trim();
@@ -1158,6 +1182,45 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 ),
                                             ],
                                           ),
+                                          if (_isCurrentRescan) ...[
+                                            const SizedBox(height: 12),
+                                            AppSelectableText(
+                                              'Rescan Duration',
+                                              style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                                            ),
+                                            const SizedBox(height: 6),
+                                            Wrap(
+                                              spacing: 8,
+                                              runSpacing: 8,
+                                              children: _rescanDurationOptions.map((mins) {
+                                                final isSelected = _rescanDuration == mins;
+                                                return ChoiceChip(
+                                                  label: Text('$mins mins'),
+                                                  selected: isSelected,
+                                                  selectedColor: secondaryColor,
+                                                  backgroundColor: const Color(0xFFF3F4F6),
+                                                  labelStyle: TextStyle(
+                                                    color: isSelected ? Colors.white : const Color(0xFF374151),
+                                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                                    fontSize: 12,
+                                                  ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    side: BorderSide(
+                                                      color: isSelected ? secondaryColor : const Color(0xFFE5E7EB),
+                                                    ),
+                                                  ),
+                                                  onSelected: (selected) {
+                                                    if (selected) {
+                                                      setState(() {
+                                                        _rescanDuration = mins;
+                                                      });
+                                                    }
+                                                  },
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ],
                                         ],
                                         if (widget.type == 'create')
                                           StreamBuilder<DateTime>(
@@ -1381,6 +1444,34 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               field: 'appointmentPage'.tr(gender: 'branch'),
                                                             ),
                                                           );
+                                                        } else if (_isCurrentRescan) {
+                                                          final selectedDate = await showDialog<String>(
+                                                            context: context,
+                                                            builder: (_) => Dialog(
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.all(16),
+                                                                child: SelectionCalendarDateOnlyView(
+                                                                  startMonth: DateTime.now().month,
+                                                                  year: DateTime.now().year,
+                                                                  totalMonths: 3,
+                                                                  availableDates: [],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+
+                                                          if (selectedDate != null) {
+                                                            final picked = await showTimePicker(
+                                                              context: context,
+                                                              initialTime: TimeOfDay.now(),
+                                                            );
+                                                            if (picked != null) {
+                                                              final selectedTime = formatTimeOfDay(picked);
+                                                              dateTimeController.text = '$selectedDate $selectedTime';
+                                                              calculateGestational();
+                                                              rebuildDropdown.add(DateTime.now());
+                                                            }
+                                                          }
                                                         } else if (_appointmentBranch != null &&
                                                             (availableDateTime.isNotEmpty)) {
                                                           DateTime now = DateTime.now();
@@ -2270,6 +2361,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   receiptNo: _receiptNumberController.text.trim().isEmpty
                       ? null
                       : _receiptNumberController.text.trim(),
+                  serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
                 ),
               ).then((value) {
                 dismissLoading();
