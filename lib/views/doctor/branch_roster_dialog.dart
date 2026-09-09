@@ -353,7 +353,42 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
       dismissLoading();
 
       if (!mounted) return;
-      if (responseCode(res.code)) {
+      if (res.code == 409) {
+        // Active bookings found!
+        final data = res.data;
+        final count = (data is Map) ? (data['affectedCount'] ?? 0) : 0;
+        final list = (data is Map && data['affectedAppointments'] is List)
+            ? (data['affectedAppointments'] as List)
+            : [];
+        final patientSummary = list.take(5).map((a) {
+          final dt = a['appointmentDatetime']?.toString() ?? '';
+          final timeStr = formatToDisplayTime(dt);
+          return '• ${a['patientName']} ($timeStr)';
+        }).join('\n');
+        final moreNotice = list.length > 5 ? '\n...and ${list.length - 5} more.' : '';
+
+        final proceed = await showConfirmDialog(
+          context,
+          '$count patient(s) are already booked during this shift:\n\n'
+          '$patientSummary$moreNotice\n\n'
+          'Deleting this shift will immediately block new bookings from patients.\n'
+          'These appointments will be flagged in the appointment list for reassignment.\n\n'
+          'Proceed to remove shift and block further bookings?',
+          title: 'Active Bookings Found',
+        );
+
+        if (proceed == true && mounted) {
+          showLoading();
+          final forceRes = await BranchRosterController.delete(context, rosterId: item.rosterId!, force: true);
+          dismissLoading();
+          if (mounted && responseCode(forceRes.code)) {
+            showDialogSuccess(context, 'Shift deleted. Bookings flagged for reassignment.');
+            _loadRosterShifts();
+          } else if (mounted) {
+            showDialogError(context, forceRes.message ?? 'Failed to delete shift.');
+          }
+        }
+      } else if (responseCode(res.code)) {
         showDialogSuccess(context, 'Shift deleted successfully.');
         _loadRosterShifts();
       } else {

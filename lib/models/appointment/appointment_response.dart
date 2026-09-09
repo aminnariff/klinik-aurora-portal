@@ -51,6 +51,7 @@ class Data {
   List<Payment>? payment;
   Branch? branch;
   Doctor? doctor;
+  bool? rosterConflict;
 
   Data({
     this.appointmentId,
@@ -71,6 +72,7 @@ class Data {
     this.payment,
     this.branch,
     this.doctor,
+    this.rosterConflict,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -86,6 +88,7 @@ class Data {
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
     adminRemark = json['adminRemark'];
+    rosterConflict = json['rosterConflict'] == true;
     createdBy = json['createdBy'] != null ? CreatedBy.fromJson(json['createdBy']) : null;
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     service = json['service'] != null ? Service.fromJson(json['service']) : null;

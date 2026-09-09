@@ -1499,8 +1499,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           ),
         DataCell(
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: item.rosterConflict == true ? const Color(0xFFFEF2F2) : const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(6),
+              border: item.rosterConflict == true ? Border.all(color: const Color(0xFFEF4444), width: 1) : null,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -1513,6 +1517,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   Text(
                     item.doctor!.doctorName!,
                     style: const TextStyle(color: primary, fontWeight: FontWeight.w600, fontSize: 11),
+                  ),
+                if (item.rosterConflict == true)
+                  Container(
+                    margin: const EdgeInsets.only(top: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(color: const Color(0xFFEF4444), borderRadius: BorderRadius.circular(4)),
+                    child: const Text(
+                      '⚠️ Off Duty / Reassign',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
+                    ),
                   ),
               ],
             ),

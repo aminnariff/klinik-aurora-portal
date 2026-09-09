@@ -65,11 +65,12 @@ class BranchRosterController extends ChangeNotifier {
   static Future<ApiResponse<dynamic>> delete(
     BuildContext context, {
     required String rosterId,
+    bool force = false,
   }) async {
     return ApiController().call(
       context,
       method: Method.delete,
-      endpoint: 'admin/branch-roster/$rosterId',
+      endpoint: 'admin/branch-roster/$rosterId${force ? '?force=true' : ''}',
     );
   }
 }
