@@ -42,6 +42,7 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -334,6 +335,172 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     });
   }
 
+  void _quickUpdateStatus(int newStatus, String statusName) {
+    if (newStatus == 5) {
+      final needsCompletionCheck =
+          widget.appointment?.appointmentStatus != 5 &&
+          (double.tryParse(widget.appointment?.service?.serviceBookingFee ?? '0') ?? 0) > 0;
+
+      final alreadyPaid = isBookingFeePaid(
+        widget.appointment?.appointmentNote,
+        payments: widget.appointment?.payment,
+      );
+
+      if (needsCompletionCheck && !alreadyPaid && !_bookingFeeCollected) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: const Text('Unpaid Booking Fee', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'This appointment has an unpaid booking fee. Please enter receipt number to confirm collection before completing.',
+                  style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _receiptNumberController,
+                  decoration: const InputDecoration(
+                    labelText: 'Receipt No. / Ref No.',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.receipt_long_rounded),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => ctx.pop(), child: const Text('Cancel')),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF059669),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  if (_receiptNumberController.text.trim().isEmpty) {
+                    showDialogError(context, 'Please enter a receipt number');
+                    return;
+                  }
+                  ctx.pop();
+                  _doUpdateStatus(5, 'Completed', bookingFeeCollected: true, receiptNo: _receiptNumberController.text.trim());
+                },
+                child: const Text('Confirm & Complete'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text('Mark as $statusName?', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+        content: Text(
+          'Are you sure you want to mark this appointment as $statusName?',
+          style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => ctx.pop(),
+            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: newStatus == 5 ? const Color(0xFF059669) : const Color(0xFFF59E0B),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              ctx.pop();
+              _doUpdateStatus(newStatus, statusName);
+            },
+            child: Text('Confirm $statusName'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _doUpdateStatus(int newStatus, String statusName, {bool? bookingFeeCollected, String? receiptNo}) {
+    showLoading();
+    AppointmentController.update(
+      context,
+      UpdateAppointmentRequest(
+        appointmentId: widget.appointment?.appointmentId,
+        userId: widget.appointment?.user?.userId,
+        appointmentDateTime: widget.appointment?.appointmentDatetime,
+        serviceBranchId: widget.appointment?.serviceBranchId ?? _service?.key,
+        appointmentNote: _buildNote(),
+        appointmentStatus: newStatus,
+        adminRemark: _adminRemarkController.text.trim().isEmpty ? null : _adminRemarkController.text.trim(),
+        bookingFeeCollected: bookingFeeCollected ?? _bookingFeeCollected,
+        receiptNo: receiptNo,
+      ),
+    ).then((value) {
+      dismissLoading();
+      if (responseCode(value.code)) {
+        if (widget.refreshData != null) widget.refreshData!();
+        Navigator.of(context, rootNavigator: true).pop();
+        showDialogSuccess(context, 'Successfully marked as $statusName');
+      } else {
+        showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+      }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
+    });
+  }
+
+  Widget _headerQuickAction({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required Color bg,
+    required Color borderColor,
+    required VoidCallback onTap,
+  }) {
+    if (isMobile) {
+      return SizedBox(
+        width: 28,
+        height: 28,
+        child: IconButton(
+          onPressed: onTap,
+          icon: Icon(icon, size: 16, color: color),
+          tooltip: label,
+          padding: EdgeInsets.zero,
+          style: IconButton.styleFrom(
+            backgroundColor: bg,
+          ),
+        ),
+      );
+    }
+    return InkWell(
+      borderRadius: BorderRadius.circular(6),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: color),
+            const SizedBox(width: 4),
+            Text(label, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: color)),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return editBranch();
@@ -357,8 +524,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             children: [
               Container(
                 constraints: BoxConstraints(
-                  maxWidth: math.min(840, MediaQuery.of(context).size.width - 16),
-                  maxHeight: MediaQuery.of(context).size.height - (isMobile ? 32 : 64),
+                  maxWidth: math.min(940, MediaQuery.of(context).size.width - 16),
+                  maxHeight: MediaQuery.of(context).size.height - (isMobile ? 32 : 48),
                 ),
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -409,6 +576,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         ),
                                       ),
                                     ),
+                                  if (widget.type == 'update')
+                                    AppointmentStatusBadge(status: widget.appointment?.appointmentStatus),
                                   if (parentAppointmentId != null)
                                     InkWell(
                                       borderRadius: BorderRadius.circular(6),
@@ -444,6 +613,26 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                if (widget.type == 'update' && widget.appointment?.appointmentStatus == 1) ...[
+                                  _headerQuickAction(
+                                    label: 'Mark Completed',
+                                    icon: Icons.check_circle_outline_rounded,
+                                    color: const Color(0xFF059669),
+                                    bg: const Color(0xFFECFDF5),
+                                    borderColor: const Color(0xFFA7F3D0),
+                                    onTap: () => _quickUpdateStatus(5, 'Completed'),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  _headerQuickAction(
+                                    label: 'Mark No-Show',
+                                    icon: Icons.person_off_outlined,
+                                    color: const Color(0xFFD97706),
+                                    bg: const Color(0xFFFFFBEB),
+                                    borderColor: const Color(0xFFFDE68A),
+                                    onTap: () => _quickUpdateStatus(6, 'No-Show'),
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
                                 if (widget.type == 'update')
                                   CopyButton(
                                     textToCopy:
@@ -494,6 +683,50 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           ],
                         ),
                       ),
+                      if (widget.type == 'update' && widget.appointment?.appointmentStatus == 2)
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFEF2F2),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFFECACA)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.cancel_rounded, size: 16, color: Color(0xFFDC2626)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'This appointment was cancelled.${(widget.appointment?.adminRemark != null && widget.appointment!.adminRemark!.isNotEmpty) ? ' Reason: ${widget.appointment!.adminRemark}' : (widget.appointment?.appointmentNote != null && widget.appointment!.appointmentNote!.isNotEmpty ? ' (${widget.appointment!.appointmentNote})' : '')}',
+                                  style: const TextStyle(fontSize: 12.5, color: Color(0xFF991B1B), fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (widget.type == 'update' && widget.appointment?.appointmentStatus == 8)
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F3FF),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFDDD6FE)),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.swap_horiz_rounded, size: 16, color: Color(0xFF7C3AED)),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'This appointment was marked as Transferred. Check destination branch for schedule.',
+                                  style: TextStyle(fontSize: 12.5, color: Color(0xFF5B21B6), fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       Flexible(
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.all(24),
@@ -502,11 +735,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             children: [
                               Container(
                                 constraints: BoxConstraints(
-                                  maxWidth: isMobile ? MediaQuery.of(context).size.width - 32 : 760,
-                                  minWidth: isMobile ? 0 : 580,
+                                  maxWidth: isMobile ? MediaQuery.of(context).size.width - 32 : 900,
+                                  minWidth: isMobile ? 0 : 700,
                                 ),
                                 child: Builder(
                                   builder: (context) {
+                                    if (widget.type == 'update') {
+                                      return _buildUpdateLayout(context);
+                                    }
                                     Widget wrapExpanded(Widget child) => isMobile ? child : Expanded(child: child);
                                     final leftColumn = Consumer<ServiceBranchController>(
                                       builder: (context, serviceBranchController, _) {
@@ -1660,9 +1896,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   },
                                 ),
                               ),
-                              const Divider(color: Color(0xFFF3F4F6), height: 1),
-                              const SizedBox(height: 20),
-                              if (widget.type == 'update') extraInformation(),
                               const SizedBox(height: 16),
                               StreamBuilder<DateTime>(
                                 stream: rebuild.stream,
@@ -1822,7 +2055,148 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     }
   }
 
-  Widget extraInformation() {
+  Widget _buildUpdateLayout(BuildContext context) {
+    final leftContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildPatientProfileCard(),
+        const SizedBox(height: 16),
+        _buildFeesSection(),
+        const SizedBox(height: 16),
+        _buildRecordInfoSection(),
+      ],
+    );
+
+    final rightContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAppointmentScheduleCard(),
+        const SizedBox(height: 16),
+        _buildNotesAndRemarksCard(),
+        if (widget.appointment?.appointmentStatus == 5) ...[
+          const SizedBox(height: 16),
+          _buildFeedbackSection(),
+        ],
+      ],
+    );
+
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildPatientProfileCard(),
+          const SizedBox(height: 16),
+          _buildAppointmentScheduleCard(),
+          const SizedBox(height: 16),
+          _buildNotesAndRemarksCard(),
+          const SizedBox(height: 16),
+          _buildFeesSection(),
+          if (widget.appointment?.appointmentStatus == 5) ...[
+            const SizedBox(height: 16),
+            _buildFeedbackSection(),
+          ],
+          const SizedBox(height: 16),
+          _buildRecordInfoSection(),
+        ],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(flex: 5, child: leftContent),
+        const SizedBox(width: 20),
+        Expanded(flex: 6, child: rightContent),
+      ],
+    );
+  }
+
+  Widget _buildPatientProfileCard() {
+    final patientName = patientNameController.controller.text.isNotEmpty
+        ? patientNameController.controller.text
+        : (widget.appointment?.user?.userFullName ?? 'Unknown Patient');
+    final patientNric = widget.appointment?.user?.userNric;
+    final patientPhone = patientContactNoController.controller.text.isNotEmpty
+        ? patientContactNoController.controller.text
+        : (widget.appointment?.user?.userPhone ?? '');
+    final patientEmail = patientEmailController.controller.text.isNotEmpty
+        ? patientEmailController.controller.text
+        : (widget.appointment?.user?.userEmail ?? '');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _extraSectionLabel('Patient', Icons.person_rounded),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                patientName,
+                style: const TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF111827),
+                ),
+              ),
+              if (notNullOrEmptyString(patientNric)) ...[
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.badge_outlined, size: 14, color: Color(0xFF6B7280)),
+                    const SizedBox(width: 6),
+                    Text(
+                      patientNric!,
+                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                    ),
+                  ],
+                ),
+              ],
+              if (notNullOrEmptyString(patientPhone)) ...[
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF6B7280)),
+                    const SizedBox(width: 6),
+                    Text(
+                      patientPhone,
+                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                    ),
+                  ],
+                ),
+              ],
+              if (notNullOrEmptyString(patientEmail)) ...[
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.email_outlined, size: 14, color: Color(0xFF6B7280)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        patientEmail,
+                        style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeesSection() {
     final isCompleted = widget.appointment?.appointmentStatus == 5;
     final hasPaidBooking = isBookingFeePaid(widget.appointment?.appointmentNote, payments: widget.appointment?.payment);
     final paidBookingEntry = hasPaidBooking
@@ -1841,200 +2215,799 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Fee section ──────────────────────────────────────────────────────
-        if (widget.type == 'update') ...[
-          _extraSectionLabel('Fees & Payment', Icons.payments_outlined),
-          const SizedBox(height: 12),
-          Row(
+        _extraSectionLabel('Fees & Payment', Icons.payments_outlined),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _extraFeeCard(
-                  label: 'Booking Fee',
-                  value: paidBookingEntry != null
-                      ? 'RM ${paidBookingEntry.paymentAmount}'
-                      : (widget.appointment?.service?.serviceBookingFee != null
-                            ? 'RM ${widget.appointment!.service!.serviceBookingFee}'
-                            : 'N/A'),
-                  icon: Icons.payments_outlined,
-                  color: const Color(0xFF0369A1),
-                  badge: showPaymentStatus(
-                    context,
-                    isCompleted
-                        ? 1
-                        : hasPaidBooking
-                        ? 1
-                        : 0,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: const [
+                      Icon(Icons.payments_outlined, size: 14, color: Color(0xFF0369A1)),
+                      SizedBox(width: 6),
+                      Text('Booking Fee', style: TextStyle(fontSize: 12, color: Color(0xFF4B5563))),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _extraFeeCard(
-                  label: 'Service Price',
-                  value: servicePrice != null ? 'RM ${servicePrice.toStringAsFixed(2)}' : '—',
-                  icon: Icons.receipt_long_outlined,
-                  color: const Color(0xFF6366F1),
-                ),
-              ),
-            ],
-          ),
-          if (balance != null) ...[
-            const SizedBox(height: 10),
-            _extraFeeCard(
-              label: isCompleted ? 'Remaining Balance (Fully Paid)' : 'Remaining Balance',
-              value: 'RM ${balance.toStringAsFixed(2)}',
-              icon: isCompleted || balance == 0
-                  ? Icons.check_circle_outline_rounded
-                  : Icons.account_balance_wallet_outlined,
-              color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
-              fullWidth: true,
-            ),
-          ],
-          if (paidBookingEntry != null) ...[
-            const SizedBox(height: 8),
-            _metaInfoRow(Icons.tag_rounded, 'Payment ID', '${paidBookingEntry.paymentId}'),
-          ],
-          // Payment proof
-          if (selectedFiles.isNotEmpty ||
-              (widget.type == 'update' &&
-                  widget.appointment?.payment?.any((e) => e.paymentType == 2 && e.paymentStatus == 1) == true)) ...[
-            const SizedBox(height: 12),
-            _proofButton(
-              label: 'appointmentPage'.tr(gender: 'paymentProof'),
-              icon: Icons.receipt_outlined,
-              color: const Color(0xFF0369A1),
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Center(
-                    child: CardContainer(
-                      Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: Image.network(
-                          '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 2 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-          // Refund proof
-          if (widget.type == 'update' &&
-              widget.appointment?.payment?.any((e) => e.paymentType == 4 && e.paymentStatus == 1) == true) ...[
-            const SizedBox(height: 8),
-            _proofButton(
-              label: 'appointmentPage'.tr(gender: 'refundProof'),
-              icon: Icons.undo_rounded,
-              color: const Color(0xFFDC2626),
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Center(
-                    child: CardContainer(
-                      Padding(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: Image.network(
-                          '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 4 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(height: 20),
-          const Divider(color: Color(0xFFF3F4F6), height: 1),
-          const SizedBox(height: 16),
-        ],
-        // ── Feedback + Record Info ────────────────────────────────────────────
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.appointment?.appointmentStatus == 5) ...[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _extraSectionLabel('Patient Feedback', Icons.star_outline_rounded),
-                    const SizedBox(height: 10),
-                    AbsorbPointer(
-                      child: RatingStars(
-                        value: double.parse('${widget.appointment?.appointmentRating ?? 0}'),
-                        onValueChanged: (v) {},
-                        starBuilder: (index, color) => Icon(Icons.star, color: color),
-                        starCount: 5,
-                        starSize: 20,
-                        valueLabelColor: const Color(0xff9b9b9b),
-                        valueLabelTextStyle: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12.0,
-                        ),
-                        valueLabelRadius: 10,
-                        maxValue: 5,
-                        starSpacing: 2,
-                        maxValueVisibility: true,
-                        valueLabelVisibility: true,
-                        animationDuration: Duration(milliseconds: 1000),
-                        valueLabelPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
-                        valueLabelMargin: const EdgeInsets.only(right: 8),
-                        starOffColor: const Color(0xffe7e8ea),
-                        starColor: Colors.amber,
-                      ),
-                    ),
-                    if (widget.appointment?.appointmentFeedback != null &&
-                        widget.appointment!.appointmentFeedback!.isNotEmpty) ...[
-                      const SizedBox(height: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
-                        widget.appointment!.appointmentFeedback!,
-                        style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+                        paidBookingEntry != null
+                            ? 'RM ${paidBookingEntry.paymentAmount}'
+                            : (widget.appointment?.service?.serviceBookingFee != null
+                                ? 'RM ${widget.appointment!.service!.serviceBookingFee}'
+                                : 'N/A'),
+                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF0369A1)),
+                      ),
+                      const SizedBox(width: 6),
+                      showPaymentStatus(
+                        context,
+                        isCompleted
+                            ? 1
+                            : hasPaidBooking
+                            ? 1
+                            : 0,
                       ),
                     ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: 20),
-            ],
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _extraSectionLabel('Record Info', Icons.info_outline_rounded),
-                  const SizedBox(height: 10),
-                  _metaInfoRow(
-                    Icons.add_circle_outline,
-                    'Created',
-                    dateConverter(widget.appointment?.createdDate) ?? '—',
                   ),
-                  const SizedBox(height: 6),
-                  _metaInfoRow(
-                    widget.appointment?.createdBy != null ? Icons.shield_outlined : Icons.smartphone_rounded,
-                    'Created By',
-                    widget.appointment?.createdBy != null
-                        ? 'Admin: ${widget.appointment?.createdBy?.name ?? widget.appointment?.createdBy?.email ?? 'Staff'}'
-                        : 'Patient (Self-booked via App)',
-                  ),
-                  if (widget.appointment?.modifiedDate != null) ...[
-                    const SizedBox(height: 6),
-                    _metaInfoRow(
-                      Icons.edit_outlined,
-                      'Last Updated',
-                      dateConverter(widget.appointment?.modifiedDate) ?? '—',
-                    ),
-                  ],
                 ],
               ),
-            ),
-          ],
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Divider(height: 1, color: Color(0xFFE5E7EB)),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: const [
+                      Icon(Icons.receipt_long_outlined, size: 14, color: Color(0xFF6366F1)),
+                      SizedBox(width: 6),
+                      Text('Service Price', style: TextStyle(fontSize: 12, color: Color(0xFF4B5563))),
+                    ],
+                  ),
+                  Text(
+                    servicePrice != null ? 'RM ${servicePrice.toStringAsFixed(2)}' : '—',
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF6366F1)),
+                  ),
+                ],
+              ),
+              if (balance != null) ...[
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Divider(height: 1, color: Color(0xFFE5E7EB)),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          isCompleted || balance == 0
+                              ? Icons.check_circle_outline_rounded
+                              : Icons.account_balance_wallet_outlined,
+                          size: 14,
+                          color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isCompleted ? 'Balance (Fully Paid)' : 'Remaining Balance',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'RM ${balance.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (paidBookingEntry != null) ...[
+                const SizedBox(height: 8),
+                _metaInfoRow(Icons.tag_rounded, 'Payment ID', '${paidBookingEntry.paymentId}'),
+              ],
+              // Payment proof
+              if (selectedFiles.isNotEmpty ||
+                  (widget.appointment?.payment?.any((e) => e.paymentType == 2 && e.paymentStatus == 1) == true)) ...[
+                const SizedBox(height: 10),
+                _proofButton(
+                  label: 'appointmentPage'.tr(gender: 'paymentProof'),
+                  icon: Icons.receipt_outlined,
+                  color: const Color(0xFF0369A1),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (_) => GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Center(
+                        child: CardContainer(
+                          Padding(
+                            padding: EdgeInsets.all(screenPadding),
+                            child: Image.network(
+                              '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 2 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              // Refund proof
+              if (widget.appointment?.payment?.any((e) => e.paymentType == 4 && e.paymentStatus == 1) == true) ...[
+                const SizedBox(height: 8),
+                _proofButton(
+                  label: 'appointmentPage'.tr(gender: 'refundProof'),
+                  icon: Icons.undo_rounded,
+                  color: const Color(0xFFDC2626),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (_) => GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Center(
+                        child: CardContainer(
+                          Padding(
+                            padding: EdgeInsets.all(screenPadding),
+                            child: Image.network(
+                              '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 4 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ],
     );
+  }
+
+  Widget _buildRecordInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _extraSectionLabel('Record Info', Icons.info_outline_rounded),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _metaInfoRow(
+                Icons.add_circle_outline,
+                'Created',
+                dateConverter(widget.appointment?.createdDate) ?? '—',
+              ),
+              const SizedBox(height: 6),
+              _metaInfoRow(
+                widget.appointment?.createdBy != null ? Icons.shield_outlined : Icons.smartphone_rounded,
+                'Created By',
+                widget.appointment?.createdBy != null
+                    ? 'Admin: ${widget.appointment?.createdBy?.name ?? widget.appointment?.createdBy?.email ?? 'Staff'}'
+                    : 'Patient (Self-booked via App)',
+              ),
+              if (widget.appointment?.modifiedDate != null) ...[
+                const SizedBox(height: 6),
+                _metaInfoRow(
+                  Icons.edit_outlined,
+                  'Last Updated',
+                  dateConverter(widget.appointment?.modifiedDate) ?? '—',
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeedbackSection() {
+    if (widget.appointment?.appointmentRating == null &&
+        (widget.appointment?.appointmentFeedback == null || widget.appointment!.appointmentFeedback!.isEmpty)) {
+      return const SizedBox();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _extraSectionLabel('Patient Feedback', Icons.star_outline_rounded),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFFBEB),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFFDE68A)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AbsorbPointer(
+                child: RatingStars(
+                  value: double.tryParse('${widget.appointment?.appointmentRating ?? 0}') ?? 0,
+                  onValueChanged: (v) {},
+                  starBuilder: (index, color) => Icon(Icons.star, color: color),
+                  starCount: 5,
+                  starSize: 18,
+                  valueLabelColor: const Color(0xff9b9b9b),
+                  valueLabelTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 11.0,
+                  ),
+                  valueLabelRadius: 10,
+                  maxValue: 5,
+                  starSpacing: 2,
+                  maxValueVisibility: true,
+                  valueLabelVisibility: true,
+                  animationDuration: const Duration(milliseconds: 1000),
+                  valueLabelPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 6),
+                  valueLabelMargin: const EdgeInsets.only(right: 8),
+                  starOffColor: const Color(0xffe7e8ea),
+                  starColor: Colors.amber,
+                ),
+              ),
+              if (widget.appointment?.appointmentFeedback != null &&
+                  widget.appointment!.appointmentFeedback!.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  widget.appointment!.appointmentFeedback!,
+                  style: const TextStyle(fontSize: 12.5, color: Color(0xFF374151), height: 1.4),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAppointmentScheduleCard() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _extraSectionLabel('Appointment Schedule', Icons.event_note_rounded),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              labelValue('Branch', widget.appointment?.branch?.branchName ?? '', alignStart: true),
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        labelValue('Service', widget.appointment?.service?.serviceName ?? '', alignStart: true),
+                        AppSelectableText('RM ${widget.appointment?.service?.servicePrice ?? 0}'),
+                      ],
+                    ),
+                  ),
+                  if (_isEligibleForRescan(widget.appointment?.service?.serviceName))
+                    TextButton.icon(
+                      onPressed: () {
+                        showLoading();
+                        ServiceBranchController.rescanServiceBranchId(
+                          context,
+                          branchId: widget.appointment?.branch?.branchId,
+                        ).then((value) {
+                          dismissLoading();
+                          if (responseCode(value.code) && value.data?.serviceBranchId != null) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => RescanAppointment(
+                                appointment: detail_model.AppointmentDetailResponse(
+                                  data: widget.appointment != null
+                                      ? detail_model.Data.fromJson(widget.appointment!.toJson())
+                                      : null,
+                                ),
+                                serviceBranchId: value.data!.serviceBranchId!,
+                                rescanServiceTime: value.data?.serviceTime,
+                              ),
+                            );
+                          } else {
+                            showDialogError(context, value.message ?? 'Rescan service branch not found');
+                          }
+                        }).catchError((e) {
+                          dismissLoading();
+                          showDialogError(context, e.toString());
+                        });
+                      },
+                      icon: const Icon(Icons.refresh_rounded, size: 14),
+                      label: const Text('Rescan', style: TextStyle(fontSize: 12)),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      ),
+                    ),
+                ],
+              ),
+              if (_isCurrentRescan) ...[
+                const SizedBox(height: 10),
+                AppSelectableText(
+                  'Rescan Duration',
+                  style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _rescanDurationOptions.map((mins) {
+                    final isSelected = _rescanDuration == mins;
+                    return ChoiceChip(
+                      label: Text('$mins mins'),
+                      selected: isSelected,
+                      selectedColor: secondaryColor,
+                      backgroundColor: const Color(0xFFF3F4F6),
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : const Color(0xFF374151),
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontSize: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: isSelected ? secondaryColor : const Color(0xFFE5E7EB),
+                        ),
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            _rescanDuration = mins;
+                            availableDateTime = [];
+                            dateTimeController.clear();
+                          });
+                        }
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
+              if (widget.appointment?.doctor?.doctorName != null &&
+                  widget.appointment!.doctor!.doctorName!.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                labelValue('Practitioner', widget.appointment!.doctor!.doctorName!, alignStart: true),
+              ],
+              const SizedBox(height: 10),
+              StreamBuilder<DateTime>(
+                stream: rebuildDropdown.stream,
+                builder: (context, snapshot) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _isLocked
+                          ? labelValue('Status', _status?.name ?? '')
+                          : AppDropdown(
+                              attributeList: DropdownAttributeList(
+                                getAppointmentStatus(),
+                                labelText: 'appointmentPage'.tr(gender: 'status'),
+                                isEditable: true,
+                                value: _status?.name,
+                                onChanged: (p0) {
+                                  _status = p0;
+                                  if (_status?.key == '6' && appointmentNoteController.controller.text.isEmpty) {
+                                    appointmentNoteController.controller.text =
+                                        "Refund request has been submitted to HQ for processing. Please allow approximately 7-14 business days for completion.";
+                                  }
+                                  rebuild.add(DateTime.now());
+                                  rebuildDropdown.add(DateTime.now());
+                                },
+                                width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
+                              ),
+                            ),
+                      if (_status?.key == '2' || _status?.key == '6') ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF7ED),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFFB923C).withAlpha(80)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.policy_outlined, size: 14, color: Color(0xFFEA580C)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    _status?.key == '6' ? 'Refund Policy' : 'Cancellation Policy',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF9A3412),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                '• Each appointment may only be rescheduled once.\n'
+                                '• Refunds, if approved, are processed within 5–7 business days.\n'
+                                '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
+                                style: TextStyle(fontSize: 11, color: Color(0xFF9A3412), height: 1.4),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              Consumer<ServiceBranchAvailableDtController>(
+                builder: (context, snapshot, _) {
+                  return _isLocked
+                      ? labelValue('Slots', dateTimeController.text)
+                      : GestureDetector(
+                          onTap: _selectAppointmentSlot,
+                          child: ReadOnly(
+                            isEditable: false,
+                            InputField(
+                              field: InputFieldAttribute(
+                                controller: dateTimeController,
+                                labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                isEditable: false,
+                                uneditableColor: textFormFieldEditableColor,
+                                suffixWidget: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [Icon(Icons.date_range)],
+                                ),
+                              ),
+                              width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
+                            ),
+                          ),
+                        );
+                },
+              ),
+              if ((widget.appointment?.service?.dueDateToggle == 1) || selectedService?.dueDateToggle == 1) ...[
+                const SizedBox(height: 10),
+                _isLocked
+                    ? (dueDateController.controller.text.isNotEmpty
+                        ? labelValue('Due Date', dueDateController.controller.text)
+                        : const SizedBox())
+                    : GestureDetector(
+                        onTap: dueDateCalendar,
+                        child: ReadOnly(
+                          InputField(field: dueDateController),
+                          isEditable: false,
+                        ),
+                      ),
+                if (((notNullOrEmptyString(widget.appointment?.service?.eddRequired) &&
+                            widget.appointment?.service?.dueDateToggle == 1) ||
+                        (selectedService?.dueDateToggle == 1 && selectedService?.eddRequired != null)) &&
+                    dueDateController.controller.text.isNotEmpty)
+                  StreamBuilder(
+                    stream: rebuild.stream,
+                    builder: (context, asyncSnapshot) {
+                      if (dateTimeController.text.isEmpty) {
+                        return Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withAlpha(18),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.withAlpha(60)),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.info_outline_rounded, size: 13, color: Colors.grey.shade500),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'Select appointment date to check eligibility',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      if (gestationalResult == null) return const SizedBox();
+                      final color = gestationalStatusColor(gestationalResult?.status);
+                      final isEligible = gestationalResult?.status == GestationalEligibility.eligible;
+                      return Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: color.withAlpha(18),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: color.withAlpha(60)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 1),
+                              child: Icon(
+                                isEligible ? Icons.check_circle_rounded : Icons.warning_amber_rounded,
+                                size: 13,
+                                color: color,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                getGestationalStatusMessage(
+                                      result: gestationalResult,
+                                      range: widget.appointment?.service?.eddRequired ??
+                                          selectedService?.eddRequired ??
+                                          '',
+                                      showRange: true,
+                                    ) ??
+                                    '',
+                                style: TextStyle(fontSize: 12, color: color, height: 1.4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+              ],
+              if (_status?.key != '6') ...[
+                const SizedBox(height: 12),
+                _extraSectionLabel('Attachment', Icons.attach_file_rounded),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _attachmentUrlController,
+                  style: const TextStyle(fontSize: 13),
+                  decoration: InputDecoration(
+                    labelText: 'Attachment URL (optional)',
+                    labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                    hintText: 'https://',
+                    hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
+                    prefixIcon: const Icon(Icons.link_rounded, size: 16, color: Color(0xFF6B7280)),
+                    filled: true,
+                    fillColor: const Color(0xFFF9FAFB),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
+                    SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        'Documents linked here are stored for 6 months to 1 year and may be deleted thereafter. Patients are advised to save their own copy.',
+                        style: TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), height: 1.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNotesAndRemarksCard() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _extraSectionLabel('Notes & Remarks', Icons.notes_rounded),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _isLocked
+                  ? (appointmentNoteController.controller.text.isNotEmpty
+                      ? labelValue('Notes', appointmentNoteController.controller.text)
+                      : const SizedBox())
+                  : InputField(field: appointmentNoteController),
+              const SizedBox(height: 12),
+              _isLocked
+                  ? ((widget.appointment?.adminRemark ?? '').isNotEmpty
+                      ? labelValue('Admin Remark (internal)', widget.appointment?.adminRemark ?? '')
+                      : const SizedBox())
+                  : TextField(
+                      controller: _adminRemarkController,
+                      style: const TextStyle(fontSize: 13),
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Admin Remark (internal — not shown to patient)',
+                        labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(bottom: 40),
+                          child: Icon(Icons.lock_outline_rounded, size: 16, color: Color(0xFF6B7280)),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                        ),
+                      ),
+                    ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _selectAppointmentSlot() async {
+    if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
+      if (availableDateTime.isNotEmpty) {
+        DateTime now = DateTime.now();
+        availableDateTime = removePastDates(availableDateTime);
+        availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
+        String? selectedDateTime = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: isMobile ? screenWidth(92) : 560.0,
+                        maxHeight: MediaQuery.of(context).size.height * 0.85,
+                      ),
+                      child: CardContainer(
+                        SingleChildScrollView(
+                          padding: EdgeInsets.all(isMobile ? 12 : 20),
+                          child: SelectionCalendarView(
+                            startMonth: now.month,
+                            year: now.year,
+                            initialDateTimes: availableDateTime,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+        if (selectedDateTime != null) {
+          dateTimeController.text = formatDateTimeToDisplay(selectedDateTime) ??
+              dateConverter(widget.appointment?.appointmentDatetime, format: 'yyyy-MM-dd HH:mm') ??
+              '';
+          calculateGestational();
+          rebuild.add(DateTime.now());
+        }
+      } else {
+        showLoading();
+        ServiceBranchAvailableDtController.getAvailableSlot(
+          context,
+          serviceBranchId: widget.appointment?.serviceBranchId ?? _service?.key,
+          serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
+          durationMinutes: _isCurrentRescan ? _rescanDuration : null,
+        ).then((value) async {
+          dismissLoading();
+          if (responseCode(value.code)) {
+            availableDateTime = value.data?.slots ?? [];
+            DateTime now = DateTime.now();
+            availableDateTime = removePastDates(availableDateTime);
+            availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
+            if (availableDateTime.isEmpty) {
+              showDialogError(context, 'No available slots');
+              return;
+            }
+            String? selectedDateTime = await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth: isMobile ? screenWidth(92) : 560.0,
+                            maxHeight: MediaQuery.of(context).size.height * 0.85,
+                          ),
+                          child: CardContainer(
+                            SingleChildScrollView(
+                              padding: EdgeInsets.all(isMobile ? 12 : 20),
+                              child: SelectionCalendarView(
+                                startMonth: now.month,
+                                year: now.year,
+                                initialDateTimes: availableDateTime,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            );
+            if (selectedDateTime != null) {
+              dateTimeController.text = formatDateTimeToDisplay(selectedDateTime) ??
+                  dateConverter(widget.appointment?.appointmentDatetime, format: 'yyyy-MM-dd HH:mm') ??
+                  '';
+              calculateGestational();
+              rebuildDropdown.add(DateTime.now());
+              rebuild.add(DateTime.now());
+            }
+          } else {
+            showDialogError(context, value.message ?? 'Failed to load slots');
+          }
+        }).catchError((e) {
+          dismissLoading();
+          showDialogError(context, e.toString());
+        });
+      }
+    }
   }
 
   Widget _extraSectionLabel(String text, IconData icon) {
@@ -2059,52 +3032,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _extraFeeCard({
-    required String label,
-    required String value,
-    required IconData icon,
-    required Color color,
-    Widget? badge,
-    bool fullWidth = false,
-  }) {
-    return Container(
-      width: fullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withAlpha(15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withAlpha(40)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
-                    ),
-                    if (badge != null) ...[const SizedBox(width: 6), badge],
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: color),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
