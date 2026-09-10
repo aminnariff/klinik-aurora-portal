@@ -198,45 +198,52 @@ class _MainDashboardState extends State<MainDashboard> {
             children: [
               // Branch Switcher for Superadmin
               if (isSuper) ...[
-                Container(
-                  height: 38,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String?>(
-                      value: _selectedBranchId,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF64748B)),
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
-                      items: [
-                        const DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text('🌐 All Branches (Network View)'),
+                Builder(
+                  builder: (context) {
+                    final sortedBranches = List.from(branches)
+                      ..sort((a, b) => (a.branchName ?? '').toLowerCase().compareTo((b.branchName ?? '').toLowerCase()));
+
+                    return Container(
+                      height: 38,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String?>(
+                          value: _selectedBranchId,
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF64748B)),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                          items: [
+                            const DropdownMenuItem<String?>(
+                              value: null,
+                              child: Text('All Branches (Network View)'),
+                            ),
+                            ...sortedBranches.map(
+                              (b) => DropdownMenuItem<String?>(
+                                value: b.branchId,
+                                child: Text(b.branchName ?? 'Branch'),
+                              ),
+                            ),
+                          ],
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedBranchId = val;
+                              if (val == null) {
+                                _selectedBranchName = null;
+                              } else {
+                                final match = branches.firstWhere((b) => b.branchId == val, orElse: () => branches.first);
+                                _selectedBranchName = match.branchName;
+                              }
+                            });
+                            _loadData();
+                          },
                         ),
-                        ...branches.map(
-                          (b) => DropdownMenuItem<String?>(
-                            value: b.branchId,
-                            child: Text('🏥 ${b.branchName ?? "Branch"}'),
-                          ),
-                        ),
-                      ],
-                      onChanged: (val) {
-                        setState(() {
-                          _selectedBranchId = val;
-                          if (val == null) {
-                            _selectedBranchName = null;
-                          } else {
-                            final match = branches.firstWhere((b) => b.branchId == val, orElse: () => branches.first);
-                            _selectedBranchName = match.branchName;
-                          }
-                        });
-                        _loadData();
-                      },
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: 10),
               ],

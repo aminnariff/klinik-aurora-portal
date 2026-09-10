@@ -188,11 +188,12 @@ class SuperadminDashboardView extends StatelessWidget {
   Widget _buildRevenueTrajectoryCard(BuildContext context, List<RevenueByMonth> revenueList) {
     final currencyFormatter = NumberFormat.compactCurrency(locale: 'en_MY', symbol: 'RM ');
 
-    double maxY = 10000;
+    double maxRevenue = 0;
     for (final r in revenueList) {
       final v = (r.revenueByMonth ?? 0).toDouble();
-      if (v > maxY) maxY = v;
+      if (v > maxRevenue) maxRevenue = v;
     }
+    final double maxY = maxRevenue > 0 ? maxRevenue : 1000;
 
     final monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -290,7 +291,7 @@ class SuperadminDashboardView extends StatelessWidget {
                       gridData: FlGridData(
                         show: true,
                         drawVerticalLine: false,
-                        horizontalInterval: math.max(1000, (maxY / 4).roundToDouble()),
+                        horizontalInterval: math.max(100, (maxY / 4).roundToDouble()),
                         getDrawingHorizontalLine: (value) => const FlLine(color: Color(0xFFF1F5F9), strokeWidth: 1),
                       ),
                       borderData: FlBorderData(show: false),
@@ -313,8 +314,10 @@ class SuperadminDashboardView extends StatelessWidget {
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
+                            interval: 1,
                             reservedSize: 26,
                             getTitlesWidget: (value, meta) {
+                              if (value != value.roundToDouble()) return const SizedBox();
                               final idx = value.toInt();
                               if (idx < 0 || idx >= revenueList.length) return const SizedBox();
                               final m = revenueList[idx].month;
