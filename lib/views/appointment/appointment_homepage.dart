@@ -1523,9 +1523,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     margin: const EdgeInsets.only(top: 2),
                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                     decoration: BoxDecoration(color: const Color(0xFFEF4444), borderRadius: BorderRadius.circular(4)),
-                    child: const Text(
-                      '⚠️ Off Duty / Reassign',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
+                    child: Text(
+                      notNullOrEmptyString(item.doctor?.doctorName)
+                          ? '⚠️ Off Duty / Reassign'
+                          : '⚠️ No Staff on Duty',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
                     ),
                   ),
               ],

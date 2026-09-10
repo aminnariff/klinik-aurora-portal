@@ -58,13 +58,19 @@ class ServiceBranchAvailableDtController extends ChangeNotifier {
   static Future<ApiResponse<ServiceBranchAvailableTimingResponse>> getAvailableSlot(
     BuildContext context, {
     String? serviceBranchId,
+    String? serviceTime,
+    int? durationMinutes,
   }) async {
     return ApiController()
         .call(
           context,
           method: Method.get,
           endpoint: 'admin/service-available-datetime/available',
-          queryParameters: {if (notNullOrEmptyString(serviceBranchId)) "serviceBranchId": serviceBranchId},
+          queryParameters: {
+            if (notNullOrEmptyString(serviceBranchId)) "serviceBranchId": serviceBranchId,
+            if (notNullOrEmptyString(serviceTime)) "serviceTime": serviceTime,
+            if (durationMinutes != null && durationMinutes > 0) "durationMinutes": durationMinutes.toString(),
+          },
         )
         .then((value) {
           try {

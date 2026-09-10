@@ -1301,7 +1301,13 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
       }
     }
     for (final list in shiftsByDate.values) {
-      list.sort((a, b) => (a.startTime ?? '').compareTo(b.startTime ?? ''));
+      list.sort((a, b) {
+        final timeComp = (a.startTime ?? '').compareTo(b.startTime ?? '');
+        if (timeComp != 0) return timeComp;
+        final typeComp = (a.doctorType ?? 1).compareTo(b.doctorType ?? 1);
+        if (typeComp != 0) return typeComp;
+        return (a.doctorName ?? '').compareTo(b.doctorName ?? '');
+      });
     }
 
     const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -1411,9 +1417,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                   borderRadius: BorderRadius.circular(3),
                                   border: Border.all(color: const Color(0xFFBFDBFE)),
                                 ),
-                                child: const Text(
-                                  '2 Staff',
-                                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Color(0xFF2563EB)),
+                                child: Text(
+                                  '$distinctDocs Staff',
+                                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Color(0xFF2563EB)),
                                 ),
                               ),
                           ],

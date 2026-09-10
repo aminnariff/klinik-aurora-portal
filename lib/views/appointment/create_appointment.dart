@@ -34,7 +34,6 @@ import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
-import 'package:klinik_aurora_portal/views/widgets/calendar/date_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -1214,6 +1213,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                     if (selected) {
                                                       setState(() {
                                                         _rescanDuration = mins;
+                                                        availableDateTime = [];
+                                                        dateTimeController.clear();
                                                       });
                                                     }
                                                   },
@@ -1268,6 +1269,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               ServiceBranchAvailableDtController.getAvailableSlot(
                                                                 context,
                                                                 serviceBranchId: _service?.key,
+                                                                serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
+                                                                durationMinutes: _isCurrentRescan ? _rescanDuration : null,
                                                               ).then((value) {
                                                                 if (responseCode(value.code)) {
                                                                   context
@@ -1444,34 +1447,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               field: 'appointmentPage'.tr(gender: 'branch'),
                                                             ),
                                                           );
-                                                        } else if (_isCurrentRescan) {
-                                                          final selectedDate = await showDialog<String>(
-                                                            context: context,
-                                                            builder: (_) => Dialog(
-                                                              child: Padding(
-                                                                padding: const EdgeInsets.all(16),
-                                                                child: SelectionCalendarDateOnlyView(
-                                                                  startMonth: DateTime.now().month,
-                                                                  year: DateTime.now().year,
-                                                                  totalMonths: 3,
-                                                                  availableDates: [],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          );
-
-                                                          if (selectedDate != null) {
-                                                            final picked = await showTimePicker(
-                                                              context: context,
-                                                              initialTime: TimeOfDay.now(),
-                                                            );
-                                                            if (picked != null) {
-                                                              final selectedTime = formatTimeOfDay(picked);
-                                                              dateTimeController.text = '$selectedDate $selectedTime';
-                                                              calculateGestational();
-                                                              rebuildDropdown.add(DateTime.now());
-                                                            }
-                                                          }
                                                         } else if (_appointmentBranch != null &&
                                                             (availableDateTime.isNotEmpty)) {
                                                           DateTime now = DateTime.now();
@@ -1490,11 +1465,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     children: [
                                                                       Container(
                                                                         constraints: BoxConstraints(
-                                                                          maxWidth: screenWidth(80),
+                                                                          maxWidth: isMobile ? screenWidth(92) : 560.0,
+                                                                          maxHeight: MediaQuery.of(context).size.height * 0.85,
                                                                         ),
                                                                         child: CardContainer(
-                                                                          Padding(
-                                                                            padding: EdgeInsets.all(screenPadding),
+                                                                          SingleChildScrollView(
+                                                                            padding: EdgeInsets.all(isMobile ? 12 : 20),
                                                                             child: SelectionCalendarView(
                                                                               startMonth: now.month,
                                                                               year: now.year,
@@ -1522,6 +1498,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           ServiceBranchAvailableDtController.getAvailableSlot(
                                                             context,
                                                             serviceBranchId: widget.appointment?.serviceBranchId,
+                                                            serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
+                                                            durationMinutes: _isCurrentRescan ? _rescanDuration : null,
                                                           ).then((value) async {
                                                             if (responseCode(value.code)) {
                                                               availableDateTime = value.data?.slots ?? [];
@@ -1536,13 +1514,19 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                       Column(
                                                                         mainAxisAlignment: MainAxisAlignment.center,
                                                                         children: [
-                                                                          CardContainer(
-                                                                            Padding(
-                                                                              padding: EdgeInsets.all(screenPadding),
-                                                                              child: SelectionCalendarView(
-                                                                                startMonth: now.month,
-                                                                                year: now.year,
-                                                                                initialDateTimes: availableDateTime,
+                                                                          Container(
+                                                                            constraints: BoxConstraints(
+                                                                              maxWidth: isMobile ? screenWidth(92) : 560.0,
+                                                                              maxHeight: MediaQuery.of(context).size.height * 0.85,
+                                                                            ),
+                                                                            child: CardContainer(
+                                                                              SingleChildScrollView(
+                                                                                padding: EdgeInsets.all(isMobile ? 12 : 20),
+                                                                                child: SelectionCalendarView(
+                                                                                  startMonth: now.month,
+                                                                                  year: now.year,
+                                                                                  initialDateTimes: availableDateTime,
+                                                                                ),
                                                                               ),
                                                                             ),
                                                                           ),
@@ -2384,7 +2368,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               });
             }
           }
-        }, actionText: 'button'.tr(gender: widget.type)),
+        },
+        actionText: 'button'.tr(gender: widget.type),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        borderRadius: 8,
+        elevation: 0,
+        color: secondaryColor,
+      ),
       ],
     );
   }

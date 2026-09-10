@@ -8,10 +8,11 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_detail_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/create_appointment_request.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
-import 'package:klinik_aurora_portal/views/widgets/calendar/date_calendar_view.dart';
+import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -135,6 +136,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                     if (selected) {
                                       setState(() {
                                         _selectedDuration = mins;
+                                        _selectedDateTime = null;
                                       });
                                       rebuild.add(DateTime.now());
                                     }
@@ -227,7 +229,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                             runSpacing: 8,
                             children: [
                               (notNullOrEmptyString(_selectedDateTime))
-                                  ? _infoRow('$_selectedDateTime')
+                                  ? _infoRow('${formatDateTimeToDisplay(_selectedDateTime)}')
                                   : _infoRow('-'),
                               ElevatedButton.icon(
                                 style: ButtonStyle(
@@ -235,8 +237,11 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                   ),
                                   backgroundColor: WidgetStateProperty.all(secondaryColor),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  ),
                                 ),
-                                icon: Icon(Icons.calendar_today, color: Colors.white),
+                                icon: const Icon(Icons.calendar_today, color: Colors.white, size: 16),
                                 label: Text(
                                   'Select Slot',
                                   style: AppTypography.bodyMedium(
@@ -244,113 +249,174 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   ).apply(fontWeightDelta: 1, color: Colors.white),
                                 ),
                                 onPressed: () async {
-                                  final selectedDate = await showDialog<String>(
-                                    context: context,
-                                    builder: (_) => Dialog(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: SelectionCalendarDateOnlyView(
-                                          startMonth: DateTime.now().month,
-                                          year: DateTime.now().year,
-                                          totalMonths: 3,
-                                          availableDates: [],
-                                        ),
-                                      ),
-                                    ),
+                                  if (widget.serviceBranchId == null) {
+                                    showDialogError(context, 'Rescan service branch ID is missing');
+                                    return;
+                                  }
+
+                                  showLoading();
+                                  final slotResponse = await ServiceBranchAvailableDtController.getAvailableSlot(
+                                    context,
+                                    serviceBranchId: widget.serviceBranchId,
+                                    serviceTime: '$_selectedDuration minutes',
+                                    durationMinutes: _selectedDuration,
+                                  );
+                                  dismissLoading();
+
+                                  if (!responseCode(slotResponse.code)) {
+                                    showDialogError(
+                                      context,
+                                      slotResponse.message ??
+                                          slotResponse.data?.message ??
+                                          'Failed to retrieve available slots',
+                                    );
+                                    return;
+                                  }
+
+                                  List<String> availableSlots = slotResponse.data?.slots ?? [];
+                                  availableSlots = removePastDates(availableSlots);
+
+                                  if (availableSlots.isEmpty) {
+                                    showDialogError(
+                                      context,
+                                      'No available slots found for this branch. Please ensure practitioner roster shifts are scheduled.',
+                                    );
+                                    return;
+                                  }
+
+                                  availableSlots.sort(
+                                    (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
                                   );
 
-                                  if (selectedDate != null) {
-                                    final picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-                                    if (picked != null) {
-                                      selectedTime = formatTimeOfDay(picked);
-                                      _selectedDateTime = '$selectedDate $selectedTime';
-                                      try {
-                                        if (notNullOrEmptyString(widget.appointment?.data?.customerDueDate) &&
-                                            notNullOrEmptyString(widget.appointment?.data?.service?.eddRequired)) {
-                                          gestationalResult = getGestationalStatusFromString(
-                                            eddStr:
-                                                dateConverter(
-                                                  widget.appointment?.data?.customerDueDate,
-                                                  format: 'dd-MM-yyyy',
-                                                ) ??
-                                                '',
-                                            range: widget.appointment?.data?.service?.eddRequired ?? '26w0d-31w1d',
-                                            appointmentDate: DateTime.parse(
-                                              convertMalaysiaTimeToUtc(_selectedDateTime ?? '', plainFormat: true),
-                                            ),
-                                          );
-                                        }
-                                      } catch (e) {
-                                        debugPrint('$e');
+                                  final DateTime now = DateTime.now();
+                                  final selectedDateTime = await showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext dialogContext) {
+                                      return Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                constraints: BoxConstraints(
+                                                  maxWidth: isMobile ? screenWidth(92) : 560.0,
+                                                  maxHeight: MediaQuery.of(dialogContext).size.height * 0.85,
+                                                ),
+                                                child: CardContainer(
+                                                  SingleChildScrollView(
+                                                    padding: EdgeInsets.all(isMobile ? 12 : 20),
+                                                    child: SelectionCalendarView(
+                                                      startMonth: now.month,
+                                                      year: now.year,
+                                                      initialDateTimes: availableSlots,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+
+                                  if (selectedDateTime != null) {
+                                    _selectedDateTime = selectedDateTime;
+                                    try {
+                                      if (notNullOrEmptyString(widget.appointment?.data?.customerDueDate) &&
+                                          notNullOrEmptyString(widget.appointment?.data?.service?.eddRequired)) {
+                                        gestationalResult = getGestationalStatusFromString(
+                                          eddStr:
+                                              dateConverter(
+                                                widget.appointment?.data?.customerDueDate,
+                                                format: 'dd-MM-yyyy',
+                                              ) ??
+                                              '',
+                                          range: widget.appointment?.data?.service?.eddRequired ?? '26w0d-31w1d',
+                                          appointmentDate: DateTime.parse(
+                                            convertMalaysiaTimeToUtc(_selectedDateTime ?? '', plainFormat: true),
+                                          ),
+                                        );
                                       }
-                                      rebuild.add(DateTime.now());
+                                    } catch (e) {
+                                      debugPrint('$e');
                                     }
+                                    rebuild.add(DateTime.now());
                                   }
                                 },
                               ),
                             ],
                           ),
-                          SizedBox(height: 32),
-                          Button(() {
-                            if (notNullOrEmptyString(_selectedDateTime)) {
-                              showConfirmDialog(
-                                context,
-                                "Are you sure you want to create a rescan appointment for ${widget.appointment?.data?.user?.userFullName?.titleCase()}",
-                              ).then((value) {
-                                if (value) {
-                                  showLoading();
-                                  final parentId = widget.appointment?.data?.appointmentId ?? '';
-                                  final reason = noteController.text.trim();
-                                  final parentServiceName = widget.appointment?.data?.service?.serviceName ?? 'Scan';
-                                  final shortId = parentId.length > 8 ? parentId.substring(0, 8) : parentId;
-                                  final notePrefix = shortId.isNotEmpty
-                                      ? 'Rescan for $parentServiceName (Appt #$shortId)'
-                                      : 'Rescan for $parentServiceName';
-                                  final fullNote = reason.isNotEmpty ? '$notePrefix: $reason' : notePrefix;
-                                  final adminRemark = parentId.isNotEmpty ? 'Parent Appointment ID: $parentId' : null;
-
-                                  AppointmentController.create(
+                          const SizedBox(height: 48),
+                          Center(
+                            child: Button(
+                              () {
+                                if (notNullOrEmptyString(_selectedDateTime)) {
+                                  showConfirmDialog(
                                     context,
-                                    CreateAppointmentRequest(
-                                      userId: widget.appointment?.data?.user?.userId,
-                                      serviceBranchId: widget.serviceBranchId,
-                                      appointmentDateTime: convertMalaysiaTimeToUtc(
-                                        _selectedDateTime.toString(),
-                                        plainFormat: true,
-                                      ),
-                                      appointmentNote: fullNote,
-                                      adminRemark: adminRemark,
-                                      customerDueDate: dateConverter(
-                                        widget.appointment?.data?.customerDueDate,
-                                        format: 'dd-MM-yyyy',
-                                      ),
-                                      appointmentStatus: 1,
-                                      serviceTime: '$_selectedDuration minutes',
-                                    ),
-                                  ).then((createResponse) {
-                                    dismissLoading();
-                                    if (responseCode(createResponse.code)) {
-                                      context.pop();
-                                      showDialogSuccess(context, "Rescan appointment successfully created.");
-                                    } else {
-                                      showDialogError(
+                                    "Are you sure you want to create a rescan appointment for ${widget.appointment?.data?.user?.userFullName?.titleCase()}",
+                                  ).then((value) {
+                                    if (value) {
+                                      showLoading();
+                                      final parentId = widget.appointment?.data?.appointmentId ?? '';
+                                      final reason = noteController.text.trim();
+                                      final parentServiceName = widget.appointment?.data?.service?.serviceName ?? 'Scan';
+                                      final shortId = parentId.length > 8 ? parentId.substring(0, 8) : parentId;
+                                      final notePrefix = shortId.isNotEmpty
+                                          ? 'Rescan for $parentServiceName (Appt #$shortId)'
+                                          : 'Rescan for $parentServiceName';
+                                      final fullNote = reason.isNotEmpty ? '$notePrefix: $reason' : notePrefix;
+                                      final adminRemark = parentId.isNotEmpty ? 'Parent Appointment ID: $parentId' : null;
+
+                                      AppointmentController.create(
                                         context,
-                                        createResponse.message ??
-                                            createResponse.data?.message ??
-                                            'Failed to create rescan appointment',
-                                      );
+                                        CreateAppointmentRequest(
+                                          userId: widget.appointment?.data?.user?.userId,
+                                          serviceBranchId: widget.serviceBranchId,
+                                          appointmentDateTime: convertMalaysiaTimeToUtc(
+                                            _selectedDateTime.toString(),
+                                            plainFormat: true,
+                                          ),
+                                          appointmentNote: fullNote,
+                                          adminRemark: adminRemark,
+                                          customerDueDate: dateConverter(
+                                            widget.appointment?.data?.customerDueDate,
+                                            format: 'dd-MM-yyyy',
+                                          ),
+                                          appointmentStatus: 1,
+                                          serviceTime: '$_selectedDuration minutes',
+                                        ),
+                                      ).then((createResponse) {
+                                        dismissLoading();
+                                        if (responseCode(createResponse.code)) {
+                                          context.pop();
+                                          showDialogSuccess(context, "Rescan appointment successfully created.");
+                                        } else {
+                                          showDialogError(
+                                            context,
+                                            createResponse.message ??
+                                                createResponse.data?.message ??
+                                                'Failed to create rescan appointment',
+                                          );
+                                        }
+                                      }).catchError((e) {
+                                        dismissLoading();
+                                        showDialogError(context, e.toString());
+                                      });
                                     }
-                                  }).catchError((e) {
-                                    dismissLoading();
-                                    showDialogError(context, e.toString());
                                   });
+                                } else {
+                                  showDialogError(context, ErrorMessage.required(field: 'Slot'));
                                 }
-                              });
-                            } else {
-                              showDialogError(context, ErrorMessage.required(field: 'Slot'));
-                            }
-                          }, actionText: 'Book'),
-                          SizedBox(height: 12),
+                              },
+                              actionText: 'Book',
+                              width: 160,
+                              borderRadius: 6,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
                         ],
                       );
                     },
@@ -368,6 +434,33 @@ class _RescanAppointmentState extends State<RescanAppointment> {
     final now = DateTime.now();
     final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
     return DateFormat('HH:mm').format(dt);
+  }
+
+  List<String> removePastDates(List<String> dateList) {
+    DateTime now = DateTime.now();
+    return dateList.where((dateStr) {
+      try {
+        DateTime date = DateTime.parse(dateStr).toLocal();
+        return date.isAfter(now);
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+  }
+
+  String? formatDateTimeToDisplay(String? input) {
+    final regex = RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$');
+    if (!regex.hasMatch(input ?? '')) {
+      return input;
+    }
+    try {
+      final inputFormat = DateFormat("yyyy-MM-dd HH:mm");
+      final outputFormat = DateFormat("dd-MM-yyyy HH:mm");
+      final dateTime = inputFormat.parse(input ?? '');
+      return outputFormat.format(dateTime);
+    } catch (e) {
+      return input;
+    }
   }
 
   Widget _infoBlock(String title, List<Widget> children) {
