@@ -142,12 +142,12 @@ class BranchDashboardView extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
 
             // ── 2. 7-Day Activity Bar Chart ──────────────────────────────────────
             _buildWeeklyActivityCard(context, data?.weeklyActivity ?? []),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
 
             // ── 3. Bottom Row: Live Queue + Service Donut & Revenue ──────────────
             LayoutBuilder(
@@ -160,7 +160,7 @@ class BranchDashboardView extends StatelessWidget {
                   return Column(
                     children: [
                       queueWidget,
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 12),
                       performanceWidget,
                     ],
                   );
@@ -170,7 +170,7 @@ class BranchDashboardView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(flex: 11, child: queueWidget),
-                    const SizedBox(width: 18),
+                    const SizedBox(width: 12),
                     Expanded(flex: 9, child: performanceWidget),
                   ],
                 );
@@ -191,7 +191,7 @@ class BranchDashboardView extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -237,9 +237,9 @@ class BranchDashboardView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          AspectRatio(
-            aspectRatio: isMobile ? 1.9 : 3.6,
+          const SizedBox(height: 12),
+          SizedBox(
+            height: isMobile ? 150 : 170,
             child: activity.isEmpty
                 ? const Center(
                     child: Text('No appointment activity in the last 7 days', style: TextStyle(color: Color(0xFF94A3B8))),

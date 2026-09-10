@@ -23,6 +23,19 @@ class _MainDashboardState extends State<MainDashboard> {
   String? _selectedBranchId; // null = Network View for superadmin
   String? _selectedBranchName;
   bool _isLoading = false;
+  DateTime? _lastRefreshTime;
+  static const Duration _cooldownDuration = Duration(seconds: 5);
+
+  bool get _isCooldownActive {
+    if (_lastRefreshTime == null) return false;
+    return DateTime.now().difference(_lastRefreshTime!) < _cooldownDuration;
+  }
+
+  void _handleManualRefresh() {
+    if (_isLoading || _isCooldownActive) return;
+    _lastRefreshTime = DateTime.now();
+    _loadData();
+  }
 
   @override
   void initState() {
@@ -97,7 +110,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final activeBranchName = _selectedBranchName ?? userBranch?.branchName ?? branchOpsName;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(screenPadding),
+      padding: EdgeInsets.fromLTRB(screenPadding, 8, screenPadding, 16),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1400),
@@ -106,7 +119,7 @@ class _MainDashboardState extends State<MainDashboard> {
             children: [
               // ── Header Bar ───────────────────────────────────────────────
               _buildHeader(isSuper, activeBranchName),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
               // ── Main Content ─────────────────────────────────────────────
               if (_isLoading)
@@ -129,7 +142,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final branches = context.watch<BranchController>().branchAllResponse?.data?.data ?? [];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -250,19 +263,35 @@ class _MainDashboardState extends State<MainDashboard> {
 
               // Refresh Button
               Tooltip(
-                message: 'Refresh data',
+                message: _isLoading
+                    ? 'Refreshing...'
+                    : _isCooldownActive
+                        ? 'Please wait a moment'
+                        : 'Refresh data',
                 child: InkWell(
-                  onTap: _loadData,
+                  onTap: (_isLoading || _isCooldownActive) ? null : _handleManualRefresh,
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
+                      color: (_isLoading || _isCooldownActive) ? const Color(0xFFF1F5F9) : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
-                    child: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF475569)),
+                    child: _isLoading
+                        ? const Center(
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF64748B)),
+                            ),
+                          )
+                        : Icon(
+                            Icons.refresh_rounded,
+                            size: 18,
+                            color: (_isLoading || _isCooldownActive) ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                          ),
                   ),
                 ),
               ),

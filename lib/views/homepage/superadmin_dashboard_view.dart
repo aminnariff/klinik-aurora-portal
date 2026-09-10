@@ -144,12 +144,12 @@ class SuperadminDashboardView extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
 
             // ── 2. 6-Month Revenue Trajectory Area Chart ─────────────────────────
             _buildRevenueTrajectoryCard(context, data?.revenueByMonth ?? []),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
 
             // ── 3. Bottom Row: Branch Leaderboard + Service Breakdown ────────────
             LayoutBuilder(
@@ -162,7 +162,7 @@ class SuperadminDashboardView extends StatelessWidget {
                   return Column(
                     children: [
                       leaderboardWidget,
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 12),
                       serviceWidget,
                     ],
                   );
@@ -172,7 +172,7 @@ class SuperadminDashboardView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(flex: 11, child: leaderboardWidget),
-                    const SizedBox(width: 18),
+                    const SizedBox(width: 12),
                     Expanded(flex: 9, child: serviceWidget),
                   ],
                 );
@@ -198,7 +198,7 @@ class SuperadminDashboardView extends StatelessWidget {
     final monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -256,9 +256,9 @@ class SuperadminDashboardView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          AspectRatio(
-            aspectRatio: isMobile ? 1.9 : 3.6,
+          const SizedBox(height: 12),
+          SizedBox(
+            height: isMobile ? 150 : 170,
             child: revenueList.isEmpty
                 ? const Center(
                     child: Text('No revenue history available', style: TextStyle(color: Color(0xFF94A3B8))),

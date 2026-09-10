@@ -417,10 +417,10 @@ class _HomepageState extends State<Homepage> {
 
   Widget _buildTopBar(BuildContext context) {
     return Container(
-      height: 56,
+      height: 44,
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(12), blurRadius: 6, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 4, offset: const Offset(0, 1))],
       ),
       padding: EdgeInsets.symmetric(horizontal: screenPadding),
       child: Row(
@@ -428,16 +428,18 @@ class _HomepageState extends State<Homepage> {
         children: [
           if (context.read<AuthController>().isSuperAdmin) ...[
             IconButton(
-              icon: const Icon(Icons.notifications_outlined),
+              icon: const Icon(Icons.notifications_outlined, size: 20),
               color: const Color(0xFF637381),
               tooltip: 'Announcements',
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
               onPressed: () => showDialog(context: context, builder: (_) => NotificationHomepage()),
             ),
             const SizedBox(width: 4),
           ],
           PopupMenuButton<String>(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            offset: const Offset(0, 44),
+            offset: const Offset(0, 38),
             color: Colors.white,
             tooltip: '',
             onSelected: _handleMenuSelection,
@@ -447,10 +449,10 @@ class _HomepageState extends State<Homepage> {
               const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
             ],
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
               decoration: BoxDecoration(
                 border: Border.all(color: const Color(0xFFE5E7EB)),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
