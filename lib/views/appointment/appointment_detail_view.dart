@@ -751,9 +751,11 @@ class AppointmentDetailsView extends StatelessWidget {
         _metaRow(Icons.add_circle_outline, 'Created', dateConverter(data?.createdDate) ?? '—'),
         const SizedBox(height: 8),
         _metaRow(
-          Icons.person_outline_rounded,
+          data?.createdBy != null ? Icons.shield_outlined : Icons.smartphone_rounded,
           'Created By',
-          data?.createdBy?.name ?? data?.createdBy?.email ?? 'Patient (self-booked)',
+          data?.createdBy != null
+              ? 'Admin: ${data?.createdBy?.name ?? data?.createdBy?.email ?? 'Staff'}'
+              : 'Patient (Self-booked via App)',
         ),
         const SizedBox(height: 8),
         _metaRow(Icons.edit_outlined, 'Last Updated', dateConverter(data?.modifiedDate) ?? '—'),

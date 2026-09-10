@@ -2012,6 +2012,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     'Created',
                     dateConverter(widget.appointment?.createdDate) ?? '—',
                   ),
+                  const SizedBox(height: 6),
+                  _metaInfoRow(
+                    widget.appointment?.createdBy != null ? Icons.shield_outlined : Icons.smartphone_rounded,
+                    'Created By',
+                    widget.appointment?.createdBy != null
+                        ? 'Admin: ${widget.appointment?.createdBy?.name ?? widget.appointment?.createdBy?.email ?? 'Staff'}'
+                        : 'Patient (Self-booked via App)',
+                  ),
                   if (widget.appointment?.modifiedDate != null) ...[
                     const SizedBox(height: 6),
                     _metaInfoRow(
