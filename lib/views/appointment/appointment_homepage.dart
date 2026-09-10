@@ -364,10 +364,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (authController.isSuperAdmin) _buildBranchBar(),
-              if (!_isCalendarView) _buildDateFilterBar(),
-              if (authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false)
-                _buildStatsStrip(authController),
+              _buildControlBar(authController),
               _buildTabAndActions(),
               Expanded(child: _isCalendarView ? _buildCalendarArea() : _buildTableArea()),
               if (!_isCalendarView) _buildPaginationBar(),
@@ -378,8 +375,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     );
   }
 
-  Widget _buildBranchBar() {
-    if (!_branchesLoaded && branches.isEmpty && mounted) {
+  Widget _buildControlBar(AuthController authController) {
+    if (authController.isSuperAdmin && !_branchesLoaded && branches.isEmpty && mounted) {
       BranchController.getAll(context, 1, 100).then((value) {
         if (responseCode(value.code) && mounted && !_branchesLoaded) {
           context.read<BranchController>().branchAllResponse = value;
@@ -391,73 +388,49 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         }
       });
     }
-    if (!_branchesLoaded) {
-      return Container(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 14),
-        child: Row(
-          children: [
-            const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
-            const SizedBox(width: 8),
-            Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
-            const SizedBox(width: 12),
-            const SizedBox(
-              height: 48,
-              width: 200,
-              child: Center(
-                child: Text('Loading branches...', style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 8),
       child: Row(
         children: [
-          const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
-          const SizedBox(width: 8),
-          Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
-          const SizedBox(width: 12),
-          Flexible(
-            child: AppDropdown(
-              attributeList: DropdownAttributeList(
-                branches,
-                isEditable: true,
-                value: _appointmentBranch?.name,
-                onChanged: (p0) {
-                  setState(() {
-                    _appointmentBranch = p0;
-                    _appointmentService = null;
-                  });
-                  context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
-                  serviceList = [];
-                  if (p0 != null) getServiceForBranch(p0.key);
-                  getDashboard();
-                  filtering();
-                  if (_isCalendarView && mounted) {
-                    _refreshCalendarCounts();
-                  }
-                },
-                width: isMobile
-                    ? MediaQuery.of(context).size.width - (screenPadding * 2) - 86
-                    : screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
-              ),
+          if (authController.isSuperAdmin) ...[
+            Text('Branch', style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF4B5563))),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: isMobile ? 150 : 220,
+              child: !_branchesLoaded && branches.isEmpty
+                  ? const Center(
+                      child: Text('Loading...', style: TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+                    )
+                  : AppDropdown(
+                      attributeList: DropdownAttributeList(
+                        branches,
+                        isEditable: true,
+                        value: _appointmentBranch?.name,
+                        onChanged: (p0) {
+                          setState(() {
+                            _appointmentBranch = p0;
+                            _appointmentService = null;
+                          });
+                          context.read<AppointmentDashboardController>().appointmentDashboardResponse = null;
+                          serviceList = [];
+                          if (p0 != null) getServiceForBranch(p0.key);
+                          getDashboard();
+                          filtering();
+                          if (_isCalendarView && mounted) {
+                            _refreshCalendarCounts();
+                          }
+                        },
+                        width: isMobile ? 150 : 220,
+                      ),
+                    ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateFilterBar() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(screenPadding, 8, screenPadding, 8),
-      child: Row(
-        children: [
-          if (!isMobile) ...[
+            const SizedBox(width: 12),
+            Container(height: 20, width: 1, color: const Color(0xFFE5E7EB)),
+            const SizedBox(width: 12),
+          ],
+          if (!_isCalendarView && !isMobile) ...[
             Expanded(
               child: DateFilterDropdown(
                 key: ValueKey('bar-${_currentDateRange?.label}'),
@@ -470,25 +443,25 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           if (isMobile) const Spacer(),
           OutlinedButton.icon(
             onPressed: _showFilterPanel,
-            icon: const Icon(Icons.tune_rounded, size: 16),
-            label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            icon: const Icon(Icons.tune_rounded, size: 15),
+            label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
             style: OutlinedButton.styleFrom(
               foregroundColor: _hasActiveFilters() ? secondaryColor : const Color(0xFF374151),
               side: BorderSide(color: _hasActiveFilters() ? secondaryColor : const Color(0xFFD1D5DB)),
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 14, vertical: isMobile ? 10 : 18),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14, vertical: isMobile ? 8 : 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
           const SizedBox(width: 8),
           IconButton(
             onPressed: _resetFilters,
-            icon: const Icon(Icons.rotate_left_rounded, size: 18),
+            icon: const Icon(Icons.rotate_left_rounded, size: 16),
             color: const Color(0xFF6B7280),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F4F6),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
             ),
           ),
         ],
@@ -768,92 +741,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     );
   }
 
-  Widget _buildStatsStrip(AuthController authController) {
-    return Consumer<AppointmentDashboardController>(
-      builder: (context, dashController, _) {
-        final dash = dashController.appointmentDashboardResponse?.data;
-
-        final stats = [
-          _StatConfig(
-            label: 'Upcoming',
-            value: dash?.totalUpcoming?.toString() ?? '–',
-            color: const Color(0xFF2196F3),
-            bg: const Color(0xFFE3F2FD),
-            icon: Icons.pending_actions_rounded,
-          ),
-          _StatConfig(
-            label: 'Completed',
-            value: dash?.totalCompleted?.toString() ?? '–',
-            color: const Color(0xFF059669),
-            bg: const Color(0xFFD1FAE5),
-            icon: Icons.check_circle_rounded,
-          ),
-          _StatConfig(
-            label: 'No-Show',
-            value: dash?.totalNoShow?.toString() ?? '–',
-            color: const Color(0xFFF59E0B),
-            bg: const Color(0xFFFEF3C7),
-            icon: Icons.person_off_rounded,
-          ),
-          _StatConfig(
-            label: 'Cancelled',
-            value: dash?.totalCanceled?.toString() ?? '–',
-            color: const Color(0xFFEF4444),
-            bg: const Color(0xFFFEE2E2),
-            icon: Icons.cancel_rounded,
-          ),
-          _StatConfig(
-            label: 'Potential Sales',
-            value: dash?.potentialSales != null ? currencyFormatter.format(dash!.potentialSales) : '–',
-            color: const Color(0xFF7C3AED),
-            bg: const Color(0xFFEDE9FE),
-            icon: Icons.monetization_on_rounded,
-          ),
-        ];
-
-        return Container(
-          padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 12),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: stats.map((s) {
-                return Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(color: s.bg, borderRadius: BorderRadius.circular(12)),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(s.icon, color: s.color, size: 18),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            s.value,
-                            style: AppTypography.bodyMedium(
-                              context,
-                            ).copyWith(fontWeight: FontWeight.bold, color: s.color),
-                          ),
-                          Text(
-                            s.label,
-                            style: AppTypography.bodyMedium(
-                              context,
-                            ).apply(fontSizeDelta: -3, color: s.color.withAlpha(180)),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildTabAndActions() {
     return Consumer<AppointmentDashboardController>(
@@ -1456,8 +1343,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     );
   }
 
-  DataRow _buildDataRow(BuildContext context, Data item, int index, AuthController authController) {
-    return DataRow(
+  DataRow2 _buildDataRow(BuildContext context, Data item, int index, AuthController authController) {
+    return DataRow2(
+      onTap: () => _handleMenuSelection('update', item),
       color: WidgetStateProperty.all(index.isEven ? Colors.white : const Color(0xFFFAFAFA)),
       cells: [
         DataCell(
@@ -2222,20 +2110,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 }
 
-class _StatConfig {
-  final String label;
-  final String value;
-  final Color color;
-  final Color bg;
-  final IconData icon;
-  const _StatConfig({
-    required this.label,
-    required this.value,
-    required this.color,
-    required this.bg,
-    required this.icon,
-  });
-}
 
 class _GuidelineSection {
   final IconData icon;
