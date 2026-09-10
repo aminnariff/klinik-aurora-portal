@@ -93,6 +93,12 @@ class _HomepageState extends State<Homepage> {
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
+          return FaIcon(FontAwesomeIcons.userDoctor, color: Colors.white);
+        },
+        label: DoctorHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
           return Icon(Icons.medical_services_rounded, color: Colors.white);
         },
         label: ServiceHomepage.displayName,
@@ -108,12 +114,6 @@ class _HomepageState extends State<Homepage> {
           return Icon(Icons.store_rounded, color: Colors.white);
         },
         label: BranchHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return FaIcon(FontAwesomeIcons.userDoctor, color: Colors.white);
-        },
-        label: DoctorHomepage.displayName,
       ),
       // Campaigns and Point Modifiers share one entry — see MarketingHomepage.
       SidebarXItem(

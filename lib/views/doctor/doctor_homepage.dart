@@ -32,7 +32,7 @@ import 'package:provider/provider.dart';
 
 class DoctorHomepage extends StatefulWidget {
   static const routeName = '/pic';
-  static const displayName = 'Person In Charge';
+  static const displayName = 'Practitioners';
   final String? branchId;
   const DoctorHomepage({super.key, this.branchId});
 
@@ -138,7 +138,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                   const SizedBox(width: 8),
                   _MobileActionButton(
                     icon: Icons.person_add_alt_1_rounded,
-                    tooltip: 'Add PIC',
+                    tooltip: 'Add Practitioner',
                     color: Colors.white,
                     background: secondaryColor,
                     onTap: () => showDialog(
@@ -233,7 +233,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
-          Expanded(child: SizedBox(height: 40, child: _searchInput(_nameController, 'Search by PIC name…'))),
+          Expanded(child: SizedBox(height: 40, child: _searchInput(_nameController, 'Search by practitioner name…'))),
           const SizedBox(width: 12),
           OutlinedButton.icon(
             onPressed: _showFilterPanel,
@@ -283,7 +283,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               builder: (_) => const DoctorDetails(type: 'create'),
             ),
             icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
-            label: const Text('Add PIC', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            label: const Text('Add Practitioner', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: secondaryColor,
               foregroundColor: Colors.white,
@@ -346,7 +346,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       dividerThickness: 1,
       columns: const [
         DataColumn2(
-          label: Text('Person In Charge', style: headerStyle),
+          label: Text('Practitioners', style: headerStyle),
           size: ColumnSize.M,
         ),
         DataColumn2(
@@ -604,9 +604,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Filter PICs', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        const Text('Filter Practitioners', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                         const SizedBox(height: 16),
-                        _filterTextField(_nameController, 'PIC Name'),
+                        _filterTextField(_nameController, 'Practitioner Name'),
                         const SizedBox(height: 12),
                         _filterTextField(_phoneController, 'Contact Number'),
                         const SizedBox(height: 12),
@@ -772,8 +772,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         if (await showConfirmDialog(
           context,
           doc.doctorStatus == 1
-              ? 'Are you certain you wish to deactivate this PIC?'
-              : 'Are you certain you wish to activate this PIC?',
+              ? 'Are you certain you wish to deactivate this practitioner?'
+              : 'Are you certain you wish to activate this practitioner?',
         )) {
           Future.delayed(Duration.zero, () {
             DoctorController.update(
@@ -789,7 +789,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             ).then((value) {
               if (responseCode(value.code)) {
                 filtering();
-                showDialogSuccess(context, 'PIC ${doc.doctorStatus == 1 ? 'deactivated' : 'activated'} successfully.');
+                showDialogSuccess(context, 'Practitioner ${doc.doctorStatus == 1 ? 'deactivated' : 'activated'} successfully.');
               } else {
                 showDialogError(context, value.message ?? value.data?.message ?? '');
               }

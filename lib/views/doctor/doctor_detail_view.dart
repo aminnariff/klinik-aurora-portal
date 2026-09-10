@@ -205,7 +205,7 @@ class DoctorDetailView extends StatelessWidget {
             child: const Icon(Icons.person_rounded, size: 16, color: Color(0xFF6366F1)),
           ),
           const SizedBox(width: 10),
-          Text('PIC Details', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+          Text('Practitioner Details', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
           const Spacer(),
           CloseButton(onPressed: () => context.pop()),
         ],

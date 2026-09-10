@@ -684,7 +684,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
               filtering();
               showDialogSuccess(
                 context,
-                'The PIC has been successfully ${data.userStatus == 1 ? 'deactivated' : 'activated'}.',
+                'The staff has been successfully ${data.userStatus == 1 ? 'deactivated' : 'activated'}.',
               );
             } else {
               showDialogError(context, value.message ?? value.data?.message ?? '');

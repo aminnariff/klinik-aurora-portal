@@ -161,7 +161,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                               const Icon(Icons.person_rounded, size: 18, color: Color(0xFF6B7280)),
                               const SizedBox(width: 8),
                               Text(
-                                widget.type == 'create' ? 'New PIC' : 'Edit PIC',
+                                widget.type == 'create' ? 'New Practitioner' : 'Edit Practitioner',
                                 style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                               ),
                               const Spacer(),
@@ -393,16 +393,16 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         context.read<DoctorController>().doctorBranchResponse = value.data;
         context.pop();
         if (widget.type == 'update') {
-          showDialogSuccess(context, 'Successfully updated PIC');
+          showDialogSuccess(context, 'Successfully updated practitioner');
         } else {
-          showDialogSuccess(context, 'Successfully created new PIC');
+          showDialogSuccess(context, 'Successfully created new practitioner');
         }
       } else {
         context.pop();
         if (widget.type == 'update') {
-          showDialogSuccess(context, 'Successfully updated PIC');
+          showDialogSuccess(context, 'Successfully updated practitioner');
         } else {
-          showDialogSuccess(context, 'Successfully created new PIC');
+          showDialogSuccess(context, 'Successfully created new practitioner');
         }
       }
     });
@@ -437,7 +437,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     if (widget.type == 'create') {
       if (_doctorImage.controller.text.trim().isEmpty) {
         temp = false;
-        showDialogError(context, 'Please upload or provide an image for the person in charge (PIC).');
+        showDialogError(context, 'Please upload or provide an image for the practitioner.');
       }
     }
     setState(() {});

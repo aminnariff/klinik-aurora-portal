@@ -192,8 +192,8 @@ class _DoctorListState extends State<DoctorList> {
                                                                             ?.data?[index]
                                                                             .doctorStatus ==
                                                                         1
-                                                                    ? 'Are you certain you wish to deactivate this PIC account? Please note, this action can be reversed at a later time.'
-                                                                    : 'Are you certain you wish to activate this PIC account? Please note, this action can be reversed at a later time.',
+                                                                    ? 'Are you certain you wish to deactivate this practitioner account? Please note, this action can be reversed at a later time.'
+                                                                    : 'Are you certain you wish to activate this practitioner account? Please note, this action can be reversed at a later time.',
                                                               )) {
                                                                 Future.delayed(Duration.zero, () {
                                                                   DoctorController.update(
@@ -243,12 +243,12 @@ class _DoctorListState extends State<DoctorList> {
                                                                               value.data;
                                                                           showDialogSuccess(
                                                                             context,
-                                                                            'Successfully updated new PIC',
+                                                                            'Successfully updated practitioner',
                                                                           );
                                                                         } else {
                                                                           showDialogSuccess(
                                                                             context,
-                                                                            'Successfully updated new PIC',
+                                                                            'Successfully updated practitioner',
                                                                           );
                                                                         }
                                                                       });
