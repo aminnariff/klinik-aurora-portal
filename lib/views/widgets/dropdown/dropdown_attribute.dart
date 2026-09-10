@@ -7,6 +7,8 @@ class DropdownAttributeList {
   String? value;
   final String? hintText;
   final String? labelText;
+  final TextStyle? labelStyle;
+  final FloatingLabelBehavior? floatingLabelBehavior;
   final String? helpText;
   TextAlign? helpTextAlign;
   String? errorMessage;
@@ -25,6 +27,8 @@ class DropdownAttributeList {
     this.value,
     this.hintText,
     this.labelText,
+    this.labelStyle,
+    this.floatingLabelBehavior,
     this.helpText,
     this.helpTextAlign,
     this.errorMessage,

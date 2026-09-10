@@ -223,6 +223,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                                               ),
                                                             )
                                                             .toList(),
+                                                        labelText: 'Branch',
                                                         isEditable: isSuper,
                                                         fieldColor: isSuper
                                                             ? textFormFieldEditableColor
@@ -244,6 +245,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                             ),
                                           ],
                                         ),
+                                        AppPadding.vertical(denominator: 2),
                                         Row(
                                           children: [
                                             StreamBuilder<DateTime>(

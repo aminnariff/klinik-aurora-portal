@@ -72,7 +72,7 @@ class _BranchDetailState extends State<BranchDetail> {
       _postcode.text = widget.branch?.postcode?.toString() ?? '0';
       _address.text = widget.branch?.address ?? '';
       _city.text = widget.branch?.city ?? '';
-      _branchPhone.text = widget.branch?.phoneNumber?.substring(1, widget.branch?.phoneNumber?.length) ?? '';
+      _branchPhone.text = widget.branch?.phoneNumber ?? '';
       _state.text = widget.branch?.state ?? '';
       _branchStatus.value = widget.branch?.branchStatus == 1;
       _is24Hours.value = widget.branch?.is24Hours == true;
@@ -219,24 +219,6 @@ class _BranchDetailState extends State<BranchDetail> {
                                             controller: _branchPhone,
                                             labelText: 'branchPage'.tr(gender: 'phoneNo'),
                                             isNumber: true,
-                                            maxCharacter: 10,
-                                            prefixIcon: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
-                                                  child: const Text(
-                                                    '+60',
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.w700,
-                                                      fontSize: 15.0,
-                                                      color: textPrimaryColor,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
                                           ),
                                         ),
                                         const SizedBox(height: 24),
@@ -505,7 +487,7 @@ class _BranchDetailState extends State<BranchDetail> {
                 CreateBranchRequest(
                   branchName: _branchName.text,
                   branchCode: _branchCode.text,
-                  phoneNumber: '0${_branchPhone.text}',
+                  phoneNumber: _branchPhone.text.trim(),
                   address: _address.text,
                   city: _city.text,
                   postcode: _postcode.text,
@@ -545,7 +527,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   branchId: widget.branch?.branchId ?? '',
                   branchCode: _branchCode.text,
                   branchName: _branchName.text,
-                  phoneNumber: '0${_branchPhone.text}',
+                  phoneNumber: _branchPhone.text.trim(),
                   address: _address.text,
                   city: _city.text,
                   postcode: _postcode.text,

@@ -63,9 +63,9 @@
     "voucherStatus": "Status"
   },
   "doctorPage": {
-    "doctorName": "PIC Name",
-    "phoneNo": "PIC Contact No.",
-    "doctorImage": "PIC Image",
+    "doctorName": "Practitioner Name",
+    "phoneNo": "Practitioner Contact No.",
+    "doctorImage": "Practitioner Image",
     "browseFile": "Browse your files here (max 1MB)",
     "voucherStatus": "Status"
   },
@@ -141,7 +141,7 @@
     "serviceDescription": "ServiceDescription",
     "servicePrice": "Price",
     "serviceBookingFee": "Booking Fee",
-    "doctorType": "Type",
+    "doctorType": "Practitioner Type",
     "serviceTime": "Service Time",
     "estimatedDuration": "Estimated Duration",
     "serviceImage": "Service Image",

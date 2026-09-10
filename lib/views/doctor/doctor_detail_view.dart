@@ -86,6 +86,16 @@ class DoctorDetailView extends StatelessWidget {
                                           ),
                                         ),
                                         AppPadding.vertical(denominator: 2),
+                                        _fieldLabel(context, 'Practitioner Type'),
+                                        AppSelectableText(
+                                          doctor.doctorType != null ? doctorType(doctor.doctorType!) : 'Doctor',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF111827),
+                                          ),
+                                        ),
+                                        AppPadding.vertical(denominator: 2),
                                         _fieldLabel(context, 'Status'),
                                         _statusChip(doctor.doctorStatus == 1),
                                         AppPadding.vertical(denominator: 2),

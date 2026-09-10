@@ -616,6 +616,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                             attributeList: DropdownAttributeList(
                               [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
                               labelText: 'Status',
+                              fieldColor: const Color(0xFFF9FAFB),
                               value: _selectedStatus?.name,
                               onChanged: (p0) {
                                 _selectedStatus = p0;
@@ -639,6 +640,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 DropdownAttribute('5', doctorType(5)),
                               ],
                               labelText: 'Practitioner Type',
+                              fieldColor: const Color(0xFFF9FAFB),
                               value: _selectedDoctorType?.name,
                               onChanged: (p0) {
                                 _selectedDoctorType = p0;
