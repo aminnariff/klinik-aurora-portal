@@ -14,8 +14,12 @@ class ServiceBranchResponse {
         data!.add(Data.fromJson(v));
       });
     }
-    totalCount = json['totalCount'];
-    totalPage = json['totalPage'];
+    totalCount = json['totalCount'] is int
+        ? json['totalCount']
+        : int.tryParse(json['totalCount']?.toString() ?? '');
+    totalPage = json['totalPage'] is int
+        ? json['totalPage']
+        : int.tryParse(json['totalPage']?.toString() ?? '');
   }
 
   Map<String, dynamic> toJson() {
@@ -77,7 +81,9 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     serviceBranchId = json['serviceBranchId'];
-    serviceBranchStatus = json['serviceBranchStatus'];
+    serviceBranchStatus = json['serviceBranchStatus'] is int
+        ? json['serviceBranchStatus']
+        : int.tryParse(json['serviceBranchStatus']?.toString() ?? '');
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
     serviceId = json['serviceId'];
@@ -85,17 +91,29 @@ class Data {
     serviceDescription = json['serviceDescription'];
     serviceImage = json['serviceImage'];
     serviceTime = json['serviceTime'];
-    servicePrice = json['servicePrice'];
-    serviceBookingFee = json['serviceBookingFee'];
-    doctorType = json['doctorType'];
+    servicePrice = json['servicePrice']?.toString();
+    serviceBookingFee = json['serviceBookingFee']?.toString();
+    doctorType = json['doctorType'] is int
+        ? json['doctorType']
+        : int.tryParse(json['doctorType']?.toString() ?? '');
     serviceCategory = json['serviceCategory'];
-    serviceBranchAvailableTime = json['serviceBranchAvailableTime'].cast<String>();
-    serviceStatus = json['serviceStatus'];
+    if (json['serviceBranchAvailableTime'] != null) {
+      serviceBranchAvailableTime = (json['serviceBranchAvailableTime'] as List)
+          .map((e) => e.toString())
+          .toList();
+    } else {
+      serviceBranchAvailableTime = [];
+    }
+    serviceStatus = json['serviceStatus'] is int
+        ? json['serviceStatus']
+        : int.tryParse(json['serviceStatus']?.toString() ?? '');
     branchId = json['branchId'];
     branchCode = json['branchCode'];
     branchName = json['branchName'];
     branchImage = json['branchImage'];
-    branchStatus = json['branchStatus'];
+    branchStatus = json['branchStatus'] is int
+        ? json['branchStatus']
+        : int.tryParse(json['branchStatus']?.toString() ?? '');
   }
 
   Map<String, dynamic> toJson() {

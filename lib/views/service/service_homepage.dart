@@ -1158,9 +1158,14 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           context.read<ServiceBranchController>().serviceBranchResponse = value.data;
           _totalCount = value.data?.totalCount ?? 0;
           _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
+        } else {
+          context.read<ServiceBranchController>().serviceBranchResponse = service_branch_model.ServiceBranchResponse(data: []);
+          showDialogError(context, value.message ?? 'Failed to load services');
         }
       }).catchError((e) {
         dismissLoading();
+        context.read<ServiceBranchController>().serviceBranchResponse = service_branch_model.ServiceBranchResponse(data: []);
+        showDialogError(context, e.toString());
       });
     } else {
       ServiceController.getAll(
@@ -1181,9 +1186,14 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           _totalCount = value.data?.totalCount ?? 0;
           _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
           context.read<ServiceController>().servicesResponse = value.data;
+        } else {
+          context.read<ServiceController>().servicesResponse = ServicesResponse(data: []);
+          showDialogError(context, value.message ?? 'Failed to load services');
         }
       }).catchError((e) {
         dismissLoading();
+        context.read<ServiceController>().servicesResponse = ServicesResponse(data: []);
+        showDialogError(context, e.toString());
       });
     }
   }

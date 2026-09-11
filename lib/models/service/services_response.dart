@@ -14,8 +14,12 @@ class ServicesResponse {
         data!.add(Data.fromJson(v));
       });
     }
-    totalCount = json['totalCount'];
-    totalPage = json['totalPage'];
+    totalCount = json['totalCount'] is int
+        ? json['totalCount']
+        : int.tryParse(json['totalCount']?.toString() ?? '');
+    totalPage = json['totalPage'] is int
+        ? json['totalPage']
+        : int.tryParse(json['totalPage']?.toString() ?? '');
   }
 
   Map<String, dynamic> toJson() {
