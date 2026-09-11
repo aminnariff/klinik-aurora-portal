@@ -5,6 +5,8 @@ class PaymentSuccessResponse {
   Filters? filters;
   Range? range;
   int? total;
+  int? totalUnrecovered;
+  int? totalRecovered;
   List<String>? data;
   List<PaymentAppointmentItem>? items;
 
@@ -15,6 +17,8 @@ class PaymentSuccessResponse {
     this.filters,
     this.range,
     this.total,
+    this.totalUnrecovered,
+    this.totalRecovered,
     this.data,
     this.items,
   });
@@ -26,6 +30,8 @@ class PaymentSuccessResponse {
     filters = json['filters'] != null ? Filters.fromJson(json['filters']) : null;
     range = json['range'] != null ? Range.fromJson(json['range']) : null;
     total = json['total'];
+    totalUnrecovered = json['totalUnrecovered'];
+    totalRecovered = json['totalRecovered'];
     if (json['data'] != null) {
       data = json['data'].cast<String>();
     }
@@ -49,6 +55,8 @@ class PaymentSuccessResponse {
       data['range'] = range!.toJson();
     }
     data['total'] = total;
+    data['totalUnrecovered'] = totalUnrecovered;
+    data['totalRecovered'] = totalRecovered;
     data['data'] = this.data;
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
@@ -68,6 +76,7 @@ class PaymentAppointmentItem {
   String? paymentAmount;
   String? paymentStatus;
   String? paymentChannel;
+  bool? isRecovered;
 
   PaymentAppointmentItem({
     this.appointmentId,
@@ -80,6 +89,7 @@ class PaymentAppointmentItem {
     this.paymentAmount,
     this.paymentStatus,
     this.paymentChannel,
+    this.isRecovered,
   });
 
   PaymentAppointmentItem.fromJson(Map<String, dynamic> json) {
@@ -93,6 +103,7 @@ class PaymentAppointmentItem {
     paymentAmount = json['paymentAmount']?.toString();
     paymentStatus = json['paymentStatus'];
     paymentChannel = json['paymentChannel'];
+    isRecovered = json['isRecovered'] == true;
   }
 
   Map<String, dynamic> toJson() {
@@ -107,6 +118,7 @@ class PaymentAppointmentItem {
     data['paymentAmount'] = paymentAmount;
     data['paymentStatus'] = paymentStatus;
     data['paymentChannel'] = paymentChannel;
+    data['isRecovered'] = isRecovered;
     return data;
   }
 }
