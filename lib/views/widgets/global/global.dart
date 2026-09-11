@@ -152,8 +152,19 @@ int calculateCustomerPoints(String amount) {
 
 String convertMalaysiaTimeToUtc(String malaysiaTimeStr, {bool plainFormat = false}) {
   try {
-    final inputFormat = DateFormat('dd-MM-yyyy HH:mm');
-    final malaysiaTime = inputFormat.parseStrict(malaysiaTimeStr);
+    final trimmed = malaysiaTimeStr.trim();
+    if (trimmed.isEmpty) return '';
+
+    DateTime malaysiaTime;
+    if (RegExp(r'^\d{4}-\d{2}-\d{2}').hasMatch(trimmed)) {
+      if (trimmed.contains('T')) {
+        malaysiaTime = DateTime.parse(trimmed);
+      } else {
+        malaysiaTime = DateFormat('yyyy-MM-dd HH:mm').parse(trimmed);
+      }
+    } else {
+      malaysiaTime = DateFormat('dd-MM-yyyy HH:mm').parseStrict(trimmed);
+    }
 
     final utcTime = malaysiaTime.toUtc();
 

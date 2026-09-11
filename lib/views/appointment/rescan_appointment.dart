@@ -360,6 +360,22 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                     "Are you sure you want to create a rescan appointment for ${widget.appointment?.data?.user?.userFullName?.titleCase()}",
                                   ).then((value) {
                                     if (value) {
+                                      final utcDateTime = convertMalaysiaTimeToUtc(
+                                        _selectedDateTime.toString(),
+                                        plainFormat: true,
+                                      );
+
+                                      if (utcDateTime.isEmpty) {
+                                        showDialogError(context, "Invalid appointment datetime format selected");
+                                        return;
+                                      }
+
+                                      final patientUserId = widget.appointment?.data?.user?.userId;
+                                      if (patientUserId == null || patientUserId.isEmpty) {
+                                        showDialogError(context, "Patient user ID is missing from original appointment");
+                                        return;
+                                      }
+
                                       showLoading();
                                       final parentId = widget.appointment?.data?.appointmentId ?? '';
                                       final reason = noteController.text.trim();
@@ -374,12 +390,9 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                       AppointmentController.create(
                                         context,
                                         CreateAppointmentRequest(
-                                          userId: widget.appointment?.data?.user?.userId,
+                                          userId: patientUserId,
                                           serviceBranchId: widget.serviceBranchId,
-                                          appointmentDateTime: convertMalaysiaTimeToUtc(
-                                            _selectedDateTime.toString(),
-                                            plainFormat: true,
-                                          ),
+                                          appointmentDateTime: utcDateTime,
                                           appointmentNote: fullNote,
                                           adminRemark: adminRemark,
                                           customerDueDate: dateConverter(
