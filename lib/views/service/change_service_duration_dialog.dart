@@ -38,6 +38,8 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
     '1 hour',
     '1 hour 15 minutes',
     '1 hour 30 minutes',
+    '1 hour 45 minutes',
+    '2 hours',
   ];
 
   String? _weekdayDuration;
@@ -53,6 +55,8 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
     '1 hour',
     '1 hour 15 minutes',
     '1 hour 30 minutes',
+    '1 hour 45 minutes',
+    '2 hours',
   ];
 
   bool get _hasActiveAdvancedRules =>
