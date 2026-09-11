@@ -637,6 +637,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
     }
     final isCustom = item.branchServiceTime != null && item.branchServiceTime!.trim().isNotEmpty;
+    final hasRules = item.serviceTimeRules != null && item.serviceTimeRules!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -649,19 +650,39 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             Text(time, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF374151))),
           ],
         ),
-        if (isCustom) ...[
+        if (isCustom || hasRules) ...[
           const SizedBox(height: 3),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFEF3C7),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: const Color(0xFFFDE68A)),
-            ),
-            child: const Text(
-              'Custom',
-              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
-            ),
+          Wrap(
+            spacing: 4,
+            runSpacing: 2,
+            children: [
+              if (isCustom)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF3C7),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: const Color(0xFFFDE68A)),
+                  ),
+                  child: const Text(
+                    'Custom',
+                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+                  ),
+                ),
+              if (hasRules)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                  decoration: BoxDecoration(
+                    color: primary.withAlpha(20),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: primary.withAlpha(50)),
+                  ),
+                  child: const Text(
+                    'Rules Active',
+                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: primary),
+                  ),
+                ),
+            ],
           ),
         ],
       ],

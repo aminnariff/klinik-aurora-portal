@@ -189,6 +189,21 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                 ),
                                               ),
                                             ],
+                                            if (item?.serviceTimeRules != null && (item?.serviceTimeRules?['weekday'] != null || item?.serviceTimeRules?['weekend'] != null || (item?.serviceTimeRules?['date_overrides'] as Map?)?.isNotEmpty == true)) ...[
+                                              const SizedBox(width: 4),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFE0E7FF),
+                                                  borderRadius: BorderRadius.circular(4),
+                                                  border: Border.all(color: const Color(0xFFC7D2FE)),
+                                                ),
+                                                child: const Text(
+                                                  'Rules Active',
+                                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFF4338CA)),
+                                                ),
+                                              ),
+                                            ],
                                           ],
                                         ),
                                         trailing: Row(

@@ -46,6 +46,7 @@ class Data {
   String? serviceTime;
   String? hqServiceTime;
   String? branchServiceTime;
+  Map<String, dynamic>? serviceTimeRules;
   String? serviceBookingFee;
   String? servicePrice;
   int? doctorType;
@@ -70,6 +71,7 @@ class Data {
     this.serviceTime,
     this.hqServiceTime,
     this.branchServiceTime,
+    this.serviceTimeRules,
     this.servicePrice,
     this.serviceBookingFee,
     this.doctorType,
@@ -97,6 +99,13 @@ class Data {
     serviceTime = json['serviceTime'];
     hqServiceTime = json['hqServiceTime'];
     branchServiceTime = json['branchServiceTime'];
+    if (json['serviceTimeRules'] != null) {
+      if (json['serviceTimeRules'] is Map<String, dynamic>) {
+        serviceTimeRules = json['serviceTimeRules'];
+      } else if (json['serviceTimeRules'] is Map) {
+        serviceTimeRules = Map<String, dynamic>.from(json['serviceTimeRules']);
+      }
+    }
     servicePrice = json['servicePrice']?.toString();
     serviceBookingFee = json['serviceBookingFee']?.toString();
     doctorType = json['doctorType'] is int
@@ -135,6 +144,7 @@ class Data {
     data['serviceTime'] = serviceTime;
     data['hqServiceTime'] = hqServiceTime;
     data['branchServiceTime'] = branchServiceTime;
+    data['serviceTimeRules'] = serviceTimeRules;
     data['servicePrice'] = servicePrice;
     data['serviceBookingFee'] = serviceBookingFee;
     data['doctorType'] = doctorType;

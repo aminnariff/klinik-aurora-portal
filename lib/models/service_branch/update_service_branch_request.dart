@@ -3,6 +3,8 @@ class UpdateServiceBranchRequest {
   int? serviceBranchStatus;
   List<String>? serviceBranchAvailableTime;
   String? serviceTime;
+  Map<String, dynamic>? serviceTimeRules;
+  bool resetServiceTimeRules = false;
   bool resetToHqDefault = false;
 
   UpdateServiceBranchRequest({
@@ -10,6 +12,8 @@ class UpdateServiceBranchRequest {
     this.serviceBranchStatus,
     this.serviceBranchAvailableTime,
     this.serviceTime,
+    this.serviceTimeRules,
+    this.resetServiceTimeRules = false,
     this.resetToHqDefault = false,
   });
 
@@ -20,7 +24,11 @@ class UpdateServiceBranchRequest {
         ? (json['serviceBranchAvailableTime'] as List).cast<String>()
         : null;
     serviceTime = json['serviceTime'];
+    if (json['serviceTimeRules'] != null && json['serviceTimeRules'] is Map<String, dynamic>) {
+      serviceTimeRules = json['serviceTimeRules'];
+    }
     resetToHqDefault = false;
+    resetServiceTimeRules = false;
   }
 
   Map<String, dynamic> toJson() {
@@ -30,8 +38,16 @@ class UpdateServiceBranchRequest {
     if (serviceBranchAvailableTime != null) data['serviceBranchAvailableTime'] = serviceBranchAvailableTime;
     if (resetToHqDefault) {
       data['serviceTime'] = null;
-    } else if (serviceTime != null) {
-      data['serviceTime'] = serviceTime;
+      data['serviceTimeRules'] = null;
+    } else {
+      if (serviceTime != null) {
+        data['serviceTime'] = serviceTime;
+      }
+      if (resetServiceTimeRules) {
+        data['serviceTimeRules'] = null;
+      } else if (serviceTimeRules != null) {
+        data['serviceTimeRules'] = serviceTimeRules;
+      }
     }
     return data;
   }

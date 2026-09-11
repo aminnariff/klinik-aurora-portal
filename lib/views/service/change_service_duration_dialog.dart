@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -39,6 +40,26 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
     '1 hour 30 minutes',
   ];
 
+  String? _weekdayDuration;
+  String? _weekendDuration;
+  final Map<String, String> _dateOverrides = {};
+  bool _showAdvancedRules = false;
+
+  final List<String> _timingOptions = [
+    '15 minutes',
+    '20 minutes',
+    '30 minutes',
+    '45 minutes',
+    '1 hour',
+    '1 hour 15 minutes',
+    '1 hour 30 minutes',
+  ];
+
+  bool get _hasActiveAdvancedRules =>
+      (_weekdayDuration != null && _weekdayDuration!.isNotEmpty) ||
+      (_weekendDuration != null && _weekendDuration!.isNotEmpty) ||
+      _dateOverrides.isNotEmpty;
+
   String get _hqTime {
     final hq = widget.serviceBranch.hqServiceTime;
     if (hq != null && hq.trim().isNotEmpty) return hq.trim();
@@ -61,6 +82,26 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
   void _initFromCurrentDuration() {
     final currentTime = widget.serviceBranch.branchServiceTime ?? widget.serviceBranch.serviceTime ?? _hqTime;
     _parseAndSetDuration(currentTime);
+
+    final existingRules = widget.serviceBranch.serviceTimeRules;
+    if (existingRules != null) {
+      if (existingRules['weekday'] != null) {
+        _weekdayDuration = existingRules['weekday'].toString();
+        _showAdvancedRules = true;
+      }
+      if (existingRules['weekend'] != null) {
+        _weekendDuration = existingRules['weekend'].toString();
+        _showAdvancedRules = true;
+      }
+      if (existingRules['date_overrides'] != null && existingRules['date_overrides'] is Map) {
+        (existingRules['date_overrides'] as Map).forEach((k, v) {
+          _dateOverrides[k.toString()] = v.toString();
+        });
+        if (_dateOverrides.isNotEmpty) {
+          _showAdvancedRules = true;
+        }
+      }
+    }
   }
 
   void _parseAndSetDuration(String timeStr) {
@@ -129,7 +170,30 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
     setState(() {
       _isResetToHq = true;
       _parseAndSetDuration(_hqTime);
+      _weekdayDuration = null;
+      _weekendDuration = null;
+      _dateOverrides.clear();
+      _showAdvancedRules = false;
     });
+  }
+
+  Future<void> _addDateOverride() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(now.year, now.month, 1),
+      lastDate: DateTime(now.year + 2, 12, 31),
+    );
+    if (picked != null) {
+      final key = DateFormat('yyyy-MM-dd').format(picked);
+      setState(() {
+        _dateOverrides[key] = _timingOptions.contains(_currentConfiguredDuration)
+            ? _currentConfiguredDuration
+            : '20 minutes';
+        _showAdvancedRules = true;
+      });
+    }
   }
 
   Future<void> _handleSave() async {
@@ -142,10 +206,26 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
     setState(() => _isSubmitting = true);
     showLoading();
 
+    final Map<String, dynamic> rules = {};
+    if (_weekdayDuration != null && _weekdayDuration!.isNotEmpty) {
+      rules['weekday'] = _weekdayDuration;
+    }
+    if (_weekendDuration != null && _weekendDuration!.isNotEmpty) {
+      rules['weekend'] = _weekendDuration;
+    }
+    if (_dateOverrides.isNotEmpty) {
+      rules['date_overrides'] = Map<String, String>.from(_dateOverrides);
+    }
+
+    final hadExistingRules = widget.serviceBranch.serviceTimeRules != null;
+    final resetRules = rules.isEmpty && hadExistingRules;
+
     final request = UpdateServiceBranchRequest(
       serviceBranchId: serviceBranchId,
       resetToHqDefault: _isResetToHq,
       serviceTime: _isResetToHq ? null : _currentConfiguredDuration,
+      serviceTimeRules: rules.isNotEmpty ? rules : null,
+      resetServiceTimeRules: resetRules,
     );
 
     try {
@@ -194,7 +274,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
+        constraints: const BoxConstraints(maxWidth: 560, maxHeight: 850),
         child: CardContainer(
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -248,11 +328,12 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
               ),
 
               // Body
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     // Context Card: HQ Standard vs Branch Status
                     Container(
                       padding: const EdgeInsets.all(14),
@@ -474,6 +555,305 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                     ),
                     const SizedBox(height: 16),
 
+                    // Advanced Timing Rules Card
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          InkWell(
+                            onTap: () => setState(() => _showAdvancedRules = !_showAdvancedRules),
+                            borderRadius: BorderRadius.circular(10),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.tune_rounded,
+                                    size: 18,
+                                    color: _hasActiveAdvancedRules ? primary : const Color(0xFF6B7280),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Advanced Timing Rules',
+                                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                                        ),
+                                        Text(
+                                          'Configure separate weekday, weekend, or date-specific durations',
+                                          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (_hasActiveAdvancedRules)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: primary.withAlpha(20),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Text(
+                                        'Active',
+                                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: primary),
+                                      ),
+                                    ),
+                                  const SizedBox(width: 6),
+                                  Icon(
+                                    _showAdvancedRules ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                                    size: 20,
+                                    color: const Color(0xFF6B7280),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (_showAdvancedRules) ...[
+                            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                            Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Weekday Duration
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Weekday Duration (Mon–Fri)',
+                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                                            ),
+                                            Text(
+                                              'Overrides standard duration on weekdays',
+                                              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      SizedBox(
+                                        width: 170,
+                                        height: 38,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: const Color(0xFFD1D5DB)),
+                                          ),
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton<String?>(
+                                              value: _weekdayDuration,
+                                              isExpanded: true,
+                                              hint: const Text('Default (Branch)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                              items: [
+                                                const DropdownMenuItem<String?>(
+                                                  value: null,
+                                                  child: Text('Default (Branch)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                                ),
+                                                ..._timingOptions.map(
+                                                  (opt) => DropdownMenuItem<String?>(
+                                                    value: opt,
+                                                    child: Text(opt, style: const TextStyle(fontSize: 12)),
+                                                  ),
+                                                ),
+                                              ],
+                                              onChanged: (val) => setState(() => _weekdayDuration = val),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 14),
+
+                                  // Weekend Duration
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Weekend Duration (Sat–Sun)',
+                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                                            ),
+                                            Text(
+                                              'Overrides standard duration on weekends',
+                                              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      SizedBox(
+                                        width: 170,
+                                        height: 38,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: const Color(0xFFD1D5DB)),
+                                          ),
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton<String?>(
+                                              value: _weekendDuration,
+                                              isExpanded: true,
+                                              hint: const Text('Default (Branch)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                              items: [
+                                                const DropdownMenuItem<String?>(
+                                                  value: null,
+                                                  child: Text('Default (Branch)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                                ),
+                                                ..._timingOptions.map(
+                                                  (opt) => DropdownMenuItem<String?>(
+                                                    value: opt,
+                                                    child: Text(opt, style: const TextStyle(fontSize: 12)),
+                                                  ),
+                                                ),
+                                              ],
+                                              onChanged: (val) => setState(() => _weekendDuration = val),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Specific Date Overrides
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Specific Date Overrides',
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                                          ),
+                                          Text(
+                                            'For promotional campaigns or special clinic events',
+                                            style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                          ),
+                                        ],
+                                      ),
+                                      TextButton.icon(
+                                        onPressed: _addDateOverride,
+                                        icon: const Icon(Icons.add_rounded, size: 16),
+                                        label: const Text('Add Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: primary,
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (_dateOverrides.isEmpty)
+                                    Container(
+                                      width: double.infinity,
+                                      margin: const EdgeInsets.only(top: 8),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF9FAFB),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                                      ),
+                                      child: const Center(
+                                        child: Text(
+                                          'No specific date overrides configured',
+                                          style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontStyle: FontStyle.italic),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    ListView.separated(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding: const EdgeInsets.only(top: 8),
+                                      itemCount: _dateOverrides.length,
+                                      separatorBuilder: (context, index) => const SizedBox(height: 6),
+                                      itemBuilder: (context, index) {
+                                        final dateKey = _dateOverrides.keys.elementAt(index);
+                                        final durationVal = _dateOverrides[dateKey]!;
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF9FAFB),
+                                            borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(Icons.event_outlined, size: 16, color: Color(0xFF4B5563)),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                dateKey,
+                                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                                              ),
+                                              const Spacer(),
+                                              SizedBox(
+                                                width: 140,
+                                                height: 32,
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(6),
+                                                    border: Border.all(color: const Color(0xFFD1D5DB)),
+                                                  ),
+                                                  child: DropdownButtonHideUnderline(
+                                                    child: DropdownButton<String>(
+                                                      value: durationVal,
+                                                      isExpanded: true,
+                                                      items: _timingOptions.map(
+                                                        (opt) => DropdownMenuItem<String>(
+                                                          value: opt,
+                                                          child: Text(opt, style: const TextStyle(fontSize: 11)),
+                                                        ),
+                                                      ).toList(),
+                                                      onChanged: (val) {
+                                                        if (val != null) {
+                                                          setState(() => _dateOverrides[dateKey] = val);
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.redAccent),
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                                                onPressed: () => setState(() => _dateOverrides.remove(dateKey)),
+                                                tooltip: 'Remove',
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
                     // Reset button if custom override is present or modified
                     if (isOverridden || _isResetToHq) ...[
                       InkWell(
@@ -513,6 +893,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                   ],
                 ),
               ),
+            ),
 
               // Footer
               Container(
