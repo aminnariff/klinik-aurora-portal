@@ -37,6 +37,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   bool _branchesLoaded = false;
   static const Color _dateAccent = Color(0xFF2196F3);
 
+  String _tableSortColumn = 'date';
+  bool _tableSortAscending = false;
+
   static const _muted = Color(0xff68737d);
 
   @override
@@ -668,17 +671,33 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       }
     }
 
-    final channelColors = [
-      const Color(0xFF6366F1),
-      const Color(0xFF0891B2),
-      const Color(0xFF059669),
-      const Color(0xFF7C3AED),
-      const Color(0xFFF59E0B),
-      const Color(0xFFEF4444),
-      const Color(0xFF0369A1),
-      const Color(0xFF15803D),
-      const Color(0xFFD97706),
-    ];
+    Color channelBrandColor(String? ch) {
+      switch (ch?.toUpperCase()) {
+        case 'GRAB':
+          return const Color(0xFF00B14F); // Grab Green
+        case 'TNG-EWALLET':
+        case 'TNG':
+          return const Color(0xFF005BAB); // TNG Blue
+        case 'BOOST':
+          return const Color(0xFFED1C24); // Boost Red
+        case 'DUITNOWQR':
+        case 'DUITNOW':
+          return const Color(0xFFED008C); // DuitNow Pink
+        case 'FPX':
+          return const Color(0xFF00A39D); // FPX Teal
+        case 'CREDIT':
+        case 'CARD':
+          return const Color(0xFF4F46E5); // Indigo
+        case 'SHOPEEPAY':
+          return const Color(0xFFEE4D2D); // Shopee Orange
+        case 'APPLEPAY':
+          return const Color(0xFF1E293B); // Apple Slate
+        case 'GOOGLEPAY':
+          return const Color(0xFF4285F4); // Google Blue
+        default:
+          return const Color(0xFF6366F1);
+      }
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -696,24 +715,66 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
             child: Row(
               children: [
-                const Icon(Icons.donut_small_rounded, size: 16, color: Color(0xFF6366F1)),
+                const Icon(Icons.pie_chart_rounded, size: 16, color: Color(0xFF4F46E5)),
                 const SizedBox(width: 8),
                 Text('Payment Channel Breakdown', style: AppTypography.displayMedium(context)),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: SizedBox(
+                    height: 8,
+                    child: Row(
+                      children: channels.where((c) => (c.count ?? 0) > 0).map((c) {
+                        final count = c.count ?? 0;
+                        final fraction = totalCount > 0 ? count / totalCount : 0.0;
+                        final flex = (fraction * 1000).toInt().clamp(1, 1000);
+                        return Expanded(
+                          flex: flex,
+                          child: Container(
+                            color: channelBrandColor(c.channel),
+                            margin: const EdgeInsets.only(right: 1.5),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$totalCount total transactions',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                    ),
+                    Text(
+                      'RM ${channels.fold<double>(0.0, (sum, c) => sum + (double.tryParse(c.totalAmount ?? '0') ?? 0.0)).toStringAsFixed(2)} volume',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
           Padding(
             padding: EdgeInsets.all(screenPadding * 0.75),
             child: Column(
               children: [
-                ...displayChannels.asMap().entries.map((entry) {
-                  final i = entry.key;
-                  final c = entry.value;
-                  final color = channelColors[i % channelColors.length];
+                ...displayChannels.map((c) {
+                  final color = channelBrandColor(c.channel);
                   final count = c.count ?? 0;
                   final fraction = totalCount > 0 ? count / totalCount : 0.0;
                   final amount = double.tryParse(c.totalAmount ?? '0') ?? 0.0;
+                  final atv = count > 0 ? amount / count : 0.0;
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -723,39 +784,57 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                         Row(
                           children: [
                             Container(
-                              width: 28,
-                              height: 28,
+                              width: 32,
+                              height: 32,
                               decoration: BoxDecoration(
                                 color: color.withAlpha(25),
                                 borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: color.withAlpha(50)),
                               ),
-                              child: Icon(channelIcon(c.channel), size: 14, color: color),
+                              child: Icon(channelIcon(c.channel), size: 16, color: color),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Text(
-                                c.channelLabel,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF111827),
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    c.channelLabel,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'ATV: RM ${atv.toStringAsFixed(2)} / txn',
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              '$count txn${count != 1 ? 's' : ''}',
-                              style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: color.withAlpha(20),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '$count txn${count != 1 ? 's' : ''}',
+                                style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700),
+                              ),
                             ),
                             const SizedBox(width: 12),
                             SizedBox(
-                              width: 90,
+                              width: 95,
                               child: Text(
                                 'RM ${amount.toStringAsFixed(2)}',
                                 textAlign: TextAlign.right,
                                 style: const TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF374151),
+                                  color: Color(0xFF0F172A),
                                 ),
                               ),
                             ),
@@ -764,14 +843,14 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            const SizedBox(width: 38),
+                            const SizedBox(width: 42),
                             Expanded(
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(4),
                                 child: LinearProgressIndicator(
                                   value: fraction,
-                                  minHeight: 6,
-                                  backgroundColor: color.withAlpha(20),
+                                  minHeight: 5,
+                                  backgroundColor: color.withAlpha(25),
                                   valueColor: AlwaysStoppedAnimation<Color>(color),
                                 ),
                               ),
@@ -781,7 +860,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                               width: 38,
                               child: Text(
                                 '${(fraction * 100).toStringAsFixed(0)}%',
-                                style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                                style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700),
                               ),
                             ),
                           ],
@@ -1237,17 +1316,170 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     );
   }
 
+  String _formatDateWithDay(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return '—';
+    final parsed = DateTime.tryParse(dateStr);
+    if (parsed == null) return dateStr;
+    return DateFormat('dd MMM yyyy (E)').format(parsed);
+  }
+
   Widget _buildDataTable(List<Data> data, bool isSuperAdmin, PaymentController controller) {
     const headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF64748B));
     const cellStyle = TextStyle(fontSize: 13, color: Color(0xFF0F172A));
 
-    Widget headerCell(String text, {bool alignRight = false}) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    // Sort data copy
+    final sortedData = List<Data>.from(data);
+    sortedData.sort((a, b) {
+      int cmp = 0;
+      switch (_tableSortColumn) {
+        case 'branch':
+          cmp = (a.branchName ?? '').toLowerCase().compareTo((b.branchName ?? '').toLowerCase());
+          break;
+        case 'date':
+          cmp = (a.paymentDate ?? '').compareTo(b.paymentDate ?? '');
+          break;
+        case 'checkouts':
+          cmp = (a.totalPayments ?? 0).compareTo(b.totalPayments ?? 0);
+          break;
+        case 'successful':
+          final aSucc = int.tryParse(a.successfulPayments ?? '0') ?? 0;
+          final bSucc = int.tryParse(b.successfulPayments ?? '0') ?? 0;
+          cmp = aSucc.compareTo(bSucc);
+          break;
+        case 'rescue':
+          final aFailed = int.tryParse(a.failedPayments ?? '0') ?? 0;
+          final bFailed = int.tryParse(b.failedPayments ?? '0') ?? 0;
+          cmp = aFailed.compareTo(bFailed);
+          break;
+        case 'conv':
+          final aTot = a.totalPayments ?? 0;
+          final aSucc = int.tryParse(a.successfulPayments ?? '0') ?? 0;
+          final aRate = aTot > 0 ? (aSucc / aTot) : 0.0;
+          final bTot = b.totalPayments ?? 0;
+          final bSucc = int.tryParse(b.successfulPayments ?? '0') ?? 0;
+          final bRate = bTot > 0 ? (bSucc / bTot) : 0.0;
+          cmp = aRate.compareTo(bRate);
+          break;
+        case 'paid':
+          final aPaid = double.tryParse(a.totalPaidAmount ?? '0') ?? 0.0;
+          final bPaid = double.tryParse(b.totalPaidAmount ?? '0') ?? 0.0;
+          cmp = aPaid.compareTo(bPaid);
+          break;
+        case 'refund':
+          final aRef = double.tryParse(a.totalRefundAmount ?? '0') ?? 0.0;
+          final bRef = double.tryParse(b.totalRefundAmount ?? '0') ?? 0.0;
+          cmp = aRef.compareTo(bRef);
+          break;
+        case 'revenue':
+          final aRev = double.tryParse(a.netRevenue ?? '0') ?? 0.0;
+          final bRev = double.tryParse(b.netRevenue ?? '0') ?? 0.0;
+          cmp = aRev.compareTo(bRev);
+          break;
+        default:
+          cmp = (a.paymentDate ?? '').compareTo(b.paymentDate ?? '');
+      }
+      return _tableSortAscending ? cmp : -cmp;
+    });
+
+    // Compute aggregate totals across dataset
+    int totalCheckouts = 0;
+    int totalSuccessful = 0;
+    int totalFailed = 0;
+    double totalPaid = 0.0;
+    double totalRefund = 0.0;
+    double totalNetRevenue = 0.0;
+
+    for (final row in data) {
+      totalCheckouts += row.totalPayments ?? 0;
+      totalSuccessful += int.tryParse(row.successfulPayments ?? '0') ?? 0;
+      totalFailed += int.tryParse(row.failedPayments ?? '0') ?? 0;
+      totalPaid += double.tryParse(row.totalPaidAmount ?? '0') ?? 0.0;
+      totalRefund += double.tryParse(row.totalRefundAmount ?? '0') ?? 0.0;
+      totalNetRevenue += double.tryParse(row.netRevenue ?? '0') ?? 0.0;
+    }
+    final overallConvRate = totalCheckouts > 0 ? (totalSuccessful / totalCheckouts) * 100 : 0.0;
+
+    Widget sortableHeaderCell(String text, String columnKey, {bool alignRight = false}) {
+      final isSorted = _tableSortColumn == columnKey;
+      return InkWell(
+        onTap: () {
+          setState(() {
+            if (_tableSortColumn == columnKey) {
+              _tableSortAscending = !_tableSortAscending;
+            } else {
+              _tableSortColumn = columnKey;
+              _tableSortAscending = false;
+            }
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: alignRight ? MainAxisAlignment.end : MainAxisAlignment.start,
+            children: [
+              if (alignRight) ...[
+                Icon(
+                  isSorted
+                      ? (_tableSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded)
+                      : Icons.unfold_more_rounded,
+                  size: 13,
+                  color: isSorted ? const Color(0xFF0F172A) : const Color(0xFFCBD5E1),
+                ),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                text,
+                textAlign: alignRight ? TextAlign.right : TextAlign.left,
+                style: headerStyle.copyWith(
+                  color: isSorted ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                  fontWeight: isSorted ? FontWeight.w700 : FontWeight.w600,
+                ),
+              ),
+              if (!alignRight) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  isSorted
+                      ? (_tableSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded)
+                      : Icons.unfold_more_rounded,
+                  size: 13,
+                  color: isSorted ? const Color(0xFF0F172A) : const Color(0xFFCBD5E1),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget convPill(double rate) {
+      Color bg;
+      Color border;
+      Color text;
+      if (rate >= 85.0) {
+        bg = const Color(0xFFECFDF5);
+        border = const Color(0xFFA7F3D0);
+        text = const Color(0xFF047857);
+      } else if (rate >= 60.0) {
+        bg = const Color(0xFFFFFBEB);
+        border = const Color(0xFFFDE68A);
+        text = const Color(0xFFB45309);
+      } else {
+        bg = const Color(0xFFFEF2F2);
+        border = const Color(0xFFFECACA);
+        text = const Color(0xFFDC2626);
+      }
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: border),
+        ),
         child: Text(
-          text,
-          textAlign: alignRight ? TextAlign.right : TextAlign.left,
-          style: headerStyle,
+          '${rate.toStringAsFixed(1)}%',
+          style: TextStyle(color: text, fontWeight: FontWeight.w700, fontSize: 11),
         ),
       );
     }
@@ -1259,163 +1491,275 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         TableRow(
           decoration: const BoxDecoration(color: Color(0xFFF8FAFC)),
           children: [
-            if (isSuperAdmin) headerCell('Branch'),
-            headerCell('Date'),
-            headerCell('Checkouts'),
-            headerCell('Successful'),
-            headerCell('Needs Rescue'),
-            headerCell('Paid (RM)', alignRight: true),
-            headerCell('Refund (RM)', alignRight: true),
-            headerCell('Net Revenue (RM)', alignRight: true),
+            if (isSuperAdmin) sortableHeaderCell('Branch', 'branch'),
+            sortableHeaderCell('Date', 'date'),
+            sortableHeaderCell('Checkouts', 'checkouts'),
+            sortableHeaderCell('Successful', 'successful'),
+            sortableHeaderCell('Needs Rescue', 'rescue'),
+            sortableHeaderCell('Conv %', 'conv'),
+            sortableHeaderCell('Paid (RM)', 'paid', alignRight: true),
+            sortableHeaderCell('Refund (RM)', 'refund', alignRight: true),
+            sortableHeaderCell('Net Revenue (RM)', 'revenue', alignRight: true),
           ],
         ),
-        for (int i = 0; i < data.length; i++)
-          TableRow(
-            decoration: BoxDecoration(color: i.isEven ? Colors.white : const Color(0xFFFAFAFA)),
-            children: [
-              if (isSuperAdmin)
+        for (int i = 0; i < sortedData.length; i++) ...[
+          () {
+            final rowTotal = sortedData[i].totalPayments ?? 0;
+            final rowSucc = int.tryParse(sortedData[i].successfulPayments ?? '0') ?? 0;
+            final rowRate = rowTotal > 0 ? (rowSucc / rowTotal) * 100 : 0.0;
+
+            return TableRow(
+              decoration: BoxDecoration(color: i.isEven ? Colors.white : const Color(0xFFFAFAFA)),
+              children: [
+                if (isSuperAdmin)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Text(sortedData[i].branchName ?? '—', style: cellStyle.copyWith(fontWeight: FontWeight.w500)),
+                  ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Text(data[i].branchName ?? '—', style: cellStyle.copyWith(fontWeight: FontWeight.w500)),
+                  child: Text(_formatDateWithDay(sortedData[i].paymentDate), style: cellStyle),
                 ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text(data[i].paymentDate ?? '—', style: cellStyle),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text('${data[i].totalPayments ?? 0}', style: cellStyle),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: GestureDetector(
-                  onTap: () => _openAppointmentsDialog(
-                    date: data[i].paymentDate,
-                    branchId: data[i].branchId,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFA7F3D0)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.check_circle_outline_rounded, size: 12, color: Color(0xFF10B981)),
-                            const SizedBox(width: 4),
-                            Text(
-                              data[i].successfulPayments ?? '0',
-                              style: const TextStyle(
-                                color: Color(0xFF047857),
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Text('${sortedData[i].totalPayments ?? 0}', style: cellStyle),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: GestureDetector(
+                    onTap: () => _openAppointmentsDialog(
+                      date: sortedData[i].paymentDate,
+                      branchId: sortedData[i].branchId,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFECFDF5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFA7F3D0)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.check_circle_outline_rounded, size: 12, color: Color(0xFF10B981)),
+                              const SizedBox(width: 4),
+                              Text(
+                                sortedData[i].successfulPayments ?? '0',
+                                style: const TextStyle(
+                                  color: Color(0xFF047857),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF10B981)),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: GestureDetector(
-                  onTap: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                      ? () => _openAppointmentsDialog(
-                            date: data[i].paymentDate,
-                            branchId: data[i].branchId,
-                            status: 'failed',
-                          )
-                      : null,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                              ? const Color(0xFFFEF2F2)
-                              : const Color(0xFFF3F4F6),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                                ? const Color(0xFFFECACA)
-                                : Colors.transparent,
+                            ],
                           ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                                  ? Icons.warning_amber_rounded
-                                  : Icons.remove_circle_outline_rounded,
-                              size: 12,
-                              color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                                  ? const Color(0xFFDC2626)
-                                  : const Color(0xFF9CA3AF),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              data[i].failedPayments ?? '0',
-                              style: TextStyle(
-                                color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                                    ? const Color(0xFFDC2626)
-                                    : const Color(0xFF6B7280),
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if ((int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0) ...[
                         const SizedBox(width: 4),
-                        const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFFDC2626)),
+                        const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF10B981)),
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text(
-                  data[i].totalPaidAmount ?? '0.00',
-                  textAlign: TextAlign.right,
-                  style: cellStyle.copyWith(fontWeight: FontWeight.w500),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text(
-                  data[i].totalRefundAmount ?? '0.00',
-                  textAlign: TextAlign.right,
-                  style: cellStyle.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: (double.tryParse(data[i].totalRefundAmount ?? '0') ?? 0) > 0
-                        ? const Color(0xFFF59E0B)
-                        : const Color(0xFF94A3B8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: GestureDetector(
+                    onTap: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
+                        ? () => _openAppointmentsDialog(
+                              date: sortedData[i].paymentDate,
+                              branchId: sortedData[i].branchId,
+                              status: 'failed',
+                            )
+                        : null,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
+                                ? const Color(0xFFFEF2F2)
+                                : const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
+                                  ? const Color(0xFFFECACA)
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
+                                    ? Icons.warning_amber_rounded
+                                    : Icons.remove_circle_outline_rounded,
+                                size: 12,
+                                color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
+                                    ? const Color(0xFFDC2626)
+                                    : const Color(0xFF9CA3AF),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                sortedData[i].failedPayments ?? '0',
+                                style: TextStyle(
+                                  color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
+                                      ? const Color(0xFFDC2626)
+                                      : const Color(0xFF6B7280),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if ((int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0) ...[
+                          const SizedBox(width: 4),
+                          const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFFDC2626)),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: convPill(rowRate),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Text(
+                    sortedData[i].totalPaidAmount ?? '0.00',
+                    textAlign: TextAlign.right,
+                    style: cellStyle.copyWith(fontWeight: FontWeight.w500),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Text(
+                    sortedData[i].totalRefundAmount ?? '0.00',
+                    textAlign: TextAlign.right,
+                    style: cellStyle.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: (double.tryParse(sortedData[i].totalRefundAmount ?? '0') ?? 0) > 0
+                          ? const Color(0xFFF59E0B)
+                          : const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Text(
+                    sortedData[i].netRevenue ?? '0.00',
+                    textAlign: TextAlign.right,
+                    style: cellStyle.copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)),
+                  ),
+                ),
+              ],
+            );
+          }(),
+        ],
+        // Sticky/Summary Totals Footer Row
+        TableRow(
+          decoration: const BoxDecoration(color: Color(0xFFF1F5F9)),
+          children: [
+            if (isSuperAdmin)
+              Container(
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Text('TOTALS', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A))),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text(
-                  data[i].netRevenue ?? '0.00',
-                  textAlign: TextAlign.right,
-                  style: cellStyle.copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Text(
+                isSuperAdmin ? 'All Records' : 'TOTALS (${data.length} days)',
+                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A)),
+              ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Text('$totalCheckouts', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A))),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Text('$totalSuccessful', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF047857))),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Text(
+                '$totalFailed',
+                style: cellStyle.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: totalFailed > 0 ? const Color(0xFFDC2626) : const Color(0xFF64748B),
                 ),
               ),
-            ],
-          ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: convPill(overallConvRate),
+              ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Text(
+                totalPaid.toStringAsFixed(2),
+                textAlign: TextAlign.right,
+                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A)),
+              ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Text(
+                totalRefund.toStringAsFixed(2),
+                textAlign: TextAlign.right,
+                style: cellStyle.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: totalRefund > 0 ? const Color(0xFFF59E0B) : const Color(0xFF94A3B8),
+                ),
+              ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Text(
+                totalNetRevenue.toStringAsFixed(2),
+                textAlign: TextAlign.right,
+                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A)),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
