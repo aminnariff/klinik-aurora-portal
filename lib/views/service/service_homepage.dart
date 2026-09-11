@@ -19,6 +19,7 @@ import 'package:klinik_aurora_portal/models/service_branch/update_service_branch
 import 'package:klinik_aurora_portal/views/doctor/branch_roster_dialog.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/practitioner_schedule/practitioner_schedule_wizard.dart';
+import 'package:klinik_aurora_portal/views/service/change_service_duration_dialog.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/service/service_details.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
@@ -492,7 +493,16 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                       cells: [
                         DataCell(_serviceNameCell(items[i].serviceName, items[i].serviceDescription)),
                         DataCell(_categoryChip(items[i].serviceCategory)),
-                        DataCell(_timeBadge(items[i].serviceTime)),
+                        DataCell(
+                          InkWell(
+                            onTap: () => _handleAdminMenuSelection('changeDuration', items[i]),
+                            borderRadius: BorderRadius.circular(6),
+                            child: Tooltip(
+                              message: 'Click to change duration',
+                              child: _adminTimeBadge(items[i]),
+                            ),
+                          ),
+                        ),
                         DataCell(_priceCell(items[i].servicePrice, items[i].serviceBookingFee)),
                         DataCell(_doctorTypeChip(items[i].doctorType)),
                         DataCell(_statusChip(items[i].serviceBranchStatus == 1)),
@@ -519,7 +529,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     return [
       _col('Service', ColumnSize.L),
       _col('Category', ColumnSize.S),
-      _col('Time', ColumnSize.S, fixedWidth: 100),
+      _col('Time', ColumnSize.S, fixedWidth: 130),
       _col('Price', ColumnSize.S, fixedWidth: 120),
       _col('Type', ColumnSize.S, fixedWidth: 100),
       _col('Status', ColumnSize.S, fixedWidth: 90),
@@ -529,43 +539,132 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   Widget _adminActions(service_branch_model.Data serviceBranch) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _actionIconButton(
-          icon: Icons.schedule_rounded,
-          tooltip: 'Update Timing',
-          color: secondaryColor,
-          onTap: () => _handleAdminMenuSelection('update', serviceBranch),
+    final isActive = serviceBranch.serviceBranchStatus == 1;
+    return PopupMenuButton<String>(
+      tooltip: 'More Options',
+      icon: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F4F6),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
         ),
-        const SizedBox(width: 8),
-        _actionIconButton(
-          icon: serviceBranch.serviceBranchStatus == 1 ? Icons.toggle_on_rounded : Icons.toggle_off_rounded,
-          tooltip: serviceBranch.serviceBranchStatus == 1 ? 'Deactivate' : 'Re-Activate',
-          color: serviceBranch.serviceBranchStatus == 1 ? const Color(0xFF16A34A) : Colors.grey,
-          onTap: () => _handleAdminMenuSelection('enableDisable', serviceBranch),
+        child: const Icon(Icons.more_vert_rounded, size: 18, color: Color(0xFF4B5563)),
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 4,
+      onSelected: (value) => _handleAdminMenuSelection(value, serviceBranch),
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: 'changeDuration',
+          height: 40,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: secondaryColor.withAlpha(25),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.timer_outlined, size: 16, color: secondaryColor),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Change Duration',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF1F2937)),
+              ),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'update',
+          height: 40,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: primary.withAlpha(25),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.calendar_month_outlined, size: 16, color: primary),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Manage Time Slots',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF1F2937)),
+              ),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        PopupMenuItem<String>(
+          value: 'enableDisable',
+          height: 40,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: (isActive ? const Color(0xFFDC2626) : const Color(0xFF16A34A)).withAlpha(25),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  isActive ? Icons.power_settings_new_rounded : Icons.check_circle_outline_rounded,
+                  size: 16,
+                  color: isActive ? const Color(0xFFDC2626) : const Color(0xFF16A34A),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                isActive ? 'Deactivate Service' : 'Activate Service',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: isActive ? const Color(0xFFDC2626) : const Color(0xFF16A34A),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _actionIconButton({
-    required IconData icon,
-    required String tooltip,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(6)),
-          child: Icon(icon, color: color, size: 18),
+  Widget _adminTimeBadge(service_branch_model.Data item) {
+    final time = item.serviceTime;
+    if (time == null || time.isEmpty) {
+      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+    }
+    final isCustom = item.branchServiceTime != null && item.branchServiceTime!.trim().isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.schedule_outlined, size: 13, color: Color(0xFF6B7280)),
+            const SizedBox(width: 4),
+            Text(time, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF374151))),
+          ],
         ),
-      ),
+        if (isCustom) ...[
+          const SizedBox(height: 3),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF3C7),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: const Color(0xFFFDE68A)),
+            ),
+            child: const Text(
+              'Custom',
+              style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -1033,7 +1132,15 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   void _handleAdminMenuSelection(String value, service_branch_model.Data serviceBranch) async {
-    if (value == 'update') {
+    if (value == 'changeDuration') {
+      showDialog(
+        context: context,
+        builder: (_) => ChangeServiceDurationDialog(
+          serviceBranch: serviceBranch,
+          onSuccess: () => filtering(enableDebounce: false),
+        ),
+      );
+    } else if (value == 'update') {
       showLoading();
       ServiceBranchAvailableDtController.get(context, 1, 100, serviceBranchId: serviceBranch.serviceBranchId).then((
         value,

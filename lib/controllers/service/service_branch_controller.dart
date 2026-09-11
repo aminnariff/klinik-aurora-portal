@@ -101,11 +101,7 @@ class ServiceBranchController extends ChangeNotifier {
           context,
           method: Method.put,
           endpoint: 'admin/service-branch/update',
-          data: {
-            "serviceBranchId": request.serviceBranchId,
-            "serviceBranchStatus": request.serviceBranchStatus,
-            "serviceBranchAvailableTime": request.serviceBranchAvailableTime,
-          },
+          data: request.toJson(),
         )
         .then((value) {
           try {

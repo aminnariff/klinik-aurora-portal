@@ -3,12 +3,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
+import 'package:klinik_aurora_portal/views/service/change_service_duration_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -164,9 +166,73 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                           });
                                         },
                                         title: Text('${item?.branchName}', style: AppTypography.bodyMedium(context)),
-                                        trailing: CupertinoSwitch(
-                                          value: item?.serviceBranchStatus == 1,
-                                          onChanged: (value) async {
+                                        subtitle: Row(
+                                          children: [
+                                            const Icon(Icons.schedule_outlined, size: 12, color: Color(0xFF6B7280)),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              item?.serviceTime ?? '—',
+                                              style: const TextStyle(fontSize: 12, color: Color(0xFF4B5563)),
+                                            ),
+                                            if (item?.branchServiceTime != null && item!.branchServiceTime!.trim().isNotEmpty) ...[
+                                              const SizedBox(width: 6),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFFEF3C7),
+                                                  borderRadius: BorderRadius.circular(4),
+                                                  border: Border.all(color: const Color(0xFFFDE68A)),
+                                                ),
+                                                child: const Text(
+                                                  'Custom',
+                                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            if (item != null) ...[
+                                              Tooltip(
+                                                message: 'Change Duration',
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (_) => ChangeServiceDurationDialog(
+                                                        serviceBranch: item,
+                                                        onSuccess: () {
+                                                          ServiceBranchController.getAll(
+                                                            context,
+                                                            1,
+                                                            100,
+                                                            serviceId: item.serviceId,
+                                                          ).then((val) {
+                                                            context.read<ServiceBranchController>().serviceBranchResponse = val.data;
+                                                            rebuild.add(DateTime.now());
+                                                          });
+                                                        },
+                                                      ),
+                                                    );
+                                                  },
+                                                  borderRadius: BorderRadius.circular(6),
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(6),
+                                                    decoration: BoxDecoration(
+                                                      color: secondaryColor.withAlpha(25),
+                                                      borderRadius: BorderRadius.circular(6),
+                                                    ),
+                                                    child: const Icon(Icons.timer_outlined, size: 18, color: secondaryColor),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                            ],
+                                            CupertinoSwitch(
+                                              value: item?.serviceBranchStatus == 1,
+                                              onChanged: (value) async {
                                             try {
                                               if (await showConfirmDialog(
                                                 context,
@@ -212,12 +278,14 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                   }).catchError((e) {
                                                     showDialogError(context, e.toString());
                                                   });
-                                                });
-                                              }
-                                            } catch (e) {
-                                              debugPrint(e.toString());
-                                            }
-                                          },
+                                                    });
+                                                  }
+                                                } catch (e) {
+                                                  debugPrint(e.toString());
+                                                }
+                                              },
+                                            ),
+                                          ],
                                         ),
                                       ),
                                   ],
