@@ -43,10 +43,8 @@ import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
@@ -68,27 +66,38 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     controller: TextEditingController(),
     isEditable: false,
     labelText: 'appointmentPage'.tr(gender: 'patientName'),
+    isEditableColor: Colors.white,
+    uneditableColor: Colors.white,
   );
   final InputFieldAttribute patientContactNoController = InputFieldAttribute(
     controller: TextEditingController(),
     isEditable: false,
     labelText: 'appointmentPage'.tr(gender: 'patientContactNo'),
+    isNumber: true,
+    isEditableColor: Colors.white,
+    uneditableColor: Colors.white,
   );
   final InputFieldAttribute patientEmailController = InputFieldAttribute(
     controller: TextEditingController(),
     isEditable: false,
     labelText: 'appointmentPage'.tr(gender: 'patientEmail'),
+    isEditableColor: Colors.white,
+    uneditableColor: Colors.white,
   );
   final InputFieldAttribute appointmentNoteController = InputFieldAttribute(
     controller: TextEditingController(),
     lineNumber: 3,
     maxCharacter: 500,
     labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
+    isEditableColor: Colors.white,
+    uneditableColor: Colors.white,
   );
   final InputFieldAttribute dueDateController = InputFieldAttribute(
     controller: TextEditingController(),
     labelText: 'appointmentPage'.tr(gender: 'dueDate'),
     isNumber: true,
+    isEditableColor: Colors.white,
+    uneditableColor: Colors.white,
   );
   List<DropdownAttribute> branches = [];
   final TextEditingController dateTimeController = TextEditingController();
@@ -781,7 +790,34 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 appointmentNoteController.controller.text,
                                                               )
                                                             : SizedBox()
-                                                      : InputField(field: appointmentNoteController),
+                                                      : TextField(
+                                                          controller: appointmentNoteController.controller,
+                                                          style: const TextStyle(fontSize: 13),
+                                                          maxLines: 3,
+                                                          decoration: InputDecoration(
+                                                            labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
+                                                            labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                                                            prefixIcon: const Padding(
+                                                              padding: EdgeInsets.only(bottom: 40),
+                                                              child: Icon(Icons.edit_note_rounded, size: 18, color: Color(0xFF6B7280)),
+                                                            ),
+                                                            filled: true,
+                                                            fillColor: Colors.white,
+                                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                                            border: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                                                            ),
+                                                            enabledBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                                                            ),
+                                                            focusedBorder: OutlineInputBorder(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                                                            ),
+                                                          ),
+                                                        ),
                                                   AppPadding.vertical(denominator: 2),
                                                   // Staff-only note — never shown to the patient. Covers rare cases
                                                   // like branch transfers ("transferred from/to Branch X").
@@ -811,22 +847,22 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               ),
                                                             ),
                                                             filled: true,
-                                                            fillColor: const Color(0xFFF9FAFB),
+                                                            fillColor: Colors.white,
                                                             contentPadding: const EdgeInsets.symmetric(
                                                               horizontal: 12,
                                                               vertical: 10,
                                                             ),
                                                             border: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                                             ),
                                                             enabledBorder: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFF6B7280)),
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderSide: const BorderSide(color: Color(0xFF6366F1)),
                                                             ),
                                                           ),
                                                         ),
@@ -841,9 +877,41 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             onTap: () async {
                                                               dueDateCalendar();
                                                             },
-                                                            child: ReadOnly(
-                                                              InputField(field: dueDateController),
-                                                              isEditable: false,
+                                                            child: SizedBox(
+                                                              width: screenWidthByBreakpoint(90, 70, 30),
+                                                              child: InputDecorator(
+                                                                decoration: InputDecoration(
+                                                                  labelText: 'appointmentPage'.tr(gender: 'dueDate'),
+                                                                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                                                                  labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                                                  filled: true,
+                                                                  fillColor: Colors.white,
+                                                                  contentPadding: EdgeInsets.fromLTRB(
+                                                                    screenPadding / 2,
+                                                                    screenPadding / 3,
+                                                                    screenPadding / 3,
+                                                                    screenPadding / 3,
+                                                                  ),
+                                                                  border: OutlineInputBorder(
+                                                                    borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                  ),
+                                                                  enabledBorder: OutlineInputBorder(
+                                                                    borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                  ),
+                                                                  suffixIcon: const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF6B7280)),
+                                                                ),
+                                                                child: Text(
+                                                                  dueDateController.controller.text.isEmpty
+                                                                      ? 'Select due date (EDD)'
+                                                                      : dueDateController.controller.text,
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    color: dueDateController.controller.text.isEmpty ? Colors.grey : textPrimaryColor,
+                                                                  ),
+                                                                ),
+                                                              ),
                                                             ),
                                                           ),
                                                   if (((notNullOrEmptyString(
@@ -1303,8 +1371,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           labelText: 'appointmentPage'.tr(gender: 'branch'),
                                                           isEditable: authController.isSuperAdmin,
                                                           fieldColor: authController.isSuperAdmin
-                                                              ? null
+                                                              ? Colors.white
                                                               : textFormFieldUneditableColor,
+                                                          borderColor: const Color(0xFFD1D5DB),
                                                           value: _appointmentBranch?.name,
                                                           onChanged: (p0) {
                                                             _appointmentBranch = p0;
@@ -1478,7 +1547,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             value: _service?.name,
                                                             fieldColor: widget.type == 'update'
                                                                 ? textFormFieldUneditableColor
-                                                                : null,
+                                                                : Colors.white,
+                                                            borderColor: const Color(0xFFD1D5DB),
                                                             isEditable: widget.type == 'create',
                                                             onChanged: (p0) {
                                                               _service = p0;
@@ -1587,8 +1657,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               widget.type == 'update' ? getAppointmentStatus() : [],
                                                               isEditable: widget.type == 'update',
                                                               fieldColor: widget.type == 'update'
-                                                                  ? null
+                                                                  ? Colors.white
                                                                   : textFormFieldUneditableColor,
+                                                              borderColor: const Color(0xFFD1D5DB),
                                                               labelText: 'appointmentPage'.tr(gender: 'status'),
                                                               value: _status?.name,
                                                               onChanged: (p0) {
@@ -1802,22 +1873,40 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                         }
                                                       }
                                                     },
-                                                    child: ReadOnly(
-                                                      isEditable: false,
-                                                      InputField(
-                                                        field: InputFieldAttribute(
-                                                          controller: dateTimeController,
-                                                          labelText: 'appointmentPage'.tr(
-                                                            gender: 'appointmentDateTime',
+                                                    child: SizedBox(
+                                                      width: screenWidthByBreakpoint(90, 70, 30),
+                                                      child: InputDecorator(
+                                                        decoration: InputDecoration(
+                                                          labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                                                          labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                                          filled: true,
+                                                          fillColor: Colors.white,
+                                                          contentPadding: EdgeInsets.fromLTRB(
+                                                            screenPadding / 2,
+                                                            screenPadding / 3,
+                                                            screenPadding / 3,
+                                                            screenPadding / 3,
                                                           ),
-                                                          isEditable: false,
-                                                          uneditableColor: textFormFieldEditableColor,
-                                                          suffixWidget: Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: [Icon(Icons.date_range)],
+                                                          border: OutlineInputBorder(
+                                                            borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                          ),
+                                                          enabledBorder: OutlineInputBorder(
+                                                            borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                          ),
+                                                          suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
+                                                        ),
+                                                        child: Text(
+                                                          dateTimeController.text.isEmpty
+                                                              ? 'Select appointment slot'
+                                                              : dateTimeController.text,
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
                                                           ),
                                                         ),
-                                                        width: screenWidthByBreakpoint(90, 70, 30),
                                                       ),
                                                     ),
                                                   );
@@ -1841,21 +1930,21 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 color: Color(0xFF6B7280),
                                               ),
                                               filled: true,
-                                              fillColor: const Color(0xFFF9FAFB),
+                                              fillColor: Colors.white,
                                               contentPadding: const EdgeInsets.symmetric(
                                                 horizontal: 12,
                                                 vertical: 10,
                                               ),
                                               border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                               ),
                                               enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                               ),
                                               focusedBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius: BorderRadius.circular(10),
                                                 borderSide: const BorderSide(color: Color(0xFF6366F1)),
                                               ),
                                             ),
@@ -2620,6 +2709,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 labelText: 'appointmentPage'.tr(gender: 'status'),
                                 isEditable: true,
                                 value: _status?.name,
+                                fieldColor: Colors.white,
+                                borderColor: const Color(0xFFD1D5DB),
                                 onChanged: (p0) {
                                   _status = p0;
                                   if (_status?.key == '6' && appointmentNoteController.controller.text.isEmpty) {
@@ -2680,20 +2771,40 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       ? labelValue('Slots', dateTimeController.text)
                       : GestureDetector(
                           onTap: _selectAppointmentSlot,
-                          child: ReadOnly(
-                            isEditable: false,
-                            InputField(
-                              field: InputFieldAttribute(
-                                controller: dateTimeController,
+                          child: SizedBox(
+                            width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
+                            child: InputDecorator(
+                              decoration: InputDecoration(
                                 labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
-                                isEditable: false,
-                                uneditableColor: textFormFieldEditableColor,
-                                suffixWidget: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [Icon(Icons.date_range)],
+                                floatingLabelBehavior: FloatingLabelBehavior.always,
+                                labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: EdgeInsets.fromLTRB(
+                                  screenPadding / 2,
+                                  screenPadding / 3,
+                                  screenPadding / 3,
+                                  screenPadding / 3,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
+                              ),
+                              child: Text(
+                                dateTimeController.text.isEmpty
+                                    ? 'Select appointment slot'
+                                    : dateTimeController.text,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
                                 ),
                               ),
-                              width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
                             ),
                           ),
                         );
@@ -2707,9 +2818,41 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         : const SizedBox())
                     : GestureDetector(
                         onTap: dueDateCalendar,
-                        child: ReadOnly(
-                          InputField(field: dueDateController),
-                          isEditable: false,
+                        child: SizedBox(
+                          width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              labelText: 'appointmentPage'.tr(gender: 'dueDate'),
+                              floatingLabelBehavior: FloatingLabelBehavior.always,
+                              labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: EdgeInsets.fromLTRB(
+                                screenPadding / 2,
+                                screenPadding / 3,
+                                screenPadding / 3,
+                                screenPadding / 3,
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              suffixIcon: const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF6B7280)),
+                            ),
+                            child: Text(
+                              dueDateController.controller.text.isEmpty
+                                  ? 'Select due date (EDD)'
+                                  : dueDateController.controller.text,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: dueDateController.controller.text.isEmpty ? Colors.grey : textPrimaryColor,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                 if (((notNullOrEmptyString(widget.appointment?.service?.eddRequired) &&
@@ -2798,18 +2941,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
                     prefixIcon: const Icon(Icons.link_rounded, size: 16, color: Color(0xFF6B7280)),
                     filled: true,
-                    fillColor: const Color(0xFFF9FAFB),
+                    fillColor: Colors.white,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Color(0xFF6366F1)),
                     ),
                   ),
@@ -2857,7 +3000,34 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   ? (appointmentNoteController.controller.text.isNotEmpty
                       ? labelValue('Notes', appointmentNoteController.controller.text)
                       : const SizedBox())
-                  : InputField(field: appointmentNoteController),
+                  : TextField(
+                      controller: appointmentNoteController.controller,
+                      style: const TextStyle(fontSize: 13),
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
+                        labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(bottom: 40),
+                          child: Icon(Icons.edit_note_rounded, size: 18, color: Color(0xFF6B7280)),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                        ),
+                      ),
+                    ),
               const SizedBox(height: 12),
               _isLocked
                   ? ((widget.appointment?.adminRemark ?? '').isNotEmpty
@@ -2878,15 +3048,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                           borderSide: const BorderSide(color: Color(0xFF6366F1)),
                         ),
                       ),
