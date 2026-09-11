@@ -211,7 +211,7 @@ class _PointHomepageState extends State<PointHomepage> {
                                   Icon(
                                     Icons.history_rounded,
                                     size: 18,
-                                    color: _selectedMobileTab == 1 ? const Color(0xFF7C3AED) : Colors.grey.shade600,
+                                    color: _selectedMobileTab == 1 ? const Color(0xFF2ECC40) : Colors.grey.shade600,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -219,7 +219,7 @@ class _PointHomepageState extends State<PointHomepage> {
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: _selectedMobileTab == 1 ? FontWeight.w600 : FontWeight.w500,
-                                      color: _selectedMobileTab == 1 ? const Color(0xFF7C3AED) : Colors.grey.shade700,
+                                      color: _selectedMobileTab == 1 ? const Color(0xFF2ECC40) : Colors.grey.shade700,
                                     ),
                                   ),
                                 ],
@@ -294,7 +294,7 @@ class _PointHomepageState extends State<PointHomepage> {
                     color: secondaryColor.withAlpha(25),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.receipt_long_rounded, color: Color(0xFF0284C7), size: 22),
+                  child: const Icon(Icons.receipt_long_rounded, color: secondaryColor, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -411,7 +411,7 @@ class _PointHomepageState extends State<PointHomepage> {
           width: 22,
           height: 22,
           decoration: BoxDecoration(
-            color: const Color(0xFF0284C7),
+            color: secondaryColor,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Center(
@@ -496,7 +496,7 @@ class _PointHomepageState extends State<PointHomepage> {
             Icon(
               icon,
               size: 15,
-              color: isSelected ? const Color(0xFF0284C7) : Colors.grey.shade600,
+              color: isSelected ? secondaryColor : Colors.grey.shade600,
             ),
             const SizedBox(width: 6),
             Text(
@@ -504,7 +504,7 @@ class _PointHomepageState extends State<PointHomepage> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? const Color(0xFF0284C7) : Colors.grey.shade700,
+                color: isSelected ? secondaryColor : Colors.grey.shade700,
               ),
             ),
           ],
@@ -515,60 +515,64 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget _buildSearchInputField() {
     final isPhone = _searchType == PatientSearchType.phone;
-    final hint = isPhone ? 'Enter mobile number (e.g. 0123456789)' : 'Enter 12-digit IC (e.g. 950101-10-1234)';
-    final label = isPhone ? 'Patient Mobile Number' : 'Patient IC Number';
+    final hint = isPhone ? 'e.g. 0123456789' : 'e.g. 950101101234 or 950101-10-1234';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  labelText: label,
-                  hintText: hint,
-                  hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
-                  prefixIcon: Icon(
-                    isPhone ? Icons.phone_android_rounded : Icons.badge_outlined,
-                    size: 19,
-                    color: Colors.grey.shade600,
+        SizedBox(
+          height: 40,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  style: const TextStyle(fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+                    prefixIcon: Icon(
+                      isPhone ? Icons.phone_android_rounded : Icons.badge_outlined,
+                      size: 17,
+                      color: Colors.grey.shade600,
+                    ),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    isDense: true,
+                    filled: true,
+                    fillColor: const Color(0xFFF8FAFC),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+                    ),
                   ),
-                  filled: true,
-                  fillColor: const Color(0xFFF8FAFC),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFF0284C7), width: 1.5),
-                  ),
+                  onSubmitted: (_) => _handleSearch(),
                 ),
-                style: const TextStyle(fontSize: 14),
-                onSubmitted: (_) => _handleSearch(),
               ),
-            ),
-            const SizedBox(width: 10),
-            ElevatedButton.icon(
-              onPressed: _handleSearch,
-              icon: const Icon(Icons.search, size: 17),
-              label: const Text('Search', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0284C7),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                elevation: 0,
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                onPressed: _handleSearch,
+                icon: const Icon(Icons.search, size: 16),
+                label: const Text('Search', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  elevation: 0,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         if (_searchError != null) ...[
           const SizedBox(height: 4),
@@ -590,16 +594,16 @@ class _PointHomepageState extends State<PointHomepage> {
     final rmValue = (currentPoints / 10).toStringAsFixed(2);
 
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF0284C7).withAlpha(120), width: 1.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: secondaryColor.withAlpha(90), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0284C7).withAlpha(15),
-            blurRadius: 8,
+            color: Colors.black.withAlpha(4),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -610,24 +614,24 @@ class _PointHomepageState extends State<PointHomepage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0284C7).withAlpha(25),
-                  borderRadius: BorderRadius.circular(12),
+                  color: secondaryColor.withAlpha(25),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
                   child: Text(
                     _getInitials(item.userFullname),
                     style: const TextStyle(
-                      color: Color(0xFF0284C7),
+                      color: tertiaryColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                      fontSize: 14,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -637,36 +641,36 @@ class _PointHomepageState extends State<PointHomepage> {
                         Flexible(
                           child: Text(
                             item.userFullname ?? 'N/A',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFECFDF5),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFFA7F3D0)),
+                            color: const Color(0xFF2ECC40).withAlpha(20),
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: const Color(0xFF2ECC40).withAlpha(50)),
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.check_circle, size: 10, color: Color(0xFF059669)),
+                              Icon(Icons.check_circle, size: 10, color: Color(0xFF2ECC40)),
                               SizedBox(width: 3),
                               Text(
                                 'Verified Member',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF059669)),
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Wrap(
                       spacing: 8,
-                      runSpacing: 4,
+                      runSpacing: 3,
                       children: [
                         _infoPill(Icons.phone_outlined, item.userPhone ?? 'No Phone'),
                         _infoPill(Icons.badge_outlined, item.userNric ?? 'No IC'),
@@ -681,45 +685,43 @@ class _PointHomepageState extends State<PointHomepage> {
                     _selectedPatient = null;
                   });
                 },
-                icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-                label: const Text('Change', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                icon: const Icon(Icons.swap_horiz_rounded, size: 15),
+                label: const Text('Change', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade700,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   visualDensity: VisualDensity.compact,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Current balance spotlight container
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFFFBEB), Color(0xFFFEF3C7)],
-              ),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFFDE68A)),
+              color: const Color(0xFF2ECC40).withAlpha(12),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFF2ECC40).withAlpha(40)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.stars_rounded, color: Color(0xFFD97706), size: 22),
+                const Icon(Icons.stars_rounded, color: Color(0xFF2ECC40), size: 20),
                 const SizedBox(width: 8),
-                Text(
+                const Text(
                   'Current Balance:',
-                  style: TextStyle(fontSize: 12, color: Colors.amber.shade900, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12, color: Color(0xFF1E822B), fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '$currentPoints pts',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.amber.shade900),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E822B)),
                 ),
                 const Spacer(),
                 Text(
                   '≈ RM $rmValue redemption value',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.amber.shade800),
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
                 ),
               ],
             ),
@@ -734,16 +736,16 @@ class _PointHomepageState extends State<PointHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: Colors.grey.shade600),
+          Icon(icon, size: 11, color: Colors.grey.shade600),
           const SizedBox(width: 4),
           Text(
             text,
-            style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 10.5, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -752,25 +754,25 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget _multiplePatientsList(List<UserResponse> patients) {
     return Container(
-      margin: const EdgeInsets.only(top: 12),
+      margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
             child: Text(
               '${patients.length} matching patients found. Select one to award points:',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
             ),
           ),
           const Divider(height: 1),
           ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 200),
+            constraints: const BoxConstraints(maxHeight: 190),
             child: ListView.separated(
               shrinkWrap: true,
               itemCount: patients.length,
@@ -779,17 +781,17 @@ class _PointHomepageState extends State<PointHomepage> {
                 final item = patients[index];
                 return ListTile(
                   dense: true,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                   leading: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: const Color(0xFF0284C7).withAlpha(25),
+                    radius: 15,
+                    backgroundColor: secondaryColor.withAlpha(25),
                     child: Text(
                       _getInitials(item.userFullname),
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: tertiaryColor),
                     ),
                   ),
                   title: Text(item.userFullname ?? 'N/A',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5)),
                   subtitle: Text(
                     '${item.userPhone ?? ''}  ·  IC: ${item.userNric ?? 'N/A'}  ·  ${item.totalPoint ?? 0} pts',
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
@@ -801,13 +803,13 @@ class _PointHomepageState extends State<PointHomepage> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0284C7),
+                      backgroundColor: secondaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       visualDensity: VisualDensity.compact,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
-                    child: const Text('Select', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    child: const Text('Select', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
                   ),
                 );
               },
@@ -820,21 +822,21 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget _emptyPatientPlaceholder() {
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, color: Colors.grey.shade500, size: 18),
+          Icon(Icons.info_outline_rounded, color: Colors.grey.shade500, size: 15),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Search patient by Mobile Number or IC above to view balance and award points.',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
             ),
           ),
         ],
@@ -864,17 +866,17 @@ class _PointHomepageState extends State<PointHomepage> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? const Color(0xFF0284C7) : Colors.grey.shade700,
+                  color: isSelected ? secondaryColor : Colors.grey.shade700,
                 ),
               ),
               selected: isSelected,
-              selectedColor: const Color(0xFF0284C7).withAlpha(30),
-              checkmarkColor: const Color(0xFF0284C7),
+              selectedColor: secondaryColor.withAlpha(30),
+              checkmarkColor: secondaryColor,
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(
-                  color: isSelected ? const Color(0xFF0284C7) : const Color(0xFFE2E8F0),
+                  color: isSelected ? secondaryColor : const Color(0xFFE2E8F0),
                 ),
               ),
               onSelected: (selected) {
@@ -945,21 +947,21 @@ class _PointHomepageState extends State<PointHomepage> {
 
     return SizedBox(
       width: double.infinity,
-      height: 46,
+      height: 44,
       child: ElevatedButton.icon(
         onPressed: isReady ? () => _confirmAwardPoints(_selectedPatient!, totalPoints) : null,
-        icon: const Icon(Icons.stars_rounded, size: 19),
+        icon: const Icon(Icons.stars_rounded, size: 18),
         label: Text(
           buttonLabel,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           overflow: TextOverflow.ellipsis,
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF0D9488),
+          backgroundColor: const Color(0xFF2ECC40),
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey.shade200,
           disabledForegroundColor: Colors.grey.shade500,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: isReady ? 1 : 0,
         ),
       ),
@@ -995,10 +997,10 @@ class _PointHomepageState extends State<PointHomepage> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF7C3AED).withAlpha(20),
+                        color: const Color(0xFF2ECC40).withAlpha(20),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.history_rounded, color: Color(0xFF7C3AED), size: 20),
+                      child: const Icon(Icons.history_rounded, color: Color(0xFF2ECC40), size: 20),
                     ),
                     const SizedBox(width: 10),
                     Text('Points Activity Log', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
@@ -1090,81 +1092,72 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget _historyCard(user_model.Data item) {
     final isPositive = (item.totalPoint ?? 0) > 0;
-    final badgeBg = isPositive ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2);
-    final badgeText = isPositive ? const Color(0xFF059669) : errorColor;
-    final badgeBorder = isPositive ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA);
+    final accentColor = isPositive ? const Color(0xFF2ECC40) : errorColor;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        border: Border.all(color: const Color(0xFFF0F0F0)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: IntrinsicHeight(
         child: Row(
           children: [
+            // Accent strip
             Container(
-              width: 32,
-              height: 32,
+              width: 4,
               decoration: BoxDecoration(
-                color: isPositive ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Icon(
-                  isPositive ? Icons.add_circle_outline_rounded : Icons.remove_circle_outline_rounded,
-                  size: 17,
-                  color: badgeText,
-                ),
+                color: accentColor,
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
               ),
             ),
-            const SizedBox(width: 10),
+            // Content
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.username ?? 'Patient',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (item.pointDescription != null && item.pointDescription!.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      item.pointDescription!,
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.username ?? 'Patient',
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (item.pointDescription != null && item.pointDescription!.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              item.pointDescription!,
+                              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                          const SizedBox(height: 4),
+                          Text(
+                            'Recorded by ${item.createdByFullname ?? 'Staff'}  ·  ${dateConverter(item.createdDate) ?? 'N/A'}',
+                            style: TextStyle(fontSize: 10, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: accentColor.withAlpha(15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        isPositive ? '+${item.totalPoint}' : '${item.totalPoint}',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: accentColor),
+                      ),
                     ),
                   ],
-                  const SizedBox(height: 4),
-                  Text(
-                    'Recorded by ${item.createdByFullname ?? 'Staff'}  ·  ${dateConverter(item.createdDate) ?? 'N/A'}',
-                    style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-              decoration: BoxDecoration(
-                color: badgeBg,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: badgeBorder),
-              ),
-              child: Text(
-                isPositive ? '+${item.totalPoint}' : '${item.totalPoint}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: badgeText),
+                ),
               ),
             ),
           ],
