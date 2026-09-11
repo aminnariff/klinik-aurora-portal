@@ -24,6 +24,7 @@ class AppointmentIds extends StatefulWidget {
 class _AppointmentIdsState extends State<AppointmentIds> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  int _selectedTab = 0; // 0 = Needs Rescue (unrecovered), 1 = All Attempts
 
   @override
   void dispose() {
@@ -34,7 +35,10 @@ class _AppointmentIdsState extends State<AppointmentIds> {
   bool get _isFailed => widget.response?.filters?.status == 'failed';
 
   List<PaymentAppointmentItem> _getFilteredItems() {
-    final items = widget.response?.items ?? [];
+    var items = widget.response?.items ?? [];
+    if (_isFailed && _selectedTab == 0) {
+      items = items.where((item) => item.isRecovered != true).toList();
+    }
     if (_searchQuery.trim().isEmpty) return items;
     final q = _searchQuery.toLowerCase().trim();
     return items.where((item) {
@@ -100,7 +104,11 @@ class _AppointmentIdsState extends State<AppointmentIds> {
 
   @override
   Widget build(BuildContext context) {
-    final hasItems = widget.response?.items != null && widget.response!.items!.isNotEmpty;
+    final allItems = widget.response?.items ?? [];
+    final unrecoveredTotal = allItems.where((i) => i.isRecovered != true).length;
+    final totalCountAll = allItems.length;
+
+    final hasItems = allItems.isNotEmpty;
     final filteredItems = hasItems ? _getFilteredItems() : <PaymentAppointmentItem>[];
     final filteredIds = !hasItems ? _getFilteredIds() : <String>[];
     final totalCount = hasItems ? filteredItems.length : filteredIds.length;
@@ -164,22 +172,42 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: lightBg,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: primaryAccent.withAlpha(60)),
-                    ),
-                    child: Text(
-                      '$totalCount total',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: primaryAccent,
+                  if (_isFailed)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: unrecoveredTotal > 0 ? const Color(0xFFFEE2E2) : const Color(0xFFD1FAE5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: unrecoveredTotal > 0 ? const Color(0xFFFCA5A5) : const Color(0xFF86EFAC),
+                        ),
+                      ),
+                      child: Text(
+                        unrecoveredTotal > 0 ? '$unrecoveredTotal needs rescue' : 'All recovered',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: unrecoveredTotal > 0 ? const Color(0xFFDC2626) : const Color(0xFF15803D),
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: lightBg,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: primaryAccent.withAlpha(60)),
+                      ),
+                      child: Text(
+                        '$totalCount total',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: primaryAccent,
+                        ),
                       ),
                     ),
-                  ),
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
@@ -223,6 +251,84 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                 ),
               ),
             ),
+
+            if (_isFailed && hasItems) ...[
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => setState(() => _selectedTab = 0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _selectedTab == 0 ? const Color(0xFFFEE2E2) : const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _selectedTab == 0 ? const Color(0xFFFCA5A5) : Colors.transparent,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              size: 14,
+                              color: _selectedTab == 0 ? const Color(0xFFDC2626) : const Color(0xFF6B7280),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Needs Rescue ($unrecoveredTotal)',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: _selectedTab == 0 ? const Color(0xFFDC2626) : const Color(0xFF4B5563),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => setState(() => _selectedTab = 1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _selectedTab == 1 ? const Color(0xFFEFF6FF) : const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _selectedTab == 1 ? const Color(0xFFBFDBFE) : Colors.transparent,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.list_alt_rounded,
+                              size: 14,
+                              color: _selectedTab == 1 ? const Color(0xFF2563EB) : const Color(0xFF6B7280),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'All Attempts ($totalCountAll)',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: _selectedTab == 1 ? const Color(0xFF2563EB) : const Color(0xFF4B5563),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 14),
 
             const Divider(height: 1, color: Color(0xFFE5E7EB)),
@@ -378,42 +484,89 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                     ],
                   ],
                 ),
-                if (_isFailed && hasPhone) ...[
+                if (_isFailed) ...[
                   const SizedBox(height: 10),
                   const Divider(height: 1, color: Color(0xFFF3F4F6)),
                   const SizedBox(height: 8),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      OutlinedButton.icon(
-                        onPressed: () => _launchWhatsApp(item),
-                        icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 13, color: Color(0xFF25D366)),
-                        label: const Text('Rescue via WhatsApp', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF16A34A),
-                          side: const BorderSide(color: Color(0xFF86EFAC)),
-                          backgroundColor: const Color(0xFFF0FDF4),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          minimumSize: const Size(0, 32),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      if (item.isRecovered == true)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDCFCE7),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: const Color(0xFF86EFAC)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle_rounded, size: 12, color: Color(0xFF15803D)),
+                              SizedBox(width: 4),
+                              Text(
+                                'Recovered (Paid)',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF15803D)),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFEE2E2),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: const Color(0xFFFCA5A5)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.warning_amber_rounded, size: 12, color: Color(0xFFDC2626)),
+                              SizedBox(width: 4),
+                              Text(
+                                'Needs Rescue',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFDC2626)),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () => _openAppointmentDetails(item.appointmentId),
-                        style: TextButton.styleFrom(
-                          foregroundColor: const Color(0xFF2563EB),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          minimumSize: const Size(0, 32),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('View Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                            SizedBox(width: 2),
-                            Icon(Icons.chevron_right_rounded, size: 16),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (item.isRecovered != true && hasPhone) ...[
+                            OutlinedButton.icon(
+                              onPressed: () => _launchWhatsApp(item),
+                              icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 13, color: Color(0xFF25D366)),
+                              label: const Text('Rescue via WhatsApp', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF16A34A),
+                                side: const BorderSide(color: Color(0xFF86EFAC)),
+                                backgroundColor: const Color(0xFFF0FDF4),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                minimumSize: const Size(0, 32),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
                           ],
-                        ),
+                          TextButton(
+                            onPressed: () => _openAppointmentDetails(item.appointmentId),
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF2563EB),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              minimumSize: const Size(0, 32),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('View Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                                SizedBox(width: 2),
+                                Icon(Icons.chevron_right_rounded, size: 16),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
