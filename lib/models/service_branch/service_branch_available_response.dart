@@ -29,6 +29,7 @@ class Data {
   String? serviceName;
   String? serviceBookingFee;
   String? servicePrice;
+  String? serviceTime;
   int? dueDateToggle;
   int? isAdminOnly;
   String? eddRequired;
@@ -38,6 +39,7 @@ class Data {
     this.serviceName,
     this.serviceBookingFee,
     this.servicePrice,
+    this.serviceTime,
     this.dueDateToggle,
     this.isAdminOnly,
     this.eddRequired,
@@ -48,6 +50,7 @@ class Data {
     serviceName = json['serviceName'];
     serviceBookingFee = json['serviceBookingFee'];
     servicePrice = json['servicePrice'];
+    serviceTime = json['serviceTime'];
     dueDateToggle = json['dueDateToggle'];
     isAdminOnly = json['isAdminOnly'];
     eddRequired = json['eddRequired'];
@@ -59,6 +62,7 @@ class Data {
     data['serviceName'] = serviceName;
     data['serviceBookingFee'] = serviceBookingFee;
     data['servicePrice'] = servicePrice;
+    data['serviceTime'] = serviceTime;
     data['dueDateToggle'] = dueDateToggle;
     data['isAdminOnly'] = isAdminOnly;
     data['eddRequired'] = eddRequired;

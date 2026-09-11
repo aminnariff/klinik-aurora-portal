@@ -136,6 +136,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           widget.appointment!.appointmentNote!.toLowerCase().contains('rescan'));
   int _rescanDuration = 20;
   final List<int> _rescanDurationOptions = [15, 20, 30, 45, 60];
+  Timer? _cooldownTimer;
+  int _refreshCooldownSeconds = 0;
+  bool _isRefreshingSlots = false;
+
+  @override
+  void dispose() {
+    _cooldownTimer?.cancel();
+    super.dispose();
+  }
 
   String formatTimeOfDay(TimeOfDay time) {
     final now = DateTime.now();
@@ -1575,7 +1584,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               ServiceBranchAvailableDtController.getAvailableSlot(
                                                                 context,
                                                                 serviceBranchId: _service?.key,
-                                                                serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
+                                                                branchId: _appointmentBranch?.key ?? widget.appointment?.branch?.branchId,
+                                                                serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : selectedService?.serviceTime,
                                                                 durationMinutes: _isCurrentRescan ? _rescanDuration : null,
                                                               ).then((value) {
                                                                 if (responseCode(value.code)) {
@@ -1740,175 +1750,52 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           builder: (context, snapshot, _) {
                                             return _isLocked
                                                 ? labelValue('Slots', dateTimeController.text)
-                                                : GestureDetector(
-                                                    onTap: () async {
-                                                      if (context.read<AuthController>().hasPermission(
-                                                            'c54a2d91-499c-11f0-9169-bc24115a1342',
-                                                          ) ==
-                                                          false) {
-                                                        if (context.read<AuthController>().isSuperAdmin &&
-                                                            _appointmentBranch == null) {
-                                                          showDialogError(
-                                                            context,
-                                                            ErrorMessage.required(
-                                                              field: 'appointmentPage'.tr(gender: 'branch'),
+                                                : Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: _selectAppointmentSlot,
+                                                        child: SizedBox(
+                                                          width: screenWidthByBreakpoint(90, 70, 30),
+                                                          child: InputDecorator(
+                                                            decoration: InputDecoration(
+                                                              labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                                              floatingLabelBehavior: FloatingLabelBehavior.always,
+                                                              labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                                              filled: true,
+                                                              fillColor: Colors.white,
+                                                              contentPadding: EdgeInsets.fromLTRB(
+                                                                screenPadding / 2,
+                                                                screenPadding / 3,
+                                                                screenPadding / 3,
+                                                                screenPadding / 3,
+                                                              ),
+                                                              border: OutlineInputBorder(
+                                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                borderRadius: BorderRadius.circular(10.0),
+                                                              ),
+                                                              enabledBorder: OutlineInputBorder(
+                                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                borderRadius: BorderRadius.circular(10.0),
+                                                              ),
+                                                              suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
                                                             ),
-                                                          );
-                                                        } else if (_appointmentBranch != null &&
-                                                            (availableDateTime.isNotEmpty)) {
-                                                          DateTime now = DateTime.now();
-                                                          availableDateTime = removePastDates(availableDateTime);
-                                                          availableDateTime.sort(
-                                                            (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
-                                                          );
-                                                          String? selectedDateTime = await showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext context) {
-                                                              return Row(
-                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                children: [
-                                                                  Column(
-                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                    children: [
-                                                                      Container(
-                                                                        constraints: BoxConstraints(
-                                                                          maxWidth: isMobile ? screenWidth(92) : 560.0,
-                                                                          maxHeight: MediaQuery.of(context).size.height * 0.85,
-                                                                        ),
-                                                                        child: CardContainer(
-                                                                          SingleChildScrollView(
-                                                                            padding: EdgeInsets.all(isMobile ? 12 : 20),
-                                                                            child: SelectionCalendarView(
-                                                                              startMonth: now.month,
-                                                                              year: now.year,
-                                                                              initialDateTimes: availableDateTime,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              );
-                                                            },
-                                                          );
-                                                          dateTimeController.text =
-                                                              formatDateTimeToDisplay(selectedDateTime) ??
-                                                              dateConverter(
-                                                                widget.appointment?.appointmentDatetime,
-                                                                format: 'yyyy-MM-dd HH:mm',
-                                                              ) ??
-                                                              '';
-                                                          calculateGestational();
-                                                        } else if (widget.type == 'update' &&
-                                                            availableDateTime.isEmpty) {
-                                                          ServiceBranchAvailableDtController.getAvailableSlot(
-                                                            context,
-                                                            serviceBranchId: widget.appointment?.serviceBranchId,
-                                                            serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
-                                                            durationMinutes: _isCurrentRescan ? _rescanDuration : null,
-                                                          ).then((value) async {
-                                                            if (responseCode(value.code)) {
-                                                              availableDateTime = value.data?.slots ?? [];
-                                                              DateTime now = DateTime.now();
-                                                              availableDateTime = removePastDates(availableDateTime);
-                                                              String? selectedDateTime = await showDialog(
-                                                                context: context,
-                                                                builder: (BuildContext context) {
-                                                                  return Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                    children: [
-                                                                      Column(
-                                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                                        children: [
-                                                                          Container(
-                                                                            constraints: BoxConstraints(
-                                                                              maxWidth: isMobile ? screenWidth(92) : 560.0,
-                                                                              maxHeight: MediaQuery.of(context).size.height * 0.85,
-                                                                            ),
-                                                                            child: CardContainer(
-                                                                              SingleChildScrollView(
-                                                                                padding: EdgeInsets.all(isMobile ? 12 : 20),
-                                                                                child: SelectionCalendarView(
-                                                                                  startMonth: now.month,
-                                                                                  year: now.year,
-                                                                                  initialDateTimes: availableDateTime,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  );
-                                                                },
-                                                              );
-                                                              dateTimeController.text =
-                                                                  formatDateTimeToDisplay(selectedDateTime) ??
-                                                                  dateConverter(
-                                                                    widget.appointment?.appointmentDatetime,
-                                                                    format: 'yyyy-MM-dd HH:mm',
-                                                                  ) ??
-                                                                  '';
-                                                              calculateGestational();
-                                                              rebuildDropdown.add(DateTime.now());
-                                                            }
-                                                          });
-                                                        } else if (_service == null) {
-                                                          showDialogError(
-                                                            context,
-                                                            ErrorMessage.required(
-                                                              field: 'appointmentPage'.tr(gender: 'service'),
+                                                            child: Text(
+                                                              dateTimeController.text.isEmpty
+                                                                  ? 'Select appointment slot'
+                                                                  : dateTimeController.text,
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
+                                                              ),
                                                             ),
-                                                          );
-                                                        } else if (availableDateTime.isEmpty) {
-                                                          showDialogError(context, 'No available slots');
-                                                        } else {
-                                                          showDialogError(
-                                                            context,
-                                                            ErrorMessage.required(
-                                                              field: 'appointmentPage'.tr(gender: 'branch'),
-                                                            ),
-                                                          );
-                                                        }
-                                                      }
-                                                    },
-                                                    child: SizedBox(
-                                                      width: screenWidthByBreakpoint(90, 70, 30),
-                                                      child: InputDecorator(
-                                                        decoration: InputDecoration(
-                                                          labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
-                                                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                                                          labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
-                                                          filled: true,
-                                                          fillColor: Colors.white,
-                                                          contentPadding: EdgeInsets.fromLTRB(
-                                                            screenPadding / 2,
-                                                            screenPadding / 3,
-                                                            screenPadding / 3,
-                                                            screenPadding / 3,
-                                                          ),
-                                                          border: OutlineInputBorder(
-                                                            borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                                            borderRadius: BorderRadius.circular(10.0),
-                                                          ),
-                                                          enabledBorder: OutlineInputBorder(
-                                                            borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                                            borderRadius: BorderRadius.circular(10.0),
-                                                          ),
-                                                          suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
-                                                        ),
-                                                        child: Text(
-                                                          dateTimeController.text.isEmpty
-                                                              ? 'Select appointment slot'
-                                                              : dateTimeController.text,
-                                                          style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
+                                                      const SizedBox(width: 8),
+                                                      _buildRefreshSlotButton(),
+                                                    ],
                                                   );
                                           },
                                         ),
@@ -2769,44 +2656,52 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 builder: (context, snapshot, _) {
                   return _isLocked
                       ? labelValue('Slots', dateTimeController.text)
-                      : GestureDetector(
-                          onTap: _selectAppointmentSlot,
-                          child: SizedBox(
-                            width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
-                            child: InputDecorator(
-                              decoration: InputDecoration(
-                                labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
-                                floatingLabelBehavior: FloatingLabelBehavior.always,
-                                labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding: EdgeInsets.fromLTRB(
-                                  screenPadding / 2,
-                                  screenPadding / 3,
-                                  screenPadding / 3,
-                                  screenPadding / 3,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
-                              ),
-                              child: Text(
-                                dateTimeController.text.isEmpty
-                                    ? 'Select appointment slot'
-                                    : dateTimeController.text,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: _selectAppointmentSlot,
+                                child: SizedBox(
+                                  width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
+                                  child: InputDecorator(
+                                    decoration: InputDecoration(
+                                      labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                                      labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      contentPadding: EdgeInsets.fromLTRB(
+                                        screenPadding / 2,
+                                        screenPadding / 3,
+                                        screenPadding / 3,
+                                        screenPadding / 3,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                        borderRadius: BorderRadius.circular(10.0),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                        borderRadius: BorderRadius.circular(10.0),
+                                      ),
+                                      suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
+                                    ),
+                                    child: Text(
+                                      dateTimeController.text.isEmpty
+                                          ? 'Select appointment slot'
+                                          : dateTimeController.text,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                            const SizedBox(width: 8),
+                            _buildRefreshSlotButton(),
+                          ],
                         );
                 },
               ),
@@ -3068,114 +2963,215 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     );
   }
 
-  Future<void> _selectAppointmentSlot() async {
-    if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
-      if (availableDateTime.isNotEmpty) {
-        DateTime now = DateTime.now();
+  Future<bool> _fetchAvailableSlots({bool silent = false, bool showFeedback = false}) async {
+    final sBranchId = widget.appointment?.serviceBranchId ?? _service?.key;
+    final bId = _appointmentBranch?.key ?? widget.appointment?.branch?.branchId;
+    if (sBranchId == null && bId == null) {
+      if (!silent) {
+        showDialogError(
+          context,
+          ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'service')),
+        );
+      }
+      return false;
+    }
+
+    if (!silent) showLoading();
+    try {
+      final value = await ServiceBranchAvailableDtController.getAvailableSlot(
+        context,
+        serviceBranchId: sBranchId,
+        branchId: bId,
+        serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : selectedService?.serviceTime,
+        durationMinutes: _isCurrentRescan ? _rescanDuration : null,
+      );
+      if (!silent) dismissLoading();
+      if (responseCode(value.code)) {
+        availableDateTime = value.data?.slots ?? [];
         availableDateTime = removePastDates(availableDateTime);
         availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
-        String? selectedDateTime = await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth: isMobile ? screenWidth(92) : 560.0,
-                        maxHeight: MediaQuery.of(context).size.height * 0.85,
-                      ),
-                      child: CardContainer(
-                        SingleChildScrollView(
-                          padding: EdgeInsets.all(isMobile ? 12 : 20),
-                          child: SelectionCalendarView(
-                            startMonth: now.month,
-                            year: now.year,
-                            initialDateTimes: availableDateTime,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            );
-          },
-        );
-        if (selectedDateTime != null) {
-          dateTimeController.text = formatDateTimeToDisplay(selectedDateTime) ??
-              dateConverter(widget.appointment?.appointmentDatetime, format: 'yyyy-MM-dd HH:mm') ??
-              '';
-          calculateGestational();
-          rebuild.add(DateTime.now());
+        context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableTimingResponse = value.data;
+        rebuildDropdown.add(DateTime.now());
+        rebuild.add(DateTime.now());
+        if (showFeedback) {
+          showDialogSuccess(context, 'Available slots refreshed (${availableDateTime.length} available)');
         }
+        return true;
       } else {
-        showLoading();
-        ServiceBranchAvailableDtController.getAvailableSlot(
-          context,
-          serviceBranchId: widget.appointment?.serviceBranchId ?? _service?.key,
-          serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
-          durationMinutes: _isCurrentRescan ? _rescanDuration : null,
-        ).then((value) async {
-          dismissLoading();
-          if (responseCode(value.code)) {
-            availableDateTime = value.data?.slots ?? [];
-            DateTime now = DateTime.now();
-            availableDateTime = removePastDates(availableDateTime);
-            availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
-            if (availableDateTime.isEmpty) {
-              showDialogError(context, 'No available slots');
-              return;
-            }
-            String? selectedDateTime = await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          constraints: BoxConstraints(
-                            maxWidth: isMobile ? screenWidth(92) : 560.0,
-                            maxHeight: MediaQuery.of(context).size.height * 0.85,
-                          ),
-                          child: CardContainer(
-                            SingleChildScrollView(
-                              padding: EdgeInsets.all(isMobile ? 12 : 20),
-                              child: SelectionCalendarView(
-                                startMonth: now.month,
-                                year: now.year,
-                                initialDateTimes: availableDateTime,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
-            );
-            if (selectedDateTime != null) {
-              dateTimeController.text = formatDateTimeToDisplay(selectedDateTime) ??
-                  dateConverter(widget.appointment?.appointmentDatetime, format: 'yyyy-MM-dd HH:mm') ??
-                  '';
-              calculateGestational();
-              rebuildDropdown.add(DateTime.now());
-              rebuild.add(DateTime.now());
-            }
+        if (!silent) showDialogError(context, value.message ?? 'Failed to load slots');
+        return false;
+      }
+    } catch (e) {
+      if (!silent) {
+        dismissLoading();
+        showDialogError(context, e.toString());
+      }
+      return false;
+    }
+  }
+
+  void _triggerSlotRefresh({bool userInitiated = true}) async {
+    if (_refreshCooldownSeconds > 0 || _isRefreshingSlots) return;
+    setState(() {
+      _isRefreshingSlots = true;
+    });
+    await _fetchAvailableSlots(silent: false, showFeedback: userInitiated);
+    if (mounted) {
+      setState(() {
+        _isRefreshingSlots = false;
+        _refreshCooldownSeconds = 5;
+      });
+      _cooldownTimer?.cancel();
+      _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) {
+          timer.cancel();
+          return;
+        }
+        setState(() {
+          if (_refreshCooldownSeconds > 1) {
+            _refreshCooldownSeconds--;
           } else {
-            showDialogError(context, value.message ?? 'Failed to load slots');
+            _refreshCooldownSeconds = 0;
+            timer.cancel();
           }
-        }).catchError((e) {
-          dismissLoading();
-          showDialogError(context, e.toString());
         });
+      });
+    }
+  }
+
+  Widget _buildRefreshSlotButton() {
+    final bool isCoolingDown = _refreshCooldownSeconds > 0;
+    final bool isDisabled = isCoolingDown || _isRefreshingSlots || _isLocked;
+
+    return Tooltip(
+      message: isCoolingDown
+          ? 'Wait ${_refreshCooldownSeconds}s to refresh slots'
+          : 'Refresh available slots',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isDisabled ? null : () => _triggerSlotRefresh(userInitiated: true),
+          borderRadius: BorderRadius.circular(8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 48,
+            padding: EdgeInsets.symmetric(horizontal: isCoolingDown ? 10 : 12),
+            decoration: BoxDecoration(
+              color: isDisabled ? const Color(0xFFF3F4F6) : const Color(0xFFEEF2FF),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isDisabled ? const Color(0xFFE5E7EB) : const Color(0xFFC7D2FE),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (_isRefreshingSlots)
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+                  )
+                else
+                  Icon(
+                    Icons.refresh_rounded,
+                    size: 18,
+                    color: isDisabled ? const Color(0xFF9CA3AF) : const Color(0xFF4F46E5),
+                  ),
+                if (isCoolingDown) ...[
+                  const SizedBox(width: 4),
+                  Text(
+                    '${_refreshCooldownSeconds}s',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF9CA3AF),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _selectAppointmentSlot() async {
+    if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
+      if (context.read<AuthController>().isSuperAdmin &&
+          _appointmentBranch == null &&
+          widget.appointment?.branch?.branchId == null) {
+        showDialogError(
+          context,
+          ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'branch')),
+        );
+        return;
+      }
+      if (_service == null && widget.appointment?.serviceBranchId == null) {
+        showDialogError(
+          context,
+          ErrorMessage.required(field: 'appointmentPage'.tr(gender: 'service')),
+        );
+        return;
+      }
+
+      if (availableDateTime.isEmpty) {
+        final success = await _fetchAvailableSlots(silent: false);
+        if (!success || availableDateTime.isEmpty) {
+          showDialogError(context, 'No available slots');
+          return;
+        }
+      }
+
+      DateTime now = DateTime.now();
+      availableDateTime = removePastDates(availableDateTime);
+      availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
+      if (availableDateTime.isEmpty) {
+        showDialogError(context, 'No available slots');
+        return;
+      }
+
+      String? selectedDateTime = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: isMobile ? screenWidth(92) : 560.0,
+                      maxHeight: MediaQuery.of(context).size.height * 0.85,
+                    ),
+                    child: CardContainer(
+                      SingleChildScrollView(
+                        padding: EdgeInsets.all(isMobile ? 12 : 20),
+                        child: SelectionCalendarView(
+                          startMonth: now.month,
+                          year: now.year,
+                          initialDateTimes: availableDateTime,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      );
+      if (selectedDateTime != null) {
+        dateTimeController.text = formatDateTimeToDisplay(selectedDateTime) ??
+            dateConverter(widget.appointment?.appointmentDatetime, format: 'yyyy-MM-dd HH:mm') ??
+            '';
+        calculateGestational();
+        rebuildDropdown.add(DateTime.now());
+        rebuild.add(DateTime.now());
       }
     }
   }
@@ -3345,7 +3341,24 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     showDialogSuccess(context, 'Appointment successfully created for the user');
                   }
                 } else {
-                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                  final errorMsg = (value.message ?? value.data?.message ?? '').toLowerCase();
+                  final isSlotConflict = errorMsg.contains('overlap') ||
+                      errorMsg.contains('already booked') ||
+                      errorMsg.contains('fully booked') ||
+                      errorMsg.contains('no longer available') ||
+                      errorMsg.contains('choose another time') ||
+                      errorMsg.contains('select another time');
+
+                  if (isSlotConflict) {
+                    dateTimeController.clear();
+                    _fetchAvailableSlots(silent: true);
+                    showDialogError(
+                      context,
+                      'The selected slot is no longer available or already booked. Available slots have been refreshed. Please select another time.',
+                    );
+                  } else {
+                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                  }
                 }
               }).catchError((e) {
                 dismissLoading();
@@ -3465,7 +3478,24 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     showDialogSuccess(context, 'Successfully created new appointment');
                   }
                 } else {
-                  showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                  final errorMsg = (value.message ?? value.data?.message ?? '').toLowerCase();
+                  final isSlotConflict = errorMsg.contains('overlap') ||
+                      errorMsg.contains('already booked') ||
+                      errorMsg.contains('fully booked') ||
+                      errorMsg.contains('no longer available') ||
+                      errorMsg.contains('choose another time') ||
+                      errorMsg.contains('select another time');
+
+                  if (isSlotConflict) {
+                    dateTimeController.clear();
+                    _fetchAvailableSlots(silent: true);
+                    showDialogError(
+                      context,
+                      'The selected slot is no longer available or already booked. Available slots have been refreshed. Please select another time.',
+                    );
+                  } else {
+                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+                  }
                 }
               }).catchError((e) {
                 dismissLoading();
