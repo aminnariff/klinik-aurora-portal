@@ -1939,184 +1939,539 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   void showAppointmentGuidelineDialog(BuildContext context) {
-    final sections = [
-      _GuidelineSection(
-        icon: Icons.refresh_rounded,
-        iconColor: const Color(0xFF059669),
-        title: 'Get Latest Appointment List',
-        body: 'Click "Refresh" in the top-right or use the date filter to reload the latest appointments.',
-      ),
-      _GuidelineSection(
-        icon: Icons.person_add_rounded,
-        iconColor: const Color(0xFF0891B2),
-        title: 'Booking an Appointment',
-        body:
-            '1. Check whether the patient has an account or not.\n2. Patients can create an account themselves via the app, or we can book for them.\n3. If we book for them, collect the booking fee (if applicable) and insert the receipt/reference number, or add a remark if it\'s a cash payment.',
-      ),
-      _GuidelineSection(
-        icon: Icons.attach_money_rounded,
-        iconColor: const Color(0xFFEF4444),
-        title: 'Refunded Appointments',
-        body:
-            'For refunded appointments, the system will auto-update the text. It is editable, so you can add more details if needed.',
-      ),
-      _GuidelineSection(
-        icon: Icons.transfer_within_a_station_rounded,
-        iconColor: const Color(0xFF7C3AED),
-        title: 'Transferring to Other Branch',
-        body:
-            '1. Contact the other clinic for availability.\n2. Ask the other branch to add a new appointment for the patient.\n3. Update the appointment status on your branch to "Transferred".',
-      ),
-      _GuidelineSection(
-        icon: Icons.swap_horiz_rounded,
-        iconColor: const Color(0xFF2196F3),
-        title: 'Rescheduling Appointments',
-        body:
-            'Branch staff can reschedule same-day appointments.\nPatients can only reschedule via the app if more than 24 hours remain.\n\nExample:\n• Now 1:00 PM, appointment tomorrow 2:00 PM → ✅ Patient can reschedule.\n• Now 1:00 PM, appointment today 1:00 PM → ❌ Staff must handle.',
-      ),
-      _GuidelineSection(
-        icon: Icons.bedtime_rounded,
-        iconColor: const Color(0xFFF59E0B),
-        title: 'No-Show Auto-Update',
-        body:
-            'The system automatically marks un-updated appointments as "No-Show" at 12:00 AM daily. Update statuses promptly.',
-      ),
-      _GuidelineSection(
-        icon: Icons.compare_arrows_rounded,
-        iconColor: const Color(0xFF7C3AED),
-        title: 'Changing Appointment Service',
-        body: '1. Process a refund.\n2. Create a new appointment with the desired service.',
-      ),
-      _GuidelineSection(
-        icon: Icons.chat_bubble_rounded,
-        iconColor: const Color(0xFF25D366),
-        title: 'Contacting Patients via WhatsApp',
-        body: 'Click the WhatsApp icon beside an appointment to send reminders, follow-ups, or assist with changes.',
-      ),
-    ];
-
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 60, vertical: 40),
-        child: SizedBox(
-          width: 640,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(24, 20, 16, 20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDF6E98),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      builder: (_) => const _AppointmentGuidelineDialog(),
+    );
+  }
+}
+
+class _GuidelineItemData {
+  final String category;
+  final String tag;
+  final Color tagColor;
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String highlight;
+  final List<String> steps;
+  final String? alertTip;
+
+  const _GuidelineItemData({
+    required this.category,
+    required this.tag,
+    required this.tagColor,
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.highlight,
+    required this.steps,
+    this.alertTip,
+  });
+}
+
+class _AppointmentGuidelineDialog extends StatefulWidget {
+  const _AppointmentGuidelineDialog();
+
+  @override
+  State<_AppointmentGuidelineDialog> createState() => _AppointmentGuidelineDialogState();
+}
+
+class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog> {
+  String _selectedCategory = 'All';
+  final Set<int> _checkedChecklist = {};
+
+  static const List<String> _categories = [
+    'All',
+    'Arrival & Status',
+    'Reschedule & Policy',
+    'Transfers & Services',
+    'Payments & Refunds',
+    'Daily SOP Checklist',
+  ];
+
+  static const List<_GuidelineItemData> _items = [
+    _GuidelineItemData(
+      category: 'Arrival & Status',
+      tag: 'STEP-BY-STEP',
+      tagColor: Color(0xFF10B981),
+      icon: Icons.how_to_reg_rounded,
+      iconColor: Color(0xFF10B981),
+      title: 'Patient Arrival & Consultation Lifecycle',
+      highlight: 'Mark "Completed" right after consultation & counter payment.',
+      steps: [
+        'Check patient into today\'s schedule (click "Refresh" in the top-right to ensure newly booked app appointments appear).',
+        'Once doctor completes consultation and patient finishes counter payment, immediately set status to "Completed".',
+        'If doctor is running behind schedule, tap the green WhatsApp icon to send the waiting patient an estimated consultation time.',
+      ],
+      alertTip: '⚠️ Midnight Rule: The system automatically marks un-updated appointments as "No-Show" at 12:00 AM daily. Update statuses promptly before ending your shift!',
+    ),
+    _GuidelineItemData(
+      category: 'Arrival & Status',
+      tag: 'COUNTER BOOKING',
+      tagColor: Color(0xFF0891B2),
+      icon: Icons.person_add_alt_1_rounded,
+      iconColor: Color(0xFF0891B2),
+      title: 'Booking Walk-ins & In-Clinic Patients',
+      highlight: 'Search phone/IC first to avoid creating duplicate patient accounts.',
+      steps: [
+        'Always verify if the patient already has an account using their Phone Number or IC/Passport.',
+        'If collecting an in-clinic deposit (Cash, DuitNow QR, Card terminal), enter the transaction receipt / reference code in remarks.',
+        'Patients can also book directly anytime on the Aurora Mobile App without clinic staff assistance.',
+      ],
+      alertTip: '💡 Pro Tip: Walk-in patients can download the Aurora App while waiting to track upcoming visits and loyalty points.',
+    ),
+    _GuidelineItemData(
+      category: 'Reschedule & Policy',
+      tag: '24-HOUR POLICY',
+      tagColor: Color(0xFF2563EB),
+      icon: Icons.schedule_rounded,
+      iconColor: Color(0xFF2563EB),
+      title: 'Rescheduling: Patient App vs Clinic Staff',
+      highlight: 'Patients can only self-reschedule if MORE than 24 hours remain.',
+      steps: [
+        'More than 24 Hours Away: Patient can reschedule themselves directly inside the Aurora Mobile App.',
+        'Less than 24 Hours (Same-Day): Patient app is locked to protect clinic slot allocation. Only Clinic Staff can reschedule via this portal.',
+        'Example: Now is 1:00 PM. Appointment tomorrow 3:00 PM (26h away) → ✅ Patient self-reschedules in app. Appointment today 3:00 PM (2h away) → 🛑 Staff must verify doctor slot & reschedule manually.',
+      ],
+      alertTip: 'Always check doctor and room availability before confirming a same-day reschedule requested by the patient.',
+    ),
+    _GuidelineItemData(
+      category: 'Transfers & Services',
+      tag: 'BRANCH TRANSFER',
+      tagColor: Color(0xFF7C3AED),
+      icon: Icons.storefront_rounded,
+      iconColor: Color(0xFF7C3AED),
+      title: 'Transferring Patient to Another Aurora Branch',
+      highlight: 'Follow the 3-step inter-branch protocol to prevent double bookings.',
+      steps: [
+        'Step 1: Contact receiving clinic via WhatsApp/call to verify doctor & slot availability.',
+        'Step 2: Receiving branch adds the new appointment on their portal schedule.',
+        'Step 3: Origin branch updates existing appointment status to "Transferred" with remarks indicating target branch.',
+      ],
+      alertTip: 'Never delete an appointment when transferring — marking "Transferred" preserves audit history for both clinics.',
+    ),
+    _GuidelineItemData(
+      category: 'Transfers & Services',
+      tag: 'TREATMENT CHANGE',
+      tagColor: Color(0xFFD97706),
+      icon: Icons.medical_services_rounded,
+      iconColor: Color(0xFFD97706),
+      title: 'Switching Appointment Service / Treatment',
+      highlight: 'Never overwrite notes if price or duration differs — refund & rebook instead.',
+      steps: [
+        'Step 1: Process a refund for the current appointment so payment ledgers balance.',
+        'Step 2: Create a new booking with the patient\'s newly selected treatment/service.',
+      ],
+      alertTip: 'This ensures inventory, doctor commissions, and financial reports reflect the correct service code.',
+    ),
+    _GuidelineItemData(
+      category: 'Payments & Refunds',
+      tag: 'FINANCIAL SOP',
+      tagColor: Color(0xFFDC2626),
+      icon: Icons.account_balance_wallet_rounded,
+      iconColor: Color(0xFFDC2626),
+      title: 'Refunded vs Cancelled (Golden Rule)',
+      highlight: 'If money was collected, ALWAYS choose "Refunded", NEVER "Cancelled".',
+      steps: [
+        'Choosing "Cancelled" does NOT log a refund transaction in financial reports or payment gateways.',
+        'Choosing "Refunded" automatically creates an accounting credit note, updates daily net revenue, and records refund details.',
+        'Only choose "Cancelled" if RM 0.00 was paid and no payment was attempted.',
+      ],
+      alertTip: '⚠️ In Payment Report, successfully refunded bookings are cleanly separated from actual clinic revenue.',
+    ),
+    _GuidelineItemData(
+      category: 'Arrival & Status',
+      tag: 'PATIENT RESCUE',
+      tagColor: Color(0xFF059669),
+      icon: Icons.chat_rounded,
+      iconColor: Color(0xFF059669),
+      title: 'WhatsApp Direct Chat & Checkout Rescue',
+      highlight: 'Reach out to patients in 1 tap without saving phone numbers.',
+      steps: [
+        'Tap the green WhatsApp icon beside any appointment to instantly open a pre-filled WhatsApp conversation on your browser/desktop.',
+        'Use WhatsApp for sending appointment reminders, location pins, pre-treatment instructions, and post-care follow-ups.',
+        'In Payment Report → "Needs Rescue", you can message patients who dropped off at checkout. Patients who already retried and paid are automatically filtered out.',
+      ],
+      alertTip: 'Polite checkout assistance via WhatsApp recovers up to 25% of dropped online booking fees!',
+    ),
+  ];
+
+  static const List<String> _checklistItems = [
+    'Morning Sync: Clicked "Refresh" to load latest online bookings from app.',
+    'Appointment Reminders: Sent WhatsApp reminders for today\'s afternoon sessions.',
+    'Post-Consultation: Updated all attended patients to "Completed" status.',
+    'Same-Day Reschedules: Verified doctor availability before shifting times.',
+    'Accounting Rule: Marked paid cancellations as "Refunded" (not "Cancelled").',
+    'Branch Transfers: Confirmed receiving branch created appointment before marking "Transferred".',
+    'Zero Leftovers: Ensured 0 appointments remain in "Booked" status by closing time.',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final filteredItems = _selectedCategory == 'All'
+        ? _items
+        : _items.where((it) => it.category == _selectedCategory).toList();
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 40, vertical: 24),
+      clipBehavior: Clip.antiAlias,
+      child: Container(
+        width: isMobile ? double.infinity : 740,
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
+        color: const Color(0xFFF8FAFC),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Executive Gradient Header
+            Container(
+              padding: const EdgeInsets.fromLTRB(22, 18, 16, 18),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFDF6E98), Color(0xFF7E2D40)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(40),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.menu_book_rounded, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Clinic Appointment Playbook',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'End-to-End Standard Operating Procedures (SOP) for Frontdesk',
+                          style: TextStyle(fontSize: 12, color: Colors.white.withAlpha(220)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+                    tooltip: 'Close',
+                    onPressed: () => context.pop(),
+                  ),
+                ],
+              ),
+            ),
+
+            // Segmented Category Filter Bar
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: [
-                    const Icon(Icons.menu_book_rounded, color: Colors.white, size: 22),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Appointment Guidelines',
-                        style: AppTypography.bodyLarge(context).apply(color: Colors.white),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
-                      onPressed: () => context.pop(),
-                    ),
-                  ],
-                ),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-                  child: Column(children: sections.map((s) => _buildGuidelineItem(context, s)).toList()),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0FDF4),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF86EFAC)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '📋 Daily Checklist',
-                      style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    for (final item in [
-                      'Refresh to load latest data',
-                      'Update appointment status post-session',
-                      'Reschedule only under proper conditions',
-                      'Process refund before creating new if changing service',
-                      'Collect & upload proof of booking fee',
-                      'Use WhatsApp for reminders',
-                      'Use "Refunded" (not Cancelled) if payment was involved',
-                    ])
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.check_box_outline_blank_rounded, size: 16, color: Color(0xFF059669)),
-                            const SizedBox(width: 8),
-                            Expanded(child: Text(item, style: AppTypography.bodyMedium(context))),
-                          ],
+                  children: _categories.map((cat) {
+                    final isSelected = _selectedCategory == cat;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: InkWell(
+                        onTap: () => setState(() => _selectedCategory = cat),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          child: Text(
+                            cat,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                              color: isSelected ? Colors.white : const Color(0xFF475569),
+                            ),
+                          ),
                         ),
                       ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+
+            // Scrollable Content
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_selectedCategory != 'Daily SOP Checklist') ...[
+                      for (final item in filteredItems) _buildCard(item),
+                    ],
+
+                    if (_selectedCategory == 'All' || _selectedCategory == 'Daily SOP Checklist') ...[
+                      const SizedBox(height: 6),
+                      _buildChecklistSection(),
+                    ],
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildGuidelineItem(BuildContext context, _GuidelineSection section) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            margin: const EdgeInsets.only(top: 2),
-            decoration: BoxDecoration(color: section.iconColor.withAlpha(25), borderRadius: BorderRadius.circular(10)),
-            child: Icon(section.icon, color: section.iconColor, size: 17),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildCard(_GuidelineItemData item) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 6, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(section.title, style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 3),
-                Text(section.body, style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: item.iconColor.withAlpha(25),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(item.icon, color: item.iconColor, size: 17),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        item.highlight,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: item.iconColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: item.tagColor.withAlpha(20),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: item.tagColor.withAlpha(50)),
+                  ),
+                  child: Text(
+                    item.tag,
+                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: item.tagColor),
+                  ),
+                ),
               ],
             ),
+            const SizedBox(height: 10),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+            const SizedBox(height: 10),
+            for (int sIdx = 0; sIdx < item.steps.length; sIdx++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 18,
+                      height: 18,
+                      margin: const EdgeInsets.only(top: 1, right: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${sIdx + 1}',
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        item.steps[sIdx],
+                        style: const TextStyle(fontSize: 12.5, height: 1.45, color: Color(0xFF334155)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (item.alertTip != null) ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFBEB),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFFDE68A)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFB45309)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        item.alertTip!,
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          height: 1.4,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF92400E),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChecklistSection() {
+    final doneCount = _checkedChecklist.length;
+    final totalCount = _checklistItems.length;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0FDF4),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF86EFAC)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.checklist_rounded, color: Color(0xFF16A34A), size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Daily Frontdesk Closing Checklist',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF166534)),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
+                decoration: BoxDecoration(
+                  color: doneCount == totalCount ? const Color(0xFF16A34A) : const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF86EFAC)),
+                ),
+                child: Text(
+                  '$doneCount / $totalCount Completed',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: doneCount == totalCount ? Colors.white : const Color(0xFF166534),
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 10),
+          const Text(
+            'Tap items below to check off your daily operational tasks:',
+            style: TextStyle(fontSize: 11.5, color: Color(0xFF15803D)),
+          ),
+          const SizedBox(height: 10),
+          for (int i = 0; i < _checklistItems.length; i++) ...[
+            InkWell(
+              onTap: () {
+                setState(() {
+                  if (_checkedChecklist.contains(i)) {
+                    _checkedChecklist.remove(i);
+                  } else {
+                    _checkedChecklist.add(i);
+                  }
+                });
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      _checkedChecklist.contains(i)
+                          ? Icons.check_box_rounded
+                          : Icons.check_box_outline_blank_rounded,
+                      size: 18,
+                      color: _checkedChecklist.contains(i) ? const Color(0xFF16A34A) : const Color(0xFF94A3B8),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _checklistItems[i],
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: _checkedChecklist.contains(i) ? const Color(0xFF15803D) : const Color(0xFF1E293B),
+                          decoration: _checkedChecklist.contains(i) ? TextDecoration.lineThrough : null,
+                          fontWeight: _checkedChecklist.contains(i) ? FontWeight.w500 : FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
-}
-
-
-class _GuidelineSection {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String body;
-  const _GuidelineSection({required this.icon, required this.iconColor, required this.title, required this.body});
 }
 
 class _ActionButton extends StatelessWidget {
