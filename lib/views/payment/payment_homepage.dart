@@ -42,6 +42,21 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
   static const _muted = Color(0xff68737d);
 
+  static const List<Color> _channelPalette = [
+    Color(0xFF005BAB), // 0: TNG Blue
+    Color(0xFF00B14F), // 1: Grab Green
+    Color(0xFF4F46E5), // 2: Card Indigo
+    Color(0xFFED1C24), // 3: Boost Red
+    Color(0xFFED008C), // 4: DuitNow Pink
+    Color(0xFF00A39D), // 5: FPX Teal
+    Color(0xFFF59E0B), // 6: Maybank Amber
+    Color(0xFFEE4D2D), // 7: Shopee Orange
+    Color(0xFF8B5CF6), // 8: Violet
+    Color(0xFF06B6D4), // 9: Cyan
+    Color(0xFFEC4899), // 10: Rose
+    Color(0xFF10B981), // 11: Emerald
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -235,7 +250,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(screenPadding),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 16 : 20,
+          vertical: 16,
+        ),
         child: Consumer<PaymentController>(
           builder: (context, controller, _) {
             final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
@@ -248,19 +266,19 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(controller),
-                SizedBox(height: screenPadding),
+                const SizedBox(height: 14),
                 _buildFilterRow(),
-                SizedBox(height: screenPadding),
+                const SizedBox(height: 14),
                 _buildSummaryCards(controller),
                 if (channels.isNotEmpty || (isSuperAdmin && branchCount >= 2)) ...[
-                  SizedBox(height: screenPadding),
+                  const SizedBox(height: 14),
                   if (channels.isNotEmpty && isSuperAdmin && branchCount >= 2)
                     isMobile
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildChannelBreakdown(controller),
-                              SizedBox(height: screenPadding),
+                              const SizedBox(height: 14),
                               _buildBranchOverview(controller),
                             ],
                           )
@@ -268,7 +286,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(child: _buildChannelBreakdown(controller)),
-                              SizedBox(width: screenPadding),
+                              const SizedBox(width: 14),
                               Expanded(child: _buildBranchOverview(controller)),
                             ],
                           )
@@ -277,8 +295,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                   else
                     _buildBranchOverview(controller),
                 ],
-                if (dateCount >= 2) ...[SizedBox(height: screenPadding), _buildChart(controller)],
-                SizedBox(height: screenPadding),
+                if (dateCount >= 2) ...[const SizedBox(height: 14), _buildChart(controller)],
+                const SizedBox(height: 14),
                 _buildTable(controller),
               ],
             );
@@ -602,23 +620,23 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           Row(
             children: [
               Expanded(child: _SummaryCard(config: cards[0])),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(child: _SummaryCard(config: cards[1])),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(child: _SummaryCard(config: cards[2])),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(child: _SummaryCard(config: cards[3])),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(child: _SummaryCard(config: cards[4])),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(child: _SummaryCard(config: cards[5])),
             ],
           ),
@@ -631,7 +649,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         final isLast = e.key == cards.length - 1;
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(right: isLast ? 0 : 12),
+            padding: EdgeInsets.only(right: isLast ? 0 : 10),
             child: _SummaryCard(config: e.value),
           ),
         );
@@ -647,56 +665,86 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     final displayChannels = _channelExpanded ? channels : channels.take(6).toList();
 
     IconData channelIcon(String? ch) {
-      switch (ch) {
-        case 'credit':
-          return Icons.credit_card_rounded;
-        case 'fpx':
-          return Icons.account_balance_rounded;
-        case 'GRAB':
-          return Icons.account_balance_wallet_rounded;
-        case 'TNG-EWALLET':
-          return Icons.account_balance_wallet_outlined;
-        case 'BOOST':
-          return Icons.bolt_rounded;
-        case 'ShopeePay':
-          return Icons.shopping_bag_rounded;
-        case 'DUITNOWQR':
-          return Icons.qr_code_2_rounded;
-        case 'APPLEPAY':
-          return Icons.phone_iphone_rounded;
-        case 'GOOGLEPAY':
-          return Icons.android_rounded;
-        default:
-          return Icons.payments_rounded;
+      final s = (ch ?? '').toLowerCase();
+      if (s.contains('credit') || s.contains('card') || s.contains('visa') || s.contains('master')) {
+        return Icons.credit_card_rounded;
+      }
+      if (s.contains('fpx') || s.contains('bank') || s.contains('m2u') || s.contains('cimb')) {
+        return Icons.account_balance_rounded;
+      }
+      if (s.contains('grab')) {
+        return Icons.account_balance_wallet_rounded;
+      }
+      if (s.contains('tng') || s.contains('touch')) {
+        return Icons.account_balance_wallet_outlined;
+      }
+      if (s.contains('boost')) {
+        return Icons.bolt_rounded;
+      }
+      if (s.contains('shopee')) {
+        return Icons.shopping_bag_rounded;
+      }
+      if (s.contains('duitnow') || s.contains('qr')) {
+        return Icons.qr_code_2_rounded;
+      }
+      if (s.contains('apple')) {
+        return Icons.phone_iphone_rounded;
+      }
+      if (s.contains('google')) {
+        return Icons.android_rounded;
+      }
+      return Icons.payments_rounded;
+    }
+
+    String channelDisplayName(ChannelBreakdown c) {
+      final raw = (c.channel ?? '').trim();
+      if (raw.isEmpty || raw.toLowerCase() == 'unknown') return 'Direct / Other';
+      return c.channelLabel;
+    }
+
+    Color? brandColor(String? ch) {
+      final s = (ch ?? '').toLowerCase().trim();
+      if (s.contains('grab')) return const Color(0xFF00B14F);
+      if (s.contains('tng') || s.contains('touch')) return const Color(0xFF005BAB);
+      if (s.contains('boost')) return const Color(0xFFED1C24);
+      if (s.contains('duitnow')) return const Color(0xFFED008C);
+      if (s.contains('shopee')) return const Color(0xFFEE4D2D);
+      if (s.contains('fpx')) return const Color(0xFF00A39D);
+      if (s.contains('credit') || s.contains('card') || s.contains('visa') || s.contains('master')) {
+        return const Color(0xFF4F46E5);
+      }
+      if (s.contains('maybank') || s.contains('m2u') || s.contains('mb2u')) return const Color(0xFFF59E0B);
+      if (s.contains('cimb')) return const Color(0xFF991B1B);
+      if (s.contains('apple')) return const Color(0xFF1E293B);
+      if (s.contains('google')) return const Color(0xFF4285F4);
+      return null;
+    }
+
+    // Assign a guaranteed UNIQUE, distinct color to each channel in the dataset
+    final Map<String, Color> channelColorMap = {};
+    final Set<Color> usedColors = {};
+    int paletteCursor = 0;
+
+    for (int i = 0; i < channels.length; i++) {
+      final key = channels[i].channel ?? 'unknown_$i';
+      final bColor = brandColor(channels[i].channel);
+      if (bColor != null && !usedColors.contains(bColor)) {
+        channelColorMap[key] = bColor;
+        usedColors.add(bColor);
+      } else {
+        while (paletteCursor < _channelPalette.length && usedColors.contains(_channelPalette[paletteCursor])) {
+          paletteCursor++;
+        }
+        final c = _channelPalette[paletteCursor % _channelPalette.length];
+        channelColorMap[key] = c;
+        usedColors.add(c);
+        paletteCursor++;
       }
     }
 
-    Color channelBrandColor(String? ch) {
-      switch (ch?.toUpperCase()) {
-        case 'GRAB':
-          return const Color(0xFF00B14F); // Grab Green
-        case 'TNG-EWALLET':
-        case 'TNG':
-          return const Color(0xFF005BAB); // TNG Blue
-        case 'BOOST':
-          return const Color(0xFFED1C24); // Boost Red
-        case 'DUITNOWQR':
-        case 'DUITNOW':
-          return const Color(0xFFED008C); // DuitNow Pink
-        case 'FPX':
-          return const Color(0xFF00A39D); // FPX Teal
-        case 'CREDIT':
-        case 'CARD':
-          return const Color(0xFF4F46E5); // Indigo
-        case 'SHOPEEPAY':
-          return const Color(0xFFEE4D2D); // Shopee Orange
-        case 'APPLEPAY':
-          return const Color(0xFF1E293B); // Apple Slate
-        case 'GOOGLEPAY':
-          return const Color(0xFF4285F4); // Google Blue
-        default:
-          return const Color(0xFF6366F1);
-      }
+    Color getChannelColor(String? ch, int idx) {
+      final key = ch ?? 'unknown_$idx';
+      return channelColorMap[key] ?? _channelPalette[idx % _channelPalette.length];
     }
 
     return Container(
@@ -712,7 +760,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 const Icon(Icons.pie_chart_rounded, size: 16, color: Color(0xFF4F46E5)),
@@ -732,14 +780,16 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                   child: SizedBox(
                     height: 8,
                     child: Row(
-                      children: channels.where((c) => (c.count ?? 0) > 0).map((c) {
+                      children: channels.where((c) => (c.count ?? 0) > 0).toList().asMap().entries.map((entry) {
+                        final i = entry.key;
+                        final c = entry.value;
                         final count = c.count ?? 0;
                         final fraction = totalCount > 0 ? count / totalCount : 0.0;
                         final flex = (fraction * 1000).toInt().clamp(1, 1000);
                         return Expanded(
                           flex: flex,
                           child: Container(
-                            color: channelBrandColor(c.channel),
+                            color: getChannelColor(c.channel, i),
                             margin: const EdgeInsets.only(right: 1.5),
                           ),
                         );
@@ -766,18 +816,20 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           ),
           const Divider(height: 1, color: Color(0xFFF1F5F9)),
           Padding(
-            padding: EdgeInsets.all(screenPadding * 0.75),
+            padding: const EdgeInsets.all(14),
             child: Column(
               children: [
-                ...displayChannels.map((c) {
-                  final color = channelBrandColor(c.channel);
+                ...displayChannels.asMap().entries.map((entry) {
+                  final i = entry.key;
+                  final c = entry.value;
+                  final color = getChannelColor(c.channel, i);
                   final count = c.count ?? 0;
                   final fraction = totalCount > 0 ? count / totalCount : 0.0;
                   final amount = double.tryParse(c.totalAmount ?? '0') ?? 0.0;
                   final atv = count > 0 ? amount / count : 0.0;
 
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -799,7 +851,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    c.channelLabel,
+                                    channelDisplayName(c),
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
@@ -933,7 +985,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 const Icon(Icons.store_rounded, size: 16, color: Color(0xFF7C3AED)),
@@ -946,7 +998,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           ),
           const Divider(height: 1, color: Color(0xFFE5E7EB)),
           Padding(
-            padding: EdgeInsets.all(screenPadding * 0.75),
+            padding: const EdgeInsets.all(14),
             child: Column(
               children: [
                 ...displayBranches.asMap().entries.map((entry) {
@@ -955,7 +1007,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                   final color = _branchColors[i % _branchColors.length];
                   final fraction = maxRevenue > 0 ? b.revenue / maxRevenue : 0.0;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.only(bottom: 8),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () {
@@ -1118,7 +1170,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
         ],
       ),
-      padding: EdgeInsets.all(screenPadding),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1161,7 +1213,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               ),
             ],
           ),
-          SizedBox(height: screenPadding),
+          const SizedBox(height: 14),
           AspectRatio(
             aspectRatio: isMobile ? 1.8 : 3.8,
             child: BarChart(
@@ -1263,7 +1315,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(screenPadding, screenPadding * 0.75, screenPadding, screenPadding * 0.75),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 Expanded(
@@ -1298,7 +1350,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
   Widget _buildEmptyState() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenPadding * 2),
+      padding: const EdgeInsets.symmetric(vertical: 28),
       child: Center(
         child: Column(
           children: [
@@ -1822,7 +1874,7 @@ class _SummaryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           onTap: config.onTap,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1830,14 +1882,14 @@ class _SummaryCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(color: config.bg, borderRadius: BorderRadius.circular(10)),
-                      child: Icon(config.icon, color: config.accent, size: 18),
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(color: config.bg, borderRadius: BorderRadius.circular(8)),
+                      child: Icon(config.icon, color: config.accent, size: 16),
                     ),
                     if (config.subtitle != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                         decoration: BoxDecoration(
                           color: config.bg,
                           borderRadius: BorderRadius.circular(20),
@@ -1850,22 +1902,22 @@ class _SummaryCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 Text(
                   config.value,
                   style: TextStyle(
-                    fontSize: isMobile ? 18 : 20,
+                    fontSize: isMobile ? 17 : 19,
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFF0F172A),
                     letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Row(
                   children: [
                     Text(
                       config.label,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                      style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
                     ),
                     if (config.onTap != null) ...[
                       const SizedBox(width: 4),
