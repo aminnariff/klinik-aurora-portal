@@ -5,10 +5,13 @@ import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
+import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/payment/payment_report_response.dart';
 import 'package:klinik_aurora_portal/views/payment/appointment_ids.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
@@ -30,6 +33,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   late DateTime endDate;
   bool _channelExpanded = false;
   bool _branchExpanded = false;
+  String? _selectedBranchId;
+  String? _selectedBranchName;
+  bool _branchesLoaded = false;
   static const Color _dateAccent = Color(0xFF2196F3);
 
   static const _bgDark = Color(0xff232d37);
@@ -41,15 +47,35 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     super.initState();
     applyDateFilter();
     getData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthController>();
+      if (auth.isSuperAdmin && !_branchesLoaded) {
+        if (context.read<BranchController>().branchAllResponse == null) {
+          BranchController.getAll(context, 1, 1000).then((value) {
+            if (mounted && responseCode(value.code)) {
+              context.read<BranchController>().branchAllResponse = value;
+              setState(() => _branchesLoaded = true);
+            }
+          });
+        } else {
+          setState(() => _branchesLoaded = true);
+        }
+      }
+    });
   }
 
   void getData() {
     showLoading();
+    final auth = context.read<AuthController>();
+    final effectiveBranchId = auth.isSuperAdmin
+        ? _selectedBranchId
+        : auth.authenticationResponse?.data?.user?.branchId;
+
     PaymentController.report(
       context,
       startDate: DateFormat('yyyy-MM-dd').format(startDate),
       endDate: DateFormat('yyyy-MM-dd').format(endDate),
-      branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+      branchId: effectiveBranchId,
     ).then((response) {
       dismissLoading();
       if (responseCode(response.code)) {
@@ -62,11 +88,16 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
   void exportData() {
     showLoading();
+    final auth = context.read<AuthController>();
+    final effectiveBranchId = auth.isSuperAdmin
+        ? _selectedBranchId
+        : auth.authenticationResponse?.data?.user?.branchId;
+
     PaymentController.exportCsvDownload(
           fileName: 'payment-report',
           startDate: DateFormat('yyyy-MM-dd').format(startDate),
           endDate: DateFormat('yyyy-MM-dd').format(endDate),
-          branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
+          branchId: effectiveBranchId,
         )
         .then((_) {
           dismissLoading();
@@ -89,6 +120,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         final yesterday = now.subtract(const Duration(days: 1));
         startDate = DateTime(yesterday.year, yesterday.month, yesterday.day);
         endDate = startDate;
+        break;
+      case 'Last 7 Days':
+        startDate = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
+        endDate = DateTime(now.year, now.month, now.day);
         break;
       case 'This Month':
         startDate = DateTime(now.year, now.month, 1);
@@ -242,12 +277,14 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Payment Report', style: AppTypography.displayMedium(context)),
-              const SizedBox(height: 2),
-              Row(
+              const SizedBox(height: 4),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(getFormattedDateRange(), style: AppTypography.bodyMedium(context).apply(color: _muted)),
                   if (!isSuperAdmin) ...[
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
@@ -267,6 +304,96 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                         ],
                       ),
                     ),
+                  ],
+                  if (isSuperAdmin) ...[
+                    Consumer<BranchController>(
+                      builder: (context, branchCtrl, _) {
+                        final branchList = branchCtrl.branchAllResponse?.data?.data ?? [];
+                        final branchItems = [
+                          DropdownAttribute('', 'All Branches'),
+                          ...branchList.map((b) => DropdownAttribute(b.branchId ?? '', b.branchName ?? '')),
+                        ];
+                        return Container(
+                          height: 32,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: _selectedBranchId != null ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
+                            ),
+                            boxShadow: _selectedBranchId != null
+                                ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(30), blurRadius: 4, offset: const Offset(0, 1))]
+                                : null,
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _selectedBranchId ?? '',
+                              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Color(0xFF6B7280)),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedBranchId = (val == null || val.isEmpty) ? null : val;
+                                  final match = branchList.firstWhere(
+                                    (b) => b.branchId == _selectedBranchId,
+                                    orElse: () => branch_model.Data(branchName: 'All Branches'),
+                                  );
+                                  _selectedBranchName = _selectedBranchId == null ? null : match.branchName;
+                                });
+                                getData();
+                              },
+                              items: branchItems.map((item) {
+                                return DropdownMenuItem<String>(
+                                  value: item.key,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        item.key.isEmpty ? Icons.domain_rounded : Icons.store_rounded,
+                                        size: 13,
+                                        color: item.key == (_selectedBranchId ?? '') ? const Color(0xFF2196F3) : const Color(0xFF6B7280),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(item.name),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    if (_selectedBranchId != null) ...[
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedBranchId = null;
+                            _selectedBranchName = null;
+                          });
+                          getData();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF6FF),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: const Color(0xFF93C5FD)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.clear_rounded, size: 12, color: Color(0xFF1D4ED8)),
+                              const SizedBox(width: 4),
+                              Text(
+                                _selectedBranchName != null ? 'Clear ($_selectedBranchName)' : 'Clear filter',
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1D4ED8)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ],
               ),
@@ -289,7 +416,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   }
 
   Widget _buildFilterRow() {
-    final filters = ['Today', 'Yesterday', 'This Month', 'Last Month', 'Custom'];
+    final filters = ['Today', 'Yesterday', 'Last 7 Days', 'This Month', 'Last Month', 'Custom'];
     final chips = filters.map((f) {
       final selected = selectedFilter == f;
       return GestureDetector(
@@ -375,11 +502,16 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
   Widget _buildSummaryCards(PaymentController controller) {
     final summary = controller.paymentReportResponse?.summary;
+    final total = summary?.totalPayments ?? 0;
+    final successful = int.tryParse(summary?.successfulPayments ?? '0') ?? 0;
+    final successRate = total > 0 ? ((successful / total) * 100).toStringAsFixed(1) : '0.0';
+    final netRev = double.tryParse(summary?.netRevenue ?? '0') ?? 0.0;
+    final atv = successful > 0 ? (netRev / successful).toStringAsFixed(2) : '0.00';
 
     final cards = [
       _CardConfig(
         label: 'Total Payments',
-        value: '${summary?.totalPayments ?? 0}',
+        value: '$total',
         icon: Icons.receipt_long_rounded,
         accent: const Color(0xFF2196F3),
         bg: const Color(0xFFE3F2FD),
@@ -388,6 +520,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       _CardConfig(
         label: 'Successful',
         value: summary?.successfulPayments ?? '0',
+        subtitle: '$successRate% conv.',
         icon: Icons.check_circle_rounded,
         accent: const Color(0xFF059669),
         bg: const Color(0xFFD1FAE5),
@@ -396,6 +529,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       _CardConfig(
         label: 'Failed',
         value: summary?.failedPayments ?? '0',
+        subtitle: (int.tryParse(summary?.failedPayments ?? '0') ?? 0) > 0 ? 'Click to rescue' : null,
         icon: Icons.cancel_rounded,
         accent: const Color(0xFFEF4444),
         bg: const Color(0xFFFEE2E2),
@@ -420,6 +554,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       _CardConfig(
         label: 'Net Revenue',
         value: 'RM ${summary?.netRevenue ?? '0.00'}',
+        subtitle: 'ATV: RM $atv',
         icon: Icons.trending_up_rounded,
         accent: const Color(0xFF0891B2),
         bg: const Color(0xFFCFFAFE),
@@ -657,7 +792,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     final Map<String, _BranchTotals> agg = {};
     for (final row in data) {
       final id = row.branchId ?? 'unknown';
-      agg.putIfAbsent(id, () => _BranchTotals(branchName: row.branchName ?? id));
+      agg.putIfAbsent(id, () => _BranchTotals(branchId: id, branchName: row.branchName ?? id));
       agg[id]!.totalPayments += row.totalPayments ?? 0;
       agg[id]!.successful += int.tryParse(row.successfulPayments ?? '0') ?? 0;
       agg[id]!.failed += int.tryParse(row.failedPayments ?? '0') ?? 0;
@@ -704,68 +839,83 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                   final color = _branchColors[i % _branchColors.length];
                   final fraction = maxRevenue > 0 ? b.revenue / maxRevenue : 0.0;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {
+                        setState(() {
+                          _selectedBranchId = b.branchId;
+                          _selectedBranchName = b.branchName;
+                        });
+                        getData();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                b.branchName,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF111827),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
                                 ),
-                              ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    b.branchName,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF111827),
+                                    ),
+                                  ),
+                                ),
+                                _miniStatChip('✓ ${b.successful}', const Color(0xFFD1FAE5), const Color(0xFF065F46)),
+                                const SizedBox(width: 6),
+                                _miniStatChip('✗ ${b.failed}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
+                                const SizedBox(width: 10),
+                                SizedBox(
+                                  width: 100,
+                                  child: Text(
+                                    'RM ${b.revenue.toStringAsFixed(2)}',
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: Color(0xFF9CA3AF)),
+                              ],
                             ),
-                            _miniStatChip('✓ ${b.successful}', const Color(0xFFD1FAE5), const Color(0xFF065F46)),
-                            const SizedBox(width: 6),
-                            _miniStatChip('✗ ${b.failed}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
-                            const SizedBox(width: 10),
-                            SizedBox(
-                              width: 100,
-                              child: Text(
-                                'RM ${b.revenue.toStringAsFixed(2)}',
-                                textAlign: TextAlign.right,
-                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
-                              ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: LinearProgressIndicator(
+                                      value: fraction,
+                                      minHeight: 6,
+                                      backgroundColor: color.withAlpha(20),
+                                      valueColor: AlwaysStoppedAnimation<Color>(color),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 38,
+                                  child: Text(
+                                    '${(fraction * 100).toStringAsFixed(0)}%',
+                                    style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: fraction,
-                                  minHeight: 6,
-                                  backgroundColor: color.withAlpha(20),
-                                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              width: 38,
-                              child: Text(
-                                '${(fraction * 100).toStringAsFixed(0)}%',
-                                style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   );
                 }),
@@ -1095,18 +1245,61 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(12)),
+                child: GestureDetector(
+                  onTap: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
+                      ? () {
+                          showLoading();
+                          PaymentController.successPayment(
+                            context,
+                            date: data[i].paymentDate,
+                            branchId: data[i].branchId,
+                            status: 'failed',
+                          ).then((value) {
+                            dismissLoading();
+                            if (responseCode(value.code)) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AppointmentIds(response: value.data),
+                              );
+                            } else {
+                              showDialogError(context, value.message ?? 'Failed to load appointments');
+                            }
+                          }).catchError((e) {
+                            dismissLoading();
+                            showDialogError(context, e.toString());
+                          });
+                        }
+                      : null,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.cancel_outlined, size: 13, color: Color(0xFFEF4444)),
-                      const SizedBox(width: 4),
-                      Text(
-                        data[i].failedPayments ?? '0',
-                        style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w600, fontSize: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEE2E2),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
+                                ? const Color(0xFFEF4444).withAlpha(60)
+                                : Colors.transparent,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.cancel_outlined, size: 13, color: Color(0xFFEF4444)),
+                            const SizedBox(width: 4),
+                            Text(
+                              data[i].failedPayments ?? '0',
+                              style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w600, fontSize: 12),
+                            ),
+                          ],
+                        ),
                       ),
+                      if ((int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0) ...[
+                        const SizedBox(width: 4),
+                        const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFFEF4444)),
+                      ],
                     ],
                   ),
                 ),
@@ -1141,6 +1334,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 }
 
 class _BranchTotals {
+  final String branchId;
   final String branchName;
   int totalPayments = 0;
   int successful = 0;
@@ -1149,12 +1343,13 @@ class _BranchTotals {
   double refund = 0;
   double revenue = 0;
 
-  _BranchTotals({required this.branchName});
+  _BranchTotals({required this.branchId, required this.branchName});
 }
 
 class _CardConfig {
   final String label;
   final String value;
+  final String? subtitle;
   final IconData icon;
   final Color accent;
   final Color bg;
@@ -1163,6 +1358,7 @@ class _CardConfig {
   const _CardConfig({
     required this.label,
     required this.value,
+    this.subtitle,
     required this.icon,
     required this.accent,
     required this.bg,
@@ -1212,6 +1408,20 @@ class _SummaryCard extends StatelessWidget {
             config.label,
             style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280), fontSizeDelta: -1),
           ),
+          if (config.subtitle != null) ...[
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: config.bg,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                config.subtitle!,
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: config.accent),
+              ),
+            ),
+          ],
         ],
       ),
     );

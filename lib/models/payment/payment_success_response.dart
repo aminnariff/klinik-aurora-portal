@@ -6,6 +6,7 @@ class PaymentSuccessResponse {
   Range? range;
   int? total;
   List<String>? data;
+  List<PaymentAppointmentItem>? items;
 
   PaymentSuccessResponse({
     this.message,
@@ -15,6 +16,7 @@ class PaymentSuccessResponse {
     this.range,
     this.total,
     this.data,
+    this.items,
   });
 
   PaymentSuccessResponse.fromJson(Map<String, dynamic> json) {
@@ -24,7 +26,15 @@ class PaymentSuccessResponse {
     filters = json['filters'] != null ? Filters.fromJson(json['filters']) : null;
     range = json['range'] != null ? Range.fromJson(json['range']) : null;
     total = json['total'];
-    data = json['data'].cast<String>();
+    if (json['data'] != null) {
+      data = json['data'].cast<String>();
+    }
+    if (json['items'] != null) {
+      items = <PaymentAppointmentItem>[];
+      json['items'].forEach((v) {
+        items!.add(PaymentAppointmentItem.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -40,22 +50,82 @@ class PaymentSuccessResponse {
     }
     data['total'] = total;
     data['data'] = this.data;
+    if (items != null) {
+      data['items'] = items!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class PaymentAppointmentItem {
+  String? appointmentId;
+  String? patientName;
+  String? patientPhone;
+  String? patientEmail;
+  String? serviceName;
+  String? branchName;
+  String? appointmentDatetime;
+  String? paymentAmount;
+  String? paymentStatus;
+  String? paymentChannel;
+
+  PaymentAppointmentItem({
+    this.appointmentId,
+    this.patientName,
+    this.patientPhone,
+    this.patientEmail,
+    this.serviceName,
+    this.branchName,
+    this.appointmentDatetime,
+    this.paymentAmount,
+    this.paymentStatus,
+    this.paymentChannel,
+  });
+
+  PaymentAppointmentItem.fromJson(Map<String, dynamic> json) {
+    appointmentId = json['appointmentId'];
+    patientName = json['patientName'];
+    patientPhone = json['patientPhone'];
+    patientEmail = json['patientEmail'];
+    serviceName = json['serviceName'];
+    branchName = json['branchName'];
+    appointmentDatetime = json['appointmentDatetime'];
+    paymentAmount = json['paymentAmount']?.toString();
+    paymentStatus = json['paymentStatus'];
+    paymentChannel = json['paymentChannel'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['appointmentId'] = appointmentId;
+    data['patientName'] = patientName;
+    data['patientPhone'] = patientPhone;
+    data['patientEmail'] = patientEmail;
+    data['serviceName'] = serviceName;
+    data['branchName'] = branchName;
+    data['appointmentDatetime'] = appointmentDatetime;
+    data['paymentAmount'] = paymentAmount;
+    data['paymentStatus'] = paymentStatus;
+    data['paymentChannel'] = paymentChannel;
     return data;
   }
 }
 
 class Filters {
   String? date;
+  String? status;
 
-  Filters({this.date});
+  Filters({this.date, this.status});
 
   Filters.fromJson(Map<String, dynamic> json) {
     date = json['date'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['date'] = date;
+    data['status'] = status;
     return data;
   }
 }

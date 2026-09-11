@@ -130,13 +130,18 @@ class PaymentController extends ChangeNotifier {
     BuildContext context, {
     String? date,
     String? branchId,
+    String? status,
   }) async {
     return ApiController()
         .call(
           context,
           method: Method.get,
           endpoint: 'admin/payment/success-payment',
-          queryParameters: {'date': date, 'branchId': branchId},
+          queryParameters: {
+            'date': ?date,
+            'branchId': ?branchId,
+            'status': ?status,
+          },
         )
         .then((value) {
           try {
