@@ -1980,6 +1980,27 @@ class _AppointmentGuidelineDialog extends StatefulWidget {
 class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog> {
   String _selectedCategory = 'All';
   final Set<int> _checkedChecklist = {};
+  final Set<String> _expandedTitles = {};
+
+  void _toggleExpand(String title) {
+    setState(() {
+      if (_expandedTitles.contains(title)) {
+        _expandedTitles.remove(title);
+      } else {
+        _expandedTitles.add(title);
+      }
+    });
+  }
+
+  void _toggleExpandAll() {
+    setState(() {
+      if (_expandedTitles.length >= _items.length) {
+        _expandedTitles.clear();
+      } else {
+        _expandedTitles.addAll(_items.map((e) => e.title));
+      }
+    });
+  }
 
   static const List<String> _categories = [
     'All',
@@ -2177,42 +2198,80 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
               ),
             ),
 
-            // Segmented Category Filter Bar
+            // Segmented Category Filter Bar + Expand/Collapse All
             Container(
               color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _categories.map((cat) {
-                    final isSelected = _selectedCategory == cat;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: InkWell(
-                        onTap: () => setState(() => _selectedCategory = cat),
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _categories.map((cat) {
+                          final isSelected = _selectedCategory == cat;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: InkWell(
+                              onTap: () => setState(() => _selectedCategory = cat),
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+                                  ),
+                                ),
+                                child: Text(
+                                  cat,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                    color: isSelected ? Colors.white : const Color(0xFF475569),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            cat,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                              color: isSelected ? Colors.white : const Color(0xFF475569),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  if (_selectedCategory != 'Daily SOP Checklist') ...[
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: _toggleExpandAll,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _expandedTitles.length >= _items.length
+                                  ? Icons.unfold_less_rounded
+                                  : Icons.unfold_more_rounded,
+                              size: 14,
+                              color: const Color(0xFF334155),
                             ),
-                          ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _expandedTitles.length >= _items.length ? 'Collapse All' : 'Expand All',
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  ],
+                ],
               ),
             ),
             const Divider(height: 1, color: Color(0xFFE2E8F0)),
@@ -2243,135 +2302,176 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
   }
 
   Widget _buildCard(_GuidelineItemData item) {
+    final isExpanded = _expandedTitles.contains(item.title);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+          color: isExpanded ? item.iconColor.withAlpha(90) : const Color(0xFFE2E8F0),
+          width: isExpanded ? 1.5 : 1.0,
+        ),
         boxShadow: [
-          BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 6, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: isExpanded ? item.iconColor.withAlpha(15) : Colors.black.withAlpha(5),
+            blurRadius: isExpanded ? 8 : 4,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: item.iconColor.withAlpha(25),
-                    borderRadius: BorderRadius.circular(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => _toggleExpand(item.title),
+            borderRadius: BorderRadius.circular(14),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: item.iconColor.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(item.icon, color: item.iconColor, size: 17),
                   ),
-                  child: Icon(item.icon, color: item.iconColor, size: 17),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: const TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                item.title,
+                                style: const TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: item.tagColor.withAlpha(20),
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(color: item.tagColor.withAlpha(50)),
+                              ),
+                              child: Text(
+                                item.tag,
+                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: item.tagColor),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.highlight,
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                          color: item.iconColor,
+                        const SizedBox(height: 3),
+                        Text(
+                          item.highlight,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: item.iconColor,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                  decoration: BoxDecoration(
-                    color: item.tagColor.withAlpha(20),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: item.tagColor.withAlpha(50)),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(
+                      isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                      size: 16,
+                      color: const Color(0xFF64748B),
+                    ),
                   ),
-                  child: Text(
-                    item.tag,
-                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: item.tagColor),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
+          ),
+          if (isExpanded) ...[
             const Divider(height: 1, color: Color(0xFFF1F5F9)),
-            const SizedBox(height: 10),
-            for (int sIdx = 0; sIdx < item.steps.length; sIdx++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int sIdx = 0; sIdx < item.steps.length; sIdx++)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 18,
+                            height: 18,
+                            margin: const EdgeInsets.only(top: 1, right: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${sIdx + 1}',
+                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              item.steps[sIdx],
+                              style: const TextStyle(fontSize: 12, height: 1.45, color: Color(0xFF334155)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (item.alertTip != null) ...[
+                    const SizedBox(height: 4),
                     Container(
-                      width: 18,
-                      height: 18,
-                      margin: const EdgeInsets.only(top: 1, right: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(9),
+                        color: const Color(0xFFFFFBEB),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFFDE68A)),
                       ),
-                      child: Center(
-                        child: Text(
-                          '${sIdx + 1}',
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        item.steps[sIdx],
-                        style: const TextStyle(fontSize: 12.5, height: 1.45, color: Color(0xFF334155)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (item.alertTip != null) ...[
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBEB),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFFDE68A)),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFB45309)),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        item.alertTip!,
-                        style: const TextStyle(
-                          fontSize: 11.5,
-                          height: 1.4,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF92400E),
-                        ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFB45309)),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              item.alertTip!,
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                height: 1.4,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF92400E),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
+                ],
               ),
-            ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
