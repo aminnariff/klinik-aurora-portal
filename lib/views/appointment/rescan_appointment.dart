@@ -255,9 +255,11 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   }
 
                                   showLoading();
+                                  final slotServiceBranchId =
+                                      widget.appointment?.data?.serviceBranchId ?? widget.serviceBranchId;
                                   final slotResponse = await ServiceBranchAvailableDtController.getAvailableSlot(
                                     context,
-                                    serviceBranchId: widget.serviceBranchId,
+                                    serviceBranchId: slotServiceBranchId,
                                     serviceTime: '$_selectedDuration minutes',
                                     durationMinutes: _selectedDuration,
                                   );
@@ -279,7 +281,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   if (availableSlots.isEmpty) {
                                     showDialogError(
                                       context,
-                                      'No available slots found for this branch. Please ensure practitioner roster shifts are scheduled.',
+                                      'No available slots found for this branch and service. Please check branch schedule or practitioner roster.',
                                     );
                                     return;
                                   }
