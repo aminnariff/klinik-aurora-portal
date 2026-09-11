@@ -1,5 +1,4 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -38,8 +37,6 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   bool _branchesLoaded = false;
   static const Color _dateAccent = Color(0xFF2196F3);
 
-  static const _bgDark = Color(0xff232d37);
-  static const _divider = Color(0xff37434d);
   static const _muted = Color(0xff68737d);
 
   @override
@@ -147,6 +144,34 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     } else {
       return '${df.format(startDate)} – ${df.format(endDate)}';
     }
+  }
+
+  void _openAppointmentsDialog({String? date, String? branchId, String? status}) {
+    showLoading();
+    final auth = context.read<AuthController>();
+    final effectiveBranchId = branchId ?? (auth.isSuperAdmin
+        ? _selectedBranchId
+        : auth.authenticationResponse?.data?.user?.branchId);
+
+    PaymentController.successPayment(
+      context,
+      date: date ?? DateFormat('yyyy-MM-dd').format(startDate),
+      branchId: effectiveBranchId,
+      status: status,
+    ).then((value) {
+      dismissLoading();
+      if (responseCode(value.code)) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AppointmentIds(response: value.data),
+        );
+      } else {
+        showDialogError(context, value.message ?? 'Failed to load appointments');
+      }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
+    });
   }
 
   Future<DateTimeRange?> _showCustomDateRangePicker() async {
@@ -442,33 +467,36 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFF2196F3) : Colors.white,
+            color: selected ? const Color(0xFF0F172A) : Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB)),
+            border: Border.all(color: selected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0)),
             boxShadow: selected
-                ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(51), blurRadius: 8, offset: const Offset(0, 2))]
+                ? [BoxShadow(color: const Color(0xFF0F172A).withAlpha(40), blurRadius: 6, offset: const Offset(0, 2))]
                 : null,
           ),
           child: Text(
             f,
-            style: AppTypography.bodyMedium(
-              context,
-            ).apply(color: selected ? Colors.white : const Color(0xFF374151), fontWeightDelta: selected ? 1 : 0),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected ? Colors.white : const Color(0xFF475569),
+            ),
           ),
         ),
       );
     }).toList();
 
     final exportButton = SizedBox(
-      height: 38,
+      height: 36,
       child: OutlinedButton.icon(
         onPressed: exportData,
-        icon: const Icon(Icons.download_rounded, size: 16),
+        icon: const Icon(Icons.file_download_outlined, size: 16),
         label: const Text('Export CSV'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFF059669),
-          side: const BorderSide(color: Color(0xFF059669)),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          foregroundColor: const Color(0xFF0F172A),
+          backgroundColor: Colors.white,
+          side: const BorderSide(color: Color(0xFFE2E8F0)),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         ),
@@ -504,61 +532,64 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     final summary = controller.paymentReportResponse?.summary;
     final total = summary?.totalPayments ?? 0;
     final successful = int.tryParse(summary?.successfulPayments ?? '0') ?? 0;
+    final failed = int.tryParse(summary?.failedPayments ?? '0') ?? 0;
     final successRate = total > 0 ? ((successful / total) * 100).toStringAsFixed(1) : '0.0';
     final netRev = double.tryParse(summary?.netRevenue ?? '0') ?? 0.0;
     final atv = successful > 0 ? (netRev / successful).toStringAsFixed(2) : '0.00';
 
     final cards = [
       _CardConfig(
-        label: 'Total Payments',
+        label: 'Total Checkouts',
         value: '$total',
         icon: Icons.receipt_long_rounded,
-        accent: const Color(0xFF2196F3),
-        bg: const Color(0xFFE3F2FD),
-        valueColor: const Color(0xFF1565C0),
+        accent: const Color(0xFF3B82F6),
+        bg: const Color(0xFFEFF6FF),
+        valueColor: const Color(0xFF0F172A),
       ),
       _CardConfig(
         label: 'Successful',
-        value: summary?.successfulPayments ?? '0',
+        value: '$successful',
         subtitle: '$successRate% conv.',
         icon: Icons.check_circle_rounded,
-        accent: const Color(0xFF059669),
-        bg: const Color(0xFFD1FAE5),
-        valueColor: const Color(0xFF065F46),
+        accent: const Color(0xFF10B981),
+        bg: const Color(0xFFECFDF5),
+        valueColor: const Color(0xFF0F172A),
+        onTap: successful > 0 ? () => _openAppointmentsDialog() : null,
       ),
       _CardConfig(
-        label: 'Failed',
-        value: summary?.failedPayments ?? '0',
-        subtitle: (int.tryParse(summary?.failedPayments ?? '0') ?? 0) > 0 ? 'Click to rescue' : null,
-        icon: Icons.cancel_rounded,
+        label: 'Needs Rescue',
+        value: '$failed',
+        subtitle: failed > 0 ? 'Click to rescue ↗' : null,
+        icon: Icons.warning_amber_rounded,
         accent: const Color(0xFFEF4444),
-        bg: const Color(0xFFFEE2E2),
-        valueColor: const Color(0xFF991B1B),
+        bg: const Color(0xFFFEF2F2),
+        valueColor: const Color(0xFF0F172A),
+        onTap: failed > 0 ? () => _openAppointmentsDialog(status: 'failed') : null,
       ),
       _CardConfig(
         label: 'Paid Amount',
         value: 'RM ${summary?.totalPaidAmount ?? '0.00'}',
         icon: Icons.payments_rounded,
-        accent: const Color(0xFF7C3AED),
-        bg: const Color(0xFFEDE9FE),
-        valueColor: const Color(0xFF4C1D95),
+        accent: const Color(0xFF8B5CF6),
+        bg: const Color(0xFFF5F3FF),
+        valueColor: const Color(0xFF0F172A),
       ),
       _CardConfig(
         label: 'Refunded',
         value: 'RM ${summary?.totalRefundAmount ?? '0.00'}',
         icon: Icons.undo_rounded,
         accent: const Color(0xFFF59E0B),
-        bg: const Color(0xFFFEF3C7),
-        valueColor: const Color(0xFF92400E),
+        bg: const Color(0xFFFFFBEB),
+        valueColor: const Color(0xFF0F172A),
       ),
       _CardConfig(
         label: 'Net Revenue',
         value: 'RM ${summary?.netRevenue ?? '0.00'}',
-        subtitle: 'ATV: RM $atv',
+        subtitle: 'ATV RM $atv',
         icon: Icons.trending_up_rounded,
-        accent: const Color(0xFF0891B2),
-        bg: const Color(0xFFCFFAFE),
-        valueColor: const Color(0xFF164E63),
+        accent: const Color(0xFFDF6E98),
+        bg: const Color(0xFFFDF2F8),
+        valueColor: const Color(0xFF0F172A),
       ),
     ];
 
@@ -619,9 +650,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         case 'fpx':
           return Icons.account_balance_rounded;
         case 'GRAB':
-          return Icons.delivery_dining_rounded;
+          return Icons.account_balance_wallet_rounded;
         case 'TNG-EWALLET':
-          return Icons.contactless_rounded;
+          return Icons.account_balance_wallet_outlined;
         case 'BOOST':
           return Icons.bolt_rounded;
         case 'ShopeePay':
@@ -653,7 +684,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -811,7 +845,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -994,27 +1031,77 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     final maxY = values.reduce((a, b) => a > b ? a : b);
 
     return Container(
-      decoration: BoxDecoration(color: _bgDark, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
+        ],
+      ),
       padding: EdgeInsets.all(screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Net Revenue by Date', style: AppTypography.displayMedium(context).apply(color: Colors.white)),
-          const SizedBox(height: 4),
-          Text(getFormattedDateRange(), style: const TextStyle(color: _muted, fontSize: 11)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Net Revenue Trend',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(getFormattedDateRange(), style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDF2F8),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFFBCFE8)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.bar_chart_rounded, size: 14, color: Color(0xFFDF6E98)),
+                    SizedBox(width: 4),
+                    Text(
+                      'Daily Total (MYT)',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF9D174D)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           SizedBox(height: screenPadding),
           AspectRatio(
-            aspectRatio: isMobile ? 1.8 : 4,
+            aspectRatio: isMobile ? 1.8 : 3.8,
             child: BarChart(
               BarChartData(
-                maxY: maxY == 0 ? 10 : maxY * 1.3,
+                maxY: maxY == 0 ? 10 : maxY * 1.25,
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => Colors.blueGrey.withAlpha(opacityCalculation(.85)),
+                    getTooltipColor: (_) => const Color(0xFF0F172A),
+                    tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
-                        '${dates[group.x]}\nRM ${rod.toY.toStringAsFixed(2)}',
-                        const TextStyle(color: Colors.white, fontSize: 11),
+                        '${dates[group.x]}\n',
+                        const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.w500),
+                        children: [
+                          TextSpan(
+                            text: 'RM ${rod.toY.toStringAsFixed(2)}',
+                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -1025,10 +1112,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 50,
+                      reservedSize: 56,
                       getTitlesWidget: (value, meta) {
                         if (value == meta.max || value == 0) return const SizedBox();
-                        return Text('RM ${value.toInt()}', style: const TextStyle(color: _muted, fontSize: 10));
+                        return Text('RM ${value.toInt()}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w500));
                       },
                     ),
                   ),
@@ -1043,7 +1130,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           meta: meta,
                           child: Text(
                             convertToDayMonth(dates[index]),
-                            style: const TextStyle(color: _muted, fontSize: 10),
+                            style: const TextStyle(color: Color(0xFF64748B), fontSize: 10, fontWeight: FontWeight.w500),
                           ),
                         );
                       },
@@ -1052,7 +1139,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 ),
                 gridData: FlGridData(
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => const FlLine(color: _divider, strokeWidth: 1),
+                  getDrawingHorizontalLine: (_) => const FlLine(color: Color(0xFFF1F5F9), strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: List.generate(dates.length, (i) {
@@ -1062,12 +1149,12 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       BarChartRodData(
                         toY: values[i],
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF2196F3), Color(0xFF0891B2)],
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
+                          colors: [Color(0xFFDF6E98), Color(0xFF7E2D40)],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
-                        width: 20,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        width: isMobile ? 12 : 24,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                       ),
                     ],
                   );
@@ -1088,7 +1175,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1100,18 +1190,22 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 Expanded(
                   child: Text(
                     isSuperAdmin ? 'Branch Breakdown' : 'Daily Breakdown',
-                    style: AppTypography.displayMedium(context),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
                   ),
                 ),
                 if (data.isNotEmpty)
                   Text(
                     '${data.length} row${data.length != 1 ? 's' : ''}',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
                   ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          const Divider(height: 1, color: Color(0xFFE2E8F0)),
           data.isEmpty
               ? _buildEmptyState()
               : SingleChildScrollView(
@@ -1144,31 +1238,35 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   }
 
   Widget _buildDataTable(List<Data> data, bool isSuperAdmin, PaymentController controller) {
-    const headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF6B7280));
-    const cellStyle = TextStyle(fontSize: 13, color: Color(0xFF111827));
+    const headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF64748B));
+    const cellStyle = TextStyle(fontSize: 13, color: Color(0xFF0F172A));
 
-    Widget headerCell(String text) {
+    Widget headerCell(String text, {bool alignRight = false}) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Text(text, style: headerStyle),
+        child: Text(
+          text,
+          textAlign: alignRight ? TextAlign.right : TextAlign.left,
+          style: headerStyle,
+        ),
       );
     }
 
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
-      border: TableBorder(horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1)),
+      border: TableBorder(horizontalInside: BorderSide(color: const Color(0xFFE2E8F0).withAlpha(128), width: 1)),
       children: [
         TableRow(
-          decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
+          decoration: const BoxDecoration(color: Color(0xFFF8FAFC)),
           children: [
             if (isSuperAdmin) headerCell('Branch'),
             headerCell('Date'),
-            headerCell('Payments'),
+            headerCell('Checkouts'),
             headerCell('Successful'),
-            headerCell('Failed'),
-            headerCell('Paid (RM)'),
-            headerCell('Refund (RM)'),
-            headerCell('Net Revenue (RM)'),
+            headerCell('Needs Rescue'),
+            headerCell('Paid (RM)', alignRight: true),
+            headerCell('Refund (RM)', alignRight: true),
+            headerCell('Net Revenue (RM)', alignRight: true),
           ],
         ),
         for (int i = 0; i < data.length; i++)
@@ -1191,46 +1289,30 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: GestureDetector(
-                  onTap: () {
-                    showLoading();
-                    PaymentController.successPayment(
-                      context,
-                      date: data[i].paymentDate,
-                      branchId: data[i].branchId,
-                    ).then((value) {
-                      dismissLoading();
-                      if (responseCode(value.code)) {
-                        showDialog(
-                          context: context,
-                          builder: (ctx) => AppointmentIds(response: value.data),
-                        );
-                      } else {
-                        showDialogError(context, value.message ?? 'Failed to load appointments');
-                      }
-                    }).catchError((e) {
-                      dismissLoading();
-                      showDialogError(context, e.toString());
-                    });
-                  },
+                  onTap: () => _openAppointmentsDialog(
+                    date: data[i].paymentDate,
+                    branchId: data[i].branchId,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD1FAE5),
+                          color: const Color(0xFFECFDF5),
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFA7F3D0)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.check_circle_outline_rounded, size: 13, color: Color(0xFF059669)),
+                            const Icon(Icons.check_circle_outline_rounded, size: 12, color: Color(0xFF10B981)),
                             const SizedBox(width: 4),
                             Text(
                               data[i].successfulPayments ?? '0',
                               style: const TextStyle(
-                                color: Color(0xFF065F46),
-                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF047857),
+                                fontWeight: FontWeight.w700,
                                 fontSize: 12,
                               ),
                             ),
@@ -1238,7 +1320,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.open_in_new_rounded, size: 12, color: CupertinoColors.link),
+                      const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF10B981)),
                     ],
                   ),
                 ),
@@ -1247,58 +1329,57 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: GestureDetector(
                   onTap: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                      ? () {
-                          showLoading();
-                          PaymentController.successPayment(
-                            context,
+                      ? () => _openAppointmentsDialog(
                             date: data[i].paymentDate,
                             branchId: data[i].branchId,
                             status: 'failed',
-                          ).then((value) {
-                            dismissLoading();
-                            if (responseCode(value.code)) {
-                              showDialog(
-                                context: context,
-                                builder: (ctx) => AppointmentIds(response: value.data),
-                              );
-                            } else {
-                              showDialogError(context, value.message ?? 'Failed to load appointments');
-                            }
-                          }).catchError((e) {
-                            dismissLoading();
-                            showDialogError(context, e.toString());
-                          });
-                        }
+                          )
                       : null,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEE2E2),
+                          color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
+                              ? const Color(0xFFFEF2F2)
+                              : const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
-                                ? const Color(0xFFEF4444).withAlpha(60)
+                                ? const Color(0xFFFECACA)
                                 : Colors.transparent,
                           ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.cancel_outlined, size: 13, color: Color(0xFFEF4444)),
+                            Icon(
+                              (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
+                                  ? Icons.warning_amber_rounded
+                                  : Icons.remove_circle_outline_rounded,
+                              size: 12,
+                              color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
+                                  ? const Color(0xFFDC2626)
+                                  : const Color(0xFF9CA3AF),
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               data[i].failedPayments ?? '0',
-                              style: const TextStyle(color: Color(0xFF991B1B), fontWeight: FontWeight.w600, fontSize: 12),
+                              style: TextStyle(
+                                color: (int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0
+                                    ? const Color(0xFFDC2626)
+                                    : const Color(0xFF6B7280),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
                       ),
                       if ((int.tryParse(data[i].failedPayments ?? '0') ?? 0) > 0) ...[
                         const SizedBox(width: 4),
-                        const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFFEF4444)),
+                        const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFFDC2626)),
                       ],
                     ],
                   ),
@@ -1306,16 +1387,22 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text(data[i].totalPaidAmount ?? '0.00', style: cellStyle),
+                child: Text(
+                  data[i].totalPaidAmount ?? '0.00',
+                  textAlign: TextAlign.right,
+                  style: cellStyle.copyWith(fontWeight: FontWeight.w500),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Text(
                   data[i].totalRefundAmount ?? '0.00',
+                  textAlign: TextAlign.right,
                   style: cellStyle.copyWith(
+                    fontWeight: FontWeight.w500,
                     color: (double.tryParse(data[i].totalRefundAmount ?? '0') ?? 0) > 0
                         ? const Color(0xFFF59E0B)
-                        : null,
+                        : const Color(0xFF94A3B8),
                   ),
                 ),
               ),
@@ -1323,7 +1410,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Text(
                   data[i].netRevenue ?? '0.00',
-                  style: cellStyle.copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF0891B2)),
+                  textAlign: TextAlign.right,
+                  style: cellStyle.copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)),
                 ),
               ),
             ],
@@ -1354,6 +1442,7 @@ class _CardConfig {
   final Color accent;
   final Color bg;
   final Color valueColor;
+  final VoidCallback? onTap;
 
   const _CardConfig({
     required this.label,
@@ -1363,6 +1452,7 @@ class _CardConfig {
     required this.accent,
     required this.bg,
     required this.valueColor,
+    this.onTap,
   });
 }
 
@@ -1373,56 +1463,76 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(color: config.bg, borderRadius: BorderRadius.circular(10)),
-                child: Icon(config.icon, color: config.accent, size: 18),
-              ),
-              Container(
-                width: 4,
-                height: 32,
-                decoration: BoxDecoration(color: config.accent, borderRadius: BorderRadius.circular(2)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            config.value,
-            style: TextStyle(fontSize: isMobile ? 16 : 20, fontWeight: FontWeight.bold, color: config.valueColor),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            config.label,
-            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280), fontSizeDelta: -1),
-          ),
-          if (config.subtitle != null) ...[
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: config.bg,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                config.subtitle!,
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: config.accent),
-              ),
-            ),
-          ],
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
         ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: config.onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(color: config.bg, borderRadius: BorderRadius.circular(10)),
+                      child: Icon(config.icon, color: config.accent, size: 18),
+                    ),
+                    if (config.subtitle != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: config.bg,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: config.accent.withAlpha(40)),
+                        ),
+                        child: Text(
+                          config.subtitle!,
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: config.accent),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  config.value,
+                  style: TextStyle(
+                    fontSize: isMobile ? 18 : 20,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF0F172A),
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      config.label,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                    ),
+                    if (config.onTap != null) ...[
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 9, color: config.accent),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
