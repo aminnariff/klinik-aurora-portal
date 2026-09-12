@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -289,7 +290,25 @@ class AppointmentDetailsView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel('Patient', Icons.person_rounded),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _sectionLabel('Patient', Icons.person_rounded),
+            if (user != null)
+              _copyInlineAction(
+                context,
+                label: 'Copy Details',
+                onTap: () {
+                  final buffer = StringBuffer();
+                  if (notNullOrEmptyString(user.userFullName)) buffer.writeln(user.userFullName);
+                  if (notNullOrEmptyString(user.userNric)) buffer.writeln(user.userNric);
+                  if (notNullOrEmptyString(user.userPhone)) buffer.writeln(user.userPhone);
+                  if (notNullOrEmptyString(user.userEmail)) buffer.writeln(user.userEmail);
+                  _copyToClipboard(context, buffer.toString().trim(), 'patient details');
+                },
+              ),
+          ],
+        ),
         const SizedBox(height: 10),
         Row(
           children: [
@@ -306,10 +325,39 @@ class AppointmentDetailsView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                  if (user?.userPhone != null) _subtleText(user!.userPhone!),
-                  if (user?.userEmail != null) _subtleText(user!.userEmail!),
-                  if (notNullOrEmptyString(user?.userNric)) _subtleText('NRIC: ${user!.userNric}'),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppSelectableText(
+                          name,
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                        ),
+                      ),
+                      if (notNullOrEmptyString(user?.userFullName))
+                        _copyFieldIcon(context, user!.userFullName!, 'name'),
+                    ],
+                  ),
+                  if (user?.userPhone != null)
+                    Row(
+                      children: [
+                        Expanded(child: _subtleText(user!.userPhone!)),
+                        _copyFieldIcon(context, user.userPhone!, 'phone number'),
+                      ],
+                    ),
+                  if (user?.userEmail != null)
+                    Row(
+                      children: [
+                        Expanded(child: _subtleText(user!.userEmail!)),
+                        _copyFieldIcon(context, user.userEmail!, 'email'),
+                      ],
+                    ),
+                  if (notNullOrEmptyString(user?.userNric))
+                    Row(
+                      children: [
+                        Expanded(child: _subtleText('NRIC: ${user!.userNric}')),
+                        _copyFieldIcon(context, user.userNric!, 'NRIC'),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -953,7 +1001,81 @@ class AppointmentDetailsView extends StatelessWidget {
   Widget _subtleText(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 1),
-      child: Text(text, style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+      child: AppSelectableText(text, style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+    );
+  }
+
+  void _copyToClipboard(BuildContext context, String text, String label) {
+    if (text.trim().isEmpty) return;
+    Clipboard.setData(ClipboardData(text: text.trim()));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 16),
+            const SizedBox(width: 8),
+            Text(
+              'Copied $label to clipboard',
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+        backgroundColor: const Color(0xFF1F2937),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  Widget _copyFieldIcon(BuildContext context, String text, String label) {
+    if (text.trim().isEmpty) return const SizedBox.shrink();
+    return Tooltip(
+      message: 'Copy $label',
+      child: InkWell(
+        onTap: () => _copyToClipboard(context, text, label),
+        borderRadius: BorderRadius.circular(4),
+        hoverColor: const Color(0xFFEEF2FF),
+        child: Padding(
+          padding: const EdgeInsets.all(3.0),
+          child: Icon(
+            Icons.copy_rounded,
+            size: 13,
+            color: Colors.grey[400],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _copyInlineAction(BuildContext context, {required String label, required VoidCallback onTap}) {
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        hoverColor: const Color(0xFFEEF2FF),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.copy_rounded, size: 12, color: Color(0xFF6366F1)),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF6366F1),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

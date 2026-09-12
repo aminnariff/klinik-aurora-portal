@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -771,7 +772,22 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  _extraSectionLabel('Patient', Icons.person_rounded),
+                                                   Row(
+                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                     children: [
+                                                       _extraSectionLabel('Patient', Icons.person_rounded),
+                                                       _copyInlineAction(
+                                                         label: 'Copy Details',
+                                                         onTap: () {
+                                                           final buffer = StringBuffer(patientNameController.controller.text);
+                                                           if (notNullOrEmptyString(widget.appointment?.user?.userNric)) buffer.write('\n${widget.appointment?.user?.userNric}');
+                                                           if (notNullOrEmptyString(patientContactNoController.controller.text)) buffer.write('\n${patientContactNoController.controller.text}');
+                                                           if (notNullOrEmptyString(patientEmailController.controller.text)) buffer.write('\n${patientEmailController.controller.text}');
+                                                           _copyToClipboard(buffer.toString(), 'Patient details');
+                                                         },
+                                                       ),
+                                                     ],
+                                                   ),
                                                   const SizedBox(height: 10),
                                                   labelValue(
                                                     'Patient Details',
@@ -2087,6 +2103,80 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     );
   }
 
+  void _copyToClipboard(String text, String label) {
+    if (text.trim().isEmpty) return;
+    Clipboard.setData(ClipboardData(text: text.trim()));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 16),
+            const SizedBox(width: 8),
+            Text(
+              'Copied $label to clipboard',
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+        backgroundColor: const Color(0xFF1F2937),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  Widget _copyFieldIcon(String text, String label) {
+    if (text.trim().isEmpty) return const SizedBox.shrink();
+    return Tooltip(
+      message: 'Copy $label',
+      child: InkWell(
+        onTap: () => _copyToClipboard(text, label),
+        borderRadius: BorderRadius.circular(4),
+        hoverColor: const Color(0xFFEEF2FF),
+        child: Padding(
+          padding: const EdgeInsets.all(3.0),
+          child: Icon(
+            Icons.copy_rounded,
+            size: 13,
+            color: Colors.grey[400],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _copyInlineAction({required String label, required VoidCallback onTap}) {
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        hoverColor: const Color(0xFFEEF2FF),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.copy_rounded, size: 12, color: Color(0xFF6366F1)),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF6366F1),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildPatientProfileCard() {
     final patientName = patientNameController.controller.text.isNotEmpty
         ? patientNameController.controller.text
@@ -2102,7 +2192,23 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _extraSectionLabel('Patient', Icons.person_rounded),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _extraSectionLabel('Patient', Icons.person_rounded),
+            _copyInlineAction(
+              label: 'Copy Details',
+              onTap: () {
+                final buffer = StringBuffer();
+                if (patientName.isNotEmpty && patientName != 'Unknown Patient') buffer.writeln(patientName);
+                if (notNullOrEmptyString(patientNric)) buffer.writeln(patientNric);
+                if (patientPhone.isNotEmpty) buffer.writeln(patientPhone);
+                if (patientEmail.isNotEmpty) buffer.writeln(patientEmail);
+                _copyToClipboard(buffer.toString().trim(), 'patient details');
+              },
+            ),
+          ],
+        ),
         const SizedBox(height: 10),
         Container(
           width: double.infinity,
@@ -2115,53 +2221,74 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                patientName,
-                style: const TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF111827),
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: AppSelectableText(
+                      patientName,
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  _copyFieldIcon(patientName, 'name'),
+                ],
               ),
               if (notNullOrEmptyString(patientNric)) ...[
                 const SizedBox(height: 6),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(Icons.badge_outlined, size: 14, color: Color(0xFF6B7280)),
                     const SizedBox(width: 6),
-                    Text(
-                      patientNric!,
-                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                    Expanded(
+                      child: AppSelectableText(
+                        patientNric!,
+                        style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                      ),
                     ),
+                    const SizedBox(width: 6),
+                    _copyFieldIcon(patientNric, 'NRIC'),
                   ],
                 ),
               ],
               if (notNullOrEmptyString(patientPhone)) ...[
                 const SizedBox(height: 6),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF6B7280)),
                     const SizedBox(width: 6),
-                    Text(
-                      patientPhone,
-                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                    Expanded(
+                      child: AppSelectableText(
+                        patientPhone,
+                        style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                      ),
                     ),
+                    const SizedBox(width: 6),
+                    _copyFieldIcon(patientPhone, 'phone number'),
                   ],
                 ),
               ],
               if (notNullOrEmptyString(patientEmail)) ...[
                 const SizedBox(height: 6),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(Icons.email_outlined, size: 14, color: Color(0xFF6B7280)),
                     const SizedBox(width: 6),
                     Expanded(
-                      child: Text(
+                      child: AppSelectableText(
                         patientEmail,
                         style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 6),
+                    _copyFieldIcon(patientEmail, 'email'),
                   ],
                 ),
               ],
