@@ -1424,8 +1424,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         ),
         DataCell(_buildStatusBadge(item.appointmentStatus)),
         DataCell(
-          (item.service?.serviceBookingFee != null ||
-                  (double.tryParse(item.service?.serviceBookingFee ?? '0') ?? 0) > 0)
+          ((double.tryParse(item.service?.serviceBookingFee ?? '0') ?? 0) > 0)
               ? _buildPaymentBadge(
                   item.appointmentStatus == 5
                       ? 1

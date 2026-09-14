@@ -568,8 +568,9 @@ class AppointmentDetailsView extends StatelessWidget {
   Widget _feeSection(BuildContext context, Data? data) {
     final price = double.tryParse(data?.service?.servicePrice ?? '');
     final bookingFee = double.tryParse(data?.service?.serviceBookingFee ?? '');
+    final isFreeBooking = (bookingFee ?? 0) <= 0 || (data?.service?.serviceName?.toLowerCase().contains('rescan') ?? false);
     final isCompleted = data?.appointmentStatus == 5;
-    final isPaid = isCompleted || isBookingFeePaid(data?.appointmentNote, payments: data?.payment);
+    final isPaid = isCompleted || isFreeBooking || isBookingFeePaid(data?.appointmentNote, payments: data?.payment);
 
     // Completed = fully paid at clinic → remaining balance is RM 0.00
     final balance = isCompleted

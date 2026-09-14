@@ -2301,7 +2301,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   Widget _buildFeesSection() {
     final isCompleted = widget.appointment?.appointmentStatus == 5;
-    final hasPaidBooking = isBookingFeePaid(widget.appointment?.appointmentNote, payments: widget.appointment?.payment);
+    final bookingFeeVal = double.tryParse('${widget.appointment?.service?.serviceBookingFee ?? 0}') ?? 0;
+    final isFreeBooking = bookingFeeVal <= 0 || (widget.appointment?.service?.serviceName?.toLowerCase().contains('rescan') ?? false);
+    final hasPaidBooking = isFreeBooking || isBookingFeePaid(widget.appointment?.appointmentNote, payments: widget.appointment?.payment);
     final paidBookingEntry = hasPaidBooking
         ? widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentStatus == 1, orElse: () => null)
         : null;
