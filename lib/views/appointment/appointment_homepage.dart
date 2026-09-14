@@ -1371,7 +1371,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         DataCell(
           Tooltip(
             message:
-                '${item.service?.serviceTime ?? 'N/A'}\nBooking Fee: RM ${item.service?.serviceBookingFee ?? 'N/A'}',
+                '${item.service?.serviceTime ?? 'N/A'}\nBooking Fee: RM ${(double.tryParse(item.service?.serviceBookingFee ?? '') ?? 0) > 0 ? item.service!.serviceBookingFee! : '0'}',
             child: Text(
               item.service?.serviceName ?? 'N/A',
               style: AppTypography.bodyMedium(context).copyWith(fontSize: 13),
