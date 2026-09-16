@@ -525,7 +525,7 @@ class _UserHomepageState extends State<UserHomepage> {
       onSelected: (value) => _handleMenuSelection(value, user),
       itemBuilder: (_) => [
         _menuItem('update', Icons.edit_outlined, 'Update Info'),
-        _menuItem('appointment', Icons.calendar_today_outlined, 'Appointment'),
+        _menuItem('appointment', Icons.calendar_today_outlined, 'Book Appointment'),
         _menuItem('appointmentHistory', Icons.history_rounded, 'Appointment History'),
         _menuItem('managePoints', Icons.stars_rounded, 'Manage Points'),
         PopupMenuItem<String>(
