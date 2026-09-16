@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
@@ -16,9 +17,7 @@ import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:provider/provider.dart';
 
@@ -239,6 +238,7 @@ class _UserDetailState extends State<UserDetail> {
         isValid = false;
       }
 
+      final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
       if (widget.type != 'update') {
         if (_usernameController.text.trim().isEmpty) {
           _usernameError = 'Username is required';
@@ -258,6 +258,12 @@ class _UserDetailState extends State<UserDetail> {
             isValid = false;
           }
         }
+      } else if (isSuperAdmin && _emailController.text.trim().isNotEmpty) {
+        final emailRegex = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+        if (!emailRegex.hasMatch(_emailController.text.trim())) {
+          _emailError = 'Enter a valid email address';
+          isValid = false;
+        }
       }
     });
 
@@ -272,6 +278,10 @@ class _UserDetailState extends State<UserDetail> {
 
     final rawPhone = _phoneController.text.trim();
     final docId = _nricController.text.trim().isNotEmpty ? _nricController.text.trim() : null;
+    final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
+    final emailToUpdate = isSuperAdmin && _emailController.text.trim().isNotEmpty
+        ? _emailController.text.trim().toLowerCase()
+        : null;
 
     if (widget.type == 'update') {
       UserController.update(
@@ -285,6 +295,7 @@ class _UserDetailState extends State<UserDetail> {
           userPhone: rawPhone,
           branchId: _selectedBranch?.key,
           userStatus: _userStatus.value ? 1 : 0,
+          userEmail: emailToUpdate,
         ),
       ).then((value) {
         if (responseCode(value.code)) {
@@ -680,13 +691,16 @@ class _UserDetailState extends State<UserDetail> {
   }
 
   Widget _buildFormGrid() {
+    final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
+    final isUpdate = widget.type == 'update';
+    final canEditEmail = !isUpdate || isSuperAdmin;
+
     final leftCol = [
       _buildTextField(
         label: 'Full Name *',
         controller: _fullNameController,
         errorText: _fullNameError,
         hintText: 'e.g. Siti Aminah Binti Yusof',
-        icon: Icons.person_outline_rounded,
         onChanged: (val) {
           if (_fullNameError != null) setState(() => _fullNameError = null);
         },
@@ -697,7 +711,6 @@ class _UserDetailState extends State<UserDetail> {
         controller: _nricController,
         errorText: _nricError,
         hintText: '12-digit NRIC or Passport No',
-        icon: Icons.badge_outlined,
         onChanged: (val) {
           if (_nricError != null) setState(() => _nricError = null);
           _inspectDocumentId(val);
@@ -713,7 +726,6 @@ class _UserDetailState extends State<UserDetail> {
           controller: _usernameController,
           errorText: _usernameError,
           hintText: 'e.g. sitiaminah',
-          icon: Icons.alternate_email_rounded,
           onChanged: (val) {
             if (_usernameError != null) setState(() => _usernameError = null);
           },
@@ -727,29 +739,23 @@ class _UserDetailState extends State<UserDetail> {
         controller: _phoneController,
         errorText: _phoneError,
         hintText: 'e.g. 0123456789 or +60123456789',
-        icon: Icons.phone_outlined,
         onChanged: (val) {
           if (_phoneError != null) setState(() => _phoneError = null);
         },
       ),
       const SizedBox(height: 12),
-      if (widget.type == 'update')
-        _buildReadOnlyField(
-          label: 'Email Address',
-          value: _emailController.text.isNotEmpty ? _emailController.text : '—',
-          icon: Icons.mail_outline_rounded,
-        )
-      else
-        _buildTextField(
-          label: 'Email Address *',
-          controller: _emailController,
-          errorText: _emailError,
-          hintText: 'e.g. patient@gmail.com',
-          icon: Icons.mail_outline_rounded,
-          onChanged: (val) {
-            if (_emailError != null) setState(() => _emailError = null);
-          },
-        ),
+      _buildTextField(
+        label: isUpdate
+            ? (isSuperAdmin ? 'Email Address (Superadmin Edit)' : 'Email Address')
+            : 'Email Address *',
+        controller: _emailController,
+        errorText: _emailError,
+        readOnly: !canEditEmail,
+        hintText: 'e.g. patient@gmail.com',
+        onChanged: (val) {
+          if (_emailError != null) setState(() => _emailError = null);
+        },
+      ),
       const SizedBox(height: 12),
       _buildBranchDropdown(),
     ];
@@ -776,7 +782,6 @@ class _UserDetailState extends State<UserDetail> {
     required TextEditingController controller,
     String? errorText,
     String? hintText,
-    required IconData icon,
     void Function(String)? onChanged,
     bool readOnly = false,
   }) {
@@ -794,6 +799,8 @@ class _UserDetailState extends State<UserDetail> {
         ),
         const SizedBox(height: 5),
         Container(
+          height: 42,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: readOnly ? const Color(0xFFF8FAFC) : Colors.white,
             borderRadius: BorderRadius.circular(8),
@@ -806,15 +813,18 @@ class _UserDetailState extends State<UserDetail> {
             controller: controller,
             readOnly: readOnly,
             onChanged: onChanged,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+            textAlignVertical: TextAlignVertical.center,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: readOnly ? const Color(0xFF475569) : const Color(0xFF1E293B),
+            ),
             decoration: InputDecoration(
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
               border: InputBorder.none,
               hintText: hintText,
-              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-              prefixIcon: Icon(icon, size: 16, color: const Color(0xFF64748B)),
-              prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
             ),
           ),
         ),
@@ -869,7 +879,8 @@ class _UserDetailState extends State<UserDetail> {
           },
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            height: 42,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
@@ -880,18 +891,17 @@ class _UserDetailState extends State<UserDetail> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_month_outlined, size: 16, color: Color(0xFF64748B)),
-                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     _dobController.text.isNotEmpty ? _dobController.text : 'Select Date of Birth',
                     style: TextStyle(
                       fontSize: 13,
+                      fontWeight: _dobController.text.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
                       color: _dobController.text.isNotEmpty ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
                     ),
                   ),
                 ),
-                const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF94A3B8)),
+                const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF94A3B8)),
               ],
             ),
           ),
@@ -907,45 +917,11 @@ class _UserDetailState extends State<UserDetail> {
     );
   }
 
-  Widget _buildReadOnlyField({required String label, required String value, required IconData icon}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
-          ),
-        ),
-        const SizedBox(height: 5),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: 16, color: const Color(0xFF94A3B8)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: AppSelectableText(
-                  value,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildBranchDropdown() {
+    final selectedItem = _selectedBranch != null && branches.any((b) => b.key == _selectedBranch!.key)
+        ? branches.firstWhere((b) => b.key == _selectedBranch!.key)
+        : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -959,26 +935,54 @@ class _UserDetailState extends State<UserDetail> {
           ),
         ),
         const SizedBox(height: 5),
-        StreamBuilder<DateTime>(
-          stream: _rebuildDropdown.stream,
-          builder: (context, _) {
-            return AppDropdown(
-              attributeList: DropdownAttributeList(
-                branches,
-                onChanged: (selected) {
+        Container(
+          height: 42,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: _branchError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+              width: _branchError != null ? 1.5 : 1,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<DropdownAttribute>(
+              isExpanded: true,
+              value: selectedItem,
+              hint: const Text(
+                'Select Branch',
+                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              ),
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF94A3B8)),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+              onChanged: (DropdownAttribute? selected) {
+                if (selected != null) {
                   setState(() {
                     _selectedBranch = selected;
                     _branchError = null;
                   });
-                },
-                value: _selectedBranch?.name,
-                hintText: 'Select Branch',
-                width: double.infinity,
-                errorMessage: _branchError,
-              ),
-            );
-          },
+                }
+              },
+              items: branches.map((DropdownAttribute b) {
+                return DropdownMenuItem<DropdownAttribute>(
+                  value: b,
+                  child: Text(
+                    b.name,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         ),
+        if (_branchError != null) ...[
+          const SizedBox(height: 3),
+          Text(
+            _branchError!,
+            style: const TextStyle(fontSize: 11, color: Color(0xFFEF4444), fontWeight: FontWeight.w500),
+          ),
+        ],
       ],
     );
   }

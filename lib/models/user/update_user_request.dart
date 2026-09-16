@@ -7,6 +7,7 @@ class UpdateUserRequest {
   String? userPhone;
   String? userDob;
   int? userStatus;
+  String? userEmail;
 
   UpdateUserRequest({
     this.userId,
@@ -17,6 +18,7 @@ class UpdateUserRequest {
     this.userPhone,
     this.userStatus,
     this.userDob,
+    this.userEmail,
   });
 
   UpdateUserRequest.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class UpdateUserRequest {
     userPhone = json['userPhone'];
     userStatus = json['userStatus'];
     userDob = json['userDob'];
+    userEmail = json['userEmail'];
   }
 
   Map<String, dynamic> toJson() {
@@ -40,6 +43,7 @@ class UpdateUserRequest {
     data['userPhone'] = userPhone;
     data['userStatus'] = userStatus;
     data['userDob'] = userDob;
+    data['userEmail'] = userEmail;
     return data;
   }
 }
