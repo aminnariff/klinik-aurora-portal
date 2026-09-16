@@ -1,4 +1,3 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -256,113 +255,288 @@ class _HomepageState extends State<Homepage> {
               return SidebarX(
                 controller: pageController,
                 theme: SidebarXTheme(
-                  width: screenWidth(8),
+                  width: 76,
                   margin: EdgeInsets.zero,
                   decoration: const BoxDecoration(
-                    color: sidebarColor,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF246E7A),
+                        Color(0xFF1B545E),
+                      ],
+                    ),
                     borderRadius: BorderRadius.only(topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 16,
+                        offset: Offset(4, 0),
+                      ),
+                    ],
                   ),
-                  hoverColor: Colors.white.withAlpha(20),
-                  textStyle: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 14, fontWeight: FontWeight.w500),
-                  selectedTextStyle: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                  hoverColor: Colors.white.withValues(alpha: 0.12),
+                  textStyle: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                  selectedTextStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
                   itemTextPadding: const EdgeInsets.symmetric(horizontal: 10),
                   selectedItemTextPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  iconTheme: const IconThemeData(color: Color(0xB3FFFFFF), size: 22),
-                  selectedIconTheme: const IconThemeData(color: Colors.white, size: 22),
+                  iconTheme: const IconThemeData(color: Color(0xCCFFFFFF), size: 20),
+                  selectedIconTheme: const IconThemeData(color: Colors.white, size: 20),
+                  itemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  selectedItemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.transparent),
                   selectedItemDecoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.white.withAlpha(28),
-                    border: Border.all(color: Colors.white.withAlpha(45)),
+                    color: Colors.white.withValues(alpha: 0.22),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                 ),
                 extendedTheme: SidebarXTheme(
-                  width: screenWidth(15),
+                  width: 255,
                   decoration: const BoxDecoration(
-                    color: sidebarColor,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF246E7A),
+                        Color(0xFF1B545E),
+                      ],
+                    ),
                     borderRadius: BorderRadius.only(topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 16,
+                        offset: Offset(4, 0),
+                      ),
+                    ],
                   ),
-                  textStyle: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 14, fontWeight: FontWeight.w500),
-                  selectedTextStyle: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                  hoverColor: Colors.white.withValues(alpha: 0.12),
+                  textStyle: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                  selectedTextStyle: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
                   itemTextPadding: const EdgeInsets.symmetric(horizontal: 10),
                   selectedItemTextPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  iconTheme: const IconThemeData(color: Color(0xB3FFFFFF), size: 22),
-                  selectedIconTheme: const IconThemeData(color: Colors.white, size: 22),
+                  iconTheme: const IconThemeData(color: Color(0xCCFFFFFF), size: 20),
+                  selectedIconTheme: const IconThemeData(color: Colors.white, size: 20),
+                  itemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  selectedItemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.transparent),
                   selectedItemDecoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.white.withAlpha(28),
-                    border: Border.all(color: Colors.white.withAlpha(45)),
+                    color: Colors.white.withValues(alpha: 0.22),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                 ),
-                footerDivider: Divider(color: Colors.white.withAlpha(40), height: 1),
                 headerBuilder: (context, extended) {
                   return Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(8, 20, 8, extended ? 8 : 20),
+                        padding: EdgeInsets.fromLTRB(12, 20, 12, extended ? 12 : 20),
                         child: extended
-                            ? SlideInLeft(child: SizedBox(height: 15))
-                            : SlideInRight(
-                                child: Center(
-                                  child: Image.asset('assets/icons/logo/klinik-aurora.png', width: 36, height: 36),
+                            ? Row(
+                                children: [
+                                  Container(
+                                    width: 38,
+                                    height: 38,
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.12),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Image.asset('assets/icons/logo/klinik-aurora.png', fit: BoxFit.contain),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'KLINIK AURORA',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 13,
+                                            letterSpacing: 1.2,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        SizedBox(height: 1),
+                                        Text(
+                                          'Management Portal',
+                                          style: TextStyle(
+                                            color: Color(0xB3FFFFFF),
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                            letterSpacing: 0.3,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Container(
+                                width: 40,
+                                height: 40,
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.12),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
+                                child: Image.asset('assets/icons/logo/klinik-aurora.png', fit: BoxFit.contain),
                               ),
                       ),
                       if (extended)
                         Consumer<AuthController>(
-                          builder: (context, auth, _) => Container(
-                            margin: const EdgeInsets.fromLTRB(10, 0, 10, 14),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withAlpha(18),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.white.withAlpha(30)),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(7),
-                                  decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
-                                  child: Image.asset('assets/icons/logo/klinik-aurora.png', width: 27, height: 27),
-                                  // child: const Icon(Icons.person_rounded, color: tertiaryColor, size: 16),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                          builder: (context, auth, _) {
+                            final isSonographer = auth.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') && !auth.isSuperAdmin;
+                            final isSuper = auth.isSuperAdmin;
+                            final roleTitle = isSonographer
+                                ? 'Sonographer (Locum)'
+                                : isSuper
+                                    ? 'Super Admin'
+                                    : 'Clinic Admin';
+
+                            final roleBg = isSonographer
+                                ? const Color(0xFF818CF8)
+                                : isSuper
+                                    ? const Color(0xFFF59E0B)
+                                    : const Color(0xFF34D399);
+
+                            final fullName = auth.authenticationResponse?.data?.user?.userFullname ??
+                                auth.authenticationResponse?.data?.user?.userName ??
+                                'Staff';
+
+                            final initial = fullName.isNotEmpty ? fullName[0].toUpperCase() : 'A';
+
+                            return Container(
+                              margin: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                              ),
+                              child: Row(
+                                children: [
+                                  Stack(
                                     children: [
-                                      Text(
-                                        auth.authenticationResponse?.data?.user?.userFullname ?? '—',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
+                                      Container(
+                                        width: 34,
+                                        height: 34,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(alpha: 0.22),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
                                         ),
-                                        overflow: TextOverflow.ellipsis,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          initial,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14,
+                                          ),
+                                        ),
                                       ),
-                                      Text(
-                                        auth.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')
-                                            ? 'Sonographer'
-                                            : auth.isSuperAdmin
-                                            ? 'Super Admin'
-                                            : 'Admin',
-                                        style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 11),
+                                      Positioned(
+                                        right: 0,
+                                        bottom: 0,
+                                        child: Container(
+                                          width: 9,
+                                          height: 9,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF10B981),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: const Color(0xFF246E7A), width: 1.5),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          fullName,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                          decoration: BoxDecoration(
+                                            color: roleBg.withValues(alpha: 0.25),
+                                            borderRadius: BorderRadius.circular(4),
+                                            border: Border.all(color: roleBg.withValues(alpha: 0.5)),
+                                          ),
+                                          child: Text(
+                                            roleTitle,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
                     ],
                   );
                 },
+                footerDivider: Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
                 footerBuilder: (ctx, extended) {
                   return Column(
                     children: [
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       InkWell(
                         onTap: () async {
                           try {
@@ -373,18 +547,18 @@ class _HomepageState extends State<Homepage> {
                           }
                         },
                         borderRadius: BorderRadius.circular(10),
-                        hoverColor: Colors.white.withAlpha(20),
+                        hoverColor: Colors.white.withValues(alpha: 0.15),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           child: Row(
                             mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.logout_rounded, color: Color(0xB3FFFFFF), size: 22),
+                              const Icon(Icons.logout_rounded, color: Color(0xD9FFFFFF), size: 20),
                               if (extended) ...[
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 10),
                                 const Text(
                                   'Logout',
-                                  style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 14, fontWeight: FontWeight.w500),
+                                  style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ],
@@ -556,63 +730,102 @@ class _HomepageState extends State<Homepage> {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: sidebarColor,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                child: Row(
-                  children: [
-                    Image.asset('assets/icons/logo/klinik-aurora.png', width: 44, height: 44),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'ADMIN',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                        letterSpacing: 4,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF246E7A),
+                Color(0xFF1B545E),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.12),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Image.asset('assets/icons/logo/klinik-aurora.png', fit: BoxFit.contain),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(color: Colors.white24, height: 1),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  children: [
-                    for (int i = 0; i < sideBarAttribute.length; i++)
-                      _DrawerItem(
-                        icon: sideBarAttribute[i].iconBuilder != null
-                            ? sideBarAttribute[i].iconBuilder!(false, false)
-                            : Icon(sideBarAttribute[i].icon, color: Colors.white),
-                        label: sideBarAttribute[i].label ?? '',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          action(sideBarAttribute[i].label);
-                        },
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'KLINIK AURORA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          Text(
+                            'Management Portal',
+                            style: TextStyle(
+                              color: Color(0xB3FFFFFF),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const Divider(color: Colors.white24, height: 1),
-              ListTile(
-                leading: const Icon(Icons.logout, color: Colors.white),
-                title: const Text('Logout', style: TextStyle(color: Colors.white)),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  try {
-                    await context.read<AuthController>().logout(context);
-                    if (context.mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
-                  } catch (e) {
-                    debugPrint(e.toString());
-                  }
-                },
-              ),
-              Padding(padding: const EdgeInsets.only(bottom: 12), child: version()),
-            ],
+                Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    children: [
+                      for (int i = 0; i < sideBarAttribute.length; i++)
+                        _DrawerItem(
+                          icon: sideBarAttribute[i].iconBuilder != null
+                              ? sideBarAttribute[i].iconBuilder!(false, false)
+                              : Icon(sideBarAttribute[i].icon, color: Colors.white),
+                          label: sideBarAttribute[i].label ?? '',
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            action(sideBarAttribute[i].label);
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
+                ListTile(
+                  leading: const Icon(Icons.logout, color: Colors.white),
+                  title: const Text('Logout', style: TextStyle(color: Colors.white)),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _handleMenuSelection('logout');
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: version(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -620,7 +833,7 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  void _handleMenuSelection(String value) async {
+  Future<void> _handleMenuSelection(String value) async {
     if (value == 'logout') {
       try {
         await context.read<AuthController>().logout(context);
@@ -677,9 +890,23 @@ class _HomepageState extends State<Homepage> {
     return ValueListenableBuilder<AppVersionAttribute>(
       valueListenable: appVersionAttribute,
       builder: (context, snapshot, child) {
-        return Text(
-          'v${snapshot.version}',
-          style: Theme.of(context).textTheme.bodyMedium!.apply(color: textSecondaryColor),
+        final ver = snapshot.version ?? '1.3.0';
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+          ),
+          child: Text(
+            'v$ver',
+            style: const TextStyle(
+              color: Color(0xD9FFFFFF),
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
         );
       },
     );
