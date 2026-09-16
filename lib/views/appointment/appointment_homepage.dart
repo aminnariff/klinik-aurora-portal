@@ -1203,15 +1203,36 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           Row(
                             children: [
                               Expanded(
-                                child: Text(
-                                  patientName,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF111827),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        patientName,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF111827),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if (deriveAgeFromNric(apt.user?.userNric) != null) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF3F4F6),
+                                          borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(color: const Color(0xFFE5E7EB), width: 0.8),
+                                        ),
+                                        child: Text(
+                                          deriveAgeFromNric(apt.user?.userNric)!,
+                                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
                               if (appointmentId.isNotEmpty) ...[
@@ -1349,23 +1370,52 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       color: WidgetStateProperty.all(index.isEven ? Colors.white : const Color(0xFFFAFAFA)),
       cells: [
         DataCell(
-          Tooltip(
-            message: 'Phone: ${item.user?.userPhone ?? 'N/A'}\nEmail: ${item.user?.userEmail ?? 'N/A'}',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  item.user?.userFullName?.titleCase() ?? 'N/A',
-                  style: AppTypography.bodyMedium(context).copyWith(fontSize: 13, fontWeight: FontWeight.w500),
+          Builder(
+            builder: (context) {
+              final ageStr = deriveAgeFromNric(item.user?.userNric);
+              return Tooltip(
+                message:
+                    'IC: ${item.user?.userNric ?? 'N/A'}${ageStr != null ? ' ($ageStr)' : ''}\nPhone: ${item.user?.userPhone ?? 'N/A'}\nEmail: ${item.user?.userEmail ?? 'N/A'}',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            item.user?.userFullName?.titleCase() ?? 'N/A',
+                            style: AppTypography.bodyMedium(context).copyWith(fontSize: 13, fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (ageStr != null) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: const Color(0xFFE5E7EB), width: 0.8),
+                            ),
+                            child: Text(
+                              ageStr,
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    if (item.user?.userPhone != null)
+                      Text(
+                        item.user!.userPhone!,
+                        style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: const Color(0xFF9CA3AF)),
+                      ),
+                  ],
                 ),
-                if (item.user?.userPhone != null)
-                  Text(
-                    item.user!.userPhone!,
-                    style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: const Color(0xFF9CA3AF)),
-                  ),
-              ],
-            ),
+              );
+            },
           ),
         ),
         DataCell(

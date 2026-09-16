@@ -60,6 +60,43 @@ String doctorType(int? type) {
   }
 }
 
+String? deriveAgeFromNric(String? nric, {bool includeGender = true}) {
+  if (nric == null) return null;
+  final clean = nric.replaceAll(RegExp(r'[^0-9]'), '');
+  if (clean.length != 12) return null;
+
+  final yy = int.tryParse(clean.substring(0, 2));
+  final mm = int.tryParse(clean.substring(2, 4));
+  final dd = int.tryParse(clean.substring(4, 6));
+  if (yy == null || mm == null || dd == null) return null;
+  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return null;
+
+  final now = DateTime.now();
+  final currentYear = now.year;
+  final currentTwoDigitYear = currentYear % 100;
+  final birthYear = yy <= currentTwoDigitYear ? (2000 + yy) : (1900 + yy);
+
+  try {
+    final birthDate = DateTime(birthYear, mm, dd);
+    if (birthDate.month != mm || birthDate.day != dd) return null;
+
+    int age = now.year - birthYear;
+    if (now.month < mm || (now.month == mm && now.day < dd)) {
+      age--;
+    }
+    if (age < 0 || age > 120) return null;
+
+    if (includeGender) {
+      final genderDigit = int.tryParse(clean.substring(11, 12));
+      final gender = (genderDigit != null) ? (genderDigit % 2 == 1 ? 'M' : 'F') : '';
+      return gender.isNotEmpty ? '$age$gender' : '$age yrs';
+    }
+    return '$age yrs';
+  } catch (_) {
+    return null;
+  }
+}
+
 String pointType(int? type) {
   switch (type) {
     case 1:
