@@ -1,10 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -15,16 +14,10 @@ import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
 import 'package:klinik_aurora_portal/models/user/create_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
-import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +25,7 @@ import 'package:provider/provider.dart';
 class UserDetail extends StatefulWidget {
   final UserResponse? user;
   final String type;
+
   const UserDetail({super.key, this.user, required this.type});
 
   @override
@@ -39,91 +33,103 @@ class UserDetail extends StatefulWidget {
 }
 
 class _UserDetailState extends State<UserDetail> {
-  InputFieldAttribute usernameAttribute = InputFieldAttribute(
-    controller: TextEditingController(),
-    maxCharacter: 20,
-    isAlphaNumericOnly: true,
-    isEditable: true,
-    labelText: 'information'.tr(gender: 'username'),
-  );
-  InputFieldAttribute fullNameAttribute = InputFieldAttribute(
-    controller: TextEditingController(),
-    labelText: 'information'.tr(gender: 'fullName'),
-  );
-  InputFieldAttribute passwordAttribute = InputFieldAttribute(controller: TextEditingController());
-  TextEditingController nricController = TextEditingController();
-  InputFieldAttribute dobAttribute = InputFieldAttribute(
-    controller: TextEditingController(),
-    labelText: 'information'.tr(gender: 'dob'),
-    suffixWidget: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.calendar_month)]),
-  );
-  InputFieldAttribute phoneAttribute = InputFieldAttribute(
-    controller: TextEditingController(),
-    labelText: 'information'.tr(gender: 'phoneNo'),
-    isNumber: true,
-    maxCharacter: 13,
-    prefixIcon: Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(right: screenPadding / 2, left: 12),
-          child: const Text(
-            '🇲🇾',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0, color: textPrimaryColor),
-          ),
-        ),
-      ],
-    ),
-  );
-  InputFieldAttribute emailAttribute = InputFieldAttribute(
-    controller: TextEditingController(),
-    labelText: 'information'.tr(gender: 'email'),
-    isEmail: true,
-  );
-  InputFieldAttribute branchIdAttribute = InputFieldAttribute(
-    controller: TextEditingController(),
-    labelText: 'information'.tr(gender: 'registeredBranch'),
-  );
-  final ValueNotifier<bool> _userStatus = ValueNotifier(false);
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _nricController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
+  final ValueNotifier<bool> _userStatus = ValueNotifier(true);
   DropdownAttribute? _selectedBranch;
-  StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
-  StreamController<DateTime> rebuild = StreamController.broadcast();
   List<DropdownAttribute> branches = [];
+  final StreamController<DateTime> _rebuildDropdown = StreamController.broadcast();
+
+  int? _appointmentCount;
+  bool _isSaving = false;
+
+  // Validation errors
+  String? _fullNameError;
+  String? _usernameError;
+  String? _nricError;
+  String? _phoneError;
+  String? _dobError;
+  String? _emailError;
+  String? _branchError;
+
+  // Demographic reactive state
+  bool _isMalaysianIc = false;
+  String? _derivedGender;
+  int? _derivedAge;
 
   @override
   void initState() {
+    super.initState();
+
     if (widget.type == 'update') {
-      usernameAttribute.controller.text = widget.user?.userName ?? '';
-      fullNameAttribute.controller.text = widget.user?.userFullname ?? '';
-      branchIdAttribute.controller.text = widget.user?.branchId ?? '';
-      dobAttribute.controller.text = dateConverter(widget.user?.userDob, format: 'dd-MM-yyyy') ?? '';
-      nricController.text = widget.user?.userNric ?? '';
-      phoneAttribute.controller.text = widget.user?.userPhone ?? '';
-      emailAttribute.controller.text = widget.user?.userEmail ?? '';
+      _usernameController.text = widget.user?.userName ?? '';
+      _fullNameController.text = widget.user?.userFullname ?? '';
+      _dobController.text = dateConverter(widget.user?.userDob, format: 'dd-MM-yyyy') ?? '';
+      _nricController.text = widget.user?.userNric ?? '';
+      _phoneController.text = widget.user?.userPhone ?? '';
+      _emailController.text = widget.user?.userEmail ?? '';
       _userStatus.value = widget.user?.userStatus == 1;
+
+      // Initial demographic parse
+      _inspectDocumentId(_nricController.text);
+
+      // Fetch appointment count in background
+      if (widget.user?.userId != null) {
+        _fetchAppointmentCount(widget.user!.userId!);
+      }
     }
+
+    _loadBranches();
+  }
+
+  void _fetchAppointmentCount(String userId) {
+    UserController.appointment(context, userId).then((val) {
+      if (mounted && responseCode(val.code)) {
+        setState(() {
+          _appointmentCount = val.data?.data?.length ?? 0;
+        });
+      }
+    }).catchError((e) {
+      debugPrint('Error fetching appointments count: $e');
+    });
+  }
+
+  void _loadBranches() {
     try {
       if (context.read<BranchController>().branchAllResponse == null) {
         BranchController.getAll(context, 1, 100).then((value) {
           if (responseCode(value.code)) {
             context.read<BranchController>().branchAllResponse = value;
+            _populateBranches();
           }
         });
+      } else {
+        _populateBranches();
       }
-      for (branch_model.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? []) {
-        branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
-      }
-      branches.sort((a, b) {
-        final nameA = a.name.toLowerCase();
-        final nameB = b.name.toLowerCase();
-        return nameA.compareTo(nameB);
-      });
-      rebuildDropdown.add(DateTime.now());
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  void _populateBranches() {
+    branches.clear();
+    for (branch_model.Data item in context.read<BranchController>().branchAllResponse?.data?.data ?? []) {
+      branches.add(DropdownAttribute(item.branchId ?? '', item.branchName ?? ''));
+    }
+    branches.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    _rebuildDropdown.add(DateTime.now());
+
+    final branchId = widget.user?.branchId;
+    if (branchId != null) {
       try {
         Data? branch = context.read<BranchController>().branchAllResponse?.data?.data?.firstWhere(
-          (element) => element.branchId == branchIdAttribute.controller.text,
-        );
+              (element) => element.branchId == branchId,
+            );
         if (branch != null) {
           setState(() {
             _selectedBranch = DropdownAttribute(branch.branchId ?? '', branch.branchName ?? '');
@@ -132,466 +138,995 @@ class _UserDetailState extends State<UserDetail> {
       } catch (e) {
         debugPrint(e.toString());
       }
-    } catch (e) {
-      debugPrint(e.toString());
     }
-    super.initState();
+  }
+
+  void _inspectDocumentId(String raw) {
+    final clean = raw.trim();
+    if (clean.length == 12 && RegExp(r'^\d{12}$').hasMatch(clean)) {
+      _isMalaysianIc = true;
+      final lastDigit = int.tryParse(clean[11]);
+      if (lastDigit != null) {
+        _derivedGender = lastDigit % 2 != 0 ? 'Male' : 'Female';
+      } else {
+        _derivedGender = null;
+      }
+
+      // Auto-extract DOB if not set or create mode
+      if (widget.type == 'create' || (widget.user?.userDob == null && _dobController.text.isEmpty)) {
+        final dob = extractDobFromNric(clean);
+        if (dob != null) {
+          _dobController.text = dob;
+          _dobError = null;
+        }
+      }
+    } else {
+      _isMalaysianIc = false;
+      _derivedGender = null;
+    }
+
+    _derivedAge = _calculateAge(_dobController.text.trim());
+  }
+
+  int? _calculateAge(String dobStr) {
+    if (dobStr.isEmpty) return null;
+    try {
+      DateTime? birthDate;
+      if (dobStr.contains('-')) {
+        final parts = dobStr.split('-');
+        if (parts.length == 3) {
+          if (parts[0].length == 4) {
+            birthDate = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+          } else {
+            birthDate = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+          }
+        }
+      }
+      if (birthDate != null) {
+        final today = DateTime.now();
+        int age = today.year - birthDate.year;
+        if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {
+          age--;
+        }
+        return age >= 0 ? age : null;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  String _getInitials(String? fullName) {
+    if (fullName == null || fullName.trim().isEmpty) return 'PT';
+    final parts = fullName.trim().split(RegExp(r'\s+'));
+    if (parts.length == 1) {
+      return parts[0].substring(0, math.min(2, parts[0].length)).toUpperCase();
+    }
+    return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+  }
+
+  bool _validateForm() {
+    bool isValid = true;
+    setState(() {
+      _fullNameError = null;
+      _usernameError = null;
+      _nricError = null;
+      _phoneError = null;
+      _dobError = null;
+      _emailError = null;
+      _branchError = null;
+
+      if (_fullNameController.text.trim().isEmpty) {
+        _fullNameError = 'Full name is required';
+        isValid = false;
+      }
+
+      if (_nricController.text.trim().isEmpty) {
+        _nricError = 'Document ID (NRIC / Passport) is required';
+        isValid = false;
+      }
+
+      if (_phoneController.text.trim().isEmpty) {
+        _phoneError = 'Contact number is required';
+        isValid = false;
+      }
+
+      if (_dobController.text.trim().isEmpty) {
+        _dobError = 'Date of birth is required';
+        isValid = false;
+      }
+
+      if (_selectedBranch == null) {
+        _branchError = 'Please select a branch';
+        isValid = false;
+      }
+
+      if (widget.type != 'update') {
+        if (_usernameController.text.trim().isEmpty) {
+          _usernameError = 'Username is required';
+          isValid = false;
+        } else if (_usernameController.text.contains(' ')) {
+          _usernameError = 'Username cannot contain spaces';
+          isValid = false;
+        }
+
+        if (_emailController.text.trim().isEmpty) {
+          _emailError = 'Email address is required';
+          isValid = false;
+        } else {
+          final emailRegex = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+          if (!emailRegex.hasMatch(_emailController.text.trim())) {
+            _emailError = 'Enter a valid email address';
+            isValid = false;
+          }
+        }
+      }
+    });
+
+    return isValid;
+  }
+
+  void _submit() {
+    if (!_validateForm()) return;
+
+    setState(() => _isSaving = true);
+    showLoading();
+
+    final rawPhone = _phoneController.text.trim();
+    final docId = _nricController.text.trim().isNotEmpty ? _nricController.text.trim() : null;
+
+    if (widget.type == 'update') {
+      UserController.update(
+        context,
+        UpdateUserRequest(
+          userId: widget.user?.userId,
+          userName: widget.user?.userName ?? _usernameController.text.trim(),
+          userFullname: _fullNameController.text.trim(),
+          userNric: docId,
+          userDob: convertStringToDate(_dobController.text.trim()),
+          userPhone: rawPhone,
+          branchId: _selectedBranch?.key,
+          userStatus: _userStatus.value ? 1 : 0,
+        ),
+      ).then((value) {
+        if (responseCode(value.code)) {
+          UserController.getAll(context, 1, pageSize, userFullName: '', userName: '', userPhone: '').then((value) {
+            dismissLoading();
+            if (mounted) {
+              setState(() => _isSaving = false);
+              context.read<UserController>().userAllResponse = value.data?.data;
+              context.pop(true);
+              showDialogSuccess(context, 'Successfully updated customer information');
+            }
+          }).catchError((e) {
+            dismissLoading();
+            if (mounted) setState(() => _isSaving = false);
+          });
+        } else {
+          dismissLoading();
+          if (mounted) {
+            setState(() => _isSaving = false);
+            showDialogError(context, value.message ?? value.data?.message ?? 'ERROR: ${value.code}');
+          }
+        }
+      }).catchError((e) {
+        dismissLoading();
+        if (mounted) {
+          setState(() => _isSaving = false);
+          showDialogError(context, e.toString());
+        }
+      });
+    } else {
+      UserController.create(
+        context,
+        CreateUserRequest(
+          userName: _usernameController.text.trim(),
+          userFullname: _fullNameController.text.trim(),
+          userNric: docId,
+          userPhone: rawPhone,
+          userEmail: _emailController.text.trim().toLowerCase(),
+          userDob: convertStringToDate(_dobController.text.trim()),
+          userPassword: 'aurora123',
+          userRetypePassword: 'aurora123',
+          branchId: _selectedBranch?.key,
+        ),
+      ).then((value) {
+        if (responseCode(value.code)) {
+          UserController.getAll(context, 1, pageSize, userFullName: '', userPhone: '', userName: '').then((value) {
+            dismissLoading();
+            if (mounted) {
+              setState(() => _isSaving = false);
+              context.read<UserController>().userAllResponse = value.data?.data;
+              context.pop(true);
+              showDialogSuccess(context, 'Successfully created customer');
+            }
+          }).catchError((e) {
+            dismissLoading();
+            if (mounted) setState(() => _isSaving = false);
+          });
+        } else {
+          dismissLoading();
+          if (mounted) {
+            setState(() => _isSaving = false);
+            showDialogError(context, value.message ?? value.data?.message ?? 'ERROR: ${value.code}');
+          }
+        }
+      }).catchError((e) {
+        dismissLoading();
+        if (mounted) {
+          setState(() => _isSaving = false);
+          showDialogError(context, e.toString());
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _usernameController.dispose();
+    _nricController.dispose();
+    _dobController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _rebuildDropdown.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return editUser();
-  }
+    final maxH = MediaQuery.of(context).size.height - (isMobile ? 32 : 64);
+    final maxW = math.min(640.0, MediaQuery.of(context).size.width - 24);
 
-  Widget _sectionLabel(String label, IconData icon) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(width: 3, height: 13, decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2))),
-        const SizedBox(width: 8),
-        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
-        const SizedBox(width: 5),
-        Text(label.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF6B7280), letterSpacing: 1.0)),
-      ],
-    );
-  }
-
-  Row editUser() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
-            maxHeight: MediaQuery.of(context).size.height * 0.9,
-          ),
-          child: StreamBuilder<DateTime>(
-            stream: rebuild.stream,
-            builder: (context, snapshot) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CardContainer(
-                      IntrinsicWidth(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // ── Header ──────────────────────────────────────
-                            Container(
-                              padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFF9FAFB),
-                                border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(8)),
-                                    child: const Icon(Icons.person_rounded, size: 16, color: Color(0xFF6366F1)),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        widget.type == 'create' ? 'New Customer' : 'Edit Customer',
-                                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                                      ),
-                                      Text(
-                                        widget.type == 'create' ? 'Register a new customer account' : 'Update customer profile and settings',
-                                        style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  CloseButton(onPressed: () => context.pop()),
-                                ],
-                              ),
-                            ),
-                            // ── Body ────────────────────────────────────────
-                            Padding(
-                              padding: EdgeInsets.all(screenPadding),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Wrap(
-                                    spacing: screenPadding,
-                                    runSpacing: screenPaddingVertical(),
-                                    crossAxisAlignment: WrapCrossAlignment.start,
-                                    children: [
-                                      // Left: Personal Info
-                                      SizedBox(
-                                        width: isMobile ? (MediaQuery.of(context).size.width * 0.85) : screenWidth1728(26),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            _sectionLabel('Personal Information', Icons.badge_outlined),
-                                            const SizedBox(height: 12),
-                                            if (widget.type == 'update')
-                                              labelValue('Username', usernameAttribute.controller.text)
-                                            else
-                                              InputField(field: usernameAttribute),
-                                            const SizedBox(height: 12),
-                                            InputField(field: fullNameAttribute),
-                                            const SizedBox(height: 12),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                var results = await showCalendarDatePicker2Dialog(
-                                                  context: context,
-                                                  config: CalendarDatePicker2WithActionButtonsConfig(
-                                                    firstDate: DateTime(DateTime.now().year - 100),
-                                                    lastDate: DateTime.now(),
-                                                    calendarViewMode: CalendarDatePicker2Mode.year,
-                                                  ),
-                                                  dialogSize: Size(
-                                                    isMobile ? (MediaQuery.of(context).size.width * 0.88) : screenWidth1728(60),
-                                                    screenHeight829(60),
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(15),
-                                                );
-                                                if (results != null) {
-                                                  if (dobAttribute.errorMessage != null) {
-                                                    dobAttribute.errorMessage = null;
-                                                    rebuild.add(DateTime.now());
-                                                  }
-                                                  dobAttribute.controller.text =
-                                                      dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
-                                                }
-                                              },
-                                              child: ReadOnly(InputField(field: dobAttribute), isEditable: false),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            InputField(
-                                              field: InputFieldAttribute(
-                                                labelText: 'Document ID',
-                                                helpText: 'If patient is a Malaysian, please enter their NRIC. Otherwise, provide their passport number.',
-                                                controller: nricController,
-                                                isEditable: true,
-                                                maxCharacter: 12,
-                                                isUpperCase: true,
-                                                isAlphaNumericOnly: true,
-                                                onChanged: (value) {
-                                                  if (widget.user?.userDob == null) {
-                                                    try {
-                                                      if (value.length == 12 && int.tryParse(value) != null) {
-                                                        try {
-                                                          final dob = extractDobFromNric(value);
-                                                          if (dob != null) {
-                                                            dobAttribute.controller.text = dob;
-                                                            dobAttribute.errorMessage = null;
-                                                            rebuild.add(DateTime.now());
-                                                          }
-                                                        } catch (e) { debugPrint(e.toString()); }
-                                                      }
-                                                    } catch (e) { debugPrint(e.toString()); }
-                                                  }
-                                                },
-                                              ),
-                                            ),
-                                            if (widget.type == 'update') ...[
-                                              const SizedBox(height: 20),
-                                              const Divider(color: Color(0xFFF3F4F6), thickness: 1),
-                                              const SizedBox(height: 12),
-                                              _sectionLabel('Record Info', Icons.history_rounded),
-                                              const SizedBox(height: 10),
-                                              labelValue('Created At', dateConverter(widget.user?.createdDate) ?? '—'),
-                                              if (widget.user?.modifiedDate != null) ...[
-                                                const SizedBox(height: 8),
-                                                labelValue('Last Updated At', dateConverter(widget.user?.modifiedDate) ?? '—'),
-                                              ],
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                      // Right: Contact & Branch
-                                      SizedBox(
-                                        width: isMobile ? (MediaQuery.of(context).size.width * 0.85) : screenWidth1728(30),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            _sectionLabel('Contact & Branch', Icons.contacts_outlined),
-                                            const SizedBox(height: 12),
-                                            InputField(field: phoneAttribute),
-                                            const SizedBox(height: 12),
-                                            if (widget.type == 'update')
-                                              labelValue('Email', emailAttribute.controller.text)
-                                            else
-                                              InputField(
-                                                field: InputFieldAttribute(
-                                                  controller: emailAttribute.controller,
-                                                  labelText: emailAttribute.labelText,
-                                                  isEmail: true,
-                                                  errorMessage: emailAttribute.errorMessage,
-                                                ),
-                                              ),
-                                            const SizedBox(height: 12),
-                                            StreamBuilder<DateTime>(
-                                              stream: rebuildDropdown.stream,
-                                              builder: (context, asyncSnapshot) {
-                                                return AppDropdown(
-                                                  attributeList: DropdownAttributeList(
-                                                    branches,
-                                                    onChanged: (selected) {
-                                                      setState(() {
-                                                        _selectedBranch = selected;
-                                                        branchIdAttribute.errorMessage = null;
-                                                        branchIdAttribute.controller.text = selected!.name;
-                                                      });
-                                                    },
-                                                    value: _selectedBranch?.name,
-                                                    hintText: 'Branch',
-                                                    width: isMobile ? (MediaQuery.of(context).size.width * 0.85) : screenWidth1728(30),
-                                                    errorMessage: branchIdAttribute.errorMessage,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                            if (widget.type == 'update') ...[
-                                              const SizedBox(height: 20),
-                                              const Divider(color: Color(0xFFF3F4F6), thickness: 1),
-                                              const SizedBox(height: 12),
-                                              _sectionLabel('Account Metadata', Icons.info_outline_rounded),
-                                              const SizedBox(height: 10),
-                                              labelValue('Created by', widget.user?.createdByAdmin == 1 ? 'Admin' : 'Patient'),
-                                              const SizedBox(height: 8),
-                                              labelValue(
-                                                'T&C Status',
-                                                widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0 ? 'Accepted' : 'Not Accepted',
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20),
-                                  const Divider(color: Color(0xFFF3F4F6), thickness: 1),
-                                  const SizedBox(height: 12),
-                                  if (widget.type == 'update')
-                                    ValueListenableBuilder<bool>(
-                                      valueListenable: _userStatus,
-                                      builder: (context, status, _) {
-                                        return Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                          decoration: BoxDecoration(
-                                            color: status ? const Color(0xFFF0FDF4) : const Color(0xFFFFF7F7),
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(color: status ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA)),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                status ? Icons.check_circle_outline_rounded : Icons.block_rounded,
-                                                size: 18,
-                                                color: status ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              const Flexible(
-                                                child: Text('Account Status', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151))),
-                                              ),
-                                              const Spacer(),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                                decoration: BoxDecoration(
-                                                  color: status ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                                child: Text(
-                                                  status ? 'Active' : 'Inactive',
-                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: status ? const Color(0xFF15803D) : const Color(0xFFB91C1C)),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Switch(value: status, onChanged: (val) => _userStatus.value = val, activeThumbColor: const Color(0xFF15803D)),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Button(() {
-                                        if (validate()) {
-                                          showLoading();
-                                          if (widget.type == 'update') {
-                                            UserController.update(
-                                              context,
-                                              UpdateUserRequest(
-                                                userId: widget.user?.userId,
-                                                userName: widget.user?.userName ?? usernameAttribute.controller.text.trim(),
-                                                userFullname: fullNameAttribute.controller.text.trim(),
-                                                userNric: notNullOrEmptyString(nricController.text) ? nricController.text : null,
-                                                userDob: convertStringToDate(dobAttribute.controller.text),
-                                                userPhone: phoneAttribute.controller.text.trim(),
-                                                branchId: _selectedBranch?.key,
-                                                userStatus: _userStatus.value ? 1 : 0,
-                                              ),
-                                            ).then((value) {
-                                              if (responseCode(value.code)) {
-                                                UserController.getAll(context, 1, pageSize, userFullName: '', userName: '', userPhone: '').then((value) {
-                                                  dismissLoading();
-                                                  if (responseCode(value.code)) {
-                                                    context.read<UserController>().userAllResponse = value.data?.data;
-                                                    context.pop();
-                                                    showDialogSuccess(context, 'Successfully updated customer information');
-                                                  } else {
-                                                    context.pop();
-                                                    showDialogSuccess(context, 'Successfully updated customer information');
-                                                  }
-                                                }).catchError((e) {
-                                                  dismissLoading();
-                                                });
-                                              } else {
-                                                dismissLoading();
-                                                showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                                              }
-                                            }).catchError((e) {
-                                              dismissLoading();
-                                              showDialogError(context, e.toString());
-                                            });
-                                          } else {
-                                            UserController.create(
-                                              context,
-                                              CreateUserRequest(
-                                                userName: usernameAttribute.controller.text,
-                                                userFullname: fullNameAttribute.controller.text.trim(),
-                                                userPhone: phoneAttribute.controller.text.trim(),
-                                                userEmail: emailAttribute.controller.text.trim(),
-                                                userDob: convertStringToDate(dobAttribute.controller.text),
-                                                userPassword: 'aurora123',
-                                                userRetypePassword: 'aurora123',
-                                                branchId: _selectedBranch?.key,
-                                              ),
-                                            ).then((value) {
-                                              if (responseCode(value.code)) {
-                                                UserController.getAll(context, 1, pageSize, userFullName: '', userPhone: '', userName: '').then((value) {
-                                                  dismissLoading();
-                                                  if (responseCode(value.code)) {
-                                                    context.read<UserController>().userAllResponse = value.data?.data;
-                                                    context.pop();
-                                                    showDialogSuccess(context, 'Successfully created customer');
-                                                  } else {
-                                                    context.pop();
-                                                    showDialogSuccess(context, 'Successfully created customer information');
-                                                  }
-                                                }).catchError((e) {
-                                                  dismissLoading();
-                                                });
-                                              } else {
-                                                dismissLoading();
-                                                showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                                              }
-                                            }).catchError((e) {
-                                              dismissLoading();
-                                              showDialogError(context, e.toString());
-                                            });
-                                          }
-                                        }
-                                      }, actionText: 'button'.tr(gender: widget.type)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(maxWidth: maxW, maxHeight: maxH),
+        margin: EdgeInsets.all(isMobile ? 12 : 24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Material(
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(),
+                if (widget.type == 'update') _buildQuickStats(),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildFormGrid(),
+                        if (widget.type == 'update') ...[
+                          const SizedBox(height: 18),
+                          _buildAccountStatusCard(),
+                          const SizedBox(height: 14),
+                          _buildMetadataCard(),
+                        ],
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              );
-            },
+                _buildFooter(),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    final isCreate = widget.type == 'create';
+    final displayName = isCreate ? 'Register New Patient' : (_fullNameController.text.isNotEmpty ? _fullNameController.text : widget.user?.userFullname ?? 'Patient Details');
+    final initials = isCreate ? 'PT' : _getInitials(displayName);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 18, 16, 16),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFAFAFA),
+        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF0284C7), Color(0xFF0EA5E9)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF0284C7).withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              initials,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        displayName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF0F172A),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (!isCreate) ...[
+                      const SizedBox(width: 8),
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _userStatus,
+                        builder: (context, active, _) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: active ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: active ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
+                              ),
+                            ),
+                            child: Text(
+                              active ? 'Active' : 'Inactive',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: active ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 6),
+                _buildDemographicBadges(),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            splashRadius: 18,
+            onPressed: () => context.pop(),
+            tooltip: 'Close',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDemographicBadges() {
+    final List<Widget> badges = [];
+
+    final docText = _nricController.text.trim();
+    if (docText.isNotEmpty) {
+      badges.add(_badge(
+        _isMalaysianIc ? 'MyKad' : 'Passport / ID',
+        icon: _isMalaysianIc ? Icons.badge_outlined : Icons.flight_takeoff_outlined,
+        color: const Color(0xFF0369A1),
+        bgColor: const Color(0xFFF0F9FF),
+      ));
+    }
+
+    if (_derivedGender != null) {
+      final isMale = _derivedGender == 'Male';
+      badges.add(_badge(
+        _derivedGender!,
+        icon: isMale ? Icons.male_rounded : Icons.female_rounded,
+        color: isMale ? const Color(0xFF2563EB) : const Color(0xFFDB2777),
+        bgColor: isMale ? const Color(0xFFEFF6FF) : const Color(0xFFFDF2F8),
+      ));
+    }
+
+    if (_derivedAge != null && _derivedAge! >= 0) {
+      badges.add(_badge(
+        '$_derivedAge yrs',
+        icon: Icons.cake_outlined,
+        color: const Color(0xFF059669),
+        bgColor: const Color(0xFFECFDF5),
+      ));
+    }
+
+    final dob = _dobController.text.trim();
+    if (dob.isNotEmpty) {
+      badges.add(_badge(
+        dob,
+        icon: Icons.calendar_today_outlined,
+        color: const Color(0xFF475569),
+        bgColor: const Color(0xFFF1F5F9),
+      ));
+    }
+
+    if (badges.isEmpty) {
+      return Text(
+        widget.type == 'create' ? 'Fill details below to register patient' : 'No IC / demographic details',
+        style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+      );
+    }
+
+    return Wrap(
+      spacing: 6,
+      runSpacing: 4,
+      children: badges,
+    );
+  }
+
+  Widget _badge(String text, {required IconData icon, required Color color, required Color bgColor}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStats() {
+    final branchName = _selectedBranch?.name ?? '—';
+    final points = widget.user?.totalPoint ?? 0;
+    final visits = _appointmentCount != null ? '$_appointmentCount Visits' : '...';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF8FAFC),
+        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _statCard('Home Branch', branchName, Icons.storefront_outlined, const Color(0xFF475569)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _statCard('Appointments', visits, Icons.event_note_outlined, const Color(0xFF0284C7)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _statCard('Points Balance', '$points pts', Icons.stars_rounded, const Color(0xFFD97706)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statCard(String label, String value, IconData icon, Color accentColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 12, color: const Color(0xFF94A3B8)),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: accentColor),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormGrid() {
+    final leftCol = [
+      _buildTextField(
+        label: 'Full Name *',
+        controller: _fullNameController,
+        errorText: _fullNameError,
+        hintText: 'e.g. Siti Aminah Binti Yusof',
+        icon: Icons.person_outline_rounded,
+        onChanged: (val) {
+          if (_fullNameError != null) setState(() => _fullNameError = null);
+        },
+      ),
+      const SizedBox(height: 12),
+      _buildTextField(
+        label: 'Document ID (NRIC / Passport) *',
+        controller: _nricController,
+        errorText: _nricError,
+        hintText: '12-digit NRIC or Passport No',
+        icon: Icons.badge_outlined,
+        onChanged: (val) {
+          if (_nricError != null) setState(() => _nricError = null);
+          _inspectDocumentId(val);
+          setState(() {});
+        },
+      ),
+      const SizedBox(height: 12),
+      _buildDatePickerField(),
+      if (widget.type != 'update') ...[
+        const SizedBox(height: 12),
+        _buildTextField(
+          label: 'Username *',
+          controller: _usernameController,
+          errorText: _usernameError,
+          hintText: 'e.g. sitiaminah',
+          icon: Icons.alternate_email_rounded,
+          onChanged: (val) {
+            if (_usernameError != null) setState(() => _usernameError = null);
+          },
+        ),
+      ],
+    ];
+
+    final rightCol = [
+      _buildTextField(
+        label: 'Contact Number *',
+        controller: _phoneController,
+        errorText: _phoneError,
+        hintText: 'e.g. 0123456789 or +60123456789',
+        icon: Icons.phone_outlined,
+        onChanged: (val) {
+          if (_phoneError != null) setState(() => _phoneError = null);
+        },
+      ),
+      const SizedBox(height: 12),
+      if (widget.type == 'update')
+        _buildReadOnlyField(
+          label: 'Email Address',
+          value: _emailController.text.isNotEmpty ? _emailController.text : '—',
+          icon: Icons.mail_outline_rounded,
+        )
+      else
+        _buildTextField(
+          label: 'Email Address *',
+          controller: _emailController,
+          errorText: _emailError,
+          hintText: 'e.g. patient@gmail.com',
+          icon: Icons.mail_outline_rounded,
+          onChanged: (val) {
+            if (_emailError != null) setState(() => _emailError = null);
+          },
+        ),
+      const SizedBox(height: 12),
+      _buildBranchDropdown(),
+    ];
+
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [...leftCol, const SizedBox(height: 12), ...rightCol],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: leftCol)),
+        const SizedBox(width: 16),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rightCol)),
       ],
     );
   }
 
-  Widget labelValue(String label, String value, {bool alignStart = true}) {
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    String? errorText,
+    String? hintText,
+    required IconData icon,
+    void Function(String)? onChanged,
+    bool readOnly = false,
+  }) {
     return Column(
-      crossAxisAlignment: alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           label,
           style: const TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF6B7280),
-            letterSpacing: 0.3,
+            color: Color(0xFF475569),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            // color: const Color(0xFFF3F4F6),
+            color: readOnly ? const Color(0xFFF8FAFC) : Colors.white,
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+              width: errorText != null ? 1.5 : 1,
+            ),
           ),
-          child: AppSelectableText(
-            value.isNotEmpty ? value : '—',
-            style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+          child: TextField(
+            controller: controller,
+            readOnly: readOnly,
+            onChanged: onChanged,
+            style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              border: InputBorder.none,
+              hintText: hintText,
+              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              prefixIcon: Icon(icon, size: 16, color: const Color(0xFF64748B)),
+              prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            ),
+          ),
+        ),
+        if (errorText != null) ...[
+          const SizedBox(height: 3),
+          Text(
+            errorText,
+            style: const TextStyle(fontSize: 11, color: Color(0xFFEF4444), fontWeight: FontWeight.w500),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDatePickerField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'Date of Birth *',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF475569),
+          ),
+        ),
+        const SizedBox(height: 5),
+        InkWell(
+          onTap: () async {
+            var results = await showCalendarDatePicker2Dialog(
+              context: context,
+              config: CalendarDatePicker2WithActionButtonsConfig(
+                firstDate: DateTime(DateTime.now().year - 100),
+                lastDate: DateTime.now(),
+                calendarViewMode: CalendarDatePicker2Mode.year,
+              ),
+              dialogSize: Size(
+                isMobile ? (MediaQuery.of(context).size.width * 0.88) : screenWidth1728(60),
+                screenHeight829(60),
+              ),
+              borderRadius: BorderRadius.circular(15),
+            );
+            if (results != null && results.isNotEmpty && results.first != null) {
+              final formatted = dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
+              setState(() {
+                _dobController.text = formatted;
+                _dobError = null;
+                _derivedAge = _calculateAge(formatted);
+              });
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _dobError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                width: _dobError != null ? 1.5 : 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_month_outlined, size: 16, color: Color(0xFF64748B)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _dobController.text.isNotEmpty ? _dobController.text : 'Select Date of Birth',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: _dobController.text.isNotEmpty ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF94A3B8)),
+              ],
+            ),
+          ),
+        ),
+        if (_dobError != null) ...[
+          const SizedBox(height: 3),
+          Text(
+            _dobError!,
+            style: const TextStyle(fontSize: 11, color: Color(0xFFEF4444), fontWeight: FontWeight.w500),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildReadOnlyField({required String label, required String value, required IconData icon}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF475569),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: const Color(0xFF94A3B8)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: AppSelectableText(
+                  value,
+                  style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  bool validate() {
-    bool isValid = true;
-
-    void checkRequired(InputFieldAttribute attribute) {
-      if (attribute.controller.text.trim().isEmpty) {
-        attribute.errorMessage = ErrorMessage.required(field: attribute.labelText);
-        isValid = false;
-      }
-    }
-
-    final requiredFields = [
-      fullNameAttribute,
-      if (widget.type != 'update') usernameAttribute,
-      if (widget.type != 'update') emailAttribute,
-      phoneAttribute,
-      dobAttribute,
-      branchIdAttribute,
-    ];
-
-    for (var field in requiredFields) {
-      checkRequired(field);
-    }
-
-    if (widget.type != 'update' && usernameAttribute.controller.text.contains(' ')) {
-      usernameAttribute.errorMessage = 'Username must not contain spaces.';
-      isValid = false;
-    }
-
-    final emailRegex = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-
-    if (widget.type != 'update' &&
-        emailAttribute.controller.text.isNotEmpty &&
-        !emailRegex.hasMatch(emailAttribute.controller.text)) {
-      emailAttribute.errorMessage = 'Please enter a valid email address.';
-      isValid = false;
-    }
-
-    rebuild.add(DateTime.now());
-    return isValid;
+  Widget _buildBranchDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'Registered Branch *',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF475569),
+          ),
+        ),
+        const SizedBox(height: 5),
+        StreamBuilder<DateTime>(
+          stream: _rebuildDropdown.stream,
+          builder: (context, _) {
+            return AppDropdown(
+              attributeList: DropdownAttributeList(
+                branches,
+                onChanged: (selected) {
+                  setState(() {
+                    _selectedBranch = selected;
+                    _branchError = null;
+                  });
+                },
+                value: _selectedBranch?.name,
+                hintText: 'Select Branch',
+                width: double.infinity,
+                errorMessage: _branchError,
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 
-  double bytesToMB(int bytes) {
-    double megabytes = bytes / 1048576.0;
-    // double sizeInGB = sizeInBytes / 1073741824.0;
-    return megabytes;
+  Widget _buildAccountStatusCard() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _userStatus,
+      builder: (context, active, _) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: active ? const Color(0xFFF0FDF4) : const Color(0xFFFFF1F2),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: active ? const Color(0xFFBBF7D0) : const Color(0xFFFECDD3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                active ? Icons.check_circle_outline_rounded : Icons.block_rounded,
+                size: 18,
+                color: active ? const Color(0xFF15803D) : const Color(0xFFBE123C),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Account Status: ${active ? "Active" : "Deactivated"}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: active ? const Color(0xFF166534) : const Color(0xFF9F1239),
+                      ),
+                    ),
+                    Text(
+                      active ? 'Patient is eligible to book appointments & earn points' : 'Account deactivated — booking & portal login disabled',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: active ? const Color(0xFF15803D) : const Color(0xFFBE123C),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: active,
+                onChanged: (val) => _userStatus.value = val,
+                activeThumbColor: const Color(0xFF16A34A),
+                activeTrackColor: const Color(0xFFBBF7D0),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMetadataCard() {
+    final createdDate = dateConverter(widget.user?.createdDate) ?? '—';
+    final modifiedDate = widget.user?.modifiedDate != null ? dateConverter(widget.user?.modifiedDate) ?? '—' : null;
+    final createdBy = widget.user?.createdByAdmin == 1 ? 'Admin' : 'Self Registered';
+    final tnc = widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0 ? 'Accepted' : 'Pending';
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _miniMeta('Joined', createdDate),
+          if (modifiedDate != null) _miniMeta('Last Active', modifiedDate),
+          _miniMeta('Origin', createdBy),
+          _miniMeta('Terms', tnc),
+        ],
+      ),
+    );
+  }
+
+  Widget _miniMeta(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w600),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter() {
+    final isCreate = widget.type == 'create';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFAFAFA),
+        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          OutlinedButton(
+            onPressed: _isSaving ? null : () => context.pop(),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF475569),
+              side: const BorderSide(color: Color(0xFFCBD5E1)),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Cancel', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+          ),
+          const SizedBox(width: 10),
+          ElevatedButton(
+            onPressed: _isSaving ? null : _submit,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0284C7),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: _isSaving
+                ? const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : Text(
+                    isCreate ? 'Register Patient' : 'Save Changes',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+          ),
+        ],
+      ),
+    );
   }
 }

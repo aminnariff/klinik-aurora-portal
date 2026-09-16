@@ -8,6 +8,7 @@ class CreateUserRequest {
   String? branchId;
   String? userPhone;
   String? userReferral;
+  String? userNric;
 
   CreateUserRequest(
       {this.userEmail,
@@ -18,7 +19,8 @@ class CreateUserRequest {
       this.userDob,
       this.branchId,
       this.userPhone,
-      this.userReferral});
+      this.userReferral,
+      this.userNric});
 
   CreateUserRequest.fromJson(Map<String, dynamic> json) {
     userEmail = json['userEmail'];
@@ -30,6 +32,7 @@ class CreateUserRequest {
     branchId = json['branchId'];
     userPhone = json['userPhone'];
     userReferral = json['userReferral'];
+    userNric = json['userNric'];
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +46,7 @@ class CreateUserRequest {
     data['branchId'] = branchId;
     data['userPhone'] = userPhone;
     data['userReferral'] = userReferral;
+    data['userNric'] = userNric;
     return data;
   }
 }
