@@ -800,7 +800,8 @@ class _UserDetailState extends State<UserDetail> {
         const SizedBox(height: 5),
         Container(
           height: 42,
-          alignment: Alignment.center,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             color: readOnly ? const Color(0xFFF8FAFC) : Colors.white,
             borderRadius: BorderRadius.circular(8),
@@ -813,15 +814,13 @@ class _UserDetailState extends State<UserDetail> {
             controller: controller,
             readOnly: readOnly,
             onChanged: onChanged,
-            textAlignVertical: TextAlignVertical.center,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: readOnly ? const Color(0xFF475569) : const Color(0xFF1E293B),
             ),
             decoration: InputDecoration(
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+              isCollapsed: true,
               border: InputBorder.none,
               hintText: hintText,
               hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),

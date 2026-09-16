@@ -531,33 +531,37 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       widget.appointment?.appointmentNote,
     );
 
-    return SingleChildScrollView(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                constraints: BoxConstraints(
-                  maxWidth: math.min(940, MediaQuery.of(context).size.width - 16),
-                  maxHeight: MediaQuery.of(context).size.height - (isMobile ? 32 : 48),
-                ),
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // ── Header bar ──────────────────────────────────────────
+    final maxH = MediaQuery.of(context).size.height - (isMobile ? 32 : 64);
+    final maxW = math.min(940.0, MediaQuery.of(context).size.width - (isMobile ? 16 : 32));
+
+    return Center(
+      child: Container(
+        width: maxW,
+        constraints: BoxConstraints(
+          maxWidth: maxW,
+          maxHeight: maxH,
+        ),
+        margin: EdgeInsets.all(isMobile ? 8 : 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 32,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Material(
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ── Header bar ──────────────────────────────────────────
                       Container(
                         padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
                         decoration: const BoxDecoration(
@@ -772,41 +776,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                   Row(
-                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                     children: [
-                                                       _extraSectionLabel('Patient', Icons.person_rounded),
-                                                       _copyInlineAction(
-                                                         label: 'Copy Details',
-                                                         onTap: () {
-                                                           final buffer = StringBuffer(patientNameController.controller.text);
-                                                           if (notNullOrEmptyString(widget.appointment?.user?.userNric)) buffer.write('\n${widget.appointment?.user?.userNric}');
-                                                           if (notNullOrEmptyString(patientContactNoController.controller.text)) buffer.write('\n${patientContactNoController.controller.text}');
-                                                           if (notNullOrEmptyString(patientEmailController.controller.text)) buffer.write('\n${patientEmailController.controller.text}');
-                                                           _copyToClipboard(buffer.toString(), 'Patient details');
-                                                         },
-                                                       ),
-                                                     ],
-                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  labelValue(
-                                                    'Patient Details',
-                                                    patientNameController.controller.text,
-                                                    alignStart: true,
-                                                  ),
-                                                  if (notNullOrEmptyString(widget.appointment?.user?.userNric))
-                                                    AppSelectableText(
-                                                      widget.appointment?.user?.userNric ?? '',
-                                                      style: AppTypography.bodyMedium(context),
-                                                    ),
-                                                  AppSelectableText(
-                                                    patientContactNoController.controller.text,
-                                                    style: AppTypography.bodyMedium(context),
-                                                  ),
-                                                  AppSelectableText(
-                                                    patientEmailController.controller.text,
-                                                    style: AppTypography.bodyMedium(context),
-                                                  ),
+                                                   _buildPatientProfileCard(),
                                                   AppPadding.vertical(denominator: 1),
                                                   _isLocked
                                                       ? appointmentNoteController.controller.text != ''
@@ -1955,37 +1925,43 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   );
                                 },
                               ),
-                              Center(
-                                child: Wrap(
-                                  alignment: WrapAlignment.center,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  spacing: 12,
-                                  runSpacing: 10,
-                                  children: [
-                                    if (!_isLocked || _canSubmitWhenLockedCompleted) button(),
-                                    OutlinedButton.icon(
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                        side: const BorderSide(color: Color(0xFFD1D5DB)),
-                                      ),
-                                      icon: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF374151)),
-                                      label: const Text('Close', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
-                                      onPressed: () => Navigator.of(context).pop(),
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ],
                           ),
                         ),
                       ),
+                      _buildDialogFooter(),
                     ],
                   ),
                 ),
               ),
-            ],
+            ),
+          );
+  }
+
+  Widget _buildDialogFooter() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: 14),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFAFAFA),
+        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          OutlinedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF475569),
+              side: const BorderSide(color: Color(0xFFCBD5E1)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Close', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           ),
+          if (!_isLocked || _canSubmitWhenLockedCompleted) ...[
+            const SizedBox(width: 12),
+            button(),
+          ],
         ],
       ),
     );
@@ -3426,221 +3402,217 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   Widget button() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Button(() {
-          if (validate()) {
-            showLoading();
-            if (widget.type == 'create') {
-              AppointmentController.create(
+    return Button(
+      () => _submitAppointment(),
+      actionText: widget.type == 'create' ? 'Create Appointment' : 'Save Changes',
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      borderRadius: 8,
+      elevation: 0,
+      color: secondaryColor,
+    );
+  }
+
+  void _submitAppointment() {
+    if (validate()) {
+      showLoading();
+      if (widget.type == 'create') {
+        AppointmentController.create(
+          context,
+          CreateAppointmentRequest(
+            userId: widget.appointment?.user?.userId,
+            serviceBranchId: _service?.key,
+            appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
+            appointmentNote: _buildNote(),
+            appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
+            customerDueDate: (() {
+              try {
+                return DateFormat(
+                  'yyyy-MM-dd',
+                ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
+              } catch (_) {
+                return dueDateController.controller.text;
+              }
+            })(),
+            appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
+            adminRemark: _adminRemarkController.text.trim().isEmpty
+                ? null
+                : _adminRemarkController.text.trim(),
+            bookingFeeCollected: _bookingFeeCollected,
+            receiptNo: _receiptNumberController.text.trim().isEmpty
+                ? null
+                : _receiptNumberController.text.trim(),
+          ),
+        ).then((value) {
+          dismissLoading();
+          if (responseCode(value.code)) {
+            if (widget.refreshData != null) {
+              widget.refreshData!();
+            }
+            context.pop();
+            showDialogSuccess(context, 'Successfully created new appointment');
+          } else {
+            final errorMsg = (value.message ?? value.data?.message ?? '').toLowerCase();
+            final isSlotConflict = errorMsg.contains('overlap') ||
+                errorMsg.contains('already booked') ||
+                errorMsg.contains('fully booked') ||
+                errorMsg.contains('no longer available') ||
+                errorMsg.contains('choose another time') ||
+                errorMsg.contains('select another time');
+
+            if (isSlotConflict) {
+              dateTimeController.clear();
+              _fetchAvailableSlots(silent: true);
+              showDialogError(
                 context,
-                CreateAppointmentRequest(
-                  userId: widget.appointment?.user?.userId,
-                  serviceBranchId: _service?.key,
-                  appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
-                  appointmentNote: _buildNote(),
-                  appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
-                  customerDueDate: (() {
-                    try {
-                      return DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
-                    } catch (_) {
-                      return dueDateController.controller.text;
-                    }
-                  })(),
-                  appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
-                  adminRemark: _adminRemarkController.text.trim().isEmpty
-                      ? null
-                      : _adminRemarkController.text.trim(),
-                  bookingFeeCollected: _bookingFeeCollected,
-                  receiptNo: _receiptNumberController.text.trim().isEmpty
-                      ? null
-                      : _receiptNumberController.text.trim(),
-                ),
-              ).then((value) {
-                dismissLoading();
-                if (responseCode(value.code)) {
-                  if (widget.refreshData != null) {
-                    widget.refreshData!();
-                  } else {
-                    context.pop();
-                    showDialogSuccess(context, 'Appointment successfully created for the user');
-                  }
-                } else {
-                  final errorMsg = (value.message ?? value.data?.message ?? '').toLowerCase();
-                  final isSlotConflict = errorMsg.contains('overlap') ||
-                      errorMsg.contains('already booked') ||
-                      errorMsg.contains('fully booked') ||
-                      errorMsg.contains('no longer available') ||
-                      errorMsg.contains('choose another time') ||
-                      errorMsg.contains('select another time');
-
-                  if (isSlotConflict) {
-                    dateTimeController.clear();
-                    _fetchAvailableSlots(silent: true);
-                    showDialogError(
-                      context,
-                      'The selected slot is no longer available or already booked. Available slots have been refreshed. Please select another time.',
-                    );
-                  } else {
-                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                  }
-                }
-              }).catchError((e) {
-                dismissLoading();
-                showDialogError(context, e.toString());
-              });
-            } else {
-              // ── Completion check for unpaid booking fee ──
-              final needsCompletionCheck =
-                  _status?.key == '5' &&
-                  widget.appointment?.appointmentStatus != 5 &&
-                  (double.tryParse(widget.appointment?.service?.serviceBookingFee ?? '0') ?? 0) > 0;
-
-              final alreadyPaid = isBookingFeePaid(
-                widget.appointment?.appointmentNote,
-                payments: widget.appointment?.payment,
+                'The selected slot is no longer available or already booked. Available slots have been refreshed. Please select another time.',
               );
-
-              if (needsCompletionCheck && !alreadyPaid && !_bookingFeeCollected) {
-                dismissLoading();
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Unpaid Booking Fee'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'This appointment has an unpaid booking fee. Please confirm collection and enter receipt no. before completing.',
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: _receiptNumberController,
-                          decoration: const InputDecoration(
-                            labelText: 'Receipt No. / Ref No.',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.receipt_long),
-                          ),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_receiptNumberController.text.trim().isEmpty) {
-                            showDialogError(context, 'Please enter a receipt number');
-                            return;
-                          }
-                          _bookingFeeCollected = true;
-                          Navigator.pop(context);
-                          button(); // Re-trigger save
-                        },
-                        child: const Text('Collect & Complete'),
-                      ),
-                    ],
-                  ),
-                );
-                return;
-              }
-
-              // Normalize times for comparison to detect rescheduling
-              final newUtcStr = convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true);
-              final oldUtcStr = widget.appointment?.appointmentDatetime != null
-                  ? (widget.appointment!.appointmentDatetime!.contains('T')
-                        ? convertMalaysiaTimeToUtc(
-                            dateConverter(widget.appointment!.appointmentDatetime, format: 'dd-MM-yyyy HH:mm') ?? '',
-                            plainFormat: true,
-                          )
-                        : widget.appointment!.appointmentDatetime)
-                  : null;
-
-              if (newUtcStr != oldUtcStr && newUtcStr.isNotEmpty) {
-                // Auto-set status to rescheduled only if it's currently in an "Upcoming/Active" state
-                if (_status?.key == '1' || _status?.key == '4') {
-                  _status = DropdownAttribute('3', 'Rescheduled');
-                }
-              }
-
-              AppointmentController.update(
-                context,
-                UpdateAppointmentRequest(
-                  appointmentId: widget.appointment?.appointmentId,
-                  userId: widget.appointment?.user?.userId,
-                  appointmentDateTime: newUtcStr,
-                  serviceBranchId: _service?.key,
-                  appointmentNote: _buildNote(),
-                  appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
-                  customerDueDate: (() {
-                    try {
-                      return DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
-                    } catch (_) {
-                      return dueDateController.controller.text;
-                    }
-                  })(),
-                  appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
-                  adminRemark: _adminRemarkController.text.trim().isEmpty
-                      ? null
-                      : _adminRemarkController.text.trim(),
-                  bookingFeeCollected: _bookingFeeCollected,
-                  receiptNo: _receiptNumberController.text.trim().isEmpty
-                      ? null
-                      : _receiptNumberController.text.trim(),
-                  serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
-                ),
-              ).then((value) {
-                dismissLoading();
-                if (responseCode(value.code)) {
-                  if (widget.refreshData != null) {
-                    widget.refreshData!();
-                  }
-                  context.pop();
-                  if (widget.type == 'update') {
-                    showDialogSuccess(context, 'Successfully updated appointment');
-                  } else {
-                    showDialogSuccess(context, 'Successfully created new appointment');
-                  }
-                } else {
-                  final errorMsg = (value.message ?? value.data?.message ?? '').toLowerCase();
-                  final isSlotConflict = errorMsg.contains('overlap') ||
-                      errorMsg.contains('already booked') ||
-                      errorMsg.contains('fully booked') ||
-                      errorMsg.contains('no longer available') ||
-                      errorMsg.contains('choose another time') ||
-                      errorMsg.contains('select another time');
-
-                  if (isSlotConflict) {
-                    dateTimeController.clear();
-                    _fetchAvailableSlots(silent: true);
-                    showDialogError(
-                      context,
-                      'The selected slot is no longer available or already booked. Available slots have been refreshed. Please select another time.',
-                    );
-                  } else {
-                    showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
-                  }
-                }
-              }).catchError((e) {
-                dismissLoading();
-                showDialogError(context, e.toString());
-              });
+            } else {
+              showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
             }
           }
-        },
-        actionText: 'button'.tr(gender: widget.type),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        borderRadius: 8,
-        elevation: 0,
-        color: secondaryColor,
-      ),
-      ],
-    );
+        }).catchError((e) {
+          dismissLoading();
+          showDialogError(context, e.toString());
+        });
+      } else {
+        // ── Completion check for unpaid booking fee ──
+        final needsCompletionCheck =
+            _status?.key == '5' &&
+            widget.appointment?.appointmentStatus != 5 &&
+            (double.tryParse(widget.appointment?.service?.serviceBookingFee ?? '0') ?? 0) > 0;
+
+        final alreadyPaid = isBookingFeePaid(
+          widget.appointment?.appointmentNote,
+          payments: widget.appointment?.payment,
+        );
+
+        if (needsCompletionCheck && !alreadyPaid && !_bookingFeeCollected) {
+          dismissLoading();
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Unpaid Booking Fee'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'This appointment has an unpaid booking fee. Please confirm collection and enter receipt no. before completing.',
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _receiptNumberController,
+                    decoration: const InputDecoration(
+                      labelText: 'Receipt No. / Ref No.',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.receipt_long),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_receiptNumberController.text.trim().isEmpty) {
+                      showDialogError(context, 'Please enter a receipt number');
+                      return;
+                    }
+                    _bookingFeeCollected = true;
+                    Navigator.pop(context);
+                    _submitAppointment(); // Re-trigger save
+                  },
+                  child: const Text('Collect & Complete'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
+        // Normalize times for comparison to detect rescheduling
+        final newUtcStr = convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true);
+        final oldUtcStr = widget.appointment?.appointmentDatetime != null
+            ? (widget.appointment!.appointmentDatetime!.contains('T')
+                  ? convertMalaysiaTimeToUtc(
+                      dateConverter(widget.appointment!.appointmentDatetime, format: 'dd-MM-yyyy HH:mm') ?? '',
+                      plainFormat: true,
+                    )
+                  : widget.appointment!.appointmentDatetime)
+            : null;
+
+        if (newUtcStr != oldUtcStr && newUtcStr.isNotEmpty) {
+          // Auto-set status to rescheduled only if it's currently in an "Upcoming/Active" state
+          if (_status?.key == '1' || _status?.key == '4') {
+            _status = DropdownAttribute('3', 'Rescheduled');
+          }
+        }
+
+        AppointmentController.update(
+          context,
+          UpdateAppointmentRequest(
+            appointmentId: widget.appointment?.appointmentId,
+            userId: widget.appointment?.user?.userId,
+            appointmentDateTime: newUtcStr,
+            serviceBranchId: _service?.key,
+            appointmentNote: _buildNote(),
+            appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
+            customerDueDate: (() {
+              try {
+                return DateFormat(
+                  'yyyy-MM-dd',
+                ).format(DateFormat('dd-MM-yyyy').parseStrict(dueDateController.controller.text));
+              } catch (_) {
+                return dueDateController.controller.text;
+              }
+            })(),
+            appointmentStatus: _status != null ? int.parse(_status?.key ?? '0') : 0,
+            adminRemark: _adminRemarkController.text.trim().isEmpty
+                ? null
+                : _adminRemarkController.text.trim(),
+            bookingFeeCollected: _bookingFeeCollected,
+            receiptNo: _receiptNumberController.text.trim().isEmpty
+                ? null
+                : _receiptNumberController.text.trim(),
+            serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
+          ),
+        ).then((value) {
+          dismissLoading();
+          if (responseCode(value.code)) {
+            if (widget.refreshData != null) {
+              widget.refreshData!();
+            }
+            context.pop();
+            if (widget.type == 'update') {
+              showDialogSuccess(context, 'Successfully updated appointment');
+            } else {
+              showDialogSuccess(context, 'Successfully created new appointment');
+            }
+          } else {
+            final errorMsg = (value.message ?? value.data?.message ?? '').toLowerCase();
+            final isSlotConflict = errorMsg.contains('overlap') ||
+                errorMsg.contains('already booked') ||
+                errorMsg.contains('fully booked') ||
+                errorMsg.contains('no longer available') ||
+                errorMsg.contains('choose another time') ||
+                errorMsg.contains('select another time');
+
+            if (isSlotConflict) {
+              dateTimeController.clear();
+              _fetchAvailableSlots(silent: true);
+              showDialogError(
+                context,
+                'The selected slot is no longer available or already booked. Available slots have been refreshed. Please select another time.',
+              );
+            } else {
+              showDialogError(context, value.message ?? value.data?.message ?? 'ERROR : ${value.code}');
+            }
+          }
+        }).catchError((e) {
+          dismissLoading();
+          showDialogError(context, e.toString());
+        });
+      }
+    }
   }
 
   void getLatestData() {
