@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
@@ -366,7 +367,13 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                      color: WidgetStateProperty.resolveWith<Color?>((states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return const Color(0xFFF1F5F9);
+                        }
+                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                      }),
+                      onTap: () => _handleMenuSelection('update', items[i]),
                       cells: [
                         DataCell(_serviceNameCell(items[i].serviceName, items[i].serviceDescription)),
                         DataCell(_categoryChip(items[i].serviceCategory)),
@@ -489,7 +496,13 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                      color: WidgetStateProperty.resolveWith<Color?>((states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return const Color(0xFFF1F5F9);
+                        }
+                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                      }),
+                      onTap: () => _openBranchServiceTimingOptions(items[i]),
                       cells: [
                         DataCell(_serviceNameCell(items[i].serviceName, items[i].serviceDescription)),
                         DataCell(_categoryChip(items[i].serviceCategory)),
@@ -1150,6 +1163,200 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     ).then((changed) {
       if (changed == true) filtering();
     });
+  }
+
+  void _openBranchServiceTimingOptions(service_branch_model.Data serviceBranch) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return Center(
+          child: Container(
+            width: math.min(560.0, screenWidth(92)),
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.14),
+                  blurRadius: 28,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Material(
+                color: Colors.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFAFAFA),
+                        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF246E7A), Color(0xFF1B545E)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.schedule_rounded, size: 20, color: Colors.white),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  serviceBranch.serviceName ?? 'Service Timing & Schedule',
+                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  serviceBranch.branchName != null && serviceBranch.branchName!.isNotEmpty
+                                      ? 'Branch: ${serviceBranch.branchName}'
+                                      : 'Configure service timing and calendar for your branch',
+                                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+                            onPressed: () => Navigator.pop(ctx),
+                            hoverColor: const Color(0xFFF1F5F9),
+                            splashRadius: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Options
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          _timingOptionCard(
+                            icon: Icons.timer_outlined,
+                            iconColor: const Color(0xFF0284C7),
+                            iconBg: const Color(0xFFE0F2FE),
+                            title: 'Edit Service Timing & Duration',
+                            badgeText: 'Duration & Rules',
+                            subtitle: 'Adjust appointment duration (e.g. 15m, 30m, 1h) and customize weekday/weekend rules.',
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              _handleAdminMenuSelection('changeDuration', serviceBranch);
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          _timingOptionCard(
+                            icon: Icons.calendar_month_outlined,
+                            iconColor: const Color(0xFF246E7A),
+                            iconBg: const Color(0xFFF0FDFA),
+                            title: 'Manage Time Slots & Calendar',
+                            badgeText: 'Available Datetimes',
+                            subtitle: 'Open the 3-month clinic calendar to allocate, review, and customize available appointment booking slots.',
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              _handleAdminMenuSelection('update', serviceBranch);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _timingOptionCard({
+    required IconData icon,
+    required Color iconColor,
+    required Color iconBg,
+    required String title,
+    required String badgeText,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(10)),
+              child: Icon(icon, size: 22, color: iconColor),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: iconColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          badgeText,
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: iconColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), height: 1.3),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF94A3B8)),
+          ],
+        ),
+      ),
+    );
   }
 
   void _handleAdminMenuSelection(String value, service_branch_model.Data serviceBranch) async {

@@ -82,8 +82,25 @@ final router = GoRouter(
 
       final isSuperAdmin = parsed.data?.user?.isSuperadmin ?? false;
       final permissions = parsed.data?.user?.permissions ?? <String>[];
+      final isSonographer = permissions.contains('c54a2d91-499c-11f0-9169-bc24115a1342') && !isSuperAdmin;
 
-      // 4. Checking specific SuperAdmin guarded pages
+      // 4. SuperAdmin unconditionally has unrestricted access to all routes
+      if (isSuperAdmin) {
+        return null;
+      }
+
+      // 4b. Non-superadmin access to root dashboard '/'
+      if (uri == Homepage.routeName) {
+        if (isSonographer) {
+          // Sonographers must only land on and access appointments
+          return AppointmentHomepage.routeName;
+        }
+        if (permissions.isEmpty) {
+          return NoPermission.routeName;
+        }
+      }
+
+      // 4c. Checking specific SuperAdmin guarded pages
       final requiresSuperAdmin = [
         AdminHomepage.routeName,
         BranchHomepage.routeName,
@@ -95,7 +112,12 @@ final router = GoRouter(
         MarketingHomepage.routeName,
       ];
 
-      if (requiresSuperAdmin.contains(uri) && !isSuperAdmin) {
+      if (requiresSuperAdmin.contains(uri)) {
+        return NoPermission.routeName;
+      }
+
+      // 4d. Sonographer restricted to only appointments
+      if (isSonographer && uri != AppointmentHomepage.routeName && uri != PaymentMismatchPage.routeName) {
         return NoPermission.routeName;
       }
 
@@ -123,7 +145,7 @@ final router = GoRouter(
       if (requiredPermission != null && !permissions.contains(requiredPermission)) {
         // Sonographer UUID grants access to Appointment page
         final isSonographerOnAppointment =
-            uri == AppointmentHomepage.routeName && permissions.contains('c54a2d91-499c-11f0-9169-bc24115a1342');
+            uri == AppointmentHomepage.routeName && isSonographer;
         if (!isSonographerOnAppointment) {
           return NoPermission.routeName;
         }

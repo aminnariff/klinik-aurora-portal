@@ -1,8 +1,14 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
+import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
+import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +20,19 @@ class NoPermission extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rawAuth = prefs.getString(authResponse);
+    final bool isAuthenticated = rawAuth != null && rawAuth.isNotEmpty;
+    bool isSonographer = false;
+    if (isAuthenticated) {
+      try {
+        final decoded = json.decode(rawAuth);
+        final parsed = AuthResponse.fromJson(decoded);
+        final isSuper = parsed.data?.user?.isSuperadmin ?? false;
+        final perms = parsed.data?.user?.permissions ?? <String>[];
+        isSonographer = perms.contains('c54a2d91-499c-11f0-9169-bc24115a1342') && !isSuper;
+      } catch (_) {}
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -132,40 +151,65 @@ class NoPermission extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () => context.goNamed(LoginPage.routeName),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: const Color(0xFFDF184A),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                              textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 1),
-                            ),
-                            child: const Text('GO TO LOGIN'),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              context.read<AuthController>().logout(context);
-                              context.pushReplacementNamed(LoginPage.routeName, extra: true);
-                            },
-                            icon: const Icon(Icons.logout_rounded, size: 18),
-                            label: const Text('LOG OUT'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white.withAlpha(200),
-                              side: BorderSide(color: Colors.white.withAlpha(50)),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                              textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, letterSpacing: 1),
+                        if (isAuthenticated) ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                if (isSonographer) {
+                                  context.goNamed(AppointmentHomepage.routeName);
+                                } else {
+                                  context.goNamed(Homepage.routeName);
+                                }
+                              },
+                              icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                              label: const Text('RETURN TO SAFE AREA'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFFDF184A),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, letterSpacing: 1),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                context.read<AuthController>().logout(context);
+                                context.pushReplacementNamed(LoginPage.routeName, extra: true);
+                              },
+                              icon: const Icon(Icons.logout_rounded, size: 18),
+                              label: const Text('LOG OUT'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.white.withAlpha(200),
+                                side: BorderSide(color: Colors.white.withAlpha(50)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, letterSpacing: 1),
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () => context.goNamed(LoginPage.routeName),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFFDF184A),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 1),
+                              ),
+                              child: const Text('GO TO LOGIN'),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -184,17 +228,28 @@ class NoPermission extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => context.goNamed(LoginPage.routeName),
+                    onPressed: () {
+                      if (isAuthenticated) {
+                        if (isSonographer) {
+                          context.goNamed(AppointmentHomepage.routeName);
+                        } else {
+                          context.goNamed(Homepage.routeName);
+                        }
+                      } else {
+                        context.goNamed(LoginPage.routeName);
+                      }
+                    },
                     icon: const Icon(Icons.arrow_back_rounded, color: Colors.white70),
                   ),
                   const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      context.read<AuthController>().logout(context);
-                      context.pushReplacementNamed(LoginPage.routeName, extra: true);
-                    },
-                    icon: const Icon(Icons.logout_rounded, color: Colors.white70),
-                  ),
+                  if (isAuthenticated)
+                    IconButton(
+                      onPressed: () {
+                        context.read<AuthController>().logout(context);
+                        context.pushReplacementNamed(LoginPage.routeName, extra: true);
+                      },
+                      icon: const Icon(Icons.logout_rounded, color: Colors.white70),
+                    ),
                 ],
               ),
             ),
