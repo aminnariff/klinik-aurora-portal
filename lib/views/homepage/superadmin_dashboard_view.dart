@@ -28,6 +28,7 @@ class SuperadminDashboardView extends StatelessWidget {
         final totalBranches = '${data?.totalActiveBranch ?? 0} Clinics';
         final totalUsers = data?.totalUser?.toString() ?? '0';
         final activeUsers = data?.totalActiveUser ?? 0;
+        final doctorsOnDuty = '${data?.totalDoctorsOnDutyToday ?? 0} Doctors';
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +36,7 @@ class SuperadminDashboardView extends StatelessWidget {
             // ── 1. Executive Network KPIs Row ────────────────────────────────────
             LayoutBuilder(
               builder: (context, constraints) {
-                final isCompact = constraints.maxWidth < 768;
+                final isCompact = constraints.maxWidth < 1100;
                 if (isCompact) {
                   return Column(
                     children: [
@@ -67,6 +68,17 @@ class SuperadminDashboardView extends StatelessWidget {
                       const SizedBox(height: 10),
                       Row(
                         children: [
+                          Expanded(
+                            child: DashboardMetricCard(
+                              label: 'Doctors on Duty',
+                              value: doctorsOnDuty,
+                              accentColor: const Color(0xFF0D9488), // Teal
+                              icon: Icons.medical_services_rounded,
+                              subtitle: 'Active Roster Today',
+                              subtitleColor: const Color(0xFF0D9488),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: DashboardMetricCard(
                               label: 'Active Clinics',
@@ -115,6 +127,17 @@ class SuperadminDashboardView extends StatelessWidget {
                         icon: Icons.event_available_rounded,
                         subtitle: 'This Month',
                         subtitleColor: const Color(0xFF2563EB),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DashboardMetricCard(
+                        label: 'Doctors on Duty',
+                        value: doctorsOnDuty,
+                        accentColor: const Color(0xFF0D9488), // Teal
+                        icon: Icons.medical_services_rounded,
+                        subtitle: 'Active Roster Today',
+                        subtitleColor: const Color(0xFF0D9488),
                       ),
                     ),
                     const SizedBox(width: 12),

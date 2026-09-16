@@ -34,6 +34,7 @@ class Data {
   List<TotalRegistrationByMonth>? totalRegistrationByMonth;
   int? totalAppointmentsToday;
   int? totalAppointmentsThisMonth;
+  int? totalDoctorsOnDutyToday;
   num? revenueThisMonth;
   List<RevenueByMonth>? revenueByMonth;
   num? totalPointsExpiring30Days;
@@ -48,6 +49,7 @@ class Data {
       this.totalRegistrationByMonth,
       this.totalAppointmentsToday,
       this.totalAppointmentsThisMonth,
+      this.totalDoctorsOnDutyToday,
       this.revenueThisMonth,
       this.revenueByMonth,
       this.totalPointsExpiring30Days,
@@ -72,6 +74,9 @@ class Data {
     }
     totalAppointmentsToday = json['totalAppointmentsToday'];
     totalAppointmentsThisMonth = json['totalAppointmentsThisMonth'];
+    totalDoctorsOnDutyToday = json['totalDoctorsOnDutyToday'] is int
+        ? json['totalDoctorsOnDutyToday']
+        : int.tryParse(json['totalDoctorsOnDutyToday']?.toString() ?? '') ?? 0;
     revenueThisMonth = _asNum(json['revenueThisMonth']);
     if (json['revenueByMonth'] != null) {
       revenueByMonth = <RevenueByMonth>[];

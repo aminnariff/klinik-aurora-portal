@@ -17,6 +17,7 @@ class BranchOperationsData {
   List<UpcomingQueueItem>? upcomingQueue;
   List<DoctorOnDutyItem>? doctorsOnDuty;
   List<WeeklyActivityItem>? weeklyActivity;
+  List<MonthlyHeatmapItem>? monthlyHeatmap;
   List<TopServiceItem>? topServices;
   num? revenueThisMonth;
 
@@ -27,6 +28,7 @@ class BranchOperationsData {
     this.upcomingQueue,
     this.doctorsOnDuty,
     this.weeklyActivity,
+    this.monthlyHeatmap,
     this.topServices,
     this.revenueThisMonth,
   });
@@ -51,6 +53,12 @@ class BranchOperationsData {
       weeklyActivity = <WeeklyActivityItem>[];
       json['weeklyActivity'].forEach((v) {
         weeklyActivity!.add(WeeklyActivityItem.fromJson(v));
+      });
+    }
+    if (json['monthlyHeatmap'] != null) {
+      monthlyHeatmap = <MonthlyHeatmapItem>[];
+      json['monthlyHeatmap'].forEach((v) {
+        monthlyHeatmap!.add(MonthlyHeatmapItem.fromJson(v));
       });
     }
     if (json['topServices'] != null) {
@@ -175,3 +183,22 @@ class TopServiceItem {
     revenue = json['revenue'] != null ? num.tryParse(json['revenue'].toString()) ?? 0 : 0;
   }
 }
+
+class MonthlyHeatmapItem {
+  String? dateStr;
+  int? total;
+  int? completed;
+
+  MonthlyHeatmapItem({
+    this.dateStr,
+    this.total,
+    this.completed,
+  });
+
+  MonthlyHeatmapItem.fromJson(Map<String, dynamic> json) {
+    dateStr = json['dateStr'];
+    total = json['total'] ?? 0;
+    completed = json['completed'] ?? 0;
+  }
+}
+

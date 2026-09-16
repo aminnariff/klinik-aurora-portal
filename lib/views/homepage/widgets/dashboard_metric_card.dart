@@ -7,6 +7,7 @@ class DashboardMetricCard extends StatelessWidget {
   final IconData? icon;
   final String? subtitle;
   final Color? subtitleColor;
+  final double? progress;
   final VoidCallback? onTap;
 
   const DashboardMetricCard({
@@ -17,6 +18,7 @@ class DashboardMetricCard extends StatelessWidget {
     this.icon,
     this.subtitle,
     this.subtitleColor,
+    this.progress,
     this.onTap,
   });
 
@@ -96,6 +98,18 @@ class DashboardMetricCard extends StatelessWidget {
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: subtitleColor ?? accentColor,
+                      ),
+                    ),
+                  ],
+                  if (progress != null) ...[
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: progress!.clamp(0.0, 1.0),
+                        minHeight: 4,
+                        backgroundColor: accentColor.withValues(alpha: 0.12),
+                        valueColor: AlwaysStoppedAnimation<Color>(accentColor),
                       ),
                     ),
                   ],

@@ -32,6 +32,10 @@ class BranchDashboardView extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final isCompact = constraints.maxWidth < 768;
+                final seenRatioValue = '$totalCompleted / $totalToday';
+                final seenRatioProgress = totalToday > 0 ? (totalCompleted / totalToday) : 0.0;
+                final upcomingCount = today?.totalUpcoming ?? 0;
+
                 if (isCompact) {
                   return Column(
                     children: [
@@ -39,24 +43,26 @@ class BranchDashboardView extends StatelessWidget {
                         children: [
                           Expanded(
                             child: DashboardMetricCard(
-                              label: "Today's Appointments",
-                              value: totalToday.toString(),
-                              accentColor: const Color(0xFF2563EB), // Blue
-                              icon: Icons.calendar_today_rounded,
-                              subtitle: '$totalCompleted Completed',
-                              subtitleColor: const Color(0xFF16A34A),
+                              label: 'Seen vs Scheduled',
+                              value: seenRatioValue,
+                              accentColor: const Color(0xFF0D9488), // Teal
+                              icon: Icons.fact_check_rounded,
+                              subtitle: '$completedPercent% seen today',
+                              subtitleColor: const Color(0xFF0D9488),
+                              progress: seenRatioProgress,
                               onTap: () => context.go('/appointment'),
                             ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: DashboardMetricCard(
-                              label: 'Completed',
-                              value: totalCompleted.toString(),
-                              accentColor: const Color(0xFF16A34A), // Green
-                              icon: Icons.check_circle_outline_rounded,
-                              subtitle: '$completedPercent% Completed',
-                              subtitleColor: const Color(0xFF16A34A),
+                              label: 'Remaining Visits',
+                              value: upcomingCount.toString(),
+                              accentColor: const Color(0xFF2563EB), // Blue
+                              icon: Icons.schedule_rounded,
+                              subtitle: 'Upcoming today',
+                              subtitleColor: const Color(0xFF2563EB),
+                              onTap: () => context.go('/appointment'),
                             ),
                           ),
                         ],
@@ -95,24 +101,26 @@ class BranchDashboardView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: DashboardMetricCard(
-                        label: "Today's Appointments",
-                        value: totalToday.toString(),
-                        accentColor: const Color(0xFF2563EB), // Blue
-                        icon: Icons.calendar_today_rounded,
-                        subtitle: '$totalCompleted Completed',
-                        subtitleColor: const Color(0xFF16A34A),
+                        label: 'Seen vs Scheduled',
+                        value: seenRatioValue,
+                        accentColor: const Color(0xFF0D9488), // Teal
+                        icon: Icons.fact_check_rounded,
+                        subtitle: '$completedPercent% seen today',
+                        subtitleColor: const Color(0xFF0D9488),
+                        progress: seenRatioProgress,
                         onTap: () => context.go('/appointment'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
-                        label: 'Completed',
-                        value: totalCompleted.toString(),
-                        accentColor: const Color(0xFF16A34A), // Green
-                        icon: Icons.check_circle_outline_rounded,
-                        subtitle: '$completedPercent% Completed',
-                        subtitleColor: const Color(0xFF16A34A),
+                        label: 'Remaining Visits',
+                        value: upcomingCount.toString(),
+                        accentColor: const Color(0xFF2563EB), // Blue
+                        icon: Icons.schedule_rounded,
+                        subtitle: 'Upcoming today',
+                        subtitleColor: const Color(0xFF2563EB),
+                        onTap: () => context.go('/appointment'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -144,8 +152,33 @@ class BranchDashboardView extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // ── 2. 7-Day Activity Bar Chart ──────────────────────────────────────
-            _buildWeeklyActivityCard(context, data?.weeklyActivity ?? []),
+            // ── 2. Weekly Activity Bar Chart + Monthly Calendar Heatmap ──────────
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 950;
+                final weeklyWidget = _buildWeeklyActivityCard(context, data?.weeklyActivity ?? []);
+                final heatmapWidget = _buildMonthlyHeatmapCard(context, data?.monthlyHeatmap ?? []);
+
+                if (isCompact) {
+                  return Column(
+                    children: [
+                      weeklyWidget,
+                      const SizedBox(height: 12),
+                      heatmapWidget,
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 11, child: weeklyWidget),
+                    const SizedBox(width: 12),
+                    Expanded(flex: 9, child: heatmapWidget),
+                  ],
+                );
+              },
+            ),
 
             const SizedBox(height: 12),
 
@@ -320,6 +353,208 @@ class BranchDashboardView extends StatelessWidget {
                       }).toList(),
                     ),
                   ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Monthly Calendar Heatmap ───────────────────────────────────────────────
+  Widget _buildMonthlyHeatmapCard(BuildContext context, List<MonthlyHeatmapItem> heatmap) {
+    final now = DateTime.now();
+    final currentYear = now.year;
+    final currentMonth = now.month;
+    final monthName = DateFormat('MMMM yyyy').format(now);
+
+    final map = <String, MonthlyHeatmapItem>{};
+    for (final item in heatmap) {
+      if (item.dateStr != null) {
+        map[item.dateStr!] = item;
+      }
+    }
+
+    final firstDay = DateTime(currentYear, currentMonth, 1);
+    final daysInMonth = DateTime(currentYear, currentMonth + 1, 0).day;
+    // Dart: Monday is 1, Sunday is 7. Offset: 0 for Monday, 6 for Sunday.
+    final firstWeekdayOffset = firstDay.weekday - 1;
+    final totalCells = firstWeekdayOffset + daysInMonth;
+    final numRows = (totalCells / 7).ceil();
+
+    final dayHeaders = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Booking Heatmap',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    monthName,
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Text(
+                    '0',
+                    style: TextStyle(fontSize: 9.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 4),
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFCCFBF1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF5EEAD4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D9488),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    '9+',
+                    style: TextStyle(fontSize: 9.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Weekday header row
+          Row(
+            children: List.generate(7, (colIndex) {
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    dayHeaders[colIndex],
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 4),
+          // Calendar grid rows
+          SizedBox(
+            height: isMobile ? 150 : 170,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(numRows, (rowIndex) {
+                return Row(
+                  children: List.generate(7, (colIndex) {
+                    final cellIndex = rowIndex * 7 + colIndex;
+                    if (cellIndex < firstWeekdayOffset || cellIndex >= totalCells) {
+                      return const Expanded(child: SizedBox(height: 22));
+                    }
+                    final dayNumber = cellIndex - firstWeekdayOffset + 1;
+                    final dateKey = '$currentYear-${currentMonth.toString().padLeft(2, '0')}-${dayNumber.toString().padLeft(2, '0')}';
+                    final item = map[dateKey];
+                    final total = item?.total ?? 0;
+                    final completed = item?.completed ?? 0;
+                    final isToday = dayNumber == now.day;
+
+                    Color bg;
+                    Color fg;
+                    if (total == 0) {
+                      bg = const Color(0xFFF8FAFC);
+                      fg = const Color(0xFF94A3B8);
+                    } else if (total <= 3) {
+                      bg = const Color(0xFFCCFBF1);
+                      fg = const Color(0xFF0F766E);
+                    } else if (total <= 8) {
+                      bg = const Color(0xFF5EEAD4);
+                      fg = const Color(0xFF134E4A);
+                    } else {
+                      bg = const Color(0xFF0D9488);
+                      fg = Colors.white;
+                    }
+
+                    return Expanded(
+                      child: Tooltip(
+                        message: '$dayNumber ${DateFormat('MMM').format(now)}: $total bookings ($completed completed)',
+                        child: Container(
+                          height: 22,
+                          margin: const EdgeInsets.symmetric(horizontal: 1.5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: bg,
+                            borderRadius: BorderRadius.circular(4),
+                            border: isToday
+                                ? Border.all(color: const Color(0xFF2563EB), width: 1.5)
+                                : Border.all(color: Colors.transparent),
+                          ),
+                          child: Center(
+                            child: Text(
+                              dayNumber.toString(),
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: isToday ? FontWeight.w800 : FontWeight.w600,
+                                color: fg,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                );
+              }),
+            ),
           ),
         ],
       ),
