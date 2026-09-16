@@ -9,6 +9,7 @@ import "package:klinik_aurora_portal/controllers/branch/branch_controller.dart";
 import "package:klinik_aurora_portal/models/branch/branch_all_response.dart";
 import "package:klinik_aurora_portal/models/branch/create_branch_request.dart";
 import "package:klinik_aurora_portal/models/branch/update_branch_request.dart";
+import "package:klinik_aurora_portal/utils/image_helper.dart";
 import "package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart";
 import "package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart";
 import "package:klinik_aurora_portal/views/widgets/global/global.dart";
@@ -63,6 +64,8 @@ class _BranchDetailState extends State<BranchDetail> {
       hintText: "https://... or upload photo",
     );
 
+    _branchImage.controller.addListener(_onBranchImageChanged);
+
     if (widget.type == "update") {
       _branchName.text = widget.branch?.branchName ?? "";
       _branchCode.text = widget.branch?.branchCode ?? "";
@@ -83,8 +86,13 @@ class _BranchDetailState extends State<BranchDetail> {
     }
   }
 
+  void _onBranchImageChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    _branchImage.controller.removeListener(_onBranchImageChanged);
     _branchName.dispose();
     _branchCode.dispose();
     _branchPhone.dispose();
@@ -463,20 +471,7 @@ class _BranchDetailState extends State<BranchDetail> {
     final rightCol = [
       _sectionLabel("Branch Photo", Icons.image_outlined),
       const SizedBox(height: 12),
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-        ),
-        child: AppImageField(
-          field: _branchImage,
-          folder: "branch",
-          previewHeight: 130,
-          previewWidth: double.infinity,
-        ),
-      ),
+      _buildBranchPhotoCard(),
       const SizedBox(height: 22),
       _sectionLabel("Operating Schedule", Icons.schedule_outlined),
       const SizedBox(height: 12),
@@ -698,6 +693,124 @@ class _BranchDetailState extends State<BranchDetail> {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildBranchPhotoCard() {
+    final imagePath = _branchImage.controller.text.trim();
+    final hasImage = imagePath.isNotEmpty;
+    final resolvedUrl = resolveImageUrl(imagePath);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (hasImage) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Stack(
+                children: [
+                  Container(
+                    height: 160,
+                    width: double.infinity,
+                    color: const Color(0xFFE2E8F0),
+                    child: Image.network(
+                      resolvedUrl,
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0F766E)),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 160,
+                        width: double.infinity,
+                        color: const Color(0xFFF1F5F9),
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.broken_image_rounded, size: 36, color: Color(0xFF94A3B8)),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Unable to load preview image',
+                              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.65),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_circle_rounded, size: 12, color: Color(0xFF34D399)),
+                          SizedBox(width: 4),
+                          Text(
+                            'Current Photo',
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ] else ...[
+            Container(
+              height: 90,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFCBD5E1)),
+              ),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add_photo_alternate_outlined, size: 28, color: Colors.grey.shade400),
+                  const SizedBox(height: 4),
+                  Text(
+                    'No branch photo uploaded yet',
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          AppImageField(
+            field: _branchImage,
+            folder: "branch",
+            previewHeight: 64,
+            previewWidth: 100,
+          ),
+        ],
+      ),
     );
   }
 

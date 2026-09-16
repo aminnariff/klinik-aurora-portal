@@ -33,4 +33,44 @@ class PermissionController extends ChangeNotifier {
       }
     });
   }
+
+  static Future<ApiResponse> create(
+    BuildContext context, {
+    required String permissionName,
+  }) async {
+    return ApiController().call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/admin-permission',
+      data: {
+        'roleName': permissionName,
+        'permissionName': permissionName,
+      },
+    );
+  }
+
+  static Future<ApiResponse> update(
+    BuildContext context, {
+    required String permissionId,
+    String? permissionName,
+    int? permissionStatus,
+  }) async {
+    final Map<String, dynamic> data = {
+      'roleId': permissionId,
+      'permissionId': permissionId,
+    };
+    if (permissionName != null) {
+      data['roleName'] = permissionName;
+      data['permissionName'] = permissionName;
+    }
+    if (permissionStatus != null) {
+      data['permissionStatus'] = permissionStatus;
+    }
+    return ApiController().call(
+      context,
+      method: Method.put,
+      endpoint: 'admin/admin-permission',
+      data: data,
+    );
+  }
 }

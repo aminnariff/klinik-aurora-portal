@@ -520,7 +520,20 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AdminDetail(user: items[i], type: 'update');
+                          },
+                        );
+                      },
+                      color: WidgetStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return const Color(0xFFF1F5F9);
+                        }
+                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                      }),
                       cells: [
                         DataCell(
                           GestureDetector(

@@ -42,6 +42,17 @@ class _AppImageFieldState extends State<AppImageField> {
   void initState() {
     super.initState();
     _initialValue = widget.field.controller.text.trim();
+    widget.field.controller.addListener(_onControllerChanged);
+  }
+
+  void _onControllerChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.field.controller.removeListener(_onControllerChanged);
+    super.dispose();
   }
 
   Future<void> _handleReplace() async {
@@ -270,53 +281,56 @@ class _AppImageFieldState extends State<AppImageField> {
         ],
         if (hasValue) ...[
           const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  resolvedUrl,
-                  height: widget.previewHeight,
-                  width: widget.previewWidth,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
+          () {
+            final double safeWidth = widget.previewWidth.isFinite ? widget.previewWidth : 180.0;
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    resolvedUrl,
                     height: widget.previewHeight,
-                    width: widget.previewWidth,
-                    color: const Color(0xFFF1F5F9),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Unreachable',
-                      style: AppTypography.bodyMedium(context).apply(color: textMutedColor, fontSizeDelta: -3),
+                    width: safeWidth,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => Container(
+                      height: widget.previewHeight,
+                      width: safeWidth,
+                      color: const Color(0xFFF1F5F9),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Unreachable',
+                        style: AppTypography.bodyMedium(context).apply(color: textMutedColor, fontSizeDelta: -3),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      value.contains('storage.googleapis.com') || value.contains('firebasestorage.googleapis.com')
-                          ? 'Stored in Firebase Storage.'
-                          : (value.startsWith('http://') || value.startsWith('https://'))
-                              ? 'External link.'
-                              : 'Stored on local server.',
-                      style: AppTypography.bodyMedium(context).apply(color: textMutedColor, fontSizeDelta: -3),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      value,
-                      style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        value.contains('storage.googleapis.com') || value.contains('firebasestorage.googleapis.com')
+                            ? 'Stored in Firebase Storage.'
+                            : (value.startsWith('http://') || value.startsWith('https://'))
+                                ? 'External link.'
+                                : 'Stored on local server.',
+                        style: AppTypography.bodyMedium(context).apply(color: textMutedColor, fontSizeDelta: -3),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        value,
+                        style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }(),
         ],
       ],
     );

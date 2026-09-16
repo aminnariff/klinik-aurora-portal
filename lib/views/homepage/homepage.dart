@@ -155,55 +155,61 @@ class _HomepageState extends State<Homepage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthController>().init(context).then((value) {
         if (value != null) {
-          if (context.read<AuthController>().hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f') == false) {
-            sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
-          }
-          if (!context.read<AuthController>().hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') ||
-              context.read<AuthController>().isSuperAdmin == false) {
-            sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
-          }
-          if (context.read<AuthController>().hasPermission('a231db36-058d-11ef-943b-626efeb17d5e') == false) {
-            sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
-          }
-          if (!context.read<AuthController>().hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') ||
-              context.read<AuthController>().isSuperAdmin == false) {
-            sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
-          }
-          if (!context.read<AuthController>().hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
-            sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
-          }
-          if (!context.read<AuthController>().hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
-            sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
-          }
-          if (!context.read<AuthController>().hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f') ||
-              context.read<AuthController>().isSuperAdmin == false) {
-            sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
-          }
-          if (!context.read<AuthController>().hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
-            sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
-          }
-          if (context.read<AuthController>().hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2') == false) {
-            sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
-          }
-          if (context.read<AuthController>().hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342') == false) {
-            sideBarAttribute.removeWhere((element) => element.label == ServiceHomepage.displayName);
-          }
-          if (context.read<AuthController>().hasPermission('f57576c4-4d15-11f0-b054-1ff6746392b2') == false) {
-            sideBarAttribute.removeWhere((element) => element.label == PaymentSummaryPage.displayName);
-          }
-          // Mirrors the superadmin gate on these two routes in routes.dart —
-          // without this the entries would show but bounce to No Permission.
-          if (context.read<AuthController>().isSuperAdmin == false) {
-            sideBarAttribute.removeWhere((element) => element.label == MarketingHomepage.displayName);
-          }
-          context.read<TopBarController>().pageValue = 0;
-          if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')) {
-            sideBarAttribute.removeWhere((element) => element.label == 'Dashboard');
+          final auth = context.read<AuthController>();
+          final isSuperAdmin = auth.isSuperAdmin;
+          final isSonographer = auth.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') && !isSuperAdmin;
+
+          if (isSonographer) {
+            sideBarAttribute.retainWhere((element) => element.label == AppointmentHomepage.displayName);
+            pageController.selectIndex(0);
             context.goNamed(AppointmentHomepage.routeName);
+          } else {
+            if (!auth.hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
+              sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
+            }
+            if (!auth.hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') || !isSuperAdmin) {
+              sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
+            }
+            if (!auth.hasPermission('a231db36-058d-11ef-943b-626efeb17d5e')) {
+              sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
+            }
+            if (!auth.hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') || !isSuperAdmin) {
+              sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
+            }
+            if (!auth.hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
+              sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
+            }
+            if (!auth.hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
+              sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
+            }
+            if (!auth.hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f') || !isSuperAdmin) {
+              sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
+            }
+            if (!auth.hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
+              sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
+            }
+            if (!auth.hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2')) {
+              sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
+            }
+            if (!auth.hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342')) {
+              sideBarAttribute.removeWhere((element) => element.label == ServiceHomepage.displayName);
+            }
+            if (!auth.hasPermission('f57576c4-4d15-11f0-b054-1ff6746392b2')) {
+              sideBarAttribute.removeWhere((element) => element.label == PaymentSummaryPage.displayName);
+            }
+            if (!auth.hasPermission('3b8e7d9d-ac51-11ef-a1b7-bc24115a1342')) {
+              sideBarAttribute.removeWhere((element) => element.label == AppointmentHomepage.displayName);
+            }
+            if (!isSuperAdmin) {
+              sideBarAttribute.removeWhere((element) => element.label == MarketingHomepage.displayName);
+            }
+            context.read<TopBarController>().pageValue = 0;
           }
+
           if (sideBarAttribute.isEmpty) {
             context.goNamed(NoPermission.routeName);
           }
+          if (mounted) setState(() {});
         }
       });
     });

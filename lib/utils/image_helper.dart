@@ -7,5 +7,12 @@ String resolveImageUrl(String? path) {
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
-  return '${Environment.imageUrl}$trimmed';
+  final base = Environment.imageUrl;
+  if (base.endsWith('/') && trimmed.startsWith('/')) {
+    return '$base${trimmed.substring(1)}';
+  } else if (!base.endsWith('/') && !trimmed.startsWith('/')) {
+    return '$base/$trimmed';
+  }
+  return '$base$trimmed';
 }
+

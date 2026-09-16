@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
 import 'package:klinik_aurora_portal/models/branch/update_branch_request.dart';
+import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/views/branch/branch_detail.dart';
 import 'package:klinik_aurora_portal/views/branch/doctor_list.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
@@ -571,7 +572,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                 isVerticalScrollBarVisible: true,
                 headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
                 headingRowHeight: 48,
-                dataRowHeight: 56,
+                dataRowHeight: 64,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(12),
@@ -589,24 +590,73 @@ class _BranchHomepageState extends State<BranchHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => BranchDetail(branch: items[i], type: 'update'),
+                        );
+                      },
+                      color: WidgetStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return const Color(0xFFF1F5F9);
+                        }
+                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                      }),
                       cells: [
                         DataCell(
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (_) => BranchDetail(branch: items[i], type: 'update'),
-                              );
-                            },
-                            child: Text(
-                              items[i].branchName ?? '—',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF111827),
+                          Row(
+                            children: [
+                              Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: (items[i].branchImage != null && items[i].branchImage!.trim().isNotEmpty)
+                                    ? Image.network(
+                                        resolveImageUrl(items[i].branchImage),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => const Center(
+                                          child: Icon(Icons.storefront_rounded, size: 20, color: Color(0xFF0F766E)),
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Icon(Icons.storefront_rounded, size: 20, color: Color(0xFF0F766E)),
+                                      ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      items[i].branchName ?? '—',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF0F172A),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    if (items[i].branchCode != null && items[i].branchCode!.isNotEmpty)
+                                      Text(
+                                        items[i].branchCode!.toUpperCase(),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF64748B),
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         DataCell(
