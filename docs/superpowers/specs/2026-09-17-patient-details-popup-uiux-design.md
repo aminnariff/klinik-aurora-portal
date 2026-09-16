@@ -18,7 +18,7 @@ The current patient popup dialog in `lib/views/user/user_detail.dart` suffers fr
   - 3 structured stat chips: Home Branch, Total Appointments count, and Points balance.
 - **Responsive 2-Column Form**:
   - Left column: Full Name, Document ID (NRIC / Passport), Date of Birth (auto-filled, tap to override with date picker).
-  - Right column: Contact Number (+60 prefix), Email Address, Branch assignment dropdown.
+  - Right column: Contact Number (saves whatever is entered in the mobile text field without forced prefix/length formatting), Email Address, Branch assignment dropdown.
 - **Account Controls**:
   - Clean status card with switch toggle (Active vs Deactivated) and descriptive subtext.
   - Reset Password button for existing customer accounts.
