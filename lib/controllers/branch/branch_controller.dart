@@ -159,6 +159,9 @@ class BranchController extends ChangeNotifier {
     formData.fields.add(MapEntry('branchClosingHours', request.branchClosingHours));
     formData.fields.add(MapEntry('is24Hours', '${request.is24Hours}'));
     formData.fields.add(MapEntry('branchLaunchDate', request.branchLaunchDate));
+    if (request.branchStatus != null) {
+      formData.fields.add(MapEntry('branchStatus', '${request.branchStatus}'));
+    }
     try {
       return await dio
           .put(

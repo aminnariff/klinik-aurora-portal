@@ -15,6 +15,7 @@ class UpdateBranchRequest {
   final String branchLaunchDate;
   FileAttribute? branchImage;
   String? branchImageUrl;
+  final int? branchStatus;
 
   UpdateBranchRequest({
     required this.branchId,
@@ -31,5 +32,6 @@ class UpdateBranchRequest {
     required this.branchLaunchDate,
     this.branchImage,
     this.branchImageUrl,
+    this.branchStatus,
   });
 }
