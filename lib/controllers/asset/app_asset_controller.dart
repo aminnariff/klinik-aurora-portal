@@ -16,6 +16,10 @@ class AppAssetController {
   }) async {
     final extension = filename.contains('.') ? filename.split('.').last.toLowerCase() : 'png';
 
+    final mediaType = extension == 'pdf'
+        ? MediaType('application', 'pdf')
+        : MediaType('image', extension == 'jpg' ? 'jpeg' : extension);
+
     final formData = FormData();
     formData.files.add(
       MapEntry(
@@ -23,7 +27,7 @@ class AppAssetController {
         MultipartFile.fromBytes(
           bytes,
           filename: filename,
-          contentType: MediaType('image', extension == 'jpg' ? 'jpeg' : extension),
+          contentType: mediaType,
         ),
       ),
     );

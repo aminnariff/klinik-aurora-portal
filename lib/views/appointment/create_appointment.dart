@@ -44,6 +44,7 @@ import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_attachment_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
@@ -1789,38 +1790,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         if (_status?.key != '6') ...[
                                           _extraSectionLabel('Attachment', Icons.attach_file_rounded),
                                           const SizedBox(height: 8),
-                                          TextField(
+                                          AppAttachmentField(
                                             controller: _attachmentUrlController,
-                                            style: const TextStyle(fontSize: 13),
-                                            decoration: InputDecoration(
-                                              labelText: 'Attachment URL (optional)',
-                                              labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                                              hintText: 'https://',
-                                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
-                                              prefixIcon: const Icon(
-                                                Icons.link_rounded,
-                                                size: 16,
-                                                color: Color(0xFF6B7280),
-                                              ),
-                                              filled: true,
-                                              fillColor: Colors.white,
-                                              contentPadding: const EdgeInsets.symmetric(
-                                                horizontal: 12,
-                                                vertical: 10,
-                                              ),
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                                borderSide: const BorderSide(color: Color(0xFF6366F1)),
-                                              ),
-                                            ),
+                                            folder: 'appointment',
+                                            onChanged: () => setState(() {}),
                                           ),
                                           const SizedBox(height: 6),
                                           Row(
@@ -2931,31 +2904,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 const SizedBox(height: 12),
                 _extraSectionLabel('Attachment', Icons.attach_file_rounded),
                 const SizedBox(height: 8),
-                TextField(
+                AppAttachmentField(
                   controller: _attachmentUrlController,
-                  style: const TextStyle(fontSize: 13),
-                  decoration: InputDecoration(
-                    labelText: 'Attachment URL (optional)',
-                    labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                    hintText: 'https://',
-                    hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
-                    prefixIcon: const Icon(Icons.link_rounded, size: 16, color: Color(0xFF6B7280)),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFF6366F1)),
-                    ),
-                  ),
+                  folder: 'appointment',
+                  onChanged: () => setState(() {}),
                 ),
                 const SizedBox(height: 6),
                 Row(
