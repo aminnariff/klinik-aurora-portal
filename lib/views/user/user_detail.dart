@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -15,6 +16,10 @@ import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart';
 import 'package:klinik_aurora_portal/models/user/create_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/update_user_request.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
+import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart' as appointment_model;
+import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
+import 'package:klinik_aurora_portal/views/user/appointment_ids.dart';
+import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -46,6 +51,7 @@ class _UserDetailState extends State<UserDetail> {
 
   int? _appointmentCount;
   bool _isSaving = false;
+  bool _isEmailUnlocked = false;
 
   // Validation errors
   String? _fullNameError;
@@ -239,6 +245,7 @@ class _UserDetailState extends State<UserDetail> {
       }
 
       final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
+      final canUpdateEmail = isSuperAdmin || _isEmailUnlocked;
       if (widget.type != 'update') {
         if (_usernameController.text.trim().isEmpty) {
           _usernameError = 'Username is required';
@@ -258,12 +265,15 @@ class _UserDetailState extends State<UserDetail> {
             isValid = false;
           }
         }
-      } else if (isSuperAdmin && _emailController.text.trim().isNotEmpty) {
+      } else if (canUpdateEmail && _emailController.text.trim().isNotEmpty) {
         final emailRegex = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
         if (!emailRegex.hasMatch(_emailController.text.trim())) {
           _emailError = 'Enter a valid email address';
           isValid = false;
         }
+      } else if (_isEmailUnlocked && _emailController.text.trim().isEmpty) {
+        _emailError = 'Email address cannot be empty';
+        isValid = false;
       }
     });
 
@@ -279,7 +289,8 @@ class _UserDetailState extends State<UserDetail> {
     final rawPhone = _phoneController.text.trim();
     final docId = _nricController.text.trim().isNotEmpty ? _nricController.text.trim() : null;
     final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
-    final emailToUpdate = isSuperAdmin && _emailController.text.trim().isNotEmpty
+    final canUpdateEmail = isSuperAdmin || _isEmailUnlocked;
+    final emailToUpdate = canUpdateEmail && _emailController.text.trim().isNotEmpty
         ? _emailController.text.trim().toLowerCase()
         : null;
 
@@ -629,36 +640,185 @@ class _UserDetailState extends State<UserDetail> {
     final visits = _appointmentCount != null ? '$_appointmentCount Visits' : '...';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       decoration: const BoxDecoration(
         color: Color(0xFFF8FAFC),
         border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _statCard('Home Branch', branchName, Icons.storefront_outlined, const Color(0xFF475569)),
+          Row(
+            children: [
+              Expanded(
+                child: _statCard('Home Branch', branchName, Icons.storefront_outlined, const Color(0xFF475569)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _statCard(
+                  'Appointments',
+                  visits,
+                  Icons.event_note_outlined,
+                  const Color(0xFF0284C7),
+                  onTap: _openAppointmentHistory,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _statCard(
+                  'Points Balance',
+                  '$points pts',
+                  Icons.stars_rounded,
+                  const Color(0xFFD97706),
+                  onTap: _openManagePoints,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _statCard('Appointments', visits, Icons.event_note_outlined, const Color(0xFF0284C7)),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _statCard('Points Balance', '$points pts', Icons.stars_rounded, const Color(0xFFD97706)),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _actionBtn(
+                  icon: Icons.add_circle_outline_rounded,
+                  label: 'Book Appointment',
+                  color: primary,
+                  bgColor: primary.withValues(alpha: 0.08),
+                  onTap: _openCreateAppointment,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _actionBtn(
+                  icon: Icons.calendar_month_outlined,
+                  label: 'Appointment History',
+                  color: const Color(0xFF0284C7),
+                  bgColor: const Color(0xFFE0F2FE),
+                  onTap: _openAppointmentHistory,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _actionBtn(
+                  icon: Icons.stars_rounded,
+                  label: 'Manage Points',
+                  color: const Color(0xFFD97706),
+                  bgColor: const Color(0xFFFEF3C7),
+                  onTap: _openManagePoints,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _statCard(String label, String value, IconData icon, Color accentColor) {
-    return Container(
+  void _openCreateAppointment() {
+    final user = widget.user;
+    if (user == null) return;
+    showDialog(
+      context: context,
+      builder: (_) => AppointmentDetails(
+        type: 'create',
+        appointment: appointment_model.Data(
+          user: appointment_model.User(
+            userId: user.userId,
+            userName: user.userName,
+            userEmail: user.userEmail,
+            userFullName: user.userFullname,
+            userPhone: user.userPhone,
+          ),
+        ),
+        refreshData: () {
+          if (user.userId != null) _fetchAppointmentCount(user.userId!);
+        },
+      ),
+    );
+  }
+
+  void _openAppointmentHistory() {
+    final user = widget.user;
+    if (user?.userId == null) return;
+    showLoading();
+    UserController.appointment(context, user!.userId!).then((value) {
+      dismissLoading();
+      if (responseCode(value.code)) {
+        showDialog(
+          context: context,
+          builder: (_) => UserAppointmentIds(response: value.data, patient: user),
+        );
+      } else {
+        showDialogError(context, value.message ?? 'Failed to load appointment history');
+      }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
+    });
+  }
+
+  void _openManagePoints() {
+    final user = widget.user;
+    if (user == null) return;
+    showDialog(
+      context: context,
+      builder: (_) => UserPointDetail(user: user),
+    ).then((_) {
+      UserController.getAll(context, 1, 10, userFullName: user.userFullname ?? '', userName: user.userName ?? '', userPhone: '').then((val) {
+        if (responseCode(val.code) && (val.data?.data?.isNotEmpty ?? false)) {
+          final updated = val.data!.data!.firstWhere((u) => u.userId == user.userId, orElse: () => user);
+          if (mounted) {
+            setState(() {
+              widget.user?.totalPoint = updated.totalPoint;
+            });
+          }
+        }
+      });
+    });
+  }
+
+  Widget _actionBtn({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required Color bgColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _statCard(String label, String value, IconData icon, Color accentColor, {VoidCallback? onTap}) {
+    final card = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: onTap != null ? accentColor.withValues(alpha: 0.3) : const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -666,7 +826,7 @@ class _UserDetailState extends State<UserDetail> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 12, color: const Color(0xFF94A3B8)),
+              Icon(icon, size: 12, color: accentColor),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -676,6 +836,8 @@ class _UserDetailState extends State<UserDetail> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (onTap != null)
+                Icon(Icons.arrow_forward_ios_rounded, size: 9, color: accentColor.withValues(alpha: 0.6)),
             ],
           ),
           const SizedBox(height: 3),
@@ -688,12 +850,103 @@ class _UserDetailState extends State<UserDetail> {
         ],
       ),
     );
+
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: card,
+      );
+    }
+    return card;
+  }
+
+  void _confirmUnlockEmail() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Color(0xFFDC2626), size: 22),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Unlock & Edit Email?',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Customer email is used for portal login, appointment confirmations, and system notifications.',
+              style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFECACA)),
+              ),
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.gavel_rounded, size: 16, color: Color(0xFFDC2626)),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Please note: You will be held responsible for this change.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF991B1B),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Are you sure you want to proceed and unlock this field?',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              setState(() {
+                _isEmailUnlocked = true;
+              });
+            },
+            child: const Text('Yes, I am Responsible (Unlock)'),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildFormGrid() {
     final isSuperAdmin = context.read<AuthController>().isSuperAdmin;
     final isUpdate = widget.type == 'update';
-    final canEditEmail = !isUpdate || isSuperAdmin;
+    final canEditEmail = !isUpdate || isSuperAdmin || _isEmailUnlocked;
 
     final leftCol = [
       _buildTextField(
@@ -746,7 +999,9 @@ class _UserDetailState extends State<UserDetail> {
       const SizedBox(height: 12),
       _buildTextField(
         label: isUpdate
-            ? (isSuperAdmin ? 'Email Address (Superadmin Edit)' : 'Email Address')
+            ? (isSuperAdmin
+                ? 'Email Address (Superadmin Edit)'
+                : (_isEmailUnlocked ? 'Email Address (Unlocked)' : 'Email Address'))
             : 'Email Address *',
         controller: _emailController,
         errorText: _emailError,
@@ -755,7 +1010,80 @@ class _UserDetailState extends State<UserDetail> {
         onChanged: (val) {
           if (_emailError != null) setState(() => _emailError = null);
         },
+        action: isUpdate && !canEditEmail
+            ? InkWell(
+                onTap: _confirmUnlockEmail,
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: const Color(0xFFFECACA)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.lock_open_rounded, size: 11, color: Color(0xFFDC2626)),
+                      SizedBox(width: 3),
+                      Text(
+                        'Unlock to Edit',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFDC2626),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : null,
+        suffix: isUpdate && !canEditEmail
+            ? InkWell(
+                onTap: _confirmUnlockEmail,
+                borderRadius: BorderRadius.circular(4),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.lock_outline_rounded, size: 14, color: Color(0xFFDC2626)),
+                      SizedBox(width: 4),
+                      Text(
+                        'Unlock',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFDC2626)),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : null,
       ),
+      if (isUpdate && _isEmailUnlocked) ...[
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFFBEB),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: const Color(0xFFFDE68A)),
+          ),
+          child: const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.warning_amber_rounded, size: 14, color: Color(0xFFD97706)),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Email unlocked. You will be responsible for this change.',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
       const SizedBox(height: 12),
       _buildBranchDropdown(),
     ];
@@ -784,18 +1112,26 @@ class _UserDetailState extends State<UserDetail> {
     String? hintText,
     void Function(String)? onChanged,
     bool readOnly = false,
+    Widget? action,
+    Widget? suffix,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF475569),
+              ),
+            ),
+            if (action != null) action,
+          ],
         ),
         const SizedBox(height: 5),
         Container(
@@ -810,21 +1146,28 @@ class _UserDetailState extends State<UserDetail> {
               width: errorText != null ? 1.5 : 1,
             ),
           ),
-          child: TextField(
-            controller: controller,
-            readOnly: readOnly,
-            onChanged: onChanged,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: readOnly ? const Color(0xFF475569) : const Color(0xFF1E293B),
-            ),
-            decoration: InputDecoration(
-              isCollapsed: true,
-              border: InputBorder.none,
-              hintText: hintText,
-              hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  readOnly: readOnly,
+                  onChanged: onChanged,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: readOnly ? const Color(0xFF475569) : const Color(0xFF1E293B),
+                  ),
+                  decoration: InputDecoration(
+                    isCollapsed: true,
+                    border: InputBorder.none,
+                    hintText: hintText,
+                    hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
+                  ),
+                ),
+              ),
+              if (suffix != null) suffix,
+            ],
           ),
         ),
         if (errorText != null) ...[
