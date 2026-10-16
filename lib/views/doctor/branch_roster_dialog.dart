@@ -247,61 +247,70 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
       }
     }
 
-    // 2. Validate that slots in the form do not overlap each other
-    for (int i = 0; i < _timeSlots.length; i++) {
-      final sA = _timeSlots[i];
-      final startA = sA.startTime.hour * 60 + sA.startTime.minute;
-      final endA = sA.endTime.hour * 60 + sA.endTime.minute;
+    // 2. Automatically merge contiguous or overlapping slots entered in the form
+    // e.g. [10:30-11:00, 11:00-11:30, 11:30-12:00, 12:00-12:30] -> [10:30-12:30]
+    final sortedSlots = List<ShiftTimeSlot>.from(_timeSlots)
+      ..sort((a, b) {
+        final aStart = a.startTime.hour * 60 + a.startTime.minute;
+        final bStart = b.startTime.hour * 60 + b.startTime.minute;
+        return aStart.compareTo(bStart);
+      });
 
-      for (int j = i + 1; j < _timeSlots.length; j++) {
-        final sB = _timeSlots[j];
-        final startB = sB.startTime.hour * 60 + sB.startTime.minute;
-        final endB = sB.endTime.hour * 60 + sB.endTime.minute;
+    final List<ShiftTimeSlot> consolidatedSlots = [];
+    for (final s in sortedSlots) {
+      if (consolidatedSlots.isEmpty) {
+        consolidatedSlots.add(ShiftTimeSlot(startTime: s.startTime, endTime: s.endTime));
+        continue;
+      }
+      final last = consolidatedSlots.last;
+      final lastEndM = last.endTime.hour * 60 + last.endTime.minute;
+      final sStartM = s.startTime.hour * 60 + s.startTime.minute;
+      final sEndM = s.endTime.hour * 60 + s.endTime.minute;
 
-        if (startA < endB && endA > startB) {
-          showDialogError(
-            context,
-            'Time Slot ${i + 1} (${_formatTimeOfDay(sA.startTime)} - ${_formatTimeOfDay(sA.endTime)}) overlaps with Slot ${j + 1} (${_formatTimeOfDay(sB.startTime)} - ${_formatTimeOfDay(sB.endTime)}).\n\nTime slots cannot overlap.',
+      if (sStartM <= lastEndM) {
+        // Touching or overlapping -> merge into single continuous shift!
+        if (sEndM > lastEndM) {
+          consolidatedSlots[consolidatedSlots.length - 1] = ShiftTimeSlot(
+            startTime: last.startTime,
+            endTime: s.endTime,
           );
-          return;
         }
+      } else {
+        consolidatedSlots.add(ShiftTimeSlot(startTime: s.startTime, endTime: s.endTime));
       }
     }
 
-    // 3. Check for overlaps with already scheduled shifts on those dates for this practitioner
-    for (final date in _selectedDates) {
-      final dateStr = DateFormat('yyyy-MM-dd').format(date);
-      for (int i = 0; i < _timeSlots.length; i++) {
-        final slot = _timeSlots[i];
-        final startMinutes = slot.startTime.hour * 60 + slot.startTime.minute;
-        final endMinutes = slot.endTime.hour * 60 + slot.endTime.minute;
-
-        for (final existing in _rosterShifts) {
-          if (existing.doctorId == _selectedDoctorId && existing.rosterDate == dateStr) {
-            final exStart = _parseTimeToMinutes(existing.startTime);
-            final exEnd = _parseTimeToMinutes(existing.endTime);
-            if (exStart != null && exEnd != null) {
-              if (startMinutes < exEnd && endMinutes > exStart) {
-                showDialogError(
-                  context,
-                  'Slot ${i + 1} (${_formatTimeOfDay(slot.startTime)} - ${_formatTimeOfDay(slot.endTime)}) overlaps with an existing shift on $dateStr (${_formatTime(existing.startTime)} - ${_formatTime(existing.endTime)}).\n\nPlease remove or reschedule the existing shift first.',
-                );
-                return;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // 4. Build batch payload (dates × slots)
+    // 3. Build batch payload (dates × merged slots), merging with any existing shifts on that date
     final List<RosterShiftPayload> payloads = [];
     for (final date in _selectedDates) {
       final dateStr = DateFormat('yyyy-MM-dd').format(date);
-      for (final slot in _timeSlots) {
-        final startStr = '${slot.startTime.hour.toString().padLeft(2, '0')}:${slot.startTime.minute.toString().padLeft(2, '0')}:00';
-        final endStr = '${slot.endTime.hour.toString().padLeft(2, '0')}:${slot.endTime.minute.toString().padLeft(2, '0')}:00';
+      final existingOnDate = _rosterShifts
+          .where((e) => e.doctorId == _selectedDoctorId && e.rosterDate == dateStr)
+          .toList();
+
+      for (final slot in consolidatedSlots) {
+        int slotStartM = slot.startTime.hour * 60 + slot.startTime.minute;
+        int slotEndM = slot.endTime.hour * 60 + slot.endTime.minute;
+        String? targetRosterId;
+
+        for (final existing in existingOnDate) {
+          final exStart = _parseTimeToMinutes(existing.startTime);
+          final exEnd = _parseTimeToMinutes(existing.endTime);
+          if (exStart != null && exEnd != null) {
+            // If touches or overlaps existing shift, merge with it!
+            if (slotStartM <= exEnd && slotEndM >= exStart) {
+              slotStartM = math.min(slotStartM, exStart);
+              slotEndM = math.max(slotEndM, exEnd);
+              targetRosterId = existing.rosterId;
+            }
+          }
+        }
+
+        final startStr = '${(slotStartM ~/ 60).toString().padLeft(2, '0')}:${(slotStartM % 60).toString().padLeft(2, '0')}:00';
+        final endStr = '${(slotEndM ~/ 60).toString().padLeft(2, '0')}:${(slotEndM % 60).toString().padLeft(2, '0')}:00';
+
         payloads.add(RosterShiftPayload(
+          rosterId: targetRosterId,
           rosterDate: dateStr,
           startTime: startStr,
           endTime: endStr,
