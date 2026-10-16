@@ -306,6 +306,15 @@ class ApiController {
                 debugPrint('$error');
               }
             } else if (e.response?.statusCode == 409) {
+              if (e.response?.data is Map &&
+                  (e.response?.data['error'] == 'ACTIVE_APPOINTMENTS' ||
+                      e.response?.data['code'] == 'ACTIVE_APPOINTMENTS')) {
+                return ApiResponse(
+                  code: e.response?.statusCode,
+                  message: e.response?.data['message']?.toString(),
+                  data: e.response?.data,
+                );
+              }
               try {
                 Future.delayed(Duration.zero, () {
                   context.goNamed(LoginPage.routeName);

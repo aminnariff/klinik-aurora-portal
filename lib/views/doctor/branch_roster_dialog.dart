@@ -361,8 +361,11 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
       final res = await BranchRosterController.delete(context, rosterId: item.rosterId!);
       dismissLoading();
 
-      if (!mounted) return;
-      if (res.code == 409) {
+      if (res.code == 409 ||
+          res.code == 422 ||
+          (res.data is Map &&
+              (res.data['error'] == 'ACTIVE_APPOINTMENTS' ||
+                  res.data['code'] == 'ACTIVE_APPOINTMENTS'))) {
         // Active bookings found!
         final data = res.data;
         final count = (data is Map) ? (data['affectedCount'] ?? 0) : 0;
