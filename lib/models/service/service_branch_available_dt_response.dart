@@ -54,7 +54,11 @@ class Data {
     serviceBranchId = json['serviceBranchId'];
     branchId = json['branchId'];
     serviceId = json['serviceId'];
-    availableDatetimes = json['availableDatetimes'].cast<String>();
+    if (json['availableDatetimes'] != null && json['availableDatetimes'] is List) {
+      availableDatetimes = (json['availableDatetimes'] as List).map((e) => e.toString()).toList();
+    } else {
+      availableDatetimes = null;
+    }
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
   }

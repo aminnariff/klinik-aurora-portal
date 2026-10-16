@@ -3,10 +3,12 @@ import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
@@ -58,16 +60,80 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
+  bool _hasUsedPractitionerSchedule = false;
+  String? _checkedBranchId;
 
   @override
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(ServiceHomepage.displayName);
+      _checkPractitionerScheduleUsage();
     });
     _page = 1;
     filtering();
     super.initState();
+  }
+
+  void _checkPractitionerScheduleUsage() {
+    final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
+    if (isSuperAdmin) {
+      if (!_hasUsedPractitionerSchedule) {
+        setState(() => _hasUsedPractitionerSchedule = true);
+      }
+      return;
+    }
+
+    final branchId = context.read<AuthController>().authenticationResponse?.data?.user?.branchId;
+    if (branchId == null || branchId.isEmpty) {
+      if (_hasUsedPractitionerSchedule) {
+        setState(() => _hasUsedPractitionerSchedule = false);
+      }
+      return;
+    }
+
+    if (_checkedBranchId == branchId) return;
+    _checkedBranchId = branchId;
+
+    // Check device-local draft pattern
+    bool hasLocalPattern = false;
+    for (final type in [1, 2, 3, 4, 5]) {
+      final val = prefs.getString('practitioner_pattern_${branchId}_$type');
+      if (val != null && val.trim().isNotEmpty) {
+        hasLocalPattern = true;
+        break;
+      }
+    }
+
+    if (hasLocalPattern) {
+      if (mounted) setState(() => _hasUsedPractitionerSchedule = true);
+      return;
+    }
+
+    // Check backend records for configured available datetimes
+    ServiceBranchAvailableDtController.get(
+      context,
+      1,
+      1,
+      branchId: branchId,
+    ).then((value) {
+      if (!mounted) return;
+      bool hasUsed = false;
+      if (responseCode(value.code)) {
+        final list = value.data?.data ?? [];
+        if (list.isNotEmpty) {
+          final first = list.first;
+          if (first.availableDatetimes != null && first.availableDatetimes!.isNotEmpty) {
+            hasUsed = true;
+          }
+        }
+      }
+      if (_hasUsedPractitionerSchedule != hasUsed) {
+        setState(() => _hasUsedPractitionerSchedule = hasUsed);
+      }
+    }).catchError((e) {
+      debugPrint('Error checking practitioner schedule usage: $e');
+    });
   }
 
   @override
@@ -138,13 +204,15 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             ),
           ),
           const SizedBox(width: 12),
-          _toolbarButton(
-            icon: Icons.schedule_rounded,
-            label: 'Practitioner Schedule',
-            color: secondaryColor,
-            onTap: _openPractitionerSchedule,
-          ),
-          const SizedBox(width: 8),
+          if (isSuperAdmin || _hasUsedPractitionerSchedule) ...[
+            _toolbarButton(
+              icon: Icons.schedule_rounded,
+              label: 'Practitioner Schedule',
+              color: secondaryColor,
+              onTap: _openPractitionerSchedule,
+            ),
+            const SizedBox(width: 8),
+          ],
           _toolbarButton(
             icon: Icons.calendar_month_rounded,
             label: 'Branch Roster',
@@ -375,8 +443,15 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                       }),
                       onTap: () => _handleMenuSelection('update', items[i]),
                       cells: [
-                        DataCell(_serviceNameCell(items[i].serviceName, items[i].serviceDescription)),
-                        DataCell(_categoryChip(items[i].serviceCategory)),
+                        DataCell(
+                          _serviceNameCell(
+                            items[i].serviceName,
+                            image: items[i].serviceImage,
+                            doctorType: items[i].doctorType,
+                            category: items[i].serviceCategory,
+                          ),
+                        ),
+                        DataCell(_descriptionCell(items[i].serviceDescription)),
                         DataCell(_timeBadge(items[i].serviceTime)),
                         DataCell(_priceCell(items[i].servicePrice, items[i].serviceBookingFee)),
                         DataCell(_doctorTypeChip(items[i].doctorType)),
@@ -403,7 +478,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   List<DataColumn2> _superadminColumns() {
     return [
       _col('Service', ColumnSize.L),
-      _col('Category', ColumnSize.S),
+      _col('Description', ColumnSize.M),
       _col('Time', ColumnSize.S, fixedWidth: 100),
       _col('Price', ColumnSize.S, fixedWidth: 120),
       _col('Type', ColumnSize.S, fixedWidth: 100),
@@ -504,8 +579,15 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                       }),
                       onTap: () => _openBranchServiceTimingOptions(items[i]),
                       cells: [
-                        DataCell(_serviceNameCell(items[i].serviceName, items[i].serviceDescription)),
-                        DataCell(_categoryChip(items[i].serviceCategory)),
+                        DataCell(
+                          _serviceNameCell(
+                            items[i].serviceName,
+                            image: items[i].serviceImage,
+                            doctorType: items[i].doctorType,
+                            category: items[i].serviceCategory,
+                          ),
+                        ),
+                        DataCell(_descriptionCell(items[i].serviceDescription)),
                         DataCell(
                           InkWell(
                             onTap: () => _handleAdminMenuSelection('changeDuration', items[i]),
@@ -541,7 +623,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   List<DataColumn2> _adminColumns() {
     return [
       _col('Service', ColumnSize.L),
-      _col('Category', ColumnSize.S),
+      _col('Description', ColumnSize.M),
       _col('Time', ColumnSize.S, fixedWidth: 130),
       _col('Price', ColumnSize.S, fixedWidth: 120),
       _col('Type', ColumnSize.S, fixedWidth: 100),
@@ -713,35 +795,112 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  Widget _serviceNameCell(String? name, String? description) {
+  Widget _serviceThumbnail(String? image, int? doctorType, String? category) {
+    if (image != null && image.trim().isNotEmpty) {
+      return Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Image.network(
+          resolveImageUrl(image.trim()),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _fallbackServiceBadge(doctorType, category),
+        ),
+      );
+    }
+    return _fallbackServiceBadge(doctorType, category);
+  }
+
+  Widget _fallbackServiceBadge(int? doctorType, String? category) {
+    final catLower = (category ?? '').toLowerCase();
+    Color bg;
+    Color fg;
+    IconData icon;
+
+    if (doctorType == 2 || catLower.contains('scan') || catLower.contains('ultra') || catLower.contains('baby')) {
+      // Ultrasound / Sonographer
+      bg = const Color(0xFFCCFBF1);
+      fg = const Color(0xFF0F766E);
+      icon = Icons.sensors_rounded;
+    } else if (doctorType == 3 ||
+        doctorType == 4 ||
+        catLower.contains('spa') ||
+        catLower.contains('facial') ||
+        catLower.contains('massage') ||
+        catLower.contains('skin')) {
+      // Spa / Aesthetics / Therapist
+      bg = const Color(0xFFFCE7F3);
+      fg = const Color(0xFFBE185D);
+      icon = Icons.spa_rounded;
+    } else if (doctorType == 5 || catLower.contains('diet') || catLower.contains('nutri') || catLower.contains('weight')) {
+      // Dietitian / Wellness
+      bg = const Color(0xFFDCFCE7);
+      fg = const Color(0xFF15803D);
+      icon = Icons.eco_rounded;
+    } else if (catLower.contains('blood') || catLower.contains('lab') || catLower.contains('test') || catLower.contains('screening')) {
+      // Laboratory / Blood test
+      bg = const Color(0xFFF3E8FF);
+      fg = const Color(0xFF7E22CE);
+      icon = Icons.science_rounded;
+    } else {
+      // General Doctor / Consultation / Medical
+      bg = const Color(0xFFEEF2FF);
+      fg = const Color(0xFF4338CA);
+      icon = Icons.medical_services_rounded;
+    }
+
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Icon(icon, size: 20, color: fg),
+      ),
+    );
+  }
+
+  Widget _serviceNameCell(
+    String? name, {
+    String? image,
+    int? doctorType,
+    String? category,
+  }) {
     return Row(
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(color: secondaryColor.withAlpha(40), borderRadius: BorderRadius.circular(8)),
-          child: const Icon(Icons.medical_services_outlined, size: 18, color: secondaryColor),
-        ),
-        const SizedBox(width: 10),
+        _serviceThumbnail(image, doctorType, category),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              (description != null && description.isNotEmpty)
-                  ? Tooltip(
-                      message: description,
-                      child: Text(
-                        name ?? '—',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                  : Text(
-                      name ?? '—',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+              Text(
+                name ?? '—',
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (category != null && category.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    category,
+                    style: const TextStyle(fontSize: 10.5, color: Color(0xFF475569), fontWeight: FontWeight.w500),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -749,17 +908,24 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     );
   }
 
-  Widget _categoryChip(String? category) {
-    if (category == null || category.isEmpty) {
-      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+  Widget _descriptionCell(String? description) {
+    if (description == null || description.trim().isEmpty) {
+      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 12));
     }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
+    final cleanDesc = description.trim();
+    return Tooltip(
+      message: cleanDesc,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F2937),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      textStyle: const TextStyle(color: Colors.white, fontSize: 12, height: 1.4),
       child: Text(
-        category,
-        style: const TextStyle(fontSize: 11, color: Color(0xFF374151), fontWeight: FontWeight.w500),
+        cleanDesc,
+        maxLines: 2,
         overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontSize: 12, color: Color(0xFF4B5563), height: 1.3),
       ),
     );
   }
@@ -880,10 +1046,12 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 .map<Widget>(
                   (s) => _mobileServiceCard(
                     name: s.serviceName,
+                    image: s.serviceImage,
                     category: s.serviceCategory,
                     time: s.serviceTime,
                     price: s.servicePrice,
                     isActive: s.serviceStatus == 1,
+                    drType: s.doctorType,
                     onTap: () => _handleMenuSelection('update', s),
                   ),
                 )
@@ -900,6 +1068,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 .map<Widget>(
                   (s) => _mobileServiceCard(
                     name: s.serviceName,
+                    image: s.serviceImage,
                     category: s.serviceCategory,
                     time: s.serviceTime,
                     price: s.servicePrice,
@@ -946,13 +1115,15 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _MobileActionButton(
-                        icon: Icons.schedule_rounded,
-                        tooltip: 'Practitioner Schedule',
-                        color: secondaryColor,
-                        onTap: _openPractitionerSchedule,
-                      ),
-                      const SizedBox(width: 8),
+                      if (isSuperAdmin || _hasUsedPractitionerSchedule) ...[
+                        _MobileActionButton(
+                          icon: Icons.schedule_rounded,
+                          tooltip: 'Practitioner Schedule',
+                          color: secondaryColor,
+                          onTap: _openPractitionerSchedule,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
                       _MobileActionButton(
                         icon: Icons.calendar_month_rounded,
                         tooltip: 'Branch Roster',
@@ -1020,6 +1191,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
   Widget _mobileServiceCard({
     String? name,
+    String? image,
     String? category,
     String? time,
     String? price,
@@ -1045,15 +1217,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: secondaryColor.withAlpha(40),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.medical_services_outlined, size: 18, color: secondaryColor),
-                  ),
+                  _serviceThumbnail(image, drType, category),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(name ?? '—', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
@@ -1154,6 +1318,11 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   void _openPractitionerSchedule() {
+    final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
+    if (!isSuperAdmin && !_hasUsedPractitionerSchedule) {
+      showDialogError(context, 'This branch uses the new Branch Roster flow. Practitioner Schedule is not available.');
+      return;
+    }
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1408,7 +1577,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           serviceBranchAvailableDatetimeId: updateId,
                           startMonth: now.month,
                           year: now.year,
-                          totalMonths: 3,
+                          totalMonths: 6,
                           branchId: serviceBranch.branchId,
                           initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
                         ),
@@ -1482,6 +1651,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     showLoading();
     if (page != null) _page = page;
     if (context.read<AuthController>().isSuperAdmin == false) {
+      _checkPractitionerScheduleUsage();
       ServiceBranchController.getAll(
         context,
         _page,
