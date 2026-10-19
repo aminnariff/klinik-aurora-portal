@@ -561,6 +561,44 @@ class AppointmentDetailsView extends StatelessWidget {
             ],
           ),
         ],
+        if (notNullOrEmptyString(data?.appointmentReferralLetterUrl) &&
+            (data!.appointmentReferralLetterUrl!.startsWith('http://') ||
+                data.appointmentReferralLetterUrl!.startsWith('https://'))) ...[
+          const SizedBox(height: 14),
+          _fieldLabel('Referral Letter (PDF)'),
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () => launchWebUrl(data.appointmentReferralLetterUrl ?? '', webOnlyWindowName: '_blank'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFF2563EB).withAlpha(80)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.picture_as_pdf_rounded, size: 16, color: Color(0xFFDC2626)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      data.appointmentReferralLetterUrl ?? '',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF2563EB),
+                        decoration: TextDecoration.underline,
+                        decorationColor: Color(0xFF2563EB),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF2563EB)),
+                ],
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

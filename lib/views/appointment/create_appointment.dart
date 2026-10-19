@@ -120,18 +120,19 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   // context (e.g. branch-transfer waiver) or any other internal remark.
   final TextEditingController _adminRemarkController = TextEditingController();
   final TextEditingController _attachmentUrlController = TextEditingController();
+  final TextEditingController _referralLetterUrlController = TextEditingController();
   StreamController<String?> documentErrorMessage = StreamController.broadcast();
   List<DropdownAttribute> serviceList = [];
   List<String> availableDateTime = [];
   service_branch_available_model.Data? selectedService;
   GestationalController? gestationalResult;
 
-  bool get _isLocked =>
-      widget.appointment?.appointmentStatus == 2 ||
-      widget.appointment?.appointmentStatus == 4 ||
-      widget.appointment?.appointmentStatus == 5 ||
-      widget.appointment?.appointmentStatus == 8;
-  bool get _canSubmitWhenLockedCompleted => widget.type == 'update' && widget.appointment?.appointmentStatus == 5;
+  bool _isUnlocked = false;
+
+  bool get _isStatusLockedByDefault =>
+      [2, 4, 5, 6, 8].contains(widget.appointment?.appointmentStatus);
+
+  bool get _isLocked => _isStatusLockedByDefault && !_isUnlocked;
   bool get _isCurrentRescan =>
       widget.appointment?.service?.serviceName?.toLowerCase().contains('rescan') == true ||
       (widget.appointment?.appointmentNote != null &&
@@ -162,6 +163,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     appointmentNoteController.controller.text = widget.appointment?.appointmentNote ?? '';
     dueDateController.controller.text = dateConverter(widget.appointment?.customerDueDate, format: 'dd-MM-yyyy') ?? '';
     _attachmentUrlController.text = widget.appointment?.appointmentAttachmentUrl ?? '';
+    _referralLetterUrlController.text = widget.appointment?.appointmentReferralLetterUrl ?? '';
 
     if (_isCurrentRescan && widget.appointment?.service?.serviceTime != null) {
       final parsed = int.tryParse(widget.appointment!.service!.serviceTime!.replaceAll(RegExp(r'[^0-9]'), ''));
@@ -476,6 +478,63 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     });
   }
 
+  String _getStatusName(int? status) {
+    switch (status) {
+      case 2:
+        return 'Cancelled';
+      case 4:
+        return 'Pending Payment';
+      case 5:
+        return 'Completed';
+      case 6:
+        return 'Refunded';
+      case 8:
+        return 'Transferred';
+      default:
+        return 'Locked';
+    }
+  }
+
+  void _confirmUnlockAppointment() {
+    final statusName = _getStatusName(widget.appointment?.appointmentStatus);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          'Edit $statusName Appointment?',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          'This appointment is currently marked as $statusName. Are you sure you want to unlock it to make changes?',
+          style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF059669),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              setState(() {
+                _isUnlocked = true;
+              });
+              rebuildDropdown.add(DateTime.now());
+              rebuild.add(DateTime.now());
+            },
+            child: const Text('Yes, Unlock to Edit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _headerQuickAction({
     required String label,
     required IconData icon,
@@ -707,47 +766,104 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           ],
                         ),
                       ),
-                      if (widget.type == 'update' && widget.appointment?.appointmentStatus == 2)
+                      if (widget.type == 'update' && _isStatusLockedByDefault)
                         Container(
                           margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEF2F2),
+                            color: _isUnlocked
+                                ? const Color(0xFFF0FDF4)
+                                : widget.appointment?.appointmentStatus == 2
+                                ? const Color(0xFFFEF2F2)
+                                : widget.appointment?.appointmentStatus == 8
+                                ? const Color(0xFFF5F3FF)
+                                : const Color(0xFFFFFBEB),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFFECACA)),
+                            border: Border.all(
+                              color: _isUnlocked
+                                  ? const Color(0xFFBBF7D0)
+                                  : widget.appointment?.appointmentStatus == 2
+                                  ? const Color(0xFFFECACA)
+                                  : widget.appointment?.appointmentStatus == 8
+                                  ? const Color(0xFFDDD6FE)
+                                  : const Color(0xFFFDE68A),
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.cancel_rounded, size: 16, color: Color(0xFFDC2626)),
+                              Icon(
+                                _isUnlocked
+                                    ? Icons.lock_open_rounded
+                                    : widget.appointment?.appointmentStatus == 2
+                                    ? Icons.cancel_rounded
+                                    : widget.appointment?.appointmentStatus == 8
+                                    ? Icons.swap_horiz_rounded
+                                    : Icons.lock_outline_rounded,
+                                size: 16,
+                                color: _isUnlocked
+                                    ? const Color(0xFF16A34A)
+                                    : widget.appointment?.appointmentStatus == 2
+                                    ? const Color(0xFFDC2626)
+                                    : widget.appointment?.appointmentStatus == 8
+                                    ? const Color(0xFF7C3AED)
+                                    : const Color(0xFFD97706),
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'This appointment was cancelled.${(widget.appointment?.adminRemark != null && widget.appointment!.adminRemark!.isNotEmpty) ? ' Reason: ${widget.appointment!.adminRemark}' : (widget.appointment?.appointmentNote != null && widget.appointment!.appointmentNote!.isNotEmpty ? ' (${widget.appointment!.appointmentNote})' : '')}',
-                                  style: const TextStyle(fontSize: 12.5, color: Color(0xFF991B1B), fontWeight: FontWeight.w500),
+                                  _isUnlocked
+                                      ? 'Appointment unlocked for editing. You can now modify status, date/time slot, and notes.'
+                                      : widget.appointment?.appointmentStatus == 2
+                                      ? 'This appointment was cancelled.${(widget.appointment?.adminRemark != null && widget.appointment!.adminRemark!.isNotEmpty) ? ' Reason: ${widget.appointment!.adminRemark}' : (widget.appointment?.appointmentNote != null && widget.appointment!.appointmentNote!.isNotEmpty ? ' (${widget.appointment!.appointmentNote})' : '')}'
+                                      : widget.appointment?.appointmentStatus == 8
+                                      ? 'This appointment was marked as Transferred. Check destination branch for schedule.'
+                                      : 'This appointment is marked as ${_getStatusName(widget.appointment?.appointmentStatus)}.',
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    color: _isUnlocked
+                                        ? const Color(0xFF166534)
+                                        : widget.appointment?.appointmentStatus == 2
+                                        ? const Color(0xFF991B1B)
+                                        : widget.appointment?.appointmentStatus == 8
+                                        ? const Color(0xFF5B21B6)
+                                        : const Color(0xFF92400E),
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      if (widget.type == 'update' && widget.appointment?.appointmentStatus == 8)
-                        Container(
-                          margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F3FF),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFDDD6FE)),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.swap_horiz_rounded, size: 16, color: Color(0xFF7C3AED)),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'This appointment was marked as Transferred. Check destination branch for schedule.',
-                                  style: TextStyle(fontSize: 12.5, color: Color(0xFF5B21B6), fontWeight: FontWeight.w500),
+                              if (!_isUnlocked) ...[
+                                const SizedBox(width: 8),
+                                InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () => _confirmUnlockAppointment(),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: widget.appointment?.appointmentStatus == 2
+                                          ? const Color(0xFFDC2626)
+                                          : widget.appointment?.appointmentStatus == 8
+                                          ? const Color(0xFF7C3AED)
+                                          : const Color(0xFFD97706),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.edit_rounded, size: 13, color: Colors.white),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'Unlock to Edit',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ),
@@ -1795,6 +1911,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             folder: 'appointment',
                                             onChanged: () => setState(() {}),
                                           ),
+                                          const SizedBox(height: 12),
+                                          _extraSectionLabel('Referral Letter (PDF)', Icons.description_outlined),
+                                          const SizedBox(height: 8),
+                                          AppAttachmentField(
+                                            controller: _referralLetterUrlController,
+                                            folder: 'referral-letters',
+                                            onChanged: () => setState(() {}),
+                                          ),
                                           const SizedBox(height: 6),
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1845,7 +1969,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   }
 
                                   // Editing-specific notes
-                                  if (!_isLocked || _canSubmitWhenLockedCompleted) {
+                                  if (!_isLocked) {
                                     if (widget.type == 'update') {
                                       notes.add(
                                         'Changing the appointment slot will automatically set the status to Rescheduled.',
@@ -1931,7 +2055,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             ),
             child: const Text('Close', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           ),
-          if (!_isLocked || _canSubmitWhenLockedCompleted) ...[
+          if (!_isLocked) ...[
             const SizedBox(width: 12),
             button(),
           ],
@@ -2909,6 +3033,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   folder: 'appointment',
                   onChanged: () => setState(() {}),
                 ),
+                const SizedBox(height: 12),
+                _extraSectionLabel('Referral Letter (PDF)', Icons.description_outlined),
+                const SizedBox(height: 8),
+                AppAttachmentField(
+                  controller: _referralLetterUrlController,
+                  folder: 'referral-letters',
+                  onChanged: () => setState(() {}),
+                ),
                 const SizedBox(height: 6),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -3376,6 +3508,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
             appointmentNote: _buildNote(),
             appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
+            appointmentReferralLetterUrl: _referralLetterUrlController.text.trim().isEmpty
+                ? null
+                : _referralLetterUrlController.text.trim(),
             customerDueDate: (() {
               try {
                 return DateFormat(
@@ -3493,8 +3628,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             : null;
 
         if (newUtcStr != oldUtcStr && newUtcStr.isNotEmpty) {
-          // Auto-set status to rescheduled only if it's currently in an "Upcoming/Active" state
-          if (_status?.key == '1' || _status?.key == '4') {
+          // Auto-set status to rescheduled if slot actually changed
+          if (['1', '2', '4', '5', '6', '8'].contains(_status?.key)) {
             _status = DropdownAttribute('3', 'Rescheduled');
           }
         }
@@ -3508,6 +3643,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             serviceBranchId: _service?.key,
             appointmentNote: _buildNote(),
             appointmentAttachmentUrl: _attachmentUrlController.text.trim(),
+            appointmentReferralLetterUrl: _referralLetterUrlController.text.trim().isEmpty
+                ? null
+                : _referralLetterUrlController.text.trim(),
             customerDueDate: (() {
               try {
                 return DateFormat(

@@ -5,6 +5,7 @@ class UpdateAppointmentRequest {
   String? appointmentDateTime;
   String? appointmentNote;
   String? appointmentAttachmentUrl;
+  String? appointmentReferralLetterUrl;
   String? customerDueDate;
   String? doctorId;
   int? appointmentRating;
@@ -23,6 +24,7 @@ class UpdateAppointmentRequest {
     this.appointmentDateTime,
     this.appointmentNote,
     this.appointmentAttachmentUrl,
+    this.appointmentReferralLetterUrl,
     this.customerDueDate,
     this.doctorId,
     this.appointmentRating,
@@ -41,6 +43,7 @@ class UpdateAppointmentRequest {
     appointmentDateTime = json['appointmentDateTime'];
     appointmentNote = json['appointmentNote'];
     appointmentAttachmentUrl = json['appointmentAttachmentUrl'];
+    appointmentReferralLetterUrl = json['appointmentReferralLetterUrl'];
     customerDueDate = json['customerDueDate'];
     doctorId = json['doctorId'];
     appointmentRating = json['appointmentRating'];
@@ -60,6 +63,7 @@ class UpdateAppointmentRequest {
     data['appointmentDateTime'] = appointmentDateTime;
     data['appointmentNote'] = appointmentNote;
     data['appointmentAttachmentUrl'] = appointmentAttachmentUrl;
+    data['appointmentReferralLetterUrl'] = appointmentReferralLetterUrl;
     data['customerDueDate'] = customerDueDate;
     data['doctorId'] = doctorId;
     data['appointmentRating'] = appointmentRating;

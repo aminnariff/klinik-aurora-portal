@@ -19,6 +19,7 @@ import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart' as appointment_model;
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/user/appointment_ids.dart';
+import 'package:klinik_aurora_portal/views/user/user_baby_tracker_dialog.dart';
 import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -706,6 +707,16 @@ class _UserDetailState extends State<UserDetail> {
                   onTap: _openManagePoints,
                 ),
               ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _actionBtn(
+                  icon: Icons.child_care_rounded,
+                  label: 'Baby Kick Tracker',
+                  color: const Color(0xFFE11D48),
+                  bgColor: const Color(0xFFFFE4E6),
+                  onTap: _openBabyKickTracker,
+                ),
+              ),
             ],
           ),
         ],
@@ -774,6 +785,15 @@ class _UserDetailState extends State<UserDetail> {
         }
       });
     });
+  }
+
+  void _openBabyKickTracker() {
+    final user = widget.user;
+    if (user == null) return;
+    showDialog(
+      context: context,
+      builder: (_) => UserBabyTrackerDialog(patient: user),
+    );
   }
 
   Widget _actionBtn({
@@ -1130,7 +1150,7 @@ class _UserDetailState extends State<UserDetail> {
                 color: Color(0xFF475569),
               ),
             ),
-            if (action != null) action,
+            ?action,
           ],
         ),
         const SizedBox(height: 5),
@@ -1166,7 +1186,7 @@ class _UserDetailState extends State<UserDetail> {
                   ),
                 ),
               ),
-              if (suffix != null) suffix,
+              ?suffix,
             ],
           ),
         ),

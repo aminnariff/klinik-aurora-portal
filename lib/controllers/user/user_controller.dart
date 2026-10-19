@@ -94,6 +94,15 @@ class UserController extends ChangeNotifier {
         });
   }
 
+  static Future<ApiResponse<dynamic>> babyTracker(BuildContext context, String userId) async {
+    return ApiController().call(
+      context,
+      method: Method.get,
+      endpoint: 'admin/user-management/baby-tracker',
+      queryParameters: {'userId': userId},
+    );
+  }
+
   static Future<ApiResponse<UpdateUserResponse>> update(BuildContext context, UpdateUserRequest request) async {
     return ApiController()
         .call(context, method: Method.put, endpoint: 'admin/user-management/update', data: request.toJson())
