@@ -39,7 +39,7 @@ class MultiTimeCalendarPage extends StatefulWidget {
     this.serviceBranchAvailableDatetimeId,
     required this.startMonth,
     required this.year,
-    this.totalMonths = 2,
+    this.totalMonths = 6,
     this.initialDateTimes,
     this.branchId,
   });

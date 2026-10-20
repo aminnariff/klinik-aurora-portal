@@ -1,3 +1,10 @@
+int? _parseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString());
+}
+
 class UserAllResponse {
   String? message;
   List<UserResponse>? data;
@@ -14,8 +21,8 @@ class UserAllResponse {
         data!.add(UserResponse.fromJson(v));
       });
     }
-    totalPage = json['totalPage'];
-    totalCount = json['totalCount'];
+    totalPage = _parseInt(json['totalPage']);
+    totalCount = _parseInt(json['totalCount']);
   }
 
   Map<String, dynamic> toJson() {
@@ -75,10 +82,10 @@ class UserResponse {
     branchId = json['branchId'];
     userPhone = json['userPhone'];
     userReferral = json['userReferral'];
-    userStatus = json['userStatus'];
-    totalPoint = json['totalPoint'];
-    createdByAdmin = json['createdByAdmin'];
-    tncAccepted = json['tncAccepted'];
+    userStatus = _parseInt(json['userStatus']);
+    totalPoint = _parseInt(json['totalPoint']);
+    createdByAdmin = _parseInt(json['createdByAdmin']);
+    tncAccepted = _parseInt(json['tncAccepted']);
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
   }

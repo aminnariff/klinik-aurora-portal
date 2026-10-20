@@ -29,6 +29,8 @@ class AdminController extends ChangeNotifier {
     String? userPhone,
     String? userEmail,
     int? userStatus,
+    String? sortBy,
+    String? sortOrder,
   }) async {
     return ApiController()
         .call(
@@ -40,6 +42,8 @@ class AdminController extends ChangeNotifier {
             if (notNullOrEmptyString(userPhone)) 'userPhone': userPhone,
             if (notNullOrEmptyString(userEmail)) 'userEmail': userEmail,
             'userStatus': ?userStatus,
+            if (notNullOrEmptyString(sortBy)) 'sortBy': sortBy,
+            if (notNullOrEmptyString(sortOrder)) 'sortOrder': sortOrder,
             'page': page,
             'pageSize': pageSize,
           },

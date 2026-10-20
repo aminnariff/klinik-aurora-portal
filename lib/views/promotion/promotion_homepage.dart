@@ -16,19 +16,13 @@ import 'package:klinik_aurora_portal/models/promotion/promotion_all_response.dar
 import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/promotion/promotion_detail.dart';
-import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
-import 'package:klinik_aurora_portal/views/widgets/checkbox/checkbox.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_multi_image_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
-import 'package:klinik_aurora_portal/views/widgets/read_only/read_only.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
@@ -678,25 +672,29 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 40, vertical: isMobile ? 24 : 40),
-      child: SizedBox(
-        width: isMobile ? double.infinity : 820,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16 : 32,
+        vertical: isMobile ? 20 : 32,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: isMobile ? double.infinity : 780,
+          maxHeight: MediaQuery.of(context).size.height * 0.92,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header
             _buildDialogHeader(context),
-            const Divider(height: 1, color: Color(0xFFE5E7EB)),
-            // Body
+            const Divider(height: 1, color: Color(0xFFE2E8F0)),
             Flexible(
               child: SingleChildScrollView(
-                padding: EdgeInsets.all(screenPadding),
+                padding: EdgeInsets.all(isMobile ? 16 : 24),
                 child: isMobile ? _buildMobileForm(context) : _buildDesktopForm(context),
               ),
             ),
-            // Footer
-            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            const Divider(height: 1, color: Color(0xFFE2E8F0)),
             _buildDialogFooter(context),
           ],
         ),
@@ -706,22 +704,40 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
 
   Widget _buildDialogHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 12, 16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
       child: Row(
         children: [
           Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(color: primary.withAlpha(25), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.local_offer_rounded, color: primary, size: 18),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: primary.withAlpha(25),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.campaign_rounded, color: primary, size: 20),
           ),
           const SizedBox(width: 12),
-          Text(widget.title, style: AppTypography.bodyLarge(context)),
-          const Spacer(),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                ),
+                const SizedBox(height: 2),
+                const Text(
+                  'Configure promotion title, banner images, and schedule',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                ),
+              ],
+            ),
+          ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20),
+            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
             onPressed: () => context.pop(),
-            style: IconButton.styleFrom(foregroundColor: const Color(0xFF6B7280)),
+            splashRadius: 20,
           ),
         ],
       ),
@@ -730,18 +746,36 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
 
   Widget _buildDialogFooter(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          TextButton(
+          OutlinedButton(
             onPressed: () => context.pop(),
-            child: Text('Cancel', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              side: const BorderSide(color: Color(0xFFCBD5E1)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600),
+            ),
           ),
           const SizedBox(width: 12),
-          Button(
-            () => widget.onSave(_imageUrls),
-            actionText: widget.title == 'New Promotion' ? 'button'.tr(gender: 'create') : 'button'.tr(gender: 'update'),
+          ElevatedButton.icon(
+            onPressed: () => widget.onSave(_imageUrls),
+            icon: const Icon(Icons.check_rounded, size: 18, color: Colors.white),
+            label: Text(
+              widget.title == 'New Promotion' ? 'Create Promotion' : 'Update Promotion',
+              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primary,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              elevation: 0,
+            ),
           ),
         ],
       ),
@@ -753,7 +787,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(child: _buildLeftColumn(context)),
-        const SizedBox(width: 24),
+        const SizedBox(width: 28),
         Expanded(child: _buildRightColumn(context)),
       ],
     );
@@ -761,121 +795,130 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
 
   Widget _buildMobileForm(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ..._buildLeftColumn(context).children,
-        const SizedBox(height: 16),
-        ..._buildRightColumn(context).children,
+        _buildLeftColumn(context),
+        const SizedBox(height: 20),
+        _buildRightColumn(context),
       ],
     );
   }
 
-  Column _buildLeftColumn(BuildContext context) {
+  Widget _buildLeftColumn(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel(context, 'Promotion Details'),
-        const SizedBox(height: 12),
-        InputField(
-          field: InputFieldAttribute(controller: widget.promotionName, labelText: 'Name'),
+        _sectionHeader('PROMOTION CONTENT', Icons.article_outlined),
+        const SizedBox(height: 14),
+        _fieldLabel('Promotion Title', isRequired: true),
+        const SizedBox(height: 6),
+        _styledTextField(
+          controller: widget.promotionName,
+          hint: 'e.g. Raya Glow Treatment Special',
         ),
-        AppPadding.vertical(denominator: 2),
-        TextField(
-          maxLines: 4,
-          style: Theme.of(context).textTheme.bodyMedium,
+        const SizedBox(height: 14),
+        _fieldLabel('Description', isRequired: true),
+        const SizedBox(height: 6),
+        _styledTextField(
           controller: widget.promotionDescription,
-          decoration: appInputDecoration(context, 'Description'),
-        ),
-        AppPadding.vertical(denominator: 2),
-        TextField(
+          hint: 'Describe promotion offerings, highlights, or discounts...',
           maxLines: 4,
-          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 14),
+        _fieldLabel('Terms & Conditions (Optional)'),
+        const SizedBox(height: 6),
+        _styledTextField(
           controller: widget.promotionTnc,
-          decoration: appInputDecoration(context, 'Terms & Conditions'),
+          hint: 'Redemption terms, appointment validity, exclusions...',
+          maxLines: 4,
         ),
       ],
     );
   }
 
-  Column _buildRightColumn(BuildContext context) {
+  Widget _buildRightColumn(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel(context, 'Images & Schedule'),
+        _sectionHeader('BANNER IMAGES', Icons.image_outlined),
         const SizedBox(height: 12),
         AppMultiImageField(
           title: 'promotionPage'.tr(gender: 'promotionImage'),
           images: _imageUrls,
           maxImages: 3,
+          folder: 'promotion',
           onChanged: (urls) {
             setState(() {
               _imageUrls = urls;
             });
           },
         ),
-        AppPadding.vertical(),
-        GestureDetector(
-          onTap: () async {
-            final results = await showCalendarDatePicker2Dialog(
-              context: context,
-              config: CalendarDatePicker2WithActionButtonsConfig(),
-              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-              borderRadius: BorderRadius.circular(15),
-            );
-            widget.startDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-          },
-          child: ReadOnly(
-            InputField(
-              field: InputFieldAttribute(
-                controller: widget.startDate,
-                isEditable: false,
-                labelText: 'promotionPage'.tr(gender: 'startDate'),
-                suffixWidget: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF9CA3AF))],
-                ),
-              ),
-            ),
-            isEditable: false,
-          ),
+        const SizedBox(height: 20),
+        _sectionHeader('SCHEDULE & VISIBILITY', Icons.schedule_outlined),
+        const SizedBox(height: 14),
+        _fieldLabel('Start Date', isRequired: true),
+        const SizedBox(height: 6),
+        _buildDatePickerField(
+          controller: widget.startDate,
+          hint: 'Select start date',
         ),
-        AppPadding.vertical(denominator: 2),
-        GestureDetector(
-          onTap: () async {
-            final results = await showCalendarDatePicker2Dialog(
-              context: context,
-              config: CalendarDatePicker2WithActionButtonsConfig(firstDate: DateTime.now()),
-              dialogSize: Size(screenWidth1728(60), screenHeight829(60)),
-              borderRadius: BorderRadius.circular(15),
-            );
-            widget.endDate.text = dateConverter('${results?.first}', format: 'dd-MM-yyyy') ?? '';
-          },
-          child: ReadOnly(
-            InputField(
-              field: InputFieldAttribute(
-                controller: widget.endDate,
-                isEditable: false,
-                labelText: 'promotionPage'.tr(gender: 'endDate'),
-                suffixWidget: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF9CA3AF))],
-                ),
-              ),
-            ),
-            isEditable: false,
-          ),
+        const SizedBox(height: 14),
+        _fieldLabel('End Date', isRequired: true),
+        const SizedBox(height: 6),
+        _buildDatePickerField(
+          controller: widget.endDate,
+          hint: 'Select end date',
         ),
-        AppPadding.vertical(denominator: 2),
+        const SizedBox(height: 18),
         ValueListenableBuilder<bool>(
           valueListenable: widget.showOnStart,
           builder: (context, value, _) {
-            return GestureDetector(
-              onTap: () => widget.showOnStart.value = !value,
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: value ? const Color(0xFFFFFBEB) : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: value ? const Color(0xFFFDE68A) : const Color(0xFFE2E8F0),
+                ),
+              ),
               child: Row(
                 children: [
-                  CheckBoxWidget((p0) => widget.showOnStart.value = !value, value: value),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text('promotionPage'.tr(gender: 'showOnStart'), style: AppTypography.bodyMedium(context)),
+                  Icon(
+                    Icons.star_rounded,
+                    size: 20,
+                    color: value ? const Color(0xFFD97706) : const Color(0xFF94A3B8),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Featured on App Launch',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: value ? const Color(0xFFB45309) : const Color(0xFF334155),
+                          ),
+                        ),
+                        Text(
+                          'Shows full-screen popup banner when mobile app opens',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: value ? const Color(0xFF92400E) : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: value,
+                    activeTrackColor: const Color(0xFFD97706),
+                    activeThumbColor: Colors.white,
+                    onChanged: (val) {
+                      widget.showOnStart.value = val;
+                    },
                   ),
                 ],
               ),
@@ -886,10 +929,150 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
     );
   }
 
-  Widget _sectionLabel(BuildContext context, String label) {
-    return Text(
-      label,
-      style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF374151)),
+  Widget _buildDatePickerField({
+    required TextEditingController controller,
+    required String hint,
+  }) {
+    return InkWell(
+      onTap: () async {
+        DateTime? initial;
+        if (controller.text.isNotEmpty) {
+          try {
+            initial = DateFormat('dd-MM-yyyy').parseStrict(controller.text);
+          } catch (_) {}
+        }
+        final results = await showCalendarDatePicker2Dialog(
+          context: context,
+          config: CalendarDatePicker2WithActionButtonsConfig(
+            currentDate: initial ?? DateTime.now(),
+          ),
+          dialogSize: const Size(360, 360),
+          borderRadius: BorderRadius.circular(16),
+        );
+        if (results != null && results.isNotEmpty && results.first != null) {
+          setState(() {
+            controller.text = dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
+          });
+        }
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        height: 42,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFCBD5E1)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF64748B)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                controller.text.isNotEmpty ? controller.text : hint,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: controller.text.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
+                  color: controller.text.isNotEmpty ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                ),
+              ),
+            ),
+            if (controller.text.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
+                splashRadius: 14,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => setState(() => controller.clear()),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionHeader(String title, IconData icon) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 3,
+          height: 14,
+          decoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(2)),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 14, color: const Color(0xFF64748B)),
+        const SizedBox(width: 6),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF475569),
+            letterSpacing: 0.8,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _fieldLabel(String label, {bool isRequired = false}) {
+    return RichText(
+      text: TextSpan(
+        text: label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF334155),
+        ),
+        children: isRequired
+            ? [
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.bold),
+                ),
+              ]
+            : [],
+      ),
+    );
+  }
+
+  Widget _styledTextField({
+    required TextEditingController controller,
+    required String hint,
+    int maxLines = 1,
+  }) {
+    return SizedBox(
+      height: maxLines == 1 ? 42 : null,
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF0F172A),
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
+          filled: true,
+          fillColor: const Color(0xFFF8FAFC),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            borderSide: BorderSide(color: primary, width: 1.5),
+          ),
+        ),
+      ),
     );
   }
 }

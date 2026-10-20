@@ -139,7 +139,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                                   serviceBranchAvailableDatetimeId: updateId,
                                                                   startMonth: now.month,
                                                                   year: now.year,
-                                                                  totalMonths: 3,
+                                                                  totalMonths: 6,
                                                                   initialDateTimes: haveElements
                                                                       ? value.data?.data?.first.availableDatetimes
                                                                       : null,

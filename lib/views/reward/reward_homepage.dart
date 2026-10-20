@@ -362,9 +362,16 @@ class _RewardHomepageState extends State<RewardHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(
-                        i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC),
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (_) => RewardDetail(reward: items[i], type: 'update'),
                       ),
+                      color: WidgetStateProperty.resolveWith<Color?>((states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return const Color(0xFFF1F5F9);
+                        }
+                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                      }),
                       cells: [
                         DataCell(_rewardNameCell(items[i])),
                         DataCell(_pointsBadge(items[i].rewardPoint)),
@@ -719,14 +726,19 @@ class _RewardHomepageState extends State<RewardHomepage> {
   }
 
   Widget _mobileCard(Data reward) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+    return GestureDetector(
+      onTap: () => showDialog(
+        context: context,
+        builder: (_) => RewardDetail(reward: reward, type: 'update'),
       ),
-      color: Colors.white,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 10),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -771,7 +783,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   String _stockLabel(Data reward) {

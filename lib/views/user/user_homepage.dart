@@ -418,7 +418,16 @@ class _UserHomepageState extends State<UserHomepage> {
       columns: columns(),
       rows: [
         for (int i = 0; i < users.length; i++)
-          DataRow2(color: WidgetStateProperty.all(Colors.white), cells: _buildCells(users[i])),
+          DataRow2(
+            color: WidgetStateProperty.resolveWith<Color?>((states) {
+              if (states.contains(WidgetState.hovered)) {
+                return const Color(0xFFF1F5F9);
+              }
+              return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+            }),
+            onTap: () => _handleMenuSelection('update', users[i]),
+            cells: _buildCells(users[i]),
+          ),
       ],
     );
   }

@@ -10,7 +10,6 @@ import 'package:klinik_aurora_portal/controllers/point_management/point_manageme
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/points/point_detail.dart';
-import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/table_header_attribute.dart';
@@ -52,23 +51,27 @@ class _UserPointDetailState extends State<UserPointDetail> {
   ];
   bool? isLoading;
 
+  void _loadPoints() {
+    UserController.points(context, widget.user.userId ?? '').then((value) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        if (responseCode(value.code)) {
+          context.read<UserController>().userPoints = value.data;
+        }
+      }
+    });
+    PointManagementController.get(context, 1, userId: widget.user.userId).then((value) {
+      if (mounted && responseCode(value.code)) {
+        context.read<PointManagementController>().userPointsResponse = value.data;
+      }
+    });
+  }
+
   @override
   void initState() {
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       context.read<UserController>().userPoints = null;
-      UserController.points(context, widget.user.userId ?? '').then((value) {
-        setState(() => isLoading = false);
-        if (responseCode(value.code)) {
-          context.read<UserController>().userPoints = value.data;
-        } else {
-          showDialogError(context, 'Unable to fetch user\'s points history');
-        }
-      });
-      PointManagementController.get(context, 1, userId: widget.user.userId).then((value) {
-        if (responseCode(value.code)) {
-          context.read<PointManagementController>().userPointsResponse = value.data;
-        }
-      });
+      _loadPoints();
     });
     super.initState();
   }
@@ -131,7 +134,9 @@ class _UserPointDetailState extends State<UserPointDetail> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) => PointDetail(user: widget.user),
-                        );
+                        ).then((_) {
+                          _loadPoints();
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primary,
@@ -291,32 +296,37 @@ class _UserPointDetailState extends State<UserPointDetail> {
   Widget _buildSummaryCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.1)),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
-              child: Icon(icon, color: color, size: 24),
+              child: Icon(icon, color: color, size: 22),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     title,
-                    style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade600, fontSizeDelta: -1),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Text(
                     value,
-                    style: AppTypography.bodyMedium(context).copyWith(fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: color, height: 1.2),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

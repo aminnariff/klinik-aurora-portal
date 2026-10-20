@@ -63,7 +63,7 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
     _branchId = widget.branchId;
     final now = DateTime.now();
     _availableFrom = DateTime(now.year, now.month, now.day);
-    _availableUntil = DateTime(now.year, now.month + 3, 0); // end of month +2
+    _availableUntil = DateTime(now.year, now.month + 6, 0); // end of month +5
     // The footer's Next/block-reason logic reads _editor.isValid and the
     // pattern; without this subscription it would go stale on pattern edits.
     _editor.addListener(_onEditorChanged);

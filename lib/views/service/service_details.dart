@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
@@ -13,7 +14,6 @@ import 'package:klinik_aurora_portal/models/service/update_service_request.dart'
 import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
-import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
@@ -363,23 +363,20 @@ class _ServiceDetailsState extends State<ServiceDetails> {
           StreamBuilder<DateTime>(
             stream: rebuildDropdown.stream,
             builder: (context, snapshot) {
-              return AppDropdown(
-                attributeList: DropdownAttributeList(
-                  [
-                    DropdownAttribute('1', 'Doctor'),
-                    DropdownAttribute('2', 'Sonographer'),
-                    DropdownAttribute('3', 'Therapist'),
-                    DropdownAttribute('4', 'Spa Therapist'),
-                    DropdownAttribute('5', 'Dietitian'),
-                  ],
-                  labelText: 'Performed By',
-                  value: _doctorType?.name,
-                  onChanged: (p0) {
-                    _doctorType = p0;
-                    rebuildDropdown.add(DateTime.now());
-                  },
-                  width: double.infinity,
-                ),
+              return _styledDropdown(
+                items: [
+                  DropdownAttribute('1', 'Doctor'),
+                  DropdownAttribute('2', 'Sonographer'),
+                  DropdownAttribute('3', 'Therapist'),
+                  DropdownAttribute('4', 'Spa Therapist'),
+                  DropdownAttribute('5', 'Dietitian'),
+                ],
+                value: _doctorType?.name,
+                hint: 'Select practitioner role',
+                onChanged: (p0) {
+                  _doctorType = p0;
+                  rebuildDropdown.add(DateTime.now());
+                },
               );
             },
           ),
@@ -979,10 +976,10 @@ class _ServiceDetailsState extends State<ServiceDetails> {
             controller: controller,
             keyboardType: isNumber ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
             maxLines: maxLines,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1000,6 +997,86 @@ class _ServiceDetailsState extends State<ServiceDetails> {
               focusedBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
                 borderSide: BorderSide(color: Color(0xFF246E7A), width: 1.5),
+              ),
+            ),
+          ),
+        ),
+        if (errorText != null) ...[
+          const SizedBox(height: 4),
+          Text(errorText, style: const TextStyle(color: Color(0xFFDC2626), fontSize: 11)),
+        ],
+      ],
+    );
+  }
+
+  Widget _styledDropdown({
+    required List<DropdownAttribute> items,
+    required String? value,
+    required ValueChanged<DropdownAttribute?> onChanged,
+    String hint = 'Select',
+    String? errorText,
+  }) {
+    final hasValue = value != null && value.trim().isNotEmpty;
+    final displayLabel = hasValue ? value : hint;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 42,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton2<DropdownAttribute>(
+              isExpanded: true,
+              isDense: true,
+              hint: Text(
+                displayLabel,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: hasValue ? FontWeight.w600 : FontWeight.normal,
+                  color: hasValue ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              items: items
+                  .map(
+                    (item) => DropdownItem<DropdownAttribute>(
+                      value: item,
+                      child: Text(
+                        item.name,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: onChanged,
+              iconStyleData: const IconStyleData(
+                icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: Color(0xFF64748B)),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                elevation: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(20),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -5,7 +5,6 @@ import 'package:klinik_aurora_portal/controllers/campaign/campaign_controller.da
 import 'package:klinik_aurora_portal/models/campaign/campaign.dart';
 import 'package:klinik_aurora_portal/views/campaigns/campaign_editor.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
@@ -180,7 +179,7 @@ class _CampaignManagementState extends State<CampaignManagement> {
   }
 }
 
-class _CampaignCard extends StatelessWidget {
+class _CampaignCard extends StatefulWidget {
   final Campaign campaign;
   final bool hasOverlapWarning;
   final VoidCallback onEdit;
@@ -194,72 +193,225 @@ class _CampaignCard extends StatelessWidget {
   });
 
   @override
+  State<_CampaignCard> createState() => _CampaignCardState();
+}
+
+class _CampaignCardState extends State<_CampaignCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return CardContainer(
-      Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ThemeSwatch(theme: campaign.theme),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+    final campaign = widget.campaign;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: _isHovered ? secondaryColor.withAlpha(160) : const Color(0xFFE2E8F0),
+            width: _isHovered ? 1.5 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _isHovered ? secondaryColor.withAlpha(25) : const Color(0x08000000),
+              blurRadius: _isHovered ? 12 : 4,
+              offset: Offset(0, _isHovered ? 4 : 2),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            hoverColor: secondaryColor.withAlpha(8),
+            onTap: widget.onEdit,
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isNarrow = constraints.maxWidth < 650;
+                      if (isNarrow) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                _ThemeSwatch(theme: campaign.theme),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        campaign.name,
+                                        style: AppTypography.bodyLarge(context).apply(fontWeightDelta: 2),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Wrap(
+                                        spacing: 6,
+                                        runSpacing: 4,
+                                        children: [
+                                          _StatusChip(campaign: campaign),
+                                          if (campaign.globalPointMultiplier != 1.0)
+                                            _MultiplierBadge(multiplier: campaign.globalPointMultiplier),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 8,
+                              children: [
+                                _CampaignFact(
+                                  icon: Icons.calendar_today_rounded,
+                                  label: 'Dates',
+                                  value: '${_formatDate(campaign.startDate)} – ${_formatDate(campaign.endDate)}',
+                                ),
+                                if (campaign.globalPointMultiplier == 1.0)
+                                  const _CampaignFact(
+                                    icon: Icons.tune_rounded,
+                                    label: 'Points',
+                                    value: 'Standard (1.0x)',
+                                  ),
+                                if (!campaign.theme.isEmpty)
+                                  const _CampaignFact(
+                                    icon: Icons.palette_outlined,
+                                    label: 'Theme',
+                                    value: 'Custom App Theme',
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton.icon(
+                                  icon: const Icon(Icons.edit_outlined, size: 16),
+                                  label: const Text('Edit'),
+                                  style: TextButton.styleFrom(foregroundColor: secondaryColor),
+                                  onPressed: widget.onEdit,
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton.icon(
+                                  icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                                  label: const Text('Delete'),
+                                  style: TextButton.styleFrom(foregroundColor: const Color(0xFFD32F2F)),
+                                  onPressed: widget.onDelete,
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Row(
                         children: [
-                          Flexible(
-                            child: Text(
-                              campaign.name,
-                              style: AppTypography.bodyLarge(context),
-                              overflow: TextOverflow.ellipsis,
+                          _ThemeSwatch(theme: campaign.theme),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        campaign.name,
+                                        style: AppTypography.bodyLarge(context).apply(fontWeightDelta: 2),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    _StatusChip(campaign: campaign),
+                                    if (campaign.globalPointMultiplier != 1.0) ...[
+                                      const SizedBox(width: 8),
+                                      _MultiplierBadge(multiplier: campaign.globalPointMultiplier),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 8,
+                                  children: [
+                                    _CampaignFact(
+                                      icon: Icons.calendar_today_rounded,
+                                      label: 'Dates',
+                                      value: '${_formatDate(campaign.startDate)} – ${_formatDate(campaign.endDate)}',
+                                    ),
+                                    if (campaign.globalPointMultiplier == 1.0)
+                                      const _CampaignFact(
+                                        icon: Icons.tune_rounded,
+                                        label: 'Points',
+                                        value: 'Standard (1.0x)',
+                                      ),
+                                    if (!campaign.theme.isEmpty)
+                                      const _CampaignFact(
+                                        icon: Icons.palette_outlined,
+                                        label: 'Theme',
+                                        value: 'Custom App Theme',
+                                      ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          _StatusChip(campaign: campaign),
+                          const SizedBox(width: 12),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined),
+                                color: secondaryColor,
+                                tooltip: 'Edit campaign',
+                                onPressed: widget.onEdit,
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline_rounded),
+                                color: const Color(0xFFEF4444),
+                                tooltip: 'Delete campaign',
+                                onPressed: widget.onDelete,
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                color: _isHovered ? secondaryColor : const Color(0xFFCBD5E1),
+                                size: 22,
+                              ),
+                            ],
+                          ),
                         ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        '${_formatDate(campaign.startDate)} → ${_formatDate(campaign.endDate)}',
-                        style: AppTypography.bodyMedium(context).apply(color: textMutedColor),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        campaign.globalPointMultiplier == 1.0
-                            ? 'No point multiplier'
-                            : '${campaign.globalPointMultiplier}x points app-wide',
-                        style: AppTypography.bodyMedium(context).apply(color: textMutedColor),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  color: secondaryColor,
-                  tooltip: 'Edit',
-                  onPressed: onEdit,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded),
-                  color: const Color(0xFFD32F2F),
-                  tooltip: 'Delete',
-                  onPressed: onDelete,
-                ),
-              ],
-            ),
-            if (hasOverlapWarning) ...[
-              const SizedBox(height: 12),
-              _Warning(
-                message:
-                    'Date range overlaps another active campaign. The mobile app picks only one, and which one is not guaranteed.',
+                  if (widget.hasOverlapWarning) ...[
+                    const SizedBox(height: 12),
+                    const _Warning(
+                      message:
+                          'Date range overlaps another active campaign. The mobile app picks only one, and which one is not guaranteed.',
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ],
+            ),
+          ),
         ),
       ),
     );
@@ -269,6 +421,78 @@ class _CampaignCard extends StatelessWidget {
     if (value == null) return '—';
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(value.day)}/${two(value.month)}/${value.year}';
+  }
+}
+
+class _MultiplierBadge extends StatelessWidget {
+  final double multiplier;
+
+  const _MultiplierBadge({required this.multiplier});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF3C7),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFFCD34D)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.bolt_rounded, size: 13, color: Color(0xFFB45309)),
+          const SizedBox(width: 3),
+          Text(
+            '${multiplier}x Points App-Wide',
+            style: AppTypography.bodyMedium(context).apply(
+              color: const Color(0xFFB45309),
+              fontSizeDelta: -3,
+              fontWeightDelta: 3,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CampaignFact extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _CampaignFact({required this.icon, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: const Color(0xFF64748B)),
+          const SizedBox(width: 6),
+          Text(
+            '$label: ',
+            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF64748B), fontSizeDelta: -2),
+          ),
+          Text(
+            value,
+            style: AppTypography.bodyMedium(context).apply(
+              color: textPrimaryColor,
+              fontSizeDelta: -2,
+              fontWeightDelta: 2,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -288,23 +512,30 @@ class _ThemeSwatch extends StatelessWidget {
 
     if (colors.isEmpty) {
       return Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(10)),
-        child: const Icon(Icons.palette_outlined, size: 20, color: Color(0xFF9CA3AF)),
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: const Icon(Icons.palette_outlined, size: 22, color: Color(0xFF94A3B8)),
       );
     }
 
     return Container(
-      width: 44,
-      height: 44,
+      width: 48,
+      height: 48,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
+        boxShadow: const [
+          BoxShadow(color: Color(0x0A000000), blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       child: Column(
-        children: [for (final color in colors) Expanded(child: Container(width: 44, color: color))],
+        children: [for (final color in colors) Expanded(child: Container(width: 48, color: color))],
       ),
     );
   }
@@ -322,7 +553,7 @@ class _StatusChip extends StatelessWidget {
 
     if (!campaign.isActive) {
       label = 'Inactive';
-      color = const Color(0xFF9CA3AF);
+      color = const Color(0xFF6B7280);
     } else if (campaign.isLive) {
       label = 'Live now';
       color = const Color(0xFF16A34A);
@@ -336,10 +567,25 @@ class _StatusChip extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: color.withAlpha(28), borderRadius: BorderRadius.circular(20)),
-      child: Text(
-        label,
-        style: AppTypography.bodyMedium(context).apply(color: color, fontSizeDelta: -3, fontWeightDelta: 2),
+      decoration: BoxDecoration(
+        color: color.withAlpha(20),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withAlpha(60)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: AppTypography.bodyMedium(context).apply(color: color, fontSizeDelta: -3, fontWeightDelta: 2),
+          ),
+        ],
       ),
     );
   }

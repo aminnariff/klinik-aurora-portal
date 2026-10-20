@@ -4,7 +4,7 @@ import 'package:klinik_aurora_portal/env/staging.dart';
 
 enum Flavor { development, staging, production }
 
-Flavor environment = Flavor.staging;
+Flavor environment = Flavor.production;
 
 class Environment {
   static String get appName {

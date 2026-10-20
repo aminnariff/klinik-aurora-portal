@@ -58,92 +58,121 @@ class _HomepageState extends State<Homepage> {
     _initSidebar();
   }
 
+  static String _getItemCategory(String? label) {
+    if (label == null) return '';
+    if (label == 'Dashboard' ||
+        label == UserHomepage.displayName ||
+        label == AppointmentHomepage.displayName ||
+        label == DoctorHomepage.displayName ||
+        label == ServiceHomepage.displayName ||
+        label == BranchHomepage.displayName ||
+        label == PaymentSummaryPage.displayName) {
+      return 'Clinic Operations';
+    }
+    if (label == PointHomepage.displayName ||
+        label == VoucherHomepage.displayName ||
+        label == RewardHomepage.displayName ||
+        label == RewardHistoryHomepage.displayName ||
+        label == MarketingHomepage.displayName ||
+        label == PromotionHomepage.displayName) {
+      return 'Loyalty & Marketing';
+    }
+    if (label == AdminHomepage.displayName) {
+      return 'System & Settings';
+    }
+    return 'Other';
+  }
+
   void _initSidebar() {
     sideBarAttribute = [
+      // --- Clinic Operations ---
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.dashboard_rounded, color: Colors.white);
+          return const Icon(Icons.dashboard_rounded, color: Colors.white);
         },
         label: 'Dashboard',
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.people_rounded, color: Colors.white);
+          return const Icon(Icons.people_rounded, color: Colors.white);
         },
         label: UserHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.stars_rounded, color: Colors.white);
-        },
-        label: PointHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.event_rounded, color: Colors.white);
+          return const Icon(Icons.event_rounded, color: Colors.white);
         },
         label: AppointmentHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.receipt_long_rounded, color: Colors.white);
-        },
-        label: PaymentSummaryPage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return FaIcon(FontAwesomeIcons.userDoctor, color: Colors.white);
+          return const FaIcon(FontAwesomeIcons.userDoctor, color: Colors.white);
         },
         label: DoctorHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.medical_services_rounded, color: Colors.white);
+          return const Icon(Icons.medical_services_rounded, color: Colors.white);
         },
         label: ServiceHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.admin_panel_settings_rounded, color: Colors.white);
-        },
-        label: AdminHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.store_rounded, color: Colors.white);
+          return const Icon(Icons.store_rounded, color: Colors.white);
         },
         label: BranchHomepage.displayName,
       ),
-      // Campaigns and Point Modifiers share one entry — see MarketingHomepage.
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.celebration_rounded, color: Colors.white);
+          return const Icon(Icons.receipt_long_rounded, color: Colors.white);
         },
-        label: MarketingHomepage.displayName,
+        label: PaymentSummaryPage.displayName,
+      ),
+
+      // --- Loyalty & Marketing ---
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.stars_rounded, color: Colors.white);
+        },
+        label: PointHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.campaign_rounded, color: Colors.white);
-        },
-        label: PromotionHomepage.displayName,
-      ),
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return Icon(Icons.confirmation_number_rounded, color: Colors.white);
+          return const Icon(Icons.confirmation_number_rounded, color: Colors.white);
         },
         label: VoucherHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.redeem_rounded, color: Colors.white);
+          return const Icon(Icons.redeem_rounded, color: Colors.white);
         },
         label: RewardHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return Icon(Icons.history_rounded, color: Colors.white);
+          return const Icon(Icons.history_rounded, color: Colors.white);
         },
         label: RewardHistoryHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.celebration_rounded, color: Colors.white);
+        },
+        label: MarketingHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.campaign_rounded, color: Colors.white);
+        },
+        label: PromotionHomepage.displayName,
+      ),
+
+      // --- System & Settings ---
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.admin_panel_settings_rounded, color: Colors.white);
+        },
+        label: AdminHomepage.displayName,
       ),
     ];
     getAuthController();
@@ -529,8 +558,78 @@ class _HomepageState extends State<Homepage> {
                             );
                           },
                         ),
+                      if (extended && sideBarAttribute.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              _getItemCategory(sideBarAttribute.first.label).toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.5),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   );
+                },
+                separatorBuilder: (context, index) {
+                  if (index >= sideBarAttribute.length - 1) {
+                    return const SizedBox(height: 2);
+                  }
+                  final currentCat = _getItemCategory(sideBarAttribute[index].label);
+                  final nextCat = _getItemCategory(sideBarAttribute[index + 1].label);
+
+                  if (currentCat != nextCat) {
+                    return AnimatedBuilder(
+                      animation: pageController,
+                      builder: (context, _) {
+                        final extended = pageController.extended;
+                        if (!extended) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Divider(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              height: 1,
+                              indent: 16,
+                              endIndent: 16,
+                            ),
+                          );
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            Divider(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              height: 1,
+                              indent: 14,
+                              endIndent: 14,
+                            ),
+                            const SizedBox(height: 10),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                nextCat.toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                  return const SizedBox(height: 2);
                 },
                 footerDivider: Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
                 footerBuilder: (ctx, extended) {
@@ -797,7 +896,28 @@ class _HomepageState extends State<Homepage> {
                   child: ListView(
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     children: [
-                      for (int i = 0; i < sideBarAttribute.length; i++)
+                      for (int i = 0; i < sideBarAttribute.length; i++) ...[
+                        if (i == 0 ||
+                            _getItemCategory(sideBarAttribute[i].label) !=
+                                _getItemCategory(sideBarAttribute[i - 1].label)) ...[
+                          if (i > 0) ...[
+                            const SizedBox(height: 10),
+                            Divider(color: Colors.white.withValues(alpha: 0.15), height: 1, indent: 8, endIndent: 8),
+                            const SizedBox(height: 10),
+                          ],
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
+                            child: Text(
+                              _getItemCategory(sideBarAttribute[i].label).toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.5),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                        ],
                         _DrawerItem(
                           icon: sideBarAttribute[i].iconBuilder != null
                               ? sideBarAttribute[i].iconBuilder!(false, false)
@@ -808,6 +928,7 @@ class _HomepageState extends State<Homepage> {
                             action(sideBarAttribute[i].label);
                           },
                         ),
+                      ],
                     ],
                   ),
                 ),

@@ -14,7 +14,7 @@ class SelectionCalendarView extends StatefulWidget {
     super.key,
     required this.startMonth,
     required this.year,
-    this.totalMonths = 3,
+    this.totalMonths = 6,
     required this.initialDateTimes,
     this.readOnly = false,
   });

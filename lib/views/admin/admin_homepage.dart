@@ -51,6 +51,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
   final TextEditingController _userEmailController = TextEditingController();
   DropdownAttribute? _selectedUserStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
+  String _sortBy = 'name';
+  bool _sortAscending = true;
+  int _sortColumnIndex = 0;
 
   @override
   void initState() {
@@ -108,6 +111,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                       filtering(enableDebounce: false, page: 1);
                     },
                   ),
+                  const SizedBox(width: 8),
+                  _sortButton(),
                   const Spacer(),
                   _MobileActionButton(
                     icon: Icons.add_rounded,
@@ -293,6 +298,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
             ),
           ),
           const SizedBox(width: 12),
+          _sortButton(),
+          const SizedBox(width: 8),
           _toolbarButton(
             icon: Icons.filter_list_rounded,
             label: 'Filter',
@@ -330,6 +337,109 @@ class _AdminHomepageState extends State<AdminHomepage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _sortButton() {
+    String currentLabel;
+    if (_sortBy == 'name') {
+      currentLabel = _sortAscending ? 'Name (A–Z)' : 'Name (Z–A)';
+    } else {
+      currentLabel = _sortAscending ? 'Created (Oldest)' : 'Created (Newest)';
+    }
+
+    return PopupMenuButton<String>(
+      tooltip: 'Sort Admins',
+      offset: const Offset(0, 38),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: Colors.white,
+      onSelected: (val) {
+        setState(() {
+          if (val == 'name_asc') {
+            _sortBy = 'name';
+            _sortAscending = true;
+            _sortColumnIndex = 0;
+          } else if (val == 'name_desc') {
+            _sortBy = 'name';
+            _sortAscending = false;
+            _sortColumnIndex = 0;
+          } else if (val == 'date_desc') {
+            _sortBy = 'createdDate';
+            _sortAscending = false;
+            _sortColumnIndex = 4;
+          } else if (val == 'date_asc') {
+            _sortBy = 'createdDate';
+            _sortAscending = true;
+            _sortColumnIndex = 4;
+          }
+        });
+        filtering(enableDebounce: false, page: 1);
+      },
+      itemBuilder: (_) => [
+        const PopupMenuItem<String>(
+          value: 'name_asc',
+          child: Row(
+            children: [
+              Icon(Icons.sort_by_alpha_rounded, size: 16, color: Color(0xFF4B5563)),
+              SizedBox(width: 8),
+              Text('Name (A–Z)', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'name_desc',
+          child: Row(
+            children: [
+              Icon(Icons.sort_by_alpha_rounded, size: 16, color: Color(0xFF4B5563)),
+              SizedBox(width: 8),
+              Text('Name (Z–A)', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        const PopupMenuItem<String>(
+          value: 'date_desc',
+          child: Row(
+            children: [
+              Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF4B5563)),
+              SizedBox(width: 8),
+              Text('Created (Newest First)', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'date_asc',
+          child: Row(
+            children: [
+              Icon(Icons.history_rounded, size: 16, color: Color(0xFF4B5563)),
+              SizedBox(width: 8),
+              Text('Created (Oldest First)', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+      ],
+      child: Container(
+        height: 38,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFF0F766E).withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.swap_vert_rounded, size: 16, color: Color(0xFF0F766E)),
+            const SizedBox(width: 6),
+            Text(
+              currentLabel,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F766E)),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.arrow_drop_down, size: 16, color: Color(0xFF0F766E)),
+          ],
+        ),
       ),
     );
   }
@@ -509,12 +619,37 @@ class _AdminHomepageState extends State<AdminHomepage> {
                     topRight: Radius.circular(12),
                   ),
                 ),
+                sortColumnIndex: _sortColumnIndex,
+                sortAscending: _sortAscending,
                 columns: [
-                  _col('Name', ColumnSize.L),
+                  _col(
+                    'Name',
+                    ColumnSize.L,
+                    onSort: (index, ascending) {
+                      setState(() {
+                        _sortColumnIndex = index;
+                        _sortBy = 'name';
+                        _sortAscending = ascending;
+                      });
+                      filtering(enableDebounce: false, page: 1);
+                    },
+                  ),
                   _col('Email', ColumnSize.L),
                   _col('Contact', ColumnSize.S, fixedWidth: 140),
                   _col('Status', ColumnSize.S, fixedWidth: 90),
-                  _col('Created', ColumnSize.S, fixedWidth: 120),
+                  _col(
+                    'Created',
+                    ColumnSize.S,
+                    fixedWidth: 120,
+                    onSort: (index, ascending) {
+                      setState(() {
+                        _sortColumnIndex = index;
+                        _sortBy = 'createdDate';
+                        _sortAscending = ascending;
+                      });
+                      filtering(enableDebounce: false, page: 1);
+                    },
+                  ),
                   _col('Actions', ColumnSize.S, fixedWidth: 80),
                 ],
                 rows: [
@@ -587,10 +722,11 @@ class _AdminHomepageState extends State<AdminHomepage> {
     );
   }
 
-  DataColumn2 _col(String label, ColumnSize size, {double? fixedWidth}) {
+  DataColumn2 _col(String label, ColumnSize size, {double? fixedWidth, void Function(int, bool)? onSort}) {
     return DataColumn2(
       fixedWidth: fixedWidth,
       size: size,
+      onSort: onSort,
       label: Text(
         label,
         style: const TextStyle(
@@ -766,6 +902,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 ? 0
                 : null
           : null,
+      sortBy: _sortBy,
+      sortOrder: _sortAscending ? 'asc' : 'desc',
     ).then((value) {
       dismissLoading();
       if (responseCode(value.code)) {

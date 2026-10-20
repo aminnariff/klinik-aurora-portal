@@ -543,25 +543,25 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(
-                        i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC),
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (_) => VoucherDetail(type: 'update', voucher: items[i]),
                       ),
+                      color: WidgetStateProperty.resolveWith<Color?>((states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return const Color(0xFFF1F5F9);
+                        }
+                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                      }),
                       cells: [
                         DataCell(_codeCell(items[i].voucherCode)),
                         DataCell(
-                          GestureDetector(
-                            onTap: () => showDialog(
-                              context: context,
-                              builder: (_) =>
-                                  VoucherDetail(type: 'update', voucher: items[i]),
-                            ),
-                            child: Text(
-                              items[i].voucherName ?? '—',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF111827),
-                              ),
+                          Text(
+                            items[i].voucherName ?? '—',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF111827),
                             ),
                           ),
                         ),

@@ -35,7 +35,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
     super.initState();
     interval = widget.initInterval ?? 30;
     final now = DateTime.now();
-    months = List.generate(4, (i) => DateTime(now.year, now.month + i));
+    months = List.generate(12, (i) => DateTime(now.year, now.month + i));
     selectedMonth = months.first;
   }
 

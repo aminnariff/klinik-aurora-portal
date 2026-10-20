@@ -353,7 +353,16 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                 rows: [
                   for (int i = 0; i < items.length; i++)
                     DataRow2(
-                      color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (_) => RewardHistoryDetail(data: items[i], type: 'update'),
+                      ),
+                      color: WidgetStateProperty.resolveWith<Color?>((states) {
+                        if (states.contains(WidgetState.hovered)) {
+                          return const Color(0xFFF1F5F9);
+                        }
+                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                      }),
                       cells: [
                         DataCell(_patientCell(items[i])),
                         DataCell(_rewardCell(items[i])),
@@ -598,48 +607,58 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   }
 
   Widget _mobileCard(Data item) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+    return GestureDetector(
+      onTap: () => showDialog(
+        context: context,
+        builder: (_) => RewardHistoryDetail(data: item, type: 'update'),
       ),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    item.userFullname ?? '—',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 10),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0xFFE5E7EB)),
+        ),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      item.userFullname ?? '—',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    ),
                   ),
-                ),
-                _statusChip(item),
-              ],
-            ),
-            const SizedBox(height: 8),
-            _mobileRow('Reward', item.rewardName ?? '—'),
-            _mobileRow('Points', '${item.transactionPoint ?? 0} pts'),
-            if (item.userPhone != null) _mobileRow('Phone', item.userPhone!),
-            _mobileRow(
-              'Updated',
-              dateConverter(item.rewardHistoryModifiedDate) ?? dateConverter(item.rewardHistoryCreatedDate) ?? '—',
-            ),
-            if (item.rewardHistoryDescription != null && item.rewardHistoryDescription!.isNotEmpty)
-              _mobileRow('Remark', item.rewardHistoryDescription!),
-            const SizedBox(height: 8),
-            _iconBtn(Icons.edit_outlined, const Color(0xFF6366F1), () {
-              showDialog(
-                context: context,
-                builder: (_) => RewardHistoryDetail(data: item, type: 'update'),
-              );
-            }),
-          ],
+                  _statusChip(item),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _mobileRow('Reward', item.rewardName ?? '—'),
+              _mobileRow('Points', '${item.transactionPoint ?? 0} pts'),
+              if (item.userPhone != null) _mobileRow('Phone', item.userPhone!),
+              _mobileRow(
+                'Updated',
+                dateConverter(item.rewardHistoryModifiedDate) ?? dateConverter(item.rewardHistoryCreatedDate) ?? '—',
+              ),
+              if (item.rewardHistoryDescription != null && item.rewardHistoryDescription!.isNotEmpty)
+                _mobileRow('Remark', item.rewardHistoryDescription!),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _iconBtn(Icons.edit_outlined, const Color(0xFF6366F1), () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => RewardHistoryDetail(data: item, type: 'update'),
+                    );
+                  }),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
