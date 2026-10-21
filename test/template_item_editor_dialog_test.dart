@@ -273,5 +273,28 @@ void main() {
       expect(find.text('Tambah Item Templat'), findsOneWidget);
       expect(find.text('💖 Panduan Klinikal Dr. Aurora'), findsOneWidget);
     });
+
+    testWidgets('uses crisp and compact text style on text form fields (fontSize <= 14)', (tester) async {
+      tester.view.physicalSize = const Size(1200, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          TemplateItemEditorDialog(
+            categoryKey: 'baju',
+            onSave: (data) async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final textFields = tester.widgetList<TextField>(find.byType(TextField));
+      expect(textFields.length, equals(5));
+      for (final tf in textFields) {
+        expect(tf.style?.fontSize, isNotNull);
+        expect(tf.style!.fontSize!, lessThanOrEqualTo(14.0));
+      }
+    });
   });
 }

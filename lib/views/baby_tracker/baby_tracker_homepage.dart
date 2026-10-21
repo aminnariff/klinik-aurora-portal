@@ -445,6 +445,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           Expanded(
             flex: 3,
             child: TextField(
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.normal, color: Color(0xFF1E293B)),
               onChanged: (val) {
                 _reportSearch = val;
                 _debouncer.run(_fetchReports);

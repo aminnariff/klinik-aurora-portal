@@ -168,13 +168,14 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
   }) {
     return InputDecoration(
       labelText: labelText,
-      labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+      labelStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+      floatingLabelStyle: const TextStyle(fontSize: 12, color: Color(0xFFE84C7A), fontWeight: FontWeight.w600),
       hintText: hintText,
-      hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+      hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.normal),
       prefixIcon: prefixIcon,
       filled: true,
       fillColor: const Color(0xFFF8FAFC),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
@@ -228,57 +229,75 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.item != null;
+    final baseTheme = Theme.of(context);
+    final dialogTheme = baseTheme.copyWith(
+      textTheme: baseTheme.textTheme.copyWith(
+        bodyLarge: const TextStyle(
+          fontSize: 13.5,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF1E293B),
+        ),
+        bodyMedium: const TextStyle(
+          fontSize: 13.0,
+          fontWeight: FontWeight.normal,
+          color: Color(0xFF334155),
+        ),
+      ),
+    );
 
     return PopScope(
       canPop: !_isSaving,
-      child: Dialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildHeader(isEdit),
-                Flexible(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
-                    child: Form(
-                      key: _formKey,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isNarrow = constraints.maxWidth < 600;
-                          if (isNarrow) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Theme(
+        data: dialogTheme,
+        child: Dialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildHeader(isEdit),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
+                      child: Form(
+                        key: _formKey,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isNarrow = constraints.maxWidth < 600;
+                            if (isNarrow) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _buildLeftColumn(),
+                                  const SizedBox(height: 20),
+                                  _buildRightColumn(),
+                                ],
+                              );
+                            }
+
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildLeftColumn(),
-                                const SizedBox(height: 20),
-                                _buildRightColumn(),
+                                Expanded(flex: 6, child: _buildLeftColumn()),
+                                const SizedBox(width: 20),
+                                Expanded(flex: 5, child: _buildRightColumn()),
                               ],
                             );
-                          }
-
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(flex: 6, child: _buildLeftColumn()),
-                              const SizedBox(width: 20),
-                              Expanded(flex: 5, child: _buildRightColumn()),
-                            ],
-                          );
-                        },
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
-                _buildFooterActions(isEdit),
-              ],
+                  const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+                  _buildFooterActions(isEdit),
+                ],
+              ),
             ),
           ),
         ),
@@ -364,6 +383,11 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _titleCtrl,
+          style: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF1E293B),
+          ),
           validator: (v) {
             if (v == null || v.trim().isEmpty) {
               return 'Sila masukkan nama barangan';
@@ -380,6 +404,11 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
         DropdownButtonFormField<String>(
           initialValue: _categoryKey,
           isExpanded: true,
+          style: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF1E293B),
+          ),
           decoration: _inputDecoration(
             labelText: 'Kategori',
             prefixIcon: const Icon(Icons.category_outlined, color: Color(0xFFE84C7A), size: 20),
@@ -399,6 +428,11 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _qtyCtrl,
+          style: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF1E293B),
+          ),
           decoration: _inputDecoration(
             labelText: 'Cadangan Kuantiti',
             hintText: 'cth: 3-4 pasang',
@@ -539,14 +573,13 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                 child: Text(
                   '💖 Panduan Klinikal Dr. Aurora',
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFFBE185D),
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                 decoration: BoxDecoration(
@@ -554,7 +587,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
-                  'Tips Klinikal',
+                  'Klinikal',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -568,6 +601,12 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           TextFormField(
             controller: _specsCtrl,
             maxLines: 2,
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.normal,
+              color: Color(0xFF334155),
+              height: 1.35,
+            ),
             decoration: _inputDecoration(
               labelText: 'Spesifikasi (Pilihan Fabrik & Saiz)',
               hintText: 'Contoh: 100% cotton organik berventilasi baik',
@@ -577,6 +616,12 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           TextFormField(
             controller: _safetyCtrl,
             maxLines: 2,
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.normal,
+              color: Color(0xFF334155),
+              height: 1.35,
+            ),
             decoration: _inputDecoration(
               labelText: 'Keselamatan (Nasihat Pediatrik)',
               hintText: 'Contoh: Elakkan tali panjang berisiko terbelit',
@@ -586,6 +631,12 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           TextFormField(
             controller: _tipCtrl,
             maxLines: 2,
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.normal,
+              color: Color(0xFF334155),
+              height: 1.35,
+            ),
             decoration: _inputDecoration(
               labelText: 'Tip Penjimatan (Smart Budgeting)',
               hintText: 'Contoh: Beli saiz 0-3M lebih berbanding NB',
