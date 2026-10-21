@@ -24,6 +24,7 @@ import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
 import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
+import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -62,6 +63,7 @@ class _HomepageState extends State<Homepage> {
     if (label == null) return '';
     if (label == 'Dashboard' ||
         label == UserHomepage.displayName ||
+        label == BabyTrackerHomepage.displayName ||
         label == AppointmentHomepage.displayName ||
         label == DoctorHomepage.displayName ||
         label == ServiceHomepage.displayName ||
@@ -97,6 +99,12 @@ class _HomepageState extends State<Homepage> {
           return const Icon(Icons.people_rounded, color: Colors.white);
         },
         label: UserHomepage.displayName,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.pregnant_woman_rounded, color: Colors.white);
+        },
+        label: BabyTrackerHomepage.displayName,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
@@ -986,6 +994,8 @@ class _HomepageState extends State<Homepage> {
         context.go(ServiceHomepage.routeName);
       case UserHomepage.displayName:
         context.go(UserHomepage.routeName);
+      case BabyTrackerHomepage.displayName:
+        context.go(BabyTrackerHomepage.routeName);
       case AdminHomepage.displayName:
         context.go(AdminHomepage.routeName);
       case BranchHomepage.displayName:

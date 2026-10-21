@@ -112,6 +112,80 @@ class UserController extends ChangeNotifier {
     );
   }
 
+  static Future<ApiResponse<dynamic>> getPregnancyReports(
+    BuildContext context, {
+    String? search,
+    String? status,
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final query = <String, dynamic>{
+      'page': page.toString(),
+      'pageSize': pageSize.toString(),
+    };
+    if (search != null && search.isNotEmpty) query['search'] = search;
+    if (status != null && status.isNotEmpty && status != 'all') query['status'] = status;
+
+    return ApiController().call(
+      context,
+      method: Method.get,
+      endpoint: 'admin/baby-tracker/reports',
+      queryParameters: query,
+    );
+  }
+
+  static Future<ApiResponse<dynamic>> getBabyChecklistTemplate(
+    BuildContext context, {
+    String? category,
+  }) async {
+    final query = <String, dynamic>{};
+    if (category != null && category.isNotEmpty && category != 'all') {
+      query['category'] = category;
+    }
+    return ApiController().call(
+      context,
+      method: Method.get,
+      endpoint: 'admin/baby-tracker/checklist-template',
+      queryParameters: query,
+    );
+  }
+
+  static Future<ApiResponse<dynamic>> createBabyChecklistTemplateItem(
+    BuildContext context,
+    Map<String, dynamic> body,
+  ) async {
+    return ApiController().call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/baby-tracker/checklist-template',
+      data: body,
+    );
+  }
+
+  static Future<ApiResponse<dynamic>> updateBabyChecklistTemplateItem(
+    BuildContext context,
+    String templateId,
+    Map<String, dynamic> body,
+  ) async {
+    return ApiController().call(
+      context,
+      method: Method.put,
+      endpoint: 'admin/baby-tracker/checklist-template/$templateId',
+      data: body,
+    );
+  }
+
+  static Future<ApiResponse<dynamic>> deleteBabyChecklistTemplateItem(
+    BuildContext context,
+    String templateId,
+  ) async {
+    return ApiController().call(
+      context,
+      method: Method.delete,
+      endpoint: 'admin/baby-tracker/checklist-template/$templateId',
+    );
+  }
+
   static Future<ApiResponse<UpdateUserResponse>> update(BuildContext context, UpdateUserRequest request) async {
     return ApiController()
         .call(context, method: Method.put, endpoint: 'admin/user-management/update', data: request.toJson())

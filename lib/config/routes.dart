@@ -27,6 +27,7 @@ import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
 import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
+import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -249,6 +250,14 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return const NoTransitionPage(child: Scaffold(body: UserHomepage()));
+          },
+        ),
+        GoRoute(
+          name: BabyTrackerHomepage.routeName,
+          path: BabyTrackerHomepage.routeName,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return const NoTransitionPage(child: Scaffold(body: BabyTrackerHomepage()));
           },
         ),
         GoRoute(
