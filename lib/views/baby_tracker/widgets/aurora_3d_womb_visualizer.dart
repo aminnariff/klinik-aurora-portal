@@ -1367,7 +1367,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
 
   void _onPanUpdate(DragUpdateDetails details) {
     setState(() {
-      _userYaw += details.delta.dx * 0.012;
+      _userYaw = (_userYaw + details.delta.dx * 0.012) % (2 * math.pi);
       _userPitch = (_userPitch - details.delta.dy * 0.012).clamp(-1.3, 1.3);
     });
   }
@@ -1500,6 +1500,13 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
               onPressed: () {
                 setState(() {
                   _isExpanded = !_isExpanded;
+                  if (_isExpanded) {
+                    _heartbeatController.repeat();
+                    _idleController.repeat();
+                  } else {
+                    _heartbeatController.stop();
+                    _idleController.stop();
+                  }
                 });
               },
             ),
@@ -1540,14 +1547,16 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
               child: AnimatedBuilder(
                 animation: Listenable.merge([_heartbeatController, _idleController]),
                 builder: (context, _) {
-                  return CustomPaint(
-                    size: const Size(260, 260),
-                    painter: _WombOrbPainter(
-                      week: _currentWeek,
-                      userYaw: _userYaw,
-                      userPitch: _userPitch,
-                      idlePrecession: _idleController.value * 2 * math.pi,
-                      heartbeatProgress: _heartbeatController.value,
+                  return RepaintBoundary(
+                    child: CustomPaint(
+                      size: const Size(260, 260),
+                      painter: _WombOrbPainter(
+                        week: _currentWeek,
+                        userYaw: _userYaw,
+                        userPitch: _userPitch,
+                        idlePrecession: _idleController.value * 2 * math.pi,
+                        heartbeatProgress: _heartbeatController.value,
+                      ),
                     ),
                   );
                 },

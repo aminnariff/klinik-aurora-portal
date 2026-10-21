@@ -311,5 +311,18 @@ void main() {
       expect(find.text('Perkembangan Janin & Skala Minggu'), findsOneWidget);
       expect(find.text('Minggu 20'), findsOneWidget);
     });
+
+    testWidgets('renders Stage 1 blastocyst for week <= 4 without errors', (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(
+          const Aurora3DWombVisualizer(initialWeek: 2),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Minggu 2'), findsOneWidget);
+      expect(find.textContaining('Biji Popi'), findsOneWidget);
+    });
   });
 }
