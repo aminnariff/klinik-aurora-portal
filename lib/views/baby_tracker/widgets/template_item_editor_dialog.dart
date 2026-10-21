@@ -67,8 +67,12 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
     super.initState();
     final item = widget.item;
 
-    _categoryKey = item?['categoryKey']?.toString() ??
-        (widget.categoryKey != null && widget.categoryKey != 'all' ? widget.categoryKey! : 'baju');
+    final rawCat = item?['categoryKey']?.toString().trim();
+    _categoryKey = (rawCat != null && rawCat.isNotEmpty)
+        ? rawCat
+        : ((widget.categoryKey != null && widget.categoryKey!.trim().isNotEmpty && widget.categoryKey != 'all')
+            ? widget.categoryKey!.trim()
+            : 'baju');
 
     _titleCtrl = TextEditingController(text: item?['title']?.toString() ?? '');
     _qtyCtrl = TextEditingController(text: item?['quantity']?.toString() ?? '');
@@ -225,15 +229,15 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
   Widget build(BuildContext context) {
     final isEdit = widget.item != null;
 
-    return Dialog(
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 720),
-        child: SizedBox(
-          width: 720,
+    return PopScope(
+      canPop: !_isSaving,
+      child: Dialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: Column(
@@ -337,7 +341,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
             icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B), size: 22),
             splashRadius: 20,
             tooltip: 'Tutup',
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
           ),
         ],
       ),
