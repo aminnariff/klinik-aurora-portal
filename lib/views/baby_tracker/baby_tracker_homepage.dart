@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
+import 'package:klinik_aurora_portal/views/baby_tracker/widgets/aurora_3d_womb_visualizer.dart';
+import 'package:klinik_aurora_portal/views/baby_tracker/widgets/template_item_editor_dialog.dart';
 import 'package:klinik_aurora_portal/views/user/user_baby_tracker_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 
@@ -25,6 +27,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   bool _isLoadingReports = true;
   String _reportSearch = '';
   String _reportStatus = 'all'; // all, overdue, alert, low_kicks, third_trimester
+  int? _filterGestationalWeek;
+  int _visualizerWeek = 20;
   int _reportPage = 1;
   final int _reportPageSize = 20;
   final _debouncer = Debouncer(milliseconds: 600);
@@ -76,6 +80,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       context,
       search: _reportSearch,
       status: _reportStatus,
+      week: _filterGestationalWeek,
       page: _reportPage,
       pageSize: _reportPageSize,
     ).then((resp) {
@@ -131,7 +136,27 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           children: [
             // Top Header & Tab Bar
             _buildTopBar(roseColor),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+
+            // 3D Gestational Womb Visualizer Hero Section
+            Aurora3DWombVisualizer(
+              initialWeek: _visualizerWeek,
+              initiallyExpanded: false,
+              onWeekChanged: (week) {
+                _visualizerWeek = week;
+              },
+              onFilterPatients: () {
+                setState(() {
+                  _filterGestationalWeek = _visualizerWeek;
+                  _reportPage = 1;
+                  if (_tabController.index != 0) {
+                    _tabController.animateTo(0);
+                  }
+                });
+                _fetchReports();
+              },
+            ),
+            const SizedBox(height: 16),
 
             // Tab Views
             Expanded(
@@ -452,6 +477,42 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           _filterChip('alert', '⚠️ Amaran Rendah', const Color(0xFFD97706)),
           const SizedBox(width: 6),
           _filterChip('third_trimester', '🤰 Trimester 3 (Wk 28+)', const Color(0xFF7C3AED)),
+          if (_filterGestationalWeek != null) ...[
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: roseColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: roseColor, width: 1.2),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '🌟 Minggu $_filterGestationalWeek',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: roseColor,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _filterGestationalWeek = null;
+                        _reportPage = 1;
+                      });
+                      _fetchReports();
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: Icon(Icons.close_rounded, size: 14, color: roseColor),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(width: 12),
 
           // Refresh button
@@ -830,16 +891,18 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               final isWajib = item['isWajib'] == true;
               final isHospitalBag = item['isHospitalBag'] == true;
               final specs = item['drAuroraAdvice']?['specs'] ?? '';
+              final safety = item['drAuroraAdvice']?['safety'] ?? '';
+              final savingTip = item['drAuroraAdvice']?['savingTip'] ?? '';
 
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: Colors.grey.shade100)),
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      flex: 4,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -847,57 +910,124 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                             children: [
                               Text(
                                 item['title'] ?? '',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
-                              if (item['quantity'] != null) ...[
+                              if (item['quantity'] != null && item['quantity'].toString().isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF1F5F9),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    '${item['quantity']}',
+                                    style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(width: 8),
+                              if (isWajib)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFEF2F2),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: const Color(0xFFFECACA)),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.star_rounded, size: 12, color: Color(0xFFDC2626)),
+                                      SizedBox(width: 3),
+                                      Text('WAJIB', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFFDC2626))),
+                                    ],
+                                  ),
+                                ),
+                              if (isHospitalBag) ...[
                                 const SizedBox(width: 6),
-                                Text(
-                                  '(${item['quantity']})',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEFF6FF),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: const Color(0xFFBFDBFE)),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.medical_services_rounded, size: 12, color: Color(0xFF2563EB)),
+                                      SizedBox(width: 3),
+                                      Text('Beg Hospital', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF2563EB))),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ],
                           ),
                           if (specs.isNotEmpty)
                             Padding(
-                              padding: const EdgeInsets.only(top: 3),
-                              child: Text(
-                                specs,
-                                style: TextStyle(fontSize: 11.5, color: Colors.grey.shade500),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.info_outline_rounded, size: 13, color: Color(0xFFE84C7A)),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      specs,
+                                      style: TextStyle(fontSize: 11.5, color: Colors.blueGrey.shade700),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (safety.isNotEmpty || savingTip.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: [
+                                  if (safety.isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFEF3C7),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '🛡️ Keselamatan: $safety',
+                                        style: const TextStyle(fontSize: 11, color: Color(0xFF92400E)),
+                                      ),
+                                    ),
+                                  if (savingTip.isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFECFDF5),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '💡 Tip: $savingTip',
+                                        style: const TextStyle(fontSize: 11, color: Color(0xFF065F46)),
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    if (isWajib)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        margin: const EdgeInsets.only(right: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF2F2),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text('Wajib', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFDC2626))),
-                      ),
-                    if (isHospitalBag)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        margin: const EdgeInsets.only(right: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text('Beg Hospital', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF2563EB))),
-                      ),
+                    const SizedBox(width: 12),
                     IconButton(
                       icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF64748B)),
+                      tooltip: 'Kemaskini',
                       onPressed: () => _openEditTemplateItemDialog(item, roseColor),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Color(0xFFEF4444)),
+                      tooltip: 'Padam',
                       onPressed: () => _confirmDeleteItem(item['templateId']),
                     ),
                   ],
@@ -911,227 +1041,28 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   }
 
   // ---------------------------------------------------------------------------
-  // Dialogs: Add & Edit Template Item
+  // Dialogs: Add & Edit Template Item (Modernized with TemplateItemEditorDialog)
   // ---------------------------------------------------------------------------
 
   void _openAddTemplateItemDialog(Color roseColor) {
-    final titleCtrl = TextEditingController();
-    final qtyCtrl = TextEditingController();
-    final specsCtrl = TextEditingController();
-    final safetyCtrl = TextEditingController();
-    final tipCtrl = TextEditingController();
-    String categoryKey = _selectedTemplateCategory != 'all' ? _selectedTemplateCategory : 'baju';
-    bool isWajib = true;
-    bool isHospitalBag = categoryKey == 'beg_hospital';
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setDlgState) {
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              surfaceTintColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: roseColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(Icons.playlist_add_rounded, color: roseColor),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('Tambah Item Templat Baru', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              content: SizedBox(
-                width: 500,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DropdownButtonFormField<String>(
-                        initialValue: categoryKey,
-                        decoration: const InputDecoration(labelText: 'Kategori'),
-                        items: const [
-                          DropdownMenuItem(value: 'baju', child: Text('👕 Baju & Keperluan Baby')),
-                          DropdownMenuItem(value: 'mandi', child: Text('🛁 Barang Mandi & Penjagaan')),
-                          DropdownMenuItem(value: 'tidur', child: Text('🛏️ Tempat Tidur Baby')),
-                          DropdownMenuItem(value: 'penyusuan', child: Text('🍼 Barang Penyusuan')),
-                          DropdownMenuItem(value: 'ibu', child: Text('🤱🏻 Keperluan Ibu Bersalin')),
-                          DropdownMenuItem(value: 'beg_hospital', child: Text('🏥 Beg Hospital')),
-                          DropdownMenuItem(value: 'rumah', child: Text('🏡 Persediaan Rumah')),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) setDlgState(() => categoryKey = val);
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: titleCtrl,
-                        decoration: const InputDecoration(labelText: 'Nama Barangan *', hintText: 'cth: Sarung Tangan & Stokin'),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: qtyCtrl,
-                        decoration: const InputDecoration(labelText: 'Cadangan Kuantiti', hintText: 'cth: 3-4 pasang'),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: isWajib,
-                            activeColor: roseColor,
-                            onChanged: (v) => setDlgState(() => isWajib = v ?? false),
-                          ),
-                          const Text('Item WAJIB (Mestilah ada)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: isHospitalBag,
-                            activeColor: roseColor,
-                            onChanged: (v) => setDlgState(() => isHospitalBag = v ?? false),
-                          ),
-                          const Text('Termasuk dalam Beg Hospital', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: specsCtrl,
-                        maxLines: 2,
-                        decoration: const InputDecoration(labelText: 'Nasihat Spesifikasi Dr. Aurora', hintText: 'Spesifikasi fabrik atau ciri klinikal'),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: safetyCtrl,
-                        maxLines: 2,
-                        decoration: const InputDecoration(labelText: 'Nasihat Keselamatan (Safety)', hintText: 'Ciri keselamatan bayi'),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: tipCtrl,
-                        maxLines: 2,
-                        decoration: const InputDecoration(labelText: 'Tip Penjimatan (Saving Tip)', hintText: 'Tip elak membazir'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Batal'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (titleCtrl.text.trim().isEmpty) return;
-                    Navigator.pop(ctx);
-                    UserController.createBabyChecklistTemplateItem(context, {
-                      'categoryKey': categoryKey,
-                      'title': titleCtrl.text.trim(),
-                      'quantity': qtyCtrl.text.trim(),
-                      'isWajib': isWajib,
-                      'isHospitalBag': isHospitalBag,
-                      'specs': specsCtrl.text.trim(),
-                      'safety': safetyCtrl.text.trim(),
-                      'savingTip': tipCtrl.text.trim(),
-                    }).then((_) => _fetchChecklistTemplate());
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: roseColor, foregroundColor: Colors.white),
-                  child: const Text('Simpan Item'),
-                ),
-              ],
-            );
-          },
-        );
+    final catKey = _selectedTemplateCategory != 'all' ? _selectedTemplateCategory : 'baju';
+    TemplateItemEditorDialog.show(
+      context,
+      categoryKey: catKey,
+      onSave: (data) async {
+        await UserController.createBabyChecklistTemplateItem(context, data);
+        _fetchChecklistTemplate();
       },
     );
   }
 
   void _openEditTemplateItemDialog(Map<String, dynamic> item, Color roseColor) {
-    final titleCtrl = TextEditingController(text: item['title']);
-    final qtyCtrl = TextEditingController(text: item['quantity']);
-    final specsCtrl = TextEditingController(text: item['drAuroraAdvice']?['specs']);
-    final safetyCtrl = TextEditingController(text: item['drAuroraAdvice']?['safety']);
-    final tipCtrl = TextEditingController(text: item['drAuroraAdvice']?['savingTip']);
-    bool isWajib = item['isWajib'] == true;
-    bool isHospitalBag = item['isHospitalBag'] == true;
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setDlgState) {
-            return AlertDialog(
-              backgroundColor: Colors.white,
-              surfaceTintColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: const Text('Kemaskini Item Templat', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-              content: SizedBox(
-                width: 500,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Nama Barangan')),
-                      const SizedBox(height: 10),
-                      TextField(controller: qtyCtrl, decoration: const InputDecoration(labelText: 'Cadangan Kuantiti')),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: isWajib,
-                            activeColor: roseColor,
-                            onChanged: (v) => setDlgState(() => isWajib = v ?? false),
-                          ),
-                          const Text('Item WAJIB', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                          const SizedBox(width: 16),
-                          Checkbox(
-                            value: isHospitalBag,
-                            activeColor: roseColor,
-                            onChanged: (v) => setDlgState(() => isHospitalBag = v ?? false),
-                          ),
-                          const Text('Beg Hospital', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(controller: specsCtrl, maxLines: 2, decoration: const InputDecoration(labelText: 'Spesifikasi')),
-                      const SizedBox(height: 10),
-                      TextField(controller: safetyCtrl, maxLines: 2, decoration: const InputDecoration(labelText: 'Keselamatan')),
-                      const SizedBox(height: 10),
-                      TextField(controller: tipCtrl, maxLines: 2, decoration: const InputDecoration(labelText: 'Tip Penjimatan')),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    UserController.updateBabyChecklistTemplateItem(context, item['templateId'], {
-                      'title': titleCtrl.text.trim(),
-                      'quantity': qtyCtrl.text.trim(),
-                      'isWajib': isWajib,
-                      'isHospitalBag': isHospitalBag,
-                      'specs': specsCtrl.text.trim(),
-                      'safety': safetyCtrl.text.trim(),
-                      'savingTip': tipCtrl.text.trim(),
-                    }).then((_) => _fetchChecklistTemplate());
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: roseColor, foregroundColor: Colors.white),
-                  child: const Text('Kemaskini'),
-                ),
-              ],
-            );
-          },
-        );
+    TemplateItemEditorDialog.show(
+      context,
+      item: item,
+      onSave: (data) async {
+        await UserController.updateBabyChecklistTemplateItem(context, item['templateId'], data);
+        _fetchChecklistTemplate();
       },
     );
   }

@@ -116,6 +116,7 @@ class UserController extends ChangeNotifier {
     BuildContext context, {
     String? search,
     String? status,
+    int? week,
     int page = 1,
     int pageSize = 20,
   }) async {
@@ -125,6 +126,7 @@ class UserController extends ChangeNotifier {
     };
     if (search != null && search.isNotEmpty) query['search'] = search;
     if (status != null && status.isNotEmpty && status != 'all') query['status'] = status;
+    if (week != null) query['week'] = week.toString();
 
     return ApiController().call(
       context,

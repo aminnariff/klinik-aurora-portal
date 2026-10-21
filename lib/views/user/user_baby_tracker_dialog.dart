@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
+import 'package:klinik_aurora_portal/views/baby_tracker/widgets/aurora_3d_womb_visualizer.dart';
 
 class UserBabyTrackerDialog extends StatefulWidget {
   final UserResponse? patient;
@@ -301,6 +302,10 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (_gestationalWeek != null) ...[
+            _buildGestational3DHeroCard(_gestationalWeek!, pinkColor),
+            const SizedBox(height: 18),
+          ],
           Row(
             children: [
               Expanded(
@@ -677,6 +682,141 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
             );
           }),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGestational3DHeroCard(int week, Color pinkColor) {
+    final bio = Aurora3DWombVisualizer.getBiometricsForWeek(week);
+    final trimesterText = bio.trimester == 1
+        ? 'Trimester 1'
+        : bio.trimester == 2
+            ? 'Trimester 2'
+            : 'Trimester 3';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF5F8), Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFD1DC), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE84C7A).withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // 3D Mini Womb Orb with cardiac Doppler pulse
+          Container(
+            width: 95,
+            height: 95,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFFFE4E6)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: Mini3DWombOrb(week: week, size: 88),
+          ),
+          const SizedBox(width: 16),
+
+          // Biometrics Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: pinkColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Minggu $week • $trimesterText',
+                        style: TextStyle(
+                          color: pinkColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${bio.fruitEmoji} ${bio.fruit}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Metrics Chips
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    _bioChip('Panjang (CRL)', bio.formattedCrl),
+                    _bioChip('Anggaran Berat', bio.formattedWeight),
+                    _bioChip('Diameter Kepala (BPD)', bio.formattedBpd),
+                    _bioChip('Denyutan Jantung', bio.formattedFhr),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Clinical note
+                Text(
+                  '💖 Dr. Aurora: ${bio.milestone}',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Colors.grey.shade700,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bioChip(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Text(
+        '$label: $value',
+        style: const TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF334155),
+        ),
       ),
     );
   }

@@ -1961,3 +1961,68 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Mini 3D Womb Orb (Lightweight component for dialogs & patient profiles)
+// ---------------------------------------------------------------------------
+
+class Mini3DWombOrb extends StatefulWidget {
+  final int week;
+  final double size;
+
+  const Mini3DWombOrb({
+    super.key,
+    required this.week,
+    this.size = 100,
+  });
+
+  @override
+  State<Mini3DWombOrb> createState() => _Mini3DWombOrbState();
+}
+
+class _Mini3DWombOrbState extends State<Mini3DWombOrb> with TickerProviderStateMixin {
+  late AnimationController _heartbeatController;
+  late AnimationController _idleController;
+
+  @override
+  void initState() {
+    super.initState();
+    _heartbeatController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 430),
+    )..repeat();
+
+    _idleController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _heartbeatController.dispose();
+    _idleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_heartbeatController, _idleController]),
+        builder: (context, _) {
+          return CustomPaint(
+            size: Size(widget.size, widget.size),
+            painter: _WombOrbPainter(
+              week: widget.week.clamp(1, 40),
+              userYaw: 0.0,
+              userPitch: 0.0,
+              idlePrecession: _idleController.value * 2 * math.pi,
+              heartbeatProgress: _heartbeatController.value,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
