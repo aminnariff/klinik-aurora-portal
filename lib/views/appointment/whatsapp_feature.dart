@@ -36,11 +36,9 @@ void showWhatsAppTemplateDialog({
 
   if (branchName.toLowerCase().contains('tropicana') && isTargetService) {
     final String greeting = name.trim().isNotEmpty ? 'Hi {{name}},\n\n' : '';
-    final String? durationText = _formatServiceMinutes(serviceTime);
-    final String slotSentence = durationText != null ? ' Setiap slot adalah terhad kepada $durationText.' : '';
 
     final String tropicanaReminder =
-        '${greeting}Sila patuhi waktu temujanji yang telah ditetapkan. Kegagalan mematuhi waktu temujanji (lewat 15 minit) boleh menyebabkan temujanji anda dipinda dan scan tidak lengkap.$slotSentence\n'
+        '${greeting}Sila patuhi waktu temujanji yang telah ditetapkan. Kegagalan mematuhi waktu temujanji (lewat 15 minit) boleh menyebabkan temujanji anda dipinda dan scan tidak lengkap.\n'
         'Sekiranya ada sebarang perubahan , boleh inform kami semula dengan segera.\n'
         'Tiada refund / pemulangan wang sekiranya membatalkan temujanji di saat akhir.';
     if (!effectiveTemplates.contains(tropicanaReminder)) {
@@ -291,19 +289,4 @@ void _launchWhatsApp(String phone, String message) async {
   } else {
     debugPrint('Could not launch WhatsApp Web');
   }
-}
-
-String? _formatServiceMinutes(String? raw) {
-  if (raw == null || raw.trim().isEmpty) return null;
-  final numMatch = RegExp(r'(\d+)').firstMatch(raw);
-  if (numMatch != null) {
-    final val = int.tryParse(numMatch.group(1)!);
-    if (val != null && val > 0) {
-      if (raw.toLowerCase().contains('hour')) {
-        return '${val * 60}minit';
-      }
-      return '${val}minit';
-    }
-  }
-  return null;
 }
