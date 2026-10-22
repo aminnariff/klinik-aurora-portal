@@ -604,9 +604,9 @@ class _WombOrbPainter extends CustomPainter {
     // Layer 1: Ambient Backdrop Glow
     // -------------------------------------------------------------------------
     final outerGlowPaint = Paint()
-      ..color = const Color(0xFFFFB4C8).withValues(alpha: 0.18)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 22);
-    canvas.drawCircle(Offset(centerX, centerY), R * 1.08, outerGlowPaint);
+      ..color = const Color(0xFFE2E8F0).withValues(alpha: 0.35)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+    canvas.drawCircle(Offset(centerX, centerY), R * 1.04, outerGlowPaint);
 
     // -------------------------------------------------------------------------
     // Layer 2: Amniotic Fluid Radial Gradient Disc with Specular Highlight
@@ -1378,21 +1378,14 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
 
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFFFF5F8),
-            Colors.white,
-          ],
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFFD1DC), width: 1.2),
-        boxShadow: const [
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x14E91E63),
-            blurRadius: 18,
-            offset: Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -1401,7 +1394,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
         children: [
           _buildTopBar(),
           if (_isExpanded) ...[
-            const Divider(height: 1, color: Color(0xFFFFE4EC)),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: LayoutBuilder(
@@ -1452,16 +1445,16 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF0F3),
+                    color: const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFFFD1DC)),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: const Text(
-                    '🌟 3D Womb Explorer • Gestasi Maya',
+                    '✨ 3D Womb Explorer • Gestasi Maya',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFBE185D),
+                      color: Color(0xFF475569),
                     ),
                   ),
                 ),
@@ -1487,7 +1480,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
           ),
           IconButton(
             tooltip: 'Set Semula Putaran 3D',
-            icon: const Icon(Icons.restart_alt_rounded, color: Color(0xFFE11D48)),
+            icon: const Icon(Icons.restart_alt_rounded, color: Color(0xFF64748B)),
             onPressed: _resetView,
           ),
           if (widget.isCollapsible)
@@ -1523,14 +1516,14 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
       width: 260,
       height: 260,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF9FB),
+        color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFFD5E2)),
-        boxShadow: const [
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0DE91E63),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -1569,9 +1562,16 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.90),
+                  color: Colors.white.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFFCCD5)),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1594,7 +1594,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
                       style: const TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFBE185D),
+                        color: Color(0xFF334155),
                       ),
                     ),
                   ],
@@ -1607,14 +1607,21 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.88),
+                  color: Colors.white.withValues(alpha: 0.92),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFFFD1DC)),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.touch_app_rounded, size: 12, color: Color(0xFFBE185D)),
+                    Icon(Icons.touch_app_rounded, size: 12, color: Color(0xFF64748B)),
                     SizedBox(width: 4),
                     Text(
                       '🖱️ Heret untuk putar 3D',
@@ -1648,14 +1655,14 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFFE11D48), Color(0xFFBE185D)],
+                  colors: [Color(0xFF0F172A), Color(0xFF334155)],
                 ),
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x28E11D48),
-                    blurRadius: 8,
-                    offset: Offset(0, 3),
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -1683,16 +1690,16 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3E8FF),
+                color: const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFDDD6FE)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Text(
                 'Trimester ${bio.trimester}',
                 style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF7C3AED),
+                  color: Color(0xFF475569),
                 ),
               ),
             ),
@@ -1750,19 +1757,24 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF1F2),
+            color: const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFFFCCD5)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 2),
-                child: Icon(
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF1F2),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFFFE4E6)),
+                ),
+                child: const Icon(
                   Icons.medical_services_outlined,
-                  size: 18,
-                  color: Color(0xFFBE185D),
+                  size: 16,
+                  color: Color(0xFFE11D48),
                 ),
               ),
               const SizedBox(width: 10),
@@ -1775,7 +1787,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF9F1239),
+                        color: Color(0xFF1E293B),
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -1819,20 +1831,20 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFFE11D48),
+                    color: Color(0xFF0F172A),
                   ),
                 ),
               ],
             ),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                activeTrackColor: const Color(0xFFE11D48),
-                inactiveTrackColor: const Color(0xFFFFD1DC),
+                activeTrackColor: const Color(0xFF0F172A),
+                inactiveTrackColor: const Color(0xFFE2E8F0),
                 trackHeight: 6,
-                thumbColor: const Color(0xFFBE185D),
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
-                overlayColor: const Color(0x28E11D48),
-                overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+                thumbColor: const Color(0xFF0F172A),
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                overlayColor: const Color(0x1A0F172A),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
               ),
               child: Slider(
                 value: _currentWeek.toDouble(),
@@ -1858,10 +1870,10 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFE11D48) : Colors.white,
+                  color: isSelected ? const Color(0xFF0F172A) : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFFE11D48) : const Color(0xFFFFD1DC),
+                    color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
                   ),
                 ),
                 child: Text(
@@ -1882,12 +1894,13 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
           const SizedBox(height: 14),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFFBE185D),
-              side: const BorderSide(color: Color(0xFFFFB4C8)),
+              foregroundColor: const Color(0xFF1E293B),
+              backgroundColor: Colors.white,
+              side: const BorderSide(color: Color(0xFFCBD5E1)),
               padding: const EdgeInsets.symmetric(vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.filter_list_rounded, size: 16),
+            icon: const Icon(Icons.filter_list_rounded, size: 16, color: Color(0xFF475569)),
             label: Text(
               'Tapis Pesakit Minggu Ini ($_currentWeek)',
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -1916,7 +1929,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFFFE4EC)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [

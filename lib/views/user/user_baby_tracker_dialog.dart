@@ -697,16 +697,12 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFF5F8), Colors.white],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFD1DC), width: 1.2),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE84C7A).withValues(alpha: 0.06),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -719,9 +715,9 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
             width: 95,
             height: 95,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFFFE4E6)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.03),
@@ -745,13 +741,14 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: pinkColor.withValues(alpha: 0.12),
+                        color: const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
                       ),
                       child: Text(
                         'Minggu $week • $trimesterText',
-                        style: TextStyle(
-                          color: pinkColor,
+                        style: const TextStyle(
+                          color: Color(0xFF475569),
                           fontWeight: FontWeight.bold,
                           fontSize: 11,
                         ),
