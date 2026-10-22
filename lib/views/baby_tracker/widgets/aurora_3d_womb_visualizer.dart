@@ -616,10 +616,10 @@ class _WombOrbPainter extends CustomPainter {
       center: const Alignment(-0.35, -0.35),
       radius: 0.95,
       colors: [
-        const Color(0xFFFFF0F5).withValues(alpha: 0.88),
-        const Color(0xFFFFD5E2).withValues(alpha: 0.60),
-        const Color(0xFFF9A8D4).withValues(alpha: 0.28),
-        const Color(0xFFF472B6).withValues(alpha: 0.12),
+        const Color(0xFFF0F9FF).withValues(alpha: 0.92),
+        const Color(0xFFE0F2FE).withValues(alpha: 0.65),
+        const Color(0xFFBAE6FD).withValues(alpha: 0.35),
+        const Color(0xFF38BDF8).withValues(alpha: 0.15),
       ],
       stops: const [0.0, 0.45, 0.78, 1.0],
     );
@@ -628,9 +628,9 @@ class _WombOrbPainter extends CustomPainter {
 
     // Subtle inner uterine wall stroke
     final rimPaint = Paint()
-      ..color = const Color(0xFFFB7185).withValues(alpha: 0.35)
+      ..color = const Color(0xFF0284C7).withValues(alpha: 0.35)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8;
+      ..strokeWidth = 1.6;
     canvas.drawCircle(Offset(centerX, centerY), R, rimPaint);
 
     // -------------------------------------------------------------------------
@@ -709,7 +709,7 @@ class _WombOrbPainter extends CustomPainter {
     for (final seg in backSegments) {
       final frontFactor = ((R - seg.avgZ) / (2.0 * R)).clamp(0.0, 1.0);
       final alpha = (0.08 + 0.35 * frontFactor).clamp(0.05, 0.95);
-      wirePaint.color = const Color(0xFFFFB4C8).withValues(alpha: alpha);
+      wirePaint.color = const Color(0xFF38BDF8).withValues(alpha: alpha);
       wirePaint.strokeWidth = 0.9 + 0.6 * frontFactor;
       canvas.drawLine(seg.p1.offset, seg.p2.offset, wirePaint);
     }
@@ -738,7 +738,7 @@ class _WombOrbPainter extends CustomPainter {
       final pAlpha = (0.20 + 0.65 * frontFactor).clamp(0.1, 0.95);
       final pRadius = (1.4 + 1.6 * frontFactor) * proj.perspective;
 
-      particlePaint.color = const Color(0xFFFFF1F2).withValues(alpha: pAlpha);
+      particlePaint.color = const Color(0xFFE0F2FE).withValues(alpha: pAlpha);
       canvas.drawCircle(proj.offset, pRadius, particlePaint);
 
       // Pearl core
@@ -770,7 +770,7 @@ class _WombOrbPainter extends CustomPainter {
     for (final seg in frontSegments) {
       final frontFactor = ((R - seg.avgZ) / (2.0 * R)).clamp(0.0, 1.0);
       final alpha = (0.35 + 0.55 * frontFactor).clamp(0.1, 0.95);
-      wirePaint.color = const Color(0xFFFFB4C8).withValues(alpha: alpha);
+      wirePaint.color = const Color(0xFF38BDF8).withValues(alpha: alpha);
       wirePaint.strokeWidth = 1.1 + 1.1 * frontFactor;
       canvas.drawLine(seg.p1.offset, seg.p2.offset, wirePaint);
     }
@@ -882,9 +882,9 @@ class _WombOrbPainter extends CustomPainter {
     final pulseScale = 1.0 + 0.10 * cardiacPulse;
     final radius = baseRadius * pulseScale;
 
-    // Glowing golden-rose corona
+    // Glowing ultrasound corona
     final coronaPaint = Paint()
-      ..color = const Color(0xFFFDE047).withValues(alpha: 0.40)
+      ..color = const Color(0xFFBAE6FD).withValues(alpha: 0.40)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
     canvas.drawCircle(proj.offset, radius * 1.8, coronaPaint);
 
@@ -893,8 +893,8 @@ class _WombOrbPainter extends CustomPainter {
       center: const Alignment(-0.3, -0.3),
       colors: const [
         Colors.white,
-        Color(0xFFFFCCD5),
-        Color(0xFFFB7185),
+        Color(0xFFBAE6FD),
+        Color(0xFF0284C7),
       ],
       stops: const [0.0, 0.55, 1.0],
     );
@@ -902,7 +902,7 @@ class _WombOrbPainter extends CustomPainter {
     canvas.drawCircle(proj.offset, radius, corePaint);
 
     // Peripheral trophoblast cellular nodes
-    final cellPaint = Paint()..color = const Color(0xFFFFF1F2).withValues(alpha: 0.85);
+    final cellPaint = Paint()..color = const Color(0xFFF0F9FF).withValues(alpha: 0.90);
     const cellCount = 6;
     for (int i = 0; i < cellCount; i++) {
       final angle = (i / cellCount) * 2 * math.pi;
@@ -934,7 +934,7 @@ class _WombOrbPainter extends CustomPainter {
     final headRadius = 14.0 * scale * projHead.perspective;
 
     // Head fill
-    final headPaint = Paint()..color = const Color(0xFFFFCCD5);
+    final headPaint = Paint()..color = const Color(0xFFFED7AA);
     canvas.drawCircle(projHead.offset, headRadius, headPaint);
 
     // Optic vesicle point (early eye)
@@ -955,7 +955,7 @@ class _WombOrbPainter extends CustomPainter {
       ..quadraticBezierTo(pLumbar.offset.dx, pLumbar.offset.dy, pCaudal.offset.dx, pCaudal.offset.dy);
 
     final spinePaint = Paint()
-      ..color = const Color(0xFFFFB4C8)
+      ..color = const Color(0xFFFDBA74)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 13.0 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round
@@ -970,21 +970,21 @@ class _WombOrbPainter extends CustomPainter {
     // Cardiac Doppler ripple wave
     if (cardiacPulse > 0.05) {
       final ripplePaint = Paint()
-        ..color = const Color(0xFFF43F5E).withValues(alpha: (1.0 - cardiacPulse) * 0.6)
+        ..color = const Color(0xFFE11D48).withValues(alpha: (1.0 - cardiacPulse) * 0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.4;
       canvas.drawCircle(projHeart.offset, heartRadius * (1.2 + 0.8 * cardiacPulse), ripplePaint);
     }
 
     final heartPaint = Paint()
-      ..color = Color.lerp(const Color(0xFFFB7185), const Color(0xFFE11D48), cardiacPulse)!
+      ..color = Color.lerp(const Color(0xFFE11D48), const Color(0xFFBE123C), cardiacPulse)!
       ..style = PaintingStyle.fill;
     canvas.drawCircle(projHeart.offset, heartRadius, heartPaint);
 
     // 4. Limb Buds (Upper & Lower buds)
     final armBud = _project(_Point3D(10 * scale, -4 * scale, 5 * scale), cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
     final legBud = _project(_Point3D(8 * scale, 18 * scale, 5 * scale), cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
-    final budPaint = Paint()..color = const Color(0xFFFFCCD5);
+    final budPaint = Paint()..color = const Color(0xFFFED7AA);
     canvas.drawCircle(armBud.offset, 4.0 * scale * armBud.perspective, budPaint);
     canvas.drawCircle(legBud.offset, 4.2 * scale * legBud.perspective, budPaint);
   }
@@ -1010,7 +1010,7 @@ class _WombOrbPainter extends CustomPainter {
     final projHead = _project(headPt, cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
     final headRadius = 17.0 * scale * projHead.perspective;
 
-    final headPaint = Paint()..color = const Color(0xFFFFCCD5);
+    final headPaint = Paint()..color = const Color(0xFFFED7AA);
     canvas.drawCircle(projHead.offset, headRadius, headPaint);
 
     // Facial profile (nose bridge & chin)
@@ -1024,7 +1024,7 @@ class _WombOrbPainter extends CustomPainter {
       ..lineTo(nosePt.offset.dx, nosePt.offset.dy)
       ..lineTo(chinPt.offset.dx, chinPt.offset.dy);
     final profilePaint = Paint()
-      ..color = const Color(0xFFFDA4AF)
+      ..color = const Color(0xFFFB923C)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.6 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round
@@ -1055,7 +1055,7 @@ class _WombOrbPainter extends CustomPainter {
       ..quadraticBezierTo(pLumbar.offset.dx, pLumbar.offset.dy, pPelvis.offset.dx, pPelvis.offset.dy);
 
     final bodyPaint = Paint()
-      ..color = const Color(0xFFFFB4C8)
+      ..color = const Color(0xFFFDBA74)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 18.0 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round
@@ -1078,7 +1078,7 @@ class _WombOrbPainter extends CustomPainter {
     }
 
     final heartPaint = Paint()
-      ..color = Color.lerp(const Color(0xFFFB7185), const Color(0xFFE11D48), cardiacPulse)!
+      ..color = Color.lerp(const Color(0xFFE11D48), const Color(0xFFBE123C), cardiacPulse)!
       ..style = PaintingStyle.fill;
     canvas.drawCircle(projHeart.offset, heartRadius, heartPaint);
 
@@ -1088,7 +1088,7 @@ class _WombOrbPainter extends CustomPainter {
     final handPt = _project(_Point3D(8 * scale, -24 * scale, 8 * scale), cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
 
     final armPaint = Paint()
-      ..color = const Color(0xFFFFCCD5)
+      ..color = const Color(0xFFFED7AA)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6.0 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round
@@ -1121,7 +1121,7 @@ class _WombOrbPainter extends CustomPainter {
       ..quadraticBezierTo(cordControl.offset.dx, cordControl.offset.dy, cordEnd.offset.dx, cordEnd.offset.dy);
 
     final cordPaint = Paint()
-      ..color = const Color(0xFFF472B6).withValues(alpha: 0.55)
+      ..color = const Color(0xFF38BDF8).withValues(alpha: 0.65)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.5 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round;
@@ -1149,12 +1149,12 @@ class _WombOrbPainter extends CustomPainter {
     final projHead = _project(headPt, cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
     final headRadius = 21.0 * scale * projHead.perspective;
 
-    final headPaint = Paint()..color = const Color(0xFFFFCCD5);
+    final headPaint = Paint()..color = const Color(0xFFFED7AA);
     canvas.drawCircle(projHead.offset, headRadius, headPaint);
 
     // Cute chubby cheek & button nose
     final cheekPt = _project(_Point3D(14 * scale, -28 * scale, 6 * scale), cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
-    final cheekPaint = Paint()..color = const Color(0xFFFDA4AF).withValues(alpha: 0.45);
+    final cheekPaint = Paint()..color = const Color(0xFFFB923C).withValues(alpha: 0.45);
     canvas.drawCircle(cheekPt.offset, 8.0 * scale * projHead.perspective, cheekPaint);
 
     // Peaceful closed eye
@@ -1182,7 +1182,7 @@ class _WombOrbPainter extends CustomPainter {
       ..quadraticBezierTo(pLowerBack.offset.dx, pLowerBack.offset.dy, pRump.offset.dx, pRump.offset.dy);
 
     final backPaint = Paint()
-      ..color = const Color(0xFFFFB4C8)
+      ..color = const Color(0xFFFDBA74)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 26.0 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round
@@ -1191,7 +1191,7 @@ class _WombOrbPainter extends CustomPainter {
 
     // 3. Ventral Abdomen / Round Tummy
     final tummyPt = _project(_Point3D(6 * scale, 10 * scale, 4 * scale), cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
-    final tummyPaint = Paint()..color = const Color(0xFFFFCCD5);
+    final tummyPaint = Paint()..color = const Color(0xFFFED7AA);
     canvas.drawCircle(tummyPt.offset, 16.0 * scale * projHead.perspective, tummyPaint);
 
     // 4. Beating Heart with Strong Doppler Wave Pulse
@@ -1210,7 +1210,7 @@ class _WombOrbPainter extends CustomPainter {
     }
 
     final heartPaint = Paint()
-      ..color = Color.lerp(const Color(0xFFFB7185), const Color(0xFFE11D48), cardiacPulse)!
+      ..color = Color.lerp(const Color(0xFFE11D48), const Color(0xFFBE123C), cardiacPulse)!
       ..style = PaintingStyle.fill;
     canvas.drawCircle(projHeart.offset, heartRadius, heartPaint);
 
@@ -1220,7 +1220,7 @@ class _WombOrbPainter extends CustomPainter {
     final handPt = _project(_Point3D(4 * scale, -18 * scale, 9 * scale), cosYaw, sinYaw, cosPitch, sinPitch, focalLength, centerX, centerY);
 
     final limbPaint = Paint()
-      ..color = const Color(0xFFFFCCD5)
+      ..color = const Color(0xFFFED7AA)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8.5 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round
@@ -1253,7 +1253,7 @@ class _WombOrbPainter extends CustomPainter {
       ..quadraticBezierTo(cordControl.offset.dx, cordControl.offset.dy, cordEnd.offset.dx, cordEnd.offset.dy);
 
     final cordPaint = Paint()
-      ..color = const Color(0xFFF472B6).withValues(alpha: 0.60)
+      ..color = const Color(0xFF38BDF8).withValues(alpha: 0.65)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.5 * scale * projHead.perspective
       ..strokeCap = StrokeCap.round;

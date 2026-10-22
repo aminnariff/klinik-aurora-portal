@@ -125,7 +125,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
 
   @override
   Widget build(BuildContext context) {
-    const roseColor = Color(0xFFE84C7A);
+    const primaryAccentColor = Color(0xFF0284C7);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -135,7 +135,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Top Header & Tab Bar
-            _buildTopBar(roseColor),
+            _buildTopBar(primaryAccentColor),
             const SizedBox(height: 16),
 
             // 3D Gestational Womb Visualizer Hero Section
@@ -164,8 +164,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                 controller: _tabController,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildReportsTab(roseColor),
-                  _buildTemplateTab(roseColor),
+                  _buildReportsTab(primaryAccentColor),
+                  _buildTemplateTab(primaryAccentColor),
                 ],
               ),
             ),
@@ -178,7 +178,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   // ---------------------------------------------------------------------------
   // Header with Tabs
   // ---------------------------------------------------------------------------
-  Widget _buildTopBar(Color roseColor) {
+  Widget _buildTopBar(Color accentColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
@@ -202,7 +202,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                 height: 44,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFF7E9C), Color(0xFFE84372)],
+                    colors: [Color(0xFF0284C7), Color(0xFF0EA5E9)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -240,9 +240,9 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             ),
             child: Row(
               children: [
-                _tabButton(0, '📊 Laporan & Pergerakan', roseColor),
+                _tabButton(0, '📊 Laporan & Pergerakan', accentColor),
                 const SizedBox(width: 4),
-                _tabButton(1, '📋 Templat Senarai Semak', roseColor),
+                _tabButton(1, '📋 Templat Senarai Semak', accentColor),
               ],
             ),
           ),
@@ -278,7 +278,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            color: isSelected ? activeColor : Colors.grey.shade700,
+            color: isSelected ? const Color(0xFF0F172A) : Colors.grey.shade700,
           ),
         ),
       ),
@@ -289,7 +289,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   // TAB 0: Pregnancy & Movement Reports
   // ===========================================================================
 
-  Widget _buildReportsTab(Color roseColor) {
+  Widget _buildReportsTab(Color accentColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -298,7 +298,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
         const SizedBox(height: 18),
 
         // Search & Filters bar
-        _buildReportsFilterBar(roseColor),
+        _buildReportsFilterBar(accentColor),
         const SizedBox(height: 14),
 
         // Patients Table
@@ -307,7 +307,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               ? const Center(child: CircularProgressIndicator())
               : _patients.isEmpty
                   ? _buildEmptyState('Tiada rekod kehamilan dijumpai.', 'Pesakit yang mendaftar EDD di aplikasi Aurora Baby akan dipaparkan di sini.')
-                  : _buildReportsTable(roseColor),
+                  : _buildReportsTable(accentColor),
         ),
       ],
     );
@@ -322,8 +322,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             value: '${_reportSummary['totalActive'] ?? 0}',
             subtitle: 'Sedang menjejak di Aurora Baby',
             icon: Icons.pregnant_woman_rounded,
-            color: const Color(0xFFE84C7A),
-            bgColor: const Color(0xFFFDF2F8),
+            color: const Color(0xFF0284C7),
+            bgColor: const Color(0xFFE0F2FE),
           ),
         ),
         const SizedBox(width: 14),
@@ -432,7 +432,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     );
   }
 
-  Widget _buildReportsFilterBar(Color roseColor) {
+  Widget _buildReportsFilterBar(Color accentColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       decoration: BoxDecoration(
@@ -471,31 +471,31 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           const SizedBox(width: 16),
 
           // Status Filter Chips
-          _filterChip('all', 'Semua', roseColor),
+          _filterChip('all', 'Semua', const Color(0xFF0F172A)),
           const SizedBox(width: 6),
           _filterChip('overdue', '⏰ Overdue', const Color(0xFFDC2626)),
           const SizedBox(width: 6),
           _filterChip('alert', '⚠️ Amaran Rendah', const Color(0xFFD97706)),
           const SizedBox(width: 6),
-          _filterChip('third_trimester', '🤰 Trimester 3 (Wk 28+)', const Color(0xFF7C3AED)),
+          _filterChip('third_trimester', '🤰 Trimester 3 (Wk 28+)', const Color(0xFF0284C7)),
           if (_filterGestationalWeek != null) ...[
             const SizedBox(width: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: roseColor.withValues(alpha: 0.12),
+                color: const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: roseColor, width: 1.2),
+                border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     '🌟 Minggu $_filterGestationalWeek',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: roseColor,
+                      color: Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -508,7 +508,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                       _fetchReports();
                     },
                     borderRadius: BorderRadius.circular(10),
-                    child: Icon(Icons.close_rounded, size: 14, color: roseColor),
+                    child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFF64748B)),
                   ),
                 ],
               ),
@@ -560,7 +560,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     );
   }
 
-  Widget _buildReportsTable(Color roseColor) {
+  Widget _buildReportsTable(Color accentColor) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -629,7 +629,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                           'Minggu $week (${trimester != null ? 'Trimester $trimester' : ''})',
                           style: TextStyle(
                             fontSize: 11.5,
-                            color: isOverdue ? const Color(0xFFDC2626) : roseColor,
+                            color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0284C7),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -749,8 +749,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFF1F2),
-                      foregroundColor: roseColor,
+                      backgroundColor: const Color(0xFFF1F5F9),
+                      foregroundColor: const Color(0xFF0F172A),
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -770,12 +770,12 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   // TAB 1: Master Checklist Template Management
   // ===========================================================================
 
-  Widget _buildTemplateTab(Color roseColor) {
+  Widget _buildTemplateTab(Color accentColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Controls & Category selector
-        _buildTemplateHeaderBar(roseColor),
+        _buildTemplateHeaderBar(accentColor),
         const SizedBox(height: 14),
 
         // Items List
@@ -784,13 +784,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               ? const Center(child: CircularProgressIndicator())
               : _templateCategories.isEmpty
                   ? _buildEmptyState('Tiada templat dijumpai.', 'Klik "+ Tambah Item Templat" untuk memulakan.')
-                  : _buildTemplateCategoriesList(roseColor),
+                  : _buildTemplateCategoriesList(accentColor),
         ),
       ],
     );
   }
 
-  Widget _buildTemplateHeaderBar(Color roseColor) {
+  Widget _buildTemplateHeaderBar(Color accentColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       decoration: BoxDecoration(
@@ -802,25 +802,25 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
         children: [
           Row(
             children: [
-              _categoryFilterChip('all', 'Semua Kategori', roseColor),
+              _categoryFilterChip('all', 'Semua Kategori', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('baju', '👕 Baju', roseColor),
+              _categoryFilterChip('baju', '👕 Baju', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('mandi', '🛁 Mandi', roseColor),
+              _categoryFilterChip('mandi', '🛁 Mandi', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('tidur', '🛏️ Tidur', roseColor),
+              _categoryFilterChip('tidur', '🛏️ Tidur', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('penyusuan', '🍼 Penyusuan', roseColor),
+              _categoryFilterChip('penyusuan', '🍼 Penyusuan', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('beg_hospital', '🏥 Beg Hospital', roseColor),
+              _categoryFilterChip('beg_hospital', '🏥 Beg Hospital', accentColor),
             ],
           ),
           ElevatedButton.icon(
-            onPressed: () => _openAddTemplateItemDialog(roseColor),
+            onPressed: _openAddTemplateItemDialog,
             icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('Tambah Item Templat', style: TextStyle(fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: roseColor,
+              backgroundColor: const Color(0xFF0F172A),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -831,7 +831,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     );
   }
 
-  Widget _categoryFilterChip(String catKey, String label, Color roseColor) {
+  Widget _categoryFilterChip(String catKey, String label, Color accentColor) {
     final isSelected = _selectedTemplateCategory == catKey;
     return InkWell(
       onTap: () {
@@ -842,10 +842,10 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? roseColor.withValues(alpha: 0.12) : const Color(0xFFF8FAFC),
+          color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? roseColor : Colors.grey.shade300,
+            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
             width: isSelected ? 1.4 : 1,
           ),
         ),
@@ -854,14 +854,14 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           style: TextStyle(
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            color: isSelected ? roseColor : Colors.grey.shade700,
+            color: isSelected ? Colors.white : const Color(0xFF475569),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTemplateCategoriesList(Color roseColor) {
+  Widget _buildTemplateCategoriesList(Color accentColor) {
     return ListView.builder(
       itemCount: _templateCategories.length,
       itemBuilder: (context, idx) {
@@ -972,7 +972,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.info_outline_rounded, size: 13, color: Color(0xFFE84C7A)),
+                                  const Icon(Icons.info_outline_rounded, size: 13, color: Color(0xFF0284C7)),
                                   const SizedBox(width: 5),
                                   Expanded(
                                     child: Text(
@@ -1024,7 +1024,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                     IconButton(
                       icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF64748B)),
                       tooltip: 'Kemaskini',
-                      onPressed: () => _openEditTemplateItemDialog(item, roseColor),
+                      onPressed: () => _openEditTemplateItemDialog(item),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Color(0xFFEF4444)),
@@ -1045,7 +1045,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   // Dialogs: Add & Edit Template Item (Modernized with TemplateItemEditorDialog)
   // ---------------------------------------------------------------------------
 
-  void _openAddTemplateItemDialog(Color roseColor) {
+  void _openAddTemplateItemDialog() {
     final catKey = _selectedTemplateCategory != 'all' ? _selectedTemplateCategory : 'baju';
     TemplateItemEditorDialog.show(
       context,
@@ -1057,7 +1057,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     );
   }
 
-  void _openEditTemplateItemDialog(Map<String, dynamic> item, Color roseColor) {
+  void _openEditTemplateItemDialog(Map<String, dynamic> item) {
     TemplateItemEditorDialog.show(
       context,
       item: item,

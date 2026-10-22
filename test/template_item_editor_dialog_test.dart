@@ -36,7 +36,7 @@ void main() {
       expect(find.text('Keperluan asas yang disyorkan'), findsOneWidget);
       expect(find.text('Beg Hospital'), findsOneWidget);
       expect(find.text('Perlu dibawa semasa bersalin'), findsOneWidget);
-      expect(find.text('💖 Panduan Klinikal Dr. Aurora'), findsOneWidget);
+      expect(find.text('🩺 Panduan Klinikal Dr. Aurora'), findsOneWidget);
       expect(find.text('Spesifikasi (Pilihan Fabrik & Saiz)'), findsOneWidget);
       expect(find.text('Keselamatan (Nasihat Pediatrik)'), findsOneWidget);
       expect(find.text('Tip Penjimatan (Smart Budgeting)'), findsOneWidget);
@@ -271,7 +271,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Tambah Item Templat'), findsOneWidget);
-      expect(find.text('💖 Panduan Klinikal Dr. Aurora'), findsOneWidget);
+      expect(find.text('🩺 Panduan Klinikal Dr. Aurora'), findsOneWidget);
     });
 
     testWidgets('uses crisp and compact text style on text form fields (fontSize <= 14)', (tester) async {

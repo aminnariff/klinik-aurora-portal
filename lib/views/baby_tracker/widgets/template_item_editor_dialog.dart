@@ -169,7 +169,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
     return InputDecoration(
       labelText: labelText,
       labelStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
-      floatingLabelStyle: const TextStyle(fontSize: 12, color: Color(0xFFE84C7A), fontWeight: FontWeight.w600),
+      floatingLabelStyle: const TextStyle(fontSize: 12, color: Color(0xFF0284C7), fontWeight: FontWeight.w600),
       hintText: hintText,
       hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.normal),
       prefixIcon: prefixIcon,
@@ -186,7 +186,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE84C7A), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF0284C7), width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -321,9 +321,9 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           Container(
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF0F5),
+              color: const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFFFD1DC)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Text(
               _getCategoryEmoji(_categoryKey),
@@ -397,7 +397,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           decoration: _inputDecoration(
             labelText: 'Nama Barangan *',
             hintText: 'cth: Sarung Tangan & Stokin Bayi',
-            prefixIcon: const Icon(Icons.shopping_bag_outlined, color: Color(0xFFE84C7A), size: 20),
+            prefixIcon: const Icon(Icons.shopping_bag_outlined, color: Color(0xFF0284C7), size: 20),
           ),
         ),
         const SizedBox(height: 12),
@@ -411,7 +411,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           ),
           decoration: _inputDecoration(
             labelText: 'Kategori',
-            prefixIcon: const Icon(Icons.category_outlined, color: Color(0xFFE84C7A), size: 20),
+            prefixIcon: const Icon(Icons.category_outlined, color: Color(0xFF0284C7), size: 20),
           ),
           items: _buildCategoryDropdownItems(),
           onChanged: (val) {
@@ -455,8 +455,8 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
               child: _buildSelectableCard(
                 isActive: _isWajib,
                 onTap: () => setState(() => _isWajib = !_isWajib),
-                activeColor: const Color(0xFFE84C7A),
-                activeBgColor: const Color(0xFFFFF0F5),
+                activeColor: const Color(0xFFD97706),
+                activeBgColor: const Color(0xFFFFFBEB),
                 activeIcon: Icons.star_rounded,
                 inactiveIcon: Icons.star_border_rounded,
                 title: 'Item WAJIB',
@@ -571,11 +571,11 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
             children: [
               const Expanded(
                 child: Text(
-                  '💖 Panduan Klinikal Dr. Aurora',
+                  '🩺 Panduan Klinikal Dr. Aurora',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFFBE185D),
+                    color: Color(0xFF0284C7),
                   ),
                 ),
               ),
@@ -583,7 +583,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFCE7F3),
+                  color: const Color(0xFFE0F2FE),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
@@ -591,7 +591,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF9D174D),
+                    color: Color(0xFF0369A1),
                   ),
                 ),
               ),
@@ -669,14 +669,14 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFF7E9C), Color(0xFFE84C7A)],
+                colors: [Color(0xFF0F172A), Color(0xFF334155)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFE84C7A).withValues(alpha: 0.3),
+                  color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
