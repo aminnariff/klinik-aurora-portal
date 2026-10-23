@@ -48,4 +48,4 @@ app.*.map.json
 .fvm/
 
 # Superpowers brainstorming cache
-.superpowers/
+.superpowers/coverage/
