@@ -12,6 +12,8 @@ class ConfirmationDialogAttribute {
   DialogButtonAttribute? cancelButton;
   double? width;
   double? height;
+  bool isHoldToConfirm;
+  bool isDestructive;
 
   ConfirmationDialogAttribute({
     this.title,
@@ -23,5 +25,7 @@ class ConfirmationDialogAttribute {
     this.cancelButton,
     this.width,
     this.height,
+    this.isHoldToConfirm = false,
+    this.isDestructive = false,
   });
 }

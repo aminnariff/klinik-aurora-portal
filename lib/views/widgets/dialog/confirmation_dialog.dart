@@ -1,7 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/hold_to_confirm_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/confirmation_dialog_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 
@@ -12,64 +14,74 @@ class ConfirmationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-      child: Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-        child: EmilModalTransition(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: attribute.width ?? 400),
-            child: Container(
-              width: double.infinity,
-              height: attribute.height,
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0F172A).withValues(alpha: 0.12),
-                    blurRadius: 48,
-                    offset: const Offset(0, 20),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  attribute.logo ?? _questionIcon(),
-                  const SizedBox(height: 22),
-                  Text(
-                    attribute.title ?? 'Are you sure?',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A),
-                      letterSpacing: -0.4,
-                    ),
-                  ),
-                  if (attribute.text != null) ...[
-                    const SizedBox(height: 10),
-                    Text(
-                      attribute.text.toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.55),
-                    ),
-                  ],
-                  if (attribute.textWidget != null) ...[const SizedBox(height: 10), attribute.textWidget!],
-                  const SizedBox(height: 26),
-                  Row(
-                    children: [
-                      Expanded(child: _cancelButton(context)),
-                      const SizedBox(width: 10),
-                      Expanded(child: _confirmButton(context)),
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          Navigator.of(context).maybePop(false);
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            child: EmilModalTransition(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: attribute.width ?? 400),
+                child: Container(
+                  width: double.infinity,
+                  height: attribute.height,
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.12),
+                        blurRadius: 48,
+                        offset: const Offset(0, 20),
+                      ),
                     ],
                   ),
-                ],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      attribute.logo ?? _questionIcon(),
+                      const SizedBox(height: 22),
+                      Text(
+                        attribute.title ?? 'Are you sure?',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      if (attribute.text != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          attribute.text.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.55),
+                        ),
+                      ],
+                      if (attribute.textWidget != null) ...[const SizedBox(height: 10), attribute.textWidget!],
+                      const SizedBox(height: 26),
+                      Row(
+                        children: [
+                          Expanded(child: _cancelButton(context)),
+                          const SizedBox(width: 10),
+                          Expanded(child: _confirmButton(context)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -105,6 +117,25 @@ class ConfirmationDialog extends StatelessWidget {
   }
 
   Widget _confirmButton(BuildContext context) {
+    if (attribute.isHoldToConfirm) {
+      final progressColor = attribute.isDestructive ? const Color(0xFFDC2626) : tertiaryColor;
+      return HoldToConfirmButton(
+        label: attribute.confrimButton?.text ?? 'Hold to Confirm',
+        holdingLabel: 'Release to cancel...',
+        confirmedLabel: 'Confirmed',
+        progressColor: progressColor,
+        baseColor: attribute.isDestructive ? const Color(0xFFFEF2F2) : tertiaryColor.withValues(alpha: 0.1),
+        textColor: progressColor,
+        onConfirmed: () async {
+          if (attribute.confrimButton?.action != null) {
+            attribute.confrimButton!.action!();
+          } else {
+            Navigator.pop(context, true);
+          }
+        },
+      );
+    }
+
     final color = attribute.confrimButton?.color ?? tertiaryColor;
     final action = attribute.confrimButton?.action ?? () => Navigator.pop(context, true);
     return EmilPressable(
