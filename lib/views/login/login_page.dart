@@ -63,27 +63,27 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _entranceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
-    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
+    _entranceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
+    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
     _pulseCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat(reverse: true);
 
-    _formFade = CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOut);
+    _formFade = CurvedAnimation(parent: _entranceCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0));
     _formSlide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
+      begin: const Offset(0, 0.03),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: _entranceCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0)));
 
-    _logoFade = CurvedAnimation(parent: _logoCtrl, curve: Curves.easeOut);
+    _logoFade = CurvedAnimation(parent: _logoCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0));
     _logoScale = Tween<double>(
-      begin: 0.6,
+      begin: 0.94,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _logoCtrl, curve: Curves.elasticOut));
+    ).animate(CurvedAnimation(parent: _logoCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0)));
 
     _pulse = Tween<double>(begin: 0.5, end: 0.9).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
     SchedulerBinding.instance.scheduleFrameCallback((_) async {
       _logoCtrl.forward();
-      Future.delayed(const Duration(milliseconds: 280), () {
+      Future.delayed(const Duration(milliseconds: 60), () {
         if (mounted) _entranceCtrl.forward();
       });
 

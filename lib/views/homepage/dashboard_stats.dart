@@ -341,7 +341,7 @@ class _StatCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: const TextStyle(color: Color(0xff68737d), fontSize: 12),
+                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),
@@ -359,7 +359,13 @@ class _StatCard extends StatelessWidget {
               children: [
                 Text(
                   valueText ?? (value != null ? '$value' : '—'),
-                  style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, height: 1),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),

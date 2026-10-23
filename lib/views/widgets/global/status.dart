@@ -4,14 +4,36 @@ import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
 
 Widget showStatus(bool? value, {String? valueText, Color? valueColor}) {
+  final color = valueColor ?? (value == true ? const Color(0xFF059669) : const Color(0xFFDC2626));
+  final label = valueText ?? (value == true ? 'Active' : 'Inactive');
+
   return AppTooltip(
-    message: valueText ?? (value == true ? 'Active' : 'Inactive'),
+    message: label,
     child: Container(
-      width: 16,
-      height: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: valueColor ?? (value == true ? Colors.green : Colors.red),
-        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     ),
   );
@@ -22,7 +44,6 @@ class AppointmentStatusBadge extends StatelessWidget {
   final double fontSize;
   final EdgeInsets padding;
   final bool showDot;
-
   final bool isUppercase;
 
   const AppointmentStatusBadge({
@@ -30,41 +51,42 @@ class AppointmentStatusBadge extends StatelessWidget {
     required this.status,
     this.fontSize = 12,
     this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-    this.showDot = false,
+    this.showDot = true,
     this.isUppercase = false,
   });
 
   @override
   Widget build(BuildContext context) {
     // fallback to grey/Unknown if status is not found or null
-    final color = appointmentStatusColors[status] ?? Colors.grey;
+    final color = appointmentStatusColors[status] ?? const Color(0xFF64748B);
     String label = getAppointmentStatusLabel(status);
     if (isUppercase) label = label.toUpperCase();
 
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: color.withAlpha(25),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withAlpha(80)),
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (showDot) ...[
             Container(
-              width: 7,
-              height: 7,
+              width: 6,
+              height: 6,
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
           ],
           Text(
             label,
             style: TextStyle(
               fontSize: fontSize,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               color: color,
+              letterSpacing: 0.1,
             ),
           ),
         ],

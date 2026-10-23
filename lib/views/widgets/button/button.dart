@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
-class Button extends StatelessWidget {
+class Button extends StatefulWidget {
   final Function()? action;
   final String actionText;
   final MainAxisSize mainAxisSize;
@@ -39,48 +40,77 @@ class Button extends StatelessWidget {
   });
 
   @override
+  State<Button> createState() => _ButtonState();
+}
+
+class _ButtonState extends State<Button> {
+  bool _isPressed = false;
+
+  void _setPressed(bool val) {
+    if (widget.action == null) return;
+    if (_isPressed != val) {
+      setState(() => _isPressed = val);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: margin ?? EdgeInsets.symmetric(vertical: isMobile ? containerVerticalPadding ?? 0 : 0),
-      width: width,
-      height: null,
-      decoration: BoxDecoration(
-        gradient: action == null
-            ? const LinearGradient(colors: [Color(0xFFE5E7EB), Color(0xFFE5E7EB)])
-            : (color != null)
-            ? LinearGradient(colors: [color!, color!], begin: Alignment.topLeft, end: Alignment.bottomRight)
-            : gradient,
-        borderRadius: BorderRadius.circular(borderRadius ?? 20.0),
-      ),
-      child: ElevatedButton(
-        onPressed: action,
-        onHover: (value) {},
-        style: ElevatedButton.styleFrom(
-          elevation: elevation ?? 10.0,
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          padding: padding ?? EdgeInsets.symmetric(horizontal: screenPadding, vertical: 25),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius ?? 20.0)),
+    final effectiveBorderRadius = widget.borderRadius ?? 20.0;
+    return AnimatedScale(
+      scale: _isPressed ? 0.97 : 1.0,
+      duration: _isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration,
+      curve: EmilMotion.easeOut,
+      child: Container(
+        padding: widget.margin ?? EdgeInsets.symmetric(vertical: isMobile ? widget.containerVerticalPadding ?? 0 : 0),
+        width: widget.width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          gradient: widget.action == null
+              ? const LinearGradient(colors: [Color(0xFFE5E7EB), Color(0xFFE5E7EB)])
+              : (widget.color != null)
+              ? LinearGradient(colors: [widget.color!, widget.color!], begin: Alignment.topLeft, end: Alignment.bottomRight)
+              : widget.gradient,
+          borderRadius: BorderRadius.circular(effectiveBorderRadius),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            buttonText(
-              Text(
-                actionText,
-                textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium!.apply(color: textColor ?? Colors.white, fontWeightDelta: 2),
-              ),
+        child: Listener(
+          onPointerDown: (_) => _setPressed(true),
+          onPointerUp: (_) => _setPressed(false),
+          onPointerCancel: (_) => _setPressed(false),
+          child: ElevatedButton(
+            onPressed: widget.action,
+            onHover: (value) {},
+            style: ElevatedButton.styleFrom(
+              elevation: widget.elevation ?? 10.0,
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              padding: widget.padding ?? EdgeInsets.symmetric(horizontal: screenPadding, vertical: 25),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(effectiveBorderRadius)),
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.icon != null) ...[
+                  widget.icon!,
+                  const SizedBox(width: 8),
+                ],
+                buttonText(
+                  Text(
+                    widget.actionText,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium!.apply(color: widget.textColor ?? Colors.white, fontWeightDelta: 2),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget buttonText(Widget child) {
-    return isFlexible ? Flexible(child: child) : child;
+    return widget.isFlexible ? Flexible(child: child) : child;
   }
 }

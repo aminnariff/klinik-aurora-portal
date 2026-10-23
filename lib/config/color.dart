@@ -71,48 +71,42 @@ List<Color> colorOptions(String color) {
 
 Color statusColor(String? status) {
   if (status?.contains('ERROR') == true) {
-    return const Color(0XFFDF184A);
+    return const Color(0xFFDC2626);
   } else {
     switch (status) {
       case 'active' || 'completed':
-        return Colors.green;
+        return const Color(0xFF059669);
 
       case 'inactive':
-        return const Color(0XFFDF184A);
+        return const Color(0xFFDC2626);
 
       case 'in-progress':
-        return const Color(0xFFFFC107);
+        return const Color(0xFFD97706);
 
       case 'NEW':
-        return const Color(0XFF0074D9);
+        return const Color(0xFF2563EB);
 
-      case '1':
-        return const Color(0XFF2ECC40);
+      case '1' || 'true':
+        return const Color(0xFF059669);
 
-      case 'true':
-        return const Color(0XFF2ECC40);
-
-      case 'false':
-        return const Color(0XFFDF184A);
-
-      case '0':
-        return const Color(0XFFDF184A);
+      case '0' || 'false':
+        return const Color(0xFFDC2626);
 
       default:
-        return const Color(0XFF52B3E0);
+        return const Color(0xFF0D9488);
     }
   }
 }
 
 final Map<int, Color> appointmentStatusColors = {
-  1: Colors.blue, // Booked
-  2: Colors.red, // Cancelled
-  3: Colors.orange, // Rescheduled
-  4: const Color(0xFFCD9B05), // Pending Payment
-  5: Colors.green, // Completed
-  6: Colors.grey, // Refunded
-  7: Colors.purple, // No Show
-  8: const Color(0xFF0D9488), // Transferred
+  1: const Color(0xFF2563EB), // Booked (blue-600)
+  2: const Color(0xFFDC2626), // Cancelled (red-600)
+  3: const Color(0xFFD97706), // Rescheduled (amber-600)
+  4: const Color(0xFFB45309), // Pending Payment (amber-700)
+  5: const Color(0xFF059669), // Completed (emerald-600)
+  6: const Color(0xFF64748B), // Refunded (slate-500)
+  7: const Color(0xFF7C3AED), // No Show (violet-600)
+  8: const Color(0xFF0D9488), // Transferred (teal-600)
 };
 
 Color gestationalStatusColor(GestationalEligibility? eligiblity) {
