@@ -42,6 +42,7 @@ import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
+import 'package:klinik_aurora_portal/views/widgets/shimmer/table_skeleton.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/pagination.dart';
@@ -1081,7 +1082,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     border: isMobile ? null : Border.all(color: const Color(0xFFE5E7EB)),
                   ),
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator(color: secondaryColor))
+                      ? const AppTableSkeleton(rows: 8)
                       : data.isEmpty
                       ? _buildEmptyState()
                       : isMobile

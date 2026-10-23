@@ -26,6 +26,7 @@ import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
+import 'package:klinik_aurora_portal/views/widgets/command_palette/command_palette_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
@@ -283,9 +284,20 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget desktopView(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      body: Row(
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () {
+          CommandPaletteDialog.show(context);
+        },
+        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () {
+          CommandPaletteDialog.show(context);
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF5F6FA),
+          body: Row(
         children: [
           Consumer<TopBarController>(
             builder: (ctxMain, snapshot, child) {
@@ -699,20 +711,87 @@ class _HomepageState extends State<Homepage> {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget _buildTopBar(BuildContext context) {
     return Container(
-      height: 44,
+      height: 48,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 4, offset: const Offset(0, 1))],
       ),
       padding: EdgeInsets.symmetric(horizontal: screenPadding),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          // Quick Search / Command Palette trigger pill
+          InkWell(
+            onTap: () => CommandPaletteDialog.show(context),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.search_rounded, size: 16, color: Color(0xFF64748B)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Quick Search...',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(width: 14),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                    ),
+                    child: const Text(
+                      '⌘K',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Spacer(),
+          // Live Sync Indicator
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFECFDF5), // emerald-50
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFA7F3D0)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF10B981),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Text(
+                  'Live',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF047857)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
           if (context.read<AuthController>().isSuperAdmin) ...[
             IconButton(
               icon: const Icon(Icons.notifications_outlined, size: 20),
