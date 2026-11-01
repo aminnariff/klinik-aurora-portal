@@ -432,10 +432,9 @@ class _UserDetailState extends State<UserDetail> {
                       children: [
                         _buildFormGrid(),
                         if (widget.type == 'update') ...[
-                          const SizedBox(height: 18),
-                          _buildAccountStatusCard(),
                           const SizedBox(height: 14),
-                          _buildMetadataCard(),
+                          _buildAccountStatusRow(),
+                          _buildMetadataRow(),
                         ],
                       ],
                     ),
@@ -462,25 +461,14 @@ class _UserDetailState extends State<UserDetail> {
         border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 46,
-            height: 46,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF0284C7), Color(0xFF0EA5E9)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: const Color(0xFF0F172A),
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF0284C7).withValues(alpha: 0.25),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
             alignment: Alignment.center,
             child: Text(
@@ -488,7 +476,7 @@ class _UserDetailState extends State<UserDetail> {
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
-                fontSize: 16,
+                fontSize: 15,
                 letterSpacing: 0.5,
               ),
             ),
@@ -518,31 +506,35 @@ class _UserDetailState extends State<UserDetail> {
                       ValueListenableBuilder<bool>(
                         valueListenable: _userStatus,
                         builder: (context, active, _) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: active ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: active ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  color: active ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              active ? 'Active' : 'Inactive',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: active ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                              const SizedBox(width: 5),
+                              Text(
+                                active ? 'Active' : 'Inactive',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: active ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                                ),
                               ),
-                            ),
+                            ],
                           );
                         },
                       ),
                     ],
                   ],
                 ),
-                const SizedBox(height: 6),
-                _buildDemographicBadges(),
+                const SizedBox(height: 3),
+                _buildDemographicSubtitle(),
               ],
             ),
           ),
@@ -557,81 +549,39 @@ class _UserDetailState extends State<UserDetail> {
     );
   }
 
-  Widget _buildDemographicBadges() {
-    final List<Widget> badges = [];
+  Widget _buildDemographicSubtitle() {
+    final List<String> parts = [];
 
     final docText = _nricController.text.trim();
     if (docText.isNotEmpty) {
-      badges.add(_badge(
-        _isMalaysianIc ? 'MyKad' : 'Passport / ID',
-        icon: _isMalaysianIc ? Icons.badge_outlined : Icons.flight_takeoff_outlined,
-        color: const Color(0xFF0369A1),
-        bgColor: const Color(0xFFF0F9FF),
-      ));
-    }
-
-    if (_derivedGender != null) {
-      final isMale = _derivedGender == 'Male';
-      badges.add(_badge(
-        _derivedGender!,
-        icon: isMale ? Icons.male_rounded : Icons.female_rounded,
-        color: isMale ? const Color(0xFF2563EB) : const Color(0xFFDB2777),
-        bgColor: isMale ? const Color(0xFFEFF6FF) : const Color(0xFFFDF2F8),
-      ));
+      parts.add(_isMalaysianIc ? 'MyKad: $docText' : 'ID: $docText');
     }
 
     if (_derivedAge != null && _derivedAge! >= 0) {
-      badges.add(_badge(
-        '$_derivedAge yrs',
-        icon: Icons.cake_outlined,
-        color: const Color(0xFF059669),
-        bgColor: const Color(0xFFECFDF5),
-      ));
+      parts.add('$_derivedAge yrs');
+    }
+
+    if (_derivedGender != null) {
+      parts.add(_derivedGender!);
     }
 
     final dob = _dobController.text.trim();
     if (dob.isNotEmpty) {
-      badges.add(_badge(
-        dob,
-        icon: Icons.calendar_today_outlined,
-        color: const Color(0xFF475569),
-        bgColor: const Color(0xFFF1F5F9),
-      ));
+      parts.add('DOB: $dob');
     }
 
-    if (badges.isEmpty) {
+    if (parts.isEmpty) {
       return Text(
-        widget.type == 'create' ? 'Fill details below to register patient' : 'No IC / demographic details',
-        style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+        widget.type == 'create' ? 'Fill details below to register patient' : 'No demographic details',
+        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
       );
     }
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 4,
-      children: badges,
-    );
-  }
-
-  Widget _badge(String text, {required IconData icon, required Color color, required Color bgColor}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.18)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 11, color: color),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
-          ),
-        ],
-      ),
+    return Text(
+      parts.join('  ·  '),
+      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
@@ -651,7 +601,7 @@ class _UserDetailState extends State<UserDetail> {
           Row(
             children: [
               Expanded(
-                child: _statCard('Home Branch', branchName, Icons.storefront_outlined, const Color(0xFF475569)),
+                child: _statCard('Home Branch', branchName, Icons.storefront_outlined),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -659,7 +609,6 @@ class _UserDetailState extends State<UserDetail> {
                   'Appointments',
                   visits,
                   Icons.event_note_outlined,
-                  const Color(0xFF0284C7),
                   onTap: _openAppointmentHistory,
                 ),
               ),
@@ -669,7 +618,6 @@ class _UserDetailState extends State<UserDetail> {
                   'Points Balance',
                   '$points pts',
                   Icons.stars_rounded,
-                  const Color(0xFFD97706),
                   onTap: _openManagePoints,
                 ),
               ),
@@ -681,9 +629,8 @@ class _UserDetailState extends State<UserDetail> {
               Expanded(
                 child: _actionBtn(
                   icon: Icons.add_circle_outline_rounded,
-                  label: 'Book Appointment',
-                  color: primary,
-                  bgColor: primary.withValues(alpha: 0.08),
+                  label: 'Book Visit',
+                  isPrimary: true,
                   onTap: _openCreateAppointment,
                 ),
               ),
@@ -691,9 +638,7 @@ class _UserDetailState extends State<UserDetail> {
               Expanded(
                 child: _actionBtn(
                   icon: Icons.calendar_month_outlined,
-                  label: 'Appointment History',
-                  color: const Color(0xFF0284C7),
-                  bgColor: const Color(0xFFE0F2FE),
+                  label: 'Appointments',
                   onTap: _openAppointmentHistory,
                 ),
               ),
@@ -701,9 +646,7 @@ class _UserDetailState extends State<UserDetail> {
               Expanded(
                 child: _actionBtn(
                   icon: Icons.stars_rounded,
-                  label: 'Manage Points',
-                  color: const Color(0xFFD97706),
-                  bgColor: const Color(0xFFFEF3C7),
+                  label: 'Points',
                   onTap: _openManagePoints,
                 ),
               ),
@@ -711,9 +654,7 @@ class _UserDetailState extends State<UserDetail> {
               Expanded(
                 child: _actionBtn(
                   icon: Icons.child_care_rounded,
-                  label: 'Baby Kick Tracker',
-                  color: const Color(0xFFE11D48),
-                  bgColor: const Color(0xFFFFE4E6),
+                  label: 'Baby Tracker',
                   onTap: _openBabyKickTracker,
                 ),
               ),
@@ -799,9 +740,8 @@ class _UserDetailState extends State<UserDetail> {
   Widget _actionBtn({
     required IconData icon,
     required String label,
-    required Color color,
-    required Color bgColor,
     required VoidCallback onTap,
+    bool isPrimary = false,
   }) {
     return InkWell(
       onTap: onTap,
@@ -809,19 +749,29 @@ class _UserDetailState extends State<UserDetail> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
         decoration: BoxDecoration(
-          color: bgColor,
+          color: isPrimary ? primary.withValues(alpha: 0.08) : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
+          border: Border.all(
+            color: isPrimary ? primary.withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 14, color: color),
+            Icon(
+              icon,
+              size: 14,
+              color: isPrimary ? primary : const Color(0xFF475569),
+            ),
             const SizedBox(width: 5),
             Flexible(
               child: Text(
                 label,
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: isPrimary ? primary : const Color(0xFF334155),
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -832,13 +782,13 @@ class _UserDetailState extends State<UserDetail> {
     );
   }
 
-  Widget _statCard(String label, String value, IconData icon, Color accentColor, {VoidCallback? onTap}) {
+  Widget _statCard(String label, String value, IconData icon, {VoidCallback? onTap}) {
     final card = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: onTap != null ? accentColor.withValues(alpha: 0.3) : const Color(0xFFE2E8F0)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -846,7 +796,7 @@ class _UserDetailState extends State<UserDetail> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 12, color: accentColor),
+              Icon(icon, size: 12, color: const Color(0xFF64748B)),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -857,13 +807,13 @@ class _UserDetailState extends State<UserDetail> {
                 ),
               ),
               if (onTap != null)
-                Icon(Icons.arrow_forward_ios_rounded, size: 9, color: accentColor.withValues(alpha: 0.6)),
+                const Icon(Icons.arrow_forward_ios_rounded, size: 9, color: Color(0xFF94A3B8)),
             ],
           ),
           const SizedBox(height: 3),
           Text(
             value,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: accentColor),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -1349,44 +1299,57 @@ class _UserDetailState extends State<UserDetail> {
     );
   }
 
-  Widget _buildAccountStatusCard() {
+  Widget _buildAccountStatusRow() {
     return ValueListenableBuilder<bool>(
       valueListenable: _userStatus,
       builder: (context, active, _) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: active ? const Color(0xFFF0FDF4) : const Color(0xFFFFF1F2),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: active ? const Color(0xFFBBF7D0) : const Color(0xFFFECDD3),
-            ),
-          ),
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                active ? Icons.check_circle_outline_rounded : Icons.block_rounded,
-                size: 18,
-                color: active ? const Color(0xFF15803D) : const Color(0xFFBE123C),
-              ),
-              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Account Status: ${active ? "Active" : "Deactivated"}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: active ? const Color(0xFF166534) : const Color(0xFF9F1239),
-                      ),
+                    Row(
+                      children: [
+                        const Text(
+                          'Account Status',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: active ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          active ? 'Active' : 'Deactivated',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: active ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      active ? 'Patient is eligible to book appointments & earn points' : 'Account deactivated — booking & portal login disabled',
-                      style: TextStyle(
+                      active
+                          ? 'Patient is eligible to book appointments & earn rewards points'
+                          : 'Account deactivated — booking and portal login disabled',
+                      style: const TextStyle(
                         fontSize: 11,
-                        color: active ? const Color(0xFF15803D) : const Color(0xFFBE123C),
+                        color: Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -1395,8 +1358,8 @@ class _UserDetailState extends State<UserDetail> {
               Switch(
                 value: active,
                 onChanged: (val) => _userStatus.value = val,
-                activeThumbColor: const Color(0xFF16A34A),
-                activeTrackColor: const Color(0xFFBBF7D0),
+                activeTrackColor: primary,
+                activeThumbColor: Colors.white,
               ),
             ],
           ),
@@ -1405,46 +1368,25 @@ class _UserDetailState extends State<UserDetail> {
     );
   }
 
-  Widget _buildMetadataCard() {
+  Widget _buildMetadataRow() {
     final createdDate = dateConverter(widget.user?.createdDate) ?? '—';
     final modifiedDate = widget.user?.modifiedDate != null ? dateConverter(widget.user?.modifiedDate) ?? '—' : null;
     final createdBy = widget.user?.createdByAdmin == 1 ? 'Admin' : 'Self Registered';
     final tnc = widget.user?.tncAccepted == 1 || widget.user?.createdByAdmin == 0 ? 'Accepted' : 'Pending';
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _miniMeta('Joined', createdDate),
-          if (modifiedDate != null) _miniMeta('Last Active', modifiedDate),
-          _miniMeta('Origin', createdBy),
-          _miniMeta('Terms', tnc),
-        ],
-      ),
-    );
-  }
+    final items = <String>[
+      'Joined: $createdDate',
+      if (modifiedDate != null) 'Last active: $modifiedDate',
+      'Origin: $createdBy',
+      'Terms: $tnc',
+    ];
 
-  Widget _miniMeta(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w600),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 4),
+      child: Text(
+        items.join('   ·   '),
+        style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8), fontWeight: FontWeight.w500),
+      ),
     );
   }
 
@@ -1474,7 +1416,7 @@ class _UserDetailState extends State<UserDetail> {
           ElevatedButton(
             onPressed: _isSaving ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0284C7),
+              backgroundColor: primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
               elevation: 0,
