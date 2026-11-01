@@ -764,34 +764,6 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
           const Spacer(),
-          // Live Sync Indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5), // emerald-50
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFA7F3D0)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF10B981),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                const Text(
-                  'Live',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF047857)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
           if (context.read<AuthController>().isSuperAdmin) ...[
             IconButton(
               icon: const Icon(Icons.notifications_outlined, size: 20),

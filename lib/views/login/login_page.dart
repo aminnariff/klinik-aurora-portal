@@ -338,84 +338,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  // Live system status indicator pill
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.32)),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.check_circle_rounded, color: Colors.white, size: 14),
-                          SizedBox(width: 8),
-                          Text(
-                            'All Clinic Systems Operational',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  // Feature badges
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: const [
-                        _FeatureBadge(Icons.event_available_rounded, 'Real-Time Scheduling'),
-                        _FeatureBadge(Icons.health_and_safety_rounded, 'Electronic Health Records'),
-                        _FeatureBadge(Icons.medical_services_rounded, 'Multi-Branch Tenant'),
-                        _FeatureBadge(Icons.insights_rounded, 'Executive Analytics'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  // Security footer badge
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.verified_user_rounded, color: Colors.white.withValues(alpha: 0.9), size: 16),
-                          const SizedBox(width: 8),
-                          Text(
-                            'MOH Compliant · PDPA Protected · 256-Bit SSL',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.90),
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 28),
                   FadeTransition(
                     opacity: _logoFade,
                     child: Text(
                       '© 2026 Klinik Aurora Group. All rights reserved.',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 11.5),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontSize: 12),
                     ),
                   ),
                 ],
@@ -516,32 +444,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               },
             ),
 
-            // Portal label
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: const Color(0xFFDF6E98).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFFDF6E98).withValues(alpha: 0.25)),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.admin_panel_settings_rounded, color: Color(0xFFDF6E98), size: 16),
-                  SizedBox(width: 6),
-                  Text(
-                    'Healthcare Admin · Enterprise Portal',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFDF6E98),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
             // Header
             const Text(
               'Sign in to your account',
@@ -715,49 +617,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 ),
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            Center(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                        ),
-                        child: const Text(
-                          '↵ Enter',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      const Text(
-                        'to sign in quickly',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.shield_outlined, size: 13, color: Colors.grey.shade400),
-                      const SizedBox(width: 5),
-                      Text(
-                        '256-bit SSL Encrypted  ·  MOH Compliant',
-                        style: TextStyle(fontSize: 11.5, color: Colors.grey.shade400, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 16),
           ],
         );
@@ -831,36 +690,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(child: SizedBox(width: 140, child: Lottie.asset('assets/lottie/simple-loading.json', width: 140))),
-    );
-  }
-}
-
-class _FeatureBadge extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _FeatureBadge(this.icon, this.label);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.30)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 16),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
     );
   }
 }
