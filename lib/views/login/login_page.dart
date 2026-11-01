@@ -566,29 +566,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             EmilPressable(
               enabled: !_isLoggingIn,
               onTap: _handleLogin,
-              child: Container(
+              child: SizedBox(
                 width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFDF6E98), Color(0XFF6ad1e3)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFDF6E98).withValues(alpha: 0.30),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
                 child: ElevatedButton(
                   onPressed: _isLoggingIn ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    disabledBackgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
+                    backgroundColor: const Color(0xFFDF6E98),
+                    disabledBackgroundColor: const Color(0xFFDF6E98).withValues(alpha: 0.6),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -958,42 +942,29 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        backgroundColor: secondaryColor,
-                        shadowColor: secondaryColor.withValues(alpha: 0.4),
-                        elevation: 4,
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [secondaryColor, Color(0xFF3EA6B7)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'Send Verification Code',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Send Verification Code',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
                     ),
                   ),
                 ],
