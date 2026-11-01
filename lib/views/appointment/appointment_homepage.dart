@@ -31,6 +31,7 @@ import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart
 import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/widgets/break_ui/break_ui_harness.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
@@ -41,7 +42,6 @@ import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
-import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/shimmer/table_skeleton.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
@@ -73,6 +73,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   int _page = 1;
   int _pageSize = pageSize;
+  BreakUiMode _breakUiMode = BreakUiMode.live;
   int _totalCount = 0;
   String? startDate;
   String? endDate;
@@ -362,13 +363,21 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       builder: (context, authController, _) {
         return Scaffold(
           backgroundColor: const Color(0xFFF5F6FA),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          body: Stack(
             children: [
-              _buildControlBar(authController),
-              _buildTabAndActions(),
-              Expanded(child: _isCalendarView ? _buildCalendarArea() : _buildTableArea()),
-              if (!_isCalendarView) _buildPaginationBar(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildControlBar(authController),
+                  _buildTabAndActions(),
+                  Expanded(child: _isCalendarView ? _buildCalendarArea() : _buildTableArea()),
+                  if (!_isCalendarView) _buildPaginationBar(),
+                ],
+              ),
+              BreakUiDevHarness(
+                currentMode: _breakUiMode,
+                onModeChanged: (m) => setState(() => _breakUiMode = m),
+              ),
             ],
           ),
         );
@@ -1067,8 +1076,22 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   Widget _buildTabContent() {
     return Consumer2<AppointmentController, AuthController>(
       builder: (context, apptController, authController, _) {
-        final data = apptController.appointmentResponse?.data?.data ?? [];
-        final isLoading = apptController.appointmentResponse == null;
+        final List<Data> data;
+        switch (_breakUiMode) {
+          case BreakUiMode.worstCase:
+            data = BreakUiDataFactory.getWorstCaseAppointments();
+            break;
+          case BreakUiMode.empty:
+            data = BreakUiDataFactory.getEmptyAppointments();
+            break;
+          case BreakUiMode.single:
+            data = BreakUiDataFactory.getSingleAppointment();
+            break;
+          case BreakUiMode.live:
+            data = apptController.appointmentResponse?.data?.data ?? [];
+            break;
+        }
+        final isLoading = _breakUiMode == BreakUiMode.live && apptController.appointmentResponse == null;
 
         return Column(
           children: [
@@ -1429,14 +1452,21 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             child: Text(
               item.service?.serviceName ?? 'N/A',
               style: AppTypography.bodyMedium(context).copyWith(fontSize: 13),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
         if (authController.isSuperAdmin)
           DataCell(
-            AppSelectableText(
-              item.branch?.branchName ?? 'N/A',
-              style: AppTypography.bodyMedium(context).copyWith(fontSize: 13),
+            Tooltip(
+              message: item.branch?.branchName ?? 'N/A',
+              child: Text(
+                item.branch?.branchName ?? 'N/A',
+                style: AppTypography.bodyMedium(context).copyWith(fontSize: 13),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         DataCell(
@@ -1459,6 +1489,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   Text(
                     item.doctor!.doctorName!,
                     style: const TextStyle(color: primary, fontWeight: FontWeight.w600, fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 if (item.rosterConflict == true)
                   Container(
