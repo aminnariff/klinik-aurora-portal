@@ -1,0 +1,105 @@
+<h2>Payment Report UI/UX Redesign Direction</h2>
+<p class="subtitle">Choose the visual style and layout structure for the Klinik Aurora Payment Report</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Executive Bento (Stripe / Linear Aesthetic) &mdash; Recommended</h3>
+      <p>Clean white cards, crisp borders (<code>#E2E8F0</code>), subtle slate typography. Replaces pitch-black chart with a clean white card and smooth rose-to-navy gradients. Segmented date pills and refined status tags.</p>
+      <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px;">
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
+          <div style="color: #64748b; font-size: 10px; font-weight: 600; text-transform: uppercase;">Total Revenue</div>
+          <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 4px;">RM 14,250.00</div>
+          <div style="color: #10b981; font-size: 10px; margin-top: 2px;">↑ 12.4% vs last week</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
+          <div style="color: #64748b; font-size: 10px; font-weight: 600; text-transform: uppercase;">Successful</div>
+          <div style="font-size: 16px; font-weight: 700; color: #059669; margin-top: 4px;">42 Bookings</div>
+          <div style="color: #64748b; font-size: 10px; margin-top: 2px;">88.5% conversion</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #fee2e2; border-radius: 8px; padding: 10px;">
+          <div style="color: #dc2626; font-size: 10px; font-weight: 600; text-transform: uppercase;">Needs Rescue</div>
+          <div style="font-size: 16px; font-weight: 700; color: #dc2626; margin-top: 4px;">3 Lost Sales</div>
+          <div style="color: #dc2626; font-size: 10px; margin-top: 2px; font-weight: 600;">Click to WhatsApp ↗</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
+          <div style="color: #64748b; font-size: 10px; font-weight: 600; text-transform: uppercase;">Avg Transaction</div>
+          <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 4px;">RM 339.28</div>
+          <div style="color: #64748b; font-size: 10px; margin-top: 2px;">Per patient</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Clinical Brand Soft (Warm Pastel Bento)</h3>
+      <p>Soft pastel backgrounds matching clinic theme (subtle rose tint <code>#FDF2F8</code>, soft teal <code>#F0FDFA</code>, soft amber). Friendly medical feel with rounded 14px cards and pill indicators.</p>
+      <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px;">
+        <div style="background: #FDF2F8; border: 1px solid #FBCFE8; border-radius: 12px; padding: 10px;">
+          <div style="color: #9D174D; font-size: 10px; font-weight: 600;">TOTAL COLLECTED</div>
+          <div style="font-size: 16px; font-weight: 700; color: #831843; margin-top: 4px;">RM 14,250.00</div>
+        </div>
+        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 10px;">
+          <div style="color: #166534; font-size: 10px; font-weight: 600;">PAID PATIENTS</div>
+          <div style="font-size: 16px; font-weight: 700; color: #14532D; margin-top: 4px;">42 Patients</div>
+        </div>
+        <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px; padding: 10px;">
+          <div style="color: #991B1B; font-size: 10px; font-weight: 600;">RESCUE NEEDED</div>
+          <div style="font-size: 16px; font-weight: 700; color: #7F1D1D; margin-top: 4px;">3 Drop-offs</div>
+        </div>
+        <div style="background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 12px; padding: 10px;">
+          <div style="color: #075985; font-size: 10px; font-weight: 600;">ATV</div>
+          <div style="font-size: 16px; font-weight: 700; color: #0C4A6E; margin-top: 4px;">RM 339.28</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Compact Data-Dense Financial Table</h3>
+      <p>Minimizes top cards into a single slim status bar to maximize vertical space for daily table rows, channel breakdown bars, and branch ranking.</p>
+      <div style="margin-top: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+        <span>Revenue: <b style="color: #0f172a;">RM 14,250.00</b></span>
+        <span>•</span>
+        <span>Paid: <b style="color: #10b981;">42</b> (88.5%)</span>
+        <span>•</span>
+        <span>Needs Rescue: <b style="color: #ef4444;">3</b></span>
+        <span>•</span>
+        <span>ATV: <b>RM 339.28</b></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>Modal & False Alarm Handling Preview</h3>
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; font-size: 12px;">
+    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+      <span style="background: #ef4444; color: white; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 11px;">Needs Rescue (3)</span>
+      <span style="background: #e2e8f0; color: #475569; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 11px;">All Attempts / Recovered (7)</span>
+    </div>
+    <div style="background: white; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-weight: 700; color: #0f172a;">Nurul Aisyah &bull; 012-3456789</div>
+        <div style="color: #64748b; font-size: 11px;">Consultation &bull; Kota Damansara &bull; Today 2:30 PM &bull; <b style="color: #dc2626;">RM 50.00 Failed</b></div>
+      </div>
+      <button style="background: #16a34a; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer;">
+        Rescue via WhatsApp ↗
+      </button>
+    </div>
+    <div style="background: white; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; opacity: 0.75;">
+      <div>
+        <div style="font-weight: 700; color: #0f172a;">Ahmad Farhan &bull; 017-8899123</div>
+        <div style="color: #64748b; font-size: 11px;">Scaling &bull; Bangi &bull; Today 11:00 AM &bull; <span style="color: #059669; font-weight: 600;">✓ Retried & Succeeded (RM 120.00)</span></div>
+      </div>
+      <span style="background: #dcfce7; color: #15803d; border-radius: 6px; padding: 4px 8px; font-size: 10px; font-weight: 700;">
+        ✓ RECOVERED &bull; NO ACTION NEEDED
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,195 @@
+<h2>Patient Details UI/UX Options</h2>
+<p class="subtitle">Select preferred layout for viewing / editing patient profile in user homepage.</p>
+
+<div class="options">
+  <div class="option selected" data-choice="modal" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Option A: Modern Centered Modal (640px) &mdash; Recommended</h3>
+      <p>Clean dialog with avatar, status chips, quick summary banner, organized 2-column fields, and tabbed history. Familiar, self-contained, responsive.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="drawer" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Option B: Slide-over Side Drawer (520px)</h3>
+      <p>Slides in from right side without obscuring patient list. High efficiency for rapid browsing across multiple patient records.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="tabs-modal" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Option C: Multi-Tab Full Profile Modal (820px)</h3>
+      <p>Wide command modal uniting Patient Info, Appointment History, Points Ledger, and Clinic Notes in dedicated tab panels.</p>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 2rem;">
+  <h3>Visual Previews</h3>
+</div>
+
+<div class="split" style="margin-top: 1rem;">
+  <!-- PREVIEW A -->
+  <div class="mockup">
+    <div class="mockup-header"><strong>Option A: Modern Centered Modal</strong> (Recommended)</div>
+    <div class="mockup-body" style="background: #f8fafc; font-size: 13px;">
+      <!-- Dialog box -->
+      <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); overflow: hidden;">
+        <!-- Header -->
+        <div style="padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px;">
+              SA
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 700; font-size: 15px; color: #0f172a;">Siti Aminah Binti Yusof</span>
+                <span style="background: #ecfdf5; color: #059669; font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-weight: 600;">Active</span>
+              </div>
+              <div style="color: #64748b; font-size: 12px; margin-top: 2px;">
+                NRIC: 920415-10-5582 &bull; Female &bull; 34 yrs &bull; Member since Jan 2024
+              </div>
+            </div>
+          </div>
+          <button style="border: none; background: #f1f5f9; border-radius: 8px; width: 28px; height: 28px; cursor: pointer; color: #64748b; font-weight: bold;">&times;</button>
+        </div>
+
+        <!-- Quick Stat Pills -->
+        <div style="display: flex; gap: 8px; padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9;">
+          <div style="flex: 1; background: white; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <span style="color: #64748b; font-size: 11px; display: block;">Registered Branch</span>
+            <span style="font-weight: 600; color: #1e293b; font-size: 12px;">Bukit Rimau</span>
+          </div>
+          <div style="flex: 1; background: white; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <span style="color: #64748b; font-size: 11px; display: block;">Total Appointments</span>
+            <span style="font-weight: 600; color: #0284c7; font-size: 12px;">5 Visits</span>
+          </div>
+          <div style="flex: 1; background: white; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <span style="color: #64748b; font-size: 11px; display: block;">Points Balance</span>
+            <span style="font-weight: 600; color: #d97706; font-size: 12px;">420 pts</span>
+          </div>
+        </div>
+
+        <!-- Form Body -->
+        <div style="padding: 16px 20px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Full Name *</label>
+              <input type="text" value="Siti Aminah Binti Yusof" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #fff;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Document ID (NRIC / Passport) *</label>
+              <input type="text" value="920415-10-5582" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #fff;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Contact Number *</label>
+              <input type="text" value="+60 12-345 6789" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #fff;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Email Address</label>
+              <input type="text" value="sitiaminah@example.com" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #fff;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Date of Birth</label>
+              <input type="text" value="15-04-1992 (Auto from NRIC)" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #f8fafc;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Home Branch</label>
+              <input type="text" value="Klinik Aurora Bukit Rimau" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #fff;" />
+            </div>
+          </div>
+
+          <!-- Status toggle -->
+          <div style="margin-top: 14px; padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-weight: 600; font-size: 12px; color: #1e293b;">Account Status</div>
+              <div style="font-size: 11px; color: #64748b;">Allow patient to book appointments and sign in</div>
+            </div>
+            <div style="width: 36px; height: 20px; background: #0284c7; border-radius: 12px; position: relative; cursor: pointer;">
+              <div style="width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; right: 2px; top: 2px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+          <button style="border: none; background: transparent; color: #ef4444; font-size: 12px; font-weight: 600; cursor: pointer;">Reset Password</button>
+          <div style="display: flex; gap: 8px;">
+            <button style="border: 1px solid #cbd5e1; background: white; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; color: #475569; font-weight: 500;">Cancel</button>
+            <button style="border: none; background: #0284c7; color: white; padding: 7px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 600;">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW B -->
+  <div class="mockup">
+    <div class="mockup-header"><strong>Option B: Slide-over Side Drawer</strong></div>
+    <div class="mockup-body" style="background: #e2e8f0; font-size: 13px; position: relative; height: 420px; overflow: hidden; border-radius: 8px; display: flex; justify-content: flex-end;">
+      <!-- Mock background table -->
+      <div style="position: absolute; inset: 0; padding: 12px; opacity: 0.35; filter: blur(1px);">
+        <div style="height: 24px; background: #94a3b8; border-radius: 4px; margin-bottom: 8px;"></div>
+        <div style="height: 18px; background: #cbd5e1; border-radius: 4px; margin-bottom: 6px;"></div>
+        <div style="height: 18px; background: #cbd5e1; border-radius: 4px; margin-bottom: 6px;"></div>
+        <div style="height: 18px; background: #cbd5e1; border-radius: 4px; margin-bottom: 6px;"></div>
+      </div>
+
+      <!-- Drawer panel -->
+      <div style="width: 82%; background: white; height: 100%; border-left: 1px solid #cbd5e1; box-shadow: -6px 0 20px rgba(0,0,0,0.1); z-index: 2; display: flex; flex-direction: column;">
+        <div style="padding: 14px 16px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-weight: 700; font-size: 14px;">Patient Profile</span>
+          <button style="border: none; background: #f1f5f9; border-radius: 6px; width: 24px; height: 24px; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 14px 16px; flex: 1; overflow-y: auto;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: #0284c7; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">SA</div>
+            <div>
+              <div style="font-weight: 700; font-size: 13px;">Siti Aminah</div>
+              <div style="font-size: 11px; color: #64748b;">920415-10-5582</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+              <label style="font-size: 11px; color: #64748b;">Full Name</label>
+              <input type="text" value="Siti Aminah Binti Yusof" style="width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; color: #64748b;">Contact</label>
+              <input type="text" value="+60 12-345 6789" style="width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px;" />
+            </div>
+            <div>
+              <label style="font-size: 11px; color: #64748b;">Branch</label>
+              <input type="text" value="Bukit Rimau" style="width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px;" />
+            </div>
+          </div>
+        </div>
+        <div style="padding: 10px 16px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 8px;">
+          <button style="border: 1px solid #cbd5e1; background: white; padding: 6px 12px; border-radius: 6px; font-size: 11px;">Close</button>
+          <button style="border: none; background: #0284c7; color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons" style="margin-top: 1.5rem;">
+  <div class="pros">
+    <h4>Option A Advantages (Modal)</h4>
+    <ul>
+      <li>Consistent with existing portal modals (no layout shift)</li>
+      <li>Spacious 2-column layout prevents vertical scrolling fatigue</li>
+      <li>Instant visual feedback for derived NRIC data (DOB, age, gender)</li>
+      <li>Works cleanly on both desktop and tablet screens</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>Option B Advantages (Drawer)</h4>
+    <ul>
+      <li>Keeps the patient table visible in background</li>
+      <li>Fast if clinic staff need to click patient after patient quickly</li>
+      <li>More compact, but narrower form fields</li>
+    </ul>
+  </div>
+</div>

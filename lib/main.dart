@@ -75,7 +75,7 @@ Future<void> main() async {
       if (kIsWeb) {
         final host = Uri.base.host.toLowerCase();
         if (host.contains('stg') || host.contains('staging') || host.contains('localhost')) {
-          environment = Flavor.staging;
+          environment = Flavor.production;
         }
       }
       AppVersion.init();

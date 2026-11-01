@@ -1,0 +1,120 @@
+<h2>Appointment Homepage UI/UX Redesign</h2>
+<p class="subtitle">Comparing current 4-row layout vs proposed compact high-efficiency layouts for clinic receptionists</p>
+
+<div class="options">
+  <!-- Option A -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Option A: Integrated Unified Bar (Recommended)</h3>
+      <p>Reduces 4 vertical bars down to 2 compact rows. Adds instant inline search and clickable table rows.</p>
+      
+      <div style="margin-top: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+        <!-- Row 1: Controls -->
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: white; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f1f5f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #334155;">
+            <span>🏥</span> <span>Bukit Jelutong</span> ▾
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f1f5f9; border-radius: 6px; font-size: 13px; color: #334155;">
+            <span>📅</span> <span>This Month (Sep 2026)</span> ▾
+          </div>
+          <!-- Live Quick Search -->
+          <div style="flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 13px; color: #64748b;">
+            <span>🔍</span> <span>Quick search by patient name, phone, or IC...</span>
+          </div>
+          <!-- Actions -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <button style="border: none; background: #e0f2fe; color: #0284c7; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Check Slots</button>
+            <button style="border: none; background: #ede9fe; color: #7c3aed; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">📅 Calendar</button>
+            <button style="border: 1px solid #e2e8f0; background: white; color: #475569; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;">Filters (0)</button>
+            <button style="border: none; background: #f1f5f9; color: #475569; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;">🔄</button>
+          </div>
+        </div>
+
+        <!-- Row 2: Status Tabs + Sales -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div style="display: flex; gap: 8px;">
+            <div style="background: #2563eb; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+              Upcoming <span style="background: rgba(255,255,255,0.25); padding: 1px 6px; border-radius: 10px; font-size: 11px;">18</span>
+            </div>
+            <div style="background: white; border: 1px solid #e2e8f0; color: #64748b; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+              Completed <span style="background: #d1fae5; color: #059669; padding: 1px 6px; border-radius: 10px; font-size: 11px;">42</span>
+            </div>
+            <div style="background: white; border: 1px solid #e2e8f0; color: #64748b; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+              No-Show <span style="background: #fef3c7; color: #d97706; padding: 1px 6px; border-radius: 10px; font-size: 11px;">3</span>
+            </div>
+            <div style="background: white; border: 1px solid #e2e8f0; color: #64748b; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+              Cancelled <span style="background: #fee2e2; color: #dc2626; padding: 1px 6px; border-radius: 10px; font-size: 11px;">5</span>
+            </div>
+          </div>
+          <div style="background: #ede9fe; color: #6d28d9; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+            💰 Potential Sales: RM 4,850.00
+          </div>
+        </div>
+
+        <!-- Table Mockup with Clickable Rows -->
+        <div style="background: white; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; font-size: 12.5px;">
+          <div style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 1fr 1.2fr 1.5fr 1fr; background: #f8fafc; padding: 10px 14px; font-weight: 600; color: #475569; border-bottom: 1px solid #e2e8f0;">
+            <div>PATIENT</div>
+            <div>SERVICE</div>
+            <div>PRACTITIONER</div>
+            <div>STATUS</div>
+            <div>PAYMENT</div>
+            <div>DATE & TIME</div>
+            <div style="text-align: right;">ACTION</div>
+          </div>
+          <!-- Sample Row 1 -->
+          <div style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 1fr 1.2fr 1.5fr 1fr; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; align-items: center; background: #eff6ff; cursor: pointer;">
+            <div>
+              <div style="font-weight: 600; color: #1e293b;">Nurul Aisyah</div>
+              <div style="color: #64748b; font-size: 11px;">+6012-3456789</div>
+            </div>
+            <div>
+              <div style="font-weight: 500; color: #1e293b;">Laser Rejuvenation</div>
+              <div style="color: #94a3b8; font-size: 11px;">45 mins</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block;">Doctor</div>
+              <div style="color: #2563eb; font-weight: 600; font-size: 11px;">Dr. Sara</div>
+            </div>
+            <div><span style="background: #dbeafe; color: #1d4ed8; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">Upcoming</span></div>
+            <div><span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">RM 50 Paid</span></div>
+            <div>
+              <div style="font-weight: 500; color: #1e293b;">11 Sep 2026</div>
+              <div style="color: #64748b; font-size: 11px;">10:30 AM – 11:15 AM</div>
+            </div>
+            <div style="text-align: right; display: flex; justify-content: flex-end; gap: 4px;">
+              <span style="background: #dcfce7; color: #16a34a; padding: 4px; border-radius: 4px; cursor: pointer;">💬</span>
+              <span style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-weight: 600; cursor: pointer;">Update</span>
+            </div>
+          </div>
+        </div>
+        <p style="margin-top: 8px; font-size: 11px; color: #64748b; margin-bottom: 0;">💡 <em>Tip: Entire row is clickable with hover highlight. Saves 1 click per patient.</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Option B: Clean Minimalist View (Drawer Filter & Floating Search)</h3>
+      <p>Maximum table height. Keeps only Search + Status Tabs in primary view; date range & branch open via filter drawer.</p>
+      
+      <div style="margin-top: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <div style="display: flex; gap: 6px;">
+            <button style="border: none; background: #1e293b; color: white; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">All (68)</button>
+            <button style="border: 1px solid #e2e8f0; background: white; color: #475569; padding: 6px 14px; border-radius: 8px; font-size: 12px;">Upcoming (18)</button>
+            <button style="border: 1px solid #e2e8f0; background: white; color: #475569; padding: 6px 14px; border-radius: 8px; font-size: 12px;">Completed (42)</button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" placeholder="Search appointments..." style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 12px; width: 200px;" />
+            <button style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #334155;">Filter ⚙️</button>
+          </div>
+        </div>
+        <p style="font-size: 11px; color: #64748b; margin-bottom: 0;">Maximizes vertical rows, but requires extra click to change date range or branch.</p>
+      </div>
+    </div>
+  </div>
+</div>
