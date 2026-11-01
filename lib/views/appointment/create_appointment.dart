@@ -539,8 +539,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     required String label,
     required IconData icon,
     required Color color,
-    required Color bg,
-    required Color borderColor,
     required VoidCallback onTap,
   }) {
     if (isMobile) {
@@ -553,7 +551,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           tooltip: label,
           padding: EdgeInsets.zero,
           style: IconButton.styleFrom(
-            backgroundColor: bg,
+            backgroundColor: Colors.white,
           ),
         ),
       );
@@ -564,16 +562,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: bg,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: borderColor),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 13, color: color),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: color)),
+            Text(label, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
           ],
         ),
       ),
@@ -701,8 +699,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     label: 'Mark Completed',
                                     icon: Icons.check_circle_outline_rounded,
                                     color: const Color(0xFF059669),
-                                    bg: const Color(0xFFECFDF5),
-                                    borderColor: const Color(0xFFA7F3D0),
                                     onTap: () => _quickUpdateStatus(5, 'Completed'),
                                   ),
                                   const SizedBox(width: 6),
@@ -710,8 +706,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     label: 'Mark No-Show',
                                     icon: Icons.person_off_outlined,
                                     color: const Color(0xFFD97706),
-                                    bg: const Color(0xFFFFFBEB),
-                                    borderColor: const Color(0xFFFDE68A),
                                     onTap: () => _quickUpdateStatus(6, 'No-Show'),
                                   ),
                                   const SizedBox(width: 8),
@@ -769,25 +763,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       if (widget.type == 'update' && _isStatusLockedByDefault)
                         Container(
                           margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                           decoration: BoxDecoration(
-                            color: _isUnlocked
-                                ? const Color(0xFFF0FDF4)
-                                : widget.appointment?.appointmentStatus == 2
-                                ? const Color(0xFFFEF2F2)
-                                : widget.appointment?.appointmentStatus == 8
-                                ? const Color(0xFFF5F3FF)
-                                : const Color(0xFFFFFBEB),
+                            color: const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: _isUnlocked
-                                  ? const Color(0xFFBBF7D0)
-                                  : widget.appointment?.appointmentStatus == 2
-                                  ? const Color(0xFFFECACA)
-                                  : widget.appointment?.appointmentStatus == 8
-                                  ? const Color(0xFFDDD6FE)
-                                  : const Color(0xFFFDE68A),
-                            ),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
                           ),
                           child: Row(
                             children: [
@@ -818,50 +798,27 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       : widget.appointment?.appointmentStatus == 8
                                       ? 'This appointment was marked as Transferred. Check destination branch for schedule.'
                                       : 'This appointment is marked as ${_getStatusName(widget.appointment?.appointmentStatus)}.',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12.5,
-                                    color: _isUnlocked
-                                        ? const Color(0xFF166534)
-                                        : widget.appointment?.appointmentStatus == 2
-                                        ? const Color(0xFF991B1B)
-                                        : widget.appointment?.appointmentStatus == 8
-                                        ? const Color(0xFF5B21B6)
-                                        : const Color(0xFF92400E),
+                                    color: Color(0xFF334155),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
                               if (!_isUnlocked) ...[
                                 const SizedBox(width: 8),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(6),
-                                  onTap: () => _confirmUnlockAppointment(),
-                                  child: Container(
+                                OutlinedButton.icon(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: const Color(0xFF475569),
+                                    side: const BorderSide(color: Color(0xFFCBD5E1)),
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: widget.appointment?.appointmentStatus == 2
-                                          ? const Color(0xFFDC2626)
-                                          : widget.appointment?.appointmentStatus == 8
-                                          ? const Color(0xFF7C3AED)
-                                          : const Color(0xFFD97706),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.edit_rounded, size: 13, color: Colors.white),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'Unlock to Edit',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                                   ),
+                                  onPressed: () => _confirmUnlockAppointment(),
+                                  icon: const Icon(Icons.lock_open_rounded, size: 12, color: Color(0xFF475569)),
+                                  label: const Text('Unlock to Edit', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
                                 ),
                               ],
                             ],
@@ -3492,7 +3449,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       borderRadius: 8,
       elevation: 0,
-      color: secondaryColor,
+      color: primary,
     );
   }
 

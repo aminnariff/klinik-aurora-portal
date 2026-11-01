@@ -108,7 +108,7 @@ class AppointmentDetailsView extends StatelessWidget {
                           if (data?.appointmentStatus == 1 || data?.appointmentStatus == 3) ...[
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: secondaryColor,
+                                backgroundColor: primary,
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
@@ -411,28 +411,28 @@ class AppointmentDetailsView extends StatelessWidget {
       children: [
         _sectionLabel('Appointment', Icons.event_note_rounded),
         const SizedBox(height: 10),
-        // Date & Time chip
+        // Date & Time card
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F9FF),
+            color: const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: secondaryColor.withAlpha(60)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: Row(
             children: [
-              const Icon(Icons.event_rounded, size: 18, color: secondaryColor),
+              const Icon(Icons.event_rounded, size: 18, color: Color(0xFF475569)),
               const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     formatToDisplayDate(data?.appointmentDatetime ?? ''),
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF111827)),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF0F172A)),
                   ),
                   Text(
                     formatToDisplayTime(data?.appointmentDatetime ?? ''),
-                    style: const TextStyle(fontSize: 13, color: secondaryColor, fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -520,28 +520,27 @@ class AppointmentDetailsView extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F9FF),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: secondaryColor.withAlpha(80)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.attach_file_rounded, size: 15, color: secondaryColor),
+                  const Icon(Icons.attach_file_rounded, size: 15, color: Color(0xFF475569)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       data.appointmentAttachmentUrl ?? '',
                       style: const TextStyle(
                         fontSize: 12,
-                        color: secondaryColor,
-                        decoration: TextDecoration.underline,
-                        decorationColor: secondaryColor,
+                        color: Color(0xFF0F172A),
+                        fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Icon(Icons.open_in_new_rounded, size: 12, color: secondaryColor),
+                  const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF94A3B8)),
                 ],
               ),
             ),
@@ -572,9 +571,9 @@ class AppointmentDetailsView extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF2563EB).withAlpha(80)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Row(
                 children: [
@@ -585,15 +584,14 @@ class AppointmentDetailsView extends StatelessWidget {
                       data.appointmentReferralLetterUrl ?? '',
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF2563EB),
-                        decoration: TextDecoration.underline,
-                        decorationColor: Color(0xFF2563EB),
+                        color: Color(0xFF0F172A),
+                        fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF2563EB)),
+                  const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF94A3B8)),
                 ],
               ),
             ),
@@ -722,23 +720,23 @@ class AppointmentDetailsView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FF),
+        color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE0E7FF)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.credit_card_rounded, size: 13, color: Color(0xFF6366F1)),
-              const SizedBox(width: 6),
-              const Text(
+              Icon(Icons.credit_card_rounded, size: 13, color: Color(0xFF475569)),
+              SizedBox(width: 6),
+              Text(
                 'ONLINE PAYMENT DETAILS',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF6366F1),
+                  color: Color(0xFF475569),
                   letterSpacing: 0.8,
                 ),
               ),
@@ -792,13 +790,13 @@ class AppointmentDetailsView extends StatelessWidget {
       width: fullWidth ? double.infinity : null,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withAlpha(15),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withAlpha(40)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: color),
+          Icon(icon, size: 16, color: const Color(0xFF64748B)),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -811,7 +809,7 @@ class AppointmentDetailsView extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
                     ),
                     ?badge,
                   ],
@@ -819,7 +817,7 @@ class AppointmentDetailsView extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: color),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
                 ),
               ],
             ),
