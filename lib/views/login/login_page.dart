@@ -19,6 +19,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:lottie/lottie.dart';
@@ -51,13 +52,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   late final AnimationController _entranceCtrl;
   late final AnimationController _logoCtrl;
-  late final AnimationController _pulseCtrl;
 
   late final Animation<double> _formFade;
   late final Animation<Offset> _formSlide;
   late final Animation<double> _logoFade;
   late final Animation<double> _logoScale;
-  late final Animation<double> _pulse;
 
   @override
   void initState() {
@@ -65,7 +64,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
     _entranceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
     _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
-    _pulseCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat(reverse: true);
 
     _formFade = CurvedAnimation(parent: _entranceCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0));
     _formSlide = Tween<Offset>(
@@ -78,8 +76,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       begin: 0.94,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _logoCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0)));
-
-    _pulse = Tween<double>(begin: 0.5, end: 0.9).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
     SchedulerBinding.instance.scheduleFrameCallback((_) async {
       _logoCtrl.forward();
@@ -117,7 +113,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void dispose() {
     _entranceCtrl.dispose();
     _logoCtrl.dispose();
-    _pulseCtrl.dispose();
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -171,25 +166,43 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       children: [
         Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF0F172A), // Slate Navy 900
+                Color(0xFF0F2F38), // Deep Clinical Teal
+                Color(0xFF134E4A), // Rich Dark Emerald
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
         ),
-        // Decorative circles
-        _pulsableCircle(size: 200, topFactor: -0.08, leftFactor: -0.15),
-        _pulsableCircle(size: 140, topFactor: 0.12, rightFactor: -0.1),
+        // Subtle ambient glow
+        Positioned(
+          top: -80,
+          right: -80,
+          child: Container(
+            width: 260,
+            height: 260,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF0D9488).withValues(alpha: 0.16),
+            ),
+          ),
+        ),
         // Logo area
         Positioned(
           top: 0,
           left: 0,
           right: 0,
-          height: MediaQuery.of(context).size.height * 0.3,
+          height: MediaQuery.of(context).size.height * 0.28,
           child: _mobileBrandHeader(),
         ),
         // Form card
         Align(
           alignment: Alignment.bottomCenter,
           child: FractionallySizedBox(
-            heightFactor: 0.75,
+            heightFactor: 0.76,
             widthFactor: 1.0,
             child: FadeTransition(
               opacity: _formFade,
@@ -199,11 +212,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
-                    boxShadow: [BoxShadow(color: Color(0x22000000), blurRadius: 40, offset: Offset(0, -8))],
+                    boxShadow: [BoxShadow(color: Color(0x26000000), blurRadius: 40, offset: Offset(0, -8))],
                   ),
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(28, 32, 28, 28),
+                    padding: const EdgeInsets.fromLTRB(28, 28, 28, 28),
                     child: _formContent(),
                   ),
                 ),
@@ -221,14 +234,22 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       children: [
         ScaleTransition(
           scale: _logoScale,
-          child: FadeTransition(opacity: _logoFade, child: _logoAvatar(80)),
+          child: FadeTransition(opacity: _logoFade, child: _logoAvatar(76)),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         FadeTransition(
           opacity: _logoFade,
           child: const Text(
             'Klinik Aurora',
-            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: 0.4),
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.3),
+          ),
+        ),
+        const SizedBox(height: 2),
+        FadeTransition(
+          opacity: _logoFade,
+          child: Text(
+            'Enterprise Management Portal',
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w500),
           ),
         ),
       ],
@@ -236,138 +257,180 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _brandPanel() {
-    return Stack(
-      clipBehavior: Clip.hardEdge,
-      children: [
-        // Gradient
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF0F172A), // Slate Navy 900
+            Color(0xFF0F2F38), // Deep Clinical Teal
+            Color(0xFF134E4A), // Rich Dark Emerald
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        // Animated decorative blobs
-        AnimatedBuilder(
-          animation: _pulse,
-          builder: (_, _) => Stack(
-            children: [
-              Positioned(top: -90, right: -90, child: _decorCircle(280, _pulse.value * 0.16)),
-              Positioned(bottom: -70, left: -110, child: _decorCircle(320, _pulse.value * 0.12)),
-              Positioned(top: 200, left: -60, child: _decorCircle(160, _pulse.value * 0.20)),
-              Positioned(bottom: 220, right: -40, child: _decorCircle(110, _pulse.value * 0.18)),
-            ],
-          ),
-        ),
-        // Center content
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Logo
-                ScaleTransition(
-                  scale: _logoScale,
-                  child: FadeTransition(opacity: _logoFade, child: _logoAvatar(140)),
-                ),
-                const SizedBox(height: 28),
-                // Clinic name
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: const Text(
-                    'Klinik Aurora',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.4,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // Tagline
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: Text(
-                    'Your trusted healthcare partner',
-                    style: TextStyle(
-                      color: Colors.white.withAlpha(210),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                // Divider
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: Container(
-                    width: 48,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(130),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                // Feature badges
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 12,
-                    runSpacing: 10,
-                    children: const [
-                      _FeatureBadge(Icons.calendar_today_rounded, 'Appointments'),
-                      _FeatureBadge(Icons.people_rounded, 'Patients'),
-                      _FeatureBadge(Icons.medical_services_rounded, 'Services'),
-                      _FeatureBadge(Icons.bar_chart_rounded, 'Analytics'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 48),
-                // Footer
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(20),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.white.withAlpha(40)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.shield_outlined, color: Colors.white.withAlpha(180), size: 17),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Authorized Personnel Only  ·  System is monitored',
-                              style: TextStyle(
-                                color: Colors.white.withAlpha(180),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '© 2026 Klinik Aurora. All rights reserved.',
-                        style: TextStyle(color: Colors.white.withAlpha(120), fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          // Subtle ambient radial glow
+          Positioned(
+            top: -120,
+            left: -120,
+            child: Container(
+              width: 420,
+              height: 420,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF0D9488).withValues(alpha: 0.16),
+              ),
             ),
           ),
-        ),
-      ],
+          Positioned(
+            bottom: -100,
+            right: -100,
+            child: Container(
+              width: 360,
+              height: 360,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF0284C7).withValues(alpha: 0.12),
+              ),
+            ),
+          ),
+          // Center content
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo with refined frosted ring
+                  ScaleTransition(
+                    scale: _logoScale,
+                    child: FadeTransition(opacity: _logoFade, child: _logoAvatar(124)),
+                  ),
+                  const SizedBox(height: 24),
+                  // Clinic name
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: const Text(
+                      'Klinik Aurora',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.6,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Tagline
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Text(
+                      'Enterprise Clinical Management System',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.78),
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Live system status indicator pill
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.32)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'All Clinic Systems Operational',
+                            style: TextStyle(
+                              color: Color(0xFF6EE7B7),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  // Feature badges
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: const [
+                        _FeatureBadge(Icons.event_available_rounded, 'Real-Time Scheduling'),
+                        _FeatureBadge(Icons.health_and_safety_rounded, 'Electronic Health Records'),
+                        _FeatureBadge(Icons.medical_services_rounded, 'Multi-Branch Tenant'),
+                        _FeatureBadge(Icons.insights_rounded, 'Executive Analytics'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  // Security footer badge
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.verified_user_rounded, color: Colors.white.withValues(alpha: 0.8), size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            'MOH Compliant · PDPA Protected · 256-Bit SSL',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.78),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Text(
+                      '© 2026 Klinik Aurora Group. All rights reserved.',
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 11.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -377,44 +440,17 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withAlpha(80), width: 3),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(50), blurRadius: 24, offset: const Offset(0, 6))],
+        border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 28,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: const ClipOval(
         child: Image(image: AssetImage("assets/icons/logo/klinik-aurora.png"), fit: BoxFit.cover),
-      ),
-    );
-  }
-
-  Widget _decorCircle(double size, double opacity) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: opacity),
-      ),
-    );
-  }
-
-  /// Used in mobile layout for non-animated blobs (inside Stack with factors)
-  Widget _pulsableCircle({required double size, double? topFactor, double? leftFactor, double? rightFactor}) {
-    final screenH = MediaQuery.of(context).size.height;
-    final screenW = MediaQuery.of(context).size.width;
-    return Positioned(
-      top: topFactor != null ? screenH * topFactor : null,
-      left: leftFactor != null ? screenW * leftFactor : null,
-      right: rightFactor != null ? screenW * rightFactor : null,
-      child: AnimatedBuilder(
-        animation: _pulse,
-        builder: (_, _) => Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withValues(alpha: _pulse.value * 0.15),
-          ),
-        ),
       ),
     );
   }
@@ -489,44 +525,44 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: secondaryColor.withAlpha(20),
+                color: const Color(0xFF0D9488).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: secondaryColor.withAlpha(60)),
+                border: Border.all(color: const Color(0xFF0D9488).withValues(alpha: 0.25)),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.admin_panel_settings_rounded, color: secondaryColor, size: 17),
-                  SizedBox(width: 5),
+                  Icon(Icons.admin_panel_settings_rounded, color: Color(0xFF0D9488), size: 16),
+                  SizedBox(width: 6),
                   Text(
-                    'Healthcare Admin  ·  Management Portal',
+                    'Healthcare Admin · Enterprise Portal',
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: secondaryColor,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0D9488),
                       letterSpacing: 0.3,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             // Header
             const Text(
-              'Welcome back!',
+              'Sign in to your account',
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF111827),
-                letterSpacing: -0.3,
+                color: Color(0xFF0F172A),
+                letterSpacing: -0.4,
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              'Sign in to your account to continue',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w400),
+            const Text(
+              'Enter your clinic credentials to access the management portal.',
+              style: TextStyle(fontSize: 13.5, color: Color(0xFF64748B), fontWeight: FontWeight.w400),
             ),
-            const SizedBox(height: 36),
+            const SizedBox(height: 30),
 
             _fieldLabel('Email / Username'),
             const SizedBox(height: 7),
@@ -536,14 +572,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 controller: usernameController,
                 hintText: 'loginPage'.tr(gender: 'username'),
                 isEmail: true,
-                isEditableColor: const Color(0xFFF3F4F6),
+                isEditableColor: const Color(0xFFF8FAFC),
                 errorMessage: snapshot.usernameError,
+                onFieldSubmitted: (_) => _handleLogin(),
                 prefixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(width: 12),
-                    Icon(Icons.person_outline_rounded, color: Colors.grey.shade400, size: 20),
+                    Icon(Icons.alternate_email_rounded, color: Colors.grey.shade500, size: 19),
                     AppPadding.horizontal(denominator: 2),
                   ],
                 ),
@@ -551,7 +588,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -566,7 +603,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   ),
                   child: const Text(
                     'Forgot password?',
-                    style: TextStyle(fontSize: 13, color: secondaryColor, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 13, color: Color(0xFF0D9488), fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -579,14 +616,15 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 hintText: 'loginPage'.tr(gender: 'password'),
                 obscureText: true,
                 isPassword: true,
-                isEditableColor: const Color(0xFFF3F4F6),
+                isEditableColor: const Color(0xFFF8FAFC),
                 errorMessage: snapshot.passwordError,
+                onFieldSubmitted: (_) => _handleLogin(),
                 prefixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(width: 12),
-                    Icon(Icons.lock_outline_rounded, color: Colors.grey.shade400, size: 20),
+                    Icon(Icons.lock_outline_rounded, color: Colors.grey.shade500, size: 19),
                     AppPadding.horizontal(denominator: 2),
                   ],
                 ),
@@ -598,7 +636,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
 
             GestureDetector(
               onTap: () => snapshot.remember = !snapshot.remember,
@@ -612,7 +650,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     child: Checkbox(
                       value: snapshot.remember,
                       onChanged: (v) => snapshot.remember = v ?? false,
-                      activeColor: secondaryColor,
+                      activeColor: const Color(0xFF0D9488),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -620,57 +658,96 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   const SizedBox(width: 9),
                   Text(
                     'loginPage'.tr(gender: 'rememberMe'),
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 28),
+            const SizedBox(height: 26),
 
-            SizedBox(
-              width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
-              child: ElevatedButton(
-                onPressed: _handleLogin,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
-                  shadowColor: secondaryColor.withAlpha(80),
-                ),
-                child: Text(
-                  'loginPage'.tr(gender: 'signIn'),
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.4),
+            EmilPressable(
+              enabled: !_isLoggingIn,
+              onTap: _handleLogin,
+              child: SizedBox(
+                width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
+                child: ElevatedButton(
+                  onPressed: _isLoggingIn ? null : _handleLogin,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0D9488),
+                    disabledBackgroundColor: const Color(0xFF0D9488).withValues(alpha: 0.65),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                  ),
+                  child: _isLoggingIn
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'loginPage'.tr(gender: 'signIn'),
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 0.3),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.arrow_forward_rounded, size: 18),
+                          ],
+                        ),
                 ),
               ),
             ),
 
-            // // Footer
-            // Center(
-            //   child: Column(
-            //     children: [
-            //       const SizedBox(height: 20),
-            //       Row(
-            //         mainAxisAlignment: MainAxisAlignment.center,
-            //         children: [
-            //           Icon(Icons.shield_outlined, size: 11, color: Colors.grey.shade400),
-            //           const SizedBox(width: 5),
-            //           Text(
-            //             'Authorized Personnel Only  ·  System is monitored',
-            //             style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-            //           ),
-            //         ],
-            //       ),
-            //       const SizedBox(height: 6),
-            //       Text(
-            //         '© 2026 Klinik Aurora. All rights reserved.',
-            //         style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            const SizedBox(height: 20),
+
+            Center(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: const Text(
+                          '↵ Enter',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'to sign in quickly',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shield_outlined, size: 13, color: Colors.grey.shade400),
+                      const SizedBox(width: 5),
+                      Text(
+                        '256-bit SSL Encrypted  ·  MOH Compliant',
+                        style: TextStyle(fontSize: 11.5, color: Colors.grey.shade400, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 16),
           ],
         );
@@ -690,12 +767,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     validateField().then((valid) {
       if (!valid) return;
       setState(() => _isLoggingIn = true);
-      showLoading();
       AuthController.logIn(
         context,
         AuthRequest(username: usernameController.text, password: passwordController.text),
       ).then((value) async {
-        dismissLoading();
         if (responseCode(value.code)) {
           await context.read<AuthController>().setAuthenticationResponse(
             value.data,
@@ -707,7 +782,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           showDialogError(context, value.message ?? value.data?.message ?? 'Login failed. Please check your credentials.');
         }
       }).catchError((e) {
-        dismissLoading();
         showDialogError(context, e.toString());
       }).whenComplete(() {
         if (mounted) setState(() => _isLoggingIn = false);
@@ -762,18 +836,18 @@ class _FeatureBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(26),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withAlpha(51)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 17),
-          const SizedBox(width: 6),
+          Icon(icon, color: const Color(0xFF5EEAD4), size: 16),
+          const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+            style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600),
           ),
         ],
       ),
