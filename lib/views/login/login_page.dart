@@ -168,9 +168,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFF0F172A), // Slate Navy 900
-                Color(0xFF0F2F38), // Deep Clinical Teal
-                Color(0xFF134E4A), // Rich Dark Emerald
+                Color(0xFFDF6E98),
+                Color(0xFFDE8BA7),
+                Color(0xFF6AD1E3),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -179,14 +179,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         ),
         // Subtle ambient glow
         Positioned(
-          top: -80,
-          right: -80,
+          top: -60,
+          right: -60,
           child: Container(
-            width: 260,
-            height: 260,
+            width: 240,
+            height: 240,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF0D9488).withValues(alpha: 0.16),
+              color: Colors.white.withValues(alpha: 0.15),
             ),
           ),
         ),
@@ -261,9 +261,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF0F172A), // Slate Navy 900
-            Color(0xFF0F2F38), // Deep Clinical Teal
-            Color(0xFF134E4A), // Rich Dark Emerald
+            Color(0xFFDF6E98),
+            Color(0xFFDE8BA7),
+            Color(0xFF6AD1E3),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -272,28 +272,28 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       child: Stack(
         clipBehavior: Clip.hardEdge,
         children: [
-          // Subtle ambient radial glow
+          // Subtle ambient radial glow circles
           Positioned(
-            top: -120,
-            left: -120,
+            top: -80,
+            left: -80,
             child: Container(
-              width: 420,
-              height: 420,
+              width: 380,
+              height: 380,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF0D9488).withValues(alpha: 0.16),
+                color: Colors.white.withValues(alpha: 0.15),
               ),
             ),
           ),
           Positioned(
-            bottom: -100,
-            right: -100,
+            bottom: -60,
+            right: -60,
             child: Container(
-              width: 360,
-              height: 360,
+              width: 320,
+              height: 320,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF0284C7).withValues(alpha: 0.12),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
             ),
           ),
@@ -304,7 +304,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo with refined frosted ring
+                  // Logo with clean white circle
                   ScaleTransition(
                     scale: _logoScale,
                     child: FadeTransition(opacity: _logoFade, child: _logoAvatar(124)),
@@ -330,7 +330,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     child: Text(
                       'Enterprise Clinical Management System',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.78),
+                        color: Colors.white.withValues(alpha: 0.90),
                         fontSize: 14.5,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.2,
@@ -345,26 +345,19 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.14),
+                        color: Colors.white.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.32)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.32)),
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 7,
-                            height: 7,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF10B981),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
+                          Icon(Icons.check_circle_rounded, color: Colors.white, size: 14),
+                          SizedBox(width: 8),
+                          Text(
                             'All Clinic Systems Operational',
                             style: TextStyle(
-                              color: Color(0xFF6EE7B7),
+                              color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -396,19 +389,19 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.06),
+                        color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.verified_user_rounded, color: Colors.white.withValues(alpha: 0.8), size: 16),
+                          Icon(Icons.verified_user_rounded, color: Colors.white.withValues(alpha: 0.9), size: 16),
                           const SizedBox(width: 8),
                           Text(
                             'MOH Compliant · PDPA Protected · 256-Bit SSL',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.78),
+                              color: Colors.white.withValues(alpha: 0.90),
                               fontSize: 11.5,
                               fontWeight: FontWeight.w500,
                             ),
@@ -422,7 +415,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     opacity: _logoFade,
                     child: Text(
                       '© 2026 Klinik Aurora Group. All rights reserved.',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 11.5),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 11.5),
                     ),
                   ),
                 ],
@@ -438,19 +431,21 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     return Container(
       width: size,
       height: size,
+      padding: EdgeInsets.all(size * 0.12),
       decoration: BoxDecoration(
+        color: Colors.white,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 3),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 28,
+            color: Colors.black.withValues(alpha: 0.14),
+            blurRadius: 24,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: const ClipOval(
-        child: Image(image: AssetImage("assets/icons/logo/klinik-aurora.png"), fit: BoxFit.cover),
+      child: const Image(
+        image: AssetImage("assets/icons/logo/klinik-aurora.png"),
+        fit: BoxFit.contain,
       ),
     );
   }
@@ -525,21 +520,21 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: const Color(0xFF0D9488).withValues(alpha: 0.1),
+                color: const Color(0xFFDF6E98).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFF0D9488).withValues(alpha: 0.25)),
+                border: Border.all(color: const Color(0xFFDF6E98).withValues(alpha: 0.25)),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.admin_panel_settings_rounded, color: Color(0xFF0D9488), size: 16),
+                  Icon(Icons.admin_panel_settings_rounded, color: Color(0xFFDF6E98), size: 16),
                   SizedBox(width: 6),
                   Text(
                     'Healthcare Admin · Enterprise Portal',
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0D9488),
+                      color: Color(0xFFDF6E98),
                       letterSpacing: 0.3,
                     ),
                   ),
@@ -603,7 +598,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   ),
                   child: const Text(
                     'Forgot password?',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF0D9488), fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 13, color: Color(0xFFDF6E98), fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -650,7 +645,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     child: Checkbox(
                       value: snapshot.remember,
                       onChanged: (v) => snapshot.remember = v ?? false,
-                      activeColor: const Color(0xFF0D9488),
+                      activeColor: const Color(0xFFDF6E98),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -669,18 +664,33 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             EmilPressable(
               enabled: !_isLoggingIn,
               onTap: _handleLogin,
-              child: SizedBox(
+              child: Container(
                 width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFDF6E98), Color(0XFF6ad1e3)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFDF6E98).withValues(alpha: 0.30),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: _isLoggingIn ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D9488),
-                    disabledBackgroundColor: const Color(0xFF0D9488).withValues(alpha: 0.65),
+                    backgroundColor: Colors.transparent,
+                    disabledBackgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
-                    shadowColor: Colors.transparent,
                   ),
                   child: _isLoggingIn
                       ? const SizedBox(
@@ -836,14 +846,14 @@ class _FeatureBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.30)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xFF5EEAD4), size: 16),
+          Icon(icon, color: Colors.white, size: 16),
           const SizedBox(width: 8),
           Text(
             label,
