@@ -60,6 +60,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
+  // ignore: unused_field
   bool _hasUsedPractitionerSchedule = false;
   String? _checkedBranchId;
 
@@ -204,15 +205,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             ),
           ),
           const SizedBox(width: 12),
-          if (isSuperAdmin || _hasUsedPractitionerSchedule) ...[
-            _toolbarButton(
-              icon: Icons.schedule_rounded,
-              label: 'Practitioner Schedule',
-              color: secondaryColor,
-              onTap: _openPractitionerSchedule,
-            ),
-            const SizedBox(width: 8),
-          ],
           _toolbarButton(
             icon: Icons.calendar_month_rounded,
             label: 'Branch Roster',
@@ -1115,15 +1107,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      if (isSuperAdmin || _hasUsedPractitionerSchedule) ...[
-                        _MobileActionButton(
-                          icon: Icons.schedule_rounded,
-                          tooltip: 'Practitioner Schedule',
-                          color: secondaryColor,
-                          onTap: _openPractitionerSchedule,
-                        ),
-                        const SizedBox(width: 8),
-                      ],
                       _MobileActionButton(
                         icon: Icons.calendar_month_rounded,
                         tooltip: 'Branch Roster',
@@ -1317,6 +1300,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     }
   }
 
+  // ignore: unused_element
   void _openPractitionerSchedule() {
     final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
     if (!isSuperAdmin && !_hasUsedPractitionerSchedule) {
