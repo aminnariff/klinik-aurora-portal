@@ -1,149 +1,159 @@
-# Design Spec: Aurora Baby Superadmin UI/UX Overhaul & Beg Hospital Readiness Bug Fix
+# Design Spec: Aurora Baby End-to-End Clinical & Maternity Sanctuary Overhaul
 
 - **Date:** 2026-11-02
-- **Target Repositories:** `membership-api` (Backend logic), `klinik-aurora-portal` (Superadmin Web UI)
+- **Target Repositories:**
+  1. `membership-api` (Backend logic & Denominator Bug Fix)
+  2. `klinik-aurora-portal` (Superadmin Executive Clinical Hub)
+  3. `klinik-aurora-mobile` (Maternity Sanctuary Mobile Experience for Expecting Mums)
 - **Status:** Approved / In Planning
 
 ---
 
-## 1. Executive Summary & Problem Statement
+## 1. Executive Vision: The 50+ Clinic CEO & 40-Year UI/UX Standard
 
-Superadmins monitoring expectant mothers via **Aurora Baby** face two critical friction points:
-1. **Mathematical Accuracy Bug in Beg Hospital Readiness**:
-   - The system displays `100%` readiness for patients who have only checked 1 or a few items.
-   - **Root Cause**: The backend calculation in `admin/baby-tracker/baby-tracker.service.ts` uses `COUNT(*)` of `baby_checklist_item` matching `category_key = 'beg_hospital'` as the denominator. Because mobile users only sync rows for items they have interacted with, a patient who only synced 1 checked item has `hospitalBagTotal = 1` and `hospitalBagCompleted = 1`, resulting in `1/1 = 100%`.
-   - **Solution**: Compute the true clinic baseline from the active master checklist template (currently 10 hospital bag items) plus any user-defined custom items:
-     $$\text{hospitalBagTotal} = \max(\text{masterTemplateHospitalBagCount}, \text{userSyncedHospitalBagCount})$$
-     A patient with 1 item completed will now display an honest and clinically actionable `1/10 (10%)`.
+### 1.1 The Maternal Healthcare Promise
+Expectant mothers—especially first-time mothers—experience heightened vulnerability, cognitive fatigue, and anxiety fueled by predatory social media consumerism. They are told they need thousands of ringgit in baby gadgets, creating guilt and confusion.
 
-2. **Substandard UI/UX Quality**:
-   - The current view is utilitarian, cramped, and visually dated (generic Flutter `DataTable2`, flat pastel tags, monolithic 900-line popup dialogs, lack of fluid feedback).
-   - **Solution**: A 40+ years experience executive clinical overhaul inspired by Linear, Apple Health, and modern medical cockpits:
-     - **Executive Clinical Bento**: Four high-contrast KPI stations with micro-distributions (Trimester split, urgent alert pills).
-     - **Dual Inspection Mode**: **Executive Patient Cards** (default, dense cards with 40-week visual scrubber and progress track) and **Surgical Grid** (ultra-dense table for rapid triage).
-     - **Patient Deep-Dive Slide-over Drawer**: Replaces the jarring modal dialog with a fluid edge-anchored sheet featuring gestational timelines, kick velocity logs, and categorized item accordions.
+**Klinik Aurora's core promise is reassurance, clinical authority, and calm.** The digital experience must feel like a trusted senior obstetrician and midwife sitting beside the mother with a warm cup of tea:
+- Distinguishing **essential hospital labor ward items** from optional month-2 nursery goods.
+- Eliminating cold corporate software palettes in favor of a soothing maternal sanctuary.
+- Equipping fathers/partners with a 30-second "Labor Day Car Trunk" checklist when labor starts at 3 AM.
+
+### 1.2 Core System Fixes & Scope
+1. **Backend Denominator Bug**: Fix `baby-tracker.service.ts` so Beg Hospital readiness is measured against the active master template baseline (10 items), not user-synced subset rows.
+2. **Superadmin Portal Overhaul**: Linear/Apple Health clinical executive cockpit with high-density patient cards, 40-week timeline scrubber, and sliding inspection drawer.
+3. **Mobile App Maternity Transformation**: Warm rose-pearl aesthetic, 3-Bag Hospital Ward organizer, tactile haptic check-offs, husband WhatsApp summary dispatch, and progressive trimester journeys.
 
 ---
 
-## 2. Backend Bug Fix: Honest Denominator Calculation
+## 2. Backend Fix: Honest Baseline Denominator (`membership-api`)
 
-### 2.1 Files Affected
-- `admin/baby-tracker/baby-tracker.service.ts`
-- `admin/user-management/get-user-baby-checklist.ts`
-- `mobile/baby-checklist/get-checklist.ts`
+### 2.1 Problem Diagnosis
+In `admin/baby-tracker/baby-tracker.service.ts`:
+```sql
+SUM(CASE WHEN category_key = 'beg_hospital' THEN 1 ELSE 0 END) AS hospitalBagTotal,
+SUM(CASE WHEN category_key = 'beg_hospital' AND is_checked = 1 THEN 1 ELSE 0 END) AS hospitalBagCompleted
+```
+Because the mobile app only inserts rows into `baby_checklist_item` when a user interacts with or syncs an item, a mother who has only touched 1 item has `hospitalBagTotal = 1`. If checked, 1/1 = 100%, falsely flagging patients as fully prepared for hospital admission.
 
-### 2.2 Mathematical Formula & Query Logic
+### 2.2 Mathematical Fix
 1. Query active master template count for hospital bag:
    ```sql
    SELECT COUNT(*) AS total
    FROM baby_checklist_template
    WHERE is_active = 1 AND (category_key = 'beg_hospital' OR is_hospital_bag = 1);
    ```
-2. When evaluating a patient's checklist in `baby-tracker.service.ts`:
-   - `hospitalBagCompleted`: Count of `baby_checklist_item` where `(category_key = 'beg_hospital' OR is_hospital_bag = 1) AND is_checked = 1 AND is_deleted = 0`.
-   - `customBagCount`: Count of custom items created by patient with `is_custom = 1`.
-   - `effectiveTotal`: $\max(\text{masterTemplateCount}, \text{customBagCount} + \text{syncedTemplateItemsCount})$.
-   - `hospitalBagPercentage`: $\text{round}\left(\frac{\text{hospitalBagCompleted}}{\text{effectiveTotal}} \times 100\right)$.
-3. Clinic-wide Average `avgHospitalBagPercentage`:
-   - Sum individual patient percentages and divide by total active profiles:
-     $$\text{avgHospitalBagPercentage} = \text{round}\left(\frac{\sum \text{hospitalBagPercentage}}{N}\right)$$
+2. When evaluating patient checklist metrics:
+   $$\text{hospitalBagTotal} = \max(\text{masterTemplateCount}, \text{userSyncedBagItems})$$
+   $$\text{hospitalBagPercentage} = \text{round}\left(\frac{\text{hospitalBagCompleted}}{\text{hospitalBagTotal}} \times 100\right)$$
+   A patient with 1 item completed will accurately show 1/10 = 10%.
+3. Apply identical honest denominator logic to:
+   - `admin/user-management/get-user-baby-checklist.ts`
+   - `mobile/baby-checklist/get-checklist.ts`
 
 ---
 
-## 3. Frontend UI/UX Architecture (`klinik-aurora-portal`)
+## 3. Superadmin Portal UI/UX Overhaul (`klinik-aurora-portal`)
 
-### 3.1 Design Foundations & Visual Language
-- **Color Palette**:
-  - Primary Brand: Clinical Deep Teal (`Color(0xFF0F766E)` / `Color(0xFF14B8A6)`)
-  - Accent Rose: Maternity Rose (`Color(0xFFE11D48)` / `Color(0xFFFDA4AF)`)
-  - Dark Surface / Slate: Modern Obsidian (`Color(0xFF0F172A)`, `Color(0xFF1E293B)`)
-  - Card Surfaces: Crisp White (`#FFFFFF`) with border `Color(0xFFE2E8F0)` and subtle drop shadows (`0 4px 20px -2px rgba(15,23,42,0.06)`).
-  - Background: Clinical Pearl (`Color(0xFFF8FAFC)`).
-- **Typography Hierarchy**:
-  - Display KPI Numbers: `Poppins` 28px SemiBold, tabular numbers.
-  - Section Headers: 16px Bold, `letter-spacing: -0.2px`.
-  - Body & Subtitles: 13px / 11px, `Color(0xFF64748B)`.
+### 3.1 Visual Language & Palette
+- **Surfaces**: Crisp Pearl `#FFFFFF`, Clinical Slate `#0F172A`, Subtle Border `#E2E8F0`.
+- **Accents**: Clinical Teal (`#0F766E`), Maternity Rose (`#E11D48`), Amber Alert (`#D97706`).
 
-### 3.2 Layout Structure
-
-```
-lib/views/baby_tracker/
-├── baby_tracker_homepage.dart          # Executive Bento, Search Toolbar, Dual-Mode Patient List
-├── widgets/
-│   ├── aurora_3d_womb_visualizer.dart  # Interactive 3D Fetal Orb (Existing)
-│   ├── patient_clinical_card.dart      # High-density patient bento card with 40-week timeline
-│   ├── patient_detail_drawer.dart      # Smooth edge-anchored slide-over inspection drawer
-│   ├── template_item_editor_dialog.dart# Template CRUD modal (Existing)
-```
-
-### 3.3 Executive Bento KPI Stations
-1. **Ibu Hamil Aktif**:
-   - Total count + live Trimester pills: `T1: 12` • `T2: 24` • `T3: 14`.
-2. **Perhatian Klinikal (Urgent Alerts)**:
-   - Overdue pregnancies (>40w) + Low kicks (<10 kicks at ≥28w).
-   - Crimson badge with warning glow and instant 1-tap filter trigger.
-3. **Kesiapsiagaan Beg Hospital**:
-   - Honest clinic average percentage (e.g. `34%`).
-   - Micro progress track with benchmark goal indicator.
-4. **Pemantauan Fetal Harian**:
-   - Total kick sessions logged today with active monitor pulse.
-
-### 3.4 Patient Clinical Card Specification
-Each card represents one pregnant patient in a responsive grid (2 columns on standard desktop, 3 columns on wide 1440p+ screens):
-- **Card Header**:
-  - Patient Full Name, Phone, and Branch tag.
-  - Due Date Badge: `40 Hari Lagi` (Emerald) or `Overdue 3 Hari` (Crimson Pulse).
-- **40-Week Gestational Timeline Track**:
-  - Horizontal progress bar displaying current week (e.g., `Minggu 32 / 40`).
-  - Visual trimester break indicators (Week 13, Week 27, Week 40).
-- **Clinical Vital Metrics**:
-  - **Fetal Movement Badge**:
-    - `≥ 10 tendangan`: Emerald pill with checked icon.
-    - `< 10 tendangan` (Week 28+): Amber glowing pill with warning icon.
-    - Not logged today: Neutral slate pill.
-  - **Beg Hospital Progress**:
-    - True ratio pill: `e.g. 4/10 barangan (40%)`.
-- **Card Actions**:
-  - WhatsApp Quick-Chat: 1-click opens WhatsApp Web to patient phone with tailored greeting.
-  - "Periksa Detail": Opens the smooth Patient Detail Drawer.
-
-### 3.5 Patient Detail Slide-Over Drawer
-Replaces `UserBabyTrackerDialog` popup modal with an edge-anchored sliding sheet (width: 580px desktop, full-width mobile):
-- Smooth slide transition (`Tween<Offset>(begin: Offset(1, 0), end: Offset.zero)`).
-- **Tab 1: Status & Garis Masa Kehamilan**:
-  - Gestational age calculator, EDD, current fetal developmental milestone, and doctor remarks.
-- **Tab 2: Log Tendangan (Fetal Kicks)**:
-  - Daily kick totals, time-of-day velocity, and historical kick logs.
-- **Tab 3: Senarai Semak & Beg Hospital**:
-  - Accordion categories with progress bars:
-    - 🏥 Beg Hospital Ibu & Anak (`4/10 siap`)
-    - 👕 Pakaian Bayi
-    - 🍼 Kelengkapan Penyusuan
-    - 🛏️ Bilik & Tempat Tidur
-    - 🧴 Penjagaan & Mandian
-    - 👩‍🦰 Keperluan Ibu Berpantang
-    - 🏠 Keselamatan & Rumah
-  - Inline checkbox toggle for clinic staff review.
+### 3.2 Key Components
+1. **Executive Bento KPI Stations**:
+   - *Ibu Hamil Aktif*: Total count with live trimester badges (`T1`, `T2`, `T3`).
+   - *Perhatian Klinikal (Urgent)*: Overdue pregnancies (>40w) + low kick alerts (<10 kicks at ≥28w) with 1-click filter.
+   - *Kesiapsiagaan Beg Hospital*: Clinic-wide average readiness with true template denominator.
+   - *Pemantauan Fetal Harian*: Real-time kick logging sessions count.
+2. **Dual-View Patient Navigation**:
+   - **Executive Patient Cards (Default)**:
+     - 40-Week gestational timeline track with current position and trimester break indicators.
+     - Fetal kick status badge (Pulsing green `≥10` vs Amber warning `<10`).
+     - Beg hospital progress pill: `4/10 barangan • 40%`.
+     - 1-click WhatsApp quick-chat + "Periksa Detail".
+   - **Surgical Table**: High-density table for quick bulk scanning.
+3. **Patient Deep-Dive Slide-Over Drawer**:
+   - Edge-anchored smooth slide sheet (580px wide) replacing the clunky modal dialog.
+   - Tab 1: Gestational Timeline & Profile.
+   - Tab 2: Fetal Kick velocity logs & hourly distribution.
+   - Tab 3: Categorized Checklist Accordion with live hospital bag validation.
 
 ---
 
-## 4. Verification & Testing Plan
+## 4. Mobile App Experience Transformation (`klinik-aurora-mobile`)
 
-1. **Backend Verification**:
-   - Unit test on `baby-tracker.service.ts`:
-     - Patient with 1 checked hospital bag item out of 10 master items returns `10%` (not `100%`).
-     - Patient with 10 checked hospital bag items returns `100%`.
-     - Patient with 0 checked items returns `0%`.
-     - Patient with custom items has total properly incremented.
-2. **Frontend Verification**:
+### 4.1 Aesthetic: The Maternity Sanctuary
+- **Goodbye Cold Obsidian**: Eliminate `#0F172A` / `#1E293B` dark terminal backgrounds.
+- **New Warm Maternity Palette**:
+  - Background: Alabaster Silk (`#FAFAF8`).
+  - Hero Card: Gentle Rose Blush (`#FFF0F3`) to Warm Champagne Cream (`#FFF8F0`) gradient with soft rose-gold border (`#FDE2E8`).
+  - Text & Accents: Warm Espresso `#292524`, Muted Mocha `#78716C`, Clinical Rose `#E11D48`, Calm Sage `#16A34A`.
+
+### 4.2 Reassurance Hero Card (`AuroraBabyProgressSanctuaryCard`)
+- Dual circular progress indicator:
+  - Outer ring: Beg Hospital (Kritikal Wad).
+  - Inner ring: Overall baby preparation.
+- Dynamic Empathetic Micro-copy:
+  - *Weeks 20–27*: "Awal lagi Mama. Rancang & kumpul senarai perlahan-lahan 🌸"
+  - *Weeks 28–34*: "Masa ideal kemaskan Beg Hospital untuk wad bersalin 🏥"
+  - *Weeks 35+*: "Bertenang Mama, bila-bila masa sahaja si manja akan tiba ✨"
+
+### 4.3 Cognitive De-cluttering (No 55-Item Wall)
+Replace infinite scrolling list with 3 purposeful pregnancy stages:
+1. 🏥 **Beg Hospital (10 Barang Wad Bersalin - Prioriti Utama)**
+   - Grouped into 3 intuitive sub-pouches:
+     - **Beg Mama**: Kain batik, nursing bra, disposable panties, maternity pad, selipar wad.
+     - **Beg Si Manja**: Baju butang depan, barut, bedung bayi, sarung tangan & stoking, lampin newborn.
+     - **Dokumen Penting**: Buku Pink, Kad Pengenalan Suami & Isteri, Surat Jaminan / GL Insurans.
+2. 🧸 **Persediaan Rumah & Bilik Bayi (Nursery & Pakaian)**
+3. 🌿 **Keperluan Berpantang & Penyusuan Ibu**
+
+### 4.4 Tactile Sensory Interactions
+- Checking an item triggers `HapticFeedback.lightImpact()` with smooth spring-scale bounce.
+- Strike-through animation with subtle celebratory burst.
+- Reassuring confirmation: *"Satu lagi beban selesai, Mama."*
+
+### 4.5 Partner / Husband Labor Room Co-pilot
+- **1-Tap WhatsApp Dispatch Button**:
+  - Formats checked and pending items into a clean, categorized message:
+    *"Salam sayang, ini senarai beg hospital yang dah siap & belum untuk semakan dalam kereta:"*
+  - Lets the husband verify the car trunk in 30 seconds at 3 AM.
+
+### 4.6 Dr. Aurora Practical Midwife Wisdom Sheet
+- Tapping any item opens the redesigned clinical wisdom sheet:
+  - **Spesifikasi**: e.g., 100% cotton, butang depan (mudah skin-to-skin & rawatan jururawat).
+  - **Peringatan Keselamatan**: e.g., elak bantal lembut berlebihan untuk elak risiko SIDS.
+  - **Tip Jimat Bajet**: e.g., baju newborn pakai 2–3 minggu sahaja, jangan bazir beli berpuluh pasang.
+
+---
+
+## 5. Implementation Roadmap
+
+```mermaid
+flowchart TD
+    A["1. Backend Fix (membership-api)"] -->|Deploy Honest Denominator| B["2. Superadmin Portal (klinik-aurora-portal)"]
+    A -->|Serve Master Template Baseline| C["3. Mobile App (klinik-aurora-mobile)"]
+    B --> D["Bento KPI + High-Density Cards + Sliding Drawer"]
+    C --> E["Maternity Sanctuary Theme + 3-Bag Ward Organizer + Husband Share"]
+    D --> F["Verification, Web Build & Production Deploy"]
+    E --> G["Mobile Flutter Analysis & Test Verification"]
+```
+
+---
+
+## 6. Verification & Acceptance Criteria
+
+1. **Backend**:
+   - `hospitalBagPercentage` for a user with 1 checked item out of 10 master items strictly returns `10%`.
+   - Clinic-wide `avgHospitalBagPercentage` calculates true average based on master baseline.
+2. **Portal**:
    - `fvm flutter analyze` passes with 0 issues.
-   - Dual-view toggle switches seamlessly between Cards and Table.
-   - Trimester filters accurately partition the patient set.
-   - Slide-over drawer smoothly opens and closes with ESC key or backdrop tap.
-   - Production web build compiles cleanly with `fvm flutter build web --release`.
-
----
-
-## 5. Deployment Constraints
-- Code changes in `membership-api` tested locally, committed, and pushed.
-- Production web application in `klinik-aurora-portal` compiled and deployed to Firebase Hosting (`https://klinik-aurora.web.app`).
+   - Dual-view toggle works smoothly.
+   - Slide-over drawer opens seamlessly without full-page modal obstruction.
+   - Production web build compiles cleanly with `fvm flutter build web --release` and deploys to Firebase Hosting.
+3. **Mobile**:
+   - `fvm flutter analyze` passes with 0 issues.
+   - Warm Rose-Pearl sanctuary theme renders without dark/cold elements.
+   - Beg Hospital 3-sub-pouch organizer displays cleanly.
+   - Husband WhatsApp sharing correctly generates formatted message.
+   - Haptic feedback and animations execute at 60fps.
