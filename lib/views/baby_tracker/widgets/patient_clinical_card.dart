@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class PatientClinicalCard extends StatelessWidget {
@@ -177,26 +178,34 @@ class PatientClinicalCard extends StatelessWidget {
 
           const Spacer(),
           const Divider(height: 1, color: Color(0xFFF1F5F9)),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
-          // Bottom Action Row
+          // Bottom Action Row (Comfortable, large tap targets, official WhatsApp branding)
           Row(
             children: [
               if (phone != '-' && phone.isNotEmpty)
-                IconButton(
-                  tooltip: 'WhatsApp Pesakit',
-                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: Color(0xFF059669)),
-                  style: IconButton.styleFrom(
-                    backgroundColor: const Color(0xFFF0FDF4),
-                    padding: const EdgeInsets.all(7),
-                    minimumSize: const Size(32, 32),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                Tooltip(
+                  message: 'WhatsApp Pesakit ($phone)',
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+                      final phoneWithCode = cleanPhone.startsWith('6') ? cleanPhone : '6$cleanPhone';
+                      launchUrlString('https://wa.me/$phoneWithCode');
+                    },
+                    icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 15, color: Colors.white),
+                    label: const Text(
+                      'WhatsApp',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25D366),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      minimumSize: const Size(0, 38),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
                   ),
-                  onPressed: () {
-                    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
-                    final phoneWithCode = cleanPhone.startsWith('6') ? cleanPhone : '6$cleanPhone';
-                    launchUrlString('https://wa.me/$phoneWithCode');
-                  },
                 ),
               const Spacer(),
               OutlinedButton.icon(
@@ -205,8 +214,9 @@ class PatientClinicalCard extends StatelessWidget {
                 label: const Text('Buka Rekod', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF0F172A),
-                  side: const BorderSide(color: Color(0xFFCBD5E1)),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  minimumSize: const Size(0, 38),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),

@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/aurora_3d_womb_visualizer.dart';
@@ -7,6 +8,7 @@ import 'package:klinik_aurora_portal/views/baby_tracker/widgets/patient_clinical
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/patient_detail_drawer.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/template_item_editor_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class BabyTrackerHomepage extends StatefulWidget {
   static const routeName = '/aurora-baby';
@@ -29,6 +31,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   String _reportStatus = 'all'; // all, overdue, alert, low_kicks, third_trimester
   int? _filterGestationalWeek;
   int _visualizerWeek = 20;
+  bool _showVisualizer = false;
   int _reportPage = 1;
   final int _reportPageSize = 20;
   final _debouncer = Debouncer(milliseconds: 600);
@@ -40,8 +43,9 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     'totalBorn': 0,
     'avgHospitalBagPercentage': 0,
   };
+  Map<String, dynamic> _reportPagination = {};
   List<dynamic> _patients = [];
-  bool _isCardView = true;
+  bool _isCardView = false;
   Map<String, dynamic>? _selectedPatientForDrawer;
 
   // ---------------------------------------------------------------------------
@@ -93,6 +97,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
         setState(() {
           _patients = body['data'] as List<dynamic>? ?? [];
           _reportSummary = (body['summary'] as Map<String, dynamic>?) ?? _reportSummary;
+          _reportPagination = (body['pagination'] as Map<String, dynamic>?) ?? {};
         });
       }
     }).catchError((_) {
@@ -140,27 +145,29 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               children: [
                 // Top Header & Tab Bar
                 _buildTopBar(primaryAccentColor),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
-                // 3D Gestational Womb Visualizer Hero Section
-                Aurora3DWombVisualizer(
-                  initialWeek: _visualizerWeek,
-                  initiallyExpanded: false,
-                  onWeekChanged: (week) {
-                    _visualizerWeek = week;
-                  },
-                  onFilterPatients: () {
-                    setState(() {
-                      _filterGestationalWeek = _visualizerWeek;
-                      _reportPage = 1;
-                      if (_tabController.index != 0) {
-                        _tabController.animateTo(0);
-                      }
-                    });
-                    _fetchReports();
-                  },
-                ),
-                const SizedBox(height: 16),
+                // 3D Gestational Womb Visualizer Hero Section (Collapsible)
+                if (_showVisualizer) ...[
+                  Aurora3DWombVisualizer(
+                    initialWeek: _visualizerWeek,
+                    initiallyExpanded: true,
+                    onWeekChanged: (week) {
+                      _visualizerWeek = week;
+                    },
+                    onFilterPatients: () {
+                      setState(() {
+                        _filterGestationalWeek = _visualizerWeek;
+                        _reportPage = 1;
+                        if (_tabController.index != 0) {
+                          _tabController.animateTo(0);
+                        }
+                      });
+                      _fetchReports();
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                ],
 
                 // Tab Views
                 Expanded(
@@ -207,7 +214,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   // ---------------------------------------------------------------------------
   Widget _buildTopBar(Color accentColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -219,15 +226,15 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 alignment: Alignment.center,
-                child: const Icon(Icons.pregnant_woman_rounded, color: Color(0xFF0F172A), size: 22),
+                child: const Icon(Icons.pregnant_woman_rounded, color: Color(0xFF0F172A), size: 20),
               ),
               const SizedBox(width: 14),
               Column(
@@ -236,7 +243,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                   Text(
                     'Aurora Baby Hub',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w800,
                       color: Colors.blueGrey.shade900,
                       letterSpacing: -0.3,
@@ -251,19 +258,59 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
-                const SizedBox(width: 4),
-                _tabButton(1, Icons.tune_rounded, 'Templat Senarai Semak', accentColor),
-              ],
-            ),
+          Row(
+            children: [
+              // 3D Womb Visualizer Toggle
+              InkWell(
+                onTap: () => setState(() => _showVisualizer = !_showVisualizer),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: _showVisualizer ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: _showVisualizer ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.view_in_ar_rounded,
+                        size: 15,
+                        color: _showVisualizer ? Colors.white : const Color(0xFF475569),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Visualizer 3D Janin',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: _showVisualizer ? Colors.white : const Color(0xFF334155),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // Tab Switcher
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
+                    const SizedBox(width: 4),
+                    _tabButton(1, Icons.tune_rounded, 'Templat Senarai Semak', accentColor),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -354,7 +401,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            mainAxisExtent: 290,
+            mainAxisExtent: 345,
           ),
           itemCount: _patients.length,
           itemBuilder: (context, index) {
@@ -447,7 +494,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -465,20 +512,20 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                 color: Color(0xFF64748B),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 3),
             Text(
               value,
               style: TextStyle(
-                fontSize: 26,
+                fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: valueColor ?? const Color(0xFF0F172A),
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -591,44 +638,6 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             child: Row(
               children: [
                 InkWell(
-                  onTap: () => setState(() => _isCardView = true),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: _isCardView ? Colors.white : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: _isCardView
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.grid_view_rounded,
-                          size: 15,
-                          color: _isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Kad Fail',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: _isCardView ? FontWeight.bold : FontWeight.w500,
-                            color: _isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                InkWell(
                   onTap: () => setState(() => _isCardView = false),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
@@ -660,6 +669,44 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                             fontSize: 12,
                             fontWeight: !_isCardView ? FontWeight.bold : FontWeight.w500,
                             color: !_isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => setState(() => _isCardView = true),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _isCardView ? Colors.white : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: _isCardView
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.grid_view_rounded,
+                          size: 15,
+                          color: _isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Kad Fail',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: _isCardView ? FontWeight.bold : FontWeight.w500,
+                            color: _isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
                           ),
                         ),
                       ],
@@ -711,7 +758,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -720,186 +768,296 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: DataTable2(
-          columnSpacing: 16,
-          horizontalMargin: 20,
-          minWidth: 860,
-          headingRowHeight: 48,
-          dataRowHeight: 64,
-          headingRowColor: WidgetStateProperty.all(const Color(0xFFF8FAFC)),
-          columns: const [
-            DataColumn2(label: Text('PESAKIT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.L),
-            DataColumn2(label: Text('TARIKH EDD / USIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.M),
-            DataColumn2(label: Text('TENDANGAN HARI INI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.M),
-            DataColumn2(label: Text('BEG HOSPITAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.S),
-            DataColumn2(label: Text('STATUS RISIKO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.M),
-            DataColumn2(label: Text('TINDAKAN', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.S),
-          ],
-          rows: _patients.map((p) {
-            final name = p['patientName'] ?? 'Pesakit';
-            final phone = p['patientPhone'] ?? '-';
-            final branch = p['branchName'] ?? 'Klinik Aurora';
-            final edd = p['eddDate'] ?? '-';
-            final week = p['gestationalWeek'];
-            final trimester = p['trimester'];
-            final kicks = p['todayKicks'] ?? 0;
-            final lastKick = p['lastKickAt'];
-            final bagPct = p['hospitalBagPercentage'] ?? 0;
-            final isOverdue = p['isOverdue'] == true;
-            final alertStatus = p['alertStatus'] ?? 'normal';
+      child: Column(
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+              child: DataTable2(
+                columnSpacing: 16,
+                horizontalMargin: 20,
+                minWidth: 920,
+                headingRowHeight: 46,
+                dataRowHeight: 62,
+                isHorizontalScrollBarVisible: true,
+                isVerticalScrollBarVisible: true,
+                headingRowColor: WidgetStateProperty.all(const Color(0xFFF8FAFC)),
+                columns: const [
+                  DataColumn2(label: Text('PESAKIT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.L),
+                  DataColumn2(label: Text('TARIKH EDD / USIA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.M),
+                  DataColumn2(label: Text('TENDANGAN HARI INI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.M),
+                  DataColumn2(label: Text('BEG HOSPITAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.S),
+                  DataColumn2(label: Text('STATUS RISIKO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), size: ColumnSize.M),
+                  DataColumn2(label: Text('TINDAKAN', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), fixedWidth: 230),
+                ],
+                rows: _patients.map((p) {
+                  final name = p['patientName'] ?? 'Pesakit';
+                  final phone = p['patientPhone'] ?? '-';
+                  final branch = p['branchName'] ?? 'Klinik Aurora';
+                  final edd = p['eddDate'] ?? '-';
+                  final week = p['gestationalWeek'];
+                  final trimester = p['trimester'];
+                  final kicks = p['todayKicks'] ?? 0;
+                  final lastKick = p['lastKickAt'];
+                  final bagPct = p['hospitalBagPercentage'] ?? 0;
+                  final isOverdue = p['isOverdue'] == true;
+                  final alertStatus = p['alertStatus'] ?? 'normal';
 
-            return DataRow(
-              cells: [
-                // Patient Name & contact
-                DataCell(
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
-                      Text('$phone • $branch', style: TextStyle(fontSize: 11.5, color: Colors.grey.shade500)),
-                    ],
-                  ),
-                ),
+                  return DataRow(
+                    cells: [
+                      // Patient Name & contact
+                      DataCell(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
+                            Text('$phone • $branch', style: TextStyle(fontSize: 11.5, color: Colors.grey.shade500)),
+                          ],
+                        ),
+                      ),
 
-                // EDD & Week
-                DataCell(
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(edd, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                      if (week != null)
-                        Text(
-                          'Minggu $week (${trimester != null ? 'Trimester $trimester' : ''})',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0284C7),
-                            fontWeight: FontWeight.bold,
+                      // EDD & Week
+                      DataCell(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(edd, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                            if (week != null)
+                              Text(
+                                'Minggu $week (${trimester != null ? 'Trimester $trimester' : ''})',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0284C7),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+
+                      // Today's Kicks
+                      DataCell(
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: kicks >= 10
+                                    ? const Color(0xFFECFDF5)
+                                    : kicks > 0
+                                        ? const Color(0xFFFFFBEB)
+                                        : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '$kicks kali',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: kicks >= 10
+                                      ? const Color(0xFF15803D)
+                                      : kicks > 0
+                                          ? const Color(0xFFD97706)
+                                          : Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                            if (lastKick != null) ...[
+                              const SizedBox(width: 8),
+                              Text(
+                                lastKick.toString().split(' ').last,
+                                style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+
+                      // Hospital Bag
+                      DataCell(
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: bagPct == 100
+                                ? const Color(0xFFECFDF5)
+                                : bagPct >= 50
+                                    ? const Color(0xFFEFF6FF)
+                                    : const Color(0xFFFFF7ED),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '$bagPct%',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: bagPct == 100
+                                  ? const Color(0xFF059669)
+                                  : bagPct >= 50
+                                      ? const Color(0xFF2563EB)
+                                      : const Color(0xFFEA580C),
+                            ),
                           ),
                         ),
-                    ],
-                  ),
-                ),
+                      ),
 
-                // Today's Kicks
-                DataCell(
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: kicks >= 10
-                              ? const Color(0xFFECFDF5)
-                              : kicks > 0
-                                  ? const Color(0xFFFFFBEB)
-                                  : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          '$kicks kali',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.bold,
-                            color: kicks >= 10
-                                ? const Color(0xFF15803D)
-                                : kicks > 0
-                                    ? const Color(0xFFD97706)
-                                    : Colors.grey.shade600,
+                      // Risk Status
+                      DataCell(
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: alertStatus == 'overdue'
+                                ? const Color(0xFFFEE2E2)
+                                : alertStatus == 'low_kicks'
+                                    ? const Color(0xFFFEF3C7)
+                                    : const Color(0xFFF0FDF4),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            alertStatus == 'overdue'
+                                ? 'Overdue'
+                                : alertStatus == 'low_kicks'
+                                    ? 'Pergerakan Rendah'
+                                    : 'Stabil',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                              color: alertStatus == 'overdue'
+                                  ? const Color(0xFFB91C1C)
+                                  : alertStatus == 'low_kicks'
+                                      ? const Color(0xFFB45309)
+                                      : const Color(0xFF15803D),
+                            ),
                           ),
                         ),
                       ),
-                      if (lastKick != null) ...[
-                        const SizedBox(width: 8),
-                        Text(
-                          lastKick.toString().split(' ').last,
-                          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+
+                      // Actions: WhatsApp & Open Patient Detail Drawer
+                      DataCell(
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (phone != '-' && phone.isNotEmpty) ...[
+                              Tooltip(
+                                message: 'WhatsApp Pesakit ($phone)',
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+                                    final phoneWithCode = cleanPhone.startsWith('6') ? cleanPhone : '6$cleanPhone';
+                                    launchUrlString('https://wa.me/$phoneWithCode');
+                                  },
+                                  icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 14, color: Colors.white),
+                                  label: const Text(
+                                    'WhatsApp',
+                                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF25D366),
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                    minimumSize: const Size(0, 32),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() => _selectedPatientForDrawer = p as Map<String, dynamic>);
+                              },
+                              icon: const Icon(Icons.description_outlined, size: 13),
+                              label: const Text('Buka Fail', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF0F172A),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                                minimumSize: const Size(0, 32),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ],
-                  ),
-                ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          _buildPaginationBar(),
+        ],
+      ),
+    );
+  }
 
-                // Hospital Bag
-                DataCell(
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: bagPct == 100
-                          ? const Color(0xFFECFDF5)
-                          : bagPct >= 50
-                              ? const Color(0xFFEFF6FF)
-                              : const Color(0xFFFFF7ED),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '$bagPct%',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: bagPct == 100
-                            ? const Color(0xFF059669)
-                            : bagPct >= 50
-                                ? const Color(0xFF2563EB)
-                                : const Color(0xFFEA580C),
-                      ),
-                    ),
-                  ),
-                ),
+  Widget _buildPaginationBar() {
+    final totalCount = _reportPagination['totalCount'] ?? _patients.length;
+    final totalPages = (_reportPagination['totalPages'] as int?) ?? 1;
+    final page = (_reportPagination['page'] as int?) ?? _reportPage;
 
-                // Risk Status
-                DataCell(
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: alertStatus == 'overdue'
-                          ? const Color(0xFFFEE2E2)
-                          : alertStatus == 'low_kicks'
-                              ? const Color(0xFFFEF3C7)
-                              : const Color(0xFFF0FDF4),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      alertStatus == 'overdue'
-                          ? 'Overdue'
-                          : alertStatus == 'low_kicks'
-                              ? 'Pergerakan Rendah'
-                              : 'Stabil',
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
-                        color: alertStatus == 'overdue'
-                            ? const Color(0xFFB91C1C)
-                            : alertStatus == 'low_kicks'
-                                ? const Color(0xFFB45309)
-                                : const Color(0xFF15803D),
-                      ),
-                    ),
-                  ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Menunjukkan rekod ${(page - 1) * _reportPageSize + (_patients.isNotEmpty ? 1 : 0)} – ${(page - 1) * _reportPageSize + _patients.length} daripada $totalCount pesakit',
+            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+          ),
+          Row(
+            children: [
+              OutlinedButton.icon(
+                onPressed: page > 1
+                    ? () {
+                        setState(() => _reportPage--);
+                        _fetchReports();
+                      }
+                    : null,
+                icon: const Icon(Icons.arrow_back_ios_rounded, size: 12),
+                label: const Text('Sebelumnya', style: TextStyle(fontSize: 12)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
-
-                // Actions: Open Patient Detail Drawer
-                DataCell(
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() => _selectedPatientForDrawer = p as Map<String, dynamic>);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0F172A),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: const Text('Buka Fail', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-              ],
-            );
-          }).toList(),
-        ),
+                child: Text(
+                  'Halaman $page / $totalPages',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: page < totalPages
+                    ? () {
+                        setState(() => _reportPage++);
+                        _fetchReports();
+                      }
+                    : null,
+                icon: const Icon(Icons.arrow_forward_ios_rounded, size: 12),
+                label: const Text('Seterusnya', style: TextStyle(fontSize: 12)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
