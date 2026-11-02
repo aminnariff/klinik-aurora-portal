@@ -2,10 +2,10 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
-import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/aurora_3d_womb_visualizer.dart';
+import 'package:klinik_aurora_portal/views/baby_tracker/widgets/patient_clinical_card.dart';
+import 'package:klinik_aurora_portal/views/baby_tracker/widgets/patient_detail_drawer.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/template_item_editor_dialog.dart';
-import 'package:klinik_aurora_portal/views/user/user_baby_tracker_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 
 class BabyTrackerHomepage extends StatefulWidget {
@@ -41,6 +41,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     'avgHospitalBagPercentage': 0,
   };
   List<dynamic> _patients = [];
+  bool _isCardView = true;
+  Map<String, dynamic>? _selectedPatientForDrawer;
 
   // ---------------------------------------------------------------------------
   // Tab 1: Checklist Template State
@@ -129,48 +131,73 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Top Header & Tab Bar
-            _buildTopBar(primaryAccentColor),
-            const SizedBox(height: 16),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Top Header & Tab Bar
+                _buildTopBar(primaryAccentColor),
+                const SizedBox(height: 16),
 
-            // 3D Gestational Womb Visualizer Hero Section
-            Aurora3DWombVisualizer(
-              initialWeek: _visualizerWeek,
-              initiallyExpanded: false,
-              onWeekChanged: (week) {
-                _visualizerWeek = week;
-              },
-              onFilterPatients: () {
-                setState(() {
-                  _filterGestationalWeek = _visualizerWeek;
-                  _reportPage = 1;
-                  if (_tabController.index != 0) {
-                    _tabController.animateTo(0);
-                  }
-                });
-                _fetchReports();
-              },
+                // 3D Gestational Womb Visualizer Hero Section
+                Aurora3DWombVisualizer(
+                  initialWeek: _visualizerWeek,
+                  initiallyExpanded: false,
+                  onWeekChanged: (week) {
+                    _visualizerWeek = week;
+                  },
+                  onFilterPatients: () {
+                    setState(() {
+                      _filterGestationalWeek = _visualizerWeek;
+                      _reportPage = 1;
+                      if (_tabController.index != 0) {
+                        _tabController.animateTo(0);
+                      }
+                    });
+                    _fetchReports();
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Tab Views
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      _buildReportsTab(primaryAccentColor),
+                      _buildTemplateTab(primaryAccentColor),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+          ),
 
-            // Tab Views
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  _buildReportsTab(primaryAccentColor),
-                  _buildTemplateTab(primaryAccentColor),
-                ],
+          // Slide-Over Inspection Drawer
+          if (_selectedPatientForDrawer != null) ...[
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedPatientForDrawer = null),
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.35),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              bottom: 0,
+              right: 0,
+              child: PatientDetailDrawer(
+                patient: _selectedPatientForDrawer!,
+                onClose: () => setState(() => _selectedPatientForDrawer = null),
               ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -301,15 +328,44 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
         _buildReportsFilterBar(accentColor),
         const SizedBox(height: 14),
 
-        // Patients Table
+        // Patients Content (Card Grid or Data Table)
         Expanded(
           child: _isLoadingReports
               ? const Center(child: CircularProgressIndicator())
               : _patients.isEmpty
                   ? _buildEmptyState('Tiada rekod kehamilan dijumpai.', 'Pesakit yang mendaftar EDD di aplikasi Aurora Baby akan dipaparkan di sini.')
-                  : _buildReportsTable(accentColor),
+                  : _isCardView
+                      ? _buildPatientCardGrid()
+                      : _buildReportsTable(accentColor),
         ),
       ],
+    );
+  }
+
+  Widget _buildPatientCardGrid() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth > 1400 ? 3 : (constraints.maxWidth > 880 ? 2 : 1);
+        return GridView.builder(
+          padding: const EdgeInsets.only(bottom: 24),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            mainAxisExtent: 320,
+          ),
+          itemCount: _patients.length,
+          itemBuilder: (context, index) {
+            final p = _patients[index] as Map<String, dynamic>;
+            return PatientClinicalCard(
+              patient: p,
+              onOpenDetail: () {
+                setState(() => _selectedPatientForDrawer = p);
+              },
+            );
+          },
+        );
+      },
     );
   }
 
@@ -324,6 +380,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             icon: Icons.pregnant_woman_rounded,
             color: const Color(0xFF0284C7),
             bgColor: const Color(0xFFE0F2FE),
+            onTap: () {
+              setState(() {
+                _reportStatus = 'all';
+                _reportPage = 1;
+              });
+              _fetchReports();
+            },
           ),
         ),
         const SizedBox(width: 14),
@@ -335,6 +398,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             icon: Icons.alarm_on_rounded,
             color: const Color(0xFFDC2626),
             bgColor: const Color(0xFFFEF2F2),
+            onTap: () {
+              setState(() {
+                _reportStatus = 'overdue';
+                _reportPage = 1;
+              });
+              _fetchReports();
+            },
           ),
         ),
         const SizedBox(width: 14),
@@ -346,6 +416,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             icon: Icons.warning_amber_rounded,
             color: const Color(0xFFD97706),
             bgColor: const Color(0xFFFFFBEB),
+            onTap: () {
+              setState(() {
+                _reportStatus = 'alert';
+                _reportPage = 1;
+              });
+              _fetchReports();
+            },
           ),
         ),
         const SizedBox(width: 14),
@@ -370,64 +447,69 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     required IconData icon,
     required Color color,
     required Color bgColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.15)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(12),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey.shade800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 24),
             ),
-          ),
-        ],
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: color,
+                    ),
+                  ),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueGrey.shade800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -521,6 +603,96 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B)),
             tooltip: 'Muat Semula',
             onPressed: _fetchReports,
+          ),
+          const SizedBox(width: 8),
+
+          // View mode toggle: Card Grid vs Data Table
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                InkWell(
+                  onTap: () => setState(() => _isCardView = true),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _isCardView ? Colors.white : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: _isCardView
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.grid_view_rounded,
+                          size: 15,
+                          color: _isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Kad Fail',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: _isCardView ? FontWeight.bold : FontWeight.w500,
+                            color: _isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => setState(() => _isCardView = false),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: !_isCardView ? Colors.white : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: !_isCardView
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.table_rows_rounded,
+                          size: 15,
+                          color: !_isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Jadual',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: !_isCardView ? FontWeight.bold : FontWeight.w500,
+                            color: !_isCardView ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -733,29 +905,20 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                   ),
                 ),
 
-                // Actions: Open Patient Tracker Modal
+                // Actions: Open Patient Detail Drawer
                 DataCell(
                   ElevatedButton(
                     onPressed: () {
-                      final u = UserResponse(
-                        userId: p['userId'],
-                        userFullname: name,
-                        userPhone: phone,
-                        userEmail: p['patientEmail'],
-                      );
-                      showDialog(
-                        context: context,
-                        builder: (_) => UserBabyTrackerDialog(patient: u),
-                      );
+                      setState(() => _selectedPatientForDrawer = p as Map<String, dynamic>);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF1F5F9),
-                      foregroundColor: const Color(0xFF0F172A),
+                      backgroundColor: const Color(0xFF0F172A),
+                      foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text('Lihat Rekod', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                    child: const Text('Buka Fail', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
