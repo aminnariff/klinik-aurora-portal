@@ -106,8 +106,8 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 24,
+            color: Color(0x1A000000),
+            blurRadius: 20,
             offset: Offset(-4, 0),
           ),
         ],
@@ -121,7 +121,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           // Tab Navigation Bar
           Container(
             decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
+              color: Colors.white,
               border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
             child: TabBar(
@@ -129,12 +129,21 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               labelColor: const Color(0xFF0F172A),
               unselectedLabelColor: const Color(0xFF64748B),
               indicatorColor: const Color(0xFF0284C7),
-              indicatorWeight: 3,
-              labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              indicatorWeight: 2.5,
+              labelStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
               tabs: const [
-                Tab(text: '👣 Tendangan Bayi'),
-                Tab(text: '🏥 Beg Hospital'),
-                Tab(text: '📋 Senarai Semak'),
+                Tab(
+                  icon: Icon(Icons.show_chart_rounded, size: 16),
+                  text: 'Pergerakan Janin',
+                ),
+                Tab(
+                  icon: Icon(Icons.medical_services_outlined, size: 16),
+                  text: 'Beg Hospital (Wad)',
+                ),
+                Tab(
+                  icon: Icon(Icons.checklist_rounded, size: 16),
+                  text: 'Senarai Semak Penuh',
+                ),
               ],
             ),
           ),
@@ -167,38 +176,35 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     String? alertReason,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      decoration: BoxDecoration(
-        color: isOverdue
-            ? const Color(0xFFFFF1F2)
-            : alertStatus == 'low_kicks'
-                ? const Color(0xFFFFFBEB)
-                : const Color(0xFFF0F9FF),
-        border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Row: Avatar + Name + Close
+          // Top Row: Avatar + Name + Actions
           Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isOverdue
-                        ? [const Color(0xFFE11D48), const Color(0xFFF43F5E)]
-                        : [const Color(0xFF0284C7), const Color(0xFF38BDF8)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                  color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFE2E8F0),
                   ),
-                  borderRadius: BorderRadius.circular(14),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   name.isNotEmpty ? name[0].toUpperCase() : 'P',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF334155),
+                  ),
                 ),
               ),
               const SizedBox(width: 14),
@@ -208,14 +214,14 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '$phone • $branch',
-                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B)),
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -223,10 +229,10 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               if (phone != '-' && phone.isNotEmpty)
                 IconButton(
                   tooltip: 'Buka WhatsApp',
-                  icon: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF059669), size: 20),
+                  icon: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF059669), size: 18),
                   style: IconButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    backgroundColor: const Color(0xFFF0FDF4),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
                     final clean = phone.replaceAll(RegExp(r'[^0-9]'), '');
@@ -237,52 +243,49 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               const SizedBox(width: 6),
               IconButton(
                 tooltip: 'Tutup Fail',
-                icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B), size: 22),
+                icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B), size: 20),
                 style: IconButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  backgroundColor: const Color(0xFFF8FAFC),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: widget.onClose,
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
           // Clinical Quick Badges
           Row(
             children: [
               _headerPill(
-                icon: Icons.calendar_month_rounded,
+                icon: Icons.calendar_today_outlined,
                 label: 'EDD: $edd',
                 color: const Color(0xFF0F172A),
-                bgColor: Colors.white,
               ),
               const SizedBox(width: 8),
               if (week != null)
                 _headerPill(
-                  icon: Icons.pregnant_woman_rounded,
-                  label: 'Minggu $week (${trimester != null ? 'T$trimester' : ''})',
+                  icon: Icons.access_time_rounded,
+                  label: 'Minggu $week (${trimester != null ? 'Trimester $trimester' : ''})',
                   color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0284C7),
-                  bgColor: Colors.white,
                 ),
               const SizedBox(width: 8),
               _headerPill(
                 icon: isOverdue
-                    ? Icons.alarm_on_rounded
+                    ? Icons.alarm_rounded
                     : alertStatus == 'low_kicks'
                         ? Icons.warning_amber_rounded
-                        : Icons.check_circle_rounded,
+                        : Icons.check_circle_outline_rounded,
                 label: isOverdue
                     ? 'Overdue'
                     : alertStatus == 'low_kicks'
-                        ? 'Amaran Kicks'
+                        ? 'Pergerakan Rendah'
                         : 'Stabil',
                 color: isOverdue
                     ? const Color(0xFFDC2626)
                     : alertStatus == 'low_kicks'
                         ? const Color(0xFFD97706)
-                        : const Color(0xFF059669),
-                bgColor: Colors.white,
+                        : const Color(0xFF15803D),
               ),
             ],
           ),
@@ -290,10 +293,10 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           if (alertReason != null && alertStatus != 'normal') ...[
             const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
+                color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFFFFBEB),
+                borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFFDE68A),
                 ),
@@ -302,15 +305,15 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 children: [
                   Icon(
                     Icons.info_outline_rounded,
-                    size: 15,
+                    size: 14,
                     color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFFD97706),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       alertReason,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11.5,
                         fontWeight: FontWeight.w600,
                         color: isOverdue ? const Color(0xFFB91C1C) : const Color(0xFFB45309),
                       ),
@@ -329,21 +332,20 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     required IconData icon,
     required String label,
     required Color color,
-    required Color bgColor,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(6),
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: color),
+          Icon(icon, size: 12, color: color),
           const SizedBox(width: 5),
-          Text(label, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: color)),
+          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
@@ -364,8 +366,8 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('👣', style: TextStyle(fontSize: 42)),
-              const SizedBox(height: 12),
+              Icon(Icons.directions_walk_rounded, size: 40, color: Colors.grey.shade400),
+              const SizedBox(height: 10),
               Text(
                 _trackerError ?? 'Tiada rekod tendangan.',
                 style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
@@ -377,65 +379,66 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Hero Kicks Target Card
+          // Clinical Kicks Target Card
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: _todayKicks >= 10
-                    ? [const Color(0xFFECFDF5), const Color(0xFFD1FAE5)]
-                    : [const Color(0xFFFFFBEB), const Color(0xFFFEF3C7)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: _todayKicks >= 10 ? const Color(0xFFA7F3D0) : const Color(0xFFFDE68A),
-              ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Row(
               children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '$_todayKicks',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: _todayKicks >= 10 ? const Color(0xFF059669) : const Color(0xFFD97706),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'JUMLAH HARI INI',
+                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: Color(0xFF64748B)),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          '$_todayKicks',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            color: _todayKicks >= 10 ? const Color(0xFF15803D) : const Color(0xFFD97706),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Text(
+                          '/ 10 kali',
+                          style: TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _todayKicks >= 10 ? 'Sasaran 10 Tendangan Tercapai! 🎉' : 'Sedang Memantau Pergerakan Bayi',
+                        _todayKicks >= 10 ? 'Sasaran KKM Dicapai' : 'Sedang Memantau Pergerakan',
                         style: TextStyle(
-                          fontSize: 14.5,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.bold,
-                          color: _todayKicks >= 10 ? const Color(0xFF065F46) : const Color(0xFF92400E),
+                          color: _todayKicks >= 10 ? const Color(0xFF15803D) : const Color(0xFFB45309),
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        'Standard KKM: Minimum 10 pergerakan dalam tempoh 12 jam (9 pagi – 9 malam).',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: _todayKicks >= 10 ? const Color(0xFF047857) : const Color(0xFFB45309),
-                        ),
+                      const Text(
+                        'Protokol KKM: Minimum 10 pergerakan dalam tempoh 12 jam (9:00 AM – 9:00 PM).',
+                        style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                       ),
                     ],
                   ),
@@ -446,21 +449,21 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           const SizedBox(height: 20),
 
           const Text(
-            'Sejarah Sesi Tendangan Terkini',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+            'Log Sesi Pergerakan',
+            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
           ),
           const SizedBox(height: 10),
 
           if (_sessions.isEmpty)
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               alignment: Alignment.center,
-              child: const Text('Belum ada sesi tendangan dicatatkan.', style: TextStyle(color: Color(0xFF64748B), fontSize: 13)),
+              child: const Text('Belum ada sesi tendangan direkodkan hari ini.', style: TextStyle(color: Color(0xFF64748B), fontSize: 12.5)),
             )
           else
             ListView.separated(
@@ -476,23 +479,23 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 final note = s['note']?.toString() ?? s['notes']?.toString();
 
                 return Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '$kickCount 👣',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                          '$kickCount kali',
+                          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -502,12 +505,12 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                           children: [
                             Text(
                               'Mula: $startTime',
-                              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
                             ),
                             if (endTime != null)
-                              Text('Tamat: $endTime', style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
+                              Text('Tamat: $endTime', style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
                             if (note != null && note.isNotEmpty)
-                              Text('Nota: $note', style: const TextStyle(fontSize: 11.5, fontStyle: FontStyle.italic, color: Color(0xFF475569))),
+                              Text('Nota: $note', style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFF475569))),
                           ],
                         ),
                       ),
@@ -541,68 +544,55 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     final hbPercentage = hbTotal > 0 ? ((hbCompleted / hbTotal) * 100).round() : 0;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Ward Readiness Progress Hero
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: hbPercentage == 100
-                    ? [const Color(0xFFECFDF5), const Color(0xFFD1FAE5)]
-                    : hbPercentage >= 50
-                        ? [const Color(0xFFEFF6FF), const Color(0xFFDBEAFE)]
-                        : [const Color(0xFFFFF7ED), const Color(0xFFFFEDD5)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: hbPercentage == 100
-                    ? const Color(0xFFA7F3D0)
-                    : hbPercentage >= 50
-                        ? const Color(0xFFBFDBFE)
-                        : const Color(0xFFFED7AA),
-              ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Row(
               children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '$hbPercentage%',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: hbPercentage == 100
-                          ? const Color(0xFF059669)
-                          : hbPercentage >= 50
-                              ? const Color(0xFF2563EB)
-                              : const Color(0xFFEA580C),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'KESIAPSIAGAAN WAD',
+                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: Color(0xFF64748B)),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$hbPercentage%',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: hbPercentage == 100
+                            ? const Color(0xFF15803D)
+                            : hbPercentage >= 50
+                                ? const Color(0xFF0284C7)
+                                : const Color(0xFFD97706),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Kesiapsiagaan Beg Hospital Wad',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      const Text(
+                        'Barangan Kemasukan Wad Bersalin',
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
                       Text(
-                        '$hbCompleted daripada $hbTotal barangan kecemasan bersalin telah siap dibungkus.',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+                        '$hbCompleted daripada $hbTotal barangan kecemasan bersalin telah siap.',
+                        style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
                       ),
                     ],
                   ),
@@ -610,20 +600,20 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
           const Text(
-            'Barangan Wajib Beg Hospital Bersalin',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+            '10 Barangan Wajib Beg Hospital',
+            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
           ),
           const SizedBox(height: 10),
 
           if (items.isEmpty)
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               alignment: Alignment.center,
@@ -643,12 +633,12 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 final advice = item['drAuroraAdvice'] as Map<String, dynamic>?;
 
                 return Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: isChecked ? const Color(0xFFF8FAFC) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isChecked ? const Color(0xFFCBD5E1) : const Color(0xFFE2E8F0),
+                      color: isChecked ? const Color(0xFFE2E8F0) : const Color(0xFFCBD5E1),
                     ),
                   ),
                   child: Row(
@@ -656,10 +646,10 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                     children: [
                       Icon(
                         isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                        color: isChecked ? const Color(0xFF059669) : const Color(0xFF94A3B8),
-                        size: 20,
+                        color: isChecked ? const Color(0xFF15803D) : const Color(0xFF94A3B8),
+                        size: 18,
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -670,9 +660,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                                   child: Text(
                                     title,
                                     style: TextStyle(
-                                      fontSize: 13.5,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: isChecked ? const Color(0xFF475569) : const Color(0xFF0F172A),
+                                      color: isChecked ? const Color(0xFF64748B) : const Color(0xFF0F172A),
                                       decoration: isChecked ? TextDecoration.lineThrough : null,
                                     ),
                                   ),
@@ -682,11 +672,11 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFF1F5F9),
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       qty,
-                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
                                     ),
                                   ),
                               ],
@@ -694,8 +684,8 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                             if (advice != null && advice['specs'] != null && advice['specs'].toString().isNotEmpty) ...[
                               const SizedBox(height: 4),
                               Text(
-                                '💡 Dr Aurora: ${advice['specs']}',
-                                style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                                'Nasihat Dr Aurora: ${advice['specs']}',
+                                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                               ),
                             ],
                           ],
@@ -725,16 +715,16 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     final progress = _checklistSummary?['progressPercentage'] ?? 0;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Total Checklist Overview Pill
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Row(
@@ -744,20 +734,20 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Kemajuan Persediaan Bayi',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                        'KEMAJUAN KESELURUHAN',
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: Color(0xFF64748B)),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '$completedItems / $totalItems barangan telah disemak ($progress%)',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        '$completedItems / $totalItems barangan disemak',
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF0F172A), fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                 ),
                 Text(
                   '$progress%',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF0284C7)),
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF0284C7)),
                 ),
               ],
             ),
@@ -769,11 +759,10 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: categories.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, catIndex) {
               final cat = categories[catIndex];
               final catTitle = cat['title']?.toString() ?? '-';
-              final icon = cat['icon']?.toString() ?? '📋';
               final catTotal = cat['itemCount'] ?? 0;
               final catCompleted = cat['completedCount'] ?? 0;
               final items = (cat['items'] as List<dynamic>?) ?? [];
@@ -781,20 +770,19 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               return Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: Theme(
                   data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                   child: ExpansionTile(
-                    leading: Text(icon, style: const TextStyle(fontSize: 20)),
                     title: Text(
                       catTitle,
-                      style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                     ),
                     subtitle: Text(
                       '$catCompleted / $catTotal siap',
-                      style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                     ),
                     children: items.map<Widget>((it) {
                       final itemTitle = it['title']?.toString() ?? '-';
@@ -808,14 +796,14 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                             Icon(
                               isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
                               size: 16,
-                              color: isChecked ? const Color(0xFF059669) : const Color(0xFF94A3B8),
+                              color: isChecked ? const Color(0xFF15803D) : const Color(0xFF94A3B8),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 itemTitle,
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 12,
                                   color: isChecked ? const Color(0xFF64748B) : const Color(0xFF0F172A),
                                   decoration: isChecked ? TextDecoration.lineThrough : null,
                                 ),

@@ -210,14 +210,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -225,18 +219,15 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0284C7), Color(0xFF0EA5E9)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 alignment: Alignment.center,
-                child: const Text('👶', style: TextStyle(fontSize: 22)),
+                child: const Icon(Icons.pregnant_woman_rounded, color: Color(0xFF0F172A), size: 22),
               ),
               const SizedBox(width: 14),
               Column(
@@ -245,9 +236,10 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                   Text(
                     'Aurora Baby Hub',
                     style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
                       color: Colors.blueGrey.shade900,
+                      letterSpacing: -0.3,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -260,16 +252,16 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             ],
           ),
           Container(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
               color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               children: [
-                _tabButton(0, '📊 Laporan & Pergerakan', accentColor),
+                _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
                 const SizedBox(width: 4),
-                _tabButton(1, '📋 Templat Senarai Semak', accentColor),
+                _tabButton(1, Icons.tune_rounded, 'Templat Senarai Semak', accentColor),
               ],
             ),
           ),
@@ -278,35 +270,45 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     );
   }
 
-  Widget _tabButton(int index, String title, Color activeColor) {
+  Widget _tabButton(int index, IconData icon, String title, Color activeColor) {
     final isSelected = _tabController.index == index;
     return InkWell(
       onTap: () {
         setState(() => _tabController.animateTo(index));
       },
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
                   ),
                 ]
               : null,
         ),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            color: isSelected ? const Color(0xFF0F172A) : Colors.grey.shade700,
-          ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 15,
+              color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? const Color(0xFF0F172A) : Colors.grey.shade700,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -322,7 +324,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       children: [
         // KPI Metric Cards
         _buildMetricCards(),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
 
         // Search & Filters bar
         _buildReportsFilterBar(accentColor),
@@ -352,7 +354,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            mainAxisExtent: 320,
+            mainAxisExtent: 290,
           ),
           itemCount: _patients.length,
           itemBuilder: (context, index) {
@@ -370,16 +372,16 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   }
 
   Widget _buildMetricCards() {
+    final overdueCount = _reportSummary['totalOverdue'] ?? 0;
+    final alertCount = _reportSummary['totalAlerts'] ?? 0;
+
     return Row(
       children: [
         Expanded(
           child: _kpiCard(
-            title: 'Ibu Hamil Aktif',
+            label: 'Ibu Hamil Aktif',
             value: '${_reportSummary['totalActive'] ?? 0}',
-            subtitle: 'Sedang menjejak di Aurora Baby',
-            icon: Icons.pregnant_woman_rounded,
-            color: const Color(0xFF0284C7),
-            bgColor: const Color(0xFFE0F2FE),
+            subtitle: 'Dalam pemantauan antenatal',
             onTap: () {
               setState(() {
                 _reportStatus = 'all';
@@ -389,15 +391,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             },
           ),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 12),
         Expanded(
           child: _kpiCard(
-            title: 'Melebihi EDD (Overdue)',
-            value: '${_reportSummary['totalOverdue'] ?? 0}',
-            subtitle: 'Kandungan melebihi 40 minggu',
-            icon: Icons.alarm_on_rounded,
-            color: const Color(0xFFDC2626),
-            bgColor: const Color(0xFFFEF2F2),
+            label: 'Melebihi 40 Minggu',
+            value: '$overdueCount',
+            subtitle: overdueCount > 0 ? 'Perlu tindakan induksi klinikal' : 'Tiada kes tertunggak',
+            valueColor: overdueCount > 0 ? const Color(0xFFDC2626) : const Color(0xFF0F172A),
             onTap: () {
               setState(() {
                 _reportStatus = 'overdue';
@@ -407,15 +407,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             },
           ),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 12),
         Expanded(
           child: _kpiCard(
-            title: 'Amaran Pergerakan Rendah',
-            value: '${_reportSummary['totalAlerts'] ?? 0}',
-            subtitle: '< 10 tendangan / hari (Wk 28+)',
-            icon: Icons.warning_amber_rounded,
-            color: const Color(0xFFD97706),
-            bgColor: const Color(0xFFFFFBEB),
+            label: 'Amaran Tendangan',
+            value: '$alertCount',
+            subtitle: '< 10 pergerakan hari ini (Wk 28+)',
+            valueColor: alertCount > 0 ? const Color(0xFFD97706) : const Color(0xFF0F172A),
             onTap: () {
               setState(() {
                 _reportStatus = 'alert';
@@ -425,15 +423,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             },
           ),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 12),
         Expanded(
           child: _kpiCard(
-            title: 'Purata Beg Hospital',
+            label: 'Purata Beg Hospital',
             value: '${_reportSummary['avgHospitalBagPercentage'] ?? 0}%',
-            subtitle: 'Kesiapsiagaan bersalin pesakit',
-            icon: Icons.medical_services_rounded,
-            color: const Color(0xFF059669),
-            bgColor: const Color(0xFFECFDF5),
+            subtitle: 'Kesiapan 10 barangan wad',
+            valueColor: const Color(0xFF0284C7),
           ),
         ),
       ],
@@ -441,72 +437,50 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   }
 
   Widget _kpiCard({
-    required String title,
+    required String label,
     required String value,
     required String subtitle,
-    required IconData icon,
-    required Color color,
-    required Color bgColor,
+    Color? valueColor,
     VoidCallback? onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.15)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(12),
+            Text(
+              label.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+                color: Color(0xFF64748B),
               ),
-              child: Icon(icon, color: color, size: 24),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: color,
-                    ),
-                  ),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey.shade800,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                color: valueColor ?? const Color(0xFF0F172A),
+                letterSpacing: -0.5,
               ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -516,10 +490,11 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
 
   Widget _buildReportsFilterBar(Color accentColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
@@ -535,45 +510,45 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               decoration: InputDecoration(
                 hintText: 'Cari nama pesakit, nombor telefon, atau emel...',
                 hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
-                prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                prefixIcon: const Icon(Icons.search_rounded, size: 18, color: Color(0xFF64748B)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 filled: true,
                 fillColor: const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: Colors.grey.shade200),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: Colors.grey.shade200),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
 
-          // Status Filter Chips
+          // Status Filter Chips (Zero childish emojis)
           _filterChip('all', 'Semua', const Color(0xFF0F172A)),
           const SizedBox(width: 6),
-          _filterChip('overdue', '⏰ Overdue', const Color(0xFFDC2626)),
+          _filterChip('overdue', 'Overdue (>40 M)', const Color(0xFFDC2626)),
           const SizedBox(width: 6),
-          _filterChip('alert', '⚠️ Amaran Rendah', const Color(0xFFD97706)),
+          _filterChip('alert', 'Pergerakan Rendah', const Color(0xFFD97706)),
           const SizedBox(width: 6),
-          _filterChip('third_trimester', '🤰 Trimester 3 (Wk 28+)', const Color(0xFF0284C7)),
+          _filterChip('third_trimester', 'Trimester 3 (28+ M)', const Color(0xFF0284C7)),
           if (_filterGestationalWeek != null) ...[
             const SizedBox(width: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFCBD5E1)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '🌟 Minggu $_filterGestationalWeek',
+                    'Minggu $_filterGestationalWeek',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -589,14 +564,14 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                       });
                       _fetchReports();
                     },
-                    borderRadius: BorderRadius.circular(10),
-                    child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFF64748B)),
+                    borderRadius: BorderRadius.circular(6),
+                    child: const Icon(Icons.close_rounded, size: 13, color: Color(0xFF64748B)),
                   ),
                 ],
               ),
             ),
           ],
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
 
           // Refresh button
           IconButton(
@@ -824,12 +799,12 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          '$kicks 👣',
+                          '$kicks kali',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.bold,
                             color: kicks >= 10
-                                ? const Color(0xFF059669)
+                                ? const Color(0xFF15803D)
                                 : kicks > 0
                                     ? const Color(0xFFD97706)
                                     : Colors.grey.shade600,
@@ -888,10 +863,10 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                     ),
                     child: Text(
                       alertStatus == 'overdue'
-                          ? '⚠️ Overdue'
+                          ? 'Overdue'
                           : alertStatus == 'low_kicks'
-                              ? '⚠️ Amaran Tendangan'
-                              : '🟢 Normal',
+                              ? 'Pergerakan Rendah'
+                              : 'Stabil',
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.bold,
@@ -967,15 +942,15 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
             children: [
               _categoryFilterChip('all', 'Semua Kategori', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('baju', '👕 Baju', accentColor),
+              _categoryFilterChip('baju', 'Baju', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('mandi', '🛁 Mandi', accentColor),
+              _categoryFilterChip('mandi', 'Mandi', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('tidur', '🛏️ Tidur', accentColor),
+              _categoryFilterChip('tidur', 'Tidur', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('penyusuan', '🍼 Penyusuan', accentColor),
+              _categoryFilterChip('penyusuan', 'Penyusuan', accentColor),
               const SizedBox(width: 8),
-              _categoryFilterChip('beg_hospital', '🏥 Beg Hospital', accentColor),
+              _categoryFilterChip('beg_hospital', 'Beg Hospital', accentColor),
             ],
           ),
           ElevatedButton.icon(
@@ -1024,6 +999,23 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     );
   }
 
+  IconData _getCategoryIcon(String key) {
+    switch (key) {
+      case 'baju':
+        return Icons.checkroom_outlined;
+      case 'mandi':
+        return Icons.bathtub_outlined;
+      case 'tidur':
+        return Icons.bed_outlined;
+      case 'penyusuan':
+        return Icons.child_friendly_outlined;
+      case 'beg_hospital':
+        return Icons.medical_services_outlined;
+      default:
+        return Icons.inventory_2_outlined;
+    }
+  }
+
   Widget _buildTemplateCategoriesList(Color accentColor) {
     return ListView.builder(
       itemCount: _templateCategories.length,
@@ -1042,7 +1034,21 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
           child: ExpansionTile(
             initiallyExpanded: true,
             tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-            leading: Text(cat['icon'] ?? '📦', style: const TextStyle(fontSize: 22)),
+            leading: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                _getCategoryIcon(cat['categoryKey']?.toString() ?? ''),
+                size: 18,
+                color: const Color(0xFF0F172A),
+              ),
+            ),
             title: Text(
               cat['title'] ?? 'Kategori',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
@@ -1160,9 +1166,16 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                         color: const Color(0xFFFEF3C7),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      child: Text(
-                                        '🛡️ Keselamatan: $safety',
-                                        style: const TextStyle(fontSize: 11, color: Color(0xFF92400E)),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.security_outlined, size: 12, color: Color(0xFF92400E)),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Keselamatan: $safety',
+                                            style: const TextStyle(fontSize: 11, color: Color(0xFF92400E)),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   if (savingTip.isNotEmpty)
@@ -1172,9 +1185,16 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                         color: const Color(0xFFECFDF5),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      child: Text(
-                                        '💡 Tip: $savingTip',
-                                        style: const TextStyle(fontSize: 11, color: Color(0xFF065F46)),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.tips_and_updates_outlined, size: 12, color: Color(0xFF065F46)),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Tip: $savingTip',
+                                            style: const TextStyle(fontSize: 11, color: Color(0xFF065F46)),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                 ],

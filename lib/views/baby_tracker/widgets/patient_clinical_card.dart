@@ -31,24 +31,17 @@ class PatientClinicalCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isOverdue
               ? const Color(0xFFFCA5A5)
               : alertStatus == 'low_kicks'
                   ? const Color(0xFFFCD34D)
                   : const Color(0xFFE2E8F0),
-          width: isOverdue || alertStatus == 'low_kicks' ? 1.5 : 1.0,
+          width: 1.0,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -57,25 +50,22 @@ class PatientClinicalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isOverdue
-                        ? [const Color(0xFFEF4444), const Color(0xFFF87171)]
-                        : [const Color(0xFF0284C7), const Color(0xFF38BDF8)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                  color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFE2E8F0),
                   ),
-                  borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   name.isNotEmpty ? name[0].toUpperCase() : 'P',
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF334155),
                   ),
                 ),
               ),
@@ -87,7 +77,7 @@ class PatientClinicalCard extends StatelessWidget {
                     Text(
                       name,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 14.5,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF0F172A),
                       ),
@@ -97,7 +87,7 @@ class PatientClinicalCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       '$phone • $branch',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -115,7 +105,7 @@ class PatientClinicalCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFFFFBEB),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFFDE68A),
                 ),
@@ -123,8 +113,8 @@ class PatientClinicalCard extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    isOverdue ? Icons.alarm_on_rounded : Icons.warning_amber_rounded,
-                    size: 14,
+                    isOverdue ? Icons.alarm_rounded : Icons.warning_amber_rounded,
+                    size: 13,
                     color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFFD97706),
                   ),
                   const SizedBox(width: 6),
@@ -132,7 +122,7 @@ class PatientClinicalCard extends StatelessWidget {
                     child: Text(
                       alertReason,
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: isOverdue ? const Color(0xFFB91C1C) : const Color(0xFFB45309),
                       ),
@@ -145,57 +135,49 @@ class PatientClinicalCard extends StatelessWidget {
             ),
           ],
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
-          // 40-Week Gestational Timeline Bar
-          _buildGestationalBar(week, trimester, edd, isOverdue),
+          // 40-Week Gestational Timeline Track
+          _buildGestationalTrack(week, trimester, edd, isOverdue),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
           // Clinical Metrics: Kicks & Beg Hospital
           Row(
             children: [
               Expanded(
                 child: _buildMetricPill(
-                  label: 'Tendangan Hari Ini',
-                  value: '$kicks 👣',
-                  detail: lastKick != null ? 'Jam ${lastKick.toString().split(' ').last}' : 'Belum log hari ini',
+                  label: 'PERGERAKAN HARI INI',
+                  value: '$kicks',
+                  unit: 'kali',
+                  detail: lastKick != null ? 'Jam ${lastKick.toString().split(' ').last}' : 'Belum log',
                   badgeColor: kicks >= 10
-                      ? const Color(0xFF059669)
+                      ? const Color(0xFF15803D)
                       : kicks > 0
                           ? const Color(0xFFD97706)
                           : const Color(0xFF64748B),
-                  bgColor: kicks >= 10
-                      ? const Color(0xFFECFDF5)
-                      : kicks > 0
-                          ? const Color(0xFFFFFBEB)
-                          : const Color(0xFFF1F5F9),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildMetricPill(
-                  label: 'Beg Hospital',
+                  label: 'BEG HOSPITAL',
                   value: '$bagPct%',
-                  detail: '$bagCompleted / $bagTotal item siap',
+                  unit: '',
+                  detail: '$bagCompleted / $bagTotal item',
                   badgeColor: bagPct == 100
-                      ? const Color(0xFF059669)
+                      ? const Color(0xFF15803D)
                       : bagPct >= 50
                           ? const Color(0xFF0284C7)
-                          : const Color(0xFFEA580C),
-                  bgColor: bagPct == 100
-                      ? const Color(0xFFECFDF5)
-                      : bagPct >= 50
-                          ? const Color(0xFFF0F9FF)
-                          : const Color(0xFFFFF7ED),
+                          : const Color(0xFFD97706),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 14),
+          const Spacer(),
           const Divider(height: 1, color: Color(0xFFF1F5F9)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Bottom Action Row
           Row(
@@ -203,11 +185,11 @@ class PatientClinicalCard extends StatelessWidget {
               if (phone != '-' && phone.isNotEmpty)
                 IconButton(
                   tooltip: 'WhatsApp Pesakit',
-                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18, color: Color(0xFF059669)),
+                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: Color(0xFF059669)),
                   style: IconButton.styleFrom(
-                    backgroundColor: const Color(0xFFECFDF5),
-                    padding: const EdgeInsets.all(8),
-                    minimumSize: const Size(36, 36),
+                    backgroundColor: const Color(0xFFF0FDF4),
+                    padding: const EdgeInsets.all(7),
+                    minimumSize: const Size(32, 32),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
@@ -217,16 +199,15 @@ class PatientClinicalCard extends StatelessWidget {
                   },
                 ),
               const Spacer(),
-              ElevatedButton.icon(
+              OutlinedButton.icon(
                 onPressed: onOpenDetail,
-                icon: const Icon(Icons.assignment_ind_rounded, size: 15),
-                label: const Text('Buka Fail Klinikal', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0F172A),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                icon: const Icon(Icons.description_outlined, size: 14),
+                label: const Text('Buka Rekod', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF0F172A),
+                  side: const BorderSide(color: Color(0xFFCBD5E1)),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],
@@ -239,19 +220,20 @@ class PatientClinicalCard extends StatelessWidget {
   Widget _buildAlertBadge(String status, bool isOverdue) {
     if (isOverdue) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: const Color(0xFFFEE2E2),
-          borderRadius: BorderRadius.circular(8),
+          color: const Color(0xFFFEF2F2),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFFECACA)),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.alarm_on_rounded, size: 13, color: Color(0xFFDC2626)),
+            Icon(Icons.alarm_rounded, size: 12, color: Color(0xFFDC2626)),
             SizedBox(width: 4),
             Text(
               'Overdue',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
             ),
           ],
         ),
@@ -260,19 +242,20 @@ class PatientClinicalCard extends StatelessWidget {
 
     if (status == 'low_kicks') {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: const Color(0xFFFEF3C7),
-          borderRadius: BorderRadius.circular(8),
+          color: const Color(0xFFFFFBEB),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFFDE68A)),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning_amber_rounded, size: 13, color: Color(0xFFD97706)),
+            Icon(Icons.warning_amber_rounded, size: 12, color: Color(0xFFD97706)),
             SizedBox(width: 4),
             Text(
-              'Amaran Kicks',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
+              'Pergerakan Rendah',
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
             ),
           ],
         ),
@@ -280,28 +263,36 @@ class PatientClinicalCard extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: const Color(0xFFF0FDF4),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFDCFCE7)),
       ),
-      child: const Text(
-        '🟢 Stabil',
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check_circle_outline_rounded, size: 12, color: Color(0xFF15803D)),
+          SizedBox(width: 4),
+          Text(
+            'Stabil',
+            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildGestationalBar(int? week, int? trimester, String edd, bool isOverdue) {
+  Widget _buildGestationalTrack(int? week, int? trimester, String edd, bool isOverdue) {
     final validWeek = (week != null && week > 0) ? (week > 42 ? 42 : week) : 0;
     final progress = validWeek > 0 ? (validWeek / 40.0).clamp(0.0, 1.0) : 0.0;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -314,72 +305,47 @@ class PatientClinicalCard extends StatelessWidget {
                   Text(
                     validWeek > 0 ? 'Minggu $validWeek' : 'EDD Belum Sah',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12.5,
                       fontWeight: FontWeight.bold,
                       color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0F172A),
                     ),
                   ),
                   if (trimester != null) ...[
                     const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE2E8F0),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'T$trimester',
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
-                      ),
+                    Text(
+                      '• Trimester $trimester',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                     ),
                   ],
                 ],
               ),
               Text(
                 'EDD: $edd',
-                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          // 40-Week Multi-Color Progress Indicator
-          Stack(
-            children: [
-              // Background track with 3 trimester tints
-              Container(
-                height: 8,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE2E8F0),
-                  borderRadius: BorderRadius.circular(4),
-                ),
+          const SizedBox(height: 6),
+          // Precision Hairline Progress Indicator
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 5,
+              backgroundColor: const Color(0xFFE2E8F0),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0284C7),
               ),
-              // Filled progress
-              FractionallySizedBox(
-                widthFactor: progress,
-                child: Container(
-                  height: 8,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isOverdue
-                          ? [const Color(0xFFDC2626), const Color(0xFFEF4444)]
-                          : validWeek >= 28
-                              ? [const Color(0xFF0284C7), const Color(0xFFF43F5E)]
-                              : [const Color(0xFF0284C7), const Color(0xFF38BDF8)],
-                    ),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 4),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('W1', style: TextStyle(fontSize: 9.5, color: Colors.grey.shade400)),
-              Text('W13 (T1)', style: TextStyle(fontSize: 9.5, color: Colors.grey.shade400)),
-              Text('W27 (T2)', style: TextStyle(fontSize: 9.5, color: Colors.grey.shade400)),
-              Text('W40 (EDD)', style: TextStyle(fontSize: 9.5, color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+              Text('W1', style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8))),
+              Text('W13 (T1)', style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8))),
+              Text('W27 (T2)', style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8))),
+              Text('W40 (EDD)', style: TextStyle(fontSize: 9, color: Color(0xFF64748B), fontWeight: FontWeight.bold)),
             ],
           ),
         ],
@@ -390,29 +356,46 @@ class PatientClinicalCard extends StatelessWidget {
   Widget _buildMetricPill({
     required String label,
     required String value,
+    required String unit,
     required String detail,
     required Color badgeColor,
-    required Color bgColor,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
-          const SizedBox(height: 2),
           Text(
-            value,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: badgeColor),
+            label,
+            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, letterSpacing: 0.3, color: Color(0xFF64748B)),
+          ),
+          const SizedBox(height: 3),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                value,
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: badgeColor),
+              ),
+              if (unit.isNotEmpty) ...[
+                const SizedBox(width: 3),
+                Text(
+                  unit,
+                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 1),
           Text(
             detail,
-            style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+            style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
