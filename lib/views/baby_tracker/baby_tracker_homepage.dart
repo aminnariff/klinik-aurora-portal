@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
-import 'package:klinik_aurora_portal/views/baby_tracker/widgets/aurora_3d_womb_visualizer.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/patient_clinical_card.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/patient_detail_drawer.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/template_item_editor_dialog.dart';
@@ -30,8 +29,6 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   String _reportSearch = '';
   String _reportStatus = 'all'; // all, overdue, alert, low_kicks, third_trimester
   int? _filterGestationalWeek;
-  int _visualizerWeek = 20;
-  bool _showVisualizer = false;
   int _reportPage = 1;
   final int _reportPageSize = 20;
   final _debouncer = Debouncer(milliseconds: 600);
@@ -139,35 +136,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Top Header & Tab Bar
                 _buildTopBar(primaryAccentColor),
-                const SizedBox(height: 14),
-
-                // 3D Gestational Womb Visualizer Hero Section (Collapsible)
-                if (_showVisualizer) ...[
-                  Aurora3DWombVisualizer(
-                    initialWeek: _visualizerWeek,
-                    initiallyExpanded: true,
-                    onWeekChanged: (week) {
-                      _visualizerWeek = week;
-                    },
-                    onFilterPatients: () {
-                      setState(() {
-                        _filterGestationalWeek = _visualizerWeek;
-                        _reportPage = 1;
-                        if (_tabController.index != 0) {
-                          _tabController.animateTo(0);
-                        }
-                      });
-                      _fetchReports();
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                ],
+                const SizedBox(height: 12),
 
                 // Tab Views
                 Expanded(
@@ -258,59 +233,20 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               ),
             ],
           ),
-          Row(
-            children: [
-              // 3D Womb Visualizer Toggle
-              InkWell(
-                onTap: () => setState(() => _showVisualizer = !_showVisualizer),
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: _showVisualizer ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _showVisualizer ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.view_in_ar_rounded,
-                        size: 15,
-                        color: _showVisualizer ? Colors.white : const Color(0xFF475569),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Visualizer 3D Janin',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: _showVisualizer ? Colors.white : const Color(0xFF334155),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-
-              // Tab Switcher
-              Container(
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
-                    const SizedBox(width: 4),
-                    _tabButton(1, Icons.tune_rounded, 'Templat Senarai Semak', accentColor),
-                  ],
-                ),
-              ),
-            ],
+          // Tab Switcher
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
+                const SizedBox(width: 4),
+                _tabButton(1, Icons.tune_rounded, 'Templat Senarai Semak', accentColor),
+              ],
+            ),
           ),
         ],
       ),
@@ -371,13 +307,13 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       children: [
         // KPI Metric Cards
         _buildMetricCards(),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
 
         // Search & Filters bar
         _buildReportsFilterBar(accentColor),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
 
-        // Patients Content (Card Grid or Data Table)
+        // Patients Content (Data Table or Card Grid)
         Expanded(
           child: _isLoadingReports
               ? const Center(child: CircularProgressIndicator())
@@ -387,6 +323,10 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                       ? _buildPatientCardGrid()
                       : _buildReportsTable(accentColor),
         ),
+        const SizedBox(height: 10),
+
+        // Pagination Bar
+        _buildPaginationBar(),
       ],
     );
   }
@@ -758,22 +698,19 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-              child: DataTable2(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: DataTable2(
                 columnSpacing: 16,
                 horizontalMargin: 20,
                 minWidth: 920,
@@ -987,12 +924,8 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                 }).toList(),
               ),
             ),
-          ),
-          _buildPaginationBar(),
-        ],
-      ),
-    );
-  }
+          );
+        }
 
   Widget _buildPaginationBar() {
     final totalCount = _reportPagination['totalCount'] ?? _patients.length;
@@ -1000,10 +933,11 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
     final page = (_reportPagination['page'] as int?) ?? _reportPage;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: const BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
