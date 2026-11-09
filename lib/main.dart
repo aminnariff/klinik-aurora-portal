@@ -171,21 +171,16 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<VoucherController>(create: (_) => VoucherController()),
             ChangeNotifierProvider<TopBarController>(create: (_) => TopBarController()),
           ],
-          child: Consumer<DarkModeController>(
-            builder: (context, darkModeController, _) {
-              return MaterialApp.router(
-                routerConfig: router,
-                title: 'Klinik Aurora Admin',
-                localizationsDelegates: context.localizationDelegates,
-                supportedLocales: context.supportedLocales,
-                locale: context.locale,
-                builder: EasyLoading.init(builder: FToastBuilder()),
-                debugShowCheckedModeBanner: false,
-                theme: theme(context),
-                darkTheme: darkThemeData(context),
-                themeMode: darkModeController.darkMode ? ThemeMode.dark : ThemeMode.light,
-              );
-            },
+          child: MaterialApp.router(
+            routerConfig: router,
+            title: 'Klinik Aurora Admin',
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            builder: EasyLoading.init(builder: FToastBuilder()),
+            debugShowCheckedModeBanner: false,
+            theme: theme(context),
+            themeMode: ThemeMode.light,
           ),
         );
       },

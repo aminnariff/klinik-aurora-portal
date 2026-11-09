@@ -44,35 +44,16 @@ ThemeData theme(BuildContext context) {
   );
 }
 
-// Dark Theme
+// Dark Them
 ThemeData darkThemeData(BuildContext context) {
-  const darkBg = Color(0xFF0F172A);
-  const darkSurface = Color(0xFF1E293B);
-  final baseScheme = ColorScheme.fromSeed(
-    seedColor: primary,
-    brightness: Brightness.dark,
-  );
   return ThemeData.dark().copyWith(
     brightness: Brightness.dark,
-    colorScheme: baseScheme.copyWith(
-      surface: darkSurface,
-      surfaceTint: Colors.transparent,
-    ),
     primaryColor: const Color(0xFF86337c),
-    canvasColor: darkBg,
-    scaffoldBackgroundColor: darkBg,
-    dialogTheme: const DialogThemeData(
-      backgroundColor: darkSurface,
-      surfaceTintColor: Colors.transparent,
-    ),
-    popupMenuTheme: const PopupMenuThemeData(
-      color: darkSurface,
-      surfaceTintColor: Colors.transparent,
-    ),
+    canvasColor: Colors.white,
+    scaffoldBackgroundColor: Colors.white,
     cardTheme: CardThemeData(
-      color: darkSurface,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: const Color(0xFF141d26),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),
     iconTheme: const IconThemeData(color: Colors.white),
     textTheme: TextTheme(
@@ -92,7 +73,7 @@ ThemeData darkThemeData(BuildContext context) {
       titleMedium: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.normal, color: Colors.white),
       titleSmall: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600, color: Colors.white),
       labelLarge: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.white),
-      bodySmall: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
+      bodySmall: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal, color: Colors.white),
     ),
   );
 }
