@@ -74,8 +74,10 @@ Future<void> main() async {
       }
       if (kIsWeb) {
         final host = Uri.base.host.toLowerCase();
-        if (host.contains('stg') || host.contains('staging') || host.contains('localhost')) {
-          environment = Flavor.production;
+        if (host.contains('stg') || host.contains('staging')) {
+          environment = Flavor.staging;
+        } else if (host.contains('localhost') || host.contains('127.0.0.1')) {
+          environment = Flavor.staging; // Safe default for local development to protect production data
         }
       }
       AppVersion.init();
@@ -169,15 +171,21 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<VoucherController>(create: (_) => VoucherController()),
             ChangeNotifierProvider<TopBarController>(create: (_) => TopBarController()),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-            title: 'Klinik Aurora Admin',
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            builder: EasyLoading.init(builder: FToastBuilder()),
-            debugShowCheckedModeBanner: false,
-            theme: theme(context),
+          child: Consumer<DarkModeController>(
+            builder: (context, darkModeController, _) {
+              return MaterialApp.router(
+                routerConfig: router,
+                title: 'Klinik Aurora Admin',
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                builder: EasyLoading.init(builder: FToastBuilder()),
+                debugShowCheckedModeBanner: false,
+                theme: theme(context),
+                darkTheme: darkThemeData(context),
+                themeMode: darkModeController.darkMode ? ThemeMode.dark : ThemeMode.light,
+              );
+            },
           ),
         );
       },

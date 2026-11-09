@@ -10,7 +10,9 @@ double get screenPadding => screenPaddingCalculate();
 double get textSize => textSizeCalculate();
 bool get isMobile => breakpoint() == Breakpoint.mobile;
 bool get isTablet => breakpoint() == Breakpoint.tablet;
-bool get isDekstop => breakpoint() == Breakpoint.desktop;
+bool get isDesktop => breakpoint() == Breakpoint.desktop;
+@Deprecated('Typo in original API. Use isDesktop instead.')
+bool get isDekstop => isDesktop;
 
 class SizeWidget extends StatelessWidget {
   const SizeWidget({super.key});

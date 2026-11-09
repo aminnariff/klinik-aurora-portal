@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
@@ -100,7 +101,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     final alertReason = widget.patient['alertReason'] as String?;
 
     return Container(
-      width: 580,
+      width: math.min(580.0, MediaQuery.of(context).size.width * 0.95),
       height: double.infinity,
       decoration: const BoxDecoration(
         color: Colors.white,

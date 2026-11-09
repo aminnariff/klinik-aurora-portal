@@ -17,12 +17,6 @@ class LayoutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return breakpointWidget(
-      LayoutWidget(
-        mobile: mobile,
-        tablet: tablet,
-        desktop: desktop,
-      ),
-    );
+    return breakpointWidget(this);
   }
 }

@@ -198,41 +198,49 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.pregnant_woman_rounded, color: Color(0xFF0F172A), size: 20),
                 ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.pregnant_woman_rounded, color: Color(0xFF0F172A), size: 20),
-              ),
-              const SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Aurora Baby Hub',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.blueGrey.shade900,
-                      letterSpacing: -0.3,
-                    ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Aurora Baby Hub',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.blueGrey.shade900,
+                          letterSpacing: -0.3,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Pemantauan Pergerakan Bayi & Kawalan Senarai Semak Kelahiran',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Pemantauan Pergerakan Bayi & Kawalan Senarai Semak Kelahiran',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 12),
           // Tab Switcher
           Container(
             padding: const EdgeInsets.all(3),
@@ -241,6 +249,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
                 const SizedBox(width: 4),
@@ -255,43 +264,52 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
 
   Widget _tabButton(int index, IconData icon, String title, Color activeColor) {
     final isSelected = _tabController.index == index;
-    return InkWell(
-      onTap: () {
-        setState(() => _tabController.animateTo(index));
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: title,
+      child: Tooltip(
+        message: title,
+        child: InkWell(
+          onTap: () {
+            setState(() => _tabController.animateTo(index));
+          },
           borderRadius: BorderRadius.circular(8),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.white : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 15,
+                  color: isSelected ? activeColor : Colors.grey.shade600,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? Colors.blueGrey.shade900 : Colors.grey.shade600,
                   ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 15,
-              color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                ),
+              ],
             ),
-            const SizedBox(width: 6),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12.5,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? const Color(0xFF0F172A) : Colors.grey.shade700,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -876,44 +894,55 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (phone != '-' && phone.isNotEmpty) ...[
-                              Tooltip(
-                                message: 'WhatsApp Pesakit ($phone)',
-                                child: ElevatedButton.icon(
-                                  onPressed: () {
-                                    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
-                                    final phoneWithCode = cleanPhone.startsWith('6') ? cleanPhone : '6$cleanPhone';
-                                    launchUrlString('https://wa.me/$phoneWithCode');
-                                  },
-                                  icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 14, color: Colors.white),
-                                  label: const Text(
-                                    'WhatsApp',
-                                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.white),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF25D366),
-                                    foregroundColor: Colors.white,
-                                    elevation: 0,
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                                    minimumSize: const Size(0, 32),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                              Semantics(
+                                button: true,
+                                label: 'Hantar WhatsApp kepada $name',
+                                child: Tooltip(
+                                  message: 'WhatsApp Pesakit ($phone)',
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+                                      final phoneWithCode = cleanPhone.startsWith('6') ? cleanPhone : '6$cleanPhone';
+                                      launchUrlString('https://wa.me/$phoneWithCode');
+                                    },
+                                    icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 14, color: Colors.white),
+                                    label: const Text(
+                                      'WhatsApp',
+                                      style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.white),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF25D366),
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                      minimumSize: const Size(0, 36),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                    ),
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 8),
                             ],
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                setState(() => _selectedPatientForDrawer = p as Map<String, dynamic>);
-                              },
-                              icon: const Icon(Icons.description_outlined, size: 13),
-                              label: const Text('Buka Fail', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF0F172A),
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-                                minimumSize: const Size(0, 32),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                            Semantics(
+                              button: true,
+                              label: 'Buka Fail dan Rekod Pesakit $name',
+                              child: Tooltip(
+                                message: 'Buka Fail Klinikal & Senarai Semak',
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    setState(() => _selectedPatientForDrawer = p as Map<String, dynamic>);
+                                  },
+                                  icon: const Icon(Icons.description_outlined, size: 13),
+                                  label: const Text('Buka Fail', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF0F172A),
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                                    minimumSize: const Size(0, 36),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  ),
+                                ),
                               ),
                             ),
                           ],
