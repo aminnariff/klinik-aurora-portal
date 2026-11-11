@@ -42,6 +42,7 @@ class Data {
   Doctor? doctor;
   String? serviceBranchId;
   List<Payment>? payment;
+  List<TransferHistory>? transferHistory;
 
   Data({
     this.appointmentId,
@@ -64,6 +65,7 @@ class Data {
     this.doctor,
     this.serviceBranchId,
     this.payment,
+    this.transferHistory,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -90,6 +92,12 @@ class Data {
       payment = <Payment>[];
       json['payment'].forEach((v) {
         payment!.add(Payment.fromJson(v));
+      });
+    }
+    if (json['transferHistory'] != null) {
+      transferHistory = <TransferHistory>[];
+      json['transferHistory'].forEach((v) {
+        transferHistory!.add(TransferHistory.fromJson(v));
       });
     }
   }
@@ -268,6 +276,84 @@ class Doctor {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['doctorId'] = doctorId;
     data['doctorName'] = doctorName;
+    return data;
+  }
+}
+
+class TransferHistory {
+  String? transferId;
+  String? fromBranchId;
+  String? fromBranchName;
+  String? toBranchId;
+  String? toBranchName;
+  String? fromDatetime;
+  String? toDatetime;
+  String? fromDoctorId;
+  String? toDoctorId;
+  String? fromDoctorName;
+  String? toDoctorName;
+  String? transferReason;
+  String? adminRemark;
+  String? transferredBy;
+  String? transferredByName;
+  String? createdDate;
+
+  TransferHistory({
+    this.transferId,
+    this.fromBranchId,
+    this.fromBranchName,
+    this.toBranchId,
+    this.toBranchName,
+    this.fromDatetime,
+    this.toDatetime,
+    this.fromDoctorId,
+    this.toDoctorId,
+    this.fromDoctorName,
+    this.toDoctorName,
+    this.transferReason,
+    this.adminRemark,
+    this.transferredBy,
+    this.transferredByName,
+    this.createdDate,
+  });
+
+  TransferHistory.fromJson(Map<String, dynamic> json) {
+    transferId = json['transferId'];
+    fromBranchId = json['fromBranchId'];
+    fromBranchName = json['fromBranchName'];
+    toBranchId = json['toBranchId'];
+    toBranchName = json['toBranchName'];
+    fromDatetime = json['fromDatetime'];
+    toDatetime = json['toDatetime'];
+    fromDoctorId = json['fromDoctorId'];
+    toDoctorId = json['toDoctorId'];
+    fromDoctorName = json['fromDoctorName'];
+    toDoctorName = json['toDoctorName'];
+    transferReason = json['transferReason'];
+    adminRemark = json['adminRemark'];
+    transferredBy = json['transferredBy'];
+    transferredByName = json['transferredByName'];
+    createdDate = json['createdDate'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['transferId'] = transferId;
+    data['fromBranchId'] = fromBranchId;
+    data['fromBranchName'] = fromBranchName;
+    data['toBranchId'] = toBranchId;
+    data['toBranchName'] = toBranchName;
+    data['fromDatetime'] = fromDatetime;
+    data['toDatetime'] = toDatetime;
+    data['fromDoctorId'] = fromDoctorId;
+    data['toDoctorId'] = toDoctorId;
+    data['fromDoctorName'] = fromDoctorName;
+    data['toDoctorName'] = toDoctorName;
+    data['transferReason'] = transferReason;
+    data['adminRemark'] = adminRemark;
+    data['transferredBy'] = transferredBy;
+    data['transferredByName'] = transferredByName;
+    data['createdDate'] = createdDate;
     return data;
   }
 }

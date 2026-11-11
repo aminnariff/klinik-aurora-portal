@@ -50,6 +50,30 @@ class AppointmentController extends ChangeNotifier {
         });
   }
 
+  static Future<ApiResponse<dynamic>> transfer(
+    BuildContext context, {
+    required String appointmentId,
+    required String targetBranchId,
+    required String targetDateTime,
+    required String transferReason,
+    String? targetDoctorId,
+    String? adminRemark,
+  }) async {
+    return ApiController().call(
+      context,
+      method: Method.post,
+      endpoint: 'admin/appointment/transfer',
+      data: {
+        'appointmentId': appointmentId,
+        'targetBranchId': targetBranchId,
+        'targetDateTime': targetDateTime,
+        'transferReason': transferReason,
+        'targetDoctorId': ?targetDoctorId,
+        'adminRemark': ?adminRemark,
+      },
+    );
+  }
+
   Future<ApiResponse<AppointmentResponse>> get(
     BuildContext context,
     int page,

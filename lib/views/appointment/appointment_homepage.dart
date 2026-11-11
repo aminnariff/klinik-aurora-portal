@@ -29,6 +29,7 @@ import 'package:klinik_aurora_portal/views/appointment/appointment_calendar_view
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart';
+import 'package:klinik_aurora_portal/views/appointment/transfer_appointment_dialog.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/break_ui/break_ui_harness.dart';
@@ -350,6 +351,40 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           );
         },
       );
+    } else if (value == 'transfer') {
+      final appointmentId = appointment.appointmentId;
+      if (appointmentId == null) return;
+      showLoading();
+      AppointmentController.detail(context, appointmentId: appointmentId).then((detailRes) {
+        dismissLoading();
+        if (responseCode(detailRes.code) && detailRes.data != null) {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return TransferAppointmentDialog(
+                appointment: detailRes.data,
+                onTransferSuccess: () {
+                  getDashboard();
+                  filtering();
+                  if (_isCalendarView && mounted) {
+                    _refreshCalendarCounts();
+                  }
+                },
+              );
+            },
+          );
+        } else {
+          if (mounted) {
+            showDialogError(context, detailRes.message ?? 'Failed to load appointment details');
+          }
+        }
+      }).catchError((e) {
+        dismissLoading();
+        if (mounted) {
+          showDialogError(context, e.toString());
+        }
+      });
     }
   }
 
@@ -1584,6 +1619,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 onSelected: (value) => _handleMenuSelection(value, item),
                 itemBuilder: (_) {
                   final isLocked = [2, 6, 8].contains(item.appointmentStatus);
+                  final canTransfer = item.appointmentStatus == 1 || item.appointmentStatus == 3;
                   return [
                     PopupMenuItem<String>(
                       value: 'update',
@@ -1599,6 +1635,21 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         ],
                       ),
                     ),
+                    if (canTransfer)
+                      PopupMenuItem<String>(
+                        value: 'transfer',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.swap_horiz_rounded,
+                              size: 20,
+                              color: Color(0xFF2563EB),
+                            ),
+                            const SizedBox(width: 8),
+                            Text('Transfer Branch', style: AppTypography.bodyMedium(context)),
+                          ],
+                        ),
+                      ),
                   ];
                 },
                 child: Container(

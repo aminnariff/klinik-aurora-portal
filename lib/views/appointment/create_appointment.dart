@@ -32,6 +32,7 @@ import 'package:klinik_aurora_portal/models/service_branch/service_branch_availa
 import 'package:klinik_aurora_portal/views/appointment/appointment_detail_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
+import 'package:klinik_aurora_portal/views/appointment/transfer_appointment_dialog.dart';
 import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
@@ -142,6 +143,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   Timer? _cooldownTimer;
   int _refreshCooldownSeconds = 0;
   bool _isRefreshingSlots = false;
+  List<detail_model.TransferHistory>? _transferHistory;
 
   @override
   void dispose() {
@@ -187,6 +189,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     }
 
     SchedulerBinding.instance.scheduleFrameCallback((_) {
+      if (widget.type == 'update' && widget.appointment?.appointmentId != null) {
+        AppointmentController.detail(context, appointmentId: widget.appointment!.appointmentId).then((val) {
+          if (responseCode(val.code) && mounted && val.data?.data?.transferHistory != null) {
+            setState(() {
+              _transferHistory = val.data!.data!.transferHistory;
+            });
+          }
+        }).catchError((_) {});
+      }
       if (context.read<AuthController>().isSuperAdmin == false && widget.type == 'create') {
         ServiceBranchController.available(
           context,
@@ -350,6 +361,39 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         );
       } else {
         showDialogError(context, value.message ?? 'Failed to load original appointment details');
+      }
+    }).catchError((e) {
+      dismissLoading();
+      showDialogError(context, e.toString());
+    });
+  }
+
+  void _openTransferBranchDialog() {
+    final appointmentId = widget.appointment?.appointmentId;
+    if (appointmentId == null) return;
+    showLoading();
+    AppointmentController.detail(context, appointmentId: appointmentId).then((value) {
+      dismissLoading();
+      if (responseCode(value.code) && value.data != null) {
+        final navContext = Navigator.of(context, rootNavigator: true).context;
+        showDialog(
+          context: navContext,
+          builder: (BuildContext dialogContext) {
+            return TransferAppointmentDialog(
+              appointment: value.data,
+              onTransferSuccess: () {
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+                if (widget.refreshData != null) {
+                  widget.refreshData!();
+                }
+              },
+            );
+          },
+        );
+      } else {
+        showDialogError(context, value.message ?? 'Failed to load appointment details');
       }
     }).catchError((e) {
       dismissLoading();
@@ -707,6 +751,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     icon: Icons.person_off_outlined,
                                     color: const Color(0xFFD97706),
                                     onTap: () => _quickUpdateStatus(6, 'No-Show'),
+                                  ),
+                                  const SizedBox(width: 6),
+                                ],
+                                if (widget.type == 'update' &&
+                                    (widget.appointment?.appointmentStatus == 1 ||
+                                        widget.appointment?.appointmentStatus == 3)) ...[
+                                  _headerQuickAction(
+                                    label: 'Transfer Branch',
+                                    icon: Icons.swap_horiz_rounded,
+                                    color: const Color(0xFF2563EB),
+                                    onTap: () => _openTransferBranchDialog(),
                                   ),
                                   const SizedBox(width: 8),
                                 ],
@@ -2095,6 +2150,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         _buildAppointmentScheduleCard(),
         const SizedBox(height: 16),
         _buildNotesAndRemarksCard(),
+        if (_transferHistory != null && _transferHistory!.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          _buildTransferHistoryCard(_transferHistory!),
+        ],
         if (widget.appointment?.appointmentStatus == 5) ...[
           const SizedBox(height: 16),
           _buildFeedbackSection(),
@@ -2111,6 +2170,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           _buildAppointmentScheduleCard(),
           const SizedBox(height: 16),
           _buildNotesAndRemarksCard(),
+          if (_transferHistory != null && _transferHistory!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _buildTransferHistoryCard(_transferHistory!),
+          ],
           const SizedBox(height: 16),
           _buildFeesSection(),
           if (widget.appointment?.appointmentStatus == 5) ...[
@@ -3103,6 +3166,118 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       ),
                     ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTransferHistoryCard(List<detail_model.TransferHistory> history) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _extraSectionLabel('Transfer History (${history.length})', Icons.swap_horiz_rounded),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE5E7EB)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: history.asMap().entries.map((entry) {
+              final idx = entry.key;
+              final item = entry.value;
+              final isLast = idx == history.length - 1;
+              return Container(
+                margin: EdgeInsets.only(bottom: isLast ? 0 : 10),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEFF6FF),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  '#${idx + 1}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2563EB),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '${item.fromBranchName ?? '—'}  ➜  ${item.toBranchName ?? '—'}',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (item.createdDate != null)
+                          Text(
+                            dateConverter(item.createdDate, format: 'dd MMM yyyy, HH:mm') ?? '',
+                            style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Reason: ${item.transferReason ?? '—'}',
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Transferred by: ${item.transferredByName ?? 'Staff'}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF64748B),
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        if (item.toDatetime != null)
+                          Text(
+                            'New Slot: ${dateConverter(item.toDatetime, format: 'dd MMM yyyy, HH:mm') ?? item.toDatetime!}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],

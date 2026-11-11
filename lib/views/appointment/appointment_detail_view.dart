@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/models/appointment/appointment_response.dar
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
+import 'package:klinik_aurora_portal/views/appointment/transfer_appointment_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
@@ -24,8 +25,9 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class AppointmentDetailsView extends StatelessWidget {
   final AppointmentDetailResponse? response;
+  final VoidCallback? refreshData;
 
-  const AppointmentDetailsView({super.key, required this.response});
+  const AppointmentDetailsView({super.key, required this.response, this.refreshData});
 
   @override
   Widget build(BuildContext context) {
@@ -101,9 +103,18 @@ class AppointmentDetailsView extends StatelessWidget {
                         const SizedBox(height: 20),
                         _feedbackSection(context, data),
                       ],
+                      // Transfer history timeline
+                      if (data?.transferHistory != null && data!.transferHistory!.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        const Divider(color: Color(0xFFF3F4F6), height: 1),
+                        const SizedBox(height: 20),
+                        _transferHistorySection(context, data.transferHistory!),
+                      ],
                       const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 12,
+                        runSpacing: 10,
                         children: [
                           if (data?.appointmentStatus == 1 || data?.appointmentStatus == 3) ...[
                             ElevatedButton.icon(
@@ -118,20 +129,52 @@ class AppointmentDetailsView extends StatelessWidget {
                                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                               ),
                               onPressed: () {
+                                final navContext = Navigator.of(context, rootNavigator: true).context;
                                 Navigator.of(context, rootNavigator: true).pop();
                                 showDialog(
-                                  context: context,
+                                  context: navContext,
                                   builder: (BuildContext context) {
                                     return AppointmentDetails(
                                       type: 'update',
                                       appointment: data != null ? appt_resp.Data.fromJson(data.toJson()) : null,
                                       tabs: [],
+                                      refreshData: refreshData,
                                     );
                                   },
                                 );
                               },
                             ),
-                            const SizedBox(width: 12),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2563EB),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              icon: const Icon(Icons.swap_horiz_rounded, size: 16, color: Colors.white),
+                              label: const Text(
+                                'Transfer Branch',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
+                              onPressed: () {
+                                final navContext = Navigator.of(context, rootNavigator: true).context;
+                                showDialog(
+                                  context: navContext,
+                                  builder: (BuildContext dialogContext) {
+                                    return TransferAppointmentDialog(
+                                      appointment: response,
+                                      onTransferSuccess: () {
+                                        if (context.mounted) {
+                                          Navigator.of(context).pop();
+                                        }
+                                        if (refreshData != null) {
+                                          refreshData!();
+                                        }
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ],
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
@@ -1113,6 +1156,118 @@ class AppointmentDetailsView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _transferHistorySection(BuildContext context, List<TransferHistory> history) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.history_rounded, size: 18, color: Color(0xFF2563EB)),
+            const SizedBox(width: 8),
+            Text(
+              'Transfer History (${history.length})',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        ...history.asMap().entries.map((entry) {
+          final idx = entry.key;
+          final item = entry.value;
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF6FF),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '#${idx + 1}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2563EB),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '${item.fromBranchName ?? '—'}  ➜  ${item.toBranchName ?? '—'}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF0F172A),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      item.createdDate != null ? dateConverter(item.createdDate, format: 'dd MMM yyyy, HH:mm') ?? '' : '',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Reason: ${item.transferReason ?? '—'}',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Transferred by: ${item.transferredByName ?? 'Staff'}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF64748B),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    if (item.toDatetime != null)
+                      Text(
+                        'New Slot: ${dateConverter(item.toDatetime, format: 'dd MMM yyyy, HH:mm') ?? item.toDatetime!}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF2563EB),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 }
