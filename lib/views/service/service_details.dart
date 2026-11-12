@@ -13,6 +13,8 @@ import 'package:klinik_aurora_portal/models/service/services_response.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_request.dart';
 import 'package:klinik_aurora_portal/utils/image_helper.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_form_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_image_field.dart';
@@ -758,37 +760,16 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          OutlinedButton(
+          AppButton.secondary(
+            text: 'Cancel',
             onPressed: () => context.pop(),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              side: const BorderSide(color: Color(0xFFCBD5E1)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Cancel', style: TextStyle(color: Color(0xFF475569), fontWeight: FontWeight.w600)),
           ),
           const SizedBox(width: 12),
-          ElevatedButton.icon(
+          AppButton.primary(
+            text: widget.type == 'create' ? 'Create Service' : 'Save Changes',
+            isLoading: _isSubmitting,
+            icon: const Icon(Icons.check_rounded, size: 18, color: Colors.white),
             onPressed: _isSubmitting ? null : _handleSubmit,
-            icon: _isSubmitting
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                  )
-                : const Icon(Icons.check_rounded, size: 18, color: Colors.white),
-            label: Text(
-              _isSubmitting
-                  ? 'Saving...'
-                  : (widget.type == 'create' ? 'Create Service' : 'Save Changes'),
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF246E7A),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              elevation: 0,
-            ),
           ),
         ],
       ),
@@ -968,45 +949,20 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     IconData? prefixIcon,
     int maxLines = 1,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: maxLines == 1 ? 42 : null,
-          child: TextField(
-            controller: controller,
-            keyboardType: isNumber ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
-            maxLines: maxLines,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
-              filled: true,
-              fillColor: const Color(0xFFF8FAFC),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              prefixText: prefixText,
-              prefixStyle: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF475569), fontSize: 13),
-              prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 16, color: const Color(0xFF64748B)) : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1)),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                borderSide: BorderSide(color: Color(0xFF246E7A), width: 1.5),
-              ),
-            ),
-          ),
-        ),
-        if (errorText != null) ...[
-          const SizedBox(height: 4),
-          Text(errorText, style: const TextStyle(color: Color(0xFFDC2626), fontSize: 11)),
-        ],
-      ],
+    return AppFormField(
+      controller: controller,
+      hintText: hint,
+      errorText: errorText,
+      isNumber: isNumber,
+      prefixIcon: prefixIcon != null
+          ? Icon(prefixIcon, size: 16, color: const Color(0xFF64748B))
+          : (prefixText != null
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(prefixText, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF475569), fontSize: 13)),
+                )
+              : null),
+      maxLines: maxLines,
     );
   }
 

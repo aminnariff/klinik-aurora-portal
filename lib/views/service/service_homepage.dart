@@ -32,6 +32,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_filter_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -382,20 +383,10 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   }
 
   Widget _filterTextField(TextEditingController controller, String hint) {
-    return SizedBox(
-      height: 40,
-      child: TextField(
-        controller: controller,
-        onChanged: (_) => filtering(page: 1),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
-          filled: true,
-          fillColor: const Color(0xFFF5F6FA),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-        ),
-      ),
+    return AppFilterField(
+      controller: controller,
+      hintText: hint,
+      onChanged: (_) => filtering(page: 1),
     );
   }
 

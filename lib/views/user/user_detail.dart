@@ -22,6 +22,8 @@ import 'package:klinik_aurora_portal/views/user/appointment_ids.dart';
 import 'package:klinik_aurora_portal/views/user/user_baby_tracker_dialog.dart';
 import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_form_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -1085,69 +1087,17 @@ class _UserDetailState extends State<UserDetail> {
     Widget? action,
     Widget? suffix,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF475569),
-              ),
-            ),
-            ?action,
-          ],
-        ),
-        const SizedBox(height: 5),
-        Container(
-          height: 42,
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: readOnly ? const Color(0xFFF8FAFC) : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
-              width: errorText != null ? 1.5 : 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  readOnly: readOnly,
-                  onChanged: onChanged,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: readOnly ? const Color(0xFF475569) : const Color(0xFF1E293B),
-                  ),
-                  decoration: InputDecoration(
-                    isCollapsed: true,
-                    border: InputBorder.none,
-                    hintText: hintText,
-                    hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
-                  ),
-                ),
-              ),
-              ?suffix,
-            ],
-          ),
-        ),
-        if (errorText != null) ...[
-          const SizedBox(height: 3),
-          Text(
-            errorText,
-            style: const TextStyle(fontSize: 11, color: Color(0xFFEF4444), fontWeight: FontWeight.w500),
-          ),
-        ],
-      ],
+    final isReq = label.endsWith(' *');
+    final cleanLabel = isReq ? label.substring(0, label.length - 2) : label;
+    return AppFormField(
+      label: cleanLabel,
+      isRequired: isReq,
+      controller: controller,
+      errorText: errorText,
+      hintText: hintText,
+      onChanged: onChanged,
+      isEditable: !readOnly,
+      suffixIcon: suffix,
     );
   }
 
@@ -1402,36 +1352,15 @@ class _UserDetailState extends State<UserDetail> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          OutlinedButton(
+          AppButton.secondary(
+            text: 'Cancel',
             onPressed: _isSaving ? null : () => context.pop(),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF475569),
-              side: const BorderSide(color: Color(0xFFCBD5E1)),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Cancel', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
           ),
           const SizedBox(width: 10),
-          ElevatedButton(
+          AppButton.primary(
+            text: isCreate ? 'Register Patient' : 'Save Changes',
+            isLoading: _isSaving,
             onPressed: _isSaving ? null : _submit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: _isSaving
-                ? const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                  )
-                : Text(
-                    isCreate ? 'Register Patient' : 'Save Changes',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                  ),
           ),
         ],
       ),
