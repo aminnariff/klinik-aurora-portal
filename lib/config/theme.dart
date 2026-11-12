@@ -2,21 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 
 ThemeData theme(BuildContext context) {
-  final baseScheme = ColorScheme.fromSeed(seedColor: primary);
+  final baseScheme = ColorScheme.fromSeed(
+    seedColor: primary,
+    primary: primary,
+    secondary: secondaryColor,
+    surface: Colors.white,
+  );
   return ThemeData(
     useMaterial3: true,
-    colorScheme: baseScheme.copyWith(surface: Colors.white, surfaceTint: Colors.transparent),
+    colorScheme: baseScheme.copyWith(
+      surface: Colors.white,
+      surfaceTint: Colors.transparent,
+      outline: borderSubtle,
+    ),
     brightness: Brightness.light,
     canvasColor: Colors.white,
+    scaffoldBackgroundColor: const Color(0xFFF8FAFC),
     primaryColor: primary,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     fontFamily: 'Figtree',
+    dividerTheme: const DividerThemeData(color: borderSubtle, thickness: 1),
     dialogTheme: const DialogThemeData(backgroundColor: Colors.white, surfaceTintColor: Colors.transparent),
     popupMenuTheme: const PopupMenuThemeData(color: Colors.white, surfaceTintColor: Colors.transparent),
     cardTheme: const CardThemeData(color: Colors.white, surfaceTintColor: Colors.transparent),
+    tooltipTheme: TooltipThemeData(
+      decoration: BoxDecoration(
+        color: neutralDark.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      textStyle: const TextStyle(color: Colors.white, fontSize: 12),
+      waitDuration: const Duration(milliseconds: 300),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: const Color(0xFFF8FAFC),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: borderSubtle),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: borderSubtle),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: primaryAccessibleText, width: 1.5),
+      ),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        textStyle: const TextStyle(color: Colors.white),
+        textStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         padding: EdgeInsets.zero,
         elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),

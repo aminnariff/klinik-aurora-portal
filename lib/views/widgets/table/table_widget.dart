@@ -10,35 +10,52 @@ Widget tableAction({
   Widget? child,
 }) {
   return Container(
-    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2),
+    padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 2),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         child ?? const SizedBox(),
         if (isEdit)
-          SizedBox(
-            width: isMobile ? 10.w : 33,
-            child: TextButton(
-              onPressed: editAction,
-              child: Icon(
-                Icons.edit,
-                size: isMobile ? 16.w : 4.sp,
-                color: Colors.grey.shade400,
+          Tooltip(
+            message: 'Kemaskini',
+            child: Semantics(
+              label: 'Kemaskini rekod',
+              button: true,
+              child: InkWell(
+                onTap: editAction,
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: Icon(
+                    Icons.edit_outlined,
+                    size: isMobile ? 18.w : 18,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
               ),
             ),
           ),
         if (isDelete)
-          SizedBox(
-            width: isMobile ? 10.w : 32,
-            child: TextButton(
-              onPressed: deleteAction,
-              child: Icon(
-                Icons.delete_outline_outlined,
-                size: isMobile ? 16.w : 3.sp,
-                color: Colors.grey.shade400,
+          Tooltip(
+            message: 'Padam',
+            child: Semantics(
+              label: 'Padam rekod',
+              button: true,
+              child: InkWell(
+                onTap: deleteAction,
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: Icon(
+                    Icons.delete_outline_rounded,
+                    size: isMobile ? 18.w : 18,
+                    color: const Color(0xFFDC2626),
+                  ),
+                ),
               ),
             ),
-          )
+          ),
       ],
     ),
   );

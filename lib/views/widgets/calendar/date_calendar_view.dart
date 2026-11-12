@@ -136,6 +136,7 @@ class _SelectionCalendarDateOnlyViewState extends State<SelectionCalendarDateOnl
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
+              tooltip: 'Bulan Sebelumnya',
               icon: const Icon(Icons.chevron_left),
               onPressed: currentMonthIndex > 0 ? () => setState(() => currentMonthIndex--) : null,
             ),
@@ -144,6 +145,7 @@ class _SelectionCalendarDateOnlyViewState extends State<SelectionCalendarDateOnl
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             IconButton(
+              tooltip: 'Bulan Seterusnya',
               icon: const Icon(Icons.chevron_right),
               onPressed: currentMonthIndex < widget.totalMonths - 1 ? () => setState(() => currentMonthIndex++) : null,
             ),

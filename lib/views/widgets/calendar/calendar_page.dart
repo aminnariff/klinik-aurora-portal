@@ -130,7 +130,8 @@ class _CalendarPageState extends State<CalendarPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: Icon(Icons.chevron_left),
+                tooltip: 'Bulan Sebelumnya',
+                icon: const Icon(Icons.chevron_left),
                 onPressed:
                     currentMonthIndex > 0
                         ? () {
@@ -142,10 +143,11 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
               Text(
                 DateFormat('MMMM yyyy').format(firstDay),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               IconButton(
-                icon: Icon(Icons.chevron_right),
+                tooltip: 'Bulan Seterusnya',
+                icon: const Icon(Icons.chevron_right),
                 onPressed:
                     currentMonthIndex < widget.totalMonths - 1
                         ? () {

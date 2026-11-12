@@ -15,6 +15,14 @@ const tertiaryColor = Color(0XFF07272d);
 const quaternaryColor = Color(0xFF7e2d40);
 const sidebarColor = Color(0xFF52AFBF);
 
+// WCAG AA Compliant accessible variants for text/icons on white (>4.5:1 contrast)
+const primaryAccessibleText = Color(0xFFA8295E);
+const secondaryAccessibleText = Color(0xFF007A93);
+const neutralDark = Color(0xFF0F172A);
+const neutralMuted = Color(0xFF64748B);
+const borderSubtle = Color(0xFFE2E8F0);
+const surfaceLight = Color(0xFFF8FAFC);
+
 //TextFormField
 const textFormFieldEditableColor = Color(0XFFF8F8F8);
 const textFormFieldUneditableColor = Color(0xFFEEEEEE);

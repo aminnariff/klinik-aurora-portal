@@ -48,7 +48,8 @@ class _SearchToggleState extends State<SearchToggle> {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.search, color: CupertinoColors.activeBlue),
+            tooltip: 'Cari',
+            icon: const Icon(Icons.search, color: CupertinoColors.activeBlue),
             onPressed: () {
               setState(() {
                 _showTextField = true;

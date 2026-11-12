@@ -60,9 +60,10 @@ class InputField extends StatelessWidget {
                     }),
                   ),
                   if (field.tooltip != null)
-                    Tooltip(
-                      message: field.tooltip,
-                      child: IconButton(icon: const Icon(Icons.info), onPressed: () {}),
+                    IconButton(
+                      tooltip: field.tooltip,
+                      icon: const Icon(Icons.info_outline_rounded),
+                      onPressed: () {},
                     ),
                 ],
               );
@@ -92,15 +93,22 @@ class InputField extends StatelessWidget {
         fillColor: field.isEditable ? field.isEditableColor : field.uneditableColor,
         filled: true,
         suffixIcon: field.isPassword
-            ? InkWell(
-                onTap: () {
-                  field.obscureText = !field.obscureText;
-                  rebuild();
-                },
-                child: Icon(
-                  field.obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: field.obscureText ? const Color(0xFFa3b7c7) : const Color(0xff163567),
-                  size: 22,
+            ? Tooltip(
+                message: field.obscureText ? 'Papar kata laluan' : 'Sembunyi kata laluan',
+                child: Semantics(
+                  label: field.obscureText ? 'Papar kata laluan' : 'Sembunyi kata laluan',
+                  button: true,
+                  child: InkWell(
+                    onTap: () {
+                      field.obscureText = !field.obscureText;
+                      rebuild();
+                    },
+                    child: Icon(
+                      field.obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: field.obscureText ? const Color(0xFFa3b7c7) : const Color(0xff163567),
+                      size: 22,
+                    ),
+                  ),
                 ),
               )
             : field.isDatePicker

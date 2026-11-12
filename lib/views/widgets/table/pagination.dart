@@ -84,11 +84,12 @@ class _PaginationState extends State<Pagination> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
+          tooltip: 'Halaman Sebelumnya',
           icon:
               widget.previousIcon ??
               Icon(
                 Icons.arrow_circle_left_outlined,
-                color: widget.selectedPage > 1 ? secondaryColor : Colors.grey,
+                color: widget.selectedPage > 1 ? secondaryAccessibleText : Colors.grey,
                 size: 35,
               ),
           onPressed: widget.selectedPage > 1 ? () => widget.onPageChanged(widget.selectedPage - 1) : null,
@@ -101,27 +102,36 @@ class _PaginationState extends State<Pagination> {
               style:
                   i == widget.selectedPage
                       ? ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(secondaryColor),
-                        elevation: WidgetStateProperty.all(15),
+                        backgroundColor: WidgetStateProperty.all(secondaryAccessibleText),
+                        elevation: WidgetStateProperty.all(2),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
                       )
-                      : ButtonStyle(elevation: WidgetStateProperty.all(0)),
+                      : ButtonStyle(
+                        elevation: WidgetStateProperty.all(0),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
               onPressed: () => widget.onPageChanged(i),
               child: Text(
                 '$i',
                 style:
                     i == widget.selectedPage
                         ? const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)
-                        : const TextStyle(fontSize: 14, color: secondaryColor, fontWeight: FontWeight.w700),
+                        : const TextStyle(fontSize: 14, color: secondaryAccessibleText, fontWeight: FontWeight.w700),
               ),
             ),
           ),
         SizedBox(width: widget.spacing ?? 0),
         IconButton(
+          tooltip: 'Halaman Seterusnya',
           icon:
               widget.nextIcon ??
               Icon(
                 Icons.arrow_circle_right_outlined,
-                color: widget.selectedPage < widget.numOfPages ? secondaryColor : Colors.grey,
+                color: widget.selectedPage < widget.numOfPages ? secondaryAccessibleText : Colors.grey,
                 size: 35,
               ),
           onPressed:
