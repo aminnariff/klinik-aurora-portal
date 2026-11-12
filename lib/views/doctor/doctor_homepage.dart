@@ -22,6 +22,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_filter_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -285,7 +286,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
             label: const Text('Add Practitioner', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: secondaryColor,
+              backgroundColor: primary,
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -731,29 +732,10 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   Widget _filterTextField(TextEditingController ctrl, String label) {
-    return TextField(
+    return AppFilterField(
       controller: ctrl,
+      hintText: label,
       onChanged: (_) => filtering(page: 1),
-      style: const TextStyle(fontSize: 13),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(fontSize: 13),
-        filled: true,
-        fillColor: const Color(0xFFF9FAFB),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-        ),
-      ),
     );
   }
 

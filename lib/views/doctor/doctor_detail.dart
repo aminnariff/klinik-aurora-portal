@@ -23,6 +23,7 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.d
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:provider/provider.dart';
@@ -573,37 +574,21 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: const BoxDecoration(
-        color: Color(0xFFF9FAFB),
-        border: Border(top: BorderSide(color: Color(0xFFF3F4F6))),
+        color: Color(0xFFFAFAFA),
+        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          OutlinedButton(
+          AppButton.secondary(
+            text: 'Cancel',
             onPressed: () => context.pop(),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              side: const BorderSide(color: Color(0xFFD1D5DB)),
-            ),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(fontSize: 13, color: Color(0xFF4B5563), fontWeight: FontWeight.w500),
-            ),
           ),
           const SizedBox(width: 12),
-          FilledButton.icon(
+          AppButton.primary(
+            text: widget.type == 'create' ? 'Create Practitioner' : 'Save Changes',
+            icon: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
             onPressed: _submit,
-            icon: const Icon(Icons.check_rounded, size: 16),
-            label: Text(
-              widget.type == 'create' ? 'Create Practitioner' : 'Save Changes',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            style: FilledButton.styleFrom(
-              backgroundColor: secondaryColor,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
           ),
         ],
       ),
