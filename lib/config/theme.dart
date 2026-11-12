@@ -24,7 +24,11 @@ ThemeData theme(BuildContext context) {
     dividerTheme: const DividerThemeData(color: borderSubtle, thickness: 1),
     dialogTheme: const DialogThemeData(backgroundColor: Colors.white, surfaceTintColor: Colors.transparent),
     popupMenuTheme: const PopupMenuThemeData(color: Colors.white, surfaceTintColor: Colors.transparent),
-    cardTheme: const CardThemeData(color: Colors.white, surfaceTintColor: Colors.transparent),
+    cardTheme: CardThemeData(
+      color: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ),
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
         color: neutralDark.withValues(alpha: 0.9),
@@ -38,15 +42,15 @@ ThemeData theme(BuildContext context) {
       fillColor: const Color(0xFFF8FAFC),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(color: borderSubtle),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(color: borderSubtle),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(color: primaryAccessibleText, width: 1.5),
       ),
     ),
@@ -54,8 +58,22 @@ ThemeData theme(BuildContext context) {
       style: ElevatedButton.styleFrom(
         textStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         padding: EdgeInsets.zero,
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF475569),
+        side: const BorderSide(color: Color(0xFFCBD5E1)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: primary,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     textTheme: TextTheme(

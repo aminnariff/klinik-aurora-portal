@@ -28,7 +28,7 @@ class CardContainer extends StatelessWidget {
         elevation: elevation ?? 5.0,
         color: color ?? Colors.white,
         margin: margin ?? EdgeInsets.all(screenPadding),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius ?? 15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius ?? 8.0)),
         child: child,
       ),
     );

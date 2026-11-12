@@ -52,13 +52,13 @@ class _AppOutlinedButtonState extends State<AppOutlinedButton> {
           child: OutlinedButton(
             onPressed: widget.onPressed,
             style: ElevatedButton.styleFrom(
-              elevation: 10.0,
+              elevation: 0.0,
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               enableFeedback: widget.enableFeedback,
               backgroundColor: widget.backgroundColor ?? Colors.white,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? 50),
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? 8.0),
               ),
             ),
             child: widget.widget ??

@@ -160,30 +160,30 @@ class InputField extends StatelessWidget {
             color: field.isEditable ? const Color(0xFFE5E7EB) : Colors.transparent,
             width: 1.0,
           ),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Color(0xFF0D9488), width: 1.5),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: field.isEditable ? const Color(0xFFE5E7EB) : Colors.transparent,
             width: 1.0,
           ),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         errorBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.0),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         disabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
       ),
       onFieldSubmitted: field.onFieldSubmitted,
@@ -226,27 +226,27 @@ InputDecoration appInputDecoration(BuildContext context, String label) {
     contentPadding: EdgeInsets.fromLTRB(screenPadding / 2, screenPadding / 3, screenPadding / 3, screenPadding / 3),
     border: OutlineInputBorder(
       borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(8.0),
     ),
     focusedBorder: OutlineInputBorder(
       borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(8.0),
     ),
     enabledBorder: OutlineInputBorder(
       borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(8.0),
     ),
     errorBorder: OutlineInputBorder(
       borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.0),
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(8.0),
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(8.0),
     ),
     disabledBorder: OutlineInputBorder(
       borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(8.0),
     ),
     labelText: label,
     hintStyle: Theme.of(context).textTheme.bodyMedium!.apply(color: Colors.grey),

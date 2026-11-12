@@ -55,7 +55,7 @@ class _ButtonState extends State<Button> {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBorderRadius = widget.borderRadius ?? 20.0;
+    final effectiveBorderRadius = widget.borderRadius ?? 8.0;
     return AnimatedScale(
       scale: _isPressed ? 0.97 : 1.0,
       duration: _isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration,
