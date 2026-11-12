@@ -7,7 +7,7 @@ enum AppButtonVariant { primary, secondary, destructive }
 /// Standardized action button for Klinik Aurora Portal.
 ///
 /// Variants:
-/// - [AppButton.primary]: Brand Pink (#DF6E98) filled, white text
+/// - [AppButton.primary]: Deep Teal (#0F766E) filled, white text
 /// - [AppButton.secondary]: White background, Slate-300 (#CBD5E1) border, Slate-600 text
 /// - [AppButton.destructive]: Red (#DC2626) filled, white text
 ///

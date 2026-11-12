@@ -3,11 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 
-const primary = Color(0xFFDF6E98);
+const brandPink = Color(0xFFDF6E98);
+const primary = Color(0xFF0F766E); // Klinik Aurora Deep Teal (clinical, professional)
+const primaryButtonColor = Color(0xFF0F766E);
 const primaryColors = [
-  Color(0xFFDF6E98),
-  // Color(0XFFD2ACB9),
-  Color(0XFF6ad1e3),
+  Color(0xFF0F766E),
+  Color(0xFF1B545E),
 ];
 
 const secondaryColor = Color(0XFF6ad1e3);
@@ -16,7 +17,7 @@ const quaternaryColor = Color(0xFF7e2d40);
 const sidebarColor = Color(0xFF52AFBF);
 
 // WCAG AA Compliant accessible variants for text/icons on white (>4.5:1 contrast)
-const primaryAccessibleText = Color(0xFFA8295E);
+const primaryAccessibleText = Color(0xFF0F766E);
 const secondaryAccessibleText = Color(0xFF007A93);
 const neutralDark = Color(0xFF0F172A);
 const neutralMuted = Color(0xFF64748B);

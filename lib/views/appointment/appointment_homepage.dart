@@ -848,7 +848,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             _ActionButton(
               icon: Icons.menu_book_rounded,
               tooltip: 'Guideline',
-              color: const Color(0xFFDF6E98),
+              color: primary,
               onTap: () => showAppointmentGuidelineDialog(context),
             ),
             const SizedBox(width: 4),

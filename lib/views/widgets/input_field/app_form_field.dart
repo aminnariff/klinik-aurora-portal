@@ -10,7 +10,7 @@ import 'package:klinik_aurora_portal/views/widgets/input_field/upper_case_alpha_
 /// - Top label with optional red asterisk (`*`) for required fields
 /// - Universal 8px radius
 /// - 42px standard single-line height
-/// - Accessible contrast and focus outline (`#DF6E98`)
+/// - Accessible contrast and focus outline (`#0F766E`)
 /// - Support for password visibility, currency, numbers, and custom validators
 class AppFormField extends StatefulWidget {
   final String? label;

@@ -6,7 +6,7 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 
 // Brand colours (mirrored from color.dart to avoid circular deps)
-const _kPrimary = Color(0xFFDF6E98);
+const _kPrimary = Color(0xFF0F766E);
 const _kSecondary = Color(0xFF6AD1E3);
 
 class PrivacyPolicy extends StatelessWidget {

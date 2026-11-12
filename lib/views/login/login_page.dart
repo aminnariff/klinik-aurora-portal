@@ -547,7 +547,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     child: Checkbox(
                       value: snapshot.remember,
                       onChanged: (v) => snapshot.remember = v ?? false,
-                      activeColor: const Color(0xFFDF6E98),
+                      activeColor: primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -571,8 +571,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 child: ElevatedButton(
                   onPressed: _isLoggingIn ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFDF6E98),
-                    disabledBackgroundColor: const Color(0xFFDF6E98).withValues(alpha: 0.6),
+                    backgroundColor: primary,
+                    disabledBackgroundColor: primary.withValues(alpha: 0.6),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
