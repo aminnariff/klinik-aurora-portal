@@ -19,6 +19,9 @@ import "package:klinik_aurora_portal/models/admin/update_permission_admin_reques
 import "package:klinik_aurora_portal/models/branch/branch_all_response.dart" as branch_model;
 import "package:klinik_aurora_portal/models/permission/permission_all_response.dart" as model_permission;
 import "package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart";
+import "package:klinik_aurora_portal/views/widgets/button/app_button.dart";
+import "package:klinik_aurora_portal/views/widgets/input_field/app_form_field.dart";
+import "package:klinik_aurora_portal/config/color.dart";
 import "package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart";
 import "package:klinik_aurora_portal/views/widgets/size.dart";
 import "package:provider/provider.dart";
@@ -625,75 +628,17 @@ class _AdminDetailState extends State<AdminDetail> {
     bool isRequired = false,
     VoidCallback? onChanged,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF475569),
-              ),
-            ),
-            if (isRequired)
-              const Text(
-                " *",
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFEF4444)),
-              ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Container(
-          height: 42,
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: isEditable ? Colors.white : const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: errorText != null
-                  ? const Color(0xFFEF4444)
-                  : (isEditable ? const Color(0xFFCBD5E1) : const Color(0xFFE2E8F0)),
-              width: errorText != null ? 1.5 : 1,
-            ),
-          ),
-          child: TextField(
-            controller: controller,
-            enabled: isEditable,
-            obscureText: isPassword,
-            keyboardType: isEmail
-                ? TextInputType.emailAddress
-                : (isNumber ? TextInputType.phone : TextInputType.text),
-            style: TextStyle(
-              fontSize: 13,
-              color: isEditable ? const Color(0xFF0F172A) : const Color(0xFF64748B),
-              fontWeight: FontWeight.w400,
-            ),
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-              border: InputBorder.none,
-              hintText: hintText,
-              hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-            ),
-            onChanged: (_) {
-              if (onChanged != null) onChanged();
-            },
-          ),
-        ),
-        if (errorText != null) ...[
-          const SizedBox(height: 3),
-          Text(
-            errorText,
-            style: const TextStyle(fontSize: 11, color: Color(0xFFEF4444), fontWeight: FontWeight.w500),
-          ),
-        ],
-      ],
+    return AppFormField(
+      controller: controller,
+      label: label,
+      hintText: hintText,
+      errorText: errorText,
+      isPassword: isPassword,
+      isNumber: isNumber,
+      isEditable: isEditable,
+      isRequired: isRequired,
+      keyboardType: isEmail ? TextInputType.emailAddress : (isNumber ? TextInputType.phone : null),
+      onChanged: onChanged != null ? (_) => onChanged() : null,
     );
   }
 
@@ -1270,7 +1215,7 @@ class _AdminDetailState extends State<AdminDetail> {
               ),
               FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: dialogSaving
@@ -1348,34 +1293,15 @@ class _AdminDetailState extends State<AdminDetail> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF64748B),
-              side: const BorderSide(color: Color(0xFFCBD5E1)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            ),
+          AppButton.secondary(
+            text: "Cancel",
             onPressed: _isSaving ? null : () => context.pop(),
-            child: const Text("Cancel", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           ),
           const SizedBox(width: 12),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF4F46E5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
-            ),
+          AppButton.primary(
+            text: isCreate ? "Create Admin" : "Update Admin",
+            isLoading: _isSaving,
             onPressed: _isSaving ? null : _saveAdmin,
-            child: _isSaving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                  )
-                : Text(
-                    isCreate ? "Create Admin" : "Update Admin",
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
           ),
         ],
       ),
