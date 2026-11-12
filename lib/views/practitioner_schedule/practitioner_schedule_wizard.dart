@@ -337,8 +337,8 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: secondaryColor.withAlpha(30), borderRadius: BorderRadius.circular(12)),
-          child: const Icon(Icons.schedule_rounded, color: secondaryColor, size: 24),
+          decoration: BoxDecoration(color: primary.withAlpha(20), borderRadius: BorderRadius.circular(8)),
+          child: const Icon(Icons.schedule_rounded, color: primary, size: 24),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -394,11 +394,11 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
     Color bg;
     Color fg;
     if (isCurrent) {
-      bg = secondaryColor;
+      bg = primary;
       fg = Colors.white;
     } else if (isCompleted) {
-      bg = secondaryColor.withAlpha(30);
-      fg = secondaryColor;
+      bg = primary.withAlpha(20);
+      fg = primary;
     } else {
       bg = _neutralBg;
       fg = Colors.grey[500]!;
@@ -473,7 +473,7 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
           if (_loadingTargets)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 48),
-              child: Center(child: CircularProgressIndicator(color: secondaryColor)),
+              child: Center(child: CircularProgressIndicator(color: primary)),
             )
           else if (_doctorTypeValue == null)
             _emptyHint('Select a practitioner type to list its active services.')
@@ -559,7 +559,7 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
                   }
                 });
               },
-              style: TextButton.styleFrom(foregroundColor: secondaryColor),
+              style: TextButton.styleFrom(foregroundColor: primary),
               child: Text(allSelected ? 'Untick all' : 'Tick all', style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
@@ -577,7 +577,7 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFEFF6FF),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFBFDBFE)),
       ),
       child: Row(
@@ -606,8 +606,8 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: selected ? Colors.white : _neutralBg.withAlpha(150),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: selected ? secondaryColor.withAlpha(100) : _neutralBorder, width: selected ? 1.5 : 1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: selected ? primary.withAlpha(100) : _neutralBorder, width: selected ? 1.5 : 1),
       ),
       child: Row(
         children: [
@@ -616,7 +616,7 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
             height: 24,
             child: Checkbox(
               value: selected,
-              activeColor: secondaryColor,
+              activeColor: primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
               onChanged: (val) => setState(() => target.selected = val ?? false),
             ),
@@ -758,13 +758,13 @@ class _PractitionerScheduleWizardState extends State<PractitionerScheduleWizard>
   }
 
   ButtonStyle _primaryButtonStyle() => ElevatedButton.styleFrom(
-    backgroundColor: secondaryColor,
+    backgroundColor: primary,
     foregroundColor: Colors.white,
-    disabledBackgroundColor: secondaryColor.withAlpha(90),
+    disabledBackgroundColor: primary.withAlpha(90),
     disabledForegroundColor: Colors.white70,
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
     elevation: 0,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
   );
 
   // ─── Small shared UI helpers ───

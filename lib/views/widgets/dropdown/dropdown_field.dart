@@ -56,7 +56,7 @@ class _AppDropdownState extends State<AppDropdown> {
                 (isEditable ? const Color(0xFFE5E7EB) : Colors.transparent),
             width: 1.0,
           ),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
@@ -64,23 +64,23 @@ class _AppDropdownState extends State<AppDropdown> {
                 (isEditable ? const Color(0xFFE5E7EB) : Colors.transparent),
             width: 1.0,
           ),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-          borderRadius: BorderRadius.circular(10.0),
+          borderSide: const BorderSide(color: primary, width: 1.5),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         errorBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.0),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         disabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(8.0),
         ),
       ),
       child: DropdownButtonHideUnderline(
@@ -161,7 +161,7 @@ class _AppDropdownState extends State<AppDropdown> {
             maxHeight: 260,
             padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
               color: Colors.white,
               border: Border.all(color: const Color(0xFFE5E7EB)),
               boxShadow: [
@@ -183,7 +183,7 @@ class _AppDropdownState extends State<AppDropdown> {
           menuItemStyleData: MenuItemStyleData(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             selectedMenuItemBuilder: (context, child) => Container(
-              color: secondaryColor.withAlpha(20),
+              color: primary.withAlpha(20),
               child: child,
             ),
           ),

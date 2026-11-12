@@ -107,7 +107,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
       builder: (context, child) => Theme(
         data: ThemeData(
           colorScheme: const ColorScheme.light(
-            primary: secondaryColor,
+            primary: primary,
             onPrimary: Colors.white,
             surface: Colors.white,
             onSurface: Color(0xFF111827),
@@ -312,7 +312,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                     children: [
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Icon(Icons.calendar_month_rounded, color: secondaryColor, size: 20),
+                        child: Icon(Icons.calendar_month_rounded, color: primary, size: 20),
                       ),
                       Text(
                         DateFormat('MMMM yyyy').format(DateTime(displayYear, displayMonth)),
@@ -389,12 +389,12 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                                         Container(
                                           padding: const EdgeInsets.all(8),
                                           decoration: BoxDecoration(
-                                            color: secondaryColor.withAlpha(20),
-                                            borderRadius: BorderRadius.circular(10),
+                                            color: primary.withAlpha(20),
+                                            borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: const Icon(
                                             Icons.access_time_filled_rounded,
-                                            color: secondaryColor,
+                                            color: primary,
                                             size: 20,
                                           ),
                                         ),
@@ -486,7 +486,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                         icon: Icons.auto_awesome_rounded,
                         label: 'Generator',
                         onTap: _openGenerator,
-                        color: secondaryColor,
+                        color: primary,
                       ),
                       const SizedBox(width: 8),
                       _utilityIconBtn(
@@ -526,12 +526,12 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: secondaryColor.withAlpha(20),
-                        borderRadius: BorderRadius.circular(10),
+                        color: primary.withAlpha(20),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         '${_getAllDateTimeValues().length}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: secondaryColor),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primary),
                       ),
                     ),
                   ],
@@ -619,13 +619,13 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      backgroundColor: secondaryColor.withAlpha(20),
+                      backgroundColor: primary.withAlpha(20),
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Text(
                       'Got it!',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: secondaryColor),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: primary),
                     ),
                   ),
                 ],
@@ -647,7 +647,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
             width: 28,
             height: 28,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
             child: Text(
               '$number',
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
@@ -676,10 +676,10 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: onTap == null ? Colors.grey[100] : secondaryColor.withAlpha(20),
+          color: onTap == null ? Colors.grey[100] : primary.withAlpha(20),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, size: 18, color: onTap == null ? Colors.grey[400] : secondaryColor),
+        child: Icon(icon, size: 18, color: onTap == null ? Colors.grey[400] : primary),
       ),
     );
   }
@@ -704,12 +704,12 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: color.withAlpha(50)),
         ),
         child: Row(
@@ -735,12 +735,12 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
     final color = highlight ? const Color(0xFF6366F1) : const Color(0xFF374151);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           border: Border.all(color: color.withAlpha(50)),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -807,9 +807,9 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                   height: 32,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: isSelected ? secondaryColor : Colors.transparent,
+                    color: isSelected ? primary : Colors.transparent,
                     shape: BoxShape.circle,
-                    border: isToday ? Border.all(color: secondaryColor.withAlpha(100)) : null,
+                    border: isToday ? Border.all(color: primary.withAlpha(100)) : null,
                   ),
                   child: Text(
                     '$day',
@@ -818,7 +818,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                       fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.w500,
                       color: isSelected
                           ? Colors.white
-                          : (isPast ? Colors.grey[300] : (isToday ? secondaryColor : const Color(0xFF374151))),
+                          : (isPast ? Colors.grey[300] : (isToday ? primary : const Color(0xFF374151))),
                     ),
                   ),
                 ),
@@ -1066,14 +1066,14 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
               child: Row(
                 children: [
                   Checkbox(
                     value: allSelected,
-                    activeColor: secondaryColor,
+                    activeColor: primary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                     onChanged: _toggleAll,
                   ),
@@ -1085,7 +1085,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                   const Spacer(),
                   Text(
                     '${widget.services.where((s) => widget.selectedMap[s.serviceBranchId] == true).length} selected',
-                    style: TextStyle(fontSize: 12, color: secondaryColor, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 12, color: primary, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -1107,14 +1107,14 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                   final isSelected = widget.selectedMap[s.serviceBranchId] == true;
                   return InkWell(
                     onTap: () => setState(() => widget.selectedMap[s.serviceBranchId!] = !isSelected),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: isSelected ? secondaryColor.withAlpha(5) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        color: isSelected ? primary.withAlpha(5) : Colors.white,
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: isSelected ? secondaryColor.withAlpha(100) : const Color(0xFFE5E7EB),
+                          color: isSelected ? primary.withAlpha(100) : const Color(0xFFE5E7EB),
                           width: isSelected ? 1.5 : 1,
                         ),
                       ),
@@ -1123,13 +1123,13 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: isSelected ? secondaryColor.withAlpha(20) : const Color(0xFFF3F4F6),
+                              color: isSelected ? primary.withAlpha(20) : const Color(0xFFF3F4F6),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
                               Icons.medical_services_outlined,
                               size: 16,
-                              color: isSelected ? secondaryColor : const Color(0xFF9CA3AF),
+                              color: isSelected ? primary : const Color(0xFF9CA3AF),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -1155,7 +1155,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                           ),
                           Checkbox(
                             value: isSelected,
-                            activeColor: secondaryColor,
+                            activeColor: primary,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                             onChanged: (v) => setState(() => widget.selectedMap[s.serviceBranchId!] = v!),
                           ),
@@ -1175,7 +1175,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: Color(0xFFE5E7EB)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: Text(
                       'Cancel',
@@ -1188,11 +1188,11 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: secondaryColor,
+                      backgroundColor: primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Text('Apply Configuration', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),

@@ -552,7 +552,7 @@ class _PointHomepageState extends State<PointHomepage> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+                      borderSide: const BorderSide(color: primary, width: 1.5),
                     ),
                   ),
                   onSubmitted: (_) => _handleSearch(),
@@ -564,7 +564,7 @@ class _PointHomepageState extends State<PointHomepage> {
                 icon: const Icon(Icons.search, size: 16),
                 label: const Text('Search', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor,
+                  backgroundColor: primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -803,7 +803,7 @@ class _PointHomepageState extends State<PointHomepage> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: secondaryColor,
+                      backgroundColor: primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       visualDensity: VisualDensity.compact,
@@ -1334,9 +1334,9 @@ class _PointHomepageState extends State<PointHomepage> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: secondaryColor,
+                      backgroundColor: primary,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: const Text('Got It', style: TextStyle(fontWeight: FontWeight.w600)),

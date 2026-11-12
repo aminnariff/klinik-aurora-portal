@@ -416,7 +416,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFFBEB),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: const Color(0xFFFDE68A)),
                   ),
                   child: Row(
@@ -575,7 +575,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     disabledBackgroundColor: const Color(0xFFDF6E98).withValues(alpha: 0.6),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
                   child: _isLoggingIn
@@ -759,7 +759,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 1.5),
                 boxShadow: [
                   BoxShadow(
@@ -768,7 +768,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                     blurRadius: 40,
                   ),
                   BoxShadow(
-                    color: secondaryColor.withValues(alpha: 0.08),
+                    color: primary.withValues(alpha: 0.08),
                     offset: const Offset(0, 8),
                     blurRadius: 24,
                   ),
@@ -787,15 +787,15 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [secondaryColor, Color(0xFF3EA6B7)],
+                          gradient: LinearGradient(
+                            colors: [primary, primary.withValues(alpha: 0.8)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: secondaryColor.withValues(alpha: 0.35),
+                              color: primary.withValues(alpha: 0.35),
                               offset: const Offset(0, 6),
                               blurRadius: 14,
                             ),
@@ -896,16 +896,16 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                         borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: secondaryColor, width: 1.8),
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: primary, width: 1.5),
                       ),
                     ),
                   ),
@@ -915,7 +915,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFEF2F2),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: const Color(0xFFFECACA)),
                       ),
                       child: Row(
@@ -947,7 +947,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                         backgroundColor: primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       child: _isLoading
                           ? const SizedBox(

@@ -195,7 +195,7 @@ class AppDialog extends StatelessWidget {
             foregroundColor: item.textColor ?? Colors.white,
             elevation: 8,
             shadowColor: color.withValues(alpha: 0.35),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           child: Text(
             item.text ?? 'okay'.tr(),

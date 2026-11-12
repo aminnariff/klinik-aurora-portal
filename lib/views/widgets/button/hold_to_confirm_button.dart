@@ -30,7 +30,7 @@ class HoldToConfirmButton extends StatefulWidget {
     this.textColor = const Color(0xFFDC2626),
     this.height = 50,
     this.width,
-    this.borderRadius = 14,
+    this.borderRadius = 8,
     this.icon,
   });
 

@@ -142,7 +142,7 @@ class _NotificationScheduleEditorState extends State<NotificationScheduleEditor>
                               ChoiceChip(
                                 label: Text(channel.name),
                                 selected: _topic == channel.key,
-                                selectedColor: secondaryColor.withAlpha(40),
+                                selectedColor: primary.withAlpha(40),
                                 onSelected: (_) => setState(() => _topic = channel.key),
                               ),
                           ],
@@ -193,7 +193,7 @@ class _NotificationScheduleEditorState extends State<NotificationScheduleEditor>
                     Button(
                       _saving ? null : _save,
                       actionText: _saving ? 'Saving…' : 'Save Changes',
-                      color: secondaryColor,
+                      color: primary,
                     ),
                   ],
                 ),

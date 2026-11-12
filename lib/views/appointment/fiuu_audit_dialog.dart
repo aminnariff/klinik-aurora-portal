@@ -152,7 +152,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
                   child: ElevatedButton(
                     onPressed: _start,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: secondaryColor,
+                      backgroundColor: primary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
@@ -204,13 +204,13 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
     final selected = _mode == mode;
     return InkWell(
       onTap: () => setState(() => _mode = mode),
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFEFF6FF) : Colors.white,
-          border: Border.all(color: selected ? const Color(0xFF2563EB) : const Color(0xFFE5E7EB)),
-          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: selected ? primary : const Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

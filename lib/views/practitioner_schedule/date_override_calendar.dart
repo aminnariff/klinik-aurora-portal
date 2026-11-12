@@ -369,7 +369,11 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: secondaryColor, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
               onPressed: working.any((r) => !_isRangeValid(r)) ? null : () => Navigator.pop(ctx, working),
               child: const Text('Save'),
             ),

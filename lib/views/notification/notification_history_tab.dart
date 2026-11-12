@@ -39,7 +39,7 @@ class _NotificationHistoryTabState extends State<NotificationHistoryTab> {
             IconButton(
               tooltip: 'Refresh',
               onPressed: _refresh,
-              icon: const Icon(Icons.refresh_rounded, color: secondaryColor),
+              icon: const Icon(Icons.refresh_rounded, color: primary),
             ),
           ],
         ),
@@ -49,7 +49,7 @@ class _NotificationHistoryTabState extends State<NotificationHistoryTab> {
             future: _future,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: secondaryColor));
+                return const Center(child: CircularProgressIndicator(color: primary));
               }
               if (snapshot.hasError || !responseCode(snapshot.data?.code)) {
                 return _ErrorState(onRetry: _refresh);
@@ -133,7 +133,7 @@ class _ErrorState extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Unable to load announcements.', style: AppTypography.bodyMedium(context)),
           const SizedBox(height: 12),
-          Button(onRetry, actionText: 'Retry', color: secondaryColor),
+          Button(onRetry, actionText: 'Retry', color: primary),
         ],
       ),
     );

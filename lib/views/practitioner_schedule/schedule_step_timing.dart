@@ -157,7 +157,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
         ),
         const SizedBox(height: 6),
         InkWell(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           onTap: () async {
             final now = DateTime.now();
             final today = DateTime(now.year, now.month, now.day);
@@ -170,7 +170,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
               builder: (context, child) => Theme(
                 data: ThemeData(
                   colorScheme: const ColorScheme.light(
-                    primary: secondaryColor,
+                    primary: primary,
                     onPrimary: Colors.white,
                     surface: Colors.white,
                     onSurface: _textColor,
@@ -187,7 +187,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
               color: _neutralBg,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: _neutralBorder),
             ),
             child: Row(
@@ -231,7 +231,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: _neutralBg,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: _neutralBorder),
       ),
       child: Column(
@@ -253,7 +253,7 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
                     TextSpan(text: '${target.gapMinutes} min · '),
                     TextSpan(
                       text: '$count slot${count == 1 ? '' : 's'}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: secondaryColor),
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: primary),
                     ),
                   ],
                 ),
@@ -320,12 +320,12 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onTap: usable ? () => Navigator.pop(ctx, target) : null,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: usable ? Colors.white : const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Row(
@@ -333,13 +333,13 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: (usable ? secondaryColor : Colors.grey).withAlpha(20),
-                  borderRadius: BorderRadius.circular(10),
+                  color: (usable ? primary : Colors.grey).withAlpha(20),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.medical_services_rounded,
                   size: 18,
-                  color: usable ? secondaryColor : Colors.grey[400],
+                  color: usable ? primary : Colors.grey[400],
                 ),
               ),
               const SizedBox(width: 12),
@@ -398,10 +398,10 @@ class _ScheduleStepTimingState extends State<ScheduleStepTiming> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: secondaryColor.withAlpha(20),
-                      borderRadius: BorderRadius.circular(10),
+                      color: primary.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.download_rounded, size: 20, color: secondaryColor),
+                    child: const Icon(Icons.download_rounded, size: 20, color: primary),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(

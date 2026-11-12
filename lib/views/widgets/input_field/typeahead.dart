@@ -132,23 +132,23 @@ class DropdownSearch extends StatelessWidget {
                 ),
                 border: OutlineInputBorder(
                   borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: primary.withAlpha(opacityCalculation(.1)), width: 0.0),
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: primary.withAlpha(opacityCalculation(.1)), width: 0.0),
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 errorBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: errorColor, width: 1.0),
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 disabledBorder: OutlineInputBorder(
                   borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
               inputFormatters: [

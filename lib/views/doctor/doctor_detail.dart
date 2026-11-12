@@ -223,13 +223,13 @@ class _DoctorDetailsState extends State<DoctorDetails> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: secondaryColor.withAlpha(25),
-              borderRadius: BorderRadius.circular(10),
+              color: primary.withAlpha(20),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               widget.type == 'create' ? Icons.person_add_rounded : Icons.person_rounded,
               size: 20,
-              color: secondaryColor,
+              color: primary,
             ),
           ),
           const SizedBox(width: 12),
@@ -489,10 +489,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: secondaryColor.withAlpha(20),
+                                      color: primary.withAlpha(20),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: Icon(Icons.add_a_photo_outlined, size: 24, color: secondaryColor),
+                                    child: Icon(Icons.add_a_photo_outlined, size: 24, color: primary),
                                   ),
                                   const SizedBox(height: 8),
                                   const Text(

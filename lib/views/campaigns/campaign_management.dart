@@ -148,7 +148,7 @@ class _CampaignManagementState extends State<CampaignManagement> {
         icon: Icons.error_outline_rounded,
         title: 'Could not load campaigns',
         message: _error!,
-        action: Button(_load, actionText: 'Retry', color: secondaryColor),
+        action: Button(_load, actionText: 'Retry', color: primary),
       );
     }
 
@@ -157,7 +157,7 @@ class _CampaignManagementState extends State<CampaignManagement> {
         icon: Icons.campaign_rounded,
         title: 'No campaigns yet',
         message: 'Create one to run a point multiplier or re-skin the mobile app for a festive season.',
-        action: Button(() => _openEditor(), actionText: 'New Campaign', color: secondaryColor),
+        action: Button(() => _openEditor(), actionText: 'New Campaign', color: primary),
       );
     }
 
@@ -305,7 +305,7 @@ class _CampaignCardState extends State<_CampaignCard> {
                                 TextButton.icon(
                                   icon: const Icon(Icons.edit_outlined, size: 16),
                                   label: const Text('Edit'),
-                                  style: TextButton.styleFrom(foregroundColor: secondaryColor),
+                                  style: TextButton.styleFrom(foregroundColor: primary),
                                   onPressed: widget.onEdit,
                                 ),
                                 const SizedBox(width: 8),

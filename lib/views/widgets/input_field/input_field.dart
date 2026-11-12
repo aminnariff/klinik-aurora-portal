@@ -229,7 +229,7 @@ InputDecoration appInputDecoration(BuildContext context, String label) {
       borderRadius: BorderRadius.circular(8.0),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+      borderSide: const BorderSide(color: primary, width: 1.5),
       borderRadius: BorderRadius.circular(8.0),
     ),
     enabledBorder: OutlineInputBorder(

@@ -106,7 +106,7 @@ class _ModeToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
       child: Wrap(
         spacing: 4,
         runSpacing: 4,
@@ -155,7 +155,7 @@ class _ToggleOption extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 15, color: isSelected ? secondaryColor : const Color(0xFF637381)),
+              Icon(icon, size: 15, color: isSelected ? primary : const Color(0xFF637381)),
               const SizedBox(width: 6),
               Text(
                 label,
@@ -188,7 +188,7 @@ class _DateField extends StatelessWidget {
         calendarType: CalendarDatePicker2Type.single,
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(const Duration(days: 365)),
-        selectedDayHighlightColor: secondaryColor,
+        selectedDayHighlightColor: primary,
         weekdayLabelTextStyle: TextStyle(color: Colors.grey.shade600),
         controlsTextStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         selectedDayTextStyle: const TextStyle(color: Colors.white),
@@ -197,7 +197,7 @@ class _DateField extends StatelessWidget {
       ),
       value: [value],
       dialogSize: Size(screenWidthByBreakpoint(90, 70, 50), screenHeightByBreakpoint(90, 80, 50)),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(8),
     );
 
     final picked = results?.firstOrNull;

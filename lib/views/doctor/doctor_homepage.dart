@@ -141,7 +141,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                     icon: Icons.person_add_alt_1_rounded,
                     tooltip: 'Add Practitioner',
                     color: Colors.white,
-                    background: secondaryColor,
+                    background: primary,
                     onTap: () => showDialog(
                       context: context,
                       builder: (_) => const DoctorDetails(type: 'create'),
@@ -725,7 +725,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+          borderSide: const BorderSide(color: primary, width: 1.5),
         ),
       ),
     );

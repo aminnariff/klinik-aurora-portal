@@ -491,8 +491,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             icon: const Icon(Icons.tune_rounded, size: 15),
             label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
             style: OutlinedButton.styleFrom(
-              foregroundColor: _hasActiveFilters() ? secondaryColor : const Color(0xFF374151),
-              side: BorderSide(color: _hasActiveFilters() ? secondaryColor : const Color(0xFFD1D5DB)),
+              foregroundColor: _hasActiveFilters() ? primary : const Color(0xFF374151),
+              side: BorderSide(color: _hasActiveFilters() ? primary : const Color(0xFFD1D5DB)),
               padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14, vertical: isMobile ? 8 : 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -584,16 +584,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: secondaryColor.withAlpha(18),
-                                border: Border.all(color: secondaryColor.withAlpha(90)),
-                                borderRadius: BorderRadius.circular(10),
+                                color: primary.withAlpha(18),
+                                border: Border.all(color: primary.withAlpha(90)),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
-                                      const Icon(Icons.event_rounded, size: 15, color: secondaryColor),
+                                      const Icon(Icons.event_rounded, size: 15, color: primary),
                                       const SizedBox(width: 6),
                                       Expanded(
                                         child: Text(
@@ -601,7 +601,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                           style: const TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w700,
-                                            color: secondaryColor,
+                                            color: primary,
                                           ),
                                         ),
                                       ),
@@ -664,7 +664,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                 icon: const Icon(Icons.search_rounded, size: 16),
                                 label: const Text('Apply Filters', style: TextStyle(fontWeight: FontWeight.w600)),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: secondaryColor,
+                                  backgroundColor: primary,
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -780,7 +780,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
+          borderSide: const BorderSide(color: primary, width: 1.5),
         ),
       ),
     );
@@ -1178,7 +1178,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   Widget _buildMobileAppointmentList(BuildContext context, List<Data> data, AuthController authController) {
     return RefreshIndicator(
-      color: secondaryColor,
+      color: primary,
       onRefresh: () async => filtering(),
       child: ListView.builder(
         padding: const EdgeInsets.only(top: 4, bottom: 24),

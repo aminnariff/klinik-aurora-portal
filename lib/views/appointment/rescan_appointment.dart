@@ -119,7 +119,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                 return ChoiceChip(
                                   label: Text('$mins mins'),
                                   selected: isSelected,
-                                  selectedColor: secondaryColor,
+                                  selectedColor: primary,
                                   backgroundColor: const Color(0xFFF3F4F6),
                                   labelStyle: TextStyle(
                                     color: isSelected ? Colors.white : const Color(0xFF374151),
@@ -129,7 +129,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
-                                      color: isSelected ? secondaryColor : const Color(0xFFE5E7EB),
+                                      color: isSelected ? primary : const Color(0xFFE5E7EB),
                                     ),
                                   ),
                                   onSelected: (selected) {
@@ -217,7 +217,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: secondaryColor),
+                                borderSide: const BorderSide(color: primary, width: 1.5),
                               ),
                             ),
                           ),
@@ -236,9 +236,9 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   padding: WidgetStateProperty.all(
                                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                   ),
-                                  backgroundColor: WidgetStateProperty.all(secondaryColor),
+                                  backgroundColor: WidgetStateProperty.all(primary),
                                   shape: WidgetStateProperty.all(
-                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   ),
                                 ),
                                 icon: const Icon(Icons.calendar_today, color: Colors.white, size: 16),
@@ -427,7 +427,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                               },
                               actionText: 'Book',
                               width: 160,
-                              borderRadius: 6,
+                              borderRadius: 8,
                               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                             ),
                           ),

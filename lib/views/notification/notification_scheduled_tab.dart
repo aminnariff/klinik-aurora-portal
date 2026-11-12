@@ -97,7 +97,7 @@ class _NotificationScheduledTabState extends State<NotificationScheduledTab> {
             const SizedBox(height: 12),
             Text(_error!, textAlign: TextAlign.center, style: AppTypography.bodyMedium(context)),
             const SizedBox(height: 16),
-            Button(_load, actionText: 'Retry', color: secondaryColor),
+            Button(_load, actionText: 'Retry', color: primary),
           ],
         ),
       );
@@ -108,7 +108,7 @@ class _NotificationScheduledTabState extends State<NotificationScheduledTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.schedule_rounded, size: 48, color: secondaryColor.withAlpha(100)),
+            Icon(Icons.schedule_rounded, size: 48, color: primary.withAlpha(100)),
             const SizedBox(height: 12),
             Text('Nothing scheduled', style: AppTypography.bodyLarge(context)),
             const SizedBox(height: 6),
@@ -242,7 +242,7 @@ class _ScheduledRow extends StatelessWidget {
         if (item.isPending) ...[
           IconButton(
             icon: const Icon(Icons.edit_outlined, size: 20),
-            color: secondaryColor,
+            color: primary,
             tooltip: 'Edit',
             onPressed: onEdit,
           ),

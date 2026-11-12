@@ -40,16 +40,16 @@ class _ChannelCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(8),
       child: Semantics(
         selected: isSelected,
         button: true,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFEFFAFC) : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: isSelected ? secondaryColor : const Color(0xFFE5E7EB), width: isSelected ? 2 : 1),
+            color: isSelected ? primary.withAlpha(15) : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: isSelected ? primary : const Color(0xFFE5E7EB), width: isSelected ? 2 : 1),
           ),
           child: Row(
             children: [
@@ -83,7 +83,7 @@ class _ChannelCard extends StatelessWidget {
               SizedBox(
                 width: 22,
                 child: isSelected
-                    ? const ExcludeSemantics(child: Icon(Icons.check_circle_rounded, color: secondaryColor, size: 22))
+                    ? const ExcludeSemantics(child: Icon(Icons.check_circle_rounded, color: primary, size: 22))
                     : null,
               ),
             ],

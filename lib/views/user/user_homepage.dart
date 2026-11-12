@@ -23,6 +23,7 @@ import 'package:klinik_aurora_portal/views/user/user_detail.dart';
 import 'package:klinik_aurora_portal/views/user/user_point_detail.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_filter_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
@@ -238,7 +239,7 @@ class _UserHomepageState extends State<UserHomepage> {
                       const SizedBox(width: 8),
                       Text(
                         '${user.totalPoint ?? 0} pts',
-                        style: AppTypography.bodyMedium(context).apply(color: secondaryColor, fontWeightDelta: 1),
+                        style: AppTypography.bodyMedium(context).apply(color: primary, fontWeightDelta: 1),
                       ),
                     ],
                   ),
@@ -279,47 +280,17 @@ class _UserHomepageState extends State<UserHomepage> {
         children: [
           // Search
           Expanded(
-            child: SizedBox(
-              height: 40,
-              child: TextField(
-                controller: _userFullNameController,
-                onChanged: (_) {
-                  setState(() {});
-                  filtering(page: 1);
-                },
-                style: AppTypography.bodyMedium(context),
-                decoration: InputDecoration(
-                  hintText: 'Search by name, username…',
-                  hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
-                  prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 18),
-                  suffixIcon: _userFullNameController.text.isNotEmpty
-                      ? IconButton(
-  tooltip: 'Kosongkan',
-                          icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
-                          onPressed: () {
-                            _userFullNameController.clear();
-                            filtering(enableDebounce: false, page: 1);
-                            setState(() {});
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: const Color(0xFFF9FAFB),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-                  ),
-                ),
-              ),
+            child: AppFilterField(
+              controller: _userFullNameController,
+              hintText: 'Search by name, username…',
+              onChanged: (_) {
+                setState(() {});
+                filtering(page: 1);
+              },
+              onClear: () {
+                filtering(enableDebounce: false, page: 1);
+                setState(() {});
+              },
             ),
           ),
           const SizedBox(width: 12),
@@ -359,7 +330,7 @@ class _UserHomepageState extends State<UserHomepage> {
             icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
             label: const Text('Add Patient', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: secondaryColor,
+              backgroundColor: primary,
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -481,10 +452,10 @@ class _UserHomepageState extends State<UserHomepage> {
       DataCell(
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(color: secondaryColor.withAlpha(25), borderRadius: BorderRadius.circular(20)),
+          decoration: BoxDecoration(color: primary.withAlpha(25), borderRadius: BorderRadius.circular(8)),
           child: Text(
             '${user.totalPoint ?? 0}',
-            style: TextStyle(color: secondaryColor.withAlpha(230), fontWeight: FontWeight.w700, fontSize: 12),
+            style: TextStyle(color: primary.withAlpha(230), fontWeight: FontWeight.w700, fontSize: 12),
           ),
         ),
       ),
@@ -706,29 +677,10 @@ class _UserHomepageState extends State<UserHomepage> {
   }
 
   Widget _filterField(TextEditingController controller, String label) {
-    return TextField(
+    return AppFilterField(
       controller: controller,
+      hintText: label,
       onChanged: (_) => filtering(page: 1),
-      style: const TextStyle(fontSize: 13),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(fontSize: 13),
-        filled: true,
-        fillColor: const Color(0xFFF9FAFB),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-        ),
-      ),
     );
   }
 

@@ -218,14 +218,14 @@ class _AppImageFieldState extends State<AppImageField> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: secondaryColor.withAlpha(35),
+                                color: primary.withAlpha(20),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: const Color(0xFFE5E7EB)),
                               ),
                               child: Icon(
                                 hasValue ? Icons.autorenew_rounded : Icons.upload_rounded,
                                 size: 20,
-                                color: secondaryColor,
+                                color: primary,
                               ),
                             ),
                           ),

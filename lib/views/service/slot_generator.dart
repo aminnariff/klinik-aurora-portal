@@ -96,7 +96,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: Container(
           width: math.min(550, MediaQuery.of(context).size.width * 0.9),
           padding: const EdgeInsets.all(32),
@@ -154,13 +154,13 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      backgroundColor: secondaryColor.withAlpha(20),
+                      backgroundColor: primary.withAlpha(20),
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Text(
                       'Got it!',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: secondaryColor),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: primary),
                     ),
                   ),
                 ],
@@ -182,7 +182,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
             width: 28,
             height: 28,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
             child: Text(
               '$number',
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
@@ -220,10 +220,10 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: secondaryColor.withAlpha(20),
-                    borderRadius: BorderRadius.circular(10),
+                    color: primary.withAlpha(20),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.auto_awesome_rounded, color: secondaryColor, size: 22),
+                  child: const Icon(Icons.auto_awesome_rounded, color: primary, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -274,7 +274,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
               child: Column(
@@ -343,7 +343,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
               child: Wrap(

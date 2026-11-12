@@ -929,15 +929,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             fillColor: Colors.white,
                                                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                                             border: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderRadius: BorderRadius.circular(8),
                                                               borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                                             ),
                                                             enabledBorder: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderRadius: BorderRadius.circular(8),
                                                               borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderRadius: BorderRadius.circular(8),
                                                               borderSide: const BorderSide(color: Color(0xFF6366F1)),
                                                             ),
                                                           ),
@@ -977,15 +977,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               vertical: 10,
                                                             ),
                                                             border: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderRadius: BorderRadius.circular(8),
                                                               borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                                             ),
                                                             enabledBorder: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderRadius: BorderRadius.circular(8),
                                                               borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
-                                                              borderRadius: BorderRadius.circular(10),
+                                                              borderRadius: BorderRadius.circular(8),
                                                               borderSide: const BorderSide(color: Color(0xFF6366F1)),
                                                             ),
                                                           ),
@@ -1018,11 +1018,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                   ),
                                                                   border: OutlineInputBorder(
                                                                     borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                    borderRadius: BorderRadius.circular(8),
                                                                   ),
                                                                   enabledBorder: OutlineInputBorder(
                                                                     borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                    borderRadius: BorderRadius.circular(8),
                                                                   ),
                                                                   suffixIcon: const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF6B7280)),
                                                                 ),
@@ -1164,7 +1164,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                         : _bookingFeeCollected
                                                                         ? const Color(0xFFF0FDF4)
                                                                         : const Color(0xFFFFF7ED),
-                                                                    borderRadius: BorderRadius.circular(10),
+                                                                    borderRadius: BorderRadius.circular(8),
                                                                     border: Border.all(
                                                                       color: _feeWaived
                                                                           ? const Color(0xFF93C5FD)
@@ -1625,7 +1625,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 return ChoiceChip(
                                                   label: Text('$mins mins'),
                                                   selected: isSelected,
-                                                  selectedColor: secondaryColor,
+                                                  selectedColor: primary,
                                                   backgroundColor: const Color(0xFFF3F4F6),
                                                   labelStyle: TextStyle(
                                                     color: isSelected ? Colors.white : const Color(0xFF374151),
@@ -1635,7 +1635,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius: BorderRadius.circular(8),
                                                     side: BorderSide(
-                                                      color: isSelected ? secondaryColor : const Color(0xFFE5E7EB),
+                                                      color: isSelected ? primary : const Color(0xFFE5E7EB),
                                                     ),
                                                   ),
                                                   onSelected: (selected) {
@@ -1888,11 +1888,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               ),
                                                               border: OutlineInputBorder(
                                                                 borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                                                borderRadius: BorderRadius.circular(10.0),
+                                                                borderRadius: BorderRadius.circular(8),
                                                               ),
                                                               enabledBorder: OutlineInputBorder(
                                                                 borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                                                borderRadius: BorderRadius.circular(10.0),
+                                                                borderRadius: BorderRadius.circular(8),
                                                               ),
                                                               suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
                                                             ),
@@ -2308,7 +2308,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Column(
@@ -2420,7 +2420,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Column(
@@ -2592,7 +2592,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Column(
@@ -2641,7 +2641,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: const Color(0xFFFFFBEB),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFFDE68A)),
           ),
           child: Column(
@@ -2698,7 +2698,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Column(
@@ -2772,7 +2772,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     return ChoiceChip(
                       label: Text('$mins mins'),
                       selected: isSelected,
-                      selectedColor: secondaryColor,
+                      selectedColor: primary,
                       backgroundColor: const Color(0xFFF3F4F6),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : const Color(0xFF374151),
@@ -2782,7 +2782,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: BorderSide(
-                          color: isSelected ? secondaryColor : const Color(0xFFE5E7EB),
+                          color: isSelected ? primary : const Color(0xFFE5E7EB),
                         ),
                       ),
                       onSelected: (selected) {
@@ -2900,11 +2900,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       ),
                                       border: OutlineInputBorder(
                                         borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                        borderRadius: BorderRadius.circular(10.0),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                        borderRadius: BorderRadius.circular(10.0),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
                                     ),
@@ -2952,11 +2952,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               ),
                               border: OutlineInputBorder(
                                 borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                borderRadius: BorderRadius.circular(10.0),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
-                                borderRadius: BorderRadius.circular(10.0),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               suffixIcon: const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF6B7280)),
                             ),
@@ -3094,7 +3094,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Column(
@@ -3119,15 +3119,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Color(0xFF6366F1)),
                         ),
                       ),
@@ -3152,15 +3152,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Color(0xFF6366F1)),
                         ),
                       ),
@@ -3183,7 +3183,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Column(

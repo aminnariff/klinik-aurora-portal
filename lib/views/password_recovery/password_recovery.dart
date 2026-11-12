@@ -231,7 +231,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                   }
                 });
               },
-              color: secondaryColor,
+              color: primary,
               actionText: 'button'.tr(gender: 'resetPassword'),
             ),
           ],

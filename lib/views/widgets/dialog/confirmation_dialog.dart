@@ -149,7 +149,7 @@ class ConfirmationDialog extends StatelessWidget {
             foregroundColor: attribute.confrimButton?.textColor ?? Colors.white,
             elevation: 8,
             shadowColor: color.withValues(alpha: 0.35),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           child: Text(
             attribute.confrimButton?.text ?? 'Confirm',
@@ -171,7 +171,7 @@ class ConfirmationDialog extends StatelessWidget {
           style: TextButton.styleFrom(
             backgroundColor: const Color(0xFFF1F5F9),
             foregroundColor: const Color(0xFF334155),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           child: Text(
             attribute.cancelButton?.text ?? 'Cancel',

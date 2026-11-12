@@ -112,18 +112,18 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           formatButtonTextStyle: AppTypography.bodyMedium(
             context,
           ).copyWith(color: Colors.white, fontWeight: FontWeight.w600),
-          formatButtonDecoration: BoxDecoration(color: secondaryColor, borderRadius: BorderRadius.circular(8)),
+          formatButtonDecoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(8)),
           leftChevronIcon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF6B7280)),
           rightChevronIcon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6B7280)),
           headerPadding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
         ),
         calendarBuilders: CalendarBuilders(prioritizedBuilder: (context, date, focusedDay) => _buildDayCell(date)),
         calendarStyle: CalendarStyle(
-          selectedDecoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
-          todayDecoration: BoxDecoration(color: secondaryColor.withAlpha(40), shape: BoxShape.circle),
+          selectedDecoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
+          todayDecoration: BoxDecoration(color: primary.withAlpha(40), shape: BoxShape.circle),
           todayTextStyle: AppTypography.bodyMedium(
             context,
-          ).copyWith(fontWeight: FontWeight.w700, color: secondaryColor),
+          ).copyWith(fontWeight: FontWeight.w700, color: primary),
           cellMargin: const EdgeInsets.all(2),
           defaultTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF374151), fontSize: 12),
           weekendTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF9CA3AF), fontSize: 12),
@@ -149,8 +149,8 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFF0F5FF) : null,
-        border: isSelected ? Border.all(color: secondaryColor.withAlpha(80), width: 1) : null,
+        color: isSelected ? primary.withAlpha(15) : null,
+        border: isSelected ? Border.all(color: primary.withAlpha(80), width: 1) : null,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +159,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             width: 26,
             height: 26,
             alignment: Alignment.center,
-            decoration: isToday ? const BoxDecoration(color: secondaryColor, shape: BoxShape.circle) : null,
+            decoration: isToday ? const BoxDecoration(color: primary, shape: BoxShape.circle) : null,
             child: Text(
               '${date.day}',
               style: TextStyle(
@@ -177,10 +177,10 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             Container(
               width: count > 9 ? null : 18,
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              decoration: BoxDecoration(color: secondaryColor.withAlpha(30), borderRadius: BorderRadius.circular(9)),
+              decoration: BoxDecoration(color: primary.withAlpha(30), borderRadius: BorderRadius.circular(8)),
               child: Text(
                 '$count',
-                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: secondaryColor),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: primary),
                 textAlign: TextAlign.center,
               ),
             )
@@ -226,7 +226,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
       decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
       child: Row(
         children: [
-          Icon(isToday ? Icons.today_rounded : Icons.calendar_today_rounded, size: 16, color: secondaryColor),
+          Icon(isToday ? Icons.today_rounded : Icons.calendar_today_rounded, size: 16, color: primary),
           const SizedBox(width: 8),
           Text(
             label,
@@ -237,12 +237,12 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(color: secondaryColor.withAlpha(20), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: primary.withAlpha(20), borderRadius: BorderRadius.circular(8)),
             child: Text(
               '$count appointment${count == 1 ? '' : 's'}',
               style: AppTypography.bodyMedium(
                 context,
-              ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: secondaryColor),
+              ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: primary),
             ),
           ),
         ],
@@ -252,7 +252,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
   Widget _buildDayAppointments() {
     if (widget.isLoadingDay) {
-      return const Center(child: CircularProgressIndicator(color: secondaryColor));
+      return const Center(child: CircularProgressIndicator(color: primary));
     }
 
     final list = widget.dayAppointments;

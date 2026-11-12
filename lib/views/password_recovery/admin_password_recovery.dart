@@ -269,8 +269,8 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      secondaryColor.withValues(alpha: 0.16),
-                      secondaryColor.withValues(alpha: 0.0),
+                      primary.withValues(alpha: 0.16),
+                      primary.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -313,7 +313,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                           padding: const EdgeInsets.all(36),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: Colors.white.withValues(alpha: 0.9),
                               width: 1.5,
@@ -325,7 +325,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                                 blurRadius: 40,
                               ),
                               BoxShadow(
-                                color: secondaryColor.withValues(alpha: 0.06),
+                                color: primary.withValues(alpha: 0.06),
                                 offset: const Offset(0, 8),
                                 blurRadius: 24,
                               ),
@@ -460,7 +460,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
       ),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
       ),
     );
@@ -468,11 +468,11 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
     final focusedPinTheme = defaultPinTheme.copyWith(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: secondaryColor, width: 2),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: primary, width: 2),
         boxShadow: [
           BoxShadow(
-            color: secondaryColor.withValues(alpha: 0.25),
+            color: primary.withValues(alpha: 0.25),
             offset: const Offset(0, 4),
             blurRadius: 10,
           ),
@@ -483,7 +483,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: BoxDecoration(
         color: const Color(0xFFF0FDF4),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF86EFAC), width: 1.5),
       ),
     );
@@ -491,7 +491,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
     final errorPinTheme = defaultPinTheme.copyWith(
       decoration: BoxDecoration(
         color: const Color(0xFFFEF2F2),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFEF4444), width: 1.5),
       ),
     );
@@ -508,15 +508,15 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [secondaryColor, Color(0xFF3EA6B7)],
+                gradient: LinearGradient(
+                  colors: [primary, primary.withValues(alpha: 0.85)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: secondaryColor.withValues(alpha: 0.35),
+                    color: primary.withValues(alpha: 0.35),
                     offset: const Offset(0, 6),
                     blurRadius: 14,
                   ),
@@ -531,21 +531,21 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: secondaryColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: secondaryColor.withValues(alpha: 0.3)),
+                color: primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primary.withValues(alpha: 0.3)),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.verified_user_outlined, size: 13, color: secondaryColor),
+                  Icon(Icons.verified_user_outlined, size: 13, color: primary),
                   SizedBox(width: 5),
                   Text(
                     'SECURITY VERIFICATION',
                     style: TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
-                      color: secondaryColor,
+                      color: primary,
                       letterSpacing: 0.6,
                     ),
                   ),
@@ -579,7 +579,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: const Color(0xFFF0FDF4),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFFBBF7D0)),
             ),
             child: Row(
@@ -667,14 +667,14 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.refresh_rounded, size: 14, color: secondaryColor),
+                            Icon(Icons.refresh_rounded, size: 14, color: primary),
                             SizedBox(width: 4),
                             Text(
                               'Resend Code',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: secondaryColor,
+                                color: primary,
                               ),
                             ),
                           ],
@@ -738,16 +738,16 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: secondaryColor, width: 1.8),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: primary, width: 1.5),
             ),
           ),
         ),
@@ -787,16 +787,16 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: secondaryColor, width: 1.8),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: primary, width: 1.5),
             ),
           ),
         ),
@@ -842,7 +842,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: Column(
@@ -884,7 +884,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: const Color(0xFFFEF2F2),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFFFECACA)),
             ),
             child: Row(
@@ -916,19 +916,19 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             onPressed: _isSubmitting ? null : _submitReset,
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.zero,
-              backgroundColor: secondaryColor,
-              shadowColor: secondaryColor.withValues(alpha: 0.4),
+              backgroundColor: primary,
+              shadowColor: primary.withValues(alpha: 0.4),
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: Ink(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [secondaryColor, Color(0xFF3EA6B7)],
+                gradient: LinearGradient(
+                  colors: [primary, primary.withValues(alpha: 0.85)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: _isSubmitting
@@ -1046,19 +1046,19 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
               onPressed: () => context.goNamed(LoginPage.routeName),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.zero,
-                backgroundColor: secondaryColor,
-                shadowColor: secondaryColor.withValues(alpha: 0.4),
+                backgroundColor: primary,
+                shadowColor: primary.withValues(alpha: 0.4),
                 elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Ink(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [secondaryColor, Color(0xFF3EA6B7)],
+                  gradient: LinearGradient(
+                    colors: [primary, primary.withValues(alpha: 0.85)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Center(
                   child: Text(
@@ -1083,17 +1083,17 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                     onPressed: () => isSuccess.value = null,
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero,
-                      backgroundColor: secondaryColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: Ink(
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [secondaryColor, Color(0xFF3EA6B7)],
+                        gradient: LinearGradient(
+                          colors: [primary, primary.withValues(alpha: 0.85)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Center(
                         child: Text(
@@ -1113,7 +1113,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                     onPressed: () => context.goNamed(LoginPage.routeName),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFCBD5E1)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Text(
                       'Back to Sign In',
@@ -1185,17 +1185,17 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                     onPressed: () => context.goNamed(LoginPage.routeName),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero,
-                      backgroundColor: secondaryColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: Ink(
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [secondaryColor, Color(0xFF3EA6B7)],
+                        gradient: LinearGradient(
+                          colors: [primary, primary.withValues(alpha: 0.85)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Center(
                         child: Text(

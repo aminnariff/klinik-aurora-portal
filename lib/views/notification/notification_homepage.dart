@@ -262,18 +262,18 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
         else
           const SizedBox.shrink(),
         if (_step < 3)
-          Button(_canProceed && !_sending ? _next : null, actionText: 'Next', color: secondaryColor)
+          Button(_canProceed && !_sending ? _next : null, actionText: 'Next', color: primary)
         else if (_scheduledFor != null)
           Button(
             _sending ? null : _schedule,
             actionText: _sending ? 'Scheduling…' : 'Schedule Announcement',
-            color: secondaryColor,
+            color: primary,
           )
         else
           Button(
             _sending ? null : _send,
             actionText: _sending ? 'Sending…' : 'Send Now',
-            color: secondaryColor,
+            color: primary,
           ),
       ],
     );
@@ -303,7 +303,7 @@ class _StepIndicator extends StatelessWidget {
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: i + 1 <= current ? secondaryColor : const Color(0xFFE5E7EB),
+                  color: i + 1 <= current ? primary : const Color(0xFFE5E7EB),
                 ),
                 alignment: Alignment.center,
                 child: i + 1 < current
@@ -341,7 +341,7 @@ class _SegmentedControl extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

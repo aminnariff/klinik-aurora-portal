@@ -176,7 +176,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                   }
                 });
               },
-              color: secondaryColor,
+              color: primary,
               actionText: 'button'.tr(gender: 'resetPassword'),
             ),
           ],

@@ -159,9 +159,10 @@ class _AppMultiImageFieldState extends State<AppMultiImageField> {
               ElevatedButton(
                 onPressed: _addUrl,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor,
+                  backgroundColor: primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 child: const Text('Add'),
               ),

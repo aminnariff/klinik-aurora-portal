@@ -163,7 +163,7 @@ class _PointItemsManagementState extends State<PointItemsManagement> {
         icon: Icons.error_outline_rounded,
         title: 'Could not load modifiers',
         message: _error!,
-        action: Button(_load, actionText: 'Retry', color: secondaryColor),
+        action: Button(_load, actionText: 'Retry', color: primary),
       );
     }
 
@@ -172,7 +172,7 @@ class _PointItemsManagementState extends State<PointItemsManagement> {
         icon: Icons.stars_rounded,
         title: 'No modifiers yet',
         message: 'Create one to let branch staff add a bonus on top of the points a transaction earns.',
-        action: Button(() => _openEditor(), actionText: 'New Modifier', color: secondaryColor),
+        action: Button(() => _openEditor(), actionText: 'New Modifier', color: primary),
       );
     }
 
@@ -670,7 +670,7 @@ class _ModifierCardState extends State<_ModifierCard> {
                             TextButton.icon(
                               icon: const Icon(Icons.edit_outlined, size: 16),
                               label: const Text('Edit'),
-                              style: TextButton.styleFrom(foregroundColor: secondaryColor),
+                              style: TextButton.styleFrom(foregroundColor: primary),
                               onPressed: widget.onEdit,
                             ),
                             const SizedBox(width: 8),

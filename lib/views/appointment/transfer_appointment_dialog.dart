@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
@@ -338,7 +339,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFC),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: const Color(0xFFE2E8F0)),
                             ),
                             child: Column(
@@ -508,7 +509,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(color: primary, width: 1.5),
                               ),
                             ),
                           ),
@@ -537,7 +538,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(color: primary, width: 1.5),
                               ),
                             ),
                           ),
@@ -590,7 +591,9 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                               const SizedBox(width: 12),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2563EB),
+                                  backgroundColor: primary,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
                                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),

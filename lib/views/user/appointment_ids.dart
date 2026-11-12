@@ -35,7 +35,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
     final appointments = widget.response?.data ?? [];
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
       child: ConstrainedBox(
@@ -57,10 +57,10 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: secondaryColor.withValues(alpha: 0.1),
+                    backgroundColor: primary.withValues(alpha: 0.1),
                     child: Text(
                       _initials(widget.patient?.userFullname),
-                      style: TextStyle(color: secondaryColor, fontWeight: FontWeight.bold, fontSize: 18),
+                      style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -129,14 +129,14 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey.shade100),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           onTap: () => _onTapAppointment(item.appointmentId),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -146,7 +146,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                 Container(
                   width: 60,
                   height: 60,
-                  decoration: BoxDecoration(color: primary.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: primary.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

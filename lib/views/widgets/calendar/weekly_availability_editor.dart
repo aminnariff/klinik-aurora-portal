@@ -180,7 +180,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
 
     _notify();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Master timing pushed to selected $targetCategory.'), backgroundColor: secondaryColor),
+      SnackBar(content: Text('Master timing pushed to selected $targetCategory.'), backgroundColor: primary),
     );
   }
 
@@ -219,7 +219,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
       builder: (context, child) => Theme(
         data: ThemeData(
           colorScheme: const ColorScheme.light(
-            primary: secondaryColor,
+            primary: primary,
             onPrimary: Colors.white,
             surface: Colors.white,
             onSurface: Color(0xFF111827),
@@ -278,9 +278,9 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
                 color: isSelected ? Colors.white : const Color(0xFFF9FAFB).withAlpha(150),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isSelected ? secondaryColor.withAlpha(100) : const Color(0xFFE5E7EB),
+                  color: isSelected ? primary.withAlpha(100) : const Color(0xFFE5E7EB),
                   width: isSelected ? 1.5 : 1,
                 ),
                 boxShadow: isSelected
@@ -295,7 +295,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                       selectedDays[day] = !isSelected;
                       _notify();
                     },
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       child: Row(
@@ -305,7 +305,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                             height: 24,
                             child: Checkbox(
                               value: isSelected,
-                              activeColor: secondaryColor,
+                              activeColor: primary,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                               onChanged: (val) {
                                 selectedDays[day] = val!;
@@ -433,9 +433,9 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                             icon: const Icon(Icons.add_rounded, size: 16),
                             label: const Text('Add Range', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             style: TextButton.styleFrom(
-                              foregroundColor: secondaryColor,
+                              foregroundColor: primary,
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              backgroundColor: secondaryColor.withAlpha(15),
+                              backgroundColor: primary.withAlpha(15),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                           ),
@@ -516,12 +516,12 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [secondaryColor, secondaryColor.withAlpha(200)],
+          colors: [primary, primary.withAlpha(200)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: secondaryColor.withAlpha(60), blurRadius: 10, offset: const Offset(0, 4))],
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [BoxShadow(color: primary.withAlpha(60), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -601,7 +601,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                 child: Checkbox(
                   value: hasMasterBreak,
                   activeColor: Colors.white,
-                  checkColor: secondaryColor,
+                  checkColor: primary,
                   side: const BorderSide(color: Colors.white70),
                   onChanged: (v) => setState(() => hasMasterBreak = v!),
                 ),
@@ -655,7 +655,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
               onPressed: _syncMasterToSelected,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: secondaryColor,
+                foregroundColor: primary,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 elevation: 0,

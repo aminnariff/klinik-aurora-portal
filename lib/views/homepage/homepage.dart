@@ -820,8 +820,8 @@ class _HomepageState extends State<Homepage> {
                   const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
-                    child: const Icon(Icons.person_rounded, color: tertiaryColor, size: 18),
+                    decoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
+                    child: const Icon(Icons.person_rounded, color: Colors.white, size: 18),
                   ),
                   const SizedBox(width: 4),
                   const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF9CA3AF), size: 18),
@@ -878,8 +878,8 @@ class _HomepageState extends State<Homepage> {
                   const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(color: secondaryColor, shape: BoxShape.circle),
-                    child: const Icon(Icons.person, color: tertiaryColor, size: 18),
+                    decoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
+                    child: const Icon(Icons.person, color: Colors.white, size: 18),
                   ),
                 ],
               ),

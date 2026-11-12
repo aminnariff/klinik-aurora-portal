@@ -34,7 +34,7 @@ class CheckBoxWidget extends StatelessWidget {
       WidgetState.focused,
     };
     if (states.any(interactiveStates.contains)) {
-      return isDisable ? Colors.grey : secondaryColor;
+      return isDisable ? Colors.grey : primary;
     }
     return isDisable
         ? Colors.grey
