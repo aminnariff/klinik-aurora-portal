@@ -228,6 +228,7 @@ class NoPermission extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
+  tooltip: 'Tindakan',
                     onPressed: () {
                       if (isAuthenticated) {
                         if (isSonographer) {
@@ -244,6 +245,7 @@ class NoPermission extends StatelessWidget {
                   const Spacer(),
                   if (isAuthenticated)
                     IconButton(
+  tooltip: 'Log Keluar',
                       onPressed: () {
                         context.read<AuthController>().logout(context);
                         context.pushReplacementNamed(LoginPage.routeName, extra: true);

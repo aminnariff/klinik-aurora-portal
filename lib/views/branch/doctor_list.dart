@@ -183,6 +183,7 @@ class _DoctorListState extends State<DoctorList> {
                                                       mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
                                                         IconButton(
+  tooltip: 'Tindakan',
                                                           onPressed: () async {
                                                             try {
                                                               if (await showConfirmDialog(

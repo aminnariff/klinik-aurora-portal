@@ -173,6 +173,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
         prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 20),
         suffixIcon: _searchController.text.isNotEmpty
             ? IconButton(
+  tooltip: 'Kosongkan',
                 icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF9CA3AF)),
                 onPressed: () {
                   _searchController.clear();
@@ -735,6 +736,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
             ),
           ),
           IconButton(
+  tooltip: 'Tutup',
             icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
             onPressed: () => context.pop(),
             splashRadius: 20,
@@ -980,6 +982,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
             ),
             if (controller.text.isNotEmpty)
               IconButton(
+  tooltip: 'Kosongkan',
                 icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
                 splashRadius: 14,
                 padding: EdgeInsets.zero,

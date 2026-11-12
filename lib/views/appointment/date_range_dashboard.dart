@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class DateRange {
   final String label;
@@ -22,7 +23,7 @@ class DateFilterDropdown extends StatefulWidget {
 
 class _DateFilterDropdownState extends State<DateFilterDropdown> {
   late DateRange _selected;
-  static const Color _accent = Color(0xFFDF6E98);
+  static const Color _accent = primaryAccessibleText;
 
   @override
   void initState() {

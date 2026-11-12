@@ -664,6 +664,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
           ),
           const SizedBox(width: 12),
           IconButton(
+  tooltip: 'Tutup',
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF6B7280)),
           ),
@@ -718,6 +719,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
           const Spacer(),
           // Month navigation
           IconButton(
+  tooltip: 'Sebelumnya',
             icon: const Icon(Icons.chevron_left_rounded, size: 20),
             onPressed: () {
               setState(() {
@@ -731,6 +733,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
           ),
           IconButton(
+  tooltip: 'Seterusnya',
             icon: const Icon(Icons.chevron_right_rounded, size: 20),
             onPressed: () {
               setState(() {

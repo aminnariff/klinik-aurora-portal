@@ -728,6 +728,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
             prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8), size: 19),
             suffixIcon: IconButton(
+  tooltip: 'Papar kata laluan',
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 color: const Color(0xFF94A3B8),
@@ -776,6 +777,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
             prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8), size: 19),
             suffixIcon: IconButton(
+  tooltip: 'Papar kata laluan',
               icon: Icon(
                 _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 color: const Color(0xFF94A3B8),

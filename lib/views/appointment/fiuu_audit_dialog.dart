@@ -122,6 +122,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
                     child: Text('Audit Fiuu Payments', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
                   ),
                   IconButton(
+  tooltip: 'Tutup',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close_rounded),
                   ),

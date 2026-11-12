@@ -225,6 +225,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                   .copyWith(fontWeight: FontWeight.w700),
                             ),
                             IconButton(
+  tooltip: 'Tutup',
                               onPressed: () => Navigator.pop(ctx),
                               icon: const Icon(Icons.close_rounded),
                               padding: EdgeInsets.zero,

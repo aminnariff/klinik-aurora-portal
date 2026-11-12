@@ -68,10 +68,12 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
             ),
             const Spacer(),
             IconButton(
+  tooltip: 'Sebelumnya',
               icon: const Icon(Icons.chevron_left_rounded, size: 20),
               onPressed: _canPrev ? () => setState(() => _month = DateTime(_month.year, _month.month - 1)) : null,
             ),
             IconButton(
+  tooltip: 'Seterusnya',
               icon: const Icon(Icons.chevron_right_rounded, size: 20),
               onPressed: _canNext ? () => setState(() => _month = DateTime(_month.year, _month.month + 1)) : null,
             ),
@@ -334,6 +336,7 @@ class _DateOverrideCalendarState extends State<DateOverrideCalendar> {
                         _timeChip(ctx, working[i].end, (t) => setDialogState(() => working[i].end = t)),
                         const Spacer(),
                         IconButton(
+  tooltip: 'Batal',
                           icon: const Icon(Icons.cancel_rounded, size: 18, color: Colors.redAccent),
                           onPressed: () => setDialogState(() => working.removeAt(i)),
                         ),

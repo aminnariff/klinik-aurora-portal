@@ -238,6 +238,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                     prefixIcon: const Icon(Icons.search_rounded, size: 18, color: Color(0xFF9CA3AF)),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
+  tooltip: 'Kosongkan',
                             icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
                             onPressed: () {
                               _searchController.clear();

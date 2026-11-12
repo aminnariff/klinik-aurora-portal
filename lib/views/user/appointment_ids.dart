@@ -81,6 +81,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                     ),
                   ),
                   IconButton(
+  tooltip: 'Tutup',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.close, color: Colors.grey.shade400),
                   ),

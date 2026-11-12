@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
@@ -1202,7 +1203,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.bar_chart_rounded, size: 14, color: Color(0xFFDF6E98)),
+                    Icon(Icons.bar_chart_rounded, size: 14, color: primaryAccessibleText),
                     SizedBox(width: 4),
                     Text(
                       'Daily Total (MYT)',

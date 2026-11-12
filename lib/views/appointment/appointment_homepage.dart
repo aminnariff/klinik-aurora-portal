@@ -1943,6 +1943,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         ),
                       ),
                       IconButton(
+  tooltip: 'Tutup',
                         icon: const Icon(Icons.close_rounded, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
                         style: IconButton.styleFrom(foregroundColor: const Color(0xFF6B7280)),

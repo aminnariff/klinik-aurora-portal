@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/branch_performance_controller.dart';
 import 'package:klinik_aurora_portal/models/dashboard/branch_performance_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -496,7 +497,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                sectionHeader('Last 3 Months', const Color(0xFFDF6E98)),
+                sectionHeader('Last 3 Months', primaryAccessibleText),
                 Row(crossAxisAlignment: CrossAxisAlignment.start, children: buildMonthColumns()),
               ],
             ),

@@ -674,6 +674,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                     top: 8,
                     right: 8,
                     child: IconButton(
+  tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded, size: 20),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -701,6 +702,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 18),
         suffixIcon: ctrl.text.isNotEmpty
             ? IconButton(
+  tooltip: 'Kosongkan',
                 icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
                 onPressed: () {
                   ctrl.clear();

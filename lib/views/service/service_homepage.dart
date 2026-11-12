@@ -312,6 +312,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                               style: AppTypography.bodyLarge(context).copyWith(fontWeight: FontWeight.w700),
                             ),
                             IconButton(
+  tooltip: 'Tutup',
                               onPressed: () => Navigator.pop(ctx),
                               icon: const Icon(Icons.close_rounded),
                               padding: EdgeInsets.zero,
@@ -1389,6 +1390,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                             ),
                           ),
                           IconButton(
+  tooltip: 'Tutup',
                             icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
                             onPressed: () => Navigator.pop(ctx),
                             hoverColor: const Color(0xFFF1F5F9),

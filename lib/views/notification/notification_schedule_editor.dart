@@ -120,6 +120,7 @@ class _NotificationScheduleEditorState extends State<NotificationScheduleEditor>
                   children: [
                     Text('Edit Scheduled Announcement', style: AppTypography.displayMedium(context)),
                     IconButton(
+  tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded),
                       color: const Color(0xFF637381),
                       onPressed: _saving ? null : () => Navigator.of(context).pop(false),

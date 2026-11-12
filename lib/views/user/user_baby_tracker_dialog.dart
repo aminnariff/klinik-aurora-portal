@@ -178,6 +178,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                         ),
                       ),
                       IconButton(
+  tooltip: 'Tutup',
                         icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
                         splashRadius: 18,
                         onPressed: () => Navigator.of(context).pop(),

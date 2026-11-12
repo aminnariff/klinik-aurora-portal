@@ -151,6 +151,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                     const SizedBox(width: 12),
                   ],
                   IconButton(
+  tooltip: 'Tutup',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.close, color: Colors.grey.shade400),
                   ),

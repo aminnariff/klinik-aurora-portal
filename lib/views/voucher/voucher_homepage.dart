@@ -412,6 +412,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                         ),
                         IconButton(
+  tooltip: 'Tutup',
                           onPressed: () => Navigator.pop(ctx),
                           icon: const Icon(Icons.close_rounded),
                           padding: EdgeInsets.zero,

@@ -250,6 +250,7 @@ class LineChartSample1State extends State<LineChartSample1> {
             ],
           ),
           IconButton(
+  tooltip: 'Muat Semula',
             icon: Icon(Icons.refresh, color: Colors.white.withAlpha(opacityCalculation(isShowingMainData ? 1.0 : 0.5))),
             onPressed: () {
               setState(() {

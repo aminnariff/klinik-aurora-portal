@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
 import 'package:klinik_aurora_portal/models/dashboard/dashboard_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -381,7 +382,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                sectionHeader('Last 7 Days', const Color(0xFFDF6E98)),
+                sectionHeader('Last 7 Days', primaryAccessibleText),
                 Row(crossAxisAlignment: CrossAxisAlignment.start, children: dayColumns),
               ],
             ),

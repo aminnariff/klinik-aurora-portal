@@ -494,6 +494,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                               style: AppTypography.bodyLarge(context).copyWith(fontWeight: FontWeight.w700),
                             ),
                             IconButton(
+  tooltip: 'Tutup',
                               onPressed: () => Navigator.pop(ctx),
                               icon: const Icon(Icons.close_rounded),
                               padding: EdgeInsets.zero,

@@ -500,7 +500,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   ),
                   child: const Text(
                     'Forgot password?',
-                    style: TextStyle(fontSize: 13, color: Color(0xFFDF6E98), fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 13, color: primaryAccessibleText, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -808,6 +808,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                         ),
                       ),
                       IconButton(
+  tooltip: 'Tutup',
                         onPressed: () => context.pop(),
                         icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8), size: 22),
                         splashRadius: 20,
@@ -884,6 +885,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                         builder: (context, value, _) {
                           if (value.text.isEmpty) return const SizedBox.shrink();
                           return IconButton(
+  tooltip: 'Kosongkan',
                             icon: const Icon(Icons.cancel_rounded, size: 18, color: Color(0xFF94A3B8)),
                             onPressed: () {
                               _controller.clear();

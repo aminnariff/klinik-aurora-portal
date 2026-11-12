@@ -323,6 +323,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                 ],
                               ),
                               IconButton(
+  tooltip: 'Tutup',
                                 icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),

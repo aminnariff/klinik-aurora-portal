@@ -93,6 +93,7 @@ void showWhatsAppTemplateDialog({
                       ),
                     ),
                     IconButton(
+  tooltip: 'Tutup',
                       icon: const Icon(Icons.close, color: Colors.grey),
                       onPressed: () => Navigator.of(context).pop(),
                     ),

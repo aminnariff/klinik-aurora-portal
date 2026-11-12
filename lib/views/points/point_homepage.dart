@@ -1306,6 +1306,7 @@ class _PointHomepageState extends State<PointHomepage> {
                     Text('Terms & Conditions', style: AppTypography.bodyLarge(context).apply(fontWeightDelta: 2)),
                     const Spacer(),
                     IconButton(
+  tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded, size: 20),
                       onPressed: () => Navigator.of(context).pop(),
                     ),

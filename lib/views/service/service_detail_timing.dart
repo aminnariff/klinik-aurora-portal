@@ -140,7 +140,8 @@ class _TimeListManagerState extends State<TimeListManager> {
                               labelText: 'Selected Time',
                               suffixWidget: Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: [IconButton(onPressed: _pickTime, icon: const Icon(Icons.add))],
+                                children: [IconButton(
+  tooltip: 'Tambah',onPressed: _pickTime, icon: const Icon(Icons.add))],
                               ),
                             ),
                             width: math.min(300, MediaQuery.of(context).size.width * 0.9),
@@ -175,6 +176,7 @@ class _TimeListManagerState extends State<TimeListManager> {
                                   const SizedBox(width: 8),
                                   Text(timeList[index]),
                                   IconButton(
+  tooltip: 'Tutup',
                                     icon: const Icon(Icons.close, color: Colors.black),
                                     onPressed: () => _removeTimeFromList(index),
                                   ),

@@ -294,6 +294,7 @@ class _UserHomepageState extends State<UserHomepage> {
                   prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 18),
                   suffixIcon: _userFullNameController.text.isNotEmpty
                       ? IconButton(
+  tooltip: 'Kosongkan',
                           icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
                           onPressed: () {
                             _userFullNameController.clear();

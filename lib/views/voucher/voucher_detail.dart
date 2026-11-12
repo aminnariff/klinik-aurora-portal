@@ -295,6 +295,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
             ),
           ),
           IconButton(
+  tooltip: 'Tutup',
             icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
             onPressed: () => context.pop(),
             splashRadius: 20,
@@ -543,6 +544,7 @@ class _VoucherDetailState extends State<VoucherDetail> {
                 ),
                 if (controller.text.isNotEmpty)
                   IconButton(
+  tooltip: 'Kosongkan',
                     icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
                     splashRadius: 14,
                     padding: EdgeInsets.zero,

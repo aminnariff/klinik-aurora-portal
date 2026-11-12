@@ -187,6 +187,7 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
                   children: [
                     Text('Announcement Center', style: AppTypography.displayMedium(context)),
                     IconButton(
+  tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded),
                       color: const Color(0xFF637381),
                       onPressed: () => Navigator.pop(context),

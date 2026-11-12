@@ -258,6 +258,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
             ),
           ),
           IconButton(
+  tooltip: 'Tutup',
             icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
             onPressed: () => context.pop(),
             splashRadius: 20,
@@ -526,6 +527,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                 radius: 14,
                 backgroundColor: Colors.black.withAlpha(150),
                 child: IconButton(
+  tooltip: 'Tutup',
                   padding: EdgeInsets.zero,
                   icon: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
                   onPressed: () => setState(() => _selectedFile = null),

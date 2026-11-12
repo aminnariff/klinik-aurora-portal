@@ -249,6 +249,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
             ),
           ),
           IconButton(
+  tooltip: 'Tutup',
             icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
             onPressed: () => context.pop(),
             hoverColor: const Color(0xFFF1F5F9),
