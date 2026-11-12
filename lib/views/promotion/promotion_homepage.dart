@@ -21,6 +21,9 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_filter_field.dart';
+import 'package:klinik_aurora_portal/views/widgets/input_field/app_form_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_multi_image_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -162,42 +165,14 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   }
 
   Widget _buildSearchField() {
-    return TextField(
+    return AppFilterField(
       controller: _searchController,
+      hintText: 'Search promotions…',
       onChanged: (_) => filtering(page: 1),
-      onSubmitted: (_) => filtering(enableDebounce: false, page: 1),
-      style: AppTypography.bodyMedium(context),
-      decoration: InputDecoration(
-        hintText: 'Search promotions…',
-        hintStyle: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
-        prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 20),
-        suffixIcon: _searchController.text.isNotEmpty
-            ? IconButton(
-  tooltip: 'Kosongkan',
-                icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF9CA3AF)),
-                onPressed: () {
-                  _searchController.clear();
-                  filtering(enableDebounce: false, page: 1);
-                  setState(() {});
-                },
-              )
-            : null,
-        filled: true,
-        fillColor: const Color(0xFFF9FAFB),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: secondaryColor, width: 1.5),
-        ),
-      ),
+      onClear: () {
+        filtering(enableDebounce: false, page: 1);
+        setState(() {});
+      },
     );
   }
 
@@ -247,7 +222,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
         backgroundColor: primary,
         foregroundColor: Colors.white,
         padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 20, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         elevation: 0,
         textStyle: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600),
       ),
@@ -752,32 +727,15 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          OutlinedButton(
+          AppButton.secondary(
+            text: 'Cancel',
             onPressed: () => context.pop(),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              side: const BorderSide(color: Color(0xFFCBD5E1)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600),
-            ),
           ),
           const SizedBox(width: 12),
-          ElevatedButton.icon(
-            onPressed: () => widget.onSave(_imageUrls),
+          AppButton.primary(
+            text: widget.title == 'New Promotion' ? 'Create Promotion' : 'Update Promotion',
             icon: const Icon(Icons.check_rounded, size: 18, color: Colors.white),
-            label: Text(
-              widget.title == 'New Promotion' ? 'Create Promotion' : 'Update Promotion',
-              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              elevation: 0,
-            ),
+            onPressed: () => widget.onSave(_imageUrls),
           ),
         ],
       ),
@@ -1046,36 +1004,10 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
     required String hint,
     int maxLines = 1,
   }) {
-    return SizedBox(
-      height: maxLines == 1 ? 42 : null,
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF0F172A),
-        ),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
-          filled: true,
-          fillColor: const Color(0xFFF8FAFC),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            borderSide: BorderSide(color: primary, width: 1.5),
-          ),
-        ),
-      ),
+    return AppFormField(
+      controller: controller,
+      hintText: hint,
+      maxLines: maxLines,
     );
   }
 }
