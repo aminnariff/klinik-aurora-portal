@@ -8,7 +8,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
-import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
@@ -21,7 +20,6 @@ import 'package:klinik_aurora_portal/models/service_branch/service_branch_respon
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
 import 'package:klinik_aurora_portal/views/doctor/branch_roster_dialog.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/practitioner_schedule/practitioner_schedule_wizard.dart';
 import 'package:klinik_aurora_portal/views/service/change_service_duration_dialog.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/service/service_details.dart';
@@ -61,81 +59,16 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   final TextEditingController _serviceNameController = TextEditingController();
   DropdownAttribute? _selectedServiceStatus;
   StreamController<DateTime> rebuildDropdown = StreamController.broadcast();
-  // ignore: unused_field
-  bool _hasUsedPractitionerSchedule = false;
-  String? _checkedBranchId;
 
   @override
   void initState() {
     dismissLoading();
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       Provider.of<TopBarController>(context, listen: false).pageValue = Homepage.getPageId(ServiceHomepage.displayName);
-      _checkPractitionerScheduleUsage();
     });
     _page = 1;
     filtering();
     super.initState();
-  }
-
-  void _checkPractitionerScheduleUsage() {
-    final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
-    if (isSuperAdmin) {
-      if (!_hasUsedPractitionerSchedule) {
-        setState(() => _hasUsedPractitionerSchedule = true);
-      }
-      return;
-    }
-
-    final branchId = context.read<AuthController>().authenticationResponse?.data?.user?.branchId;
-    if (branchId == null || branchId.isEmpty) {
-      if (_hasUsedPractitionerSchedule) {
-        setState(() => _hasUsedPractitionerSchedule = false);
-      }
-      return;
-    }
-
-    if (_checkedBranchId == branchId) return;
-    _checkedBranchId = branchId;
-
-    // Check device-local draft pattern
-    bool hasLocalPattern = false;
-    for (final type in [1, 2, 3, 4, 5]) {
-      final val = prefs.getString('practitioner_pattern_${branchId}_$type');
-      if (val != null && val.trim().isNotEmpty) {
-        hasLocalPattern = true;
-        break;
-      }
-    }
-
-    if (hasLocalPattern) {
-      if (mounted) setState(() => _hasUsedPractitionerSchedule = true);
-      return;
-    }
-
-    // Check backend records for configured available datetimes
-    ServiceBranchAvailableDtController.get(
-      context,
-      1,
-      1,
-      branchId: branchId,
-    ).then((value) {
-      if (!mounted) return;
-      bool hasUsed = false;
-      if (responseCode(value.code)) {
-        final list = value.data?.data ?? [];
-        if (list.isNotEmpty) {
-          final first = list.first;
-          if (first.availableDatetimes != null && first.availableDatetimes!.isNotEmpty) {
-            hasUsed = true;
-          }
-        }
-      }
-      if (_hasUsedPractitionerSchedule != hasUsed) {
-        setState(() => _hasUsedPractitionerSchedule = hasUsed);
-      }
-    }).catchError((e) {
-      debugPrint('Error checking practitioner schedule usage: $e');
-    });
   }
 
   @override
@@ -1292,24 +1225,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     }
   }
 
-  // ignore: unused_element
-  void _openPractitionerSchedule() {
-    final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
-    if (!isSuperAdmin && !_hasUsedPractitionerSchedule) {
-      showDialogError(context, 'This branch uses the new Branch Roster flow. Practitioner Schedule is not available.');
-      return;
-    }
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PractitionerScheduleWizard(
-        branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
-      ),
-    ).then((changed) {
-      if (changed == true) filtering();
-    });
-  }
-
   void _openBranchServiceTimingOptions(service_branch_model.Data serviceBranch) {
     showDialog(
       context: context,
@@ -1628,7 +1543,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     showLoading();
     if (page != null) _page = page;
     if (context.read<AuthController>().isSuperAdmin == false) {
-      _checkPractitionerScheduleUsage();
       ServiceBranchController.getAll(
         context,
         _page,
