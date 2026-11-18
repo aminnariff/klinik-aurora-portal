@@ -25,7 +25,7 @@
     <!-- <meta name="description" content="Experience top-quality healthcare services at Klinik Aurora. Our skilled doctors and friendly staff provide affordable, high-quality care."> -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.gstatic.com; font-src 'self' data:; connect-src 'self' http://localhost:* https: https://www.gstatic.com; worker-src 'self' blob:;"
+      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.gstatic.com https://*.googleusercontent.com; font-src 'self' data:; connect-src 'self' http://localhost:* https: https://www.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-src 'self' https://accounts.google.com https://klinik-aurora.firebaseapp.com; worker-src 'self' blob:;"
     />
 
     <!-- iOS meta tags & icons -->
@@ -292,6 +292,50 @@
           splash.remove();
         });
       });
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        signInWithPopup,
+        GoogleAuthProvider,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB5Z-FIYhA57A6d9I2V_9bjoU2X-3SFChA",
+        authDomain: "klinik-aurora.firebaseapp.com",
+        projectId: "klinik-aurora",
+        storageBucket: "klinik-aurora.firebasestorage.app",
+        messagingSenderId: "363514840689",
+        appId: "1:363514840689:web:68b5eb3a160efd90de7dd0",
+      };
+
+      try {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+
+        window.auroraGoogleSignIn = async function () {
+          try {
+            const result = await signInWithPopup(auth, provider);
+            const idToken = await result.user.getIdToken();
+            return JSON.stringify({
+              success: true,
+              idToken: idToken,
+              email: result.user.email,
+            });
+          } catch (error) {
+            return JSON.stringify({
+              success: false,
+              error: error.message || "Google Sign-In failed",
+              code: error.code || "unknown",
+            });
+          }
+        };
+      } catch (err) {
+        console.warn("[auroraGoogleSignIn] Firebase initialization error:", err);
+      }
     </script>
     <script src="flutter_bootstrap.js" async></script>
   </body>

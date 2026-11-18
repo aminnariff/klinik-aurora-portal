@@ -410,6 +410,28 @@ class AuthController extends ChangeNotifier {
         });
   }
 
+  static Future<ApiResponse<AuthResponse>> logInWithGoogle(BuildContext context, String idToken) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.post,
+          endpoint: 'admin/authentication/google',
+          data: {"idToken": idToken},
+          isAuthenticated: false,
+        )
+        .then((value) {
+          try {
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: value.data != null ? AuthResponse.fromJson(value.data) : null,
+            );
+          } catch (e) {
+            return ApiResponse(code: value.code, message: value.message ?? e.toString());
+          }
+        });
+  }
+
   static Future<ApiResponse<AuthResponse>> forgotPassword(BuildContext context, String email) async {
     return ApiController()
         .call(
