@@ -30,8 +30,8 @@ class _DialogStyle {
   static _DialogStyle of(DialogType type) {
     switch (type) {
       case DialogType.success:
-        return const _DialogStyle(
-          outerColor: Color(0xFFECFDF5),
+        return _DialogStyle(
+          outerColor: appSuccessSoft,
           innerColor: Color(0xFF10B981),
           icon: Icons.check_rounded,
           buttonColor: tertiaryColor,
@@ -39,7 +39,7 @@ class _DialogStyle {
         );
       case DialogType.error:
         return _DialogStyle(
-          outerColor: Color(0xFFFEF2F2),
+          outerColor: appDangerSoft,
           innerColor: Color(0xFFEF4444),
           icon: Icons.close_rounded,
           buttonColor: errorColor,

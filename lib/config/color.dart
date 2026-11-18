@@ -48,6 +48,14 @@ Color get appInkPrimary => _activeIsDark ? const Color(0xFFF1F5F9) : const Color
 Color get appInkSecondary => _activeIsDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155);
 Color get appInkMuted => _activeIsDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
+// Live Theme-Aware Status Pill Soft Backgrounds (Light pastel / Dark deep tint)
+Color get appDangerSoft => _activeIsDark ? const Color(0xFF3B1519) : const Color(0xFFFEF2F2);
+Color get appSuccessSoft => _activeIsDark ? const Color(0xFF0E2F26) : const Color(0xFFECFDF5);
+Color get appWarningSoft => _activeIsDark ? const Color(0xFF35260C) : const Color(0xFFFFFBEB);
+Color get appInfoSoft => _activeIsDark ? const Color(0xFF0E2738) : const Color(0xFFEFF6FF);
+Color get appPurpleSoft => _activeIsDark ? const Color(0xFF271B3D) : const Color(0xFFF5F3FF);
+Color get appTealSoft => _activeIsDark ? const Color(0xFF0E2E30) : const Color(0xFFF0FDFA);
+
 Color get neutralDark => appInkPrimary;
 Color get neutralMuted => appInkMuted;
 Color get borderSubtle => appBorder;

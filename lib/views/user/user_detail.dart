@@ -862,7 +862,7 @@ class _UserDetailState extends State<UserDetail> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF2F2),
+                color: appDangerSoft,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFFFECACA)),
               ),
@@ -989,7 +989,7 @@ class _UserDetailState extends State<UserDetail> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF2F2),
+                    color: appDangerSoft,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: const Color(0xFFFECACA)),
                   ),
@@ -1037,7 +1037,7 @@ class _UserDetailState extends State<UserDetail> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFBEB),
+            color: appWarningSoft,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: const Color(0xFFFDE68A)),
           ),

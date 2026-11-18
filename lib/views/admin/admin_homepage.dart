@@ -735,7 +735,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+        color: isActive ? appSuccessSoft : appDangerSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

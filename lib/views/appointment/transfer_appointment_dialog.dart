@@ -291,7 +291,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFEFF6FF),
+                                      color: appInfoSoft,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: const Icon(
@@ -548,7 +548,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
+                              color: appInfoSoft,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: const Color(0xFFBFDBFE)),
                             ),

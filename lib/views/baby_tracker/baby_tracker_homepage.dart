@@ -801,9 +801,9 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: kicks >= 10
-                                    ? const Color(0xFFECFDF5)
+                                    ? appSuccessSoft
                                     : kicks > 0
-                                        ? const Color(0xFFFFFBEB)
+                                        ? appWarningSoft
                                         : appSurfaceSubtle,
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -837,9 +837,9 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: bagPct == 100
-                                ? const Color(0xFFECFDF5)
+                                ? appSuccessSoft
                                 : bagPct >= 50
-                                    ? const Color(0xFFEFF6FF)
+                                    ? appInfoSoft
                                     : const Color(0xFFFFF7ED),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -864,9 +864,9 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: alertStatus == 'overdue'
-                                ? const Color(0xFFFEE2E2)
+                                ? appDangerSoft
                                 : alertStatus == 'low_kicks'
-                                    ? const Color(0xFFFEF3C7)
+                                    ? appWarningSoft
                                     : const Color(0xFFF0FDF4),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1223,7 +1223,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFEF2F2),
+                                    color: appDangerSoft,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(color: const Color(0xFFFECACA)),
                                   ),
@@ -1241,7 +1241,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEFF6FF),
+                                    color: appInfoSoft,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(color: const Color(0xFFBFDBFE)),
                                   ),
@@ -1285,7 +1285,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFEF3C7),
+                                        color: appWarningSoft,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Row(
@@ -1304,7 +1304,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFECFDF5),
+                                        color: appSuccessSoft,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Row(

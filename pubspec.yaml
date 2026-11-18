@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  animate_do: ^5.1.0
   calendar_date_picker2: ^3.0.0
   data_table_2: ^2.5.15
   dio: ^5.4.1
@@ -51,12 +50,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/
     - assets/icons/
     - assets/images/
     - assets/lottie/
-    - assets/riv/
-    - assets/typography/
     - assets/icons/failed/
     - assets/icons/logo/
     - assets/icons/success/
@@ -66,18 +62,17 @@ flutter:
   fonts:
     - family: Figtree
       fonts:
-        - asset: assets/typography/figtree/Figtree-Regular.ttf
-        - asset: assets/typography/figtree/Figtree-Black.ttf
-          weight: 900
-        - asset: assets/typography/figtree/Figtree-ExtraBold.ttf
-          weight: 800
-        - asset: assets/typography/figtree/Figtree-Bold.ttf
-          weight: 700
-        - asset: assets/typography/figtree/Figtree-SemiBold.ttf
-          weight: 600
-        - asset: assets/typography/figtree/Figtree-Medium.ttf
-          weight: 500
-        - asset: assets/typography/figtree/Figtree-Regular.ttf
-          weight: 400
         - asset: assets/typography/figtree/Figtree-Light.ttf
           weight: 300
+        - asset: assets/typography/figtree/Figtree-Regular.ttf
+          weight: 400
+        - asset: assets/typography/figtree/Figtree-Medium.ttf
+          weight: 500
+        - asset: assets/typography/figtree/Figtree-SemiBold.ttf
+          weight: 600
+        - asset: assets/typography/figtree/Figtree-Bold.ttf
+          weight: 700
+        - asset: assets/typography/figtree/Figtree-ExtraBold.ttf
+          weight: 800
+        - asset: assets/typography/figtree/Figtree-Black.ttf
+          weight: 900

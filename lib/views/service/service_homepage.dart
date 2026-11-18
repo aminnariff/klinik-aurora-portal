@@ -672,7 +672,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
+                    color: appWarningSoft,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: const Color(0xFFFDE68A)),
                   ),
@@ -755,7 +755,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       icon = Icons.spa_rounded;
     } else if (doctorType == 5 || catLower.contains('diet') || catLower.contains('nutri') || catLower.contains('weight')) {
       // Dietitian / Wellness
-      bg = const Color(0xFFDCFCE7);
+      bg = appSuccessSoft;
       fg = const Color(0xFF15803D);
       icon = Icons.eco_rounded;
     } else if (catLower.contains('blood') || catLower.contains('lab') || catLower.contains('test') || catLower.contains('screening')) {
@@ -892,7 +892,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+        color: isActive ? appSuccessSoft : appDangerSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -1326,7 +1326,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           _timingOptionCard(
                             icon: Icons.calendar_month_outlined,
                             iconColor: const Color(0xFF246E7A),
-                            iconBg: const Color(0xFFF0FDFA),
+                            iconBg: appTealSoft,
                             title: 'Manage Time Slots & Calendar',
                             badgeText: 'Available Datetimes',
                             subtitle: 'Open the 3-month clinic calendar to allocate, review, and customize available appointment booking slots.',

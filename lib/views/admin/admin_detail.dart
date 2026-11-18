@@ -279,7 +279,7 @@ class _AdminDetailState extends State<AdminDetail> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                               decoration: BoxDecoration(
-                                color: active ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+                                color: active ? appSuccessSoft : appDangerSoft,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: active ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
@@ -1072,7 +1072,7 @@ class _AdminDetailState extends State<AdminDetail> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFEF2F2),
+                                color: appDangerSoft,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Text(
@@ -1192,14 +1192,14 @@ class _AdminDetailState extends State<AdminDetail> {
                         ChoiceChip(
                           label: const Text("Active", style: TextStyle(fontSize: 12)),
                           selected: status == 1,
-                          selectedColor: const Color(0xFFDCFCE7),
+                          selectedColor: appSuccessSoft,
                           onSelected: (val) => setDialogState(() => status = 1),
                         ),
                         const SizedBox(width: 8),
                         ChoiceChip(
                           label: const Text("Inactive", style: TextStyle(fontSize: 12)),
                           selected: status == 0,
-                          selectedColor: const Color(0xFFFEE2E2),
+                          selectedColor: appDangerSoft,
                           onSelected: (val) => setDialogState(() => status = 0),
                         ),
                       ],

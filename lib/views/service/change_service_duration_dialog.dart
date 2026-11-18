@@ -387,7 +387,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: isOverridden ? const Color(0xFFFEF3C7) : const Color(0xFFDCFCE7),
+                                  color: isOverridden ? appWarningSoft : appSuccessSoft,
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
                                     color: isOverridden ? const Color(0xFFFDE68A) : const Color(0xFFBBF7D0),
@@ -866,7 +866,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: _isResetToHq ? const Color(0xFFEFF6FF) : Colors.transparent,
+                            color: _isResetToHq ? appInfoSoft : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: _isResetToHq ? const Color(0xFF3B82F6) : appBorderStrong,

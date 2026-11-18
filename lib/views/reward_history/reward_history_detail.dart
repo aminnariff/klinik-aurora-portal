@@ -329,7 +329,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFBEB),
+            color: appWarningSoft,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFFDE68A)),
           ),

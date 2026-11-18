@@ -434,7 +434,7 @@ class _MultiplierBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF3C7),
+        color: appWarningSoft,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: const Color(0xFFFCD34D)),
       ),
@@ -600,7 +600,7 @@ class _Warning extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: appWarningSoft, borderRadius: BorderRadius.circular(8)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

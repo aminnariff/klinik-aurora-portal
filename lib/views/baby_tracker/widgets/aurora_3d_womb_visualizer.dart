@@ -2024,7 +2024,7 @@ class _Mini3DWombOrbState extends State<Mini3DWombOrb> with TickerProviderStateM
       child: AnimatedBuilder(
         animation: Listenable.merge([_heartbeatController, _idleController]),
         builder: (context, _) {
-          return CustomPaint(
+          return RepaintBoundary(child: CustomPaint(
             size: Size(widget.size, widget.size),
             painter: _WombOrbPainter(
               week: widget.week.clamp(1, 40),
@@ -2033,7 +2033,7 @@ class _Mini3DWombOrbState extends State<Mini3DWombOrb> with TickerProviderStateM
               idlePrecession: _idleController.value * 2 * math.pi,
               heartbeatProgress: _heartbeatController.value,
             ),
-          );
+          ));
         },
       ),
     );

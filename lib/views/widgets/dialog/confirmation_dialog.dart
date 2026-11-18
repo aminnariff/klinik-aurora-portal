@@ -94,7 +94,7 @@ class ConfirmationDialog extends StatelessWidget {
     return Container(
       width: 90,
       height: 90,
-      decoration: const BoxDecoration(color: Color(0xFFFEF3C7), shape: BoxShape.circle),
+      decoration: BoxDecoration(color: appWarningSoft, shape: BoxShape.circle),
       child: Center(
         child: Container(
           width: 60,
@@ -124,7 +124,7 @@ class ConfirmationDialog extends StatelessWidget {
         holdingLabel: 'Release to cancel...',
         confirmedLabel: 'Confirmed',
         progressColor: progressColor,
-        baseColor: attribute.isDestructive ? const Color(0xFFFEF2F2) : tertiaryColor.withValues(alpha: 0.1),
+        baseColor: attribute.isDestructive ? appDangerSoft : tertiaryColor.withValues(alpha: 0.1),
         textColor: progressColor,
         onConfirmed: () async {
           if (attribute.confrimButton?.action != null) {

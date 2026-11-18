@@ -246,7 +246,7 @@ class _BranchDetailState extends State<BranchDetail> {
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: active ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+                              color: active ? appSuccessSoft : appDangerSoft,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: active ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
@@ -920,7 +920,7 @@ class _BranchDetailState extends State<BranchDetail> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: is24 ? const Color(0xFFDCFCE7) : appBorder,
+                  color: is24 ? appSuccessSoft : appBorder,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -979,7 +979,7 @@ class _BranchDetailState extends State<BranchDetail> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFFF0FDF4) : const Color(0xFFFEF2F2),
+            color: active ? const Color(0xFFF0FDF4) : appDangerSoft,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: active ? const Color(0xFF86EFAC) : const Color(0xFFFECACA),
@@ -990,7 +990,7 @@ class _BranchDetailState extends State<BranchDetail> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: active ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                  color: active ? appSuccessSoft : appDangerSoft,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(

@@ -488,7 +488,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   Widget _statusChip(Data item) {
     final isInProgress = item.rewardHistoryStatus == 1;
     final label = isInProgress ? 'In-Progress' : 'Completed';
-    final bg = isInProgress ? const Color(0xFFFFF7ED) : const Color(0xFFDCFCE7);
+    final bg = isInProgress ? const Color(0xFFFFF7ED) : appSuccessSoft;
     final textColor = isInProgress ? const Color(0xFFC2410C) : const Color(0xFF15803D);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

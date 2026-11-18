@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -476,9 +475,7 @@ class _PolicyHeader extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-          child: Container(
+        child: Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
@@ -547,7 +544,6 @@ class _PolicyHeader extends StatelessWidget {
               ],
             ),
           ),
-        ),
       ),
     );
   }
@@ -596,9 +592,7 @@ class _PolicySection extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
+        child: Container(
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.72),
               borderRadius: BorderRadius.circular(12),
@@ -644,7 +638,6 @@ class _PolicySection extends StatelessWidget {
               ),
             ),
           ),
-        ),
       ),
     );
   }
@@ -701,9 +694,7 @@ class _ContactCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
+        child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -749,7 +740,6 @@ class _ContactCard extends StatelessWidget {
               ],
             ),
           ),
-        ),
       ),
     );
   }
@@ -790,9 +780,7 @@ class _RelatedPolicies extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
+      child: Container(
           margin: const EdgeInsets.only(top: 4),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -831,7 +819,6 @@ class _RelatedPolicies extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

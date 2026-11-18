@@ -463,7 +463,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
 
   Widget _doctorTypeChip(int? type) {
     final label = doctorType(type);
-    Color bg = const Color(0xFFEFF6FF);
+    Color bg = appInfoSoft;
     Color fg = const Color(0xFF1D4ED8);
     switch (type) {
       case 2:
@@ -471,7 +471,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         fg = const Color(0xFF7E22CE);
         break;
       case 3:
-        bg = const Color(0xFFECFDF5);
+        bg = appSuccessSoft;
         fg = const Color(0xFF047857);
         break;
       case 4:
@@ -479,11 +479,11 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         fg = const Color(0xFFBE123C);
         break;
       case 5:
-        bg = const Color(0xFFFEF3C7);
+        bg = appWarningSoft;
         fg = const Color(0xFFB45309);
         break;
       default:
-        bg = const Color(0xFFEFF6FF);
+        bg = appInfoSoft;
         fg = const Color(0xFF1D4ED8);
         break;
     }

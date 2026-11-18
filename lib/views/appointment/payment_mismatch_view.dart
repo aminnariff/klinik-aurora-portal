@@ -432,7 +432,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
             child: Container(
               margin: const EdgeInsets.only(top: 3),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-              decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: appWarningSoft, borderRadius: BorderRadius.circular(10)),
               child: const Text(
                 '⚠ record shows Failed',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),

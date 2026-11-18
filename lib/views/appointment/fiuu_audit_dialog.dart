@@ -167,7 +167,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFEF2F2),
+                      color: appDangerSoft,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(_error!, style: const TextStyle(color: Color(0xFFB91C1C), fontSize: 13)),
@@ -208,7 +208,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFEFF6FF) : Colors.white,
+          color: selected ? appInfoSoft : Colors.white,
           border: Border.all(color: selected ? primary : appBorder),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -310,8 +310,8 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
             spacing: 6,
             runSpacing: 4,
             children: [
-              _tag('Our state: ${d.currentState}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
-              _tag('Fiuu: paid', const Color(0xFFDCFCE7), const Color(0xFF166534)),
+              _tag('Our state: ${d.currentState}', appDangerSoft, const Color(0xFF991B1B)),
+              _tag('Fiuu: paid', appSuccessSoft, const Color(0xFF166534)),
               _tag('bill_id: ${d.billId}', const Color(0xFFF3F4F6), appInkSecondary),
             ],
           ),

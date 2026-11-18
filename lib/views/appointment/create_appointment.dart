@@ -710,7 +710,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFEFF6FF),
+                                          color: appInfoSoft,
                                           borderRadius: BorderRadius.circular(6),
                                           border: Border.all(color: const Color(0xFFBFDBFE)),
                                         ),
@@ -1160,7 +1160,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                   margin: const EdgeInsets.only(top: 4),
                                                                   decoration: BoxDecoration(
                                                                     color: _feeWaived
-                                                                        ? const Color(0xFFEFF6FF)
+                                                                        ? appInfoSoft
                                                                         : _bookingFeeCollected
                                                                         ? const Color(0xFFF0FDF4)
                                                                         : const Color(0xFFFFF7ED),
@@ -2640,7 +2640,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFBEB),
+            color: appWarningSoft,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFFDE68A)),
           ),
@@ -3212,7 +3212,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEFF6FF),
+                                  color: appInfoSoft,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(

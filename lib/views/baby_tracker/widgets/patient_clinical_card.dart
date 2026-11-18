@@ -55,7 +55,7 @@ class PatientClinicalCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: isOverdue ? const Color(0xFFFEF2F2) : appSurfaceSubtle,
+                  color: isOverdue ? appDangerSoft : appSurfaceSubtle,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isOverdue ? const Color(0xFFFECACA) : appBorder,
@@ -106,7 +106,7 @@ class PatientClinicalCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFFFFBEB),
+                color: isOverdue ? appDangerSoft : appWarningSoft,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFFDE68A),
@@ -240,7 +240,7 @@ class PatientClinicalCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: const Color(0xFFFEF2F2),
+          color: appDangerSoft,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: const Color(0xFFFECACA)),
         ),
@@ -262,7 +262,7 @@ class PatientClinicalCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFBEB),
+          color: appWarningSoft,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: const Color(0xFFFDE68A)),
         ),
@@ -285,7 +285,7 @@ class PatientClinicalCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF0FDF4),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFDCFCE7)),
+        border: Border.all(color: appSuccessSoft),
       ),
       child: const Row(
         mainAxisSize: MainAxisSize.min,

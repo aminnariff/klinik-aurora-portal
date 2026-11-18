@@ -193,7 +193,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: isOverdue ? const Color(0xFFFEF2F2) : appSurfaceSubtle,
+                  color: isOverdue ? appDangerSoft : appSurfaceSubtle,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isOverdue ? const Color(0xFFFECACA) : appBorder,
@@ -297,7 +297,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFFFFBEB),
+                color: isOverdue ? appDangerSoft : appWarningSoft,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFFDE68A),

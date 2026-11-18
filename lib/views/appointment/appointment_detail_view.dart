@@ -283,7 +283,7 @@ class AppointmentDetailsView extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
+                        color: appInfoSoft,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: const Color(0xFFBFDBFE)),
                       ),
@@ -1211,7 +1211,7 @@ class AppointmentDetailsView extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
+                              color: appInfoSoft,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

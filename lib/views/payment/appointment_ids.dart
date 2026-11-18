@@ -115,7 +115,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
     final totalCount = hasItems ? filteredItems.length : filteredIds.length;
 
     final primaryAccent = _isFailed ? const Color(0xFFEF4444) : const Color(0xFF059669);
-    final lightBg = _isFailed ? const Color(0xFFFEE2E2) : const Color(0xFFD1FAE5);
+    final lightBg = _isFailed ? appDangerSoft : const Color(0xFFD1FAE5);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -177,7 +177,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: unrecoveredTotal > 0 ? const Color(0xFFFEE2E2) : const Color(0xFFD1FAE5),
+                        color: unrecoveredTotal > 0 ? appDangerSoft : const Color(0xFFD1FAE5),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: unrecoveredTotal > 0 ? const Color(0xFFFCA5A5) : const Color(0xFF86EFAC),
@@ -266,7 +266,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _selectedTab == 0 ? const Color(0xFFFEE2E2) : const Color(0xFFF3F4F6),
+                          color: _selectedTab == 0 ? appDangerSoft : const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: _selectedTab == 0 ? const Color(0xFFFCA5A5) : Colors.transparent,
@@ -300,7 +300,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _selectedTab == 1 ? const Color(0xFFEFF6FF) : const Color(0xFFF3F4F6),
+                          color: _selectedTab == 1 ? appInfoSoft : const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: _selectedTab == 1 ? const Color(0xFFBFDBFE) : Colors.transparent,
@@ -497,7 +497,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFDCFCE7),
+                            color: appSuccessSoft,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: const Color(0xFF86EFAC)),
                           ),
@@ -517,7 +517,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEE2E2),
+                            color: appDangerSoft,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: const Color(0xFFFCA5A5)),
                           ),

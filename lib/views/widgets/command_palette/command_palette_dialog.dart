@@ -2,23 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
-import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
-import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
-import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart';
-import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
-import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart';
-import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
-import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
-import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
-import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
-import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
-import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
 import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.dart';
-import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
-import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 import 'package:provider/provider.dart';
 
@@ -104,98 +91,98 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       category: 'Navigation',
       icon: Icons.calendar_month_rounded,
       subtitle: 'View upcoming, completed & cancelled appointments',
-      onSelect: (ctx) => ctx.goNamed(AppointmentHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.appointments),
     ),
     CommandItem(
       title: 'Patients & Users',
       category: 'Navigation',
       icon: Icons.people_alt_outlined,
       subtitle: 'Search patient directory and profiles',
-      onSelect: (ctx) => ctx.goNamed(UserHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.patients),
     ),
     CommandItem(
       title: 'Dashboard Overview',
       category: 'Navigation',
       icon: Icons.dashboard_outlined,
       subtitle: 'Clinic operational KPIs and revenue stats',
-      onSelect: (ctx) => ctx.goNamed(Homepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.home),
     ),
     CommandItem(
       title: 'Baby Tracker 3D',
       category: 'Navigation',
       icon: Icons.child_care_rounded,
       subtitle: 'Gestational timeline and hospital checklist',
-      onSelect: (ctx) => ctx.goNamed(BabyTrackerHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.babyTracker),
     ),
     CommandItem(
       title: 'Doctors & Rosters',
       category: 'Navigation',
       icon: Icons.medical_services_outlined,
       subtitle: 'Practitioner schedules and duty rosters',
-      onSelect: (ctx) => ctx.goNamed(DoctorHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.doctors),
     ),
     CommandItem(
       title: 'Clinic Branches',
       category: 'Navigation',
       icon: Icons.store_outlined,
       subtitle: 'Branch locations and operational timings',
-      onSelect: (ctx) => ctx.goNamed(BranchHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.branches),
     ),
     CommandItem(
       title: 'Services & Pricing',
       category: 'Navigation',
       icon: Icons.healing_outlined,
       subtitle: 'Medical packages, scans, and treatments',
-      onSelect: (ctx) => ctx.goNamed(ServiceHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.services),
     ),
     CommandItem(
       title: 'Payments & Settlement',
       category: 'Navigation',
       icon: Icons.payments_outlined,
       subtitle: 'Fiuu transactions, receipts, and revenue summary',
-      onSelect: (ctx) => ctx.goNamed(PaymentSummaryPage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.payments),
     ),
     CommandItem(
       title: 'Loyalty Points',
       category: 'Loyalty & Marketing',
       icon: Icons.stars_rounded,
       subtitle: 'Patient reward points and transaction ledger',
-      onSelect: (ctx) => ctx.goNamed(PointHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.points),
     ),
     CommandItem(
       title: 'Vouchers & Promos',
       category: 'Loyalty & Marketing',
       icon: Icons.confirmation_number_outlined,
       subtitle: 'Discounts and redemption codes',
-      onSelect: (ctx) => ctx.goNamed(VoucherHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.vouchers),
     ),
     CommandItem(
       title: 'Reward Claims',
       category: 'Loyalty & Marketing',
       icon: Icons.card_giftcard_outlined,
       subtitle: 'Patient claimed gifts and redemptions',
-      onSelect: (ctx) => ctx.goNamed(RewardHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.rewards),
     ),
     CommandItem(
       title: 'Reward History',
       category: 'Loyalty & Marketing',
       icon: Icons.history_rounded,
       subtitle: 'Historical point usage log',
-      onSelect: (ctx) => ctx.goNamed(RewardHistoryHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.rewardHistory),
     ),
     CommandItem(
       title: 'Marketing Campaigns',
       category: 'Loyalty & Marketing',
       icon: Icons.campaign_outlined,
       subtitle: 'Banners, promotions and announcements',
-      onSelect: (ctx) => ctx.goNamed(MarketingHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.marketing),
     ),
     CommandItem(
       title: 'System & Admin Settings',
       category: 'System',
       icon: Icons.admin_panel_settings_outlined,
       subtitle: 'Staff permissions and clinic configuration',
-      onSelect: (ctx) => ctx.goNamed(AdminHomepage.routeName),
+      onSelect: (ctx) => ctx.goNamed(RouteNames.admins),
     ),
   ];
 

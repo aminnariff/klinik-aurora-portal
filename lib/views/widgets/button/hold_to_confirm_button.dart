@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 /// Emil Kowalski's Hold-to-Confirm pattern:
 /// - 1.5s linear progress fill while pressed down
@@ -11,7 +12,7 @@ class HoldToConfirmButton extends StatefulWidget {
   final String label;
   final String holdingLabel;
   final String confirmedLabel;
-  final Color baseColor;
+  final Color? baseColor;
   final Color progressColor;
   final Color textColor;
   final double height;
@@ -25,7 +26,7 @@ class HoldToConfirmButton extends StatefulWidget {
     this.label = 'Hold to Confirm',
     this.holdingLabel = 'Keep holding...',
     this.confirmedLabel = 'Confirmed',
-    this.baseColor = const Color(0xFFFEF2F2), // red-50
+    this.baseColor,
     this.progressColor = const Color(0xFFDC2626), // red-600
     this.textColor = const Color(0xFFDC2626),
     this.height = 50,
@@ -105,7 +106,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: widget.baseColor,
+                      color: widget.baseColor ?? appDangerSoft,
                       border: Border.all(color: widget.progressColor.withValues(alpha: 0.3)),
                       borderRadius: BorderRadius.circular(widget.borderRadius),
                     ),

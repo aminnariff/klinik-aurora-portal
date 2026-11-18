@@ -130,7 +130,7 @@ class _NotificationScheduledTabState extends State<NotificationScheduledTab> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: appWarningSoft, borderRadius: BorderRadius.circular(8)),
             child: Row(
               children: [
                 const Icon(Icons.warning_amber_rounded, size: 18, color: Color(0xFFB45309)),

@@ -174,7 +174,7 @@ class _NotificationScheduleEditorState extends State<NotificationScheduleEditor>
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: appDangerSoft, borderRadius: BorderRadius.circular(8)),
                     child: Text(
                       _validationError!,
                       style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF991B1B)),

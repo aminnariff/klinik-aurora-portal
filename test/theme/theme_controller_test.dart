@@ -78,17 +78,23 @@ void main() {
       expect(ctrl.darkMode, isTrue);
       expect(primary, AuroraThemePreset.auroraPetrol.primaryDark);
       expect(appSurface, const Color(0xFF111B22));
+      expect(appDangerSoft, const Color(0xFF3B1519));
+
+      await ctrl.setTableDensity(TableDensity.compact);
+      expect(ctrl.isCompact, isTrue);
 
       await ctrl.resetToDefaults();
       expect(ctrl.themeMode, ThemeMode.light);
       expect(ctrl.preset, AuroraThemePreset.auroraPlum);
+      expect(ctrl.tableDensity, TableDensity.comfortable);
       expect(primary, AuroraThemePreset.auroraPlum.primaryLight);
       expect(appSurface, const Color(0xFFFFFFFF));
+      expect(appDangerSoft, const Color(0xFFFEF2F2));
     });
   });
 
   group('AppearanceSettingsDialog widget', () {
-    testWidgets('renders presets and live-updates controller on tap', (tester) async {
+    testWidgets('renders presets, density toggle, and live-updates controller on tap', (tester) async {
       final ctrl = DarkModeController();
 
       await tester.pumpWidget(
@@ -96,8 +102,8 @@ void main() {
           value: ctrl,
           child: Consumer<DarkModeController>(
             builder: (context, themeCtrl, _) => MaterialApp(
-              theme: buildLightTheme(context, themeCtrl.preset),
-              darkTheme: buildDarkTheme(context, themeCtrl.preset),
+              theme: buildLightTheme(context, themeCtrl.preset, themeCtrl.tableDensity),
+              darkTheme: buildDarkTheme(context, themeCtrl.preset, themeCtrl.tableDensity),
               themeMode: themeCtrl.themeMode,
               home: const Scaffold(body: AppearanceSettingsDialog()),
             ),
@@ -107,6 +113,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Appearance & Theme'), findsOneWidget);
+      expect(find.text('Workspace Density'), findsOneWidget);
       expect(find.text('Aurora Plum'), findsWidgets);
       expect(find.text('Aurora Berry'), findsOneWidget);
 
@@ -114,14 +121,23 @@ void main() {
       await tester.pumpAndSettle();
       expect(ctrl.themeMode, ThemeMode.dark);
 
+      await tester.tap(find.text('Compact'));
+      await tester.pumpAndSettle();
+      expect(ctrl.tableDensity, TableDensity.compact);
+
+      await tester.ensureVisible(find.text('Aurora Berry'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Aurora Berry'));
       await tester.pumpAndSettle();
       expect(ctrl.preset, AuroraThemePreset.auroraBerry);
 
+      await tester.ensureVisible(find.text('Reset Default'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Reset Default'));
       await tester.pumpAndSettle();
       expect(ctrl.themeMode, ThemeMode.light);
       expect(ctrl.preset, AuroraThemePreset.auroraPlum);
+      expect(ctrl.tableDensity, TableDensity.comfortable);
     });
   });
 }

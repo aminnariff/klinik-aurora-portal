@@ -457,7 +457,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                 isActive: _isWajib,
                 onTap: () => setState(() => _isWajib = !_isWajib),
                 activeColor: const Color(0xFFD97706),
-                activeBgColor: const Color(0xFFFFFBEB),
+                activeBgColor: appWarningSoft,
                 activeIcon: Icons.star_rounded,
                 inactiveIcon: Icons.star_border_rounded,
                 title: 'Item WAJIB',

@@ -181,7 +181,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: isSuper && _selectedBranchId == null
-                          ? const Color(0xFFEFF6FF)
+                          ? appInfoSoft
                           : const Color(0xFFF0FDF4),
                       borderRadius: BorderRadius.circular(6),
                     ),

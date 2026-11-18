@@ -490,7 +490,7 @@ class _ModifierEditorState extends State<_ModifierEditor> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFEE2E2),
+                              color: appDangerSoft,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -560,11 +560,11 @@ class _ModifierCardState extends State<_ModifierCard> {
     } else if (modifier.hasExpired) {
       statusColor = const Color(0xFFD97706);
       statusIcon = Icons.history_toggle_off_rounded;
-      iconBg = const Color(0xFFFEF3C7);
+      iconBg = appWarningSoft;
     } else if (modifier.isScheduled) {
       statusColor = const Color(0xFF2563EB);
       statusIcon = Icons.schedule_rounded;
-      iconBg = const Color(0xFFDBEAFE);
+      iconBg = appInfoSoft;
     } else {
       statusColor = secondaryColor;
       statusIcon = Icons.auto_awesome_rounded;

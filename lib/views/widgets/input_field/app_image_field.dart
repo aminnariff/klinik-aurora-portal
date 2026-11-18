@@ -241,7 +241,7 @@ class _AppImageFieldState extends State<AppImageField> {
                                 width: 48,
                                 height: 48,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFEE2E2),
+                                  color: appDangerSoft,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(color: appBorder),
                                 ),
@@ -260,7 +260,7 @@ class _AppImageFieldState extends State<AppImageField> {
             margin: const EdgeInsets.only(top: 6),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFFEF3C7),
+              color: appWarningSoft,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(color: const Color(0xFFFDE68A)),
             ),

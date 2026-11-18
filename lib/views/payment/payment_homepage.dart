@@ -423,7 +423,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEFF6FF),
+                            color: appInfoSoft,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: const Color(0xFF93C5FD)),
                           ),
@@ -565,7 +565,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         value: '$total',
         icon: Icons.receipt_long_rounded,
         accent: const Color(0xFF3B82F6),
-        bg: const Color(0xFFEFF6FF),
+        bg: appInfoSoft,
         valueColor: appInkPrimary,
       ),
       _CardConfig(
@@ -574,7 +574,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         subtitle: '$successRate% conv.',
         icon: Icons.check_circle_rounded,
         accent: const Color(0xFF10B981),
-        bg: const Color(0xFFECFDF5),
+        bg: appSuccessSoft,
         valueColor: appInkPrimary,
         onTap: successful > 0 ? () => _openAppointmentsDialog() : null,
       ),
@@ -584,7 +584,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         subtitle: failed > 0 ? 'Click to rescue ↗' : null,
         icon: Icons.warning_amber_rounded,
         accent: const Color(0xFFEF4444),
-        bg: const Color(0xFFFEF2F2),
+        bg: appDangerSoft,
         valueColor: appInkPrimary,
         onTap: failed > 0 ? () => _openAppointmentsDialog(status: 'failed') : null,
       ),
@@ -593,7 +593,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         value: 'RM ${summary?.totalPaidAmount ?? '0.00'}',
         icon: Icons.payments_rounded,
         accent: const Color(0xFF8B5CF6),
-        bg: const Color(0xFFF5F3FF),
+        bg: appPurpleSoft,
         valueColor: appInkPrimary,
       ),
       _CardConfig(
@@ -601,7 +601,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         value: 'RM ${summary?.totalRefundAmount ?? '0.00'}',
         icon: Icons.undo_rounded,
         accent: const Color(0xFFF59E0B),
-        bg: const Color(0xFFFFFBEB),
+        bg: appWarningSoft,
         valueColor: appInkPrimary,
       ),
       _CardConfig(
@@ -1043,7 +1043,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                 ),
                                 _miniStatChip('✓ ${b.successful}', const Color(0xFFD1FAE5), const Color(0xFF065F46)),
                                 const SizedBox(width: 6),
-                                _miniStatChip('✗ ${b.failed}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
+                                _miniStatChip('✗ ${b.failed}', appDangerSoft, const Color(0xFF991B1B)),
                                 const SizedBox(width: 10),
                                 SizedBox(
                                   width: 100,
@@ -1510,15 +1510,15 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       Color border;
       Color text;
       if (rate >= 85.0) {
-        bg = const Color(0xFFECFDF5);
+        bg = appSuccessSoft;
         border = const Color(0xFFA7F3D0);
         text = const Color(0xFF047857);
       } else if (rate >= 60.0) {
-        bg = const Color(0xFFFFFBEB);
+        bg = appWarningSoft;
         border = const Color(0xFFFDE68A);
         text = const Color(0xFFB45309);
       } else {
-        bg = const Color(0xFFFEF2F2);
+        bg = appDangerSoft;
         border = const Color(0xFFFECACA);
         text = const Color(0xFFDC2626);
       }
@@ -1590,7 +1590,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFECFDF5),
+                            color: appSuccessSoft,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: const Color(0xFFA7F3D0)),
                           ),
@@ -1633,7 +1633,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
-                                ? const Color(0xFFFEF2F2)
+                                ? appDangerSoft
                                 : const Color(0xFFF3F4F6),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(

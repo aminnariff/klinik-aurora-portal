@@ -3,61 +3,61 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
+import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
-import 'package:klinik_aurora_portal/privacy/privacy_policy.dart';
-import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
+import 'package:klinik_aurora_portal/privacy/privacy_policy.dart' deferred as privacy_policy_lib;
+import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart' deferred as admin_lib;
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
-import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart';
-import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
-import 'package:klinik_aurora_portal/views/delete_account/delete_account.dart';
-import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
-import 'package:klinik_aurora_portal/views/error/error.dart';
+import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart' deferred as payment_mismatch_lib;
+import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart' deferred as baby_tracker_lib;
+import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart' deferred as branch_lib;
+import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart' deferred as marketing_lib;
+import 'package:klinik_aurora_portal/views/delete_account/delete_account.dart' deferred as delete_account_lib;
+import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart' deferred as doctor_lib;
+import 'package:klinik_aurora_portal/views/error/error.dart' deferred as error_lib;
 import 'package:klinik_aurora_portal/views/homepage/dashboard.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
-import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
-import 'package:klinik_aurora_portal/views/payment/branch_summary_homepage.dart';
-import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
-import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart';
-import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
-import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
-import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
-import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
-import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
-import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
-import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart';
-import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
+import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart' deferred as password_recovery_lib;
+import 'package:klinik_aurora_portal/views/payment/branch_summary_homepage.dart' deferred as branch_summary_lib;
+import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart' deferred as payment_lib;
+import 'package:klinik_aurora_portal/views/points/point_homepage.dart' deferred as points_lib;
+import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart' deferred as promotion_lib;
+import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart' deferred as reward_lib;
+import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart' deferred as reward_history_lib;
+import 'package:klinik_aurora_portal/views/service/service_homepage.dart' deferred as service_lib;
+import 'package:klinik_aurora_portal/views/user/user_homepage.dart' deferred as user_lib;
+import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart' deferred as voucher_lib;
+import 'package:klinik_aurora_portal/views/widgets/layout/deferred_page.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
-  initialLocation: LoginPage.routeName,
+  initialLocation: RouteNames.login,
   navigatorKey: rootNavigatorKey,
   redirect: (context, state) {
     final uri = state.uri.path;
 
     // 1. Allow public routes
-    if (uri == LoginPage.routeName ||
-        uri == NoPermission.routeName ||
-        uri == AdminPasswordRecoveryPage.routeName ||
-        uri == PrivacyPolicy.routeName ||
-        uri == TermsAndConditions.routeName ||
-        uri == RefundPolicy.routeName) {
+    if (uri == RouteNames.login ||
+        uri == RouteNames.noPermission ||
+        uri == RouteNames.passwordRecovery ||
+        uri == RouteNames.privacyPolicy ||
+        uri == RouteNames.termsAndConditions ||
+        uri == RouteNames.refundPolicy) {
       return null;
     }
 
     // 2. Check for missing authentication completely
     final rawAuth = prefs.getString(authResponse);
     if (rawAuth == null || rawAuth.isEmpty) {
-      return LoginPage.routeName;
+      return RouteNames.login;
     }
 
     // 2b. Check inactivity timeout (3h) — redirect to login if exceeded.
-    //     This check is synchronous (reads from SecurePrefs cache) so it
-    //     works on every navigation, including page reloads.
     final lastActiveRaw = prefs.getString(lastActivityTimestamp);
     if (lastActiveRaw != null && lastActiveRaw.isNotEmpty) {
       final lastActive = DateTime.tryParse(lastActiveRaw);
@@ -67,7 +67,7 @@ final router = GoRouter(
           prefs.remove(authResponse);
           prefs.remove(token);
           sessionExpiredNotice.value = true;
-          return LoginPage.routeName;
+          return RouteNames.login;
         }
       }
     }
@@ -78,7 +78,7 @@ final router = GoRouter(
       final parsed = AuthResponse.fromJson(decoded);
 
       if (parsed.data?.accessToken == null) {
-        return LoginPage.routeName;
+        return RouteNames.login;
       }
 
       final isSuperAdmin = parsed.data?.user?.isSuperadmin ?? false;
@@ -91,76 +91,68 @@ final router = GoRouter(
       }
 
       // 4b. Non-superadmin access to root dashboard '/'
-      if (uri == Homepage.routeName) {
+      if (uri == RouteNames.home) {
         if (isSonographer) {
-          // Sonographers must only land on and access appointments
-          return AppointmentHomepage.routeName;
+          return RouteNames.appointments;
         }
         if (permissions.isEmpty) {
-          return NoPermission.routeName;
+          return RouteNames.noPermission;
         }
       }
 
       // 4c. Checking specific SuperAdmin guarded pages
-      final requiresSuperAdmin = [
-        AdminHomepage.routeName,
-        BranchHomepage.routeName,
-        PromotionHomepage.routeName,
-        BranchPaymentSummaryPage.routeName,
-        // Reconfigures app-wide behaviour — campaigns re-skin every patient's
-        // app and modifiers change how points are earned — so it sits alongside
-        // the other superadmin-only marketing controls.
-        MarketingHomepage.routeName,
+      const requiresSuperAdmin = [
+        RouteNames.admins,
+        RouteNames.branches,
+        RouteNames.promotions,
+        RouteNames.branchPaymentSummary,
+        RouteNames.marketing,
       ];
 
       if (requiresSuperAdmin.contains(uri)) {
-        return NoPermission.routeName;
+        return RouteNames.noPermission;
       }
 
       // 4d. Sonographer restricted to only appointments
-      if (isSonographer && uri != AppointmentHomepage.routeName && uri != PaymentMismatchPage.routeName) {
-        return NoPermission.routeName;
+      if (isSonographer && uri != RouteNames.appointments && uri != RouteNames.paymentMismatch) {
+        return RouteNames.noPermission;
       }
 
       // 5. Checking exact UUID permission constraints
-      final permissionMap = {
-        UserHomepage.routeName: '1bda631e-ef17-11ee-bd1b-cc801b09db2f',
-        AdminHomepage.routeName: '4ac042fa-ef2d-11ee-bd1b-cc801b09db2f',
-        PointHomepage.routeName: 'a231db36-058d-11ef-943b-626efeb17d5e',
-        BranchHomepage.routeName: '68c537d4-ef31-11ee-bd1b-cc801b09db2f',
-        VoucherHomepage.routeName: 'd98236e8-f490-11ee-befc-aabaa50b463f',
-        RewardHistoryHomepage.routeName: 'dc4e7a5a-0e15-11ef-82b0-94653af51fb9',
-        PromotionHomepage.routeName: 'e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f',
-        DoctorHomepage.routeName: 'f90f9f18-057b-11ef-943b-626efeb17d5e',
-        RewardHomepage.routeName: '6e0fe1f8-2f1f-11ef-8db9-6677d190faa2',
-        ServiceHomepage.routeName: '0699ac1c-ac52-11ef-a1b7-bc24115a1342',
-        PaymentSummaryPage.routeName: 'f57576c4-4d15-11f0-b054-1ff6746392b2',
-        AppointmentHomepage.routeName: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
-        // Reuses the Appointment permission — this page is a troubleshooting
-        // view over appointment/payment data, not a separately-permissioned
-        // module.
-        PaymentMismatchPage.routeName: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
+      const permissionMap = {
+        RouteNames.patients: '1bda631e-ef17-11ee-bd1b-cc801b09db2f',
+        RouteNames.admins: '4ac042fa-ef2d-11ee-bd1b-cc801b09db2f',
+        RouteNames.points: 'a231db36-058d-11ef-943b-626efeb17d5e',
+        RouteNames.branches: '68c537d4-ef31-11ee-bd1b-cc801b09db2f',
+        RouteNames.vouchers: 'd98236e8-f490-11ee-befc-aabaa50b463f',
+        RouteNames.rewardHistory: 'dc4e7a5a-0e15-11ef-82b0-94653af51fb9',
+        RouteNames.promotions: 'e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f',
+        RouteNames.doctors: 'f90f9f18-057b-11ef-943b-626efeb17d5e',
+        RouteNames.rewards: '6e0fe1f8-2f1f-11ef-8db9-6677d190faa2',
+        RouteNames.services: '0699ac1c-ac52-11ef-a1b7-bc24115a1342',
+        RouteNames.payments: 'f57576c4-4d15-11f0-b054-1ff6746392b2',
+        RouteNames.appointments: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
+        RouteNames.paymentMismatch: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
       };
 
       final requiredPermission = permissionMap[uri];
       if (requiredPermission != null && !permissions.contains(requiredPermission)) {
-        // Sonographer UUID grants access to Appointment page
         final isSonographerOnAppointment =
-            uri == AppointmentHomepage.routeName && isSonographer;
+            uri == RouteNames.appointments && isSonographer;
         if (!isSonographerOnAppointment) {
-          return NoPermission.routeName;
+          return RouteNames.noPermission;
         }
       }
     } catch (e) {
-      return LoginPage.routeName; // Deflect to login heavily if JSON parsing fails (corrupted)
+      return RouteNames.login;
     }
 
     return null;
   },
   routes: <RouteBase>[
     GoRoute(
-      name: AdminPasswordRecoveryPage.routeName,
-      path: AdminPasswordRecoveryPage.routeName,
+      name: RouteNames.passwordRecovery,
+      path: RouteNames.passwordRecovery,
       builder: (BuildContext context, GoRouterState state) {
         String? token;
         String? email;
@@ -173,48 +165,63 @@ final router = GoRouter(
         }
         token ??= state.uri.queryParameters['token'];
         email ??= state.uri.queryParameters['email'];
-        return AdminPasswordRecoveryPage(token: token, email: email);
+        return DeferredPage(
+          loadLibrary: password_recovery_lib.loadLibrary,
+          builder: (_) => password_recovery_lib.AdminPasswordRecoveryPage(token: token, email: email),
+        );
       },
     ),
     GoRoute(
-      name: DeleteAccountPage.routeName,
-      path: DeleteAccountPage.routeName,
+      name: RouteNames.deleteAccount,
+      path: RouteNames.deleteAccount,
       builder: (BuildContext context, GoRouterState state) {
-        return const DeleteAccountPage();
+        return DeferredPage(
+          loadLibrary: delete_account_lib.loadLibrary,
+          builder: (_) => delete_account_lib.DeleteAccountPage(),
+        );
       },
     ),
     GoRoute(
-      name: PrivacyPolicy.routeName,
-      path: PrivacyPolicy.routeName,
+      name: RouteNames.privacyPolicy,
+      path: RouteNames.privacyPolicy,
       builder: (BuildContext context, GoRouterState state) {
-        return const PrivacyPolicy();
+        return DeferredPage(
+          loadLibrary: privacy_policy_lib.loadLibrary,
+          builder: (_) => privacy_policy_lib.PrivacyPolicy(),
+        );
       },
     ),
     GoRoute(
-      name: TermsAndConditions.routeName,
-      path: TermsAndConditions.routeName,
+      name: RouteNames.termsAndConditions,
+      path: RouteNames.termsAndConditions,
       builder: (BuildContext context, GoRouterState state) {
-        return const TermsAndConditions();
+        return DeferredPage(
+          loadLibrary: privacy_policy_lib.loadLibrary,
+          builder: (_) => privacy_policy_lib.TermsAndConditions(),
+        );
       },
     ),
     GoRoute(
-      name: RefundPolicy.routeName,
-      path: RefundPolicy.routeName,
+      name: RouteNames.refundPolicy,
+      path: RouteNames.refundPolicy,
       builder: (BuildContext context, GoRouterState state) {
-        return const RefundPolicy();
+        return DeferredPage(
+          loadLibrary: privacy_policy_lib.loadLibrary,
+          builder: (_) => privacy_policy_lib.RefundPolicy(),
+        );
       },
     ),
     GoRoute(
-      name: LoginPage.routeName,
-      path: LoginPage.routeName,
+      name: RouteNames.login,
+      path: RouteNames.login,
       builder: (BuildContext context, GoRouterState state) {
         bool? resetUser = state.extra as bool?;
         return LoginPage(resetUser: resetUser);
       },
     ),
     GoRoute(
-      name: NoPermission.routeName,
-      path: NoPermission.routeName,
+      name: RouteNames.noPermission,
+      path: RouteNames.noPermission,
       builder: (BuildContext context, GoRouterState state) {
         return const NoPermission();
       },
@@ -228,147 +235,222 @@ final router = GoRouter(
       },
       routes: [
         GoRoute(
-          name: Homepage.routeName,
-          path: Homepage.routeName,
+          name: RouteNames.home,
+          path: RouteNames.home,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            // final orderReference = state.uri.queryParameters['orderReference'];
             return const NoTransitionPage(child: Scaffold(body: MainDashboard()));
           },
         ),
         GoRoute(
-          name: PointHomepage.routeName,
-          path: PointHomepage.routeName,
+          name: RouteNames.points,
+          path: RouteNames.points,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: PointHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: points_lib.loadLibrary,
+                builder: (_) => Scaffold(body: points_lib.PointHomepage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: UserHomepage.routeName,
-          path: UserHomepage.routeName,
+          name: RouteNames.patients,
+          path: RouteNames.patients,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: UserHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: user_lib.loadLibrary,
+                builder: (_) => Scaffold(body: user_lib.UserHomepage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: BabyTrackerHomepage.routeName,
-          path: BabyTrackerHomepage.routeName,
+          name: RouteNames.babyTracker,
+          path: RouteNames.babyTracker,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: BabyTrackerHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: baby_tracker_lib.loadLibrary,
+                builder: (_) => Scaffold(body: baby_tracker_lib.BabyTrackerHomepage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: RewardHomepage.routeName,
-          path: RewardHomepage.routeName,
+          name: RouteNames.rewards,
+          path: RouteNames.rewards,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: RewardHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: reward_lib.loadLibrary,
+                builder: (_) => Scaffold(body: reward_lib.RewardHomepage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: PaymentSummaryPage.routeName,
-          path: PaymentSummaryPage.routeName,
+          name: RouteNames.payments,
+          path: RouteNames.payments,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: PaymentSummaryPage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: payment_lib.loadLibrary,
+                builder: (_) => Scaffold(body: payment_lib.PaymentSummaryPage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: BranchPaymentSummaryPage.routeName,
-          path: BranchPaymentSummaryPage.routeName,
+          name: RouteNames.branchPaymentSummary,
+          path: RouteNames.branchPaymentSummary,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: BranchPaymentSummaryPage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: branch_summary_lib.loadLibrary,
+                builder: (_) => Scaffold(body: branch_summary_lib.BranchPaymentSummaryPage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: RewardHistoryHomepage.routeName,
-          path: RewardHistoryHomepage.routeName,
+          name: RouteNames.rewardHistory,
+          path: RouteNames.rewardHistory,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: RewardHistoryHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: reward_history_lib.loadLibrary,
+                builder: (_) => Scaffold(body: reward_history_lib.RewardHistoryHomepage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: MarketingHomepage.routeName,
-          path: MarketingHomepage.routeName,
+          name: RouteNames.marketing,
+          path: RouteNames.marketing,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: MarketingHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: marketing_lib.loadLibrary,
+                builder: (_) => Scaffold(body: marketing_lib.MarketingHomepage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: BranchHomepage.routeName,
-          path: BranchHomepage.routeName,
+          name: RouteNames.branches,
+          path: RouteNames.branches,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: BranchHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: branch_lib.loadLibrary,
+                builder: (_) => Scaffold(body: branch_lib.BranchHomepage()),
+              ),
+            );
           },
         ),
         GoRoute(
-          name: AppointmentHomepage.routeName,
-          path: AppointmentHomepage.routeName,
+          name: RouteNames.appointments,
+          path: RouteNames.appointments,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return const NoTransitionPage(child: Scaffold(body: AppointmentHomepage()));
           },
         ),
         GoRoute(
-          name: PaymentMismatchPage.routeName,
-          path: PaymentMismatchPage.routeName,
+          name: RouteNames.paymentMismatch,
+          path: RouteNames.paymentMismatch,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: PaymentMismatchPage()));
-          },
-        ),
-        GoRoute(
-          name: ServiceHomepage.routeName,
-          path: ServiceHomepage.routeName,
-          parentNavigatorKey: _shellNavigatorKey,
-          pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: ServiceHomepage()));
-          },
-        ),
-        GoRoute(
-          name: AdminHomepage.routeName,
-          path: AdminHomepage.routeName,
-          parentNavigatorKey: _shellNavigatorKey,
-          pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: AdminHomepage()));
-          },
-        ),
-        GoRoute(
-          name: PromotionHomepage.routeName,
-          path: PromotionHomepage.routeName,
-          parentNavigatorKey: _shellNavigatorKey,
-          pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: PromotionHomepage()));
-          },
-        ),
-        GoRoute(
-          name: DoctorHomepage.routeName,
-          path: DoctorHomepage.routeName,
-          parentNavigatorKey: _shellNavigatorKey,
-          pageBuilder: (context, state) {
-            final String? branchId = state.extra as String?;
             return NoTransitionPage(
-              child: Scaffold(body: DoctorHomepage(branchId: branchId)),
+              child: DeferredPage(
+                loadLibrary: payment_mismatch_lib.loadLibrary,
+                builder: (_) => Scaffold(body: payment_mismatch_lib.PaymentMismatchPage()),
+              ),
             );
           },
         ),
         GoRoute(
-          name: VoucherHomepage.routeName,
-          path: VoucherHomepage.routeName,
+          name: RouteNames.services,
+          path: RouteNames.services,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: VoucherHomepage()));
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: service_lib.loadLibrary,
+                builder: (_) => Scaffold(body: service_lib.ServiceHomepage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.admins,
+          path: RouteNames.admins,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: admin_lib.loadLibrary,
+                builder: (_) => Scaffold(body: admin_lib.AdminHomepage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.promotions,
+          path: RouteNames.promotions,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: promotion_lib.loadLibrary,
+                builder: (_) => Scaffold(body: promotion_lib.PromotionHomepage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.doctors,
+          path: RouteNames.doctors,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            final String? branchId = state.extra as String?;
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: doctor_lib.loadLibrary,
+                builder: (_) => Scaffold(body: doctor_lib.DoctorHomepage(branchId: branchId)),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.vouchers,
+          path: RouteNames.vouchers,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: voucher_lib.loadLibrary,
+                builder: (_) => Scaffold(body: voucher_lib.VoucherHomepage()),
+              ),
+            );
           },
         ),
       ],
     ),
   ],
-  errorBuilder: (context, state) => ErrorPage(error: state.error),
+  errorBuilder: (context, state) => DeferredPage(
+    loadLibrary: error_lib.loadLibrary,
+    builder: (_) => error_lib.ErrorPage(error: state.error),
+  ),
 );

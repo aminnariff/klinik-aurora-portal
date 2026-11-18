@@ -3,27 +3,39 @@ import 'package:klinik_aurora_portal/config/app_theme_preset.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 
+enum TableDensity { compact, comfortable }
+
 /// Manages Klinik Aurora Portal appearance settings:
 /// - Light / Dark / System [ThemeMode]
 /// - Curated [AuroraThemePreset] brand accent color (default: Aurora Plum)
+/// - Table & control density ([TableDensity.comfortable] / [TableDensity.compact])
 ///
 /// Persists selections in [Storage] and syncs legacy top-level color getters
 /// in `config/color.dart` so all views reflect theme updates live.
 class DarkModeController extends ChangeNotifier {
   static const String _themeModeKey = 'portal_theme_mode';
   static const String _themePresetKey = 'portal_theme_preset';
+  static const String _tableDensityKey = 'portal_table_density';
 
   ThemeMode _themeMode = ThemeMode.light;
   AuroraThemePreset _preset = AuroraThemePreset.auroraPlum;
+  TableDensity _tableDensity = TableDensity.comfortable;
 
-  DarkModeController({ThemeMode? initialThemeMode, AuroraThemePreset? initialPreset}) {
+  DarkModeController({
+    ThemeMode? initialThemeMode,
+    AuroraThemePreset? initialPreset,
+    TableDensity? initialTableDensity,
+  }) {
     if (initialThemeMode != null) _themeMode = initialThemeMode;
     if (initialPreset != null) _preset = initialPreset;
+    if (initialTableDensity != null) _tableDensity = initialTableDensity;
     _syncGlobalColors();
   }
 
   ThemeMode get themeMode => _themeMode;
   AuroraThemePreset get preset => _preset;
+  TableDensity get tableDensity => _tableDensity;
+  bool get isCompact => _tableDensity == TableDensity.compact;
 
   /// Legacy boolean compatibility getter.
   bool get darkMode => _themeMode == ThemeMode.dark;
@@ -50,6 +62,10 @@ class DarkModeController extends ChangeNotifier {
       final savedPreset = prefs.getString(_themePresetKey);
       if (savedPreset != null) {
         _preset = AuroraThemePreset.fromId(savedPreset);
+      }
+      final savedDensity = prefs.getString(_tableDensityKey);
+      if (savedDensity != null) {
+        _tableDensity = savedDensity == 'compact' ? TableDensity.compact : TableDensity.comfortable;
       }
       _syncGlobalColors();
       notifyListeners();
@@ -78,20 +94,33 @@ class DarkModeController extends ChangeNotifier {
     } catch (_) {}
   }
 
+  Future<void> setTableDensity(TableDensity density) async {
+    if (_tableDensity == density) return;
+    _tableDensity = density;
+    notifyListeners();
+    try {
+      await prefs.setString(_tableDensityKey, density == TableDensity.compact ? 'compact' : 'comfortable');
+    } catch (_) {}
+  }
+
   Future<void> toggleDarkMode(BuildContext context) async {
     final currentlyDark = isDarkActive(context);
     await setThemeMode(currentlyDark ? ThemeMode.light : ThemeMode.dark);
   }
 
   Future<void> resetToDefaults() async {
-    final changed = _themeMode != ThemeMode.light || _preset != AuroraThemePreset.auroraPlum;
+    final changed = _themeMode != ThemeMode.light ||
+        _preset != AuroraThemePreset.auroraPlum ||
+        _tableDensity != TableDensity.comfortable;
     _themeMode = ThemeMode.light;
     _preset = AuroraThemePreset.auroraPlum;
+    _tableDensity = TableDensity.comfortable;
     _syncGlobalColors();
     if (changed) notifyListeners();
     try {
       await prefs.setString(_themeModeKey, _serializeThemeMode(_themeMode));
       await prefs.setString(_themePresetKey, _preset.id);
+      await prefs.setString(_tableDensityKey, 'comfortable');
     } catch (_) {}
   }
 

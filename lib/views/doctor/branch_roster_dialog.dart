@@ -1155,7 +1155,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFECFDF5),
+                      color: appSuccessSoft,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: const Color(0xFFA7F3D0)),
                     ),
@@ -1428,7 +1428,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEFF6FF),
+                                  color: appInfoSoft,
                                   borderRadius: BorderRadius.circular(3),
                                   border: Border.all(color: const Color(0xFFBFDBFE)),
                                 ),
@@ -1553,7 +1553,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEFF6FF),
+                            color: appInfoSoft,
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(color: const Color(0xFFBFDBFE)),
                           ),
@@ -1601,7 +1601,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
 
   Widget _doctorTypeChip(int? type) {
     final label = doctorType(type);
-    Color bg = const Color(0xFFEFF6FF);
+    Color bg = appInfoSoft;
     Color fg = const Color(0xFF1D4ED8);
     switch (type) {
       case 2:
@@ -1609,7 +1609,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
         fg = const Color(0xFF7E22CE);
         break;
       case 3:
-        bg = const Color(0xFFECFDF5);
+        bg = appSuccessSoft;
         fg = const Color(0xFF047857);
         break;
       case 4:
@@ -1617,11 +1617,11 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
         fg = const Color(0xFFBE123C);
         break;
       case 5:
-        bg = const Color(0xFFFEF3C7);
+        bg = appWarningSoft;
         fg = const Color(0xFFB45309);
         break;
       default:
-        bg = const Color(0xFFEFF6FF);
+        bg = appInfoSoft;
         fg = const Color(0xFF1D4ED8);
         break;
     }

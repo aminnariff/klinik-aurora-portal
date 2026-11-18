@@ -444,7 +444,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: _showOnStart ? const Color(0xFFFFFBEB) : appSurfaceSubtle,
+        color: _showOnStart ? appWarningSoft : appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: _showOnStart ? const Color(0xFFFDE68A) : appBorder,
@@ -497,7 +497,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: _promotionStatus ? const Color(0xFFF0FDF4) : const Color(0xFFFEF2F2),
+        color: _promotionStatus ? const Color(0xFFF0FDF4) : appDangerSoft,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: _promotionStatus ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA),

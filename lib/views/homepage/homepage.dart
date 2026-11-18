@@ -4,31 +4,18 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
-import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
-import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
-import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart';
-import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart';
-import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
-import 'package:klinik_aurora_portal/views/login/login_page.dart';
-import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart';
-import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart';
-import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
-import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
-import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
-import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
-import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
+import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart' deferred as notification_lib;
 import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.dart';
-import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
-import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart';
-import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/command_palette/command_palette_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/layout/deferred_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
@@ -64,24 +51,24 @@ class _HomepageState extends State<Homepage> {
   static String _getItemCategory(String? label) {
     if (label == null) return '';
     if (label == 'Dashboard' ||
-        label == UserHomepage.displayName ||
-        label == BabyTrackerHomepage.displayName ||
-        label == AppointmentHomepage.displayName ||
-        label == DoctorHomepage.displayName ||
-        label == ServiceHomepage.displayName ||
-        label == BranchHomepage.displayName ||
-        label == PaymentSummaryPage.displayName) {
+        label == RouteNames.patientsDisplay ||
+        label == RouteNames.babyTrackerDisplay ||
+        label == RouteNames.appointmentsDisplay ||
+        label == RouteNames.doctorsDisplay ||
+        label == RouteNames.servicesDisplay ||
+        label == RouteNames.branchesDisplay ||
+        label == RouteNames.paymentsDisplay) {
       return 'Clinic Operations';
     }
-    if (label == PointHomepage.displayName ||
-        label == VoucherHomepage.displayName ||
-        label == RewardHomepage.displayName ||
-        label == RewardHistoryHomepage.displayName ||
-        label == MarketingHomepage.displayName ||
-        label == PromotionHomepage.displayName) {
+    if (label == RouteNames.pointsDisplay ||
+        label == RouteNames.vouchersDisplay ||
+        label == RouteNames.rewardsDisplay ||
+        label == RouteNames.rewardHistoryDisplay ||
+        label == RouteNames.marketingDisplay ||
+        label == RouteNames.promotionsDisplay) {
       return 'Loyalty & Marketing';
     }
-    if (label == AdminHomepage.displayName) {
+    if (label == RouteNames.adminsDisplay) {
       return 'System & Settings';
     }
     return 'Other';
@@ -100,43 +87,43 @@ class _HomepageState extends State<Homepage> {
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.people_rounded, color: Colors.white);
         },
-        label: UserHomepage.displayName,
+        label: RouteNames.patientsDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.pregnant_woman_rounded, color: Colors.white);
         },
-        label: BabyTrackerHomepage.displayName,
+        label: RouteNames.babyTrackerDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.event_rounded, color: Colors.white);
         },
-        label: AppointmentHomepage.displayName,
+        label: RouteNames.appointmentsDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const FaIcon(FontAwesomeIcons.userDoctor, color: Colors.white);
         },
-        label: DoctorHomepage.displayName,
+        label: RouteNames.doctorsDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.medical_services_rounded, color: Colors.white);
         },
-        label: ServiceHomepage.displayName,
+        label: RouteNames.servicesDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.store_rounded, color: Colors.white);
         },
-        label: BranchHomepage.displayName,
+        label: RouteNames.branchesDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.receipt_long_rounded, color: Colors.white);
         },
-        label: PaymentSummaryPage.displayName,
+        label: RouteNames.paymentsDisplay,
       ),
 
       // --- Loyalty & Marketing ---
@@ -144,37 +131,37 @@ class _HomepageState extends State<Homepage> {
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.stars_rounded, color: Colors.white);
         },
-        label: PointHomepage.displayName,
+        label: RouteNames.pointsDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.confirmation_number_rounded, color: Colors.white);
         },
-        label: VoucherHomepage.displayName,
+        label: RouteNames.vouchersDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.redeem_rounded, color: Colors.white);
         },
-        label: RewardHomepage.displayName,
+        label: RouteNames.rewardsDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.history_rounded, color: Colors.white);
         },
-        label: RewardHistoryHomepage.displayName,
+        label: RouteNames.rewardHistoryDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.celebration_rounded, color: Colors.white);
         },
-        label: MarketingHomepage.displayName,
+        label: RouteNames.marketingDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.campaign_rounded, color: Colors.white);
         },
-        label: PromotionHomepage.displayName,
+        label: RouteNames.promotionsDisplay,
       ),
 
       // --- System & Settings ---
@@ -182,7 +169,7 @@ class _HomepageState extends State<Homepage> {
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.admin_panel_settings_rounded, color: Colors.white);
         },
-        label: AdminHomepage.displayName,
+        label: RouteNames.adminsDisplay,
       ),
     ];
     getAuthController();
@@ -198,54 +185,54 @@ class _HomepageState extends State<Homepage> {
           final isSonographer = auth.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') && !isSuperAdmin;
 
           if (isSonographer) {
-            sideBarAttribute.retainWhere((element) => element.label == AppointmentHomepage.displayName);
+            sideBarAttribute.retainWhere((element) => element.label == RouteNames.appointmentsDisplay);
             pageController.selectIndex(0);
-            context.goNamed(AppointmentHomepage.routeName);
+            context.goNamed(RouteNames.appointments);
           } else {
             if (!auth.hasPermission('1bda631e-ef17-11ee-bd1b-cc801b09db2f')) {
-              sideBarAttribute.removeWhere((element) => element.label == UserHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.patientsDisplay);
             }
             if (!auth.hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') || !isSuperAdmin) {
-              sideBarAttribute.removeWhere((element) => element.label == AdminHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.adminsDisplay);
             }
             if (!auth.hasPermission('a231db36-058d-11ef-943b-626efeb17d5e')) {
-              sideBarAttribute.removeWhere((element) => element.label == PointHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.pointsDisplay);
             }
             if (!auth.hasPermission('68c537d4-ef31-11ee-bd1b-cc801b09db2f') || !isSuperAdmin) {
-              sideBarAttribute.removeWhere((element) => element.label == BranchHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.branchesDisplay);
             }
             if (!auth.hasPermission('d98236e8-f490-11ee-befc-aabaa50b463f')) {
-              sideBarAttribute.removeWhere((element) => element.label == VoucherHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.vouchersDisplay);
             }
             if (!auth.hasPermission('dc4e7a5a-0e15-11ef-82b0-94653af51fb9')) {
-              sideBarAttribute.removeWhere((element) => element.label == RewardHistoryHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.rewardHistoryDisplay);
             }
             if (!auth.hasPermission('e7f8bc9e-ef43-11ee-bd1b-cc801b09db2f') || !isSuperAdmin) {
-              sideBarAttribute.removeWhere((element) => element.label == PromotionHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.promotionsDisplay);
             }
             if (!auth.hasPermission('f90f9f18-057b-11ef-943b-626efeb17d5e')) {
-              sideBarAttribute.removeWhere((element) => element.label == DoctorHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.doctorsDisplay);
             }
             if (!auth.hasPermission('6e0fe1f8-2f1f-11ef-8db9-6677d190faa2')) {
-              sideBarAttribute.removeWhere((element) => element.label == RewardHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.rewardsDisplay);
             }
             if (!auth.hasPermission('0699ac1c-ac52-11ef-a1b7-bc24115a1342')) {
-              sideBarAttribute.removeWhere((element) => element.label == ServiceHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.servicesDisplay);
             }
             if (!auth.hasPermission('f57576c4-4d15-11f0-b054-1ff6746392b2')) {
-              sideBarAttribute.removeWhere((element) => element.label == PaymentSummaryPage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.paymentsDisplay);
             }
             if (!auth.hasPermission('3b8e7d9d-ac51-11ef-a1b7-bc24115a1342')) {
-              sideBarAttribute.removeWhere((element) => element.label == AppointmentHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.appointmentsDisplay);
             }
             if (!isSuperAdmin) {
-              sideBarAttribute.removeWhere((element) => element.label == MarketingHomepage.displayName);
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.marketingDisplay);
             }
             context.read<TopBarController>().pageValue = 0;
           }
 
           if (sideBarAttribute.isEmpty) {
-            context.goNamed(NoPermission.routeName);
+            context.goNamed(RouteNames.noPermission);
           }
           if (mounted) setState(() {});
         }
@@ -689,7 +676,7 @@ class _HomepageState extends State<Homepage> {
                           onTap: () async {
                             try {
                               await context.read<AuthController>().logout(context);
-                              if (context.mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
+                              if (context.mounted) context.pushReplacementNamed(RouteNames.login, extra: true);
                             } catch (e) {
                               debugPrint(e.toString());
                             }
@@ -815,7 +802,13 @@ class _HomepageState extends State<Homepage> {
               icon: const Icon(Icons.notifications_outlined, size: 20),
               color: colors.inkSecondary,
               tooltip: 'Announcements',
-              onPressed: () => showDialog(context: context, builder: (_) => NotificationHomepage()),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (_) => DeferredPage(
+                  loadLibrary: notification_lib.loadLibrary,
+                  builder: (_) => notification_lib.NotificationHomepage(),
+                ),
+              ),
             ),
             const SizedBox(width: 4),
           ],
@@ -1121,7 +1114,7 @@ class _HomepageState extends State<Homepage> {
     } else if (value == 'logout') {
       try {
         await context.read<AuthController>().logout(context);
-        if (mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
+        if (mounted) context.pushReplacementNamed(RouteNames.login, extra: true);
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -1129,7 +1122,10 @@ class _HomepageState extends State<Homepage> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return NotificationHomepage();
+          return DeferredPage(
+            loadLibrary: notification_lib.loadLibrary,
+            builder: (_) => notification_lib.NotificationHomepage(),
+          );
         },
       );
     } else if (value == 'relocate') {
@@ -1140,35 +1136,35 @@ class _HomepageState extends State<Homepage> {
   void action(String? label) {
     switch (label) {
       case 'Dashboard':
-        context.go(Homepage.routeName);
-      case PointHomepage.displayName:
-        context.go(PointHomepage.routeName);
-      case AppointmentHomepage.displayName:
-        context.go(AppointmentHomepage.routeName);
-      case ServiceHomepage.displayName:
-        context.go(ServiceHomepage.routeName);
-      case UserHomepage.displayName:
-        context.go(UserHomepage.routeName);
-      case BabyTrackerHomepage.displayName:
-        context.go(BabyTrackerHomepage.routeName);
-      case AdminHomepage.displayName:
-        context.go(AdminHomepage.routeName);
-      case BranchHomepage.displayName:
-        context.go(BranchHomepage.routeName);
-      case DoctorHomepage.displayName:
-        context.go(DoctorHomepage.routeName);
-      case PromotionHomepage.displayName:
-        context.go(PromotionHomepage.routeName);
-      case VoucherHomepage.displayName:
-        context.go(VoucherHomepage.routeName);
-      case RewardHomepage.displayName:
-        context.go(RewardHomepage.routeName);
-      case RewardHistoryHomepage.displayName:
-        context.go(RewardHistoryHomepage.routeName);
-      case PaymentSummaryPage.displayName:
-        context.go(PaymentSummaryPage.routeName);
-      case MarketingHomepage.displayName:
-        context.go(MarketingHomepage.routeName);
+        context.go(RouteNames.home);
+      case RouteNames.pointsDisplay:
+        context.go(RouteNames.points);
+      case RouteNames.appointmentsDisplay:
+        context.go(RouteNames.appointments);
+      case RouteNames.servicesDisplay:
+        context.go(RouteNames.services);
+      case RouteNames.patientsDisplay:
+        context.go(RouteNames.patients);
+      case RouteNames.babyTrackerDisplay:
+        context.go(RouteNames.babyTracker);
+      case RouteNames.adminsDisplay:
+        context.go(RouteNames.admins);
+      case RouteNames.branchesDisplay:
+        context.go(RouteNames.branches);
+      case RouteNames.doctorsDisplay:
+        context.go(RouteNames.doctors);
+      case RouteNames.promotionsDisplay:
+        context.go(RouteNames.promotions);
+      case RouteNames.vouchersDisplay:
+        context.go(RouteNames.vouchers);
+      case RouteNames.rewardsDisplay:
+        context.go(RouteNames.rewards);
+      case RouteNames.rewardHistoryDisplay:
+        context.go(RouteNames.rewardHistory);
+      case RouteNames.paymentsDisplay:
+        context.go(RouteNames.payments);
+      case RouteNames.marketingDisplay:
+        context.go(RouteNames.marketing);
     }
   }
 

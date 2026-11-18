@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +7,13 @@ import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/password_recovery/password_recovery_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
-import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
@@ -415,7 +414,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   margin: const EdgeInsets.only(bottom: 20),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFBEB),
+                    color: appWarningSoft,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: const Color(0xFFFDE68A)),
                   ),
@@ -731,7 +730,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
     if (responseCode(res.code)) {
       context.pop();
       context.pushNamed(
-        AdminPasswordRecoveryPage.routeName,
+        RouteNames.passwordRecovery,
         extra: {
           'token': res.data?.data?.token ?? '',
           'email': email,
@@ -749,35 +748,26 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: Container(
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: appSurface,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.14),
-                    offset: const Offset(0, 20),
-                    blurRadius: 40,
-                  ),
-                  BoxShadow(
-                    color: primary.withValues(alpha: 0.08),
-                    offset: const Offset(0, 8),
-                    blurRadius: 24,
-                  ),
-                ],
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 440),
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: appSurface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: appBorder, width: 1.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.14),
+                offset: const Offset(0, 20),
+                blurRadius: 40,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                   // Header Row with Icon & Close Button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -914,7 +904,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFEF2F2),
+                        color: appDangerSoft,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: const Color(0xFFFECACA)),
                       ),
@@ -973,8 +963,6 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 }

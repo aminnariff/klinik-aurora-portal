@@ -697,7 +697,7 @@ class BranchDashboardView extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
+                          color: appInfoSoft,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(

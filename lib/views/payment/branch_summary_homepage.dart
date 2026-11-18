@@ -353,7 +353,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
         value: '${summary?.failedPayments ?? 0}',
         icon: Icons.cancel_rounded,
         accent: const Color(0xFFEF4444),
-        bg: const Color(0xFFFEE2E2),
+        bg: appDangerSoft,
         valueColor: const Color(0xFF991B1B),
       ),
       _CardConfig(
@@ -369,7 +369,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
         value: 'RM ${summary?.totalRefundAmount ?? '0.00'}',
         icon: Icons.undo_rounded,
         accent: const Color(0xFFF59E0B),
-        bg: const Color(0xFFFEF3C7),
+        bg: appWarningSoft,
         valueColor: const Color(0xFF92400E),
       ),
       _CardConfig(
@@ -668,7 +668,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: appDangerSoft, borderRadius: BorderRadius.circular(12)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

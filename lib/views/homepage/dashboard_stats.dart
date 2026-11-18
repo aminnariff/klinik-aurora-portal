@@ -235,7 +235,7 @@ class _UserDonutCard extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  PieChart(
+                  RepaintBoundary(child: PieChart(
                     PieChartData(
                       sectionsSpace: 2,
                       centerSpaceRadius: 32,
@@ -247,7 +247,7 @@ class _UserDonutCard extends StatelessWidget {
                               PieChartSectionData(value: inactive.toDouble(), color: const Color(0xFF2a3a4a), radius: 14, showTitle: false),
                             ],
                     ),
-                  ),
+                  )),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

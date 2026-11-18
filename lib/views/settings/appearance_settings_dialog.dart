@@ -155,7 +155,46 @@ class AppearanceSettingsDialog extends StatelessWidget {
 
                       const SizedBox(height: 24),
 
-                      // 2. Brand Accent Color
+                      // 2. Table & Control Density
+                      Text(
+                        'Workspace Density',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: colors.inkPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Choose compact rows for dense reception lists or comfortable spacing.',
+                        style: TextStyle(fontSize: 12, color: colors.inkMuted),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _ModeOptionCard(
+                              label: 'Comfortable',
+                              icon: Icons.view_agenda_outlined,
+                              selected: themeCtrl.tableDensity == TableDensity.comfortable,
+                              onTap: () => themeCtrl.setTableDensity(TableDensity.comfortable),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _ModeOptionCard(
+                              label: 'Compact',
+                              icon: Icons.view_headline_rounded,
+                              selected: themeCtrl.tableDensity == TableDensity.compact,
+                              onTap: () => themeCtrl.setTableDensity(TableDensity.compact),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // 3. Brand Accent Color
                       Row(
                         children: [
                           Expanded(

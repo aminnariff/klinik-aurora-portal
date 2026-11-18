@@ -30,7 +30,7 @@ class LineChartWidget extends StatelessWidget {
           ),
           AppPadding.vertical(),
         ],
-        Expanded(child: LineChart(sampleData1, duration: const Duration(milliseconds: 150))),
+        Expanded(child: RepaintBoundary(child: LineChart(sampleData1, duration: const Duration(milliseconds: 150)))),
       ],
     );
   }

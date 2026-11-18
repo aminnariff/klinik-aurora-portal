@@ -274,7 +274,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+          color: isActive ? appSuccessSoft : appDangerSoft,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: isActive ? const Color(0xFF86EFAC) : const Color(0xFFFCA5A5)),
         ),
@@ -727,7 +727,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0FDFA),
+                      color: appTealSoft,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: const Color(0xFF246E7A).withValues(alpha: 0.3)),
                     ),

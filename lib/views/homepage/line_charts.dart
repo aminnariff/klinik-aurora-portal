@@ -10,7 +10,7 @@ class LineChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LineChart(isShowingMainData ? sampleData1 : sampleData2, duration: const Duration(milliseconds: 250));
+    return RepaintBoundary(child: LineChart(isShowingMainData ? sampleData1 : sampleData2, duration: const Duration(milliseconds: 250)));
   }
 
   LineChartData get sampleData1 => LineChartData(

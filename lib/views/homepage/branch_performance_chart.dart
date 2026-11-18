@@ -215,7 +215,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
 
     return AspectRatio(
       aspectRatio: isMobile ? 1.8 : 4,
-      child: BarChart(
+      child: RepaintBoundary(child: BarChart(
         BarChartData(
           maxY: maxY == 0 ? 10 : maxY * 1.3,
           barTouchData: BarTouchData(
@@ -310,7 +310,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
             );
           }),
         ),
-      ),
+      )),
     );
   }
 

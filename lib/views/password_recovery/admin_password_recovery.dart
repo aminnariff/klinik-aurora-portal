@@ -490,7 +490,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
 
     final errorPinTheme = defaultPinTheme.copyWith(
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF2F2),
+        color: appDangerSoft,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFEF4444), width: 1.5),
       ),
@@ -883,7 +883,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFEF2F2),
+              color: appDangerSoft,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFFFECACA)),
             ),
@@ -961,7 +961,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isMet ? const Color(0xFFECFDF5) : Colors.white,
+        color: isMet ? appSuccessSoft : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isMet ? const Color(0xFFA7F3D0) : appBorder,
@@ -1001,7 +1001,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
           width: 72,
           height: 72,
           decoration: BoxDecoration(
-            color: isSucceeded ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+            color: isSucceeded ? appSuccessSoft : appDangerSoft,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
@@ -1155,8 +1155,8 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                 Container(
                   width: 64,
                   height: 64,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFEF3C7),
+                  decoration: BoxDecoration(
+                    color: appWarningSoft,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.link_off_rounded, color: Color(0xFFD97706), size: 32),

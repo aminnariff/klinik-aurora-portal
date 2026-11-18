@@ -156,7 +156,7 @@ class _CampaignImageFieldState extends State<CampaignImageField> {
                                 width: 48,
                                 height: 48,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFEE2E2),
+                                  color: appDangerSoft,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(color: appBorder),
                                 ),

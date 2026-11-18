@@ -179,7 +179,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xFFFEF3C7),
+                                                  color: appWarningSoft,
                                                   borderRadius: BorderRadius.circular(4),
                                                   border: Border.all(color: const Color(0xFFFDE68A)),
                                                 ),

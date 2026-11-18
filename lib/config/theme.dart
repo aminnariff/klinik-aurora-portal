@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/config/app_theme_preset.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 
 /// Builds the Light [ThemeData] for Klinik Aurora Portal using [preset].
-ThemeData buildLightTheme(BuildContext context, [AuroraThemePreset preset = AuroraThemePreset.auroraPlum]) {
+ThemeData buildLightTheme(
+  BuildContext context, [
+  AuroraThemePreset preset = AuroraThemePreset.auroraPlum,
+  TableDensity density = TableDensity.comfortable,
+]) {
   final tokens = AppColors.light(preset);
   final baseScheme = ColorScheme.fromSeed(
     seedColor: tokens.brandPrimary,
@@ -34,11 +39,16 @@ ThemeData buildLightTheme(BuildContext context, [AuroraThemePreset preset = Auro
       error: tokens.danger,
     ),
     tokens: tokens,
+    density: density,
   );
 }
 
 /// Builds the Dark [ThemeData] for Klinik Aurora Portal using [preset].
-ThemeData buildDarkTheme(BuildContext context, [AuroraThemePreset preset = AuroraThemePreset.auroraPlum]) {
+ThemeData buildDarkTheme(
+  BuildContext context, [
+  AuroraThemePreset preset = AuroraThemePreset.auroraPlum,
+  TableDensity density = TableDensity.comfortable,
+]) {
   final tokens = AppColors.dark(preset);
   final baseScheme = ColorScheme.fromSeed(
     seedColor: tokens.brandPrimary,
@@ -68,6 +78,7 @@ ThemeData buildDarkTheme(BuildContext context, [AuroraThemePreset preset = Auror
       error: tokens.danger,
     ),
     tokens: tokens,
+    density: density,
   );
 }
 
@@ -75,8 +86,10 @@ ThemeData _buildBaseTheme({
   required Brightness brightness,
   required ColorScheme colorScheme,
   required AppColors tokens,
+  required TableDensity density,
 }) {
   final isDark = brightness == Brightness.dark;
+  final isCompact = density == TableDensity.compact;
 
   return ThemeData(
     useMaterial3: true,
@@ -91,7 +104,7 @@ ThemeData _buildBaseTheme({
     hoverColor: tokens.tableRowHover,
     splashColor: tokens.brandPrimary.withValues(alpha: 0.10),
     highlightColor: tokens.brandPrimary.withValues(alpha: 0.06),
-    visualDensity: VisualDensity.adaptivePlatformDensity,
+    visualDensity: isCompact ? VisualDensity.compact : VisualDensity.adaptivePlatformDensity,
     fontFamily: 'Figtree',
     iconTheme: IconThemeData(color: tokens.inkSecondary),
     dividerTheme: DividerThemeData(color: tokens.border, thickness: 1, space: 1),
@@ -151,6 +164,10 @@ ThemeData _buildBaseTheme({
       ),
     ),
     dataTableTheme: DataTableThemeData(
+      headingRowHeight: isCompact ? 38 : 46,
+      dataRowMinHeight: isCompact ? 40 : 48,
+      dataRowMaxHeight: isCompact ? 50 : 60,
+      columnSpacing: isCompact ? 12 : 20,
       headingRowColor: WidgetStateProperty.all(tokens.tableHeaderBg),
       dataRowColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) return tokens.brandSoftBg;

@@ -149,7 +149,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
 
     return AspectRatio(
       aspectRatio: isMobile ? 1.8 : 5,
-      child: LineChart(
+      child: RepaintBoundary(child: LineChart(
         LineChartData(
           lineTouchData: _lineTouchData(getLabel: (spot) => '${spot.y.toInt()} registrations'),
           gridData: _gridData(),
@@ -183,7 +183,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
           maxY: maxY,
           lineBarsData: [_lineBar(values, _dailyGradient)],
         ),
-      ),
+      )),
     );
   }
 
@@ -198,7 +198,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
 
     return AspectRatio(
       aspectRatio: isMobile ? 1.8 : 5,
-      child: LineChart(
+      child: RepaintBoundary(child: LineChart(
         LineChartData(
           lineTouchData: _lineTouchData(getLabel: (spot) => '${spot.y.toInt()} registrations'),
           gridData: _gridData(),
@@ -232,7 +232,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
           maxY: maxY,
           lineBarsData: [_lineBar(values, _monthlyGradient)],
         ),
-      ),
+      )),
     );
   }
 

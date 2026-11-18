@@ -39,7 +39,7 @@ class _Graph2WidgetState extends State<Graph2Widget> {
               ),
               child: Consumer<DashboardController>(
                 builder: (context, snapshot, _) {
-                  return LineChart(mainData(context.read<DashboardController>().dashboardResponse?.data));
+                  return RepaintBoundary(child: LineChart(mainData(context.read<DashboardController>().dashboardResponse?.data)));
                 },
               ),
             ),

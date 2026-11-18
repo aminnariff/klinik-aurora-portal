@@ -186,8 +186,8 @@ class _MyAppState extends State<MyApp> {
                 locale: context.locale,
                 builder: EasyLoading.init(builder: FToastBuilder()),
                 debugShowCheckedModeBanner: false,
-                theme: buildLightTheme(context, themeCtrl.preset),
-                darkTheme: buildDarkTheme(context, themeCtrl.preset),
+                theme: buildLightTheme(context, themeCtrl.preset, themeCtrl.tableDensity),
+                darkTheme: buildDarkTheme(context, themeCtrl.preset, themeCtrl.tableDensity),
                 themeMode: themeCtrl.themeMode,
               );
             },

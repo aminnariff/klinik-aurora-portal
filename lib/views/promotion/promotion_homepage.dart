@@ -842,7 +842,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: value ? const Color(0xFFFFFBEB) : appSurfaceSubtle,
+                color: value ? appWarningSoft : appSurfaceSubtle,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: value ? const Color(0xFFFDE68A) : appBorder,

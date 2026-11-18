@@ -579,7 +579,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: completedCount == itemCount && itemCount > 0
-                        ? const Color(0xFFDCFCE7)
+                        ? appSuccessSoft
                         : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -660,7 +660,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFEE2E2),
+                                    color: appDangerSoft,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: const Text(

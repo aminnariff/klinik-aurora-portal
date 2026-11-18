@@ -1524,7 +1524,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: item.rosterConflict == true ? const Color(0xFFFEF2F2) : const Color(0xFFF3F4F6),
+              color: item.rosterConflict == true ? appDangerSoft : const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(6),
               border: item.rosterConflict == true ? Border.all(color: const Color(0xFFEF4444), width: 1) : null,
             ),
@@ -1708,7 +1708,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       case 2:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: appDangerSoft, borderRadius: BorderRadius.circular(12)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1726,7 +1726,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       default:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: appWarningSoft, borderRadius: BorderRadius.circular(12)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1747,7 +1747,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   Widget _buildNoPaymentBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: const Color(0xFFDBEAFE), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: appInfoSoft, borderRadius: BorderRadius.circular(12)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -2596,7 +2596,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFBEB),
+                        color: appWarningSoft,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: const Color(0xFFFDE68A)),
                       ),
@@ -2659,7 +2659,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
                 decoration: BoxDecoration(
-                  color: doneCount == totalCount ? const Color(0xFF16A34A) : const Color(0xFFDCFCE7),
+                  color: doneCount == totalCount ? const Color(0xFF16A34A) : appSuccessSoft,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0xFF86EFAC)),
                 ),
