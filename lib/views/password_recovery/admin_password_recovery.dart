@@ -75,7 +75,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
       case 4:
         return const Color(0xFF10B981); // Emerald
       default:
-        return const Color(0xFFCBD5E1);
+        return appBorderStrong;
     }
   }
 
@@ -255,7 +255,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: appSurfaceSubtle,
         body: Stack(
           children: [
             // Ambient Decorative Gradients
@@ -312,8 +312,8 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                         Container(
                           padding: const EdgeInsets.all(36),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
+                            color: appSurface,
+                            borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: Colors.white.withValues(alpha: 0.9),
                               width: 1.5,
@@ -402,12 +402,12 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Klinik Aurora',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF0F172A),
+                    color: appInkPrimary,
                     letterSpacing: -0.2,
                   ),
                 ),
@@ -429,17 +429,17 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.arrow_back_rounded, size: 15, color: Color(0xFF475569)),
+              Icon(Icons.arrow_back_rounded, size: 15, color: appInkSecondary),
               SizedBox(width: 6),
               Text(
                 'Back to Sign In',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF475569),
+                  color: appInkSecondary,
                 ),
               ),
             ],
@@ -453,21 +453,21 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
     final defaultPinTheme = PinTheme(
       width: 52,
       height: 58,
-      textStyle: const TextStyle(
+      textStyle: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w800,
-        color: Color(0xFF0F172A),
+        color: appInkPrimary,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
+        border: Border.all(color: appBorderStrong, width: 1.2),
       ),
     );
 
     final focusedPinTheme = defaultPinTheme.copyWith(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: primary, width: 2),
         boxShadow: [
@@ -535,7 +535,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: primary.withValues(alpha: 0.3)),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.verified_user_outlined, size: 13, color: primary),
@@ -557,19 +557,19 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
         const SizedBox(height: 20),
 
         // Title & Description
-        const Text(
+        Text(
           'Reset your password',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF0F172A),
+            color: appInkPrimary,
             letterSpacing: -0.3,
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Enter the 6-digit code sent to your email, then choose a strong new password.',
-          style: TextStyle(fontSize: 13.5, color: Color(0xFF64748B), height: 1.45),
+          style: TextStyle(fontSize: 13.5, color: appInkMuted, height: 1.45),
         ),
         const SizedBox(height: 18),
 
@@ -626,12 +626,12 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               '6-DIGIT VERIFICATION CODE',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF475569),
+                color: appInkSecondary,
                 letterSpacing: 0.6,
               ),
             ),
@@ -640,7 +640,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   ? Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
@@ -662,7 +662,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   : InkWell(
                       onTap: _resendOtp,
                       borderRadius: BorderRadius.circular(6),
-                      child: const Padding(
+                      child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -706,12 +706,12 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
         const SizedBox(height: 26),
 
         // New Password Section
-        const Text(
+        Text(
           'NEW PASSWORD',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.6,
           ),
         ),
@@ -720,18 +720,18 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
           controller: passwordController,
           focusNode: passwordFocusNode,
           obscureText: _obscurePassword,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF0F172A)),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: appInkPrimary),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: appSurfaceSubtle,
             hintText: 'Enter at least 8 characters',
-            hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
-            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8), size: 19),
+            hintStyle: TextStyle(fontSize: 13.5, color: appInkMuted),
+            prefixIcon: Icon(Icons.lock_outline_rounded, color: appInkMuted, size: 19),
             suffixIcon: IconButton(
   tooltip: 'Papar kata laluan',
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                color: const Color(0xFF94A3B8),
+                color: appInkMuted,
                 size: 19,
               ),
               onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
@@ -739,15 +739,15 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: BorderSide(color: appBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: BorderSide(color: appBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: primary, width: 1.5),
+              borderSide: BorderSide(color: primary, width: 1.5),
             ),
           ),
         ),
@@ -755,12 +755,12 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
         const SizedBox(height: 16),
 
         // Confirm Password Section
-        const Text(
+        Text(
           'CONFIRM NEW PASSWORD',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.6,
           ),
         ),
@@ -769,18 +769,18 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
           controller: confirmPasswordController,
           focusNode: confirmPasswordFocusNode,
           obscureText: _obscureConfirm,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF0F172A)),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: appInkPrimary),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: appSurfaceSubtle,
             hintText: 'Re-type new password',
-            hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
-            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8), size: 19),
+            hintStyle: TextStyle(fontSize: 13.5, color: appInkMuted),
+            prefixIcon: Icon(Icons.lock_outline_rounded, color: appInkMuted, size: 19),
             suffixIcon: IconButton(
   tooltip: 'Papar kata laluan',
               icon: Icon(
                 _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                color: const Color(0xFF94A3B8),
+                color: appInkMuted,
                 size: 19,
               ),
               onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
@@ -788,15 +788,15 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: BorderSide(color: appBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: BorderSide(color: appBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: primary, width: 1.5),
+              borderSide: BorderSide(color: primary, width: 1.5),
             ),
           ),
         ),
@@ -827,7 +827,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   height: 4,
                   margin: EdgeInsets.only(right: index < 3 ? 6 : 0),
                   decoration: BoxDecoration(
-                    color: isFilled ? _strengthColor : const Color(0xFFE2E8F0),
+                    color: isFilled ? _strengthColor : appBorder,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -841,19 +841,19 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: appSurfaceSubtle,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Password Checklist:',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF475569),
+                  color: appInkSecondary,
                   letterSpacing: 0.3,
                 ),
               ),
@@ -964,7 +964,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
         color: isMet ? const Color(0xFFECFDF5) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isMet ? const Color(0xFFA7F3D0) : const Color(0xFFE2E8F0),
+          color: isMet ? const Color(0xFFA7F3D0) : appBorder,
         ),
       ),
       child: Row(
@@ -1020,10 +1020,10 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
         const SizedBox(height: 22),
         Text(
           isSucceeded ? 'Password Reset Successful!' : 'Password Reset Failed',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF0F172A),
+            color: appInkPrimary,
             letterSpacing: -0.3,
           ),
           textAlign: TextAlign.center,
@@ -1034,7 +1034,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
               (isSucceeded
                   ? 'Your password has been successfully updated. You can now sign in with your new credentials.'
                   : 'We were unable to reset your password. Please verify the 6-digit OTP code and try again.'),
-          style: const TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.5),
+          style: TextStyle(fontSize: 14, color: appInkMuted, height: 1.5),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 28),
@@ -1112,12 +1112,12 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   child: OutlinedButton(
                     onPressed: () => context.goNamed(LoginPage.routeName),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFCBD5E1)),
+                      side: BorderSide(color: appBorderStrong),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Back to Sign In',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: appInkSecondary),
                     ),
                   ),
                 ),
@@ -1130,7 +1130,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
 
   Widget _invalidSessionScreen() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: appSurfaceSubtle,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1138,8 +1138,8 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             constraints: const BoxConstraints(maxWidth: 440),
             padding: const EdgeInsets.all(36),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
+              color: appSurface,
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.white, width: 1.5),
               boxShadow: [
                 BoxShadow(
@@ -1162,19 +1162,19 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   child: const Icon(Icons.link_off_rounded, color: Color(0xFFD97706), size: 32),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Invalid or Expired Session',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF0F172A),
+                    color: appInkPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'This password reset link is invalid or has expired. Please initiate a new password recovery request from the sign in page.',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.45),
+                  style: TextStyle(fontSize: 14, color: appInkMuted, height: 1.45),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 26),

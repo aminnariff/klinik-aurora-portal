@@ -23,7 +23,7 @@ class DateFilterDropdown extends StatefulWidget {
 
 class _DateFilterDropdownState extends State<DateFilterDropdown> {
   late DateRange _selected;
-  static const Color _accent = primaryAccessibleText;
+  static Color get _accent => primaryAccessibleText;
 
   @override
   void initState() {
@@ -133,26 +133,26 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
               onPrimary: Colors.white,
               secondary: _accent,
               onSecondary: Colors.white,
-              surface: Colors.white,
+              surface: appSurface,
             ),
             datePickerTheme: DatePickerThemeData(
-              backgroundColor: Colors.white,
-              headerBackgroundColor: const Color(0xFFF9FAFB),
-              headerForegroundColor: const Color(0xFF374151),
+              backgroundColor: appSurface,
+              headerBackgroundColor: appCanvas,
+              headerForegroundColor: appInkSecondary,
               rangeSelectionBackgroundColor: _accent.withAlpha(45),
               rangeSelectionOverlayColor: WidgetStateProperty.all(_accent.withAlpha(24)),
-              todayBorder: const BorderSide(color: _accent),
+              todayBorder: BorderSide(color: _accent),
               dayForegroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) return Colors.white;
-                return const Color(0xFF374151);
+                return appInkSecondary;
               }),
               dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) return _accent;
                 return null;
               }),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+            dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: _accent,
@@ -175,45 +175,52 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
       final isCustom = range.shortLabel == 'Custom';
       return Tooltip(
         message: selected ? '${range.label}\n${_formatRangeLabel(_selected)}' : range.label,
-        child: GestureDetector(
-          onTap: () async {
-            if (isCustom) {
-              final picked = await _showCustomRangePicker();
-              if (picked == null) return;
-              final custom = DateRange(
-                label:
-                    'Custom (${DateFormat('dd MMM yyyy').format(picked.start)} – ${DateFormat('dd MMM yyyy').format(picked.end)})',
-                shortLabel: 'Custom',
-                start: picked.start,
-                end: picked.end,
-              );
-              setState(() => _selected = custom);
-              widget.onSelected(custom);
-              return;
-            }
+        child: Semantics(
+          button: true,
+          selected: selected,
+          label: range.label,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () async {
+              if (isCustom) {
+                final picked = await _showCustomRangePicker();
+                if (picked == null) return;
+                final custom = DateRange(
+                  label:
+                      'Custom (${DateFormat('dd MMM yyyy').format(picked.start)} – ${DateFormat('dd MMM yyyy').format(picked.end)})',
+                  shortLabel: 'Custom',
+                  start: picked.start,
+                  end: picked.end,
+                );
+                setState(() => _selected = custom);
+                widget.onSelected(custom);
+                return;
+              }
 
-            setState(() => _selected = range);
-            widget.onSelected(range);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: selected ? _accent : Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: selected ? _accent : const Color(0xFFE5E7EB)),
-              boxShadow: selected
-                  ? [BoxShadow(color: _accent.withAlpha(42), blurRadius: 8, offset: const Offset(0, 2))]
-                  : null,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (selected) ...[
-                  const Icon(Icons.check_rounded, size: 13, color: Colors.white),
-                  const SizedBox(width: 5),
-                ] else if (isCustom) ...[
-                  const Icon(Icons.tune_rounded, size: 13, color: Color(0xFF6B7280)),
+              setState(() => _selected = range);
+              widget.onSelected(range);
+            },
+            child: AnimatedContainer(
+              duration: MediaQuery.disableAnimationsOf(context)
+                  ? Duration.zero
+                  : const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+              decoration: BoxDecoration(
+                color: selected ? primary : appSurface,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: selected ? primary : appBorder),
+                boxShadow: selected
+                    ? [BoxShadow(color: primary.withAlpha(42), blurRadius: 8, offset: const Offset(0, 2))]
+                    : null,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (selected) ...[
+                    const Icon(Icons.check_rounded, size: 13, color: Colors.white),
+                    const SizedBox(width: 5),
+                  ] else if (isCustom) ...[
+                  Icon(Icons.tune_rounded, size: 13, color: appInkMuted),
                   const SizedBox(width: 5),
                 ],
                 Text(
@@ -221,10 +228,11 @@ class _DateFilterDropdownState extends State<DateFilterDropdown> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                    color: selected ? Colors.white : const Color(0xFF6B7280),
+                    color: selected ? Colors.white : appInkMuted,
                   ),
                 ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

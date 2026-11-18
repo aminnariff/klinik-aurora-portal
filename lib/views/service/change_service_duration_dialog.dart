@@ -287,9 +287,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
               // Header
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF9FAFB),
-                  border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+                decoration: BoxDecoration(
+                  color: appCanvas,
+                  border: Border(bottom: BorderSide(color: appBorder)),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                 ),
                 child: Row(
@@ -309,9 +309,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Change Service Duration',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appInkPrimary),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -323,7 +323,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 20, color: Color(0xFF6B7280)),
+                      icon: Icon(Icons.close, size: 20, color: appInkMuted),
                       onPressed: () => context.pop(),
                       tooltip: 'Close',
                     ),
@@ -342,15 +342,15 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
+                        color: appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(color: appBorder),
                       ),
                       child: Column(
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.business_rounded, size: 16, color: Color(0xFF64748B)),
+                              Icon(Icons.business_rounded, size: 16, color: appInkMuted),
                               const SizedBox(width: 8),
                               Text(
                                 'HQ Standard Duration:',
@@ -360,12 +360,12 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE2E8F0),
+                                  color: appBorder,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   _hqTime,
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
                                 ),
                               ),
                             ],
@@ -412,9 +412,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                     const SizedBox(height: 18),
 
                     // Preset chips
-                    const Text(
+                    Text(
                       'Quick Presets',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkSecondary),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -432,7 +432,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                               color: isSelected ? primary.withAlpha(25) : Colors.white,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: isSelected ? primary : const Color(0xFFD1D5DB),
+                                color: isSelected ? primary : appBorderStrong,
                                 width: isSelected ? 1.5 : 1.0,
                               ),
                             ),
@@ -440,7 +440,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (isSelected) ...[
-                                  const Icon(Icons.check_rounded, size: 14, color: primary),
+                                  Icon(Icons.check_rounded, size: 14, color: primary),
                                   const SizedBox(width: 4),
                                 ],
                                 Text(
@@ -448,7 +448,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                    color: isSelected ? primary : const Color(0xFF374151),
+                                    color: isSelected ? primary : appInkSecondary,
                                   ),
                                 ),
                               ],
@@ -460,9 +460,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                     const SizedBox(height: 18),
 
                     // Custom input
-                    const Text(
+                    Text(
                       'Or Set Custom Duration',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkSecondary),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -472,16 +472,16 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                           child: Container(
                             height: 42,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: appSurface,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFD1D5DB)),
+                              border: Border.all(color: appBorderStrong),
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: TextField(
                               controller: _numberController,
                               keyboardType: TextInputType.number,
                               onChanged: (_) => setState(() => _isResetToHq = false),
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: appInkPrimary),
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 hintText: '30',
@@ -498,15 +498,15 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                             height: 42,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: appSurface,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFD1D5DB)),
+                              border: Border.all(color: appBorderStrong),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: _selectedUnit,
                                 isExpanded: true,
-                                icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF6B7280)),
+                                icon: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: appInkMuted),
                                 items: const [
                                   DropdownMenuItem(value: 'minutes', child: Text('Minutes', style: TextStyle(fontSize: 13))),
                                   DropdownMenuItem(value: 'hours', child: Text('Hours', style: TextStyle(fontSize: 13))),
@@ -537,7 +537,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.arrow_right_alt_rounded, size: 16, color: Color(0xFF6B7280)),
+                          Icon(Icons.arrow_right_alt_rounded, size: 16, color: appInkMuted),
                           const SizedBox(width: 6),
                           Text(
                             'Will be set to: ',
@@ -545,13 +545,13 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                           ),
                           Text(
                             _currentConfiguredDuration,
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: primary),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: primary),
                           ),
                           if (_isResetToHq) ...[
                             const SizedBox(width: 6),
-                            const Text(
+                            Text(
                               '(HQ Standard)',
-                              style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFF6B7280)),
+                              style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: appInkMuted),
                             ),
                           ],
                         ],
@@ -562,9 +562,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                     // Advanced Timing Rules Card
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: appSurface,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                        border: Border.all(color: appBorder),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -579,7 +579,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                   Icon(
                                     Icons.tune_rounded,
                                     size: 18,
-                                    color: _hasActiveAdvancedRules ? primary : const Color(0xFF6B7280),
+                                    color: _hasActiveAdvancedRules ? primary : appInkMuted,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -604,7 +604,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                         color: primary.withAlpha(20),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'Active',
                                         style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: primary),
                                       ),
@@ -613,14 +613,14 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                   Icon(
                                     _showAdvancedRules ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                                     size: 20,
-                                    color: const Color(0xFF6B7280),
+                                    color: appInkMuted,
                                   ),
                                 ],
                               ),
                             ),
                           ),
                           if (_showAdvancedRules) ...[
-                            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                            Divider(height: 1, color: appBorder),
                             Padding(
                               padding: const EdgeInsets.all(14),
                               child: Column(
@@ -633,9 +633,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            const Text(
+                                            Text(
                                               'Weekday Duration (Mon–Fri)',
-                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
                                             ),
                                             Text(
                                               'Overrides standard duration on weekdays',
@@ -651,9 +651,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 10),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color: appSurface,
                                             borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: const Color(0xFFD1D5DB)),
+                                            border: Border.all(color: appBorderStrong),
                                           ),
                                           child: DropdownButtonHideUnderline(
                                             child: DropdownButton<String?>(
@@ -688,9 +688,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            const Text(
+                                            Text(
                                               'Weekend Duration (Sat–Sun)',
-                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
                                             ),
                                             Text(
                                               'Overrides standard duration on weekends',
@@ -706,9 +706,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 10),
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color: appSurface,
                                             borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: const Color(0xFFD1D5DB)),
+                                            border: Border.all(color: appBorderStrong),
                                           ),
                                           child: DropdownButtonHideUnderline(
                                             child: DropdownButton<String?>(
@@ -743,9 +743,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          const Text(
+                                          Text(
                                             'Specific Date Overrides',
-                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
                                           ),
                                           Text(
                                             'For promotional campaigns or special clinic events',
@@ -770,14 +770,14 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                       margin: const EdgeInsets.only(top: 8),
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF9FAFB),
+                                        color: appCanvas,
                                         borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                                        border: Border.all(color: appBorder),
                                       ),
-                                      child: const Center(
+                                      child: Center(
                                         child: Text(
                                           'No specific date overrides configured',
-                                          style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontStyle: FontStyle.italic),
+                                          style: TextStyle(fontSize: 11, color: appInkMuted, fontStyle: FontStyle.italic),
                                         ),
                                       ),
                                     )
@@ -794,9 +794,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                         return Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFF9FAFB),
+                                            color: appCanvas,
                                             borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                                            border: Border.all(color: appBorder),
                                           ),
                                           child: Row(
                                             children: [
@@ -813,9 +813,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                                 child: Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 8),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.white,
+                                                    color: appSurface,
                                                     borderRadius: BorderRadius.circular(6),
-                                                    border: Border.all(color: const Color(0xFFD1D5DB)),
+                                                    border: Border.all(color: appBorderStrong),
                                                   ),
                                                   child: DropdownButtonHideUnderline(
                                                     child: DropdownButton<String>(
@@ -869,7 +869,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                             color: _isResetToHq ? const Color(0xFFEFF6FF) : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: _isResetToHq ? const Color(0xFF3B82F6) : const Color(0xFFD1D5DB),
+                              color: _isResetToHq ? const Color(0xFF3B82F6) : appBorderStrong,
                             ),
                           ),
                           child: Row(
@@ -902,9 +902,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
               // Footer
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF9FAFB),
-                  border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+                decoration: BoxDecoration(
+                  color: appCanvas,
+                  border: Border(top: BorderSide(color: appBorder)),
                   borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
                 ),
                 child: Row(

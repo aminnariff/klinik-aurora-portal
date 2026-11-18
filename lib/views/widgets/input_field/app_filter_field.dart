@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/app_colors.dart';
 
 /// Standardized search/filter field across all portal table pages.
 ///
 /// Features:
 /// - Fixed 40px height
 /// - Universal 8px radius
-/// - Subtle slate-50 fill with slate-200 outline
+/// - Theme-aware light & dark surface fill + border
 /// - Search icon prefix & clear icon suffix
 class AppFilterField extends StatelessWidget {
   final TextEditingController controller;
@@ -28,6 +28,7 @@ class AppFilterField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return SizedBox(
       width: width,
       height: height,
@@ -38,29 +39,29 @@ class AppFilterField extends StatelessWidget {
           return TextField(
             controller: controller,
             onChanged: onChanged,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF0F172A),
+              color: colors.inkPrimary,
             ),
-            cursorColor: primary,
+            cursorColor: colors.brandText,
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: const TextStyle(
+              hintStyle: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
-                color: Color(0xFF94A3B8),
+                color: colors.inkMuted,
               ),
               filled: true,
-              fillColor: const Color(0xFFF8FAFC),
+              fillColor: colors.inputFill,
               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              prefixIcon: const Icon(Icons.search_rounded, size: 16, color: Color(0xFF94A3B8)),
+              prefixIcon: Icon(Icons.search_rounded, size: 16, color: colors.inkMuted),
               prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               suffixIcon: hasText
                   ? Tooltip(
                       message: 'Clear search',
                       child: IconButton(
-                        icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
+                        icon: Icon(Icons.clear_rounded, size: 16, color: colors.inkMuted),
                         onPressed: () {
                           controller.clear();
                           if (onChanged != null) onChanged!('');
@@ -72,15 +73,15 @@ class AppFilterField extends StatelessWidget {
               suffixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                borderSide: BorderSide(color: colors.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                borderSide: BorderSide(color: colors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: primary, width: 1.5),
+                borderSide: BorderSide(color: colors.brandText, width: 1.5),
               ),
             ),
           );

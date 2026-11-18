@@ -3,6 +3,7 @@ import 'package:klinik_aurora_portal/views/notification/notification_delivery_fi
 import 'package:klinik_aurora_portal/views/notification/notification_preview.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class NotificationReviewStep extends StatelessWidget {
   final DropdownAttribute channel;
@@ -78,7 +79,7 @@ class _SummaryRow extends StatelessWidget {
           width: 80,
           child: Text(
             label,
-            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF), fontWeightDelta: -1),
+            style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontWeightDelta: -1),
           ),
         ),
         Expanded(

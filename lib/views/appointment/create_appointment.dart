@@ -422,9 +422,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'This appointment has an unpaid booking fee. Please enter receipt number to confirm collection before completing.',
-                  style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                  style: TextStyle(fontSize: 13, color: appInkMuted),
                 ),
                 const SizedBox(height: 14),
                 TextField(
@@ -468,12 +468,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         title: Text('Mark as $statusName?', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
         content: Text(
           'Are you sure you want to mark this appointment as $statusName?',
-          style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+          style: TextStyle(fontSize: 13, color: appInkMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => ctx.pop(),
-            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+            child: Text('Cancel', style: TextStyle(color: appInkMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -551,12 +551,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ),
         content: Text(
           'This appointment is currently marked as $statusName. Are you sure you want to unlock it to make changes?',
-          style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+          style: TextStyle(fontSize: 13, color: appInkMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+            child: Text('Cancel', style: TextStyle(color: appInkMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -595,7 +595,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           tooltip: label,
           padding: EdgeInsets.zero,
           style: IconButton.styleFrom(
-            backgroundColor: Colors.white,
+            backgroundColor: appSurface,
           ),
         ),
       );
@@ -606,16 +606,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: appSurface,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: appBorder),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 13, color: color),
             const SizedBox(width: 4),
-            Text(label, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+            Text(label, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: appInkSecondary)),
           ],
         ),
       ),
@@ -645,8 +645,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ),
         margin: EdgeInsets.all(isMobile ? 8 : 16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.14),
@@ -656,7 +656,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           child: Material(
             color: Colors.white,
             child: Column(
@@ -666,13 +666,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 // ── Header bar ──────────────────────────────────────────
                       Container(
                         padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF9FAFB),
+                        decoration: BoxDecoration(
+                          color: appCanvas,
                           border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
+                            Icon(Icons.event_note_rounded, size: 18, color: appInkMuted),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Wrap(
@@ -694,9 +694,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       ),
                                       child: Text(
                                         '#${widget.appointment!.appointmentId!.substring(0, math.min(8, widget.appointment!.appointmentId!.length)).toUpperCase()}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
-                                          color: Color(0xFF6B7280),
+                                          color: appInkMuted,
                                           fontFamily: 'monospace',
                                         ),
                                       ),
@@ -820,9 +820,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: appSurfaceSubtle,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: appBorder),
                           ),
                           child: Row(
                             children: [
@@ -853,9 +853,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       : widget.appointment?.appointmentStatus == 8
                                       ? 'This appointment was marked as Transferred. Check destination branch for schedule.'
                                       : 'This appointment is marked as ${_getStatusName(widget.appointment?.appointmentStatus)}.',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
-                                    color: Color(0xFF334155),
+                                    color: appInkSecondary,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -864,15 +864,15 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 const SizedBox(width: 8),
                                 OutlinedButton.icon(
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF475569),
-                                    side: const BorderSide(color: Color(0xFFCBD5E1)),
+                                    foregroundColor: appInkSecondary,
+                                    side: BorderSide(color: appBorderStrong),
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     minimumSize: Size.zero,
                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                                   ),
                                   onPressed: () => _confirmUnlockAppointment(),
-                                  icon: const Icon(Icons.lock_open_rounded, size: 12, color: Color(0xFF475569)),
+                                  icon: Icon(Icons.lock_open_rounded, size: 12, color: appInkSecondary),
                                   label: const Text('Unlock to Edit', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
                                 ),
                               ],
@@ -920,21 +920,21 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           maxLines: 3,
                                                           decoration: InputDecoration(
                                                             labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
-                                                            labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                                                            prefixIcon: const Padding(
+                                                            labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
+                                                            prefixIcon: Padding(
                                                               padding: EdgeInsets.only(bottom: 40),
-                                                              child: Icon(Icons.edit_note_rounded, size: 18, color: Color(0xFF6B7280)),
+                                                              child: Icon(Icons.edit_note_rounded, size: 18, color: appInkMuted),
                                                             ),
                                                             filled: true,
-                                                            fillColor: Colors.white,
+                                                            fillColor: appSurface,
                                                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                                             border: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                                                              borderSide: BorderSide(color: appBorderStrong),
                                                             ),
                                                             enabledBorder: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                                                              borderSide: BorderSide(color: appBorderStrong),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
@@ -958,31 +958,31 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           maxLines: 3,
                                                           decoration: InputDecoration(
                                                             labelText: 'Admin Remark (internal — not shown to patient)',
-                                                            labelStyle: const TextStyle(
+                                                            labelStyle: TextStyle(
                                                               fontSize: 12,
-                                                              color: Color(0xFF6B7280),
+                                                              color: appInkMuted,
                                                             ),
-                                                            prefixIcon: const Padding(
+                                                            prefixIcon: Padding(
                                                               padding: EdgeInsets.only(bottom: 40),
                                                               child: Icon(
                                                                 Icons.lock_outline_rounded,
                                                                 size: 16,
-                                                                color: Color(0xFF6B7280),
+                                                                color: appInkMuted,
                                                               ),
                                                             ),
                                                             filled: true,
-                                                            fillColor: Colors.white,
+                                                            fillColor: appSurface,
                                                             contentPadding: const EdgeInsets.symmetric(
                                                               horizontal: 12,
                                                               vertical: 10,
                                                             ),
                                                             border: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                                                              borderSide: BorderSide(color: appBorderStrong),
                                                             ),
                                                             enabledBorder: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                                                              borderSide: BorderSide(color: appBorderStrong),
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
@@ -1009,7 +1009,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                   floatingLabelBehavior: FloatingLabelBehavior.always,
                                                                   labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
                                                                   filled: true,
-                                                                  fillColor: Colors.white,
+                                                                  fillColor: appSurface,
                                                                   contentPadding: EdgeInsets.fromLTRB(
                                                                     screenPadding / 2,
                                                                     screenPadding / 3,
@@ -1017,14 +1017,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     screenPadding / 3,
                                                                   ),
                                                                   border: OutlineInputBorder(
-                                                                    borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                    borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                                                     borderRadius: BorderRadius.circular(8),
                                                                   ),
                                                                   enabledBorder: OutlineInputBorder(
-                                                                    borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                    borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                                                     borderRadius: BorderRadius.circular(8),
                                                                   ),
-                                                                  suffixIcon: const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF6B7280)),
+                                                                  suffixIcon: Icon(Icons.calendar_month_rounded, size: 20, color: appInkMuted),
                                                                 ),
                                                                 child: Text(
                                                                   dueDateController.controller.text.isEmpty
@@ -1215,9 +1215,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                               Expanded(
                                                                                 child: RichText(
                                                                                   text: TextSpan(
-                                                                                    style: const TextStyle(
+                                                                                    style: TextStyle(
                                                                                       fontSize: 13,
-                                                                                      color: Color(0xFF374151),
+                                                                                      color: appInkSecondary,
                                                                                     ),
                                                                                     children: [
                                                                                       const TextSpan(
@@ -1243,7 +1243,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                           ),
                                                                         ),
                                                                       ),
-                                                                      const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                                                                      Divider(height: 1, color: appBorder),
                                                                       // Checkbox row — fee waived (e.g. branch transfer)
                                                                       InkWell(
                                                                         onTap: () {
@@ -1277,12 +1277,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                                 ),
                                                                               ),
                                                                               const SizedBox(width: 10),
-                                                                              const Expanded(
+                                                                              Expanded(
                                                                                 child: Text(
                                                                                   'No payment required (e.g. transferred from another branch/clinic — already paid there)',
                                                                                   style: TextStyle(
                                                                                     fontSize: 13,
-                                                                                    color: Color(0xFF374151),
+                                                                                    color: appInkSecondary,
                                                                                   ),
                                                                                 ),
                                                                               ),
@@ -1314,17 +1314,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                                   decoration: InputDecoration(
                                                                                     labelText:
                                                                                         'Receipt / Reference No. (optional)',
-                                                                                    labelStyle: const TextStyle(
+                                                                                    labelStyle: TextStyle(
                                                                                       fontSize: 12,
-                                                                                      color: Color(0xFF6B7280),
+                                                                                      color: appInkMuted,
                                                                                     ),
-                                                                                    prefixIcon: const Icon(
+                                                                                    prefixIcon: Icon(
                                                                                       Icons.receipt_outlined,
                                                                                       size: 16,
-                                                                                      color: Color(0xFF6B7280),
+                                                                                      color: appInkMuted,
                                                                                     ),
                                                                                     filled: true,
-                                                                                    fillColor: Colors.white,
+                                                                                    fillColor: appSurface,
                                                                                     contentPadding:
                                                                                         const EdgeInsets.symmetric(
                                                                                           horizontal: 12,
@@ -1354,11 +1354,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                                   ),
                                                                                 ),
                                                                               if (_feeWaived)
-                                                                                const Text(
+                                                                                Text(
                                                                                   'Explain why in the Admin Remark field below (internal — not shown to patient).',
                                                                                   style: TextStyle(
                                                                                     fontSize: 12,
-                                                                                    color: Color(0xFF6B7280),
+                                                                                    color: appInkMuted,
                                                                                     fontStyle: FontStyle.italic,
                                                                                   ),
                                                                                 ),
@@ -1448,10 +1448,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                           selectedFiles.removeAt(index);
                                                                           fileRebuild.add(DateTime.now());
                                                                         },
-                                                                        child: const Icon(
+                                                                        child: Icon(
                                                                           Icons.close_rounded,
                                                                           size: 15,
-                                                                          color: Color(0xFF6B7280),
+                                                                          color: appInkMuted,
                                                                         ),
                                                                       ),
                                                                     ],
@@ -1497,7 +1497,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           fieldColor: authController.isSuperAdmin
                                                               ? Colors.white
                                                               : textFormFieldUneditableColor,
-                                                          borderColor: const Color(0xFFD1D5DB),
+                                                          borderColor: appBorderStrong,
                                                           value: _appointmentBranch?.name,
                                                           onChanged: (p0) {
                                                             _appointmentBranch = p0;
@@ -1628,14 +1628,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   selectedColor: primary,
                                                   backgroundColor: const Color(0xFFF3F4F6),
                                                   labelStyle: TextStyle(
-                                                    color: isSelected ? Colors.white : const Color(0xFF374151),
+                                                    color: isSelected ? Colors.white : appInkSecondary,
                                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                                     fontSize: 12,
                                                   ),
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius: BorderRadius.circular(8),
                                                     side: BorderSide(
-                                                      color: isSelected ? primary : const Color(0xFFE5E7EB),
+                                                      color: isSelected ? primary : appBorder,
                                                     ),
                                                   ),
                                                   onSelected: (selected) {
@@ -1672,7 +1672,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             fieldColor: widget.type == 'update'
                                                                 ? textFormFieldUneditableColor
                                                                 : Colors.white,
-                                                            borderColor: const Color(0xFFD1D5DB),
+                                                            borderColor: appBorderStrong,
                                                             isEditable: widget.type == 'create',
                                                             onChanged: (p0) {
                                                               _service = p0;
@@ -1784,7 +1784,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               fieldColor: widget.type == 'update'
                                                                   ? Colors.white
                                                                   : textFormFieldUneditableColor,
-                                                              borderColor: const Color(0xFFD1D5DB),
+                                                              borderColor: appBorderStrong,
                                                               labelText: 'appointmentPage'.tr(gender: 'status'),
                                                               value: _status?.name,
                                                               onChanged: (p0) {
@@ -1879,7 +1879,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               floatingLabelBehavior: FloatingLabelBehavior.always,
                                                               labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
                                                               filled: true,
-                                                              fillColor: Colors.white,
+                                                              fillColor: appSurface,
                                                               contentPadding: EdgeInsets.fromLTRB(
                                                                 screenPadding / 2,
                                                                 screenPadding / 3,
@@ -1887,14 +1887,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 screenPadding / 3,
                                                               ),
                                                               border: OutlineInputBorder(
-                                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                                                 borderRadius: BorderRadius.circular(8),
                                                               ),
                                                               enabledBorder: OutlineInputBorder(
-                                                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                                                 borderRadius: BorderRadius.circular(8),
                                                               ),
-                                                              suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
+                                                              suffixIcon: Icon(Icons.date_range_rounded, size: 20, color: appInkMuted),
                                                             ),
                                                             child: Text(
                                                               dateTimeController.text.isEmpty
@@ -1923,26 +1923,26 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             folder: 'appointment',
                                             onChanged: () => setState(() {}),
                                           ),
-                                          const SizedBox(height: 12),
+                                          SizedBox(height: 12),
                                           _extraSectionLabel('Referral Letter (PDF)', Icons.description_outlined),
-                                          const SizedBox(height: 8),
+                                          SizedBox(height: 8),
                                           AppAttachmentField(
                                             controller: _referralLetterUrlController,
                                             folder: 'referral-letters',
                                             onChanged: () => setState(() {}),
                                           ),
-                                          const SizedBox(height: 6),
+                                          SizedBox(height: 6),
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: const [
-                                              Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
+                                            children: [
+                                              Icon(Icons.info_outline_rounded, size: 11, color: appInkMuted),
                                               SizedBox(width: 4),
                                               Flexible(
                                                 child: Text(
                                                   'Documents linked here are stored for 6 months to 1 year and may be deleted thereafter. Patients are advised to save their own copy.',
                                                   style: TextStyle(
                                                     fontSize: 10.5,
-                                                    color: Color(0xFF9CA3AF),
+                                                    color: appInkMuted,
                                                     height: 1.4,
                                                   ),
                                                 ),
@@ -2011,16 +2011,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               child: Row(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  const Text(
+                                                  Text(
                                                     '* ',
-                                                    style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                                                    style: TextStyle(fontSize: 11, color: appInkMuted),
                                                   ),
                                                   Flexible(
                                                     child: Text(
                                                       note,
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                         fontSize: 11,
-                                                        color: Color(0xFF9CA3AF),
+                                                        color: appInkMuted,
                                                         height: 1.4,
                                                       ),
                                                     ),
@@ -2050,9 +2050,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   Widget _buildDialogFooter() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -2060,8 +2060,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           OutlinedButton(
             onPressed: () => Navigator.of(context).pop(),
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF475569),
-              side: const BorderSide(color: Color(0xFFCBD5E1)),
+              foregroundColor: appInkSecondary,
+              side: BorderSide(color: appBorderStrong),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -2096,7 +2096,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         openedFromDialog: true,
       ),
       dialogSize: Size(screenWidthByBreakpoint(90, 70, 50), screenHeightByBreakpoint(90, 80, 50)),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(8),
     );
     if (results != null) {
       if (dueDateController.errorMessage != null) {
@@ -2307,9 +2307,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
+            color: appCanvas,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2320,10 +2320,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   Expanded(
                     child: AppSelectableText(
                       patientName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: appInkPrimary,
                       ),
                     ),
                   ),
@@ -2336,7 +2336,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.badge_outlined, size: 14, color: Color(0xFF6B7280)),
+                    Icon(Icons.badge_outlined, size: 14, color: appInkMuted),
                     const SizedBox(width: 6),
                     Expanded(
                       child: AppSelectableText(
@@ -2354,7 +2354,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF6B7280)),
+                    Icon(Icons.phone_outlined, size: 14, color: appInkMuted),
                     const SizedBox(width: 6),
                     Expanded(
                       child: AppSelectableText(
@@ -2372,7 +2372,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.email_outlined, size: 14, color: Color(0xFF6B7280)),
+                    Icon(Icons.email_outlined, size: 14, color: appInkMuted),
                     const SizedBox(width: 6),
                     Expanded(
                       child: AppSelectableText(
@@ -2419,9 +2419,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
+            color: appCanvas,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2460,9 +2460,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   ),
                 ],
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
-                child: Divider(height: 1, color: Color(0xFFE5E7EB)),
+                child: Divider(height: 1, color: appBorder),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2481,9 +2481,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 ],
               ),
               if (balance != null) ...[
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Divider(height: 1, color: Color(0xFFE5E7EB)),
+                  child: Divider(height: 1, color: appBorder),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2591,9 +2591,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
+            color: appCanvas,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2677,7 +2677,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 const SizedBox(height: 8),
                 Text(
                   widget.appointment!.appointmentFeedback!,
-                  style: const TextStyle(fontSize: 12.5, color: Color(0xFF374151), height: 1.4),
+                  style: TextStyle(fontSize: 12.5, color: appInkSecondary, height: 1.4),
                 ),
               ],
             ],
@@ -2697,9 +2697,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
+            color: appCanvas,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2775,14 +2775,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       selectedColor: primary,
                       backgroundColor: const Color(0xFFF3F4F6),
                       labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : const Color(0xFF374151),
+                        color: isSelected ? Colors.white : appInkSecondary,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                         fontSize: 12,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: BorderSide(
-                          color: isSelected ? primary : const Color(0xFFE5E7EB),
+                          color: isSelected ? primary : appBorder,
                         ),
                       ),
                       onSelected: (selected) {
@@ -2819,7 +2819,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 isEditable: true,
                                 value: _status?.name,
                                 fieldColor: Colors.white,
-                                borderColor: const Color(0xFFD1D5DB),
+                                borderColor: appBorderStrong,
                                 onChanged: (p0) {
                                   _status = p0;
                                   if (_status?.key == '6' && appointmentNoteController.controller.text.isEmpty) {
@@ -2891,7 +2891,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       floatingLabelBehavior: FloatingLabelBehavior.always,
                                       labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
                                       filled: true,
-                                      fillColor: Colors.white,
+                                      fillColor: appSurface,
                                       contentPadding: EdgeInsets.fromLTRB(
                                         screenPadding / 2,
                                         screenPadding / 3,
@@ -2899,14 +2899,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         screenPadding / 3,
                                       ),
                                       border: OutlineInputBorder(
-                                        borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                        borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                        borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      suffixIcon: const Icon(Icons.date_range_rounded, size: 20, color: Color(0xFF6B7280)),
+                                      suffixIcon: Icon(Icons.date_range_rounded, size: 20, color: appInkMuted),
                                     ),
                                     child: Text(
                                       dateTimeController.text.isEmpty
@@ -2943,7 +2943,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               floatingLabelBehavior: FloatingLabelBehavior.always,
                               labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: appSurface,
                               contentPadding: EdgeInsets.fromLTRB(
                                 screenPadding / 2,
                                 screenPadding / 3,
@@ -2951,14 +2951,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 screenPadding / 3,
                               ),
                               border: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.0),
+                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              suffixIcon: const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF6B7280)),
+                              suffixIcon: Icon(Icons.calendar_month_rounded, size: 20, color: appInkMuted),
                             ),
                             child: Text(
                               dueDateController.controller.text.isEmpty
@@ -3053,24 +3053,24 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   folder: 'appointment',
                   onChanged: () => setState(() {}),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 _extraSectionLabel('Referral Letter (PDF)', Icons.description_outlined),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 AppAttachmentField(
                   controller: _referralLetterUrlController,
                   folder: 'referral-letters',
                   onChanged: () => setState(() {}),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
+                  children: [
+                    Icon(Icons.info_outline_rounded, size: 11, color: appInkMuted),
                     SizedBox(width: 4),
                     Flexible(
                       child: Text(
                         'Documents linked here are stored for 6 months to 1 year and may be deleted thereafter. Patients are advised to save their own copy.',
-                        style: TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), height: 1.4),
+                        style: TextStyle(fontSize: 10.5, color: appInkMuted, height: 1.4),
                       ),
                     ),
                   ],
@@ -3093,9 +3093,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
+            color: appCanvas,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3110,21 +3110,21 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       maxLines: 3,
                       decoration: InputDecoration(
                         labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
-                        labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                        prefixIcon: const Padding(
+                        labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
+                        prefixIcon: Padding(
                           padding: EdgeInsets.only(bottom: 40),
-                          child: Icon(Icons.edit_note_rounded, size: 18, color: Color(0xFF6B7280)),
+                          child: Icon(Icons.edit_note_rounded, size: 18, color: appInkMuted),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: appSurface,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                          borderSide: BorderSide(color: appBorderStrong),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                          borderSide: BorderSide(color: appBorderStrong),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -3143,21 +3143,21 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       maxLines: 3,
                       decoration: InputDecoration(
                         labelText: 'Admin Remark (internal — not shown to patient)',
-                        labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                        prefixIcon: const Padding(
+                        labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
+                        prefixIcon: Padding(
                           padding: EdgeInsets.only(bottom: 40),
-                          child: Icon(Icons.lock_outline_rounded, size: 16, color: Color(0xFF6B7280)),
+                          child: Icon(Icons.lock_outline_rounded, size: 16, color: appInkMuted),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: appSurface,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                          borderSide: BorderSide(color: appBorderStrong),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                          borderSide: BorderSide(color: appBorderStrong),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -3182,9 +3182,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
+            color: appCanvas,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3196,9 +3196,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 margin: EdgeInsets.only(bottom: isLast ? 0 : 10),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: appBorder),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -3228,10 +3228,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               Expanded(
                                 child: Text(
                                   '${item.fromBranchName ?? '—'}  ➜  ${item.toBranchName ?? '—'}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF0F172A),
+                                    color: appInkPrimary,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -3242,14 +3242,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         if (item.createdDate != null)
                           Text(
                             dateConverter(item.createdDate, format: 'dd MMM yyyy, HH:mm') ?? '',
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                            style: TextStyle(fontSize: 11, color: appInkMuted),
                           ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'Reason: ${item.transferReason ?? '—'}',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                      style: TextStyle(fontSize: 12, color: appInkSecondary),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -3257,9 +3257,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       children: [
                         Text(
                           'Transferred by: ${item.transferredByName ?? 'Staff'}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF64748B),
+                            color: appInkMuted,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -3381,7 +3381,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               color: isDisabled ? const Color(0xFFF3F4F6) : const Color(0xFFEEF2FF),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: isDisabled ? const Color(0xFFE5E7EB) : const Color(0xFFC7D2FE),
+                color: isDisabled ? appBorder : const Color(0xFFC7D2FE),
                 width: 1,
               ),
             ),
@@ -3399,16 +3399,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   Icon(
                     Icons.refresh_rounded,
                     size: 18,
-                    color: isDisabled ? const Color(0xFF9CA3AF) : const Color(0xFF4F46E5),
+                    color: isDisabled ? appInkMuted : const Color(0xFF4F46E5),
                   ),
                 if (isCoolingDown) ...[
                   const SizedBox(width: 4),
                   Text(
                     '${_refreshCooldownSeconds}s',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF9CA3AF),
+                      color: appInkMuted,
                     ),
                   ),
                 ],
@@ -3507,14 +3507,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        Icon(icon, size: 13, color: appInkMuted),
         const SizedBox(width: 5),
         Text(
           text.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 10,
+          style: TextStyle(
+            fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF6B7280),
+            color: appInkMuted,
             letterSpacing: 1.0,
           ),
         ),
@@ -3526,7 +3526,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF9CA3AF)),
+        Icon(icon, size: 14, color: appInkMuted),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -3534,9 +3534,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
               ),
-              Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+              Text(value, style: TextStyle(fontSize: 12, color: appInkSecondary)),
             ],
           ),
         ),

@@ -67,7 +67,7 @@ class _PasswordRecoveryPageState extends State<PasswordRecoveryPage> {
                 Container(
                   width: screenWidth(100),
                   height: screenHeight(100),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: primaryColors,
                       begin: Alignment.topLeft,

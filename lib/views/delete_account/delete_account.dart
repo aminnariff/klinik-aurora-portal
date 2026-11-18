@@ -53,7 +53,7 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
             Container(
               width: screenWidth(100),
               height: screenHeight(100),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
                 // image: DecorationImage(
                 //   image: AssetImage("assets/images/bg.png"),

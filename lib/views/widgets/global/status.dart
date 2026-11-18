@@ -13,7 +13,7 @@ Widget showStatus(bool? value, {String? valueText, Color? valueColor}) {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
       ),
       child: Row(
@@ -58,7 +58,7 @@ class AppointmentStatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // fallback to grey/Unknown if status is not found or null
-    final color = appointmentStatusColors[status] ?? const Color(0xFF64748B);
+    final color = appointmentStatusColors[status] ?? appInkMuted;
     String label = getAppointmentStatusLabel(status);
     if (isUppercase) label = label.toUpperCase();
 
@@ -66,7 +66,7 @@ class AppointmentStatusBadge extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
       ),
       child: Row(

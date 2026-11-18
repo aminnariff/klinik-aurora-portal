@@ -119,7 +119,7 @@ class InputField extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const Icon(Icons.calendar_month_rounded, color: primary, size: 24),
+                    Icon(Icons.calendar_month_rounded, color: primary, size: 24),
                     const SizedBox(width: 2),
                     if (field.controller.text != '') const Icon(Icons.close, color: Colors.transparent, size: 22),
                   ],
@@ -157,7 +157,7 @@ class InputField extends StatelessWidget {
         contentPadding: EdgeInsets.fromLTRB(screenPadding / 2, screenPadding / 3, screenPadding / 3, screenPadding / 3),
         border: OutlineInputBorder(
           borderSide: BorderSide(
-            color: field.isEditable ? const Color(0xFFE5E7EB) : Colors.transparent,
+            color: field.isEditable ? appBorder : Colors.transparent,
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
@@ -168,7 +168,7 @@ class InputField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: field.isEditable ? const Color(0xFFE5E7EB) : Colors.transparent,
+            color: field.isEditable ? appBorder : Colors.transparent,
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
@@ -225,15 +225,15 @@ InputDecoration appInputDecoration(BuildContext context, String label) {
     fillColor: textFormFieldEditableColor,
     contentPadding: EdgeInsets.fromLTRB(screenPadding / 2, screenPadding / 3, screenPadding / 3, screenPadding / 3),
     border: OutlineInputBorder(
-      borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
+      borderSide: BorderSide(color: appBorder, width: 1.0),
       borderRadius: BorderRadius.circular(8.0),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: primary, width: 1.5),
+      borderSide: BorderSide(color: primary, width: 1.5),
       borderRadius: BorderRadius.circular(8.0),
     ),
     enabledBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
+      borderSide: BorderSide(color: appBorder, width: 1.0),
       borderRadius: BorderRadius.circular(8.0),
     ),
     errorBorder: OutlineInputBorder(

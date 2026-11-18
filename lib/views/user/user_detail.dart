@@ -406,8 +406,8 @@ class _UserDetailState extends State<UserDetail> {
         constraints: BoxConstraints(maxWidth: maxW, maxHeight: maxH),
         margin: EdgeInsets.all(isMobile ? 12 : 24),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.12),
@@ -417,7 +417,7 @@ class _UserDetailState extends State<UserDetail> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           child: Material(
             color: Colors.white,
             child: Column(
@@ -458,9 +458,9 @@ class _UserDetailState extends State<UserDetail> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 16, 16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -469,7 +469,7 @@ class _UserDetailState extends State<UserDetail> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFF0F172A),
+              color: appInkPrimary,
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
@@ -494,10 +494,10 @@ class _UserDetailState extends State<UserDetail> {
                     Flexible(
                       child: Text(
                         displayName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
+                          color: appInkPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -541,7 +541,7 @@ class _UserDetailState extends State<UserDetail> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             splashRadius: 18,
             onPressed: () => context.pop(),
             tooltip: 'Close',
@@ -575,13 +575,13 @@ class _UserDetailState extends State<UserDetail> {
     if (parts.isEmpty) {
       return Text(
         widget.type == 'create' ? 'Fill details below to register patient' : 'No demographic details',
-        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+        style: TextStyle(fontSize: 12, color: appInkMuted),
       );
     }
 
     return Text(
       parts.join('  ·  '),
-      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+      style: TextStyle(fontSize: 12, color: appInkMuted, fontWeight: FontWeight.w500),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -594,9 +594,9 @@ class _UserDetailState extends State<UserDetail> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF8FAFC),
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+      decoration: BoxDecoration(
+        color: appSurfaceSubtle,
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Column(
         children: [
@@ -754,7 +754,7 @@ class _UserDetailState extends State<UserDetail> {
           color: isPrimary ? primary.withValues(alpha: 0.08) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isPrimary ? primary.withValues(alpha: 0.3) : const Color(0xFFE2E8F0),
+            color: isPrimary ? primary.withValues(alpha: 0.3) : appBorder,
           ),
         ),
         child: Row(
@@ -763,7 +763,7 @@ class _UserDetailState extends State<UserDetail> {
             Icon(
               icon,
               size: 14,
-              color: isPrimary ? primary : const Color(0xFF475569),
+              color: isPrimary ? primary : appInkSecondary,
             ),
             const SizedBox(width: 5),
             Flexible(
@@ -772,7 +772,7 @@ class _UserDetailState extends State<UserDetail> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: isPrimary ? primary : const Color(0xFF334155),
+                  color: isPrimary ? primary : appInkSecondary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -788,9 +788,9 @@ class _UserDetailState extends State<UserDetail> {
     final card = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -798,24 +798,24 @@ class _UserDetailState extends State<UserDetail> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 12, color: const Color(0xFF64748B)),
+              Icon(icon, size: 12, color: appInkMuted),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (onTap != null)
-                const Icon(Icons.arrow_forward_ios_rounded, size: 9, color: Color(0xFF94A3B8)),
+                Icon(Icons.arrow_forward_ios_rounded, size: 9, color: appInkMuted),
             ],
           ),
           const SizedBox(height: 3),
           Text(
             value,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: appInkPrimary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -854,9 +854,9 @@ class _UserDetailState extends State<UserDetail> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Customer email is used for portal login, appointment confirmations, and system notifications.',
-              style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
+              style: TextStyle(fontSize: 13, color: appInkSecondary),
             ),
             const SizedBox(height: 12),
             Container(
@@ -885,16 +885,16 @@ class _UserDetailState extends State<UserDetail> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Are you sure you want to proceed and unlock this field?',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+            child: Text('Cancel', style: TextStyle(color: appInkMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -1001,7 +1001,7 @@ class _UserDetailState extends State<UserDetail> {
                       Text(
                         'Unlock to Edit',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFFDC2626),
                         ),
@@ -1106,12 +1106,12 @@ class _UserDetailState extends State<UserDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           'Date of Birth *',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -1144,10 +1144,10 @@ class _UserDetailState extends State<UserDetail> {
             height: 42,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: _dobError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                color: _dobError != null ? const Color(0xFFEF4444) : appBorderStrong,
                 width: _dobError != null ? 1.5 : 1,
               ),
             ),
@@ -1159,11 +1159,11 @@ class _UserDetailState extends State<UserDetail> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: _dobController.text.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                      color: _dobController.text.isNotEmpty ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
+                      color: _dobController.text.isNotEmpty ? appInkPrimary : appInkMuted,
                     ),
                   ),
                 ),
-                const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF94A3B8)),
+                Icon(Icons.calendar_today_outlined, size: 16, color: appInkMuted),
               ],
             ),
           ),
@@ -1188,12 +1188,12 @@ class _UserDetailState extends State<UserDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           'Registered Branch *',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -1201,10 +1201,10 @@ class _UserDetailState extends State<UserDetail> {
           height: 42,
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: _branchError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+              color: _branchError != null ? const Color(0xFFEF4444) : appBorderStrong,
               width: _branchError != null ? 1.5 : 1,
             ),
           ),
@@ -1212,12 +1212,12 @@ class _UserDetailState extends State<UserDetail> {
             child: DropdownButton<DropdownAttribute>(
               isExpanded: true,
               value: selectedItem,
-              hint: const Text(
+              hint: Text(
                 'Select Branch',
-                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                style: TextStyle(fontSize: 12, color: appInkMuted),
               ),
-              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF94A3B8)),
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+              icon: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: appInkMuted),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
               onChanged: (DropdownAttribute? selected) {
                 if (selected != null) {
                   setState(() {
@@ -1231,7 +1231,7 @@ class _UserDetailState extends State<UserDetail> {
                   value: b,
                   child: Text(
                     b.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
                   ),
                 );
               }).toList(),
@@ -1264,12 +1264,12 @@ class _UserDetailState extends State<UserDetail> {
                   children: [
                     Row(
                       children: [
-                        const Text(
+                        Text(
                           'Account Status',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF0F172A),
+                            color: appInkPrimary,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -1297,9 +1297,9 @@ class _UserDetailState extends State<UserDetail> {
                       active
                           ? 'Patient is eligible to book appointments & earn rewards points'
                           : 'Account deactivated — booking and portal login disabled',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: appInkMuted,
                       ),
                     ),
                   ],
@@ -1335,7 +1335,7 @@ class _UserDetailState extends State<UserDetail> {
       padding: const EdgeInsets.only(top: 8, bottom: 4),
       child: Text(
         items.join('   ·   '),
-        style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8), fontWeight: FontWeight.w500),
+        style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -1345,9 +1345,9 @@ class _UserDetailState extends State<UserDetail> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,

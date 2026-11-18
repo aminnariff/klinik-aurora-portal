@@ -38,7 +38,7 @@ class _DialogStyle {
           defaultTitle: 'Success!',
         );
       case DialogType.error:
-        return const _DialogStyle(
+        return _DialogStyle(
           outerColor: Color(0xFFFEF2F2),
           innerColor: Color(0xFFEF4444),
           icon: Icons.close_rounded,
@@ -88,11 +88,11 @@ class AppDialog extends StatelessWidget {
                   height: attribute.height,
                   padding: const EdgeInsets.fromLTRB(32, 36, 32, 32),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: appSurface,
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0F172A).withValues(alpha: 0.12),
+                        color: appInkPrimary.withValues(alpha: 0.12),
                         blurRadius: 48,
                         offset: const Offset(0, 20),
                       ),
@@ -106,10 +106,10 @@ class AppDialog extends StatelessWidget {
                       const SizedBox(height: 24),
                       AppSelectableText(
                         attribute.title ?? style.defaultTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F172A),
+                          color: appInkPrimary,
                           letterSpacing: -0.4,
                         ),
                         textAlign: TextAlign.center,
@@ -118,7 +118,7 @@ class AppDialog extends StatelessWidget {
                         const SizedBox(height: 10),
                         AppSelectableText(
                           attribute.text.toString(),
-                          style: const TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.55),
+                          style: TextStyle(fontSize: 14, color: appInkMuted, height: 1.55),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -138,7 +138,7 @@ class AppDialog extends StatelessWidget {
                         const SizedBox(height: 8),
                         TextButton(
                           onPressed: attribute.cancelButton!.action,
-                          style: TextButton.styleFrom(foregroundColor: const Color(0xFF64748B)),
+                          style: TextButton.styleFrom(foregroundColor: appInkMuted),
                           child: Text(
                             attribute.cancelButton?.text ?? 'cancel'.tr(),
                             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),

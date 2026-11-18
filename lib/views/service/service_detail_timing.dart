@@ -18,6 +18,7 @@ import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attri
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:provider/provider.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class TimeListManager extends StatefulWidget {
   final service_branch_model.Data? serviceBranch;
@@ -110,13 +111,13 @@ class _TimeListManagerState extends State<TimeListManager> {
                   children: [
                     Container(
                       padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF9FAFB),
+                      decoration: BoxDecoration(
+                        color: appCanvas,
                         border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.schedule_rounded, size: 18, color: Color(0xFF6B7280)),
+                          Icon(Icons.schedule_rounded, size: 18, color: appInkMuted),
                           const SizedBox(width: 8),
                           const Text(
                             'Manage Time Slots',

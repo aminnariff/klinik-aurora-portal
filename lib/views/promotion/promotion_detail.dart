@@ -174,7 +174,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(
         horizontal: isMobile ? 16 : 32,
         vertical: isMobile ? 20 : 32,
@@ -189,14 +189,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildHeader(context),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(isMobile ? 16 : 24),
                 child: isMobile ? _buildMobileLayout(context) : _buildDesktopLayout(context),
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             _buildFooter(context),
           ],
         ),
@@ -216,29 +216,29 @@ class _PromotionDetailState extends State<PromotionDetail> {
               color: primary.withAlpha(25),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.campaign_rounded, color: primary, size: 20),
+            child: Icon(Icons.campaign_rounded, color: primary, size: 20),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'Edit Promotion',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appInkPrimary),
                 ),
                 SizedBox(height: 2),
                 Text(
                   'Update promotion content, banner images, and active schedule',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ),
           ),
           IconButton(
   tooltip: 'Tutup',
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             onPressed: () => context.pop(),
             splashRadius: 20,
           ),
@@ -381,7 +381,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
                 currentDate: initial ?? DateTime.now(),
               ),
               dialogSize: const Size(360, 360),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
             );
             if (results != null && results.isNotEmpty && results.first != null) {
               setState(() {
@@ -399,15 +399,15 @@ class _PromotionDetailState extends State<PromotionDetail> {
             height: 42,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appSurfaceSubtle,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                color: errorText != null ? const Color(0xFFEF4444) : appBorderStrong,
               ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF64748B)),
+                Icon(Icons.calendar_today_rounded, size: 16, color: appInkMuted),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -415,14 +415,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: controller.text.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                      color: controller.text.isNotEmpty ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                      color: controller.text.isNotEmpty ? appInkPrimary : appInkMuted,
                     ),
                   ),
                 ),
                 if (controller.text.isNotEmpty)
                   IconButton(
   tooltip: 'Kosongkan',
-                    icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
+                    icon: Icon(Icons.clear_rounded, size: 16, color: appInkMuted),
                     splashRadius: 14,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -444,10 +444,10 @@ class _PromotionDetailState extends State<PromotionDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: _showOnStart ? const Color(0xFFFFFBEB) : const Color(0xFFF8FAFC),
+        color: _showOnStart ? const Color(0xFFFFFBEB) : appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: _showOnStart ? const Color(0xFFFDE68A) : const Color(0xFFE2E8F0),
+          color: _showOnStart ? const Color(0xFFFDE68A) : appBorder,
         ),
       ),
       child: Row(
@@ -455,7 +455,7 @@ class _PromotionDetailState extends State<PromotionDetail> {
           Icon(
             Icons.star_rounded,
             size: 20,
-            color: _showOnStart ? const Color(0xFFD97706) : const Color(0xFF94A3B8),
+            color: _showOnStart ? const Color(0xFFD97706) : appInkMuted,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -467,14 +467,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: _showOnStart ? const Color(0xFFB45309) : const Color(0xFF334155),
+                    color: _showOnStart ? const Color(0xFFB45309) : appInkSecondary,
                   ),
                 ),
                 Text(
                   'Shows full-screen popup banner when mobile app opens',
                   style: TextStyle(
                     fontSize: 11,
-                    color: _showOnStart ? const Color(0xFF92400E) : const Color(0xFF64748B),
+                    color: _showOnStart ? const Color(0xFF92400E) : appInkMuted,
                   ),
                 ),
               ],
@@ -578,14 +578,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
           decoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 14, color: const Color(0xFF64748B)),
+        Icon(icon, size: 14, color: appInkMuted),
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.8,
           ),
         ),
@@ -597,10 +597,10 @@ class _PromotionDetailState extends State<PromotionDetail> {
     return RichText(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
         children: isRequired
             ? [

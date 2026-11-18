@@ -104,7 +104,7 @@
 
       #splash .splash-ekg .ekg-track {
         fill: none;
-        stroke: rgba(223, 110, 152, 0.18);
+        stroke: rgba(126, 45, 64, 0.16);
         stroke-width: 2.5;
         stroke-linecap: round;
         stroke-linejoin: round;
@@ -112,7 +112,7 @@
 
       #splash .splash-ekg .ekg-pulse {
         fill: none;
-        stroke: #df6e98;
+        stroke: #7e2d40;
         stroke-width: 2.5;
         stroke-linecap: round;
         stroke-linejoin: round;
@@ -128,13 +128,47 @@
         font-weight: 500;
         letter-spacing: 2px;
         text-transform: uppercase;
-        color: rgba(126, 45, 64, 0.85);
+        color: rgba(126, 45, 64, 0.9);
       }
 
       #splash .splash-loading .dot {
         display: inline-block;
         animation: splash-dot 1.4s ease-in-out infinite;
         animation-delay: calc(var(--i) * 0.2s);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        html,
+        body,
+        #splash {
+          background-color: #0b1217;
+        }
+        #splash .splash-word {
+          color: #f3a6b9;
+        }
+        #splash .splash-ekg .ekg-track {
+          stroke: rgba(243, 166, 185, 0.2);
+        }
+        #splash .splash-ekg .ekg-pulse {
+          stroke: #f3a6b9;
+        }
+        #splash .splash-loading {
+          color: #cbd5e1;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #splash,
+        #splash .splash-logo,
+        #splash .splash-word span,
+        #splash .splash-ekg .ekg-pulse,
+        #splash .splash-loading .dot {
+          animation: none !important;
+          transition: none !important;
+          stroke-dasharray: none;
+          stroke-dashoffset: 0;
+          opacity: 1;
+        }
       }
 
       @keyframes splash-pulse {

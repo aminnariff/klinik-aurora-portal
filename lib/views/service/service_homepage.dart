@@ -86,7 +86,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
   Widget _desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -96,7 +96,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [BoxShadow(color: Colors.black.withAlpha(13), blurRadius: 8, offset: const Offset(0, 2))],
                 ),
@@ -131,7 +131,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                 ),
@@ -311,7 +311,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   Widget _filterLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted),
     );
   }
 
@@ -342,7 +342,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 minWidth: 900,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,
-                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowColor: WidgetStateProperty.all(appCanvas),
                 headingRowHeight: 48,
                 dataRowHeight: 64,
                 decoration: const BoxDecoration(
@@ -354,7 +354,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     DataRow2(
                       color: WidgetStateProperty.resolveWith<Color?>((states) {
                         if (states.contains(WidgetState.hovered)) {
-                          return const Color(0xFFF1F5F9);
+                          return appSurfaceSubtle;
                         }
                         return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
                       }),
@@ -376,7 +376,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                         DataCell(
                           Text(
                             dateConverter(items[i].createdDate) ?? '—',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                         ),
                         DataCell(_superadminActions(items[i])),
@@ -413,21 +413,21 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       tooltip: '',
       onSelected: (value) => _handleMenuSelection(value, service),
       itemBuilder: (_) => [
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'update',
           child: Row(
             children: [
-              Icon(Icons.edit_rounded, size: 16, color: Color(0xFF6B7280)),
+              Icon(Icons.edit_rounded, size: 16, color: appInkMuted),
               SizedBox(width: 10),
               Text('Edit Service', style: TextStyle(fontSize: 13)),
             ],
           ),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'updateBranchesStatus',
           child: Row(
             children: [
-              Icon(Icons.account_tree_rounded, size: 16, color: Color(0xFF6B7280)),
+              Icon(Icons.account_tree_rounded, size: 16, color: appInkMuted),
               SizedBox(width: 10),
               Text('Update Branch Service', style: TextStyle(fontSize: 13)),
             ],
@@ -454,7 +454,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),
-        child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
+        child: Icon(Icons.more_horiz, color: appInkSecondary, size: 18),
       ),
     );
   }
@@ -478,7 +478,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 minWidth: 900,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,
-                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowColor: WidgetStateProperty.all(appCanvas),
                 headingRowHeight: 48,
                 dataRowHeight: 64,
                 decoration: const BoxDecoration(
@@ -490,7 +490,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     DataRow2(
                       color: WidgetStateProperty.resolveWith<Color?>((states) {
                         if (states.contains(WidgetState.hovered)) {
-                          return const Color(0xFFF1F5F9);
+                          return appSurfaceSubtle;
                         }
                         return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
                       }),
@@ -521,7 +521,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                         DataCell(
                           Text(
                             dateConverter(items[i].createdDate) ?? '—',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                         ),
                         DataCell(_adminActions(items[i])),
@@ -559,7 +559,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         decoration: BoxDecoration(
           color: const Color(0xFFF3F4F6),
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: appBorder),
         ),
         child: const Icon(Icons.more_vert_rounded, size: 18, color: Color(0xFF4B5563)),
       ),
@@ -599,7 +599,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   color: primary.withAlpha(25),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Icon(Icons.calendar_month_outlined, size: 16, color: primary),
+                child: Icon(Icons.calendar_month_outlined, size: 16, color: primary),
               ),
               const SizedBox(width: 10),
               const Text(
@@ -646,7 +646,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   Widget _adminTimeBadge(service_branch_model.Data item) {
     final time = item.serviceTime;
     if (time == null || time.isEmpty) {
-      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+      return Text('—', style: TextStyle(color: appInkMuted, fontSize: 13));
     }
     final isCustom = item.branchServiceTime != null && item.branchServiceTime!.trim().isNotEmpty;
     final hasRules = item.serviceTimeRules != null && item.serviceTimeRules!.isNotEmpty;
@@ -657,9 +657,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.schedule_outlined, size: 13, color: Color(0xFF6B7280)),
+            Icon(Icons.schedule_outlined, size: 13, color: appInkMuted),
             const SizedBox(width: 4),
-            Text(time, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF374151))),
+            Text(time, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appInkSecondary)),
           ],
         ),
         if (isCustom || hasRules) ...[
@@ -678,7 +678,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   ),
                   child: const Text(
                     'Custom',
-                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
                   ),
                 ),
               if (hasRules)
@@ -689,9 +689,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: primary.withAlpha(50)),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Rules Active',
-                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: primary),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: primary),
                   ),
                 ),
             ],
@@ -707,7 +707,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       size: size,
       label: Text(
         label,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280), letterSpacing: 0.3),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted, letterSpacing: 0.3),
       ),
     );
   }
@@ -719,7 +719,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         height: 38,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: appBorder),
         ),
         clipBehavior: Clip.antiAlias,
         child: Image.network(
@@ -741,7 +741,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     if (doctorType == 2 || catLower.contains('scan') || catLower.contains('ultra') || catLower.contains('baby')) {
       // Ultrasound / Sonographer
       bg = const Color(0xFFCCFBF1);
-      fg = const Color(0xFF0F766E);
+      fg = primary;
       icon = Icons.sensors_rounded;
     } else if (doctorType == 3 ||
         doctorType == 4 ||
@@ -800,7 +800,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             children: [
               Text(
                 name ?? '—',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
                 overflow: TextOverflow.ellipsis,
               ),
               if (category != null && category.isNotEmpty) ...[
@@ -808,12 +808,12 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: appSurfaceSubtle,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     category,
-                    style: const TextStyle(fontSize: 10.5, color: Color(0xFF475569), fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 10.5, color: appInkSecondary, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -827,7 +827,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
   Widget _descriptionCell(String? description) {
     if (description == null || description.trim().isEmpty) {
-      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 12));
+      return Text('—', style: TextStyle(color: appInkMuted, fontSize: 12));
     }
     final cleanDesc = description.trim();
     return Tooltip(
@@ -849,13 +849,13 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
   Widget _timeBadge(String? time) {
     if (time == null || time.isEmpty) {
-      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+      return Text('—', style: TextStyle(color: appInkMuted, fontSize: 13));
     }
     return Row(
       children: [
-        const Icon(Icons.schedule_outlined, size: 13, color: Color(0xFF6B7280)),
+        Icon(Icons.schedule_outlined, size: 13, color: appInkMuted),
         const SizedBox(width: 4),
-        Text(time, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+        Text(time, style: TextStyle(fontSize: 12, color: appInkSecondary)),
       ],
     );
   }
@@ -867,10 +867,10 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       children: [
         Text(
           price != null ? 'RM $price' : '—',
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
         ),
         if (bookingFee != null && bookingFee.isNotEmpty)
-          Text('Fee: RM $bookingFee', style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF))),
+          Text('Fee: RM $bookingFee', style: TextStyle(fontSize: 11, color: appInkMuted)),
       ],
     );
   }
@@ -893,7 +893,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         isActive ? 'Active' : 'Inactive',
@@ -1017,7 +1017,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               hintText: 'Search services...',
               prefixIcon: const Icon(Icons.search, size: 20),
               filled: true,
-              fillColor: const Color(0xFFF5F6FA),
+              fillColor: appCanvas,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.symmetric(vertical: 10),
             ),
@@ -1112,7 +1112,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+        side: BorderSide(color: appBorder),
       ),
       color: Colors.white,
       child: InkWell(
@@ -1152,9 +1152,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         children: [
           SizedBox(
             width: 70,
-            child: Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+            child: Text(label, style: TextStyle(fontSize: 12, color: appInkMuted)),
           ),
-          Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+          Text(value, style: TextStyle(fontSize: 12, color: appInkSecondary)),
         ],
       ),
     );
@@ -1234,8 +1234,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             width: math.min(560.0, screenWidth(92)),
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: appSurface,
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.14),
@@ -1245,7 +1245,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
               child: Material(
                 color: Colors.white,
                 child: Column(
@@ -1255,9 +1255,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     // Header
                     Container(
                       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Color(0xFFFAFAFA),
-                        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+                        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
                       ),
                       child: Row(
                         children: [
@@ -1281,7 +1281,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                               children: [
                                 Text(
                                   serviceBranch.serviceName ?? 'Service Timing & Schedule',
-                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: appInkPrimary),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1290,16 +1290,16 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                   serviceBranch.branchName != null && serviceBranch.branchName!.isNotEmpty
                                       ? 'Branch: ${serviceBranch.branchName}'
                                       : 'Configure service timing and calendar for your branch',
-                                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                                  style: TextStyle(fontSize: 11, color: appInkMuted),
                                 ),
                               ],
                             ),
                           ),
                           IconButton(
   tooltip: 'Tutup',
-                            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+                            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
                             onPressed: () => Navigator.pop(ctx),
-                            hoverColor: const Color(0xFFF1F5F9),
+                            hoverColor: appSurfaceSubtle,
                             splashRadius: 20,
                           ),
                         ],
@@ -1363,9 +1363,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: appSurfaceSubtle,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: appBorder),
         ),
         child: Row(
           children: [
@@ -1385,7 +1385,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                       Flexible(
                         child: Text(
                           title,
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appInkPrimary),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -1399,7 +1399,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                         ),
                         child: Text(
                           badgeText,
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: iconColor),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: iconColor),
                         ),
                       ),
                     ],
@@ -1407,13 +1407,13 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), height: 1.3),
+                    style: TextStyle(fontSize: 11, color: appInkMuted, height: 1.3),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF94A3B8)),
+            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: appInkMuted),
           ],
         ),
       ),

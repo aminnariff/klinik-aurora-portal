@@ -157,14 +157,14 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
                   children: [
                     Text(
                       '${month.mmm ?? ''} ${month.yyyy ?? ''}',
-                      style: const TextStyle(color: _mutedColor, fontSize: 10),
+                      style: const TextStyle(color: _mutedColor, fontSize: 11),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${month.total ?? 0}',
                       style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const Text('appointments', style: TextStyle(color: _mutedColor, fontSize: 9)),
+                    const Text('appointments', style: TextStyle(color: _mutedColor, fontSize: 11)),
                   ],
                 ),
               );
@@ -372,7 +372,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
               child: Text(
                 '${day.dd}\n${day.mmm}',
                 textAlign: TextAlign.center,
-                style: headerStyle.copyWith(fontSize: 10),
+                style: headerStyle.copyWith(fontSize: 11),
               ),
             ),
             ...branches.map((b) {
@@ -413,7 +413,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
               child: Text(
                 '${month.mmm}\n${month.yyyy}',
                 textAlign: TextAlign.center,
-                style: headerStyle.copyWith(fontSize: 10),
+                style: headerStyle.copyWith(fontSize: 11),
               ),
             ),
             ...branches.map((b) {

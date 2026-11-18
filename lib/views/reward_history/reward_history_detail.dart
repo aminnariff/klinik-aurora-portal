@@ -176,7 +176,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(
         horizontal: isMobile ? 16 : 32,
         vertical: isMobile ? 20 : 32,
@@ -191,14 +191,14 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildHeader(context),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(isMobile ? 16 : 24),
                 child: isMobile ? _buildMobileLayout(context) : _buildDesktopLayout(context),
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             _buildFooter(context),
           ],
         ),
@@ -222,7 +222,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
               color: primary.withAlpha(25),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.receipt_long_rounded, color: primary, size: 20),
+            child: Icon(Icons.receipt_long_rounded, color: primary, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -232,20 +232,20 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
               children: [
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'Manage Reward Order',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appInkPrimary),
                     ),
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         '#$shortId',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkSecondary),
                       ),
                     ),
                   ],
@@ -253,7 +253,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                 const SizedBox(height: 2),
                 Text(
                   widget.data.rewardName ?? 'Review redemption and update order fulfillment',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -261,7 +261,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
           ),
           IconButton(
   tooltip: 'Tutup',
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             onPressed: () => context.pop(),
             splashRadius: 20,
           ),
@@ -358,9 +358,9 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,7 +372,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                 backgroundColor: primary.withAlpha(30),
                 child: Text(
                   initials,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: primary),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: primary),
                 ),
               ),
               const SizedBox(width: 10),
@@ -382,12 +382,12 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appInkPrimary),
                     ),
                     if (widget.data.userPhone != null && widget.data.userPhone!.isNotEmpty)
                       Text(
                         widget.data.userPhone!,
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                        style: TextStyle(fontSize: 11, color: appInkMuted),
                       ),
                   ],
                 ),
@@ -396,17 +396,17 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
           ),
           if (_hasAddress) ...[
             const SizedBox(height: 10),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             const SizedBox(height: 8),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF64748B)),
+                Icon(Icons.location_on_outlined, size: 14, color: appInkMuted),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     _formattedAddress,
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF475569), height: 1.3),
+                    style: TextStyle(fontSize: 11, color: appInkSecondary, height: 1.3),
                   ),
                 ),
               ],
@@ -441,20 +441,20 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.card_giftcard_rounded, size: 16, color: primary),
+              Icon(Icons.card_giftcard_rounded, size: 16, color: primary),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   rewardTitle,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
                 ),
               ),
               Container(
@@ -474,11 +474,11 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF94A3B8)),
+              Icon(Icons.calendar_today_rounded, size: 12, color: appInkMuted),
               const SizedBox(width: 6),
               Text(
                 'Redeemed on $date',
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 11, color: appInkMuted),
               ),
             ],
           ),
@@ -512,7 +512,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
         height: 180,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFCBD5E1)),
+          border: Border.all(color: appBorderStrong),
         ),
         child: Stack(
           children: [
@@ -550,16 +550,16 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-              color: const Color(0xFFF8FAFC),
+              border: Border.all(color: appBorder),
+              color: appSurfaceSubtle,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(9),
               child: Image.network(
                 resolveImageUrl(existingUrl),
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const Center(
-                  child: Icon(Icons.broken_image_rounded, size: 36, color: Color(0xFF94A3B8)),
+                errorBuilder: (_, _, _) => Center(
+                  child: Icon(Icons.broken_image_rounded, size: 36, color: appInkMuted),
                 ),
               ),
             ),
@@ -571,7 +571,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
             label: const Text('Replace Proof Image', style: TextStyle(fontSize: 12)),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              side: const BorderSide(color: Color(0xFFCBD5E1)),
+              side: BorderSide(color: appBorderStrong),
             ),
           ),
         ],
@@ -585,23 +585,23 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
         height: 140,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: appSurfaceSubtle,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFCBD5E1), style: BorderStyle.solid),
+          border: Border.all(color: appBorderStrong, style: BorderStyle.solid),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.cloud_upload_outlined, size: 32, color: Color(0xFF64748B)),
+            Icon(Icons.cloud_upload_outlined, size: 32, color: appInkMuted),
             SizedBox(height: 8),
             Text(
               'Upload proof of delivery or receipt',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
             ),
             SizedBox(height: 2),
             Text(
               'PNG, JPG, or PDF (up to 2MB)',
-              style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+              style: TextStyle(fontSize: 11, color: appInkMuted),
             ),
           ],
         ),
@@ -616,35 +616,35 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.person_outline_rounded, size: 15, color: Color(0xFF64748B)),
+              Icon(Icons.person_outline_rounded, size: 15, color: appInkMuted),
               const SizedBox(width: 8),
-              const Text('Last updated by:', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+              Text('Last updated by:', style: TextStyle(fontSize: 11, color: appInkMuted)),
               const Spacer(),
               Text(
                 updatedBy ?? 'System',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkPrimary),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.access_time_rounded, size: 15, color: Color(0xFF64748B)),
+              Icon(Icons.access_time_rounded, size: 15, color: appInkMuted),
               const SizedBox(width: 8),
-              const Text('Last modified at:', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+              Text('Last modified at:', style: TextStyle(fontSize: 11, color: appInkMuted)),
               const Spacer(),
               Text(
                 dateConverter(modifiedDate) ?? '—',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkPrimary),
               ),
             ],
           ),
@@ -685,14 +685,14 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
           decoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 14, color: const Color(0xFF64748B)),
+        Icon(icon, size: 14, color: appInkMuted),
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.8,
           ),
         ),
@@ -704,10 +704,10 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
     return RichText(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
         children: isRequired
             ? [
@@ -746,9 +746,9 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
       height: 42,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFCBD5E1)),
+        border: Border.all(color: appBorderStrong),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<DropdownAttribute>(
@@ -759,10 +759,10 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: hasValue ? FontWeight.w600 : FontWeight.normal,
-              color: hasValue ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+              color: hasValue ? appInkPrimary : appInkMuted,
             ),
           ),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF64748B)),
+          icon: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: appInkMuted),
           items: items.map((attr) {
             final isInProgress = attr.key == '1';
             return DropdownMenuItem<DropdownAttribute>(
@@ -780,7 +780,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                   const SizedBox(width: 8),
                   Text(
                     attr.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
                   ),
                 ],
               ),

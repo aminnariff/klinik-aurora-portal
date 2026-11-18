@@ -65,7 +65,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
       return Column(
         children: [
           SizedBox(height: screenHeight(45), child: _buildCalendar()),
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Divider(height: 1, color: appBorder),
           Expanded(child: _buildDayPanel()),
         ],
       );
@@ -74,7 +74,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(flex: 2, child: _buildCalendar()),
-        const VerticalDivider(width: 1, color: Color(0xFFE5E7EB)),
+        VerticalDivider(width: 1, color: appBorder),
         Expanded(flex: 3, child: _buildDayPanel()),
       ],
     );
@@ -108,33 +108,33 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
           titleTextFormatter: (date, locale) => DateFormat('MMMM yyyy').format(date),
           titleTextStyle: AppTypography.bodyLarge(
             context,
-          ).copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF111827)),
+          ).copyWith(fontWeight: FontWeight.w700, color: appInkPrimary),
           formatButtonTextStyle: AppTypography.bodyMedium(
             context,
           ).copyWith(color: Colors.white, fontWeight: FontWeight.w600),
           formatButtonDecoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(8)),
-          leftChevronIcon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF6B7280)),
-          rightChevronIcon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6B7280)),
+          leftChevronIcon: Icon(Icons.chevron_left_rounded, color: appInkMuted),
+          rightChevronIcon: Icon(Icons.chevron_right_rounded, color: appInkMuted),
           headerPadding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
         ),
         calendarBuilders: CalendarBuilders(prioritizedBuilder: (context, date, focusedDay) => _buildDayCell(date)),
         calendarStyle: CalendarStyle(
-          selectedDecoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
+          selectedDecoration: BoxDecoration(color: primary, shape: BoxShape.circle),
           todayDecoration: BoxDecoration(color: primary.withAlpha(40), shape: BoxShape.circle),
           todayTextStyle: AppTypography.bodyMedium(
             context,
           ).copyWith(fontWeight: FontWeight.w700, color: primary),
           cellMargin: const EdgeInsets.all(2),
-          defaultTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF374151), fontSize: 12),
-          weekendTextStyle: AppTypography.bodyMedium(context).copyWith(color: const Color(0xFF9CA3AF), fontSize: 12),
+          defaultTextStyle: AppTypography.bodyMedium(context).copyWith(color: appInkSecondary, fontSize: 12),
+          weekendTextStyle: AppTypography.bodyMedium(context).copyWith(color: appInkMuted, fontSize: 12),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
           weekdayStyle: AppTypography.bodyMedium(
             context,
-          ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280), fontSize: 11),
+          ).copyWith(fontWeight: FontWeight.w600, color: appInkMuted, fontSize: 11),
           weekendStyle: AppTypography.bodyMedium(
             context,
-          ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF9CA3AF), fontSize: 11),
+          ).copyWith(fontWeight: FontWeight.w600, color: appInkMuted, fontSize: 11),
         ),
       ),
     );
@@ -159,7 +159,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             width: 26,
             height: 26,
             alignment: Alignment.center,
-            decoration: isToday ? const BoxDecoration(color: primary, shape: BoxShape.circle) : null,
+            decoration: isToday ? BoxDecoration(color: primary, shape: BoxShape.circle) : null,
             child: Text(
               '${date.day}',
               style: TextStyle(
@@ -168,8 +168,8 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
                 color: isToday
                     ? Colors.white
                     : isOutsideMonth
-                    ? const Color(0xFFD1D5DB)
-                    : const Color(0xFF374151),
+                    ? appBorderStrong
+                    : appInkSecondary,
               ),
             ),
           ),
@@ -180,7 +180,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
               decoration: BoxDecoration(color: primary.withAlpha(30), borderRadius: BorderRadius.circular(8)),
               child: Text(
                 '$count',
-                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: primary),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: primary),
                 textAlign: TextAlign.center,
               ),
             )
@@ -223,7 +223,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
+      decoration: BoxDecoration(color: appCanvas),
       child: Row(
         children: [
           Icon(isToday ? Icons.today_rounded : Icons.calendar_today_rounded, size: 16, color: primary),
@@ -232,7 +232,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             label,
             style: AppTypography.bodyMedium(
               context,
-            ).copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF111827)),
+            ).copyWith(fontWeight: FontWeight.w700, color: appInkPrimary),
           ),
           const SizedBox(width: 8),
           Container(
@@ -252,7 +252,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
   Widget _buildDayAppointments() {
     if (widget.isLoadingDay) {
-      return const Center(child: CircularProgressIndicator(color: primary));
+      return Center(child: CircularProgressIndicator(color: primary));
     }
 
     final list = widget.dayAppointments;
@@ -266,14 +266,14 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
               width: 56,
               height: 56,
               decoration: const BoxDecoration(color: Color(0xFFF3F4F6), shape: BoxShape.circle),
-              child: const Icon(Icons.event_busy_rounded, size: 28, color: Color(0xFF9CA3AF)),
+              child: Icon(Icons.event_busy_rounded, size: 28, color: appInkMuted),
             ),
             const SizedBox(height: 12),
             Text(
               'No appointments on this day',
               style: AppTypography.bodyMedium(
                 context,
-              ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
+              ).copyWith(fontWeight: FontWeight.w600, color: appInkMuted),
             ),
           ],
         ),
@@ -316,7 +316,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -330,13 +330,13 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
                       timeLabel,
                       style: AppTypography.bodyMedium(
                         context,
-                      ).copyWith(fontWeight: FontWeight.w700, fontSize: 12, color: const Color(0xFF111827)),
+                      ).copyWith(fontWeight: FontWeight.w700, fontSize: 12, color: appInkPrimary),
                     ),
                     Container(
                       width: 1,
                       height: 28,
                       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
-                      color: const Color(0xFFE5E7EB),
+                      color: appBorder,
                     ),
                   ],
                 ),
@@ -376,7 +376,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
                             apt.service?.serviceName ?? 'N/A',
                             style: AppTypography.bodyMedium(
                               context,
-                            ).apply(fontSizeDelta: -2, color: const Color(0xFF6B7280)),
+                            ).apply(fontSizeDelta: -2, color: appInkMuted),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -391,11 +391,11 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
                 children: [
                   AppointmentStatusBadge(
                     status: apt.appointmentStatus,
-                    fontSize: 10,
+                    fontSize: 11,
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   ),
                   const SizedBox(height: 6),
-                  const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0xFF9CA3AF)),
+                  Icon(Icons.chevron_right_rounded, size: 18, color: appInkMuted),
                 ],
               ),
             ],

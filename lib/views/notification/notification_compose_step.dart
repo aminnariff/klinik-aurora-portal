@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/views/notification/notification_preview.dar
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class NotificationComposeStep extends StatelessWidget {
   final TextEditingController titleController;
@@ -54,7 +55,7 @@ class NotificationComposeStep extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               '${titleController.text.length}/60',
-              style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -3),
+              style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -3),
             ),
             const SizedBox(height: 16),
             Text('Content', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 3)),
@@ -73,10 +74,10 @@ class NotificationComposeStep extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               '${contentController.text.length}/200',
-              style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -3),
+              style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -3),
             ),
             const SizedBox(height: 20),
-            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            Divider(height: 1, color: appBorder),
             const SizedBox(height: 16),
             SizedBox(
               width: formWidth,

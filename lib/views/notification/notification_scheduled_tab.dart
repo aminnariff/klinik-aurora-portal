@@ -93,7 +93,7 @@ class _NotificationScheduledTabState extends State<NotificationScheduledTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 48, color: Color(0xFF9CA3AF)),
+            Icon(Icons.error_outline_rounded, size: 48, color: appInkMuted),
             const SizedBox(height: 12),
             Text(_error!, textAlign: TextAlign.center, style: AppTypography.bodyMedium(context)),
             const SizedBox(height: 16),
@@ -162,7 +162,7 @@ class _NotificationScheduledTabState extends State<NotificationScheduledTab> {
         Expanded(
           child: ListView.separated(
             itemCount: _items.length,
-            separatorBuilder: (_, _) => const Divider(height: 20, color: Color(0xFFE5E7EB)),
+            separatorBuilder: (_, _) => Divider(height: 20, color: appBorder),
             itemBuilder: (context, index) => _ScheduledRow(
               item: _items[index],
               onEdit: () => _edit(_items[index]),
@@ -250,7 +250,7 @@ class _ScheduledRow extends StatelessWidget {
         ] else if (!item.isSent)
           IconButton(
             icon: const Icon(Icons.delete_outline_rounded, size: 20),
-            color: const Color(0xFF9CA3AF),
+            color: appInkMuted,
             tooltip: 'Remove',
             onPressed: onDelete,
           ),
@@ -291,7 +291,7 @@ class _StatusChip extends StatelessWidget {
         color = const Color(0xFFDC2626);
       case 'CANCELLED':
         label = 'Cancelled';
-        color = const Color(0xFF9CA3AF);
+        color = appInkMuted;
       case 'SENDING':
         label = 'Sending';
         color = const Color(0xFF2563EB);
@@ -302,7 +302,7 @@ class _StatusChip extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(color: color.withAlpha(28), borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(color: color.withAlpha(28), borderRadius: BorderRadius.circular(8)),
       child: Text(
         label,
         style: AppTypography.bodyMedium(context).apply(color: color, fontSizeDelta: -3, fontWeightDelta: 2),

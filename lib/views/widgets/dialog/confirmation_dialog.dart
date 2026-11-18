@@ -36,11 +36,11 @@ class ConfirmationDialog extends StatelessWidget {
                   height: attribute.height,
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: appSurface,
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0F172A).withValues(alpha: 0.12),
+                        color: appInkPrimary.withValues(alpha: 0.12),
                         blurRadius: 48,
                         offset: const Offset(0, 20),
                       ),
@@ -55,10 +55,10 @@ class ConfirmationDialog extends StatelessWidget {
                       Text(
                         attribute.title ?? 'Are you sure?',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F172A),
+                          color: appInkPrimary,
                           letterSpacing: -0.4,
                         ),
                       ),
@@ -67,7 +67,7 @@ class ConfirmationDialog extends StatelessWidget {
                         Text(
                           attribute.text.toString(),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.55),
+                          style: TextStyle(fontSize: 14, color: appInkMuted, height: 1.55),
                         ),
                       ],
                       if (attribute.textWidget != null) ...[const SizedBox(height: 10), attribute.textWidget!],
@@ -169,8 +169,8 @@ class ConfirmationDialog extends StatelessWidget {
         child: TextButton(
           onPressed: action,
           style: TextButton.styleFrom(
-            backgroundColor: const Color(0xFFF1F5F9),
-            foregroundColor: const Color(0xFF334155),
+            backgroundColor: appSurfaceSubtle,
+            foregroundColor: appInkSecondary,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           child: Text(

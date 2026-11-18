@@ -158,7 +158,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Got it!',
                       style: TextStyle(fontWeight: FontWeight.bold, color: primary),
                     ),
@@ -182,7 +182,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
             width: 28,
             height: 28,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: primary, shape: BoxShape.circle),
             child: Text(
               '$number',
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
@@ -223,7 +223,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                     color: primary.withAlpha(20),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.auto_awesome_rounded, color: primary, size: 22),
+                  child: Icon(Icons.auto_awesome_rounded, color: primary, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -273,16 +273,16 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
+                color: appCanvas,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: appBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Global Configuration',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF374151)),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: appInkSecondary),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -342,9 +342,9 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: appSurface,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: appBorder),
               ),
               child: Wrap(
                 spacing: screenPadding,
@@ -392,22 +392,22 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280)),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: appInkMuted),
         ),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFD1D5DB)),
+            border: Border.all(color: appBorderStrong),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<T>(
               value: value,
               isExpanded: true,
               isDense: true,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF111827), fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 13, color: appInkPrimary, fontWeight: FontWeight.w600),
               items: items,
               onChanged: onChanged,
             ),

@@ -32,7 +32,7 @@ class _MarketingHomepageState extends State<MarketingHomepage> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         children: [
           Container(
@@ -54,7 +54,7 @@ class _MarketingHomepageState extends State<MarketingHomepage> with SingleTicker
                   isScrollable: true,
                   tabAlignment: TabAlignment.start,
                   labelColor: secondaryColor,
-                  unselectedLabelColor: const Color(0xFF637381),
+                  unselectedLabelColor: appInkMuted,
                   indicatorColor: secondaryColor,
                   dividerColor: Colors.transparent,
                   tabs: const [
@@ -65,7 +65,7 @@ class _MarketingHomepageState extends State<MarketingHomepage> with SingleTicker
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Divider(height: 1, color: appBorder),
           Expanded(
             child: TabBarView(
               controller: _tabController,

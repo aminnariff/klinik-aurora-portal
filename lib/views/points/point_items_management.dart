@@ -91,7 +91,7 @@ class _PointItemsManagementState extends State<PointItemsManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Padding(
         padding: EdgeInsets.all(isMobile ? 12 : 24),
         child: Column(
@@ -403,7 +403,7 @@ class _ModifierEditorState extends State<_ModifierEditor> {
                     IconButton(
   tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded),
-                      color: const Color(0xFF637381),
+                      color: appInkMuted,
                       onPressed: _saving ? null : () => Navigator.of(context).pop(false),
                     ),
                   ],
@@ -475,7 +475,7 @@ class _ModifierEditorState extends State<_ModifierEditor> {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
+                            color: appSurfaceSubtle,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -554,9 +554,9 @@ class _ModifierCardState extends State<_ModifierCard> {
     final IconData statusIcon;
     final Color iconBg;
     if (!modifier.isActive) {
-      statusColor = const Color(0xFF6B7280);
+      statusColor = appInkMuted;
       statusIcon = Icons.pause_circle_outline_rounded;
-      iconBg = const Color(0xFFF1F5F9);
+      iconBg = appSurfaceSubtle;
     } else if (modifier.hasExpired) {
       statusColor = const Color(0xFFD97706);
       statusIcon = Icons.history_toggle_off_rounded;
@@ -579,10 +579,10 @@ class _ModifierCardState extends State<_ModifierCard> {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOut,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: appSurface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isHovered ? secondaryColor.withAlpha(160) : const Color(0xFFE2E8F0),
+            color: _isHovered ? secondaryColor.withAlpha(160) : appBorder,
             width: _isHovered ? 1.5 : 1,
           ),
           boxShadow: [
@@ -662,7 +662,7 @@ class _ModifierCardState extends State<_ModifierCard> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                        Divider(height: 1, color: appSurfaceSubtle),
                         const SizedBox(height: 6),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -756,7 +756,7 @@ class _ModifierCardState extends State<_ModifierCard> {
                           const SizedBox(width: 4),
                           Icon(
                             Icons.chevron_right_rounded,
-                            color: _isHovered ? secondaryColor : const Color(0xFFCBD5E1),
+                            color: _isHovered ? secondaryColor : appBorderStrong,
                             size: 22,
                           ),
                         ],
@@ -819,18 +819,18 @@ class _Fact extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: const Color(0xFF64748B)),
+          Icon(icon, size: 14, color: appInkMuted),
           const SizedBox(width: 6),
           Text(
             '$label: ',
-            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF64748B), fontSizeDelta: -2),
+            style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -2),
           ),
           Text(
             value,
@@ -859,7 +859,7 @@ class _StatusChip extends StatelessWidget {
 
     if (!modifier.isActive) {
       label = 'Inactive';
-      color = const Color(0xFF6B7280);
+      color = appInkMuted;
     } else if (modifier.hasExpired) {
       label = 'Expired';
       color = const Color(0xFFD97706);
@@ -875,7 +875,7 @@ class _StatusChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withAlpha(20),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color.withAlpha(60)),
       ),
       child: Row(

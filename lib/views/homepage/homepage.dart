@@ -3,11 +3,12 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
@@ -23,6 +24,7 @@ import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
 import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
+import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
@@ -30,7 +32,6 @@ import 'package:klinik_aurora_portal/views/widgets/command_palette/command_palet
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
-import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';
 
@@ -284,6 +285,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget desktopView(BuildContext context) {
+    final colors = context.appColors;
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
         const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () {
@@ -296,7 +298,7 @@ class _HomepageState extends State<Homepage> {
       child: Focus(
         autofocus: true,
         child: Scaffold(
-          backgroundColor: const Color(0xFFF5F6FA),
+          backgroundColor: colors.canvas,
           body: Row(
         children: [
           Consumer<TopBarController>(
@@ -306,17 +308,17 @@ class _HomepageState extends State<Homepage> {
                 theme: SidebarXTheme(
                   width: 76,
                   margin: EdgeInsets.zero,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFF246E7A),
-                        Color(0xFF1B545E),
+                        colors.sidebarTop,
+                        colors.sidebarBottom,
                       ],
                     ),
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
-                    boxShadow: [
+                    borderRadius: const BorderRadius.only(topRight: Radius.circular(12), bottomRight: Radius.circular(12)),
+                    boxShadow: const [
                       BoxShadow(
                         color: Color(0x33000000),
                         blurRadius: 16,
@@ -333,9 +335,9 @@ class _HomepageState extends State<Homepage> {
                   selectedIconTheme: const IconThemeData(color: Colors.white, size: 20),
                   itemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   selectedItemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.transparent),
+                  itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.transparent),
                   selectedItemDecoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                     color: Colors.white.withValues(alpha: 0.22),
                     border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
                     boxShadow: [
@@ -349,17 +351,17 @@ class _HomepageState extends State<Homepage> {
                 ),
                 extendedTheme: SidebarXTheme(
                   width: 255,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFF246E7A),
-                        Color(0xFF1B545E),
+                        colors.sidebarTop,
+                        colors.sidebarBottom,
                       ],
                     ),
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
-                    boxShadow: [
+                    borderRadius: const BorderRadius.only(topRight: Radius.circular(12), bottomRight: Radius.circular(12)),
+                    boxShadow: const [
                       BoxShadow(
                         color: Color(0x33000000),
                         blurRadius: 16,
@@ -376,9 +378,9 @@ class _HomepageState extends State<Homepage> {
                   selectedIconTheme: const IconThemeData(color: Colors.white, size: 20),
                   itemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   selectedItemMargin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.transparent),
+                  itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.transparent),
                   selectedItemDecoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                     color: Colors.white.withValues(alpha: 0.22),
                     border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
                     boxShadow: [
@@ -437,7 +439,7 @@ class _HomepageState extends State<Homepage> {
                                           'Management Portal',
                                           style: TextStyle(
                                             color: Color(0xB3FFFFFF),
-                                            fontSize: 10,
+                                            fontSize: 11,
                                             fontWeight: FontWeight.w500,
                                             letterSpacing: 0.3,
                                           ),
@@ -563,7 +565,7 @@ class _HomepageState extends State<Homepage> {
                                             roleTitle,
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 9.5,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.w600,
                                             ),
                                             maxLines: 1,
@@ -587,7 +589,7 @@ class _HomepageState extends State<Homepage> {
                               _getItemCategory(sideBarAttribute.first.label).toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.5),
-                                fontSize: 10,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.2,
                               ),
@@ -637,7 +639,7 @@ class _HomepageState extends State<Homepage> {
                                 nextCat.toUpperCase(),
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.5),
-                                  fontSize: 10,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 1.2,
                                 ),
@@ -656,31 +658,59 @@ class _HomepageState extends State<Homepage> {
                   return Column(
                     children: [
                       const SizedBox(height: 6),
-                      InkWell(
-                        onTap: () async {
-                          try {
-                            await context.read<AuthController>().logout(context);
-                            if (context.mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
-                          } catch (e) {
-                            debugPrint(e.toString());
-                          }
-                        },
-                        borderRadius: BorderRadius.circular(10),
-                        hoverColor: Colors.white.withValues(alpha: 0.15),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          child: Row(
-                            mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.logout_rounded, color: Color(0xD9FFFFFF), size: 20),
-                              if (extended) ...[
-                                const SizedBox(width: 10),
-                                const Text(
-                                  'Logout',
-                                  style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
-                                ),
+                      Tooltip(
+                        message: 'Appearance & Theme',
+                        child: InkWell(
+                          onTap: () => AppearanceSettingsDialog.show(context),
+                          borderRadius: BorderRadius.circular(8),
+                          hoverColor: Colors.white.withValues(alpha: 0.15),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            child: Row(
+                              mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.palette_outlined, color: Color(0xE6FFFFFF), size: 20),
+                                if (extended) ...[
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                    'Appearance',
+                                    style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Tooltip(
+                        message: 'Logout',
+                        child: InkWell(
+                          onTap: () async {
+                            try {
+                              await context.read<AuthController>().logout(context);
+                              if (context.mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
+                            } catch (e) {
+                              debugPrint(e.toString());
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          hoverColor: Colors.white.withValues(alpha: 0.15),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            child: Row(
+                              mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.logout_rounded, color: Color(0xD9FFFFFF), size: 20),
+                                if (extended) ...[
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                    'Logout',
+                                    style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -717,11 +747,15 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget _buildTopBar(BuildContext context) {
+    final colors = context.appColors;
+    final themeCtrl = context.watch<DarkModeController>();
+    final isDark = themeCtrl.isDarkActive(context);
+
     return Container(
-      height: 48,
+      height: 52,
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 4, offset: const Offset(0, 1))],
+        color: colors.surface,
+        border: Border(bottom: BorderSide(color: colors.border)),
       ),
       padding: EdgeInsets.symmetric(horizontal: screenPadding),
       child: Row(
@@ -731,32 +765,32 @@ class _HomepageState extends State<Homepage> {
             onTap: () => CommandPaletteDialog.show(context),
             borderRadius: BorderRadius.circular(8),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: colors.surfaceSubtle,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: colors.border),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.search_rounded, size: 16, color: Color(0xFF64748B)),
+                  Icon(Icons.search_rounded, size: 16, color: colors.inkMuted),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Quick Search...',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 12, color: colors.inkMuted, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(width: 14),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colors.surface,
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      border: Border.all(color: colors.borderStrong),
                     ),
-                    child: const Text(
+                    child: Text(
                       '⌘K',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colors.inkSecondary),
                     ),
                   ),
                 ],
@@ -764,32 +798,74 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
           const Spacer(),
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded, size: 20),
+            color: colors.inkSecondary,
+            tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+            onPressed: () => themeCtrl.toggleDarkMode(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.palette_outlined, size: 20),
+            color: colors.inkSecondary,
+            tooltip: 'Appearance & Theme Settings',
+            onPressed: () => AppearanceSettingsDialog.show(context),
+          ),
           if (context.read<AuthController>().isSuperAdmin) ...[
             IconButton(
               icon: const Icon(Icons.notifications_outlined, size: 20),
-              color: const Color(0xFF637381),
+              color: colors.inkSecondary,
               tooltip: 'Announcements',
-              visualDensity: VisualDensity.compact,
-              padding: EdgeInsets.zero,
               onPressed: () => showDialog(context: context, builder: (_) => NotificationHomepage()),
             ),
             const SizedBox(width: 4),
           ],
           PopupMenuButton<String>(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            offset: const Offset(0, 38),
-            color: Colors.white,
-            tooltip: '',
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(color: colors.border),
+            ),
+            offset: const Offset(0, 42),
+            color: colors.surfaceElevated,
+            tooltip: 'Account menu',
             onSelected: _handleMenuSelection,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'appearance',
+                child: Row(
+                  children: [
+                    Icon(Icons.palette_outlined, size: 18),
+                    SizedBox(width: 10),
+                    Text('Appearance & Theme'),
+                  ],
+                ),
+              ),
               if (context.read<AuthController>().isSuperAdmin)
-                const PopupMenuItem<String>(value: 'announcement', child: Text('Announcement')),
-              const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
+                const PopupMenuItem<String>(
+                  value: 'announcement',
+                  child: Row(
+                    children: [
+                      Icon(Icons.campaign_outlined, size: 18),
+                      SizedBox(width: 10),
+                      Text('Announcement'),
+                    ],
+                  ),
+                ),
+              const PopupMenuDivider(),
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout_rounded, size: 18),
+                    SizedBox(width: 10),
+                    Text('Logout'),
+                  ],
+                ),
+              ),
             ],
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: colors.border),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -802,7 +878,11 @@ class _HomepageState extends State<Homepage> {
                       children: [
                         Text(
                           authController.authenticationResponse?.data?.user?.userFullname ?? 'N/A',
-                          style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: colors.inkPrimary,
+                          ),
                         ),
                         Text(
                           authController.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342')
@@ -810,9 +890,10 @@ class _HomepageState extends State<Homepage> {
                               : authController.isSuperAdmin
                               ? 'Super Admin'
                               : 'Admin',
-                          style: AppTypography.bodyMedium(
-                            context,
-                          ).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -2),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: colors.inkMuted,
+                          ),
                         ),
                       ],
                     ),
@@ -820,11 +901,11 @@ class _HomepageState extends State<Homepage> {
                   const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: colors.brandPrimary, shape: BoxShape.circle),
                     child: const Icon(Icons.person_rounded, color: Colors.white, size: 18),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF9CA3AF), size: 18),
+                  Icon(Icons.keyboard_arrow_down_rounded, color: colors.inkMuted, size: 18),
                 ],
               ),
             ),
@@ -835,10 +916,14 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget mobileView(BuildContext context) {
+    final colors = context.appColors;
+    final themeCtrl = context.watch<DarkModeController>();
+    final isDark = themeCtrl.isDarkActive(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.canvas,
       appBar: AppBar(
-        backgroundColor: sidebarColor,
+        backgroundColor: colors.sidebarTop,
         foregroundColor: Colors.white,
         elevation: 0,
         titleSpacing: 0,
@@ -853,13 +938,22 @@ class _HomepageState extends State<Homepage> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded, size: 20, color: Colors.white),
+            tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+            onPressed: () => themeCtrl.toggleDarkMode(context),
+          ),
           PopupMenuButton<String>(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            offset: const Offset(0, 40),
-            color: Colors.white,
-            tooltip: '',
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(color: colors.border),
+            ),
+            offset: const Offset(0, 44),
+            color: colors.surfaceElevated,
+            tooltip: 'Account menu',
             onSelected: _handleMenuSelection,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(value: 'appearance', child: Text('Appearance & Theme')),
               if (context.read<AuthController>().isSuperAdmin)
                 const PopupMenuItem<String>(value: 'announcement', child: Text('Announcement')),
               const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
@@ -878,7 +972,7 @@ class _HomepageState extends State<Homepage> {
                   const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(color: primary, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: colors.brandPrimary, shape: BoxShape.circle),
                     child: const Icon(Icons.person, color: Colors.white, size: 18),
                   ),
                 ],
@@ -890,13 +984,13 @@ class _HomepageState extends State<Homepage> {
       drawer: Drawer(
         backgroundColor: Colors.transparent,
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xFF246E7A),
-                Color(0xFF1B545E),
+                colors.sidebarTop,
+                colors.sidebarBottom,
               ],
             ),
           ),
@@ -970,7 +1064,7 @@ class _HomepageState extends State<Homepage> {
                               _getItemCategory(sideBarAttribute[i].label).toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.5),
-                                fontSize: 10,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.2,
                               ),
@@ -993,6 +1087,14 @@ class _HomepageState extends State<Homepage> {
                 ),
                 Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
                 ListTile(
+                  leading: const Icon(Icons.palette_outlined, color: Colors.white),
+                  title: const Text('Appearance & Theme', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    AppearanceSettingsDialog.show(context);
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.logout, color: Colors.white),
                   title: const Text('Logout', style: TextStyle(color: Colors.white)),
                   onTap: () async {
@@ -1014,7 +1116,9 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<void> _handleMenuSelection(String value) async {
-    if (value == 'logout') {
+    if (value == 'appearance') {
+      await AppearanceSettingsDialog.show(context);
+    } else if (value == 'logout') {
       try {
         await context.read<AuthController>().logout(context);
         if (mounted) context.pushReplacementNamed(LoginPage.routeName, extra: true);
@@ -1084,7 +1188,7 @@ class _HomepageState extends State<Homepage> {
             'v$ver',
             style: const TextStyle(
               color: Color(0xD9FFFFFF),
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
             ),

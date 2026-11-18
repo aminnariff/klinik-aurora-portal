@@ -110,7 +110,7 @@ class NoPermission extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white.withAlpha(20),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white.withAlpha(30)),
                     ),
                     child: const Text(
@@ -131,7 +131,7 @@ class NoPermission extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
                       color: Colors.white.withAlpha(10),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white.withAlpha(15)),
                     ),
                     child: Text(
@@ -169,7 +169,7 @@ class NoPermission extends StatelessWidget {
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFFDF184A),
                                 elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, letterSpacing: 1),
                               ),
                             ),
@@ -188,7 +188,7 @@ class NoPermission extends StatelessWidget {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.white.withAlpha(200),
                                 side: BorderSide(color: Colors.white.withAlpha(50)),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, letterSpacing: 1),
                               ),
                             ),
@@ -203,7 +203,7 @@ class NoPermission extends StatelessWidget {
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFFDF184A),
                                 elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 1),
                               ),
                               child: const Text('GO TO LOGIN'),

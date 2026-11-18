@@ -159,7 +159,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+        side: BorderSide(color: appBorder),
       ),
       color: Colors.white,
       child: Padding(
@@ -182,10 +182,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
                     },
                     child: Text(
                       data.userFullname ?? data.userName ?? 'N/A',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF111827),
+                        color: appInkPrimary,
                       ),
                     ),
                   ),
@@ -221,7 +221,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
 
   Widget desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         children: [
           _topBar(),
@@ -230,7 +230,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(color: Colors.black.withAlpha(13), blurRadius: 8, offset: const Offset(0, 2)),
@@ -261,7 +261,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
             hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
             prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
             filled: true,
-            fillColor: const Color(0xFFF5F6FA),
+            fillColor: appCanvas,
             contentPadding: EdgeInsets.zero,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
           ),
@@ -291,7 +291,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                   hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                 ),
@@ -424,21 +424,21 @@ class _AdminHomepageState extends State<AdminHomepage> {
         height: 38,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: appSurface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFF0F766E).withValues(alpha: 0.3)),
+          border: Border.all(color: primary.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.swap_vert_rounded, size: 16, color: Color(0xFF0F766E)),
+            Icon(Icons.swap_vert_rounded, size: 16, color: primary),
             const SizedBox(width: 6),
             Text(
               currentLabel,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F766E)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: primary),
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.arrow_drop_down, size: 16, color: Color(0xFF0F766E)),
+            Icon(Icons.arrow_drop_down, size: 16, color: primary),
           ],
         ),
       ),
@@ -571,7 +571,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
   Widget _filterLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted),
     );
   }
 
@@ -602,7 +602,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 minWidth: 800,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,
-                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowColor: WidgetStateProperty.all(appCanvas),
                 headingRowHeight: 48,
                 dataRowHeight: 56,
                 decoration: const BoxDecoration(
@@ -657,7 +657,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                       },
                       color: WidgetStateProperty.resolveWith<Color>((states) {
                         if (states.contains(WidgetState.hovered)) {
-                          return const Color(0xFFF1F5F9);
+                          return appSurfaceSubtle;
                         }
                         return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
                       }),
@@ -674,10 +674,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
                             },
                             child: Text(
                               items[i].userFullname ?? items[i].userName ?? 'N/A',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF111827),
+                                color: appInkPrimary,
                               ),
                             ),
                           ),
@@ -685,20 +685,20 @@ class _AdminHomepageState extends State<AdminHomepage> {
                         DataCell(
                           Text(
                             items[i].userEmail ?? 'N/A',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                         ),
                         DataCell(
                           Text(
                             items[i].userPhone ?? 'N/A',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                            style: TextStyle(fontSize: 12, color: appInkSecondary),
                           ),
                         ),
                         DataCell(_statusChip(items[i].userStatus == 1)),
                         DataCell(
                           Text(
                             dateConverter(items[i].createdDate) ?? '—',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                         ),
                         DataCell(_actionsMenu(items[i])),
@@ -721,10 +721,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
       onSort: onSort,
       label: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF6B7280),
+          color: appInkMuted,
           letterSpacing: 0.3,
         ),
       ),
@@ -736,7 +736,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         isActive ? 'Active' : 'Inactive',
@@ -768,10 +768,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
         }
       },
       itemBuilder: (_) => [
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'edit',
           child: Row(children: [
-            Icon(Icons.edit_rounded, size: 16, color: Color(0xFF6B7280)),
+            Icon(Icons.edit_rounded, size: 16, color: appInkMuted),
             SizedBox(width: 10),
             Text('Edit Admin', style: TextStyle(fontSize: 13)),
           ]),
@@ -795,7 +795,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),
-        child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
+        child: Icon(Icons.more_horiz, color: appInkSecondary, size: 18),
       ),
     );
   }

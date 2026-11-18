@@ -1,50 +1,86 @@
 // fvm flutter pub run flutter_launcher_icons -f launcher_icons.yaml
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/app_theme_preset.dart';
 import 'package:klinik_aurora_portal/controllers/gestational/gestational_controller.dart';
 
+// ── Active Brand Theme (synced by DarkModeController / ThemeController) ──────
+AuroraThemePreset _activePreset = AuroraThemePreset.auroraPlum;
+bool _activeIsDark = false;
+
+/// Updates the active brand preset & brightness so legacy top-level getters
+/// ([primary], [primaryButtonColor], [primaryAccessibleText], [primaryColors])
+/// reflect live user theme customization across all screens.
+void syncActiveBrandTheme({required AuroraThemePreset preset, required bool isDark}) {
+  _activePreset = preset;
+  _activeIsDark = isDark;
+}
+
 const brandPink = Color(0xFFDF6E98);
-const primary = Color(0xFF0F766E); // Klinik Aurora Deep Teal (clinical, professional)
-const primaryButtonColor = Color(0xFF0F766E);
-const primaryColors = [
-  Color(0xFF0F766E),
-  Color(0xFF1B545E),
-];
+const defaultAuroraPlum = Color(0xFF7E2D40);
 
-const secondaryColor = Color(0XFF6ad1e3);
-const tertiaryColor = Color(0XFF07272d);
-const quaternaryColor = Color(0xFF7e2d40);
-const sidebarColor = Color(0xFF52AFBF);
+/// Active primary brand color (defaults to Klinik Aurora Plum #7E2D40;
+/// customizable in Appearance & Theme settings).
+Color get primary => _activeIsDark ? _activePreset.primaryDark : _activePreset.primaryLight;
+Color get primaryButtonColor => primary;
+List<Color> get primaryColors =>
+    _activePreset.gradientFor(_activeIsDark ? Brightness.dark : Brightness.light);
 
-// WCAG AA Compliant accessible variants for text/icons on white (>4.5:1 contrast)
-const primaryAccessibleText = Color(0xFF0F766E);
-const secondaryAccessibleText = Color(0xFF007A93);
-const neutralDark = Color(0xFF0F172A);
-const neutralMuted = Color(0xFF64748B);
-const borderSubtle = Color(0xFFE2E8F0);
-const surfaceLight = Color(0xFFF8FAFC);
+const secondaryColor = Color(0xFF6AD1E3);
+const tertiaryColor = Color(0xFF07272D);
+const quaternaryColor = Color(0xFF7E2D40);
+const sidebarColor = Color(0xFF1B545E);
 
-//TextFormField
-const textFormFieldEditableColor = Color(0XFFF8F8F8);
-const textFormFieldUneditableColor = Color(0xFFEEEEEE);
+// WCAG AA/AAA Compliant accessible variants for text/icons (>4.5:1 contrast)
+Color get primaryAccessibleText =>
+    _activeIsDark ? _activePreset.accessibleTextDark : _activePreset.accessibleTextLight;
+Color get secondaryAccessibleText =>
+    _activeIsDark ? const Color(0xFF6AD1E3) : const Color(0xFF007A93);
+
+// Live Theme-Aware Semantic Surface, Border & Ink Tokens (Light & Dark Mode)
+Color get appCanvas => _activeIsDark ? const Color(0xFF0B1217) : const Color(0xFFF6F8FA);
+Color get appSurface => _activeIsDark ? const Color(0xFF111B22) : const Color(0xFFFFFFFF);
+Color get appSurfaceSubtle => _activeIsDark ? const Color(0xFF17242D) : const Color(0xFFF1F5F9);
+Color get appSurfaceElevated => _activeIsDark ? const Color(0xFF1C2B36) : const Color(0xFFFFFFFF);
+Color get appBorder => _activeIsDark ? const Color(0xFF243644) : const Color(0xFFE2E8F0);
+Color get appBorderStrong => _activeIsDark ? const Color(0xFF334B5E) : const Color(0xFFCBD5E1);
+Color get appInkPrimary => _activeIsDark ? const Color(0xFFF1F5F9) : const Color(0xFF0F172A);
+Color get appInkSecondary => _activeIsDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155);
+Color get appInkMuted => _activeIsDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+Color get neutralDark => appInkPrimary;
+Color get neutralMuted => appInkMuted;
+Color get borderSubtle => appBorder;
+Color get surfaceLight => appCanvas;
+
+// TextFormField
+Color get textFormFieldEditableColor =>
+    _activeIsDark ? const Color(0xFF0E171E) : const Color(0xFFF8FAFC);
+Color get textFormFieldUneditableColor =>
+    _activeIsDark ? const Color(0xFF17242D) : const Color(0xFFF1F5F9);
 
 // Button
-const Color disabledColor = Color(0XFFEAEAEA);
+Color get disabledColor =>
+    _activeIsDark ? const Color(0xFF1F2D38) : const Color(0xFFEAEAEA);
 
-//Shimmer
-const shimmerBaseColor = Color(0xFFEEEDED);
-const shimmerHighlightColor = Colors.white;
+// Shimmer
+Color get shimmerBaseColor =>
+    _activeIsDark ? const Color(0xFF1A2833) : const Color(0xFFEEEDED);
+Color get shimmerHighlightColor =>
+    _activeIsDark ? const Color(0xFF263A48) : Colors.white;
 
-//Card
-const cardColor = Color(0XFFf4f5fa);
-const darkModeCardColor = Color(0xFF141d26);
-const shadow = Color(0XFFc2ddf0);
+// Card
+Color get cardColor => appSurfaceSubtle;
+const darkModeCardColor = Color(0xFF111B22);
+Color get shadow =>
+    _activeIsDark ? const Color(0x44000000) : const Color(0x180F172A);
 
 // Error
-const Color errorColor = Color(0XFFDF184A);
+Color get errorColor =>
+    _activeIsDark ? const Color(0xFFF87171) : const Color(0xFFDC2626);
 
-//Text
-const textPrimaryColor = Colors.black;
+// Text
+Color get textPrimaryColor => appInkPrimary;
 
 /// White — for text sitting on a **dark** surface, such as the sidebar.
 ///
@@ -52,9 +88,10 @@ const textPrimaryColor = Colors.black;
 /// [textMutedColor] for secondary text on light surfaces.
 Color? textSecondaryColor = Colors.white;
 
-/// Muted grey for secondary text on light surfaces (cards, dialogs, forms).
-const textMutedColor = Color(0xFF637381);
-const textTertiaryColor = Color(0XFF1C61AC);
+/// Muted grey for secondary text on surfaces (cards, dialogs, forms).
+Color get textMutedColor => appInkMuted;
+Color get textTertiaryColor =>
+    _activeIsDark ? const Color(0xFF60A5FA) : const Color(0xFF1C61AC);
 const Color contentColorBlack = Colors.black;
 const Color contentColorWhite = Colors.white;
 const Color contentColorBlue = Color(0xFF2196F3);
@@ -69,12 +106,9 @@ const Color contentColorCyan = Color(0xFF50E4FF);
 List<Color> colorOptions(String color) {
   switch (color) {
     case 'primary':
-      {
-        return [const Color(0XFF23286C), const Color(0XFF52B3E0)];
-      }
-
+      return primaryColors;
     default:
-      return [const Color(0XFF23286C), const Color(0XFF52B3E0)];
+      return [const Color(0xFF246E7A), const Color(0xFF1B545E)];
   }
 }
 
@@ -121,13 +155,13 @@ final Map<int, Color> appointmentStatusColors = {
 Color gestationalStatusColor(GestationalEligibility? eligiblity) {
   switch (eligiblity) {
     case GestationalEligibility.eligible:
-      return const Color(0xFF29A838);
+      return const Color(0xFF059669);
 
     case GestationalEligibility.tooFar:
-      return const Color(0XFFDF184A);
+      return const Color(0xFFDC2626);
 
     case GestationalEligibility.notYetEligible:
-      return const Color.fromARGB(255, 209, 165, 35);
+      return const Color(0xFFB45309);
 
     default:
       return const Color(0xFF1C4B9D);

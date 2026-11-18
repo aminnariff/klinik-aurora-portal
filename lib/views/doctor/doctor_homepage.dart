@@ -111,14 +111,14 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                   _MobileActionButton(
                     icon: Icons.tune_rounded,
                     tooltip: 'Filter',
-                    color: const Color(0xFF374151),
+                    color: appInkSecondary,
                     onTap: _showFilterPanel,
                   ),
                   const SizedBox(width: 8),
                   _MobileActionButton(
                     icon: Icons.refresh_rounded,
                     tooltip: 'Reset filters',
-                    color: const Color(0xFF6B7280),
+                    color: appInkMuted,
                     onTap: () {
                       _resetFilters();
                       filtering(enableDebounce: false, page: 1);
@@ -175,7 +175,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+        side: BorderSide(color: appBorder),
       ),
       color: Colors.white,
       child: Padding(
@@ -190,7 +190,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                 children: [
                   Text(doc.doctorName ?? 'N/A', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
                   const SizedBox(height: 2),
-                  Text(doc.doctorPhone ?? '—', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                  Text(doc.doctorPhone ?? '—', style: TextStyle(fontSize: 12, color: appInkMuted)),
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 6,
@@ -212,7 +212,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
 
   Widget _desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -241,8 +241,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             icon: const Icon(Icons.tune_rounded, size: 16),
             label: const Text('Filter', style: TextStyle(fontSize: 13)),
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF374151),
-              side: const BorderSide(color: Color(0xFFD1D5DB)),
+              foregroundColor: appInkSecondary,
+              side: BorderSide(color: appBorderStrong),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -253,7 +253,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               _resetFilters();
               filtering(enableDebounce: false, page: 1);
             },
-            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            icon: Icon(Icons.refresh_rounded, size: 18, color: appInkMuted),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F4F6),
@@ -272,7 +272,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             label: const Text('Branch Roster', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             style: OutlinedButton.styleFrom(
               foregroundColor: primary,
-              side: const BorderSide(color: primary),
+              side: BorderSide(color: primary),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -308,23 +308,23 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         if (docs.isEmpty) {
           return Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: const Center(child: NoRecordsWidget()),
           );
         }
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             children: [
               Expanded(child: _dataTable(docs)),
-              const Divider(height: 1, color: Color(0xFFE5E7EB)),
+              Divider(height: 1, color: appBorder),
               _tableFooter(),
             ],
           ),
@@ -334,18 +334,18 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   Widget _dataTable(List<Data> docs) {
-    const headerStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280));
+    final headerStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted);
     return DataTable2(
       columnSpacing: 12,
       horizontalMargin: 16,
       isHorizontalScrollBarVisible: false,
       isVerticalScrollBarVisible: true,
-      decoration: const BoxDecoration(),
-      headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+      decoration: BoxDecoration(),
+      headingRowColor: WidgetStateProperty.all(appCanvas),
       headingRowHeight: 44,
       dataRowHeight: 64,
       dividerThickness: 1,
-      columns: const [
+      columns: [
         DataColumn2(
           label: Text('Practitioners', style: headerStyle),
           size: ColumnSize.M,
@@ -395,7 +395,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                   ),
                 ),
                 // Phone
-                DataCell(Text(doc.doctorPhone ?? '—', style: const TextStyle(fontSize: 13, color: Color(0xFF374151)))),
+                DataCell(Text(doc.doctorPhone ?? '—', style: TextStyle(fontSize: 13, color: appInkSecondary))),
                 // Branch
                 DataCell(
                   Text(
@@ -410,7 +410,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                 DataCell(
                   Text(
                     dateConverter(doc.createdDate) ?? '—',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                    style: TextStyle(fontSize: 12, color: appInkMuted),
                   ),
                 ),
                 // Actions
@@ -448,7 +448,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: active ? Colors.green.withAlpha(25) : Colors.red.withAlpha(25),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         active ? 'Active' : 'Inactive',
@@ -498,7 +498,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         style: TextStyle(
           color: fg,
           fontWeight: FontWeight.w600,
-          fontSize: 10,
+          fontSize: 11,
         ),
       ),
     );
@@ -507,7 +507,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   Widget _actionMenu(Data doc) {
     return PopupMenuButton<String>(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      offset: const Offset(0, 32),
+      offset: Offset(0, 32),
       color: Colors.white,
       elevation: 4,
       tooltip: '',
@@ -516,7 +516,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         PopupMenuItem<String>(
           value: 'roster',
           child: Row(
-            children: const [
+            children: [
               Icon(Icons.calendar_month_rounded, size: 16, color: primary),
               SizedBox(width: 10),
               Text('Manage Shifts', style: TextStyle(fontSize: 13, color: primary, fontWeight: FontWeight.w600)),
@@ -526,8 +526,8 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         PopupMenuItem<String>(
           value: 'update',
           child: Row(
-            children: const [
-              Icon(Icons.edit_outlined, size: 16, color: Color(0xFF6B7280)),
+            children: [
+              Icon(Icons.edit_outlined, size: 16, color: appInkMuted),
               SizedBox(width: 10),
               Text('Update', style: TextStyle(fontSize: 13)),
             ],
@@ -555,9 +555,9 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: appBorder),
         ),
-        child: const Icon(Icons.more_horiz_rounded, size: 16, color: Color(0xFF6B7280)),
+        child: Icon(Icons.more_horiz_rounded, size: 16, color: appInkMuted),
       ),
     );
   }
@@ -570,13 +570,13 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
           Expanded(child: _pagination()),
           Row(
             children: [
-              const Text('Rows: ', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+              Text('Rows: ', style: TextStyle(fontSize: 12, color: appInkMuted)),
               _perPage(),
               const SizedBox(width: 16),
               if (!isMobile && !isTablet)
                 Text(
                   '${(_page * _pageSize) - _pageSize + 1}–${(_page * _pageSize < _totalCount) ? _page * _pageSize : _totalCount} of $_totalCount',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
             ],
           ),
@@ -617,7 +617,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                             attributeList: DropdownAttributeList(
                               [DropdownAttribute('1', 'Active'), DropdownAttribute('0', 'Inactive')],
                               labelText: 'Status',
-                              fieldColor: const Color(0xFFF9FAFB),
+                              fieldColor: appCanvas,
                               value: _selectedStatus?.name,
                               onChanged: (p0) {
                                 _selectedStatus = p0;
@@ -641,7 +641,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 DropdownAttribute('5', doctorType(5)),
                               ],
                               labelText: 'Practitioner Type',
-                              fieldColor: const Color(0xFFF9FAFB),
+                              fieldColor: appCanvas,
                               value: _selectedDoctorType?.name,
                               onChanged: (p0) {
                                 _selectedDoctorType = p0;
@@ -661,7 +661,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                               filtering(enableDebounce: false, page: 1);
                             },
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFFD1D5DB)),
+                              side: BorderSide(color: appBorderStrong),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
@@ -699,12 +699,12 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       style: const TextStyle(fontSize: 13),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
-        prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF), size: 18),
+        hintStyle: TextStyle(color: appInkMuted, fontSize: 13),
+        prefixIcon: Icon(Icons.search_rounded, color: appInkMuted, size: 18),
         suffixIcon: ctrl.text.isNotEmpty
             ? IconButton(
   tooltip: 'Kosongkan',
-                icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
+                icon: Icon(Icons.clear_rounded, size: 16, color: appInkMuted),
                 onPressed: () {
                   ctrl.clear();
                   filtering(enableDebounce: false, page: 1);
@@ -713,19 +713,19 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
               )
             : null,
         filled: true,
-        fillColor: const Color(0xFFF9FAFB),
+        fillColor: appCanvas,
         contentPadding: const EdgeInsets.symmetric(vertical: 0),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: appBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: appBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primary, width: 1.5),
+          borderSide: BorderSide(color: primary, width: 1.5),
         ),
       ),
     );

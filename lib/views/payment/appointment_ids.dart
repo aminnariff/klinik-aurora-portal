@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class AppointmentIds extends StatefulWidget {
   final PaymentSuccessResponse? response;
@@ -123,8 +124,8 @@ class _AppointmentIdsState extends State<AppointmentIds> {
         width: math.min(680, MediaQuery.of(context).size.width * 0.94),
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(color: Colors.black.withAlpha(30), blurRadius: 24, offset: const Offset(0, 10)),
           ],
@@ -161,13 +162,13 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                           style: AppTypography.displayMedium(context).copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF111827),
+                            color: appInkPrimary,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           '${widget.response?.branchName ?? 'All Branches'} • ${widget.response?.filters?.date ?? ''}',
-                          style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                          style: TextStyle(fontSize: 13, color: appInkMuted),
                         ),
                       ],
                     ),
@@ -211,7 +212,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF9CA3AF)),
+                    icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
                     tooltip: 'Close',
                   ),
                 ],
@@ -224,22 +225,22 @@ class _AppointmentIdsState extends State<AppointmentIds> {
               child: Container(
                 height: 42,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
+                  color: appCanvas,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: appBorder),
                 ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: (val) => setState(() => _searchQuery = val),
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF111827)),
+                  style: TextStyle(fontSize: 13, color: appInkPrimary),
                   decoration: InputDecoration(
                     hintText: 'Search by patient name, phone, service, or ID...',
-                    hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
-                    prefixIcon: const Icon(Icons.search_rounded, size: 18, color: Color(0xFF9CA3AF)),
+                    hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
+                    prefixIcon: Icon(Icons.search_rounded, size: 18, color: appInkMuted),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
   tooltip: 'Kosongkan',
-                            icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF9CA3AF)),
+                            icon: Icon(Icons.clear_rounded, size: 16, color: appInkMuted),
                             onPressed: () {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
@@ -277,7 +278,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                             Icon(
                               Icons.warning_amber_rounded,
                               size: 14,
-                              color: _selectedTab == 0 ? const Color(0xFFDC2626) : const Color(0xFF6B7280),
+                              color: _selectedTab == 0 ? const Color(0xFFDC2626) : appInkMuted,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -311,7 +312,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                             Icon(
                               Icons.list_alt_rounded,
                               size: 14,
-                              color: _selectedTab == 1 ? const Color(0xFF2563EB) : const Color(0xFF6B7280),
+                              color: _selectedTab == 1 ? const Color(0xFF2563EB) : appInkMuted,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -332,7 +333,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
             ],
             const SizedBox(height: 14),
 
-            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            Divider(height: 1, color: appBorder),
 
             // Content List
             Flexible(
@@ -373,14 +374,14 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                               ListTile(
                                 onTap: () => _openAppointmentDetails(id),
                                 title: Text(id, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0xFF9CA3AF)),
+                                trailing: Icon(Icons.chevron_right_rounded, size: 18, color: appInkMuted),
                               ),
                             );
                           },
                         ),
             ),
 
-            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            Divider(height: 1, color: appBorder),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: Row(
@@ -409,18 +410,18 @@ class _AppointmentIdsState extends State<AppointmentIds> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 6, offset: const Offset(0, 2)),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           onTap: () => _openAppointmentDetails(item.appointmentId),
           child: Padding(
             padding: const EdgeInsets.all(14),
@@ -436,15 +437,15 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                         children: [
                           Text(
                             item.patientName ?? 'N/A',
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: appInkPrimary),
                           ),
                           const SizedBox(height: 2),
                           if (hasPhone)
                             Row(
                               children: [
-                                const Icon(Icons.phone_outlined, size: 12, color: Color(0xFF6B7280)),
+                                Icon(Icons.phone_outlined, size: 12, color: appInkMuted),
                                 const SizedBox(width: 4),
-                                Text(item.patientPhone!, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                                Text(item.patientPhone!, style: TextStyle(fontSize: 12, color: appInkMuted)),
                               ],
                             ),
                         ],
@@ -471,16 +472,16 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                     Expanded(
                       child: Text(
                         item.serviceName ?? 'Service',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (notNullOrEmptyString(item.appointmentDatetime)) ...[
-                      const Icon(Icons.event_outlined, size: 13, color: Color(0xFF6B7280)),
+                      Icon(Icons.event_outlined, size: 13, color: appInkMuted),
                       const SizedBox(width: 4),
                       Text(
                         item.appointmentDatetime!,
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
+                        style: TextStyle(fontSize: 11, color: appInkMuted),
                       ),
                     ],
                   ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 /// An executive, 2-column modal dialog for creating and updating
 /// checklist template items with clinical guidelines from Dr. Aurora.
@@ -168,21 +169,21 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
   }) {
     return InputDecoration(
       labelText: labelText,
-      labelStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+      labelStyle: TextStyle(fontSize: 12.5, color: appInkMuted, fontWeight: FontWeight.w500),
       floatingLabelStyle: const TextStyle(fontSize: 12, color: Color(0xFF0284C7), fontWeight: FontWeight.w600),
       hintText: hintText,
-      hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.normal),
+      hintStyle: TextStyle(fontSize: 12.5, color: appInkMuted, fontWeight: FontWeight.normal),
       prefixIcon: prefixIcon,
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
+      fillColor: appSurfaceSubtle,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderSide: BorderSide(color: appBorder),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderSide: BorderSide(color: appBorder),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -232,15 +233,15 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
     final baseTheme = Theme.of(context);
     final dialogTheme = baseTheme.copyWith(
       textTheme: baseTheme.textTheme.copyWith(
-        bodyLarge: const TextStyle(
+        bodyLarge: TextStyle(
           fontSize: 13.5,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF1E293B),
+          color: appInkPrimary,
         ),
-        bodyMedium: const TextStyle(
+        bodyMedium: TextStyle(
           fontSize: 13.0,
           fontWeight: FontWeight.normal,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
       ),
     );
@@ -250,14 +251,14 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
       child: Theme(
         data: dialogTheme,
         child: Dialog(
-          backgroundColor: Colors.white,
+          backgroundColor: appSurface,
           surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 720),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(8),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -294,7 +295,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                       ),
                     ),
                   ),
-                  const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+                  Divider(height: 1, thickness: 1, color: appSurfaceSubtle),
                   _buildFooterActions(isEdit),
                 ],
               ),
@@ -307,13 +308,13 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
 
   Widget _buildHeader(bool isEdit) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFFFFF1F5), Color(0xFFFFFFFF)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       padding: const EdgeInsets.fromLTRB(24, 18, 16, 16),
       child: Row(
@@ -321,9 +322,9 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           Container(
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: appSurfaceSubtle,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: appBorder),
             ),
             child: Text(
               _getCategoryEmoji(_categoryKey),
@@ -338,26 +339,26 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
               children: [
                 Text(
                   isEdit ? 'Kemaskini Item Templat' : 'Tambah Item Templat',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: appInkPrimary,
                     letterSpacing: -0.3,
                   ),
                 ),
                 const SizedBox(height: 3),
-                const Text(
+                Text(
                   'Tetapkan spesifikasi barangan dan panduan Dr. Aurora',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF64748B),
+                    color: appInkMuted,
                   ),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B), size: 22),
+            icon: Icon(Icons.close_rounded, color: appInkMuted, size: 22),
             splashRadius: 20,
             tooltip: 'Tutup',
             onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
@@ -372,21 +373,21 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           'Maklumat Item & Kategori',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1E293B),
+            color: appInkPrimary,
           ),
         ),
         const SizedBox(height: 12),
         TextFormField(
           controller: _titleCtrl,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF1E293B),
+            color: appInkPrimary,
           ),
           validator: (v) {
             if (v == null || v.trim().isEmpty) {
@@ -404,10 +405,10 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
         DropdownButtonFormField<String>(
           initialValue: _categoryKey,
           isExpanded: true,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF1E293B),
+            color: appInkPrimary,
           ),
           decoration: _inputDecoration(
             labelText: 'Kategori',
@@ -428,24 +429,24 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _qtyCtrl,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF1E293B),
+            color: appInkPrimary,
           ),
           decoration: _inputDecoration(
             labelText: 'Cadangan Kuantiti',
             hintText: 'cth: 3-4 pasang',
-            prefixIcon: const Icon(Icons.format_list_numbered_rounded, color: Color(0xFF64748B), size: 20),
+            prefixIcon: Icon(Icons.format_list_numbered_rounded, color: appInkMuted, size: 20),
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Status & Keutamaan',
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF334155),
+            color: appInkSecondary,
           ),
         ),
         const SizedBox(height: 8),
@@ -501,7 +502,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           color: isActive ? activeBgColor : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? activeColor : const Color(0xFFE2E8F0),
+            color: isActive ? activeColor : appBorder,
             width: isActive ? 1.5 : 1,
           ),
           boxShadow: isActive
@@ -523,7 +524,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                 Icon(
                   isActive ? activeIcon : inactiveIcon,
                   size: 18,
-                  color: isActive ? activeColor : const Color(0xFF94A3B8),
+                  color: isActive ? activeColor : appInkMuted,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
@@ -532,7 +533,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.bold,
-                      color: isActive ? activeColor : const Color(0xFF334155),
+                      color: isActive ? activeColor : appInkSecondary,
                     ),
                   ),
                 ),
@@ -543,7 +544,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
               subtitle,
               style: TextStyle(
                 fontSize: 10.5,
-                color: isActive ? const Color(0xFF475569) : const Color(0xFF64748B),
+                color: isActive ? appInkSecondary : appInkMuted,
                 height: 1.25,
               ),
               maxLines: 2,
@@ -559,7 +560,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFFFF9FB),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFFFE4E6), width: 1.2),
       ),
       padding: const EdgeInsets.all(14),
@@ -589,7 +590,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                 child: const Text(
                   'Klinikal',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF0369A1),
                   ),
@@ -601,10 +602,10 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           TextFormField(
             controller: _specsCtrl,
             maxLines: 2,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.normal,
-              color: Color(0xFF334155),
+              color: appInkSecondary,
               height: 1.35,
             ),
             decoration: _inputDecoration(
@@ -616,10 +617,10 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           TextFormField(
             controller: _safetyCtrl,
             maxLines: 2,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.normal,
-              color: Color(0xFF334155),
+              color: appInkSecondary,
               height: 1.35,
             ),
             decoration: _inputDecoration(
@@ -631,10 +632,10 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           TextFormField(
             controller: _tipCtrl,
             maxLines: 2,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.normal,
-              color: Color(0xFF334155),
+              color: appInkSecondary,
               height: 1.35,
             ),
             decoration: _inputDecoration(
@@ -656,7 +657,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           TextButton(
             onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
             style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF64748B),
+              foregroundColor: appInkMuted,
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -668,8 +669,8 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
           const SizedBox(width: 10),
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF0F172A), Color(0xFF334155)],
+              gradient: LinearGradient(
+                colors: [appInkPrimary, appInkSecondary],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

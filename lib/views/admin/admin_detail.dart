@@ -178,8 +178,8 @@ class _AdminDetailState extends State<AdminDetail> {
         ),
         margin: EdgeInsets.all(isMobile ? 8 : 16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.14),
@@ -189,7 +189,7 @@ class _AdminDetailState extends State<AdminDetail> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           child: Material(
             color: Colors.white,
             child: Column(
@@ -220,9 +220,9 @@ class _AdminDetailState extends State<AdminDetail> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -259,10 +259,10 @@ class _AdminDetailState extends State<AdminDetail> {
                     Flexible(
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
+                          color: appInkPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -274,13 +274,13 @@ class _AdminDetailState extends State<AdminDetail> {
                         valueListenable: _userStatus,
                         builder: (context, active, _) {
                           return InkWell(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(8),
                             onTap: () => _userStatus.value = !_userStatus.value,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                               decoration: BoxDecoration(
                                 color: active ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: active ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
                                 ),
@@ -319,13 +319,13 @@ class _AdminDetailState extends State<AdminDetail> {
                   isCreate
                       ? "Create credentials, set branch assignment, and assign permission roles"
                       : "Manage admin permissions, contact info, and system role",
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             tooltip: "Close",
             onPressed: () => context.pop(),
           ),
@@ -379,9 +379,9 @@ class _AdminDetailState extends State<AdminDetail> {
                         ),
                         if (!isCreate) ...[
                           const SizedBox(height: 4),
-                          const Text(
+                          Text(
                             "Username is fixed and cannot be changed.",
-                            style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                            style: TextStyle(fontSize: 11, color: appInkMuted),
                           ),
                         ],
                         if (isCreate) ...[
@@ -420,9 +420,9 @@ class _AdminDetailState extends State<AdminDetail> {
                         ),
                         if (!isCreate && !isSuperAdmin) ...[
                           const SizedBox(height: 4),
-                          const Text(
+                          Text(
                             "Only Super Admin can edit email address.",
-                            style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                            style: TextStyle(fontSize: 11, color: appInkMuted),
                           ),
                         ],
                         const SizedBox(height: 14),
@@ -536,18 +536,18 @@ class _AdminDetailState extends State<AdminDetail> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: appSurfaceSubtle,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: appBorder),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.info_outline_rounded, size: 15, color: Color(0xFF64748B)),
+              Icon(Icons.info_outline_rounded, size: 15, color: appInkMuted),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
                   "Assigning a branch restricts this admin to that branch data. Leave empty for headquarters or global management.",
-                  style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 11, color: appInkMuted),
                 ),
               ),
             ],
@@ -576,9 +576,9 @@ class _AdminDetailState extends State<AdminDetail> {
           ],
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           "Choose a role preset to quickly assign recommended permissions, or select individual permissions below:",
-          style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+          style: TextStyle(fontSize: 12, color: appInkMuted),
         ),
         const SizedBox(height: 12),
         _buildRolePresets(allPermissions),
@@ -601,14 +601,14 @@ class _AdminDetailState extends State<AdminDetail> {
           ),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 15, color: const Color(0xFF475569)),
+        Icon(icon, size: 15, color: appInkSecondary),
         const SizedBox(width: 6),
         Text(
           title.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.8,
           ),
         ),
@@ -647,35 +647,35 @@ class _AdminDetailState extends State<AdminDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           "Branch Assignment",
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
         ),
         const SizedBox(height: 5),
         Container(
           height: 42,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFCBD5E1)),
+            border: Border.all(color: appBorderStrong),
           ),
           alignment: Alignment.centerLeft,
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String?>(
               isExpanded: true,
               value: _selectedBranch?.key,
-              hint: const Text(
+              hint: Text(
                 "All Branches (Headquarters / Global)",
-                style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                style: TextStyle(fontSize: 13, color: appInkMuted),
               ),
-              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: Color(0xFF64748B)),
+              icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: appInkMuted),
               items: [
-                const DropdownMenuItem<String?>(
+                DropdownMenuItem<String?>(
                   value: null,
                   child: Text(
                     "All Branches (Headquarters / Global)",
-                    style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
+                    style: TextStyle(fontSize: 13, color: appInkSecondary),
                   ),
                 ),
                 ...branches.map(
@@ -683,7 +683,7 @@ class _AdminDetailState extends State<AdminDetail> {
                     value: b.key,
                     child: Text(
                       b.name,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, color: appInkPrimary),
                     ),
                   ),
                 ),
@@ -721,7 +721,7 @@ class _AdminDetailState extends State<AdminDetail> {
         title: "Clinic Staff",
         subtitle: "Appointments, patients & billing",
         icon: Icons.badge_outlined,
-        color: const Color(0xFF0F766E),
+        color: primary,
         permissionIds: const [
           permAppointment,
           permUserManagement,
@@ -796,7 +796,7 @@ class _AdminDetailState extends State<AdminDetail> {
                   color: isSelected ? preset.color.withValues(alpha: 0.08) : Colors.white,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isSelected ? preset.color : const Color(0xFFE2E8F0),
+                    color: isSelected ? preset.color : appBorder,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -831,7 +831,7 @@ class _AdminDetailState extends State<AdminDetail> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: isSelected ? preset.color : const Color(0xFF0F172A),
+                        color: isSelected ? preset.color : appInkPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -841,7 +841,7 @@ class _AdminDetailState extends State<AdminDetail> {
                       preset.subtitle,
                       style: TextStyle(
                         fontSize: 11,
-                        color: isSelected ? preset.color.withValues(alpha: 0.9) : const Color(0xFF64748B),
+                        color: isSelected ? preset.color.withValues(alpha: 0.9) : appInkMuted,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -864,9 +864,9 @@ class _AdminDetailState extends State<AdminDetail> {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -876,7 +876,7 @@ class _AdminDetailState extends State<AdminDetail> {
             children: [
               Text(
                 "All Permissions",
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appInkPrimary),
               ),
               const SizedBox(width: 8),
               Container(
@@ -919,7 +919,7 @@ class _AdminDetailState extends State<AdminDetail> {
                     selectedPermission.clear();
                   });
                 },
-                child: const Text("Clear", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                child: Text("Clear", style: TextStyle(fontSize: 11, color: appInkMuted)),
               ),
             ],
           ),
@@ -929,9 +929,9 @@ class _AdminDetailState extends State<AdminDetail> {
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFCBD5E1)),
+              border: Border.all(color: appBorderStrong),
             ),
             child: TextField(
               controller: _permissionSearch,
@@ -941,8 +941,8 @@ class _AdminDetailState extends State<AdminDetail> {
                 contentPadding: EdgeInsets.zero,
                 border: InputBorder.none,
                 hintText: "Search permissions...",
-                hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-                prefixIcon: const Icon(Icons.search_rounded, size: 16, color: Color(0xFF94A3B8)),
+                hintStyle: TextStyle(fontSize: 12, color: appInkMuted),
+                prefixIcon: Icon(Icons.search_rounded, size: 16, color: appInkMuted),
                 prefixIconConstraints: const BoxConstraints(minWidth: 26, maxHeight: 16),
                 suffixIcon: _permissionSearch.text.isNotEmpty
                     ? InkWell(
@@ -950,7 +950,7 @@ class _AdminDetailState extends State<AdminDetail> {
                           _permissionSearch.clear();
                           setState(() {});
                         },
-                        child: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
+                        child: Icon(Icons.clear_rounded, size: 16, color: appInkMuted),
                       )
                     : null,
                 suffixIconConstraints: const BoxConstraints(minWidth: 26, maxHeight: 16),
@@ -965,7 +965,7 @@ class _AdminDetailState extends State<AdminDetail> {
               alignment: Alignment.center,
               child: Text(
                 query.isEmpty ? "No permissions configured." : "No permissions match \"$query\".",
-                style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8), fontStyle: FontStyle.italic),
+                style: TextStyle(fontSize: 12, color: appInkMuted, fontStyle: FontStyle.italic),
               ),
             )
           else
@@ -1015,10 +1015,10 @@ class _AdminDetailState extends State<AdminDetail> {
             children: [
               Text(
                 groupTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF64748B),
+                  color: appInkMuted,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -1047,7 +1047,7 @@ class _AdminDetailState extends State<AdminDetail> {
                         color: isChecked ? const Color(0xFFEEF2FF) : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: isChecked ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
+                          color: isChecked ? const Color(0xFF6366F1) : appBorder,
                         ),
                       ),
                       child: Row(
@@ -1056,7 +1056,7 @@ class _AdminDetailState extends State<AdminDetail> {
                           Icon(
                             isChecked ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
                             size: 16,
-                            color: isChecked ? const Color(0xFF4F46E5) : const Color(0xFF94A3B8),
+                            color: isChecked ? const Color(0xFF4F46E5) : appInkMuted,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -1064,7 +1064,7 @@ class _AdminDetailState extends State<AdminDetail> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: isChecked ? FontWeight.w600 : FontWeight.w400,
-                              color: isChecked ? const Color(0xFF312E81) : const Color(0xFF1E293B),
+                              color: isChecked ? const Color(0xFF312E81) : appInkPrimary,
                             ),
                           ),
                           if (isInactive) ...[
@@ -1077,7 +1077,7 @@ class _AdminDetailState extends State<AdminDetail> {
                               ),
                               child: const Text(
                                 "Inactive",
-                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: Color(0xFFDC2626)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFDC2626)),
                               ),
                             ),
                           ],
@@ -1117,7 +1117,7 @@ class _AdminDetailState extends State<AdminDetail> {
       builder: (dialogCtx) => StatefulBuilder(
         builder: (ctx, setDialogState) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             title: Row(
               children: [
                 Container(
@@ -1145,9 +1145,9 @@ class _AdminDetailState extends State<AdminDetail> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Permission Name *",
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
                   ),
                   const SizedBox(height: 6),
                   Container(
@@ -1155,21 +1155,21 @@ class _AdminDetailState extends State<AdminDetail> {
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: appSurface,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: dialogError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                        color: dialogError != null ? const Color(0xFFEF4444) : appBorderStrong,
                       ),
                     ),
                     child: TextField(
                       controller: nameCtrl,
                       style: const TextStyle(fontSize: 13),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
                         hintText: "e.g. Lab Management or Sonographer",
-                        hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                        hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
                       ),
                     ),
                   ),
@@ -1184,9 +1184,9 @@ class _AdminDetailState extends State<AdminDetail> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Text(
+                        Text(
                           "Status:",
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
                         ),
                         const SizedBox(width: 12),
                         ChoiceChip(
@@ -1211,7 +1211,7 @@ class _AdminDetailState extends State<AdminDetail> {
             actions: [
               TextButton(
                 onPressed: dialogSaving ? null : () => Navigator.of(dialogCtx).pop(),
-                child: const Text("Cancel", style: TextStyle(color: Color(0xFF64748B))),
+                child: Text("Cancel", style: TextStyle(color: appInkMuted)),
               ),
               FilledButton(
                 style: FilledButton.styleFrom(
@@ -1286,9 +1286,9 @@ class _AdminDetailState extends State<AdminDetail> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,

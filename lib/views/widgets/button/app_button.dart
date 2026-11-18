@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 
 enum AppButtonVariant { primary, secondary, destructive }
@@ -7,12 +7,12 @@ enum AppButtonVariant { primary, secondary, destructive }
 /// Standardized action button for Klinik Aurora Portal.
 ///
 /// Variants:
-/// - [AppButton.primary]: Deep Teal (#0F766E) filled, white text
-/// - [AppButton.secondary]: White background, Slate-300 (#CBD5E1) border, Slate-600 text
-/// - [AppButton.destructive]: Red (#DC2626) filled, white text
+/// - [AppButton.primary]: Active brand primary (default Aurora Plum #7E2D40) filled, white text
+/// - [AppButton.secondary]: Surface background, subtle border, secondary ink text
+/// - [AppButton.destructive]: Red filled, white text
 ///
 /// All buttons enforce 8px corner radius, Emil scale(0.97) micro-interactions,
-/// and integrated loading state.
+/// light/dark theme adaptation, and integrated loading state.
 class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -71,6 +71,7 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = onPressed != null && !isLoading;
+    final colors = context.appColors;
 
     Color bg;
     Color fg;
@@ -78,14 +79,14 @@ class AppButton extends StatelessWidget {
 
     switch (variant) {
       case AppButtonVariant.primary:
-        bg = primary;
-        fg = Colors.white;
+        bg = colors.brandPrimary;
+        fg = colors.brandOnPrimary;
         border = null;
         break;
       case AppButtonVariant.secondary:
-        bg = Colors.white;
-        fg = const Color(0xFF475569);
-        border = const BorderSide(color: Color(0xFFCBD5E1), width: 1.0);
+        bg = colors.surface;
+        fg = colors.inkSecondary;
+        border = BorderSide(color: colors.borderStrong, width: 1.0);
         break;
       case AppButtonVariant.destructive:
         bg = const Color(0xFFDC2626);

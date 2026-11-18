@@ -58,13 +58,16 @@ class _EmilPressableState extends State<EmilPressable> {
 
   @override
   Widget build(BuildContext context) {
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
     return Listener(
       onPointerDown: (_) => _setPressed(true),
       onPointerUp: (_) => _setPressed(false),
       onPointerCancel: (_) => _setPressed(false),
       child: AnimatedScale(
-        scale: _isPressed ? 0.97 : 1.0,
-        duration: _isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration,
+        scale: (!reducedMotion && _isPressed) ? 0.97 : 1.0,
+        duration: reducedMotion
+            ? Duration.zero
+            : (_isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration),
         curve: EmilMotion.easeOut,
         child: widget.child,
       ),
@@ -74,6 +77,7 @@ class _EmilPressableState extends State<EmilPressable> {
 
 /// Dialog card entrance animation: scales smoothly from 0.95 to 1.0 with fade.
 /// Never animates from scale(0) to avoid jarring pop-in.
+/// Honors [MediaQuery.disableAnimationsOf] for reduced-motion accessibility.
 class EmilModalTransition extends StatelessWidget {
   final Widget child;
 
@@ -81,6 +85,9 @@ class EmilModalTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return child;
+    }
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
       duration: EmilMotion.modalDuration,

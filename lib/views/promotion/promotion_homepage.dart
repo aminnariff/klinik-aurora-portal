@@ -80,7 +80,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
 
   Widget _buildBody() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -188,23 +188,29 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
 
         return Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: GestureDetector(
-            onTap: () {
-              setState(() => _statusFilter = e.key);
-              filtering(enableDebounce: false, page: 1);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: selected ? chipColor : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: selected ? chipColor : const Color(0xFFE5E7EB)),
-              ),
-              child: Text(
-                e.value,
-                style: AppTypography.bodyMedium(
-                  context,
-                ).apply(color: selected ? Colors.white : const Color(0xFF6B7280), fontWeightDelta: selected ? 1 : 0),
+          child: Semantics(
+            button: true,
+            selected: selected,
+            label: 'Filter promotions: ${e.value}',
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                setState(() => _statusFilter = e.key);
+                filtering(enableDebounce: false, page: 1);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: selected ? chipColor : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: selected ? chipColor : appBorder),
+                ),
+                child: Text(
+                  e.value,
+                  style: AppTypography.bodyMedium(
+                    context,
+                  ).apply(color: selected ? Colors.white : appInkMuted, fontWeightDelta: selected ? 1 : 0),
+                ),
               ),
             ),
           ),
@@ -238,19 +244,19 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
             width: 72,
             height: 72,
             decoration: BoxDecoration(color: primary.withAlpha(25), shape: BoxShape.circle),
-            child: const Icon(Icons.local_offer_outlined, size: 36, color: primary),
+            child: Icon(Icons.local_offer_outlined, size: 36, color: primary),
           ),
           const SizedBox(height: 16),
           Text(
             'No promotions found',
-            style: AppTypography.displayMedium(context).apply(color: const Color(0xFF374151)),
+            style: AppTypography.displayMedium(context).apply(color: appInkSecondary),
           ),
           const SizedBox(height: 6),
           Text(
             _searchController.text.isNotEmpty || _statusFilter != null
                 ? 'Try adjusting your filters'
                 : 'Create your first promotion to get started',
-            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
+            style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
           ),
           const SizedBox(height: 24),
           if (_searchController.text.isNotEmpty || _statusFilter != null)
@@ -264,7 +270,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
               label: const Text('Clear filters'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: primary,
-                side: const BorderSide(color: primary),
+                side: BorderSide(color: primary),
               ),
             ),
         ],
@@ -294,7 +300,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (!isMobile)
-                    Text('Rows: ', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+                    Text('Rows: ', style: AppTypography.bodyMedium(context).apply(color: appInkMuted)),
                   PerPageWidget(
                     _pageSize.toString(),
                     DropdownAttributeList(
@@ -309,7 +315,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                     const SizedBox(width: 12),
                     Text(
                       '${((_page) * _pageSize) - _pageSize + 1}–${(_page * _pageSize < _totalCount) ? _page * _pageSize : _totalCount} of $_totalCount',
-                      style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280)),
+                      style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                     ),
                   ],
                 ],
@@ -469,8 +475,8 @@ class _PromotionCardState extends State<_PromotionCard> {
           transform: Matrix4.identity()..scaleByDouble(_hovered ? 1.025 : 1.0, _hovered ? 1.025 : 1.0, 1.0, 1.0),
           transformAlignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: appSurface,
+            borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withAlpha(_hovered ? 30 : 12),
@@ -480,7 +486,7 @@ class _PromotionCardState extends State<_PromotionCard> {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -536,7 +542,7 @@ class _PromotionCardState extends State<_PromotionCard> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: _isActive ? const Color(0xFF059669) : const Color(0xFFEF4444),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               _isActive ? 'Active' : 'Inactive',
@@ -552,7 +558,7 @@ class _PromotionCardState extends State<_PromotionCard> {
             right: 10,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(color: Colors.black.withAlpha(140), borderRadius: BorderRadius.circular(20)),
+              decoration: BoxDecoration(color: Colors.black.withAlpha(140), borderRadius: BorderRadius.circular(8)),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -575,8 +581,8 @@ class _PromotionCardState extends State<_PromotionCard> {
       color: const Color(0xFFF3F4F6),
       child: Center(
         child: loading
-            ? const CircularProgressIndicator(color: primary, strokeWidth: 2)
-            : const Icon(Icons.local_offer_outlined, size: 40, color: Color(0xFFD1D5DB)),
+            ? CircularProgressIndicator(color: primary, strokeWidth: 2)
+            : Icon(Icons.local_offer_outlined, size: 40, color: appBorderStrong),
       ),
     );
   }
@@ -599,12 +605,12 @@ class _PromotionCardState extends State<_PromotionCard> {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.calendar_today_rounded, size: 11, color: Color(0xFF9CA3AF)),
+              Icon(Icons.calendar_today_rounded, size: 11, color: appInkMuted),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   startDate != null && endDate != null ? '$startDate – $endDate' : endDate ?? '—',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
+                  style: TextStyle(fontSize: 11, color: appInkMuted),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -648,7 +654,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(
         horizontal: isMobile ? 16 : 32,
         vertical: isMobile ? 20 : 32,
@@ -663,14 +669,14 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildDialogHeader(context),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(isMobile ? 16 : 24),
                 child: isMobile ? _buildMobileForm(context) : _buildDesktopForm(context),
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             _buildDialogFooter(context),
           ],
         ),
@@ -690,7 +696,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
               color: primary.withAlpha(25),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.campaign_rounded, color: primary, size: 20),
+            child: Icon(Icons.campaign_rounded, color: primary, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -700,19 +706,19 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appInkPrimary),
                 ),
                 const SizedBox(height: 2),
-                const Text(
+                Text(
                   'Configure promotion title, banner images, and schedule',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ),
           ),
           IconButton(
   tooltip: 'Tutup',
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             onPressed: () => context.pop(),
             splashRadius: 20,
           ),
@@ -836,10 +842,10 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: value ? const Color(0xFFFFFBEB) : const Color(0xFFF8FAFC),
+                color: value ? const Color(0xFFFFFBEB) : appSurfaceSubtle,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: value ? const Color(0xFFFDE68A) : const Color(0xFFE2E8F0),
+                  color: value ? const Color(0xFFFDE68A) : appBorder,
                 ),
               ),
               child: Row(
@@ -847,7 +853,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
                   Icon(
                     Icons.star_rounded,
                     size: 20,
-                    color: value ? const Color(0xFFD97706) : const Color(0xFF94A3B8),
+                    color: value ? const Color(0xFFD97706) : appInkMuted,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -859,14 +865,14 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: value ? const Color(0xFFB45309) : const Color(0xFF334155),
+                            color: value ? const Color(0xFFB45309) : appInkSecondary,
                           ),
                         ),
                         Text(
                           'Shows full-screen popup banner when mobile app opens',
                           style: TextStyle(
                             fontSize: 11,
-                            color: value ? const Color(0xFF92400E) : const Color(0xFF64748B),
+                            color: value ? const Color(0xFF92400E) : appInkMuted,
                           ),
                         ),
                       ],
@@ -907,7 +913,7 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
             currentDate: initial ?? DateTime.now(),
           ),
           dialogSize: const Size(360, 360),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
         );
         if (results != null && results.isNotEmpty && results.first != null) {
           setState(() {
@@ -920,13 +926,13 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
         height: 42,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: appSurfaceSubtle,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFCBD5E1)),
+          border: Border.all(color: appBorderStrong),
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF64748B)),
+            Icon(Icons.calendar_today_rounded, size: 16, color: appInkMuted),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -934,14 +940,14 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: controller.text.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                  color: controller.text.isNotEmpty ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                  color: controller.text.isNotEmpty ? appInkPrimary : appInkMuted,
                 ),
               ),
             ),
             if (controller.text.isNotEmpty)
               IconButton(
   tooltip: 'Kosongkan',
-                icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
+                icon: Icon(Icons.clear_rounded, size: 16, color: appInkMuted),
                 splashRadius: 14,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -963,14 +969,14 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
           decoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 14, color: const Color(0xFF64748B)),
+        Icon(icon, size: 14, color: appInkMuted),
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.8,
           ),
         ),
@@ -982,10 +988,10 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
     return RichText(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
         children: isRequired
             ? [

@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/models/dashboard/service_performance_respon
 import 'package:klinik_aurora_portal/views/homepage/widgets/dashboard_metric_card.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:provider/provider.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class SuperadminDashboardView extends StatelessWidget {
   const SuperadminDashboardView({super.key});
@@ -223,9 +224,9 @@ class SuperadminDashboardView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -237,7 +238,7 @@ class SuperadminDashboardView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -245,13 +246,13 @@ class SuperadminDashboardView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF0F172A),
+                  color: appInkPrimary,
                 ),
               ),
               SizedBox(height: 2),
               Text(
                 'Gross revenue progression across all operational clinics',
-                style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 11, color: appInkMuted),
               ),
             ],
           ),
@@ -259,8 +260,8 @@ class SuperadminDashboardView extends StatelessWidget {
           SizedBox(
             height: isMobile ? 150 : 170,
             child: revenueList.isEmpty
-                ? const Center(
-                    child: Text('No revenue history available', style: TextStyle(color: Color(0xFF94A3B8))),
+                ? Center(
+                    child: Text('No revenue history available', style: TextStyle(color: appInkMuted)),
                   )
                 : LineChart(
                     LineChartData(
@@ -270,7 +271,7 @@ class SuperadminDashboardView extends StatelessWidget {
                       maxY: maxY * 1.25,
                       lineTouchData: LineTouchData(
                         touchTooltipData: LineTouchTooltipData(
-                          getTooltipColor: (_) => const Color(0xFF0F172A),
+                          getTooltipColor: (_) => appInkPrimary,
                           getTooltipItems: (touchedSpots) {
                             return touchedSpots.map((spot) {
                               final idx = spot.x.toInt();
@@ -291,7 +292,7 @@ class SuperadminDashboardView extends StatelessWidget {
                         show: true,
                         drawVerticalLine: false,
                         horizontalInterval: math.max(100, (maxY / 4).roundToDouble()),
-                        getDrawingHorizontalLine: (value) => const FlLine(color: Color(0xFFF1F5F9), strokeWidth: 1),
+                        getDrawingHorizontalLine: (value) => FlLine(color: appSurfaceSubtle, strokeWidth: 1),
                       ),
                       borderData: FlBorderData(show: false),
                       titlesData: FlTitlesData(
@@ -305,7 +306,7 @@ class SuperadminDashboardView extends StatelessWidget {
                               if (value == meta.max || value == 0) return const SizedBox();
                               return Text(
                                 currencyFormatter.format(value),
-                                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w600),
+                                style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w600),
                               );
                             },
                           ),
@@ -325,7 +326,7 @@ class SuperadminDashboardView extends StatelessWidget {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   mName,
-                                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.w700),
+                                  style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w700),
                                 ),
                               );
                             },
@@ -393,9 +394,9 @@ class SuperadminDashboardView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -407,7 +408,7 @@ class SuperadminDashboardView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
@@ -419,23 +420,23 @@ class SuperadminDashboardView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                     ),
                   ),
                 ],
               ),
               Text(
                 'Last 3 Months',
-                style: TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w600),
               ),
             ],
           ),
           const SizedBox(height: 14),
 
           if (sortedBranches.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: Text('No branch performance data', style: TextStyle(color: Color(0xFF94A3B8)))),
+              child: Center(child: Text('No branch performance data', style: TextStyle(color: appInkMuted))),
             )
           else
             ListView.separated(
@@ -455,7 +456,7 @@ class SuperadminDashboardView extends StatelessWidget {
                         ? const Color(0xFF2563EB) // Blue (2nd)
                         : rank == 3
                             ? const Color(0xFFD97706) // Amber (3rd)
-                            : const Color(0xFF64748B);
+                            : appInkMuted;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,13 +482,13 @@ class SuperadminDashboardView extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               item.key,
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: appInkPrimary),
                             ),
                           ],
                         ),
                         Text(
                           '$count appointments',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkSecondary),
                         ),
                       ],
                     ),
@@ -497,7 +498,7 @@ class SuperadminDashboardView extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: pct,
                         minHeight: 6,
-                        backgroundColor: const Color(0xFFF1F5F9),
+                        backgroundColor: appSurfaceSubtle,
                         valueColor: AlwaysStoppedAnimation<Color>(rankColor),
                       ),
                     ),
@@ -520,9 +521,9 @@ class SuperadminDashboardView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -534,7 +535,7 @@ class SuperadminDashboardView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -542,21 +543,21 @@ class SuperadminDashboardView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF0F172A),
+                  color: appInkPrimary,
                 ),
               ),
               Text(
                 'Last 30 Days',
-                style: TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w600),
               ),
             ],
           ),
           const SizedBox(height: 14),
 
           if (topList.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: Text('No service performance data', style: TextStyle(color: Color(0xFF94A3B8)))),
+              child: Center(child: Text('No service performance data', style: TextStyle(color: appInkMuted))),
             )
           else
             ListView.separated(
@@ -579,7 +580,7 @@ class SuperadminDashboardView extends StatelessWidget {
                         Expanded(
                           child: Text(
                             s.serviceName ?? 'Service',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: appInkPrimary),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -595,7 +596,7 @@ class SuperadminDashboardView extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: pct,
                         minHeight: 6,
-                        backgroundColor: const Color(0xFFF1F5F9),
+                        backgroundColor: appSurfaceSubtle,
                         valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
                       ),
                     ),

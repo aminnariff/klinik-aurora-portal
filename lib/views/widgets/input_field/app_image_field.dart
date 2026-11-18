@@ -61,7 +61,7 @@ class _AppImageFieldState extends State<AppImageField> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: const Row(
             children: [
               Icon(Icons.warning_amber_rounded, color: Color(0xFFD97706), size: 22),
@@ -76,7 +76,7 @@ class _AppImageFieldState extends State<AppImageField> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+              child: Text('Cancel', style: TextStyle(color: appInkMuted)),
             ),
             FilledButton(
               style: FilledButton.styleFrom(
@@ -138,7 +138,7 @@ class _AppImageFieldState extends State<AppImageField> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Row(
           children: [
             Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 22),
@@ -153,7 +153,7 @@ class _AppImageFieldState extends State<AppImageField> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+            child: Text('Cancel', style: TextStyle(color: appInkMuted)),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -220,7 +220,7 @@ class _AppImageFieldState extends State<AppImageField> {
                               decoration: BoxDecoration(
                                 color: primary.withAlpha(20),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFE5E7EB)),
+                                border: Border.all(color: appBorder),
                               ),
                               child: Icon(
                                 hasValue ? Icons.autorenew_rounded : Icons.upload_rounded,
@@ -243,7 +243,7 @@ class _AppImageFieldState extends State<AppImageField> {
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFEE2E2),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                                  border: Border.all(color: appBorder),
                                 ),
                                 child: const Icon(Icons.delete_outline_rounded, size: 20, color: Color(0xFFD32F2F)),
                               ),
@@ -296,7 +296,7 @@ class _AppImageFieldState extends State<AppImageField> {
                     errorBuilder: (_, _, _) => Container(
                       height: widget.previewHeight,
                       width: safeWidth,
-                      color: const Color(0xFFF1F5F9),
+                      color: appSurfaceSubtle,
                       alignment: Alignment.center,
                       child: Text(
                         'Unreachable',
@@ -321,7 +321,7 @@ class _AppImageFieldState extends State<AppImageField> {
                       const SizedBox(height: 2),
                       Text(
                         value,
-                        style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
+                        style: TextStyle(fontSize: 11, color: appInkMuted),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),

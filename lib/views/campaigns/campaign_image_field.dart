@@ -135,7 +135,7 @@ class _CampaignImageFieldState extends State<CampaignImageField> {
                               decoration: BoxDecoration(
                                 color: secondaryColor.withAlpha(35),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFE5E7EB)),
+                                border: Border.all(color: appBorder),
                               ),
                               child: Icon(
                                 hasValue ? Icons.autorenew_rounded : Icons.upload_rounded,
@@ -158,7 +158,7 @@ class _CampaignImageFieldState extends State<CampaignImageField> {
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFEE2E2),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                                  border: Border.all(color: appBorder),
                                 ),
                                 child: const Icon(Icons.delete_outline_rounded, size: 20, color: Color(0xFFD32F2F)),
                               ),
@@ -185,7 +185,7 @@ class _CampaignImageFieldState extends State<CampaignImageField> {
                   errorBuilder: (_, _, _) => Container(
                     height: 64,
                     width: 110,
-                    color: const Color(0xFFF1F5F9),
+                    color: appSurfaceSubtle,
                     alignment: Alignment.center,
                     child: Text(
                       'Unreachable',

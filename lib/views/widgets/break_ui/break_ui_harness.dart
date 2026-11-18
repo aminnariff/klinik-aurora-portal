@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/models/appointment/appointment_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 enum BreakUiMode {
   live,
@@ -172,18 +173,18 @@ class BreakUiDevHarness extends StatelessWidget {
         child: Material(
           elevation: 16,
           shadowColor: Colors.black.withAlpha(40),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B), // slate-800
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFF334155), width: 1),
+              color: appInkPrimary, // slate-800
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: appInkSecondary, width: 1),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -193,7 +194,7 @@ class BreakUiDevHarness extends StatelessWidget {
                       Text(
                         'Break UI',
                         style: TextStyle(
-                          color: Color(0xFF94A3B8),
+                          color: appInkMuted,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.3,
@@ -224,12 +225,12 @@ class BreakUiDevHarness extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isActive ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? const Color(0xFF0F172A) : const Color(0xFFCBD5E1),
+            color: isActive ? appInkPrimary : appBorderStrong,
             fontSize: 12,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),

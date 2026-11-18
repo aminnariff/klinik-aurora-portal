@@ -10,6 +10,7 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class BranchPaymentSummaryPage extends StatefulWidget {
   static const routeName = '/branch-payment-summary';
@@ -147,18 +148,18 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
               onPrimary: Colors.white,
               secondary: _dateAccent,
               onSecondary: Colors.white,
-              surface: Colors.white,
+              surface: appSurface,
             ),
             datePickerTheme: DatePickerThemeData(
-              backgroundColor: Colors.white,
-              headerBackgroundColor: const Color(0xFFF9FAFB),
-              headerForegroundColor: const Color(0xFF374151),
+              backgroundColor: appSurface,
+              headerBackgroundColor: appCanvas,
+              headerForegroundColor: appInkSecondary,
               rangeSelectionBackgroundColor: _dateAccent.withAlpha(45),
               rangeSelectionOverlayColor: WidgetStateProperty.all(_dateAccent.withAlpha(24)),
               todayBorder: const BorderSide(color: _dateAccent),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+            dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: _dateAccent,
@@ -175,7 +176,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: SingleChildScrollView(
         padding: EdgeInsets.all(screenPadding),
         child: Consumer<PaymentController>(
@@ -217,9 +218,9 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
-                    child: const Text(
+                    child: Text(
                       'All Branches',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
                     ),
                   ),
                 ],
@@ -232,9 +233,9 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
           icon: const Icon(Icons.refresh_rounded),
           tooltip: 'Refresh',
           style: IconButton.styleFrom(
-            foregroundColor: const Color(0xFF6B7280),
-            backgroundColor: Colors.white,
-            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            foregroundColor: appInkMuted,
+            backgroundColor: appSurface,
+            side: BorderSide(color: appBorder),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         ),
@@ -270,8 +271,8 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: selected ? const Color(0xFF2196F3) : Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: selected ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB)),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: selected ? const Color(0xFF2196F3) : appBorder),
             boxShadow: selected
                 ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(51), blurRadius: 8, offset: const Offset(0, 2))]
                 : null,
@@ -280,7 +281,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
             f,
             style: AppTypography.bodyMedium(
               context,
-            ).apply(color: selected ? Colors.white : const Color(0xFF374151), fontWeightDelta: selected ? 1 : 0),
+            ).apply(color: selected ? Colors.white : appInkSecondary, fontWeightDelta: selected ? 1 : 0),
           ),
         ),
       );
@@ -433,7 +434,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
     final maxVal = revenues.isEmpty ? 10.0 : revenues.reduce((a, b) => a > b ? a : b);
 
     return Container(
-      decoration: BoxDecoration(color: _bgDark, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: _bgDark, borderRadius: BorderRadius.circular(8)),
       padding: EdgeInsets.all(screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,7 +468,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                       reservedSize: 50,
                       getTitlesWidget: (value, meta) {
                         if (value == meta.max || value == 0) return const SizedBox();
-                        return Text('RM ${value.toInt()}', style: const TextStyle(color: _muted, fontSize: 10));
+                        return Text('RM ${value.toInt()}', style: const TextStyle(color: _muted, fontSize: 11));
                       },
                     ),
                   ),
@@ -485,7 +486,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                           child: Text(
                             truncated,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(color: _muted, fontSize: 9),
+                            style: const TextStyle(color: _muted, fontSize: 11),
                           ),
                         );
                       },
@@ -546,9 +547,9 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -561,12 +562,12 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                 if (data.isNotEmpty)
                   Text(
                     '${data.length} branch${data.length != 1 ? 'es' : ''}',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                    style: TextStyle(fontSize: 12, color: appInkMuted),
                   ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Divider(height: 1, color: appBorder),
           data.isEmpty
               ? _buildEmptyState()
               : SingleChildScrollView(scrollDirection: Axis.horizontal, child: _buildDataTable(data)),
@@ -596,8 +597,8 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
   }
 
   Widget _buildDataTable(List<Data> data) {
-    const headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF6B7280));
-    const cellStyle = TextStyle(fontSize: 13, color: Color(0xFF111827));
+    final headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: appInkMuted);
+    final cellStyle = TextStyle(fontSize: 13, color: appInkPrimary);
 
     Widget headerCell(String text) {
       return Padding(
@@ -608,10 +609,10 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
 
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
-      border: TableBorder(horizontalInside: BorderSide(color: const Color(0xFFE5E7EB).withAlpha(128), width: 1)),
+      border: TableBorder(horizontalInside: BorderSide(color: appBorder.withAlpha(128), width: 1)),
       children: [
         TableRow(
-          decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
+          decoration: BoxDecoration(color: appCanvas),
           children: [
             headerCell('Branch'),
             headerCell('Payments'),
@@ -737,9 +738,9 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -768,7 +769,7 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             config.label,
-            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280), fontSizeDelta: -1),
+            style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -1),
           ),
         ],
       ),

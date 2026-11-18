@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 /// Emil Kowalski perceived-performance table skeleton:
 /// Replaces solitary spinning wheels with layout-preserving bone placeholders.
@@ -19,7 +20,7 @@ class AppTableSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: const Color(0xFFF1F5F9), // slate-100
+      baseColor: appSurfaceSubtle, // slate-100
       highlightColor: Colors.white,
       period: const Duration(milliseconds: 1400),
       child: Padding(
@@ -32,7 +33,7 @@ class AppTableSkeleton extends StatelessWidget {
               height: 40,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: appSurfaceSubtle,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -55,10 +56,10 @@ class AppTableSkeleton extends StatelessWidget {
               child: ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: rows,
-                separatorBuilder: (_, _) => const Divider(
+                separatorBuilder: (_, _) => Divider(
                   height: 1,
                   thickness: 1,
-                  color: Color(0xFFF1F5F9),
+                  color: appSurfaceSubtle,
                 ),
                 itemBuilder: (context, index) {
                   // Vary widths slightly so placeholder looks like realistic table rows
@@ -93,7 +94,7 @@ class AppTableSkeleton extends StatelessWidget {
                             width: 76,
                             height: 24,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: appSurface,
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
@@ -118,7 +119,7 @@ class AppTableSkeleton extends StatelessWidget {
       width: width,
       height: 12,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(6),
       ),
     );
@@ -129,7 +130,7 @@ class AppTableSkeleton extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(4),
       ),
     );

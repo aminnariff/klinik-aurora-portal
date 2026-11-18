@@ -221,18 +221,18 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               onPrimary: Colors.white,
               secondary: _dateAccent,
               onSecondary: Colors.white,
-              surface: Colors.white,
+              surface: appSurface,
             ),
             datePickerTheme: DatePickerThemeData(
-              backgroundColor: Colors.white,
-              headerBackgroundColor: const Color(0xFFF9FAFB),
-              headerForegroundColor: const Color(0xFF374151),
+              backgroundColor: appSurface,
+              headerBackgroundColor: appCanvas,
+              headerForegroundColor: appInkSecondary,
               rangeSelectionBackgroundColor: _dateAccent.withAlpha(45),
               rangeSelectionOverlayColor: WidgetStateProperty.all(_dateAccent.withAlpha(24)),
               todayBorder: const BorderSide(color: _dateAccent),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+            dialogTheme: DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: _dateAccent,
@@ -249,7 +249,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 16 : 20,
@@ -364,10 +364,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           height: 32,
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: appSurface,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: _selectedBranchId != null ? const Color(0xFF2196F3) : const Color(0xFFE5E7EB),
+                              color: _selectedBranchId != null ? const Color(0xFF2196F3) : appBorder,
                             ),
                             boxShadow: _selectedBranchId != null
                                 ? [BoxShadow(color: const Color(0xFF2196F3).withAlpha(30), blurRadius: 4, offset: const Offset(0, 1))]
@@ -376,7 +376,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: _selectedBranchId ?? '',
-                              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Color(0xFF6B7280)),
+                              icon: Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: appInkMuted),
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
                               onChanged: (val) {
                                 setState(() {
@@ -398,7 +398,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                       Icon(
                                         item.key.isEmpty ? Icons.domain_rounded : Icons.store_rounded,
                                         size: 13,
-                                        color: item.key == (_selectedBranchId ?? '') ? const Color(0xFF2196F3) : const Color(0xFF6B7280),
+                                        color: item.key == (_selectedBranchId ?? '') ? const Color(0xFF2196F3) : appInkMuted,
                                       ),
                                       const SizedBox(width: 6),
                                       Text(item.name),
@@ -452,9 +452,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           icon: const Icon(Icons.refresh_rounded),
           tooltip: 'Refresh',
           style: IconButton.styleFrom(
-            foregroundColor: const Color(0xFF6B7280),
-            backgroundColor: Colors.white,
-            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            foregroundColor: appInkMuted,
+            backgroundColor: appSurface,
+            side: BorderSide(color: appBorder),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         ),
@@ -489,11 +489,11 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFF0F172A) : Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: selected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0)),
+            color: selected ? appInkPrimary : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: selected ? appInkPrimary : appBorder),
             boxShadow: selected
-                ? [BoxShadow(color: const Color(0xFF0F172A).withAlpha(40), blurRadius: 6, offset: const Offset(0, 2))]
+                ? [BoxShadow(color: appInkPrimary.withAlpha(40), blurRadius: 6, offset: const Offset(0, 2))]
                 : null,
           ),
           child: Text(
@@ -501,7 +501,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: selected ? Colors.white : const Color(0xFF475569),
+              color: selected ? Colors.white : appInkSecondary,
             ),
           ),
         ),
@@ -515,9 +515,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         icon: const Icon(Icons.file_download_outlined, size: 16),
         label: const Text('Export CSV'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFF0F172A),
-          backgroundColor: Colors.white,
-          side: const BorderSide(color: Color(0xFFE2E8F0)),
+          foregroundColor: appInkPrimary,
+          backgroundColor: appSurface,
+          side: BorderSide(color: appBorder),
           padding: const EdgeInsets.symmetric(horizontal: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
@@ -566,7 +566,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         icon: Icons.receipt_long_rounded,
         accent: const Color(0xFF3B82F6),
         bg: const Color(0xFFEFF6FF),
-        valueColor: const Color(0xFF0F172A),
+        valueColor: appInkPrimary,
       ),
       _CardConfig(
         label: 'Successful',
@@ -575,7 +575,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         icon: Icons.check_circle_rounded,
         accent: const Color(0xFF10B981),
         bg: const Color(0xFFECFDF5),
-        valueColor: const Color(0xFF0F172A),
+        valueColor: appInkPrimary,
         onTap: successful > 0 ? () => _openAppointmentsDialog() : null,
       ),
       _CardConfig(
@@ -585,7 +585,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         icon: Icons.warning_amber_rounded,
         accent: const Color(0xFFEF4444),
         bg: const Color(0xFFFEF2F2),
-        valueColor: const Color(0xFF0F172A),
+        valueColor: appInkPrimary,
         onTap: failed > 0 ? () => _openAppointmentsDialog(status: 'failed') : null,
       ),
       _CardConfig(
@@ -594,7 +594,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         icon: Icons.payments_rounded,
         accent: const Color(0xFF8B5CF6),
         bg: const Color(0xFFF5F3FF),
-        valueColor: const Color(0xFF0F172A),
+        valueColor: appInkPrimary,
       ),
       _CardConfig(
         label: 'Refunded',
@@ -602,7 +602,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         icon: Icons.undo_rounded,
         accent: const Color(0xFFF59E0B),
         bg: const Color(0xFFFFFBEB),
-        valueColor: const Color(0xFF0F172A),
+        valueColor: appInkPrimary,
       ),
       _CardConfig(
         label: 'Net Revenue',
@@ -611,7 +611,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         icon: Icons.trending_up_rounded,
         accent: const Color(0xFFDF6E98),
         bg: const Color(0xFFFDF2F8),
-        valueColor: const Color(0xFF0F172A),
+        valueColor: appInkPrimary,
       ),
     ];
 
@@ -716,7 +716,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       }
       if (s.contains('maybank') || s.contains('m2u') || s.contains('mb2u')) return const Color(0xFFF59E0B);
       if (s.contains('cimb')) return const Color(0xFF991B1B);
-      if (s.contains('apple')) return const Color(0xFF1E293B);
+      if (s.contains('apple')) return appInkPrimary;
       if (s.contains('google')) return const Color(0xFF4285F4);
       return null;
     }
@@ -750,9 +750,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
         ],
@@ -770,7 +770,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          Divider(height: 1, color: appBorder),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Column(
@@ -804,18 +804,18 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                   children: [
                     Text(
                       '$totalCount total transactions',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
                     ),
                     Text(
                       'RM ${channels.fold<double>(0.0, (sum, c) => sum + (double.tryParse(c.totalAmount ?? '0') ?? 0.0)).toStringAsFixed(2)} volume',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkPrimary),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          Divider(height: 1, color: appSurfaceSubtle),
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -853,16 +853,16 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                 children: [
                                   Text(
                                     channelDisplayName(c),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
-                                      color: Color(0xFF0F172A),
+                                      color: appInkPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     'ATV: RM ${atv.toStringAsFixed(2)} / txn',
-                                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                    style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w500),
                                   ),
                                 ],
                               ),
@@ -884,10 +884,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                               child: Text(
                                 'RM ${amount.toStringAsFixed(2)}',
                                 textAlign: TextAlign.right,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0F172A),
+                                  color: appInkPrimary,
                                 ),
                               ),
                             ),
@@ -975,9 +975,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
         ],
@@ -993,11 +993,11 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 const SizedBox(width: 8),
                 Text('Branch Overview', style: AppTypography.displayMedium(context)),
                 const Spacer(),
-                Text('${branches.length} branches', style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+                Text('${branches.length} branches', style: TextStyle(fontSize: 12, color: appInkMuted)),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          Divider(height: 1, color: appBorder),
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -1034,10 +1034,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                 Expanded(
                                   child: Text(
                                     b.branchName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF111827),
+                                      color: appInkPrimary,
                                     ),
                                   ),
                                 ),
@@ -1054,7 +1054,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: Color(0xFF9CA3AF)),
+                                Icon(Icons.arrow_forward_ios_rounded, size: 10, color: appInkMuted),
                               ],
                             ),
                             const SizedBox(height: 6),
@@ -1164,9 +1164,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
         ],
@@ -1181,26 +1181,26 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Net Revenue Trend',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(getFormattedDateRange(), style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+                  Text(getFormattedDateRange(), style: TextStyle(color: appInkMuted, fontSize: 12)),
                 ],
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFDF2F8),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: const Color(0xFFFBCFE8)),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.bar_chart_rounded, size: 14, color: primaryAccessibleText),
@@ -1222,12 +1222,12 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 maxY: maxY == 0 ? 10 : maxY * 1.25,
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => const Color(0xFF0F172A),
+                    getTooltipColor: (_) => appInkPrimary,
                     tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
                         '${dates[group.x]}\n',
-                        const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.w500),
+                        TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500),
                         children: [
                           TextSpan(
                             text: 'RM ${rod.toY.toStringAsFixed(2)}',
@@ -1247,7 +1247,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       reservedSize: 56,
                       getTitlesWidget: (value, meta) {
                         if (value == meta.max || value == 0) return const SizedBox();
-                        return Text('RM ${value.toInt()}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w500));
+                        return Text('RM ${value.toInt()}', style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500));
                       },
                     ),
                   ),
@@ -1262,7 +1262,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           meta: meta,
                           child: Text(
                             convertToDayMonth(dates[index]),
-                            style: const TextStyle(color: Color(0xFF64748B), fontSize: 10, fontWeight: FontWeight.w500),
+                            style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500),
                           ),
                         );
                       },
@@ -1271,7 +1271,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 ),
                 gridData: FlGridData(
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => const FlLine(color: Color(0xFFF1F5F9), strokeWidth: 1),
+                  getDrawingHorizontalLine: (_) => FlLine(color: appSurfaceSubtle, strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: List.generate(dates.length, (i) {
@@ -1305,9 +1305,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
         ],
@@ -1322,22 +1322,22 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 Expanded(
                   child: Text(
                     isSuperAdmin ? 'Branch Breakdown' : 'Daily Breakdown',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                     ),
                   ),
                 ),
                 if (data.isNotEmpty)
                   Text(
                     '${data.length} row${data.length != 1 ? 's' : ''}',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                    style: TextStyle(fontSize: 12, color: appInkMuted),
                   ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          Divider(height: 1, color: appBorder),
           data.isEmpty
               ? _buildEmptyState()
               : SingleChildScrollView(
@@ -1377,8 +1377,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   }
 
   Widget _buildDataTable(List<Data> data, bool isSuperAdmin, PaymentController controller) {
-    const headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF64748B));
-    const cellStyle = TextStyle(fontSize: 13, color: Color(0xFF0F172A));
+    final headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: appInkMuted);
+    final cellStyle = TextStyle(fontSize: 13, color: appInkPrimary);
 
     // Sort data copy
     final sortedData = List<Data>.from(data);
@@ -1477,7 +1477,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       ? (_tableSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded)
                       : Icons.unfold_more_rounded,
                   size: 13,
-                  color: isSorted ? const Color(0xFF0F172A) : const Color(0xFFCBD5E1),
+                  color: isSorted ? appInkPrimary : appBorderStrong,
                 ),
                 const SizedBox(width: 4),
               ],
@@ -1485,7 +1485,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 text,
                 textAlign: alignRight ? TextAlign.right : TextAlign.left,
                 style: headerStyle.copyWith(
-                  color: isSorted ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                  color: isSorted ? appInkPrimary : appInkMuted,
                   fontWeight: isSorted ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),
@@ -1496,7 +1496,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       ? (_tableSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded)
                       : Icons.unfold_more_rounded,
                   size: 13,
-                  color: isSorted ? const Color(0xFF0F172A) : const Color(0xFFCBD5E1),
+                  color: isSorted ? appInkPrimary : appBorderStrong,
                 ),
               ],
             ],
@@ -1539,10 +1539,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
-      border: TableBorder(horizontalInside: BorderSide(color: const Color(0xFFE2E8F0).withAlpha(128), width: 1)),
+      border: TableBorder(horizontalInside: BorderSide(color: appBorder.withAlpha(128), width: 1)),
       children: [
         TableRow(
-          decoration: const BoxDecoration(color: Color(0xFFF8FAFC)),
+          decoration: BoxDecoration(color: appSurfaceSubtle),
           children: [
             if (isSuperAdmin) sortableHeaderCell('Branch', 'branch'),
             sortableHeaderCell('Date', 'date'),
@@ -1652,7 +1652,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                 size: 12,
                                 color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
                                     ? const Color(0xFFDC2626)
-                                    : const Color(0xFF9CA3AF),
+                                    : appInkMuted,
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -1660,7 +1660,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                                 style: TextStyle(
                                   color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
                                       ? const Color(0xFFDC2626)
-                                      : const Color(0xFF6B7280),
+                                      : appInkMuted,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 12,
                                 ),
@@ -1700,7 +1700,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       fontWeight: FontWeight.w500,
                       color: (double.tryParse(sortedData[i].totalRefundAmount ?? '0') ?? 0) > 0
                           ? const Color(0xFFF59E0B)
-                          : const Color(0xFF94A3B8),
+                          : appInkMuted,
                     ),
                   ),
                 ),
@@ -1709,7 +1709,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                   child: Text(
                     sortedData[i].netRevenue ?? '0.00',
                     textAlign: TextAlign.right,
-                    style: cellStyle.copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)),
+                    style: cellStyle.copyWith(fontWeight: FontWeight.w700, color: appInkPrimary),
                   ),
                 ),
               ],
@@ -1718,56 +1718,56 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         ],
         // Sticky/Summary Totals Footer Row
         TableRow(
-          decoration: const BoxDecoration(color: Color(0xFFF1F5F9)),
+          decoration: BoxDecoration(color: appSurfaceSubtle),
           children: [
             if (isSuperAdmin)
               Container(
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Text('TOTALS', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A))),
+                child: Text('TOTALS', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: appInkPrimary)),
               ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Text(
                 isSuperAdmin ? 'All Records' : 'TOTALS (${data.length} days)',
-                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A)),
+                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: appInkPrimary),
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Text('$totalCheckouts', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A))),
+              child: Text('$totalCheckouts', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: appInkPrimary)),
             ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Text('$totalSuccessful', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF047857))),
             ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Text(
                 '$totalFailed',
                 style: cellStyle.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: totalFailed > 0 ? const Color(0xFFDC2626) : const Color(0xFF64748B),
+                  color: totalFailed > 0 ? const Color(0xFFDC2626) : appInkMuted,
                 ),
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Align(
@@ -1776,19 +1776,19 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Text(
                 totalPaid.toStringAsFixed(2),
                 textAlign: TextAlign.right,
-                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A)),
+                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: appInkPrimary),
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Text(
@@ -1796,19 +1796,19 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 textAlign: TextAlign.right,
                 style: cellStyle.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: totalRefund > 0 ? const Color(0xFFF59E0B) : const Color(0xFF94A3B8),
+                  color: totalRefund > 0 ? const Color(0xFFF59E0B) : appInkMuted,
                 ),
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Color(0xFFCBD5E1), width: 1.5)),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Text(
                 totalNetRevenue.toStringAsFixed(2),
                 textAlign: TextAlign.right,
-                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0F172A)),
+                style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: appInkPrimary),
               ),
             ),
           ],
@@ -1861,18 +1861,18 @@ class _SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(color: Colors.black.withAlpha(6), blurRadius: 10, offset: const Offset(0, 3)),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           onTap: config.onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -1893,12 +1893,12 @@ class _SummaryCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                         decoration: BoxDecoration(
                           color: config.bg,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: config.accent.withAlpha(40)),
                         ),
                         child: Text(
                           config.subtitle!,
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: config.accent),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: config.accent),
                         ),
                       ),
                   ],
@@ -1909,7 +1909,7 @@ class _SummaryCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: isMobile ? 17 : 19,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    color: appInkPrimary,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -1918,7 +1918,7 @@ class _SummaryCard extends StatelessWidget {
                   children: [
                     Text(
                       config.label,
-                      style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: appInkMuted),
                     ),
                     if (config.onTap != null) ...[
                       const SizedBox(width: 4),

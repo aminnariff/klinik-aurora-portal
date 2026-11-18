@@ -53,7 +53,7 @@ class _AppDropdownState extends State<AppDropdown> {
         border: OutlineInputBorder(
           borderSide: BorderSide(
             color: widget.attributeList.borderColor ??
-                (isEditable ? const Color(0xFFE5E7EB) : Colors.transparent),
+                (isEditable ? appBorder : Colors.transparent),
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
@@ -61,13 +61,13 @@ class _AppDropdownState extends State<AppDropdown> {
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: widget.attributeList.borderColor ??
-                (isEditable ? const Color(0xFFE5E7EB) : Colors.transparent),
+                (isEditable ? appBorder : Colors.transparent),
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: primary, width: 1.5),
+          borderSide: BorderSide(color: primary, width: 1.5),
           borderRadius: BorderRadius.circular(8.0),
         ),
         errorBorder: OutlineInputBorder(
@@ -110,7 +110,7 @@ class _AppDropdownState extends State<AppDropdown> {
                           : widget.attributeList.value.toString().titleCase())
                       : (widget.attributeList.hintText ?? 'Select'),
                   style: Theme.of(context).textTheme.bodyMedium?.apply(
-                        color: hasValue ? const Color(0xFF111827) : Colors.grey,
+                        color: hasValue ? appInkPrimary : Colors.grey,
                       ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -150,11 +150,11 @@ class _AppDropdownState extends State<AppDropdown> {
             icon: Icon(
               Icons.keyboard_arrow_down_rounded,
               color: isEditable
-                  ? const Color(0xFF6B7280)
+                  ? appInkMuted
                   : Colors.grey.shade400,
             ),
             iconSize: 22,
-            iconEnabledColor: const Color(0xFF6B7280),
+            iconEnabledColor: appInkMuted,
             iconDisabledColor: Colors.grey,
           ),
           dropdownStyleData: DropdownStyleData(
@@ -162,8 +162,8 @@ class _AppDropdownState extends State<AppDropdown> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              color: appSurfaceElevated,
+              border: Border.all(color: appBorder),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha(15),
@@ -200,10 +200,10 @@ class _AppDropdownState extends State<AppDropdown> {
             padding: const EdgeInsets.only(left: 6),
             child: Tooltip(
               message: widget.attributeList.tooltip!,
-              child: const Icon(
+              child: Icon(
                 Icons.info_outline_rounded,
                 size: 16,
-                color: Color(0xFF9CA3AF),
+                color: appInkMuted,
               ),
             ),
           ),

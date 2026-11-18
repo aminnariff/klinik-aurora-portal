@@ -59,40 +59,40 @@ class DoctorDetailView extends StatelessWidget {
                                         _fieldLabel(context, 'Full Name'),
                                         AppSelectableText(
                                           doctor.doctorName ?? '—',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xFF111827),
+                                            color: appInkPrimary,
                                           ),
                                         ),
                                         AppPadding.vertical(denominator: 2),
                                         _fieldLabel(context, 'Contact Number'),
                                         AppSelectableText(
                                           doctor.doctorPhone ?? '—',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xFF111827),
+                                            color: appInkPrimary,
                                           ),
                                         ),
                                         AppPadding.vertical(denominator: 2),
                                         _fieldLabel(context, 'Branch'),
                                         AppSelectableText(
                                           doctor.branchName ?? '—',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xFF111827),
+                                            color: appInkPrimary,
                                           ),
                                         ),
                                         AppPadding.vertical(denominator: 2),
                                         _fieldLabel(context, 'Practitioner Type'),
                                         AppSelectableText(
                                           doctor.doctorType != null ? doctorType(doctor.doctorType!) : 'Doctor',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xFF111827),
+                                            color: appInkPrimary,
                                           ),
                                         ),
                                         AppPadding.vertical(denominator: 2),
@@ -104,20 +104,20 @@ class DoctorDetailView extends StatelessWidget {
                                         _fieldLabel(context, 'Date Joined'),
                                         AppSelectableText(
                                           dateConverter(doctor.createdDate) ?? '—',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xFF111827),
+                                            color: appInkPrimary,
                                           ),
                                         ),
                                         AppPadding.vertical(denominator: 2),
                                         _fieldLabel(context, 'Last Updated'),
                                         AppSelectableText(
                                           dateConverter(doctor.modifiedDate) ?? '—',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xFF111827),
+                                            color: appInkPrimary,
                                           ),
                                         ),
                                       ],
@@ -163,7 +163,7 @@ class DoctorDetailView extends StatelessWidget {
                                                     borderRadius: BorderRadius.circular(12),
                                                     color: disabledColor,
                                                   ),
-                                                  child: const Center(child: Icon(Icons.error, color: errorColor)),
+                                                  child: Center(child: Icon(Icons.error, color: errorColor)),
                                                 );
                                               },
                                             ),
@@ -175,8 +175,8 @@ class DoctorDetailView extends StatelessWidget {
                                               borderRadius: BorderRadius.circular(12),
                                               color: disabledColor,
                                             ),
-                                            child: const Center(
-                                              child: Icon(Icons.person_off_rounded, size: 48, color: Color(0xFF9CA3AF)),
+                                            child: Center(
+                                              child: Icon(Icons.person_off_rounded, size: 48, color: appInkMuted),
                                             ),
                                           ),
                                       ],
@@ -203,8 +203,8 @@ class DoctorDetailView extends StatelessWidget {
   Widget _header(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF9FAFB),
+      decoration: BoxDecoration(
+        color: appCanvas,
         border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
       ),
       child: Row(
@@ -233,14 +233,14 @@ class DoctorDetailView extends StatelessWidget {
           decoration: BoxDecoration(color: Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 13, color: Color(0xFF6B7280)),
+        Icon(icon, size: 13, color: appInkMuted),
         const SizedBox(width: 5),
         Text(
           label.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 10,
+          style: TextStyle(
+            fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF6B7280),
+            color: appInkMuted,
             letterSpacing: 1.0,
           ),
         ),
@@ -253,7 +253,7 @@ class DoctorDetailView extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
       ),
     );
   }
@@ -263,7 +263,7 @@ class DoctorDetailView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: active ? Colors.green.withAlpha(25) : Colors.red.withAlpha(25),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         active ? 'Active' : 'Inactive',

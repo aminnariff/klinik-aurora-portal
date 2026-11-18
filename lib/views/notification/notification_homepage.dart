@@ -189,7 +189,7 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
                     IconButton(
   tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded),
-                      color: const Color(0xFF637381),
+                      color: appInkMuted,
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -293,7 +293,7 @@ class _StepIndicator extends StatelessWidget {
         for (var i = 0; i < steps.length; i++) ...[
           if (i > 0) ...[
             const SizedBox(width: 8),
-            Container(width: 24, height: 1, color: const Color(0xFFE5E7EB)),
+            Container(width: 24, height: 1, color: appBorder),
             const SizedBox(width: 8),
           ],
           Row(
@@ -303,7 +303,7 @@ class _StepIndicator extends StatelessWidget {
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: i + 1 <= current ? primary : const Color(0xFFE5E7EB),
+                  color: i + 1 <= current ? primary : appBorder,
                 ),
                 alignment: Alignment.center,
                 child: i + 1 < current
@@ -312,14 +312,14 @@ class _StepIndicator extends StatelessWidget {
                         '${i + 1}',
                         style: AppTypography.bodyMedium(
                           context,
-                        ).apply(color: i + 1 <= current ? Colors.white : const Color(0xFF9CA3AF), fontSizeDelta: -3),
+                        ).apply(color: i + 1 <= current ? Colors.white : appInkMuted, fontSizeDelta: -3),
                       ),
               ),
               const SizedBox(width: 6),
               Text(
                 steps[i],
                 style: AppTypography.bodyMedium(context).apply(
-                  color: i + 1 <= current ? textPrimaryColor : const Color(0xFF9CA3AF),
+                  color: i + 1 <= current ? textPrimaryColor : appInkMuted,
                   fontWeightDelta: i + 1 == current ? 3 : 0,
                 ),
               ),
@@ -341,7 +341,7 @@ class _SegmentedControl extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(8)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -381,7 +381,7 @@ class _Segment extends StatelessWidget {
           child: Text(
             label,
             style: AppTypography.bodyMedium(context).apply(
-              color: isSelected ? textPrimaryColor : const Color(0xFF637381),
+              color: isSelected ? textPrimaryColor : appInkMuted,
               fontWeightDelta: isSelected ? 3 : 0,
             ),
           ),

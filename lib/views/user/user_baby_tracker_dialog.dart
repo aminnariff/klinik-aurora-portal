@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/baby_tracker/widgets/aurora_3d_womb_visualizer.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class UserBabyTrackerDialog extends StatefulWidget {
   final UserResponse? patient;
@@ -120,9 +121,9 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
     const pinkColor = Color(0xFFE91E8C);
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: appSurface,
+      surfaceTintColor: Colors.transparent,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: math.min(760, MediaQuery.of(context).size.width * 0.94),
@@ -179,7 +180,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                       ),
                       IconButton(
   tooltip: 'Tutup',
-                        icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+                        icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
                         splashRadius: 18,
                         onPressed: () => Navigator.of(context).pop(),
                       ),
@@ -191,7 +192,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: appSurface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: pinkColor.withValues(alpha: 0.2)),
                     ),
@@ -288,9 +289,9 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
             children: [
               Icon(Icons.child_care_rounded, size: 48, color: Colors.grey.shade400),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'No baby tracker or kick data recorded for this patient.',
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                style: TextStyle(color: appInkMuted, fontSize: 13),
               ),
             ],
           ),
@@ -465,9 +466,9 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
             children: [
               Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey.shade400),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Tiada rekod checklist ditemui untuk pesakit ini.',
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                style: TextStyle(color: appInkMuted, fontSize: 13),
               ),
             ],
           ),
@@ -538,7 +539,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
                 color: isHospitalBag ? const Color(0xFFFFF1F2) : Colors.white,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: isHospitalBag ? const Color(0xFFFDA4AF) : Colors.grey.shade200,
                   width: isHospitalBag ? 1.5 : 1,
@@ -568,7 +569,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                         ),
                         child: const Text(
                           'Kritikal Wad',
-                          style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -580,7 +581,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                     color: completedCount == itemCount && itemCount > 0
                         ? const Color(0xFFDCFCE7)
                         : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '$completedCount / $itemCount',
@@ -665,7 +666,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                                   child: const Text(
                                     'Wajib',
                                     style: TextStyle(
-                                      fontSize: 9.5,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFFDC2626),
                                     ),
@@ -698,9 +699,9 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -716,9 +717,9 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
             width: 95,
             height: 95,
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: appSurfaceSubtle,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: appBorder),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.03),
@@ -742,14 +743,14 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(color: appBorder),
                       ),
                       child: Text(
                         'Minggu $week • $trimesterText',
-                        style: const TextStyle(
-                          color: Color(0xFF475569),
+                        style: TextStyle(
+                          color: appInkSecondary,
                           fontWeight: FontWeight.bold,
                           fontSize: 11,
                         ),
@@ -758,10 +759,10 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                     const SizedBox(width: 8),
                     Text(
                       '${bio.fruitEmoji} ${bio.fruit}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: Color(0xFF1E293B),
+                        color: appInkPrimary,
                       ),
                     ),
                   ],
@@ -804,16 +805,16 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Text(
         '$label: $value',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 10.5,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
       ),
     );
@@ -830,7 +831,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Column(

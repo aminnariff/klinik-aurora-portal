@@ -16,9 +16,9 @@ class NotificationPreview extends StatelessWidget {
       width: width,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: appSurfaceSubtle,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -41,8 +41,8 @@ class NotificationPreview extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
+              color: appSurface,
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8, offset: const Offset(0, 2))],
             ),
             child: Row(
@@ -52,7 +52,7 @@ class NotificationPreview extends StatelessWidget {
                   width: 40,
                   height: 40,
                   clipBehavior: Clip.antiAlias,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: primaryColors,
                       begin: Alignment.topLeft,
@@ -86,7 +86,7 @@ class NotificationPreview extends StatelessWidget {
                             'now',
                             style: AppTypography.bodyMedium(
                               context,
-                            ).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -3),
+                            ).apply(color: appInkMuted, fontSizeDelta: -3),
                           ),
                         ],
                       ),
@@ -104,7 +104,7 @@ class NotificationPreview extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.bodyMedium(
                           context,
-                        ).apply(color: const Color(0xFF6B7280), fontSizeDelta: -1),
+                        ).apply(color: appInkMuted, fontSizeDelta: -1),
                       ),
                     ],
                   ),

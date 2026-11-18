@@ -122,14 +122,14 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   selectedColor: primary,
                                   backgroundColor: const Color(0xFFF3F4F6),
                                   labelStyle: TextStyle(
-                                    color: isSelected ? Colors.white : const Color(0xFF374151),
+                                    color: isSelected ? Colors.white : appInkSecondary,
                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                     fontSize: 12,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
-                                      color: isSelected ? primary : const Color(0xFFE5E7EB),
+                                      color: isSelected ? primary : appBorder,
                                     ),
                                   ),
                                   onSelected: (selected) {
@@ -203,21 +203,21 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                             maxLines: 2,
                             decoration: InputDecoration(
                               hintText: 'e.g. Baby position uncooperative (Optional)',
-                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                              hintStyle: TextStyle(fontSize: 12, color: appInkMuted),
                               filled: true,
-                              fillColor: const Color(0xFFF9FAFB),
+                              fillColor: appCanvas,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                borderSide: BorderSide(color: appBorder),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                borderSide: BorderSide(color: appBorder),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: primary, width: 1.5),
+                                borderSide: BorderSide(color: primary, width: 1.5),
                               ),
                             ),
                           ),

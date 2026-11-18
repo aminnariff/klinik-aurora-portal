@@ -144,8 +144,8 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         constraints: BoxConstraints(maxWidth: maxW, maxHeight: maxH),
         margin: EdgeInsets.all(isMobile ? 8 : 16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.14),
@@ -155,7 +155,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           child: Material(
             color: Colors.white,
             child: Column(
@@ -188,9 +188,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -227,10 +227,10 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                     Flexible(
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
+                          color: appInkPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -245,16 +245,16 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                   isCreate
                       ? 'Define service catalog item, pricing, doctor type, and automated WhatsApp templates'
                       : 'Update pricing, doctor type, estimated duration, and notification templates',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ),
           ),
           IconButton(
   tooltip: 'Tutup',
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             onPressed: () => context.pop(),
-            hoverColor: const Color(0xFFF1F5F9),
+            hoverColor: appSurfaceSubtle,
             splashRadius: 20,
           ),
         ],
@@ -270,12 +270,12 @@ class _ServiceDetailsState extends State<ServiceDetails> {
           _serviceStatus = isActive ? 0 : 1;
         });
       },
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: isActive ? const Color(0xFF86EFAC) : const Color(0xFFFCA5A5)),
         ),
         child: Row(
@@ -293,7 +293,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
             Text(
               isActive ? 'Active' : 'Inactive',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
               ),
@@ -336,9 +336,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,9 +449,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -473,9 +473,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,9 +491,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appSurfaceSubtle,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: appBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,9 +527,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         children: [
@@ -538,13 +538,13 @@ class _ServiceDetailsState extends State<ServiceDetails> {
             child: Container(
               width: 72,
               height: 72,
-              color: const Color(0xFFE2E8F0),
+              color: appBorder,
               child: hasImage
                   ? Image.network(
                       resolved,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                        child: Icon(Icons.broken_image_rounded, color: Color(0xFF94A3B8), size: 28),
+                      errorBuilder: (context, error, stackTrace) => Center(
+                        child: Icon(Icons.broken_image_rounded, color: appInkMuted, size: 28),
                       ),
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
@@ -557,8 +557,8 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                         );
                       },
                     )
-                  : const Center(
-                      child: Icon(Icons.medical_services_outlined, color: Color(0xFF94A3B8), size: 30),
+                  : Center(
+                      child: Icon(Icons.medical_services_outlined, color: appInkMuted, size: 30),
                     ),
             ),
           ),
@@ -572,15 +572,15 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
-                        color: hasImage ? const Color(0xFFE0F2FE) : const Color(0xFFF1F5F9),
+                        color: hasImage ? const Color(0xFFE0F2FE) : appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         hasImage ? 'Current Photo' : 'No Photo Uploaded',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: hasImage ? const Color(0xFF0284C7) : const Color(0xFF64748B),
+                          color: hasImage ? const Color(0xFF0284C7) : appInkMuted,
                         ),
                       ),
                     ),
@@ -589,7 +589,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                 const SizedBox(height: 4),
                 Text(
                   hasImage ? 'Displaying active image for this service' : 'Upload or paste an image URL below',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 11, color: appInkMuted),
                 ),
               ],
             ),
@@ -631,7 +631,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                       margin: const EdgeInsets.only(right: 6),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isActive ? const Color(0xFF246E7A) : const Color(0xFFF1F5F9),
+                        color: isActive ? const Color(0xFF246E7A) : appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: isActive ? const Color(0xFF246E7A) : Colors.transparent),
                       ),
@@ -654,7 +654,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: isActive ? Colors.white : const Color(0xFF475569),
+                              color: isActive ? Colors.white : appInkSecondary,
                             ),
                           ),
                         ],
@@ -672,17 +672,17 @@ class _ServiceDetailsState extends State<ServiceDetails> {
               onChanged: (_) => templateRebuild.add(DateTime.now()),
               decoration: InputDecoration(
                 hintText: 'Enter automated message for Template ${_activeTemplate + 1}...',
-                hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                hintStyle: TextStyle(fontSize: 12, color: appInkMuted),
                 filled: true,
-                fillColor: const Color(0xFFF8FAFC),
+                fillColor: appSurfaceSubtle,
                 contentPadding: const EdgeInsets.all(12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  borderSide: BorderSide(color: appBorder),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  borderSide: BorderSide(color: appBorder),
                 ),
                 focusedBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -694,13 +694,13 @@ class _ServiceDetailsState extends State<ServiceDetails> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'CLICK TO INSERT VARIABLE',
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFF94A3B8), letterSpacing: 0.8),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkMuted, letterSpacing: 0.8),
                 ),
                 Text(
                   '${activeCtrl.text.length} chars',
-                  style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
+                  style: TextStyle(fontSize: 11, color: appInkMuted),
                 ),
               ],
             ),
@@ -753,9 +753,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -904,14 +904,14 @@ class _ServiceDetailsState extends State<ServiceDetails> {
           decoration: BoxDecoration(color: const Color(0xFF246E7A), borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 14, color: const Color(0xFF64748B)),
+        Icon(icon, size: 14, color: appInkMuted),
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.8,
           ),
         ),
@@ -923,10 +923,10 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     return RichText(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
         children: isRequired
             ? [
@@ -955,11 +955,11 @@ class _ServiceDetailsState extends State<ServiceDetails> {
       errorText: errorText,
       isNumber: isNumber,
       prefixIcon: prefixIcon != null
-          ? Icon(prefixIcon, size: 16, color: const Color(0xFF64748B))
+          ? Icon(prefixIcon, size: 16, color: appInkMuted)
           : (prefixText != null
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(prefixText, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF475569), fontSize: 13)),
+                  child: Text(prefixText, style: TextStyle(fontWeight: FontWeight.w600, color: appInkSecondary, fontSize: 13)),
                 )
               : null),
       maxLines: maxLines,
@@ -983,10 +983,10 @@ class _ServiceDetailsState extends State<ServiceDetails> {
           height: 42,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: appSurfaceSubtle,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+              color: errorText != null ? const Color(0xFFEF4444) : appBorderStrong,
             ),
           ),
           child: DropdownButtonHideUnderline(
@@ -998,7 +998,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: hasValue ? FontWeight.w600 : FontWeight.normal,
-                  color: hasValue ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                  color: hasValue ? appInkPrimary : appInkMuted,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -1008,23 +1008,23 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                       value: item,
                       child: Text(
                         item.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF0F172A),
+                          color: appInkPrimary,
                         ),
                       ),
                     ),
                   )
                   .toList(),
               onChanged: onChanged,
-              iconStyleData: const IconStyleData(
-                icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: Color(0xFF64748B)),
+              iconStyleData: IconStyleData(
+                icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: appInkMuted),
               ),
               dropdownStyleData: DropdownStyleData(
                 elevation: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
@@ -1050,9 +1050,9 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))),
+        Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted)),
         const SizedBox(height: 2),
-        Text(val, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF334155))),
+        Text(val, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appInkSecondary)),
       ],
     );
   }

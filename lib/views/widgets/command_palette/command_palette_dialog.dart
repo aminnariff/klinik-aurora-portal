@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
@@ -14,9 +16,11 @@ import 'package:klinik_aurora_portal/views/points/point_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward/reward_homepage.dart';
 import 'package:klinik_aurora_portal/views/reward_history/reward_history_homepage.dart';
 import 'package:klinik_aurora_portal/views/service/service_homepage.dart';
+import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.dart';
 import 'package:klinik_aurora_portal/views/user/user_homepage.dart';
 import 'package:klinik_aurora_portal/views/voucher/voucher_homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
+import 'package:provider/provider.dart';
 
 class CommandItem {
   final String title;
@@ -79,6 +83,20 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
         context: ctx,
         builder: (_) => const AppointmentDetails(type: 'create'),
       ),
+    ),
+    CommandItem(
+      title: 'Appearance & Theme Settings',
+      category: 'Quick Actions',
+      icon: Icons.palette_outlined,
+      subtitle: 'Customize brand accent palette and Light/Dark mode',
+      onSelect: (ctx) => AppearanceSettingsDialog.show(ctx),
+    ),
+    CommandItem(
+      title: 'Toggle Dark / Light Mode',
+      category: 'Quick Actions',
+      icon: Icons.dark_mode_outlined,
+      subtitle: 'Switch between bright reception view and low-glare dark mode',
+      onSelect: (ctx) => ctx.read<DarkModeController>().toggleDarkMode(ctx),
     ),
     // Core Navigation
     CommandItem(
@@ -234,6 +252,8 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
   @override
   Widget build(BuildContext context) {
     final items = _filteredItems;
+    final colors = context.appColors;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     return KeyboardListener(
       focusNode: _focusNode,
@@ -241,190 +261,199 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       onKeyEvent: _handleKeyDown,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.only(top: 80, bottom: 40, left: 24, right: 24),
+          padding: EdgeInsets.only(
+            top: screenWidth < 600 ? 32 : 80,
+            bottom: 32,
+            left: screenWidth < 600 ? 12 : 24,
+            right: screenWidth < 600 ? 12 : 24,
+          ),
           child: Align(
             alignment: Alignment.topCenter,
             child: Material(
               color: Colors.transparent,
-              child: Container(
-                width: 600,
-                constraints: const BoxConstraints(maxHeight: 520),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF0F172A).withValues(alpha: 0.18),
-                      blurRadius: 40,
-                      offset: const Offset(0, 16),
-                    ),
-                  ],
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Search bar header
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search_rounded, color: Color(0xFF0D9488), size: 22),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextField(
-                              controller: _searchCtrl,
-                              autofocus: true,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F172A),
-                              ),
-                              decoration: const InputDecoration(
-                                hintText: 'Type a command or search page...',
-                                hintStyle: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFF94A3B8),
-                                  fontWeight: FontWeight.normal,
-                                ),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: const Color(0xFFCBD5E1)),
-                            ),
-                            child: const Text(
-                              'ESC',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF64748B),
-                              ),
-                            ),
-                          ),
-                        ],
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600, maxHeight: 520),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.shadowColor,
+                        blurRadius: 32,
+                        offset: const Offset(0, 12),
                       ),
-                    ),
-                    const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
-                    // Results list
-                    Flexible(
-                      child: items.isEmpty
-                          ? const Padding(
-                              padding: EdgeInsets.all(32),
-                              child: Text(
-                                'No matching commands or pages found.',
-                                style: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                    ],
+                    border: Border.all(color: colors.border),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Search bar header
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search_rounded, color: colors.brandText, size: 22),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: TextField(
+                                controller: _searchCtrl,
+                                autofocus: true,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.inkPrimary,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Type a command or search page...',
+                                  hintStyle: TextStyle(
+                                    fontSize: 15,
+                                    color: colors.inkMuted,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  filled: false,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
                               ),
-                            )
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              itemCount: items.length,
-                              itemBuilder: (context, index) {
-                                final item = items[index];
-                                final isSelected = index == _selectedIndex;
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: colors.surfaceSubtle,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: colors.borderStrong),
+                              ),
+                              child: Text(
+                                'ESC',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: colors.inkMuted,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Divider(height: 1, thickness: 1, color: colors.border),
+                      // Results list
+                      Flexible(
+                        child: items.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.all(32),
+                                child: Text(
+                                  'No matching commands or pages found.',
+                                  style: TextStyle(color: colors.inkMuted, fontSize: 14),
+                                ),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                itemCount: items.length,
+                                itemBuilder: (context, index) {
+                                  final item = items[index];
+                                  final isSelected = index == _selectedIndex;
 
-                                return InkWell(
-                                  onTap: () => _execute(item),
-                                  onHover: (hovered) {
-                                    if (hovered) setState(() => _selectedIndex = index);
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? const Color(0xFFF0FDFA) : Colors.transparent, // teal-50
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: isSelected ? const Color(0xFFCCFBF1) : Colors.transparent,
+                                  return InkWell(
+                                    onTap: () => _execute(item),
+                                    onHover: (hovered) {
+                                      if (hovered) setState(() => _selectedIndex = index);
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: isSelected ? colors.brandSoftBg : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: isSelected ? colors.brandBorder : Colors.transparent,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(7),
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? colors.brandSoftBg : colors.surfaceSubtle,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Icon(
+                                              item.icon,
+                                              size: 18,
+                                              color: isSelected ? colors.brandText : colors.inkMuted,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item.title,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                                    color: colors.inkPrimary,
+                                                  ),
+                                                ),
+                                                if (item.subtitle != null) ...[
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    item.subtitle!,
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: isSelected ? colors.brandText : colors.inkMuted,
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
+                                          Text(
+                                            item.category,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: colors.inkMuted,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(7),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? const Color(0xFF0D9488).withValues(alpha: 0.15)
-                                                : const Color(0xFFF1F5F9),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Icon(
-                                            item.icon,
-                                            size: 18,
-                                            color: isSelected ? const Color(0xFF0D9488) : const Color(0xFF64748B),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                item.title,
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                                  color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF334155),
-                                                ),
-                                              ),
-                                              if (item.subtitle != null) ...[
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  item.subtitle!,
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: isSelected ? const Color(0xFF0D9488) : const Color(0xFF94A3B8),
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                        ),
-                                        Text(
-                                          item.category,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: Color(0xFF94A3B8),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
-                    const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
-                    // Footer hint
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Row(
-                        children: [
-                          _keyHint('↑↓', 'Navigate'),
-                          const SizedBox(width: 14),
-                          _keyHint('↵', 'Select'),
-                          const SizedBox(width: 14),
-                          _keyHint('ESC', 'Dismiss'),
-                          const Spacer(),
-                          const Text(
-                            'Klinik Aurora Command',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
-                          ),
-                        ],
+                                  );
+                                },
+                              ),
                       ),
-                    ),
-                  ],
+                      Divider(height: 1, thickness: 1, color: colors.border),
+                      // Footer hint
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        child: Row(
+                          children: [
+                            _keyHint(context, '↑↓', 'Navigate'),
+                            const SizedBox(width: 14),
+                            _keyHint(context, '↵', 'Select'),
+                            const SizedBox(width: 14),
+                            _keyHint(context, 'ESC', 'Dismiss'),
+                            const Spacer(),
+                            if (screenWidth >= 480)
+                              Text(
+                                'Klinik Aurora Command',
+                                style: TextStyle(fontSize: 11, color: colors.inkMuted, fontWeight: FontWeight.w600),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -434,23 +463,24 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
     );
   }
 
-  Widget _keyHint(String keyLabel, String action) {
+  Widget _keyHint(BuildContext context, String keyLabel, String action) {
+    final colors = context.appColors;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
+            color: colors.surfaceSubtle,
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
             keyLabel,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colors.inkSecondary),
           ),
         ),
         const SizedBox(width: 5),
-        Text(action, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+        Text(action, style: TextStyle(fontSize: 11, color: colors.inkMuted)),
       ],
     );
   }

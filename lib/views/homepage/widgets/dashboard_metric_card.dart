@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class DashboardMetricCard extends StatelessWidget {
   final String label;
@@ -29,9 +30,9 @@ class DashboardMetricCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: appSurface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: appBorder),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.02),
@@ -60,11 +61,11 @@ class DashboardMetricCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           label.toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.6,
-                            color: Color(0xFF64748B),
+                            color: appInkMuted,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -83,10 +84,10 @@ class DashboardMetricCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                       letterSpacing: -0.5,
                     ),
                   ),

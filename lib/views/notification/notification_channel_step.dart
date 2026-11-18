@@ -22,7 +22,7 @@ class NotificationChannelStep extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           'Subscribers receive this as a push notification on their phone.',
-          style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -2),
+          style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -2),
         ),
       ],
     );
@@ -49,14 +49,14 @@ class _ChannelCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? primary.withAlpha(15) : Colors.white,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: isSelected ? primary : const Color(0xFFE5E7EB), width: isSelected ? 2 : 1),
+            border: Border.all(color: isSelected ? primary : appBorder, width: isSelected ? 2 : 1),
           ),
           child: Row(
             children: [
               Container(
                 width: 44,
                 height: 44,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
                   shape: BoxShape.circle,
                 ),
@@ -75,7 +75,7 @@ class _ChannelCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       channel.key == 'general' ? 'Everyone who has the app installed' : 'Users who are signed in',
-                      style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280), fontSizeDelta: -1),
+                      style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -1),
                     ),
                   ],
                 ),
@@ -83,7 +83,7 @@ class _ChannelCard extends StatelessWidget {
               SizedBox(
                 width: 22,
                 child: isSelected
-                    ? const ExcludeSemantics(child: Icon(Icons.check_circle_rounded, color: primary, size: 22))
+                    ? ExcludeSemantics(child: Icon(Icons.check_circle_rounded, color: primary, size: 22))
                     : null,
               ),
             ],

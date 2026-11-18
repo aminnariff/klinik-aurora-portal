@@ -142,7 +142,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   Widget _authPage() {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: appCanvas,
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 768) return _desktopLayout();
@@ -209,8 +209,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               child: SlideTransition(
                 position: _formSlide,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: appSurface,
                     borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
                     boxShadow: [BoxShadow(color: Color(0x26000000), blurRadius: 40, offset: Offset(0, -8))],
                   ),
@@ -361,7 +361,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       height: size,
       padding: EdgeInsets.all(size * 0.12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
@@ -445,19 +445,19 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             ),
 
             // Header
-            const Text(
+            Text(
               'Sign in to your account',
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF0F172A),
+                color: appInkPrimary,
                 letterSpacing: -0.4,
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Enter your clinic credentials to access the management portal.',
-              style: TextStyle(fontSize: 13.5, color: Color(0xFF64748B), fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 13.5, color: appInkMuted, fontWeight: FontWeight.w400),
             ),
             const SizedBox(height: 30),
 
@@ -469,7 +469,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 controller: usernameController,
                 hintText: 'loginPage'.tr(gender: 'username'),
                 isEmail: true,
-                isEditableColor: const Color(0xFFF8FAFC),
+                isEditableColor: appSurfaceSubtle,
                 errorMessage: snapshot.usernameError,
                 onFieldSubmitted: (_) => _handleLogin(),
                 prefixIcon: Row(
@@ -498,7 +498,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     minimumSize: const Size(0, 0),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text(
+                  child: Text(
                     'Forgot password?',
                     style: TextStyle(fontSize: 13, color: primaryAccessibleText, fontWeight: FontWeight.w600),
                   ),
@@ -513,7 +513,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 hintText: 'loginPage'.tr(gender: 'password'),
                 obscureText: true,
                 isPassword: true,
-                isEditableColor: const Color(0xFFF8FAFC),
+                isEditableColor: appSurfaceSubtle,
                 errorMessage: snapshot.passwordError,
                 onFieldSubmitted: (_) => _handleLogin(),
                 prefixIcon: Row(
@@ -555,7 +555,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   const SizedBox(width: 9),
                   Text(
                     'loginPage'.tr(gender: 'rememberMe'),
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
+                    style: TextStyle(fontSize: 13, color: appInkSecondary),
                   ),
                 ],
               ),
@@ -611,7 +611,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   Widget _fieldLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkSecondary),
     );
   }
 
@@ -672,7 +672,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   Widget _loadingScreen() {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: appCanvas,
       body: Center(child: SizedBox(width: 140, child: Lottie.asset('assets/lottie/simple-loading.json', width: 140))),
     );
   }
@@ -750,7 +750,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(8),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: ConstrainedBox(
@@ -758,8 +758,8 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
             child: Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                color: appSurface,
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 1.5),
                 boxShadow: [
                   BoxShadow(
@@ -810,7 +810,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                       IconButton(
   tooltip: 'Tutup',
                         onPressed: () => context.pop(),
-                        icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8), size: 22),
+                        icon: Icon(Icons.close_rounded, color: appInkMuted, size: 22),
                         splashRadius: 20,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -819,32 +819,32 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                   ),
                   const SizedBox(height: 20),
                   // Title & Description
-                  const Text(
+                  Text(
                     'Reset your password',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                       letterSpacing: -0.3,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Enter your registered staff email address and we will send you a 6-digit verification code.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF64748B),
+                      color: appInkMuted,
                       height: 1.45,
                     ),
                   ),
                   const SizedBox(height: 24),
                   // Input Label
-                  const Text(
+                  Text(
                     'STAFF EMAIL',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF475569),
+                      color: appInkSecondary,
                       letterSpacing: 0.6,
                     ),
                   ),
@@ -861,23 +861,23 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                         setState(() => _errorMessage = null);
                       }
                     },
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                     ),
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
+                      fillColor: appSurfaceSubtle,
                       hintText: 'e.g. staff@klinikaurora.com',
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF94A3B8),
+                        color: appInkMuted,
                         fontWeight: FontWeight.w400,
                       ),
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.alternate_email_rounded,
-                        color: Color(0xFF94A3B8),
+                        color: appInkMuted,
                         size: 19,
                       ),
                       suffixIcon: ValueListenableBuilder<TextEditingValue>(
@@ -886,7 +886,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                           if (value.text.isEmpty) return const SizedBox.shrink();
                           return IconButton(
   tooltip: 'Kosongkan',
-                            icon: const Icon(Icons.cancel_rounded, size: 18, color: Color(0xFF94A3B8)),
+                            icon: Icon(Icons.cancel_rounded, size: 18, color: appInkMuted),
                             onPressed: () {
                               _controller.clear();
                               setState(() => _errorMessage = null);
@@ -897,15 +897,15 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: BorderSide(color: appBorder),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: BorderSide(color: appBorder),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: primary, width: 1.5),
+                        borderSide: BorderSide(color: primary, width: 1.5),
                       ),
                     ),
                   ),

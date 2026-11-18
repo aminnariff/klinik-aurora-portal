@@ -1,5 +1,6 @@
-import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class CardContainer extends StatelessWidget {
   final Widget child;
@@ -21,16 +22,25 @@ class CardContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: action,
-      child: Card(
-        surfaceTintColor: Colors.white,
-        elevation: elevation ?? 5.0,
-        color: color ?? Colors.white,
-        margin: margin ?? EdgeInsets.all(screenPadding),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius ?? 8.0)),
-        child: child,
+    final colors = context.appColors;
+    final radius = borderRadius ?? 8.0;
+    final card = Card(
+      surfaceTintColor: Colors.transparent,
+      elevation: elevation ?? 0.0,
+      color: color ?? colors.surface,
+      margin: margin ?? EdgeInsets.all(screenPadding),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius),
+        side: BorderSide(color: colors.border),
       ),
+      child: action != null
+          ? InkWell(
+              onTap: action,
+              borderRadius: BorderRadius.circular(radius),
+              child: child,
+            )
+          : child,
     );
+    return card;
   }
 }

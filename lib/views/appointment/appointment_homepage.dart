@@ -397,7 +397,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return Consumer<AuthController>(
       builder: (context, authController, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F6FA),
+          backgroundColor: appCanvas,
           body: Stack(
             children: [
               Column(
@@ -445,8 +445,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             SizedBox(
               width: isMobile ? 150 : 220,
               child: !_branchesLoaded && branches.isEmpty
-                  ? const Center(
-                      child: Text('Loading...', style: TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+                  ? Center(
+                      child: Text('Loading...', style: TextStyle(fontSize: 12, color: appInkMuted)),
                     )
                   : AppDropdown(
                       attributeList: DropdownAttributeList(
@@ -472,7 +472,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     ),
             ),
             const SizedBox(width: 12),
-            Container(height: 20, width: 1, color: const Color(0xFFE5E7EB)),
+            Container(height: 20, width: 1, color: appBorder),
             const SizedBox(width: 12),
           ],
           if (!_isCalendarView && !isMobile) ...[
@@ -491,8 +491,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             icon: const Icon(Icons.tune_rounded, size: 15),
             label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
             style: OutlinedButton.styleFrom(
-              foregroundColor: _hasActiveFilters() ? primary : const Color(0xFF374151),
-              side: BorderSide(color: _hasActiveFilters() ? primary : const Color(0xFFD1D5DB)),
+              foregroundColor: _hasActiveFilters() ? primary : appInkSecondary,
+              side: BorderSide(color: _hasActiveFilters() ? primary : appBorderStrong),
               padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14, vertical: isMobile ? 8 : 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -501,7 +501,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           IconButton(
             onPressed: _resetFilters,
             icon: const Icon(Icons.rotate_left_rounded, size: 16),
-            color: const Color(0xFF6B7280),
+            color: appInkMuted,
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F4F6),
@@ -593,12 +593,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                 children: [
                                   Row(
                                     children: [
-                                      const Icon(Icons.event_rounded, size: 15, color: primary),
+                                      Icon(Icons.event_rounded, size: 15, color: primary),
                                       const SizedBox(width: 6),
                                       Expanded(
                                         child: Text(
                                           _currentDateRange?.shortLabel ?? 'All Time',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w700,
                                             color: primary,
@@ -612,7 +612,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                     padding: const EdgeInsets.only(left: 21),
                                     child: Text(
                                       _dateRangeSummary(),
-                                      style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                                      style: TextStyle(fontSize: 12, color: appInkMuted),
                                     ),
                                   ),
                                   const SizedBox(height: 10),
@@ -636,16 +636,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             const SizedBox(height: 12),
                             _filterField(_customerNricController, 'IC Number (NRIC/Passport)'),
                             const SizedBox(height: 16),
-                            const Text(
+                            Text(
                               'Service',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkMuted),
                             ),
                             const SizedBox(height: 8),
                             _buildServiceFilter(),
                             const SizedBox(height: 16),
-                            const Text(
+                            Text(
                               'Practitioner Type',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkMuted),
                             ),
                             const SizedBox(height: 8),
                             _buildDoctorTypeFilter(),
@@ -681,7 +681,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                   Navigator.of(context).pop();
                                 },
                                 style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: Color(0xFFD1D5DB)),
+                                  side: BorderSide(color: appBorderStrong),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                 ),
@@ -768,19 +768,19 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         labelText: label,
         labelStyle: const TextStyle(fontSize: 13),
         filled: true,
-        fillColor: const Color(0xFFF9FAFB),
+        fillColor: appCanvas,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: appBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderSide: BorderSide(color: appBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primary, width: 1.5),
+          borderSide: BorderSide(color: primary, width: 1.5),
         ),
       ),
     );
@@ -825,9 +825,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     builder: (ctx) => AlertDialog(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       title: const Text('Select Branch', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                      content: const Text(
+                      content: Text(
                         'Please select a branch from the dropdown above before switching to Calendar view.',
-                        style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                        style: TextStyle(fontSize: 13, color: appInkMuted),
                       ),
                       actions: [TextButton(onPressed: () => context.pop(), child: const Text('OK'))],
                     ),
@@ -875,43 +875,51 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       final count = counts[i];
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
-                          onTap: () => _tabController.animateTo(i),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                            decoration: BoxDecoration(
-                              color: selected ? color : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: selected ? color : const Color(0xFFE5E7EB)),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _tabs[i],
-                                  style: AppTypography.bodyMedium(context).copyWith(
-                                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                                    color: selected ? Colors.white : const Color(0xFF6B7280),
-                                  ),
-                                ),
-                                if (count != null) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: selected ? Colors.white.withAlpha(60) : color.withAlpha(25),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      '$count',
-                                      style: AppTypography.bodyMedium(
-                                        context,
-                                      ).copyWith(fontWeight: FontWeight.bold, color: selected ? Colors.white : color),
+                        child: Semantics(
+                          button: true,
+                          selected: selected,
+                          label: '${_tabs[i]} appointments tab',
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () => _tabController.animateTo(i),
+                            child: AnimatedContainer(
+                              duration: MediaQuery.disableAnimationsOf(context)
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: selected ? color : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: selected ? color : appBorder),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _tabs[i],
+                                    style: AppTypography.bodyMedium(context).copyWith(
+                                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                                      color: selected ? Colors.white : appInkMuted,
                                     ),
                                   ),
+                                  if (count != null) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: selected ? Colors.white.withAlpha(60) : color.withAlpha(25),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        '$count',
+                                        style: AppTypography.bodyMedium(
+                                          context,
+                                        ).copyWith(fontWeight: FontWeight.bold, color: selected ? Colors.white : color),
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -919,7 +927,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     }),
                   ),
                   const SizedBox(width: 6),
-                  Container(height: 20, width: 1, color: const Color(0xFFE5E7EB)),
+                  Container(height: 20, width: 1, color: appBorder),
                   const SizedBox(width: 8),
                   actionButtons,
                 ],
@@ -942,43 +950,51 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       final count = counts[i];
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
-                          onTap: () => _tabController.animateTo(i),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: selected ? color : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: selected ? color : const Color(0xFFE5E7EB)),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _tabs[i],
-                                  style: AppTypography.bodyMedium(context).copyWith(
-                                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                                    color: selected ? Colors.white : const Color(0xFF6B7280),
-                                  ),
-                                ),
-                                if (count != null) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: selected ? Colors.white.withAlpha(60) : color.withAlpha(25),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      '$count',
-                                      style: AppTypography.bodyMedium(
-                                        context,
-                                      ).copyWith(fontWeight: FontWeight.bold, color: selected ? Colors.white : color),
+                        child: Semantics(
+                          button: true,
+                          selected: selected,
+                          label: '${_tabs[i]} appointments tab',
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () => _tabController.animateTo(i),
+                            child: AnimatedContainer(
+                              duration: MediaQuery.disableAnimationsOf(context)
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: selected ? color : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: selected ? color : appBorder),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _tabs[i],
+                                    style: AppTypography.bodyMedium(context).copyWith(
+                                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                                      color: selected ? Colors.white : appInkMuted,
                                     ),
                                   ),
+                                  if (count != null) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: selected ? Colors.white.withAlpha(60) : color.withAlpha(25),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        '$count',
+                                        style: AppTypography.bodyMedium(
+                                          context,
+                                        ).copyWith(fontWeight: FontWeight.bold, color: selected ? Colors.white : color),
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -1137,7 +1153,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   decoration: BoxDecoration(
                     color: isMobile ? Colors.transparent : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: isMobile ? null : Border.all(color: const Color(0xFFE5E7EB)),
+                    border: isMobile ? null : Border.all(color: appBorder),
                   ),
                   child: isLoading
                       ? const AppTableSkeleton(rows: 8)
@@ -1153,15 +1169,15 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           isVerticalScrollBarVisible: false,
                           fixedLeftColumns: 1,
                           fixedColumnsColor: Colors.white,
-                          fixedCornerColor: const Color(0xFFF9FAFB),
+                          fixedCornerColor: appCanvas,
                           columns: columns(),
-                          headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                          headingRowColor: WidgetStateProperty.all(appCanvas),
                           headingRowHeight: 44,
                           decoration: const BoxDecoration(),
                           border: TableBorder(
-                            horizontalInside: BorderSide(width: 1, color: const Color(0xFFE5E7EB)),
-                            top: BorderSide(width: 1, color: const Color(0xFFE5E7EB)),
-                            bottom: BorderSide(width: 1, color: const Color(0xFFE5E7EB)),
+                            horizontalInside: BorderSide(width: 1, color: appBorder),
+                            top: BorderSide(width: 1, color: appBorder),
+                            bottom: BorderSide(width: 1, color: appBorder),
                           ),
                           rows: [
                             for (int i = 0; i < data.length; i++) _buildDataRow(context, data[i], i, authController),
@@ -1199,14 +1215,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       case 5:
         return const Color(0xFF10B981);
       case 7:
-        return const Color(0xFF6B7280);
+        return appInkMuted;
       case 2:
       case 6:
         return const Color(0xFFEF4444);
       case 8:
         return const Color(0xFF8B5CF6);
       default:
-        return const Color(0xFF9CA3AF);
+        return appInkMuted;
     }
   }
 
@@ -1229,9 +1245,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(8),
@@ -1242,12 +1258,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: () => _handleMenuSelection('update', apt),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(8),
             child: IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1270,10 +1286,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                     Flexible(
                                       child: Text(
                                         patientName,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF111827),
+                                          color: appInkPrimary,
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -1286,11 +1302,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFF3F4F6),
                                           borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(color: const Color(0xFFE5E7EB), width: 0.8),
+                                          border: Border.all(color: appBorder, width: 0.8),
                                         ),
                                         child: Text(
                                           deriveAgeFromNric(apt.user?.userNric)!,
-                                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
+                                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
                                         ),
                                       ),
                                     ],
@@ -1307,9 +1323,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                   ),
                                   child: Text(
                                     appointmentId,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: Color(0xFF6B7280),
+                                      color: appInkMuted,
                                       fontFamily: 'monospace',
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -1321,14 +1337,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              const Icon(Icons.event_rounded, size: 14, color: Color(0xFF6B7280)),
+                              Icon(Icons.event_rounded, size: 14, color: appInkMuted),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   dateDisplay,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
-                                    color: Color(0xFF374151),
+                                    color: appInkSecondary,
                                     fontWeight: FontWeight.w600,
                                   ),
                                   maxLines: 1,
@@ -1340,7 +1356,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(Icons.medical_services_outlined, size: 14, color: Color(0xFF6B7280)),
+                              Icon(Icons.medical_services_outlined, size: 14, color: appInkMuted),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -1358,14 +1374,14 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF6B7280)),
+                              Icon(Icons.location_on_outlined, size: 14, color: appInkMuted),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   branchName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
-                                    color: Color(0xFF6B7280),
+                                    color: appInkMuted,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1382,7 +1398,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                 _buildPaymentBadge(isFeePaid ? 1 : 0),
                               ],
                               const Spacer(),
-                              const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFF9CA3AF)),
+                              Icon(Icons.chevron_right_rounded, size: 20, color: appInkMuted),
                             ],
                           ),
                         ],
@@ -1414,12 +1430,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             'No ${_tabs[_selectedTabIndex].toLowerCase()} appointments',
             style: AppTypography.bodyMedium(
               context,
-            ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF374151)),
+            ).copyWith(fontWeight: FontWeight.w600, color: appInkSecondary),
           ),
           const SizedBox(height: 4),
           Text(
             'Try adjusting the date range or filters',
-            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF9CA3AF)),
+            style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
           ),
         ],
       ),
@@ -1459,11 +1475,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             decoration: BoxDecoration(
                               color: const Color(0xFFF3F4F6),
                               borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: const Color(0xFFE5E7EB), width: 0.8),
+                              border: Border.all(color: appBorder, width: 0.8),
                             ),
                             child: Text(
                               ageStr,
-                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
                             ),
                           ),
                         ],
@@ -1472,7 +1488,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     if (item.user?.userPhone != null)
                       Text(
                         item.user!.userPhone!,
-                        style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: const Color(0xFF9CA3AF)),
+                        style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: appInkMuted),
                       ),
                   ],
                 ),
@@ -1518,12 +1534,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               children: [
                 Text(
                   doctorType(item.service?.doctorType),
-                  style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -1, color: const Color(0xFF374151)),
+                  style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -1, color: appInkSecondary),
                 ),
                 if (notNullOrEmptyString(item.doctor?.doctorName))
                   Text(
                     item.doctor!.doctorName!,
-                    style: const TextStyle(color: primary, fontWeight: FontWeight.w600, fontSize: 11),
+                    style: TextStyle(color: primary, fontWeight: FontWeight.w600, fontSize: 11),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1536,7 +1552,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       notNullOrEmptyString(item.doctor?.doctorName)
                           ? '⚠️ Off Duty / Reassign'
                           : '⚠️ No Staff on Duty',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
                     ),
                   ),
               ],
@@ -1566,7 +1582,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 if (parts.length > 1)
                   Text(
                     parts[1],
-                    style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: const Color(0xFF9CA3AF)),
+                    style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: appInkMuted),
                   ),
               ];
             }(),
@@ -1628,7 +1644,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           Icon(
                             isLocked ? Icons.visibility_rounded : Icons.edit_rounded,
                             size: 20,
-                            color: const Color(0xFF374151),
+                            color: appInkSecondary,
                           ),
                           const SizedBox(width: 8),
                           Text(isLocked ? 'View Details' : 'Update', style: AppTypography.bodyMedium(context)),
@@ -1655,7 +1671,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(color: Colors.grey.withAlpha(25), borderRadius: BorderRadius.circular(6)),
-                  child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
+                  child: Icon(Icons.more_horiz, color: appInkSecondary, size: 18),
                 ),
               ),
             ],
@@ -1767,7 +1783,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!isMobile)
-                Text('Rows: ', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+                Text('Rows: ', style: AppTypography.bodyMedium(context).apply(color: appInkMuted)),
               PerPageWidget(
                 _pageSize.toString(),
                 DropdownAttributeList(
@@ -1782,7 +1798,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 const SizedBox(width: 12),
                 Text(
                   '${((_page) * _pageSize) - _pageSize + 1}–${(_page * _pageSize < _totalCount) ? _page * _pageSize : _totalCount} of $_totalCount',
-                  style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280)),
+                  style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                 ),
               ],
             ],
@@ -1835,7 +1851,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         item.label,
                         style: AppTypography.bodyMedium(
                           context,
-                        ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
+                        ).copyWith(fontWeight: FontWeight.w600, color: appInkMuted),
                       ),
                       const SizedBox(width: 4),
                       Icon(
@@ -1845,7 +1861,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                   : Icons.keyboard_arrow_down_rounded)
                             : Icons.unfold_more_rounded,
                         size: 16,
-                        color: _sortBy == 'appointmentDatetime' ? const Color(0xFF2196F3) : const Color(0xFF9CA3AF),
+                        color: _sortBy == 'appointmentDatetime' ? const Color(0xFF2196F3) : appInkMuted,
                       ),
                     ],
                   ),
@@ -1854,7 +1870,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   item.label,
                   style: AppTypography.bodyMedium(
                     context,
-                  ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF6B7280)),
+                  ).copyWith(fontWeight: FontWeight.w600, color: appInkMuted),
                 ),
           size: item.columnSize ?? ColumnSize.M,
         ),
@@ -1910,7 +1926,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: SizedBox(
             width: math.min(500, MediaQuery.of(context).size.width * 0.92),
             height: screenHeight(80),
@@ -1937,7 +1953,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             Text('Check Available Slots', style: AppTypography.bodyLarge(context)),
                             Text(
                               'Branch: $branchLabel',
-                              style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280)),
+                              style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                             ),
                           ],
                         ),
@@ -1946,12 +1962,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   tooltip: 'Tutup',
                         icon: const Icon(Icons.close_rounded, size: 20),
                         onPressed: () => Navigator.of(context).pop(),
-                        style: IconButton.styleFrom(foregroundColor: const Color(0xFF6B7280)),
+                        style: IconButton.styleFrom(foregroundColor: appInkMuted),
                       ),
                     ],
                   ),
                 ),
-                const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                Divider(height: 1, color: appBorder),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
@@ -1959,7 +1975,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                     children: [
                       Text(
                         '${serviceList.length} service(s) available',
-                        style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280)),
+                        style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                       ),
                     ],
                   ),
@@ -1982,7 +1998,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           child: const Icon(Icons.medical_services_rounded, size: 16, color: Color(0xFF0284C7)),
                         ),
                         title: Text(item.name, style: AppTypography.bodyMedium(context)),
-                        trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF9CA3AF)),
+                        trailing: Icon(Icons.chevron_right_rounded, color: appInkMuted),
                         onTap: () async {
                           showLoading();
                           DateTime now = DateTime.now();
@@ -2272,13 +2288,13 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
         : _items.where((it) => it.category == _selectedCategory).toList();
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 40, vertical: 24),
       clipBehavior: Clip.antiAlias,
       child: Container(
         width: isMobile ? double.infinity : 740,
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2351,14 +2367,14 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                             padding: const EdgeInsets.only(right: 8),
                             child: InkWell(
                               onTap: () => setState(() => _selectedCategory = cat),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(8),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: isSelected ? appInkPrimary : appSurfaceSubtle,
+                                  borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
+                                    color: isSelected ? appInkPrimary : appBorder,
                                   ),
                                 ),
                                 child: Text(
@@ -2366,7 +2382,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                    color: isSelected ? Colors.white : const Color(0xFF475569),
+                                    color: isSelected ? Colors.white : appInkSecondary,
                                   ),
                                 ),
                               ),
@@ -2384,9 +2400,9 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5.5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: appBorder),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -2396,12 +2412,12 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                                   ? Icons.unfold_less_rounded
                                   : Icons.unfold_more_rounded,
                               size: 14,
-                              color: const Color(0xFF334155),
+                              color: appInkSecondary,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               _expandedTitles.length >= _items.length ? 'Collapse All' : 'Expand All',
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkSecondary),
                             ),
                           ],
                         ),
@@ -2411,7 +2427,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
 
             // Scrollable Content
             Flexible(
@@ -2444,10 +2460,10 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: appSurface,
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isExpanded ? item.iconColor.withAlpha(90) : const Color(0xFFE2E8F0),
+          color: isExpanded ? item.iconColor.withAlpha(90) : appBorder,
           width: isExpanded ? 1.5 : 1.0,
         ),
         boxShadow: [
@@ -2463,7 +2479,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
         children: [
           InkWell(
             onTap: () => _toggleExpand(item.title),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
@@ -2487,10 +2503,10 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                             Flexible(
                               child: Text(
                                 item.title,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0F172A),
+                                  color: appInkPrimary,
                                 ),
                               ),
                             ),
@@ -2504,7 +2520,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                               ),
                               child: Text(
                                 item.tag,
-                                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: item.tagColor),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: item.tagColor),
                               ),
                             ),
                           ],
@@ -2525,13 +2541,13 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: appSurfaceSubtle,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Icon(
                       isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                       size: 16,
-                      color: const Color(0xFF64748B),
+                      color: appInkMuted,
                     ),
                   ),
                 ],
@@ -2539,7 +2555,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
             ),
           ),
           if (isExpanded) ...[
-            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+            Divider(height: 1, color: appSurfaceSubtle),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
               child: Column(
@@ -2556,20 +2572,20 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                             height: 18,
                             margin: const EdgeInsets.only(top: 1, right: 8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
+                              color: appSurfaceSubtle,
                               borderRadius: BorderRadius.circular(9),
                             ),
                             child: Center(
                               child: Text(
                                 '${sIdx + 1}',
-                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkSecondary),
                               ),
                             ),
                           ),
                           Expanded(
                             child: Text(
                               item.steps[sIdx],
-                              style: const TextStyle(fontSize: 12, height: 1.45, color: Color(0xFF334155)),
+                              style: TextStyle(fontSize: 12, height: 1.45, color: appInkSecondary),
                             ),
                           ),
                         ],
@@ -2620,7 +2636,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFF0FDF4),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF86EFAC)),
       ),
       padding: const EdgeInsets.all(16),
@@ -2686,7 +2702,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                           ? Icons.check_box_rounded
                           : Icons.check_box_outline_blank_rounded,
                       size: 18,
-                      color: _checkedChecklist.contains(i) ? const Color(0xFF16A34A) : const Color(0xFF94A3B8),
+                      color: _checkedChecklist.contains(i) ? const Color(0xFF16A34A) : appInkMuted,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -2694,7 +2710,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                         _checklistItems[i],
                         style: TextStyle(
                           fontSize: 12.5,
-                          color: _checkedChecklist.contains(i) ? const Color(0xFF15803D) : const Color(0xFF1E293B),
+                          color: _checkedChecklist.contains(i) ? const Color(0xFF15803D) : appInkPrimary,
                           decoration: _checkedChecklist.contains(i) ? TextDecoration.lineThrough : null,
                           fontWeight: _checkedChecklist.contains(i) ? FontWeight.w500 : FontWeight.w600,
                         ),

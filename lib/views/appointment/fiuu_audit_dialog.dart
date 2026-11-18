@@ -105,7 +105,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 640, maxHeight: 640),
         child: Padding(
@@ -129,9 +129,9 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
                 ],
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Checks every transaction we have marked as NOT paid directly against Fiuu\'s own records, and reports any Fiuu confirms as actually paid.',
-                style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                style: TextStyle(fontSize: 13, color: appInkMuted),
               ),
               const SizedBox(height: 16),
               if (!_running && !_done) ...[
@@ -209,7 +209,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFEFF6FF) : Colors.white,
-          border: Border.all(color: selected ? primary : const Color(0xFFE5E7EB)),
+          border: Border.all(color: selected ? primary : appBorder),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -220,7 +220,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
               child: Icon(
                 selected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
                 size: 18,
-                color: selected ? const Color(0xFF2563EB) : const Color(0xFF9CA3AF),
+                color: selected ? const Color(0xFF2563EB) : appInkMuted,
               ),
             ),
             Expanded(
@@ -229,7 +229,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
                 children: [
                   Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                  Text(subtitle, style: TextStyle(fontSize: 12, color: appInkMuted)),
                 ],
               ),
             ),
@@ -268,8 +268,8 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
   Widget _resultsList() {
     if (_discrepancies.isEmpty) {
       if (_running) return const SizedBox.shrink();
-      return const Center(
-        child: Text('No discrepancies found.', style: TextStyle(color: Color(0xFF6B7280))),
+      return Center(
+        child: Text('No discrepancies found.', style: TextStyle(color: appInkMuted)),
       );
     }
     return ListView.separated(
@@ -303,7 +303,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
           const SizedBox(height: 2),
           Text(
             '${d.branchName ?? '—'} · ${dateConverter(d.createdDate) ?? d.createdDate}',
-            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            style: TextStyle(fontSize: 12, color: appInkMuted),
           ),
           const SizedBox(height: 4),
           Wrap(
@@ -312,7 +312,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
             children: [
               _tag('Our state: ${d.currentState}', const Color(0xFFFEE2E2), const Color(0xFF991B1B)),
               _tag('Fiuu: paid', const Color(0xFFDCFCE7), const Color(0xFF166534)),
-              _tag('bill_id: ${d.billId}', const Color(0xFFF3F4F6), const Color(0xFF374151)),
+              _tag('bill_id: ${d.billId}', const Color(0xFFF3F4F6), appInkSecondary),
             ],
           ),
         ],
@@ -323,8 +323,8 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
   Widget _tag(String text, Color bg, Color fg) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
-      child: Text(text, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: fg)),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
+      child: Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
     );
   }
 }

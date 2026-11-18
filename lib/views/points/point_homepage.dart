@@ -125,7 +125,7 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget mobileView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: SafeArea(
         child: Column(
           children: [
@@ -141,7 +141,7 @@ class _PointHomepageState extends State<PointHomepage> {
                   Container(
                     height: 44,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: appSurfaceSubtle,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.all(4),
@@ -252,7 +252,7 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: SizedBox(
         height: screenHeight(100),
         child: Column(
@@ -435,7 +435,7 @@ class _PointHomepageState extends State<PointHomepage> {
   Widget _buildSearchModePills() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.all(3),
@@ -540,19 +540,19 @@ class _PointHomepageState extends State<PointHomepage> {
                     prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                     isDense: true,
                     filled: true,
-                    fillColor: const Color(0xFFF8FAFC),
+                    fillColor: appSurfaceSubtle,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      borderSide: BorderSide(color: appBorder),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      borderSide: BorderSide(color: appBorder),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: primary, width: 1.5),
+                      borderSide: BorderSide(color: primary, width: 1.5),
                     ),
                   ),
                   onSubmitted: (_) => _handleSearch(),
@@ -580,7 +580,7 @@ class _PointHomepageState extends State<PointHomepage> {
             padding: const EdgeInsets.only(left: 4),
             child: Text(
               _searchError!,
-              style: const TextStyle(color: errorColor, fontSize: 11, fontWeight: FontWeight.w500),
+              style: TextStyle(color: errorColor, fontSize: 11, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -597,7 +597,7 @@ class _PointHomepageState extends State<PointHomepage> {
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: secondaryColor.withAlpha(90), width: 1.2),
         boxShadow: [
@@ -660,7 +660,7 @@ class _PointHomepageState extends State<PointHomepage> {
                               SizedBox(width: 3),
                               Text(
                                 'Verified Member',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
                               ),
                             ],
                           ),
@@ -735,7 +735,7 @@ class _PointHomepageState extends State<PointHomepage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(5),
       ),
       child: Row(
@@ -756,9 +756,9 @@ class _PointHomepageState extends State<PointHomepage> {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -825,9 +825,9 @@ class _PointHomepageState extends State<PointHomepage> {
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         children: [
@@ -872,11 +872,11 @@ class _PointHomepageState extends State<PointHomepage> {
               selected: isSelected,
               selectedColor: secondaryColor.withAlpha(30),
               checkmarkColor: secondaryColor,
-              backgroundColor: Colors.white,
+              backgroundColor: appSurface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(
-                  color: isSelected ? secondaryColor : const Color(0xFFE2E8F0),
+                  color: isSelected ? secondaryColor : appBorder,
                 ),
               ),
               onSelected: (selected) {
@@ -1009,7 +1009,7 @@ class _PointHomepageState extends State<PointHomepage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -1097,7 +1097,7 @@ class _PointHomepageState extends State<PointHomepage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFFF0F0F0)),
       ),
@@ -1139,7 +1139,7 @@ class _PointHomepageState extends State<PointHomepage> {
                           const SizedBox(height: 4),
                           Text(
                             'Recorded by ${item.createdByFullname ?? 'Staff'}  ·  ${dateConverter(item.createdDate) ?? 'N/A'}',
-                            style: TextStyle(fontSize: 10, color: Colors.grey.shade400),
+                            style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
                           ),
                         ],
                       ),
@@ -1171,9 +1171,9 @@ class _PointHomepageState extends State<PointHomepage> {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1284,7 +1284,7 @@ class _PointHomepageState extends State<PointHomepage> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Container(
             width: screenHeightByBreakpoint(90, 60, 42),
             padding: EdgeInsets.all(screenPadding * 1.5),

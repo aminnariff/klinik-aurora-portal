@@ -101,7 +101,7 @@ class _CampaignManagementState extends State<CampaignManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -211,10 +211,10 @@ class _CampaignCardState extends State<_CampaignCard> {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOut,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: appSurface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isHovered ? secondaryColor.withAlpha(160) : const Color(0xFFE2E8F0),
+            color: _isHovered ? secondaryColor.withAlpha(160) : appBorder,
             width: _isHovered ? 1.5 : 1,
           ),
           boxShadow: [
@@ -297,7 +297,7 @@ class _CampaignCardState extends State<_CampaignCard> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                            Divider(height: 1, color: appSurfaceSubtle),
                             const SizedBox(height: 6),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -392,7 +392,7 @@ class _CampaignCardState extends State<_CampaignCard> {
                               const SizedBox(width: 4),
                               Icon(
                                 Icons.chevron_right_rounded,
-                                color: _isHovered ? secondaryColor : const Color(0xFFCBD5E1),
+                                color: _isHovered ? secondaryColor : appBorderStrong,
                                 size: 22,
                               ),
                             ],
@@ -469,18 +469,18 @@ class _CampaignFact extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: const Color(0xFF64748B)),
+          Icon(icon, size: 14, color: appInkMuted),
           const SizedBox(width: 6),
           Text(
             '$label: ',
-            style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF64748B), fontSizeDelta: -2),
+            style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -2),
           ),
           Text(
             value,
@@ -515,11 +515,11 @@ class _ThemeSwatch extends StatelessWidget {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: const Color(0xFFF1F5F9),
+          color: appSurfaceSubtle,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: appBorder),
         ),
-        child: const Icon(Icons.palette_outlined, size: 22, color: Color(0xFF94A3B8)),
+        child: Icon(Icons.palette_outlined, size: 22, color: appInkMuted),
       );
     }
 
@@ -529,7 +529,7 @@ class _ThemeSwatch extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
+        border: Border.all(color: appBorderStrong, width: 1.2),
         boxShadow: const [
           BoxShadow(color: Color(0x0A000000), blurRadius: 4, offset: Offset(0, 2)),
         ],
@@ -553,7 +553,7 @@ class _StatusChip extends StatelessWidget {
 
     if (!campaign.isActive) {
       label = 'Inactive';
-      color = const Color(0xFF6B7280);
+      color = appInkMuted;
     } else if (campaign.isLive) {
       label = 'Live now';
       color = const Color(0xFF16A34A);
@@ -562,14 +562,14 @@ class _StatusChip extends StatelessWidget {
       color = const Color(0xFF2563EB);
     } else {
       label = 'Ended';
-      color = const Color(0xFF9CA3AF);
+      color = appInkMuted;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withAlpha(20),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color.withAlpha(60)),
       ),
       child: Row(

@@ -14,7 +14,7 @@ class Button extends StatefulWidget {
   final EdgeInsets? margin;
   final Widget? icon;
   final Color? color;
-  final Gradient gradient;
+  final Gradient? gradient;
   final bool isFlexible;
   final Color? textColor;
   final EdgeInsets? padding;
@@ -32,7 +32,7 @@ class Button extends StatefulWidget {
     this.icon,
     this.elevation,
     this.padding,
-    this.gradient = const LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight),
+    this.gradient,
     this.color,
     this.isFlexible = false,
     this.textColor,
@@ -56,9 +56,14 @@ class _ButtonState extends State<Button> {
   @override
   Widget build(BuildContext context) {
     final effectiveBorderRadius = widget.borderRadius ?? 8.0;
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
+    final effectiveGradient = widget.gradient ??
+        LinearGradient(colors: primaryColors, begin: Alignment.topLeft, end: Alignment.bottomRight);
     return AnimatedScale(
-      scale: _isPressed ? 0.97 : 1.0,
-      duration: _isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration,
+      scale: (!reducedMotion && _isPressed) ? 0.97 : 1.0,
+      duration: reducedMotion
+          ? Duration.zero
+          : (_isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration),
       curve: EmilMotion.easeOut,
       child: Container(
         padding: widget.margin ?? EdgeInsets.symmetric(vertical: isMobile ? widget.containerVerticalPadding ?? 0 : 0),
@@ -66,10 +71,10 @@ class _ButtonState extends State<Button> {
         height: widget.height,
         decoration: BoxDecoration(
           gradient: widget.action == null
-              ? const LinearGradient(colors: [Color(0xFFE5E7EB), Color(0xFFE5E7EB)])
+              ? LinearGradient(colors: [appBorder, appBorder])
               : (widget.color != null)
               ? LinearGradient(colors: [widget.color!, widget.color!], begin: Alignment.topLeft, end: Alignment.bottomRight)
-              : widget.gradient,
+              : effectiveGradient,
           borderRadius: BorderRadius.circular(effectiveBorderRadius),
         ),
         child: Listener(

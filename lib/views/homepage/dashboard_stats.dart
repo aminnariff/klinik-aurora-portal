@@ -6,6 +6,7 @@ import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.
 import 'package:klinik_aurora_portal/models/dashboard/dashboard_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:provider/provider.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class DashboardStats extends StatelessWidget {
   const DashboardStats({super.key});
@@ -224,7 +225,7 @@ class _UserDonutCard extends StatelessWidget {
 
     return Expanded(
       child: Container(
-        decoration: BoxDecoration(color: const Color(0xFF141d26), borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(color: const Color(0xFF141d26), borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         child: Row(
           children: [
@@ -251,7 +252,7 @@ class _UserDonutCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('$percent%', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                      const Text('active', style: TextStyle(color: Color(0xff68737d), fontSize: 9)),
+                      const Text('active', style: TextStyle(color: Color(0xff68737d), fontSize: 11)),
                     ],
                   ),
                 ],
@@ -327,7 +328,7 @@ class _StatCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: accent.withAlpha(40)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -341,7 +342,7 @@ class _StatCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: appInkMuted, fontSize: 12, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),

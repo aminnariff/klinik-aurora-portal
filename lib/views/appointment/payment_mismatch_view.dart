@@ -172,7 +172,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
 
   Widget _body() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -186,7 +186,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [BoxShadow(color: Colors.black.withAlpha(13), blurRadius: 8, offset: const Offset(0, 2))],
                 ),
@@ -250,9 +250,9 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
       margin: const EdgeInsets.only(bottom: 1),
       child: Row(
         children: [
-          const Icon(Icons.location_city_rounded, size: 16, color: Color(0xFF6B7280)),
+          Icon(Icons.location_city_rounded, size: 16, color: appInkMuted),
           const SizedBox(width: 8),
-          Text('Branch', style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280))),
+          Text('Branch', style: AppTypography.bodyMedium(context).apply(color: appInkMuted)),
           const SizedBox(width: 12),
           Flexible(
             child: _branchesLoaded
@@ -269,7 +269,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
                       width: screenWidthByBreakpoint(90, 70, 280, useAbsoluteValueDesktop: true),
                     ),
                   )
-                : const Text('Loading branches...', style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
+                : Text('Loading branches...', style: TextStyle(fontSize: 13, color: appInkMuted)),
           ),
         ],
       ),
@@ -291,7 +291,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
           const SizedBox(width: 8),
           IconButton(
             onPressed: _resetFilters,
-            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            icon: Icon(Icons.refresh_rounded, size: 18, color: appInkMuted),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F4F6),
@@ -319,7 +319,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
             minWidth: 1100,
             isHorizontalScrollBarVisible: true,
             isVerticalScrollBarVisible: true,
-            headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+            headingRowColor: WidgetStateProperty.all(appCanvas),
             headingRowHeight: 48,
             dataRowHeight: 64,
             decoration: const BoxDecoration(
@@ -344,7 +344,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
                     DataCell(
                       Text(
                         _items[i].serviceName ?? '—',
-                        style: const TextStyle(fontSize: 13, color: Color(0xFF111827)),
+                        style: TextStyle(fontSize: 13, color: appInkPrimary),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -354,14 +354,14 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
                             (_items[i].appointmentDatetime != null
                                 ? ' ${formatToDisplayTime(_items[i].appointmentDatetime!)}'
                                 : ''),
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                        style: TextStyle(fontSize: 12, color: appInkSecondary),
                       ),
                     ),
                     DataCell(_paymentCell(_items[i])),
                     DataCell(
                       Text(
                         dateConverter(_items[i].appointmentModifiedDate) ?? '—',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        style: TextStyle(fontSize: 12, color: appInkMuted),
                       ),
                     ),
                     DataCell(_actionsCell(_items[i])),
@@ -381,7 +381,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
       size: size,
       label: Text(
         label,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280), letterSpacing: 0.3),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted, letterSpacing: 0.3),
       ),
     );
   }
@@ -393,11 +393,11 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
       children: [
         Text(
           item.userName ?? '—',
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
           overflow: TextOverflow.ellipsis,
         ),
         if (item.userPhone != null && item.userPhone!.isNotEmpty)
-          Text(item.userPhone!, style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF))),
+          Text(item.userPhone!, style: TextStyle(fontSize: 11, color: appInkMuted)),
       ],
     );
   }
@@ -405,7 +405,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
   Widget _branchCell(PaymentMismatchData item) {
     return Text(
       item.branchName ?? '—',
-      style: const TextStyle(fontSize: 13, color: Color(0xFF111827)),
+      style: TextStyle(fontSize: 13, color: appInkPrimary),
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -422,7 +422,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
         ),
         Text(
           '${item.gatewayLabel}${item.paymentReceiptNo != null && item.paymentReceiptNo!.isNotEmpty ? ' · ${item.paymentReceiptNo}' : ''}',
-          style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+          style: TextStyle(fontSize: 11, color: appInkMuted),
           overflow: TextOverflow.ellipsis,
         ),
         if (item.paymentStatusCorrupted)
@@ -435,7 +435,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
               decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(10)),
               child: const Text(
                 '⚠ record shows Failed',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),
               ),
             ),
           ),

@@ -40,12 +40,12 @@ class AppointmentDetailsView extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: maxW, maxHeight: maxH),
         margin: EdgeInsets.all(isMobile ? 8 : 16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [BoxShadow(color: Colors.black.withAlpha(18), blurRadius: 24, offset: const Offset(0, 4))],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -180,10 +180,10 @@ class AppointmentDetailsView extends StatelessWidget {
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              side: const BorderSide(color: Color(0xFFD1D5DB)),
+                              side: BorderSide(color: appBorderStrong),
                             ),
-                            icon: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF374151)),
-                            label: const Text('Close', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w600)),
+                            icon: Icon(Icons.close_rounded, size: 16, color: appInkSecondary),
+                            label: Text('Close', style: TextStyle(color: appInkSecondary, fontWeight: FontWeight.w600)),
                             onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
                           ),
                         ],
@@ -249,13 +249,13 @@ class AppointmentDetailsView extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(isMobile ? 12 : 20, 14, 8, 14),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF9FAFB),
+      decoration: BoxDecoration(
+        color: appCanvas,
         border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
       ),
       child: Row(
         children: [
-          const Icon(Icons.event_note_rounded, size: 18, color: Color(0xFF6B7280)),
+          Icon(Icons.event_note_rounded, size: 18, color: appInkMuted),
           const SizedBox(width: 8),
           Expanded(
             child: Wrap(
@@ -273,7 +273,7 @@ class AppointmentDetailsView extends StatelessWidget {
                     decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
                     child: Text(
                       '#${data!.appointmentId!.substring(0, math.min(8, data.appointmentId!.length)).toUpperCase()}',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontFamily: 'monospace'),
+                      style: TextStyle(fontSize: 11, color: appInkMuted, fontFamily: 'monospace'),
                     ),
                   ),
                 if (parentAppointmentId != null)
@@ -360,7 +360,7 @@ class AppointmentDetailsView extends StatelessWidget {
               backgroundColor: primary.withAlpha(30),
               child: Text(
                 initials,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: primary),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: primary),
               ),
             ),
             const SizedBox(width: 12),
@@ -414,13 +414,13 @@ class AppointmentDetailsView extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: appCanvas,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: AppSelectableText(
               data!.appointmentNote!,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+              style: TextStyle(fontSize: 13, color: appInkSecondary),
             ),
           ),
         ],
@@ -458,24 +458,24 @@ class AppointmentDetailsView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: appSurfaceSubtle,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: appBorder),
           ),
           child: Row(
             children: [
-              const Icon(Icons.event_rounded, size: 18, color: Color(0xFF475569)),
+              Icon(Icons.event_rounded, size: 18, color: appInkSecondary),
               const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     formatToDisplayDate(data?.appointmentDatetime ?? ''),
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF0F172A)),
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: appInkPrimary),
                   ),
                   Text(
                     formatToDisplayTime(data?.appointmentDatetime ?? ''),
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 13, color: appInkMuted, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -542,7 +542,7 @@ class AppointmentDetailsView extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.medical_services_outlined, size: 15, color: primary),
+              Icon(Icons.medical_services_outlined, size: 15, color: primary),
               const SizedBox(width: 6),
               _valueText(data!.doctor!.doctorName!),
             ],
@@ -558,46 +558,51 @@ class AppointmentDetailsView extends StatelessWidget {
           const SizedBox(height: 14),
           _fieldLabel('Attachment'),
           const SizedBox(height: 6),
-          GestureDetector(
-            onTap: () => launchWebUrl(data.appointmentAttachmentUrl ?? '', webOnlyWindowName: '_blank'),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.attach_file_rounded, size: 15, color: Color(0xFF475569)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      data.appointmentAttachmentUrl ?? '',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF0F172A),
-                        fontWeight: FontWeight.w500,
+          Semantics(
+            button: true,
+            label: 'Open appointment attachment',
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => launchWebUrl(data.appointmentAttachmentUrl ?? '', webOnlyWindowName: '_blank'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: appSurface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: appBorder),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.attach_file_rounded, size: 15, color: appInkSecondary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        data.appointmentAttachmentUrl ?? '',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: appInkPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF94A3B8)),
-                ],
+                    const SizedBox(width: 6),
+                    Icon(Icons.open_in_new_rounded, size: 12, color: appInkMuted),
+                  ],
+                ),
               ),
             ),
           ),
           const SizedBox(height: 6),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Icon(Icons.info_outline_rounded, size: 11, color: Color(0xFF9CA3AF)),
-              SizedBox(width: 4),
+            children: [
+              Icon(Icons.info_outline_rounded, size: 12, color: appInkMuted),
+              const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   'Documents are stored for 6 months to 1 year and may be deleted thereafter. Please save your own copy.',
-                  style: TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), height: 1.4),
+                  style: TextStyle(fontSize: 11, color: appInkMuted, height: 1.4),
                 ),
               ),
             ],
@@ -609,14 +614,18 @@ class AppointmentDetailsView extends StatelessWidget {
           const SizedBox(height: 14),
           _fieldLabel('Referral Letter (PDF)'),
           const SizedBox(height: 6),
-          GestureDetector(
-            onTap: () => launchWebUrl(data.appointmentReferralLetterUrl ?? '', webOnlyWindowName: '_blank'),
-            child: Container(
+          Semantics(
+            button: true,
+            label: 'Open referral letter PDF',
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => launchWebUrl(data.appointmentReferralLetterUrl ?? '', webOnlyWindowName: '_blank'),
+              child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: appSurface,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: appBorder),
               ),
               child: Row(
                 children: [
@@ -625,19 +634,20 @@ class AppointmentDetailsView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       data.appointmentReferralLetterUrl ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF0F172A),
+                        color: appInkPrimary,
                         fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Icon(Icons.open_in_new_rounded, size: 12, color: Color(0xFF94A3B8)),
+                  Icon(Icons.open_in_new_rounded, size: 12, color: appInkMuted),
                 ],
               ),
             ),
+          ),
           ),
         ],
       ],
@@ -746,10 +756,10 @@ class AppointmentDetailsView extends StatelessWidget {
       if (txn.paymentChannel != null)
         _PayDetailRow(Icons.payment_rounded, 'Paid via', txn.channelLabel, const Color(0xFF7C3AED)),
       if (txn.cardInfo != null)
-        _PayDetailRow(Icons.credit_card_rounded, 'Card No.', _maskCard(txn.cardInfo!), const Color(0xFF374151)),
+        _PayDetailRow(Icons.credit_card_rounded, 'Card No.', _maskCard(txn.cardInfo!), appInkSecondary),
       _PayDetailRow(Icons.account_balance_rounded, 'Gateway', txn.gatewayLabel, const Color(0xFF0369A1)),
       _PayDetailRow(Icons.schedule_rounded, 'Settlement', txn.settlementTimeline, const Color(0xFF0891B2)),
-      if (txn.billId != null) _PayDetailRow(Icons.tag_rounded, 'Transaction Ref', txn.billId!, const Color(0xFF374151)),
+      if (txn.billId != null) _PayDetailRow(Icons.tag_rounded, 'Transaction Ref', txn.billId!, appInkSecondary),
       if (txn.paidAt != null)
         _PayDetailRow(
           Icons.check_circle_outline_rounded,
@@ -763,23 +773,23 @@ class AppointmentDetailsView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.credit_card_rounded, size: 13, color: Color(0xFF475569)),
+              Icon(Icons.credit_card_rounded, size: 13, color: appInkSecondary),
               SizedBox(width: 6),
               Text(
                 'ONLINE PAYMENT DETAILS',
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF475569),
+                  color: appInkSecondary,
                   letterSpacing: 0.8,
                 ),
               ),
@@ -807,7 +817,7 @@ class AppointmentDetailsView extends StatelessWidget {
             width: isMobile ? 85 : 95,
             child: Text(
               row.label,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
             ),
           ),
           Expanded(
@@ -833,13 +843,13 @@ class AppointmentDetailsView extends StatelessWidget {
       width: fullWidth ? double.infinity : null,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF64748B)),
+          Icon(icon, size: 16, color: appInkMuted),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -852,7 +862,7 @@ class AppointmentDetailsView extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
                     ),
                     ?badge,
                   ],
@@ -860,7 +870,7 @@ class AppointmentDetailsView extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: appInkPrimary),
                 ),
               ],
             ),
@@ -928,30 +938,30 @@ class AppointmentDetailsView extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: appCanvas,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.lock_outline_rounded, size: 12, color: Color(0xFF6B7280)),
+                    Icon(Icons.lock_outline_rounded, size: 12, color: appInkMuted),
                     const SizedBox(width: 6),
-                    const Text(
+                    Text(
                       'ADMIN REMARK (INTERNAL)',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF6B7280),
+                        color: appInkMuted,
                         letterSpacing: 0.6,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(data!.adminRemark!, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+                Text(data!.adminRemark!, style: TextStyle(fontSize: 12, color: appInkSecondary)),
               ],
             ),
           ),
@@ -964,7 +974,7 @@ class AppointmentDetailsView extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF9CA3AF)),
+        Icon(icon, size: 14, color: appInkMuted),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -972,9 +982,9 @@ class AppointmentDetailsView extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF9CA3AF)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
               ),
-              Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+              Text(value, style: TextStyle(fontSize: 12, color: appInkSecondary)),
             ],
           ),
         ),
@@ -1017,13 +1027,13 @@ class AppointmentDetailsView extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: appCanvas,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: AppSelectableText(
               data.appointmentFeedback!,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+              style: TextStyle(fontSize: 13, color: appInkSecondary),
             ),
           ),
         ],
@@ -1041,14 +1051,14 @@ class AppointmentDetailsView extends StatelessWidget {
           decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 13, color: const Color(0xFF6B7280)),
+        Icon(icon, size: 13, color: appInkMuted),
         const SizedBox(width: 5),
         Text(
           text.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 10,
+          style: TextStyle(
+            fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF6B7280),
+            color: appInkMuted,
             letterSpacing: 1.0,
           ),
         ),
@@ -1059,14 +1069,14 @@ class AppointmentDetailsView extends StatelessWidget {
   Widget _fieldLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
     );
   }
 
   Widget _valueText(String text) {
     return AppSelectableText(
       text,
-      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF111827)),
+      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: appInkPrimary),
     );
   }
 
@@ -1081,7 +1091,7 @@ class AppointmentDetailsView extends StatelessWidget {
   Widget _subtleText(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 1),
-      child: AppSelectableText(text, style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+      child: AppSelectableText(text, style: TextStyle(fontSize: 12, color: appInkMuted)),
     );
   }
 
@@ -1169,10 +1179,10 @@ class AppointmentDetailsView extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'Transfer History (${history.length})',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1E293B),
+                color: appInkPrimary,
               ),
             ),
           ],
@@ -1185,9 +1195,9 @@ class AppointmentDetailsView extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appSurfaceSubtle,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: appBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1217,10 +1227,10 @@ class AppointmentDetailsView extends StatelessWidget {
                           Expanded(
                             child: Text(
                               '${item.fromBranchName ?? '—'}  ➜  ${item.toBranchName ?? '—'}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F172A),
+                                color: appInkPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1231,14 +1241,14 @@ class AppointmentDetailsView extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       item.createdDate != null ? dateConverter(item.createdDate, format: 'dd MMM yyyy, HH:mm') ?? '' : '',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 11, color: appInkMuted),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Reason: ${item.transferReason ?? '—'}',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                  style: TextStyle(fontSize: 12, color: appInkSecondary),
                 ),
                 const SizedBox(height: 4),
                 Row(
@@ -1246,9 +1256,9 @@ class AppointmentDetailsView extends StatelessWidget {
                   children: [
                     Text(
                       'Transferred by: ${item.transferredByName ?? 'Staff'}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: appInkMuted,
                         fontStyle: FontStyle.italic,
                       ),
                     ),

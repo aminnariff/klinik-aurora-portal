@@ -106,7 +106,7 @@ class _ModeToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(8)),
       child: Wrap(
         spacing: 4,
         runSpacing: 4,
@@ -155,12 +155,12 @@ class _ToggleOption extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 15, color: isSelected ? primary : const Color(0xFF637381)),
+              Icon(icon, size: 15, color: isSelected ? primary : appInkMuted),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: AppTypography.bodyMedium(context).apply(
-                  color: isSelected ? textPrimaryColor : const Color(0xFF637381),
+                  color: isSelected ? textPrimaryColor : appInkMuted,
                   fontWeightDelta: isSelected ? 3 : 0,
                   fontSizeDelta: -1,
                 ),
@@ -214,7 +214,7 @@ class _DateField extends StatelessWidget {
       children: [
         Text(
           'Date',
-          style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF637381), fontSizeDelta: -2),
+          style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -2),
         ),
         const SizedBox(height: 6),
         InkWell(
@@ -226,7 +226,7 @@ class _DateField extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFFEEF3F7),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: Row(
               children: [
@@ -237,7 +237,7 @@ class _DateField extends StatelessWidget {
                     style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                   ),
                 ),
-                const Icon(Icons.calendar_month_rounded, color: primary, size: 20),
+                Icon(Icons.calendar_month_rounded, color: primary, size: 20),
               ],
             ),
           ),
@@ -277,7 +277,7 @@ class _TimeFields extends StatelessWidget {
       children: [
         Text(
           'Time',
-          style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF637381), fontSizeDelta: -2),
+          style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -2),
         ),
         const SizedBox(height: 6),
         Row(
@@ -339,7 +339,7 @@ class _Select<T> extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFEEF3F7),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorder),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
@@ -373,7 +373,7 @@ class _Summary extends StatelessWidget {
     if (scheduled == null) {
       return Text(
         'Goes out as soon as you confirm on the next step.',
-        style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF637381), fontSizeDelta: -2),
+        style: AppTypography.bodyMedium(context).apply(color: appInkMuted, fontSizeDelta: -2),
       );
     }
 
@@ -394,7 +394,7 @@ class _Summary extends StatelessWidget {
                 ? 'That time has already passed — pick a time in the future.'
                 : 'Goes out on ${formatDeliveryDate(scheduled)} at ${formatDeliveryTime(scheduled)}.',
             style: AppTypography.bodyMedium(context).apply(
-              color: isPast ? const Color(0xFF92400E) : const Color(0xFF637381),
+              color: isPast ? const Color(0xFF92400E) : appInkMuted,
               fontSizeDelta: -2,
             ),
           ),

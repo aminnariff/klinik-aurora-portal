@@ -36,8 +36,8 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: appSurface,
+      surfaceTintColor: Colors.transparent,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: math.min(600, MediaQuery.of(context).size.width * 0.9),
@@ -128,7 +128,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey.shade100),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
@@ -152,7 +152,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                     children: [
                       Text(
                         month,
-                        style: TextStyle(color: primary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                        style: TextStyle(color: primary, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                       ),
                       Text(
                         day,

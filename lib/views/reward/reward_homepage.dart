@@ -75,7 +75,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
 
   Widget _desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -85,7 +85,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -125,7 +125,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                   hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -295,7 +295,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
   Widget _filterLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted),
     );
   }
 
@@ -330,7 +330,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                 minWidth: 800,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,
-                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowColor: WidgetStateProperty.all(appCanvas),
                 headingRowHeight: 48,
                 dataRowHeight: 60,
                 decoration: const BoxDecoration(
@@ -357,7 +357,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                       ),
                       color: WidgetStateProperty.resolveWith<Color?>((states) {
                         if (states.contains(WidgetState.hovered)) {
-                          return const Color(0xFFF1F5F9);
+                          return appSurfaceSubtle;
                         }
                         return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
                       }),
@@ -367,7 +367,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                         DataCell(
                           Text(
                             _stockLabel(items[i]),
-                            style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+                            style: TextStyle(fontSize: 13, color: appInkSecondary),
                           ),
                         ),
                         DataCell(_periodCell(items[i])),
@@ -375,7 +375,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                         DataCell(
                           Text(
                             dateConverter(items[i].createdDate) ?? '—',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                         ),
                         DataCell(_actionsCell(items[i], snapshot)),
@@ -397,10 +397,10 @@ class _RewardHomepageState extends State<RewardHomepage> {
       size: size,
       label: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF6B7280),
+          color: appInkMuted,
           letterSpacing: 0.3,
         ),
       ),
@@ -417,7 +417,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
             color: primary.withAlpha(30),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.card_giftcard_rounded, size: 18, color: primary),
+          child: Icon(Icons.card_giftcard_rounded, size: 18, color: primary),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -427,17 +427,17 @@ class _RewardHomepageState extends State<RewardHomepage> {
             children: [
               Text(
                 reward.rewardName ?? '—',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF111827),
+                  color: appInkPrimary,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
               if (reward.rewardDescription != null && reward.rewardDescription!.isNotEmpty)
                 Text(
                   reward.rewardDescription!,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                  style: TextStyle(fontSize: 11, color: appInkMuted),
                   overflow: TextOverflow.ellipsis,
                 ),
             ],
@@ -452,7 +452,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFFF0F9FF),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFBAE6FD)),
       ),
       child: Text(
@@ -470,18 +470,18 @@ class _RewardHomepageState extends State<RewardHomepage> {
     final start = dateConverter(reward.rewardStartDate);
     final end = dateConverter(reward.rewardEndDate);
     if (start == null && end == null) {
-      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+      return Text('—', style: TextStyle(color: appInkMuted, fontSize: 13));
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (start != null)
-          Text(start, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+          Text(start, style: TextStyle(fontSize: 12, color: appInkSecondary)),
         if (end != null)
           Text(
             '→ $end',
-            style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+            style: TextStyle(fontSize: 11, color: appInkMuted),
           ),
       ],
     );
@@ -496,7 +496,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         color: isActive
             ? const Color(0xFFDCFCE7)
             : const Color(0xFFFEE2E2),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         isActive ? 'Active' : 'Inactive',
@@ -652,7 +652,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                   hintText: 'Search rewards...',
                   prefixIcon: const Icon(Icons.search, size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -725,7 +725,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0xFFE5E7EB)),
+          side: BorderSide(color: appBorder),
         ),
         color: Colors.white,
       child: Padding(
@@ -742,7 +742,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                     color: primary.withAlpha(30),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.card_giftcard_rounded, size: 18, color: primary),
+                  child: Icon(Icons.card_giftcard_rounded, size: 18, color: primary),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -792,12 +792,12 @@ class _RewardHomepageState extends State<RewardHomepage> {
             width: 70,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              style: TextStyle(fontSize: 12, color: appInkMuted),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+            style: TextStyle(fontSize: 12, color: appInkSecondary),
           ),
         ],
       ),

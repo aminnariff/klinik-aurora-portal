@@ -80,7 +80,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
 
   Widget _desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,7 +90,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [BoxShadow(color: Colors.black.withAlpha(13), blurRadius: 8, offset: const Offset(0, 2))],
                 ),
@@ -124,7 +124,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                   hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                 ),
@@ -296,7 +296,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
   Widget _filterLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted),
     );
   }
 
@@ -327,7 +327,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                 minWidth: 900,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,
-                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowColor: WidgetStateProperty.all(appCanvas),
                 headingRowHeight: 48,
                 dataRowHeight: 64,
                 decoration: const BoxDecoration(
@@ -351,7 +351,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                       ),
                       color: WidgetStateProperty.resolveWith<Color?>((states) {
                         if (states.contains(WidgetState.hovered)) {
-                          return const Color(0xFFF1F5F9);
+                          return appSurfaceSubtle;
                         }
                         return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
                       }),
@@ -363,7 +363,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                         DataCell(
                           Text(
                             items[i].rewardHistoryDescription ?? '—',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -372,7 +372,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                             dateConverter(items[i].rewardHistoryModifiedDate) ??
                                 dateConverter(items[i].rewardHistoryCreatedDate) ??
                                 '—',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                         ),
                         DataCell(
@@ -401,7 +401,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       size: size,
       label: Text(
         label,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280), letterSpacing: 0.3),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted, letterSpacing: 0.3),
       ),
     );
   }
@@ -438,11 +438,11 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
             children: [
               Text(
                 name,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111827)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
                 overflow: TextOverflow.ellipsis,
               ),
               if (item.userPhone != null && item.userPhone!.isNotEmpty)
-                Text(item.userPhone!, style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF))),
+                Text(item.userPhone!, style: TextStyle(fontSize: 11, color: appInkMuted)),
             ],
           ),
         ),
@@ -457,13 +457,13 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       children: [
         Text(
           item.rewardName ?? '—',
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF111827)),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: appInkPrimary),
           overflow: TextOverflow.ellipsis,
         ),
         if (item.rewardDescription != null && item.rewardDescription!.isNotEmpty)
           Text(
             item.rewardDescription!,
-            style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+            style: TextStyle(fontSize: 11, color: appInkMuted),
             overflow: TextOverflow.ellipsis,
           ),
       ],
@@ -475,7 +475,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFFF0F9FF),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFBAE6FD)),
       ),
       child: Text(
@@ -492,7 +492,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
     final textColor = isInProgress ? const Color(0xFFC2410C) : const Color(0xFF15803D);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
       child: Text(
         label,
         style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textColor),
@@ -576,7 +576,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                   hintText: 'Search by patient name...',
                   prefixIcon: const Icon(Icons.search, size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 ),
@@ -609,7 +609,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0xFFE5E7EB)),
+          side: BorderSide(color: appBorder),
         ),
         color: Colors.white,
         child: Padding(
@@ -664,10 +664,10 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
         children: [
           SizedBox(
             width: 70,
-            child: Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+            child: Text(label, style: TextStyle(fontSize: 12, color: appInkMuted)),
           ),
           Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
+            child: Text(value, style: TextStyle(fontSize: 12, color: appInkSecondary)),
           ),
         ],
       ),

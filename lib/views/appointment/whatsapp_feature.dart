@@ -54,9 +54,9 @@ void showWhatsAppTemplateDialog({
     context: context,
     builder: (context) {
       return Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: appSurface,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 600, maxHeight: MediaQuery.of(context).size.height * 0.85),
           child: Padding(
@@ -190,7 +190,7 @@ void showWhatsAppTemplateDialog({
                               borderSide: BorderSide(color: primary, width: 2),
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: appSurface,
                             contentPadding: const EdgeInsets.all(16),
                           ),
                           cursorColor: primary,

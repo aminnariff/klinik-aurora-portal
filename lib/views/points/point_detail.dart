@@ -186,8 +186,8 @@ class _PointDetailState extends State<PointDetail> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: appSurface,
       surfaceTintColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ConstrainedBox(
@@ -224,8 +224,8 @@ class _PointDetailState extends State<PointDetail> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 12, 14),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
@@ -238,25 +238,25 @@ class _PointDetailState extends State<PointDetail> {
             child: const Icon(Icons.stars_rounded, size: 20, color: Color(0xFFD97706)),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Points Management',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appInkPrimary),
                 ),
                 SizedBox(height: 2),
                 Text(
                   'Adjust points, issue voucher, or redeem reward',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ),
           ),
           IconButton(
   tooltip: 'Tutup',
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF94A3B8)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             splashRadius: 18,
             onPressed: () => context.pop(),
           ),
@@ -274,9 +274,9 @@ class _PointDetailState extends State<PointDetail> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         children: [
@@ -295,14 +295,14 @@ class _PointDetailState extends State<PointDetail> {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appInkPrimary),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '@$username',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 11, color: appInkMuted),
                 ),
               ],
             ),
@@ -311,7 +311,7 @@ class _PointDetailState extends State<PointDetail> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: const Color(0xFFFEF3C7),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFFFDE68A)),
             ),
             child: Row(
@@ -335,7 +335,7 @@ class _PointDetailState extends State<PointDetail> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -399,7 +399,7 @@ class _PointDetailState extends State<PointDetail> {
             Icon(
               icon,
               size: 14,
-              color: isSelected ? primary : const Color(0xFF64748B),
+              color: isSelected ? primary : appInkMuted,
             ),
             const SizedBox(width: 6),
             Text(
@@ -407,7 +407,7 @@ class _PointDetailState extends State<PointDetail> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? primary : const Color(0xFF64748B),
+                color: isSelected ? primary : appInkMuted,
               ),
             ),
           ],
@@ -451,10 +451,10 @@ class _PointDetailState extends State<PointDetail> {
             height: 42,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appSurfaceSubtle,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: _voucherError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                color: _voucherError != null ? const Color(0xFFEF4444) : appBorderStrong,
               ),
             ),
             child: DropdownButtonHideUnderline(
@@ -468,7 +468,7 @@ class _PointDetailState extends State<PointDetail> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: _selectedVoucher != null ? FontWeight.w600 : FontWeight.normal,
-                    color: _selectedVoucher != null ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                    color: _selectedVoucher != null ? appInkPrimary : appInkMuted,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -478,10 +478,10 @@ class _PointDetailState extends State<PointDetail> {
                         value: item,
                         child: Text(
                           '${item.voucherName ?? '—'} (${item.voucherPoint ?? 0} pts)',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF0F172A),
+                            color: appInkPrimary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -494,13 +494,13 @@ class _PointDetailState extends State<PointDetail> {
                     _voucherError = null;
                   });
                 },
-                iconStyleData: const IconStyleData(
-                  icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: Color(0xFF64748B)),
+                iconStyleData: IconStyleData(
+                  icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: appInkMuted),
                 ),
                 dropdownStyleData: DropdownStyleData(
                   elevation: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: appSurface,
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -549,10 +549,10 @@ class _PointDetailState extends State<PointDetail> {
             height: 42,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appSurfaceSubtle,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: _rewardError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                color: _rewardError != null ? const Color(0xFFEF4444) : appBorderStrong,
               ),
             ),
             child: DropdownButtonHideUnderline(
@@ -566,7 +566,7 @@ class _PointDetailState extends State<PointDetail> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: _selectedReward != null ? FontWeight.w600 : FontWeight.normal,
-                    color: _selectedReward != null ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                    color: _selectedReward != null ? appInkPrimary : appInkMuted,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -576,10 +576,10 @@ class _PointDetailState extends State<PointDetail> {
                         value: item,
                         child: Text(
                           '${item.rewardName ?? '—'} (Cost: ${item.rewardPoint ?? 0} pts)',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF0F172A),
+                            color: appInkPrimary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -592,13 +592,13 @@ class _PointDetailState extends State<PointDetail> {
                     _rewardError = null;
                   });
                 },
-                iconStyleData: const IconStyleData(
-                  icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: Color(0xFF64748B)),
+                iconStyleData: IconStyleData(
+                  icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: appInkMuted),
                 ),
                 dropdownStyleData: DropdownStyleData(
                   elevation: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: appSurface,
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -657,10 +657,10 @@ class _PointDetailState extends State<PointDetail> {
     return RichText(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
         children: isRequired
             ? [
@@ -689,21 +689,21 @@ class _PointDetailState extends State<PointDetail> {
           child: TextField(
             controller: controller,
             keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Color(0xFF94A3B8)),
+              hintStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: appInkMuted),
               filled: true,
-              fillColor: const Color(0xFFF8FAFC),
+              fillColor: appSurfaceSubtle,
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 16, color: const Color(0xFF64748B)) : null,
+              prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 16, color: appInkMuted) : null,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1)),
+                borderSide: BorderSide(color: errorText != null ? const Color(0xFFEF4444) : appBorderStrong),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: errorText != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1)),
+                borderSide: BorderSide(color: errorText != null ? const Color(0xFFEF4444) : appBorderStrong),
               ),
               focusedBorder: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -723,9 +723,9 @@ class _PointDetailState extends State<PointDetail> {
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -735,9 +735,9 @@ class _PointDetailState extends State<PointDetail> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              side: const BorderSide(color: Color(0xFFCBD5E1)),
+              side: BorderSide(color: appBorderStrong),
             ),
-            child: const Text('Cancel', style: TextStyle(fontSize: 13, color: Color(0xFF475569))),
+            child: Text('Cancel', style: TextStyle(fontSize: 13, color: appInkSecondary)),
           ),
           const SizedBox(width: 10),
           ElevatedButton.icon(

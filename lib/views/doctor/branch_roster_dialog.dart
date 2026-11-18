@@ -431,7 +431,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
         screenWidthByBreakpoint(90, 70, 50),
         screenHeightByBreakpoint(90, 80, 50),
       ),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(8),
     );
 
     if (results != null && mounted) {
@@ -455,27 +455,27 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: primary,
               onPrimary: Colors.white,
-              surface: Colors.white,
+              surface: appSurface,
               surfaceTint: Colors.transparent,
               surfaceContainerHighest: Color(0xFFF3F4F6),
               onSurface: Color(0xFF1F2937),
               onSurfaceVariant: Color(0xFF4B5563),
             ),
             timePickerTheme: TimePickerThemeData(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              backgroundColor: appSurface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               hourMinuteShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: Color(0xFFE5E7EB)),
+                side: BorderSide(color: appBorder),
               ),
               hourMinuteColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
                   return const Color(0xFFF3F4F6);
                 }
-                return const Color(0xFFF9FAFB);
+                return appCanvas;
               }),
               hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
@@ -483,7 +483,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                 }
                 return const Color(0xFF1F2937);
               }),
-              dialBackgroundColor: const Color(0xFFF9FAFB),
+              dialBackgroundColor: appCanvas,
               dialHandColor: primary,
               dialTextColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
@@ -491,7 +491,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                 }
                 return const Color(0xFF1F2937);
               }),
-              dayPeriodBorderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              dayPeriodBorderSide: BorderSide(color: appBorder),
               dayPeriodColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
                   return const Color(0xFFF3F4F6);
@@ -553,8 +553,8 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
         width: maxW,
         height: maxH,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(20),
@@ -568,7 +568,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
           children: [
             // Header
             _buildHeader(),
-            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            Divider(height: 1, color: appBorder),
 
             // Main Body
             Expanded(
@@ -593,7 +593,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             ),
 
             // Footer
-            const Divider(height: 1, color: Color(0xFFE5E7EB)),
+            Divider(height: 1, color: appBorder),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
@@ -625,7 +625,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+      padding: EdgeInsets.fromLTRB(20, 16, 16, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -633,27 +633,27 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: primary.withAlpha(25),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.calendar_month_rounded, color: primary, size: 20),
+                  child: Icon(Icons.calendar_month_rounded, color: primary, size: 20),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Branch Practitioner Roster & Shifts',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: appInkPrimary),
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 2),
                       Text(
                         'Configure practitioner working shifts to enable multi-staff concurrent capacity',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        style: TextStyle(fontSize: 12, color: appInkMuted),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -666,7 +666,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
           IconButton(
   tooltip: 'Tutup',
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF6B7280)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
           ),
         ],
       ),
@@ -677,9 +677,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: appCanvas,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         children: [
@@ -709,11 +709,11 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               ),
             ),
           ] else ...[
-            const Icon(Icons.location_on_rounded, size: 18, color: primary),
+            Icon(Icons.location_on_rounded, size: 18, color: primary),
             const SizedBox(width: 8),
             Text(
               _branches.firstWhere((b) => b.branchId == _selectedBranchId, orElse: () => branch_model.Data(branchName: 'Current Branch')).branchName ?? 'Current Branch',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: appInkPrimary),
             ),
           ],
           const Spacer(),
@@ -730,7 +730,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
           ),
           Text(
             DateFormat('MMMM yyyy').format(_currentMonth),
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: appInkPrimary),
           ),
           IconButton(
   tooltip: 'Seterusnya',
@@ -744,7 +744,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
           ),
           const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            icon: Icon(Icons.refresh_rounded, size: 18, color: appInkMuted),
             tooltip: 'Refresh shifts',
             onPressed: _loadRosterShifts,
           ),
@@ -759,9 +759,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -774,12 +774,12 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Icon(Icons.add_circle_outline_rounded, size: 18, color: primary),
                   SizedBox(width: 8),
                   Text(
                     'Configure Practitioner Shifts',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: appInkPrimary),
                   ),
                 ],
               ),
@@ -817,7 +817,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFD1D5DB)),
+                        border: Border.all(color: appBorderStrong),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
@@ -851,7 +851,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                         if (_selectedDates.length > 1)
                           InkWell(
                             onTap: () => setState(() => _selectedDates = [_selectedDates.first]),
-                            child: const Text('Reset to 1 date', style: TextStyle(fontSize: 11, color: primary, fontWeight: FontWeight.w600)),
+                            child: Text('Reset to 1 date', style: TextStyle(fontSize: 11, color: primary, fontWeight: FontWeight.w600)),
                           ),
                       ],
                     ),
@@ -863,11 +863,11 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFD1D5DB)),
+                          border: Border.all(color: appBorderStrong),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.calendar_month_rounded, size: 16, color: primary),
+                            Icon(Icons.calendar_month_rounded, size: 16, color: primary),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -886,9 +886,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                 color: primary.withAlpha(20),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Select Dates',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: primary),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: primary),
                               ),
                             ),
                           ],
@@ -911,18 +911,18 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: appCanvas,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: appBorder),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         DateFormat('dd MMM (E)').format(d),
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4),
                       InkWell(
                         onTap: () {
                           if (_selectedDates.length > 1) {
@@ -931,7 +931,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                             showDialogError(context, 'At least one shift date is required.');
                           }
                         },
-                        child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFF9CA3AF)),
+                        child: Icon(Icons.close_rounded, size: 14, color: appInkMuted),
                       ),
                     ],
                   ),
@@ -940,9 +940,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             ),
           ],
 
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, color: Color(0xFFE5E7EB)),
+            child: Divider(height: 1, color: appBorder),
           ),
 
           // Timing Section Header
@@ -954,21 +954,21 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Icon(Icons.schedule_rounded, size: 15, color: Color(0xFF4B5563)),
                   SizedBox(width: 6),
                   Text(
                     'Daily Shift Slots (Break Time Supported)',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
                   ),
                 ],
               ),
               OutlinedButton.icon(
                 onPressed: _handleAddTimeSlot,
-                icon: const Icon(Icons.add_rounded, size: 14, color: primary),
-                label: const Text('Add Time Slot (e.g. Break Time)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: primary)),
+                icon: Icon(Icons.add_rounded, size: 14, color: primary),
+                label: Text('Add Time Slot (e.g. Break Time)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: primary)),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: primary),
+                  side: BorderSide(color: primary),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
@@ -996,12 +996,12 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF3F4F6),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: appBorder),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.coffee_rounded, size: 13, color: Color(0xFF6B7280)),
+                      Icon(Icons.coffee_rounded, size: 13, color: appInkMuted),
                       const SizedBox(width: 6),
                       Text(
                         'Break: ${_formatTimeOfDay(prevSlot.endTime)} - ${_formatTimeOfDay(slot.startTime)} (${gapH > 0 ? '${gapH}h ' : ''}${gapM > 0 ? '${gapM}m' : ''})',
@@ -1021,9 +1021,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: appCanvas,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: appBorder),
                   ),
                   child: Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
@@ -1033,13 +1033,13 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: appSurface,
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFD1D5DB)),
+                          border: Border.all(color: appBorderStrong),
                         ),
                         child: Text(
                           'Slot ${index + 1}',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF374151)),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkSecondary),
                         ),
                       ),
 
@@ -1050,14 +1050,14 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                           height: 36,
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: appSurface,
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFFD1D5DB)),
+                            border: Border.all(color: appBorderStrong),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF6B7280)),
+                              Icon(Icons.access_time_rounded, size: 14, color: appInkMuted),
                               const SizedBox(width: 6),
                               Text(
                                 _formatTimeOfDay(slot.startTime),
@@ -1067,7 +1067,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                           ),
                         ),
                       ),
-                      const Text('to', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                      Text('to', style: TextStyle(fontSize: 12, color: appInkMuted)),
 
                       // End Time Button
                       InkWell(
@@ -1076,14 +1076,14 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                           height: 36,
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: appSurface,
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFFD1D5DB)),
+                            border: Border.all(color: appBorderStrong),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF6B7280)),
+                              Icon(Icons.access_time_rounded, size: 14, color: appInkMuted),
                               const SizedBox(width: 6),
                               Text(
                                 _formatTimeOfDay(slot.endTime),
@@ -1148,7 +1148,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               children: [
                 Text(
                   'Roster Shifts (${_rosterShifts.length})',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: appInkPrimary),
                 ),
                 if (_rosterShifts.any((s) => _distinctStaffCountOnDate(s.rosterDate) >= 2)) ...[
                   const SizedBox(width: 10),
@@ -1156,7 +1156,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: const Color(0xFFECFDF5),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: const Color(0xFFA7F3D0)),
                     ),
                     child: Row(
@@ -1180,7 +1180,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               decoration: BoxDecoration(
                 color: const Color(0xFFF3F4F6),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: appBorder),
               ),
               padding: const EdgeInsets.all(3),
               child: Row(
@@ -1203,9 +1203,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         if (_isLoadingShifts)
-          const Center(
+          Center(
             child: Padding(
               padding: EdgeInsets.all(32),
               child: CircularProgressIndicator(),
@@ -1214,19 +1214,19 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
         else if (_rosterShifts.isEmpty)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(32),
+            padding: EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: appCanvas,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: Column(
-              children: const [
-                Icon(Icons.event_busy_rounded, size: 36, color: Color(0xFF9CA3AF)),
+              children: [
+                Icon(Icons.event_busy_rounded, size: 36, color: appInkMuted),
                 SizedBox(height: 8),
-                Text('No roster shifts configured for this month.', style: TextStyle(fontSize: 14, color: Color(0xFF6B7280))),
+                Text('No roster shifts configured for this month.', style: TextStyle(fontSize: 14, color: appInkMuted)),
                 SizedBox(height: 4),
-                Text('Add shifts using the form above. Without shifts, standard single-slot scheduling runs.', style: TextStyle(fontSize: 12, color: Color(0xFF9CA3AF))),
+                Text('Add shifts using the form above. Without shifts, standard single-slot scheduling runs.', style: TextStyle(fontSize: 12, color: appInkMuted)),
               ],
             ),
           )
@@ -1268,7 +1268,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             Icon(
               icon,
               size: 14,
-              color: isSelected ? primary : const Color(0xFF6B7280),
+              color: isSelected ? primary : appInkMuted,
             ),
             const SizedBox(width: 5),
             Text(
@@ -1276,7 +1276,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? const Color(0xFF111827) : const Color(0xFF6B7280),
+                color: isSelected ? appInkPrimary : appInkMuted,
               ),
             ),
           ],
@@ -1329,16 +1329,16 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
 
     final calendarWidget = Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorder),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Table(
-          border: const TableBorder(
-            horizontalInside: BorderSide(color: Color(0xFFE5E7EB)),
-            verticalInside: BorderSide(color: Color(0xFFE5E7EB)),
+          border: TableBorder(
+            horizontalInside: BorderSide(color: appBorder),
+            verticalInside: BorderSide(color: appBorder),
           ),
           columnWidths: const {
             0: FlexColumnWidth(1),
@@ -1352,7 +1352,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
           children: [
             // Weekdays Header Row
             TableRow(
-              decoration: const BoxDecoration(color: Color(0xFFF9FAFB)),
+              decoration: BoxDecoration(color: appCanvas),
               children: weekdays.asMap().entries.map((entry) {
                 final idx = entry.key;
                 final day = entry.value;
@@ -1365,7 +1365,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: isWeekend ? primary : const Color(0xFF374151),
+                      color: isWeekend ? primary : appInkSecondary,
                     ),
                   ),
                 );
@@ -1434,7 +1434,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                 ),
                                 child: Text(
                                   '$distinctDocs Staff',
-                                  style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Color(0xFF2563EB)),
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF2563EB)),
                                 ),
                               ),
                           ],
@@ -1461,7 +1461,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                       Text(
                                         shift.doctorName ?? 'Staff',
                                         style: TextStyle(
-                                          fontSize: 10,
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w700,
                                           color: docColor,
                                         ),
@@ -1471,7 +1471,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                       Text(
                                         '${_formatTime(shift.startTime)} - ${_formatTime(shift.endTime)}',
                                         style: const TextStyle(
-                                          fontSize: 9,
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w500,
                                           color: Color(0xFF4B5563),
                                         ),
@@ -1518,14 +1518,14 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorder),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: DataTable(
-          headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
-          headingTextStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: Color(0xFF374151)),
-          dataTextStyle: const TextStyle(fontSize: 12, color: Color(0xFF111827)),
+          headingRowColor: WidgetStateProperty.all(appCanvas),
+          headingTextStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: appInkSecondary),
+          dataTextStyle: TextStyle(fontSize: 12, color: appInkPrimary),
           columns: const [
             DataColumn(label: Text('Date')),
             DataColumn(label: Text('Day')),
@@ -1557,7 +1557,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(color: const Color(0xFFBFDBFE)),
                           ),
-                          child: Text('$staffCount Staff (Concurrent)', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF2563EB))),
+                          child: Text('$staffCount Staff (Concurrent)', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF2563EB))),
                         ),
                       ],
                     ],
@@ -1567,7 +1567,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   Text(
                     dayOfWeek,
                     style: TextStyle(
-                      color: isWeekend ? primary : const Color(0xFF374151),
+                      color: isWeekend ? primary : appInkSecondary,
                       fontWeight: isWeekend ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),
@@ -1576,7 +1576,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.person_rounded, size: 14, color: Color(0xFF6B7280)),
+                      Icon(Icons.person_rounded, size: 14, color: appInkMuted),
                       const SizedBox(width: 6),
                       Text(shift.doctorName ?? 'Practitioner'),
                     ],

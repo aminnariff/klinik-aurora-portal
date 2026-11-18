@@ -21,7 +21,7 @@ class ShimmerContainer extends StatelessWidget {
     return Card(
       elevation: 2.0,
       color: Colors.grey[350],
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding / 2),
       child: SizedBox(width: width ?? screenWidth(100), height: height ?? screenHeight(27)),
     );

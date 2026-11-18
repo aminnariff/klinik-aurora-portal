@@ -183,9 +183,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.white,
+      backgroundColor: appSurface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.antiAlias,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
@@ -214,8 +214,8 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF9FAFB),
+      decoration: BoxDecoration(
+        color: appCanvas,
         border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
       ),
       child: Row(
@@ -239,20 +239,20 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             children: [
               Text(
                 widget.type == 'create' ? 'New Practitioner' : 'Edit Practitioner',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appInkPrimary),
               ),
               const SizedBox(height: 2),
               Text(
                 widget.type == 'create'
                     ? 'Set up practitioner details, assigned branch, and photo'
                     : 'Update practitioner information, assigned branch, or photo',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                style: TextStyle(fontSize: 12, color: appInkMuted),
               ),
             ],
           ),
           const Spacer(),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF6B7280)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             tooltip: 'Close',
             onPressed: () => context.pop(),
           ),
@@ -382,9 +382,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
+            color: appCanvas,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -395,11 +395,11 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                         height: 140,
                         width: 140,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: appSurface,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFE5E7EB)),
+                          border: Border.all(color: appBorder),
                         ),
-                        child: const Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
@@ -410,7 +410,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                             SizedBox(height: 10),
                             Text(
                               'Uploading...',
-                              style: TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontWeight: FontWeight.w500),
+                              style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -425,8 +425,8 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                   height: 140,
                                   width: 140,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                                    color: appSurface,
+                                    border: Border.all(color: appBorder),
                                   ),
                                   child: Image.network(
                                     resolvedUrl,
@@ -436,12 +436,12 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                     errorBuilder: (_, _, _) => Container(
                                       color: const Color(0xFFF3F4F6),
                                       alignment: Alignment.center,
-                                      child: const Column(
+                                      child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.broken_image_outlined, size: 32, color: Color(0xFF9CA3AF)),
+                                          Icon(Icons.broken_image_outlined, size: 32, color: appInkMuted),
                                           SizedBox(height: 4),
-                                          Text('Image error', style: TextStyle(fontSize: 11, color: Color(0xFF9CA3AF))),
+                                          Text('Image error', style: TextStyle(fontSize: 11, color: appInkMuted)),
                                         ],
                                       ),
                                     ),
@@ -455,7 +455,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                   message: 'Remove photo',
                                   child: InkWell(
                                     onTap: _clearImage,
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(8),
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
                                       decoration: const BoxDecoration(
@@ -476,10 +476,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                               height: 140,
                               width: 140,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: appSurface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: const Color(0xFFD1D5DB),
+                                  color: appBorderStrong,
                                   width: 1.2,
                                 ),
                               ),
@@ -495,18 +495,18 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                     child: Icon(Icons.add_a_photo_outlined, size: 24, color: primary),
                                   ),
                                   const SizedBox(height: 8),
-                                  const Text(
+                                  Text(
                                     'Upload Photo',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF374151),
+                                      color: appInkSecondary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  const Text(
+                                  Text(
                                     'PNG, JPG up to 5MB',
-                                    style: TextStyle(fontSize: 10, color: Color(0xFF9CA3AF)),
+                                    style: TextStyle(fontSize: 11, color: appInkMuted),
                                   ),
                                 ],
                               ),
@@ -524,7 +524,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      side: const BorderSide(color: Color(0xFFD1D5DB)),
+                      side: BorderSide(color: appBorderStrong),
                     ),
                   ),
                   if (hasImage) ...[
@@ -558,10 +558,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF374151),
+            color: appInkSecondary,
           ),
         ),
         if (isRequired)
@@ -573,9 +573,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,

@@ -61,8 +61,8 @@ class InputFieldAttribute {
     this.errorMessage,
     this.lineNumber = 1,
     this.maxCharacter = 255,
-    this.isEditableColor = textFormFieldEditableColor,
-    this.uneditableColor = textFormFieldUneditableColor,
+    Color? isEditableColor,
+    Color? uneditableColor,
     this.onChanged,
     this.dateFormat,
     this.isDatePicker = false,
@@ -75,5 +75,6 @@ class InputFieldAttribute {
     this.obsecureAction,
     this.suffixWidget,
     this.focusNode,
-  });
+  }) : isEditableColor = isEditableColor ?? textFormFieldEditableColor,
+       uneditableColor = uneditableColor ?? textFormFieldUneditableColor;
 }

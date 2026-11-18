@@ -142,7 +142,7 @@ class _Graph2WidgetState extends State<Graph2Widget> {
                 style: TextStyle(
                   color: Colors.white.withAlpha(opacityCalculation(.8)),
                   fontWeight: FontWeight.normal,
-                  fontSize: 10,
+                  fontSize: 11,
                 ),
               ),
             ],

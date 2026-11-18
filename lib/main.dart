@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/routes.dart';
@@ -138,7 +139,7 @@ class _MyAppState extends State<MyApp> {
     return ScreenUtilInit(
       designSize: const Size(1728, 829),
       minTextAdapt: true,
-      splitScreenMode: false,
+      splitScreenMode: true,
       builder: (context, child) {
         return MultiProvider(
           providers: [
@@ -153,7 +154,9 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<DashboardController>(create: (_) => DashboardController()),
             ChangeNotifierProvider<ServicePerformanceController>(create: (_) => ServicePerformanceController()),
             ChangeNotifierProvider<DoctorController>(create: (_) => DoctorController()),
-            ChangeNotifierProvider<DarkModeController>(create: (_) => DarkModeController()),
+            ChangeNotifierProvider<DarkModeController>(
+              create: (_) => DarkModeController()..loadFromStorage(),
+            ),
             ChangeNotifierProvider<PaymentController>(create: (_) => PaymentController()),
             ChangeNotifierProvider<PermissionController>(create: (_) => PermissionController()),
             ChangeNotifierProvider<PointManagementController>(create: (_) => PointManagementController()),
@@ -171,16 +174,23 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<VoucherController>(create: (_) => VoucherController()),
             ChangeNotifierProvider<TopBarController>(create: (_) => TopBarController()),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-            title: 'Klinik Aurora Admin',
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            builder: EasyLoading.init(builder: FToastBuilder()),
-            debugShowCheckedModeBanner: false,
-            theme: theme(context),
-            themeMode: ThemeMode.light,
+          child: Consumer<DarkModeController>(
+            builder: (context, themeCtrl, _) {
+              final isDark = themeCtrl.isDarkActive(context);
+              syncActiveBrandTheme(preset: themeCtrl.preset, isDark: isDark);
+              return MaterialApp.router(
+                routerConfig: router,
+                title: 'Klinik Aurora Admin',
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                builder: EasyLoading.init(builder: FToastBuilder()),
+                debugShowCheckedModeBanner: false,
+                theme: buildLightTheme(context, themeCtrl.preset),
+                darkTheme: buildDarkTheme(context, themeCtrl.preset),
+                themeMode: themeCtrl.themeMode,
+              );
+            },
           ),
         );
       },

@@ -145,7 +145,7 @@ class _GraphWidgetState extends State<GraphWidget> {
                 style: TextStyle(
                   color: Colors.white.withAlpha(opacityCalculation(.8)),
                   fontWeight: FontWeight.normal,
-                  fontSize: 10,
+                  fontSize: 11,
                 ),
               ),
             ],

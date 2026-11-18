@@ -120,7 +120,7 @@ class _PaginationState extends State<Pagination> {
                 style:
                     i == widget.selectedPage
                         ? const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)
-                        : const TextStyle(fontSize: 14, color: secondaryAccessibleText, fontWeight: FontWeight.w700),
+                        : TextStyle(fontSize: 14, color: secondaryAccessibleText, fontWeight: FontWeight.w700),
               ),
             ),
           ),

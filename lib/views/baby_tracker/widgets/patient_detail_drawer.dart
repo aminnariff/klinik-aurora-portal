@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class PatientDetailDrawer extends StatefulWidget {
   final Map<String, dynamic> patient;
@@ -103,8 +104,8 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     return Container(
       width: math.min(580.0, MediaQuery.of(context).size.width * 0.95),
       height: double.infinity,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: appSurface,
         boxShadow: [
           BoxShadow(
             color: Color(0x1A000000),
@@ -121,14 +122,14 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
 
           // Tab Navigation Bar
           Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+            decoration: BoxDecoration(
+              color: appSurface,
+              border: Border(bottom: BorderSide(color: appBorder)),
             ),
             child: TabBar(
               controller: _tabController,
-              labelColor: const Color(0xFF0F172A),
-              unselectedLabelColor: const Color(0xFF64748B),
+              labelColor: appInkPrimary,
+              unselectedLabelColor: appInkMuted,
               indicatorColor: const Color(0xFF0284C7),
               indicatorWeight: 2.5,
               labelStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
@@ -178,9 +179,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
   ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+      decoration: BoxDecoration(
+        color: appSurface,
+        border: Border(bottom: BorderSide(color: appBorder)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,10 +193,10 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFF1F5F9),
+                  color: isOverdue ? const Color(0xFFFEF2F2) : appSurfaceSubtle,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFE2E8F0),
+                    color: isOverdue ? const Color(0xFFFECACA) : appBorder,
                   ),
                 ),
                 alignment: Alignment.center,
@@ -204,7 +205,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF334155),
+                    color: isOverdue ? const Color(0xFFDC2626) : appInkSecondary,
                   ),
                 ),
               ),
@@ -215,14 +216,14 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: appInkPrimary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '$phone • $branch',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 12, color: appInkMuted),
                     ),
                   ],
                 ),
@@ -244,9 +245,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               const SizedBox(width: 6),
               IconButton(
                 tooltip: 'Tutup Fail',
-                icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B), size: 20),
+                icon: Icon(Icons.close_rounded, color: appInkMuted, size: 20),
                 style: IconButton.styleFrom(
-                  backgroundColor: const Color(0xFFF8FAFC),
+                  backgroundColor: appSurfaceSubtle,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: widget.onClose,
@@ -261,7 +262,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               _headerPill(
                 icon: Icons.calendar_today_outlined,
                 label: 'EDD: $edd',
-                color: const Color(0xFF0F172A),
+                color: appInkPrimary,
               ),
               const SizedBox(width: 8),
               if (week != null)
@@ -337,9 +338,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -371,7 +372,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
               const SizedBox(height: 10),
               Text(
                 _trackerError ?? 'Tiada rekod tendangan.',
-                style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                style: TextStyle(color: appInkMuted, fontSize: 13),
               ),
             ],
           ),
@@ -388,18 +389,18 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: appBorder),
             ),
             child: Row(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'JUMLAH HARI INI',
-                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: appInkMuted),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -415,9 +416,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           '/ 10 kali',
-                          style: TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 13, color: appInkMuted, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -437,9 +438,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                         ),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
+                      Text(
                         'Protokol KKM: Minimum 10 pergerakan dalam tempoh 12 jam (9:00 AM – 9:00 PM).',
-                        style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                        style: TextStyle(fontSize: 11, color: appInkMuted),
                       ),
                     ],
                   ),
@@ -449,9 +450,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           ),
           const SizedBox(height: 20),
 
-          const Text(
+          Text(
             'Log Sesi Pergerakan',
-            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: appInkPrimary),
           ),
           const SizedBox(height: 10),
 
@@ -459,12 +460,12 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: appSurfaceSubtle,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: appBorder),
               ),
               alignment: Alignment.center,
-              child: const Text('Belum ada sesi tendangan direkodkan hari ini.', style: TextStyle(color: Color(0xFF64748B), fontSize: 12.5)),
+              child: Text('Belum ada sesi tendangan direkodkan hari ini.', style: TextStyle(color: appInkMuted, fontSize: 12.5)),
             )
           else
             ListView.separated(
@@ -482,21 +483,21 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: appSurface,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: appBorder),
                   ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           '$kickCount kali',
-                          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: appInkPrimary),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -506,12 +507,12 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                           children: [
                             Text(
                               'Mula: $startTime',
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkPrimary),
                             ),
                             if (endTime != null)
-                              Text('Tamat: $endTime', style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                              Text('Tamat: $endTime', style: TextStyle(fontSize: 11, color: appInkMuted)),
                             if (note != null && note.isNotEmpty)
-                              Text('Nota: $note', style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFF475569))),
+                              Text('Nota: $note', style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: appInkSecondary)),
                           ],
                         ),
                       ),
@@ -553,18 +554,18 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: appBorder),
             ),
             child: Row(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'KESIAPSIAGAAN WAD',
-                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: appInkMuted),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -586,14 +587,14 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Barangan Kemasukan Wad Bersalin',
-                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: appInkPrimary),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '$hbCompleted daripada $hbTotal barangan kecemasan bersalin telah siap.',
-                        style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                        style: TextStyle(fontSize: 11.5, color: appInkMuted),
                       ),
                     ],
                   ),
@@ -603,9 +604,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           ),
           const SizedBox(height: 18),
 
-          const Text(
+          Text(
             '10 Barangan Wajib Beg Hospital',
-            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: appInkPrimary),
           ),
           const SizedBox(height: 10),
 
@@ -613,12 +614,12 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: appSurfaceSubtle,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: appBorder),
               ),
               alignment: Alignment.center,
-              child: const Text('Tiada senarai item beg hospital.', style: TextStyle(color: Color(0xFF64748B))),
+              child: Text('Tiada senarai item beg hospital.', style: TextStyle(color: appInkMuted)),
             )
           else
             ListView.separated(
@@ -636,10 +637,10 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isChecked ? const Color(0xFFF8FAFC) : Colors.white,
+                    color: isChecked ? appSurfaceSubtle : Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isChecked ? const Color(0xFFE2E8F0) : const Color(0xFFCBD5E1),
+                      color: isChecked ? appBorder : appBorderStrong,
                     ),
                   ),
                   child: Row(
@@ -647,7 +648,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                     children: [
                       Icon(
                         isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                        color: isChecked ? const Color(0xFF15803D) : const Color(0xFF94A3B8),
+                        color: isChecked ? const Color(0xFF15803D) : appInkMuted,
                         size: 18,
                       ),
                       const SizedBox(width: 10),
@@ -663,7 +664,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: isChecked ? const Color(0xFF64748B) : const Color(0xFF0F172A),
+                                      color: isChecked ? appInkMuted : appInkPrimary,
                                       decoration: isChecked ? TextDecoration.lineThrough : null,
                                     ),
                                   ),
@@ -672,12 +673,12 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF1F5F9),
+                                      color: appSurfaceSubtle,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       qty,
-                                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: appInkSecondary),
                                     ),
                                   ),
                               ],
@@ -686,7 +687,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                               const SizedBox(height: 4),
                               Text(
                                 'Nasihat Dr Aurora: ${advice['specs']}',
-                                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                                style: TextStyle(fontSize: 11, color: appInkMuted),
                               ),
                             ],
                           ],
@@ -724,9 +725,9 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appSurfaceSubtle,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: appBorder),
             ),
             child: Row(
               children: [
@@ -734,14 +735,14 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'KEMAJUAN KESELURUHAN',
-                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: Color(0xFF64748B)),
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: appInkMuted),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '$completedItems / $totalItems barangan disemak',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF0F172A), fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 12, color: appInkPrimary, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -770,20 +771,20 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
 
               return Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: appBorder),
                 ),
                 child: Theme(
                   data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                   child: ExpansionTile(
                     title: Text(
                       catTitle,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: appInkPrimary),
                     ),
                     subtitle: Text(
                       '$catCompleted / $catTotal siap',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 11, color: appInkMuted),
                     ),
                     children: items.map<Widget>((it) {
                       final itemTitle = it['title']?.toString() ?? '-';
@@ -797,7 +798,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                             Icon(
                               isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
                               size: 16,
-                              color: isChecked ? const Color(0xFF15803D) : const Color(0xFF94A3B8),
+                              color: isChecked ? const Color(0xFF15803D) : appInkMuted,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -805,13 +806,13 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                                 itemTitle,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: isChecked ? const Color(0xFF64748B) : const Color(0xFF0F172A),
+                                  color: isChecked ? appInkMuted : appInkPrimary,
                                   decoration: isChecked ? TextDecoration.lineThrough : null,
                                 ),
                               ),
                             ),
                             if (qty != null && qty.isNotEmpty)
-                              Text(qty, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                              Text(qty, style: TextStyle(fontSize: 11, color: appInkMuted)),
                           ],
                         ),
                       );

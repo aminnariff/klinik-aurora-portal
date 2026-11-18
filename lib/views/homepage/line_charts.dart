@@ -234,7 +234,7 @@ class LineChartSample1State extends State<LineChartSample1> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const SizedBox(height: 37),
-              const Text(
+              Text(
                 'Monthly Sales',
                 style: TextStyle(color: primary, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 2),
                 textAlign: TextAlign.center,

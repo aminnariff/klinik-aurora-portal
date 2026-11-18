@@ -212,7 +212,7 @@ class _RewardDetailState extends State<RewardDetail> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(
         horizontal: isMobile ? 16 : 32,
         vertical: isMobile ? 20 : 32,
@@ -227,14 +227,14 @@ class _RewardDetailState extends State<RewardDetail> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildHeader(context),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(isMobile ? 16 : 24),
                 child: isMobile ? _buildMobileLayout(context) : _buildDesktopLayout(context),
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            Divider(height: 1, color: appBorder),
             _buildFooter(context),
           ],
         ),
@@ -255,7 +255,7 @@ class _RewardDetailState extends State<RewardDetail> {
               color: primary.withAlpha(25),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.card_giftcard_rounded, color: primary, size: 20),
+            child: Icon(Icons.card_giftcard_rounded, color: primary, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -265,21 +265,21 @@ class _RewardDetailState extends State<RewardDetail> {
               children: [
                 Text(
                   isCreate ? 'New Reward' : 'Edit Reward',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appInkPrimary),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   isCreate
                       ? 'Create a redeemable reward item for customers'
                       : 'Update reward details, points, stock, and availability',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ),
           ),
           IconButton(
   tooltip: 'Tutup',
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             onPressed: () => context.pop(),
             splashRadius: 20,
           ),
@@ -353,9 +353,9 @@ class _RewardDetailState extends State<RewardDetail> {
           errorText: _totalError,
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           'Enter "0" if stock is infinite / unlimited.',
-          style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+          style: TextStyle(fontSize: 11, color: appInkMuted),
         ),
       ],
     );
@@ -393,19 +393,19 @@ class _RewardDetailState extends State<RewardDetail> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: appSurfaceSubtle,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: appBorder),
           ),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF64748B)),
+              Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Leave dates blank to keep this reward available indefinitely.',
-                  style: TextStyle(fontSize: 11, color: Color(0xFF64748B), height: 1.3),
+                  style: TextStyle(fontSize: 11, color: appInkMuted, height: 1.3),
                 ),
               ),
             ],
@@ -437,7 +437,7 @@ class _RewardDetailState extends State<RewardDetail> {
             currentDate: initial ?? DateTime.now(),
           ),
           dialogSize: const Size(360, 360),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
         );
         if (results != null && results.isNotEmpty && results.first != null) {
           setState(() {
@@ -450,13 +450,13 @@ class _RewardDetailState extends State<RewardDetail> {
         height: 42,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: appSurfaceSubtle,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFCBD5E1)),
+          border: Border.all(color: appBorderStrong),
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF64748B)),
+            Icon(Icons.calendar_today_rounded, size: 16, color: appInkMuted),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -464,14 +464,14 @@ class _RewardDetailState extends State<RewardDetail> {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: controller.text.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                  color: controller.text.isNotEmpty ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                  color: controller.text.isNotEmpty ? appInkPrimary : appInkMuted,
                 ),
               ),
             ),
             if (controller.text.isNotEmpty)
               IconButton(
   tooltip: 'Kosongkan',
-                icon: const Icon(Icons.clear_rounded, size: 16, color: Color(0xFF94A3B8)),
+                icon: Icon(Icons.clear_rounded, size: 16, color: appInkMuted),
                 splashRadius: 14,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -567,14 +567,14 @@ class _RewardDetailState extends State<RewardDetail> {
           decoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 14, color: const Color(0xFF64748B)),
+        Icon(icon, size: 14, color: appInkMuted),
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.8,
           ),
         ),
@@ -586,10 +586,10 @@ class _RewardDetailState extends State<RewardDetail> {
     return RichText(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: appInkSecondary,
         ),
         children: isRequired
             ? [
@@ -616,7 +616,7 @@ class _RewardDetailState extends State<RewardDetail> {
       hintText: hint,
       errorText: errorText,
       isNumber: isNumber,
-      prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 16, color: const Color(0xFF64748B)) : null,
+      prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 16, color: appInkMuted) : null,
       maxLines: maxLines,
     );
   }

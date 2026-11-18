@@ -112,16 +112,16 @@ class _AppAttachmentFieldState extends State<AppAttachmentField> {
                 style: const TextStyle(fontSize: 13),
                 decoration: InputDecoration(
                   labelText: 'Attachment URL (optional)',
-                  labelStyle: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                  labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
                   hintText: 'Paste URL or click Upload button',
-                  hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFD1D5DB)),
-                  prefixIcon: const Icon(Icons.link_rounded, size: 16, color: Color(0xFF6B7280)),
+                  hintStyle: TextStyle(fontSize: 12, color: appBorderStrong),
+                  prefixIcon: Icon(Icons.link_rounded, size: 16, color: appInkMuted),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: appSurface,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFD1D5DB))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFD1D5DB))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: primary, width: 1.5)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: appBorderStrong)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: appBorderStrong)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: primary, width: 1.5)),
                 ),
               ),
             ),
@@ -158,9 +158,9 @@ class _AppAttachmentFieldState extends State<AppAttachmentField> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: appSurfaceSubtle,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: appBorder),
             ),
             child: Row(
               children: [
@@ -173,7 +173,7 @@ class _AppAttachmentFieldState extends State<AppAttachmentField> {
                 Expanded(
                   child: Text(
                     url,
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF475569)),
+                    style: TextStyle(fontSize: 11, color: appInkSecondary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

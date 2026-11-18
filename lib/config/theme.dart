@@ -1,135 +1,313 @@
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/config/app_theme_preset.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 
-ThemeData theme(BuildContext context) {
+/// Builds the Light [ThemeData] for Klinik Aurora Portal using [preset].
+ThemeData buildLightTheme(BuildContext context, [AuroraThemePreset preset = AuroraThemePreset.auroraPlum]) {
+  final tokens = AppColors.light(preset);
   final baseScheme = ColorScheme.fromSeed(
-    seedColor: primary,
-    primary: primary,
+    seedColor: tokens.brandPrimary,
+    brightness: Brightness.light,
+    primary: tokens.brandPrimary,
+    onPrimary: tokens.brandOnPrimary,
     secondary: secondaryColor,
-    surface: Colors.white,
+    surface: tokens.surface,
+    error: tokens.danger,
   );
+
+  return _buildBaseTheme(
+    brightness: Brightness.light,
+    colorScheme: baseScheme.copyWith(
+      primary: tokens.brandPrimary,
+      onPrimary: tokens.brandOnPrimary,
+      surface: tokens.surface,
+      onSurface: tokens.inkPrimary,
+      onSurfaceVariant: tokens.inkMuted,
+      surfaceContainerLowest: tokens.surface,
+      surfaceContainerLow: tokens.surfaceSubtle,
+      surfaceContainer: tokens.surfaceSubtle,
+      surfaceContainerHigh: tokens.surfaceElevated,
+      surfaceTint: Colors.transparent,
+      outline: tokens.border,
+      outlineVariant: tokens.border,
+      error: tokens.danger,
+    ),
+    tokens: tokens,
+  );
+}
+
+/// Builds the Dark [ThemeData] for Klinik Aurora Portal using [preset].
+ThemeData buildDarkTheme(BuildContext context, [AuroraThemePreset preset = AuroraThemePreset.auroraPlum]) {
+  final tokens = AppColors.dark(preset);
+  final baseScheme = ColorScheme.fromSeed(
+    seedColor: tokens.brandPrimary,
+    brightness: Brightness.dark,
+    primary: tokens.brandPrimary,
+    onPrimary: tokens.brandOnPrimary,
+    secondary: secondaryColor,
+    surface: tokens.surface,
+    error: tokens.danger,
+  );
+
+  return _buildBaseTheme(
+    brightness: Brightness.dark,
+    colorScheme: baseScheme.copyWith(
+      primary: tokens.brandPrimary,
+      onPrimary: tokens.brandOnPrimary,
+      surface: tokens.surface,
+      onSurface: tokens.inkPrimary,
+      onSurfaceVariant: tokens.inkMuted,
+      surfaceContainerLowest: tokens.canvas,
+      surfaceContainerLow: tokens.surface,
+      surfaceContainer: tokens.surfaceSubtle,
+      surfaceContainerHigh: tokens.surfaceElevated,
+      surfaceTint: Colors.transparent,
+      outline: tokens.border,
+      outlineVariant: tokens.border,
+      error: tokens.danger,
+    ),
+    tokens: tokens,
+  );
+}
+
+ThemeData _buildBaseTheme({
+  required Brightness brightness,
+  required ColorScheme colorScheme,
+  required AppColors tokens,
+}) {
+  final isDark = brightness == Brightness.dark;
+
   return ThemeData(
     useMaterial3: true,
-    colorScheme: baseScheme.copyWith(
-      surface: Colors.white,
-      surfaceTint: Colors.transparent,
-      outline: borderSubtle,
-    ),
-    brightness: Brightness.light,
-    canvasColor: Colors.white,
-    scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-    primaryColor: primary,
+    brightness: brightness,
+    colorScheme: colorScheme,
+    extensions: <ThemeExtension<dynamic>>[tokens],
+    canvasColor: tokens.surface,
+    scaffoldBackgroundColor: tokens.canvas,
+    cardColor: tokens.surface,
+    primaryColor: tokens.brandPrimary,
+    focusColor: tokens.brandPrimary.withValues(alpha: 0.14),
+    hoverColor: tokens.tableRowHover,
+    splashColor: tokens.brandPrimary.withValues(alpha: 0.10),
+    highlightColor: tokens.brandPrimary.withValues(alpha: 0.06),
     visualDensity: VisualDensity.adaptivePlatformDensity,
     fontFamily: 'Figtree',
-    dividerTheme: const DividerThemeData(color: borderSubtle, thickness: 1),
-    dialogTheme: const DialogThemeData(backgroundColor: Colors.white, surfaceTintColor: Colors.transparent),
-    popupMenuTheme: const PopupMenuThemeData(color: Colors.white, surfaceTintColor: Colors.transparent),
-    cardTheme: CardThemeData(
-      color: Colors.white,
+    iconTheme: IconThemeData(color: tokens.inkSecondary),
+    dividerTheme: DividerThemeData(color: tokens.border, thickness: 1, space: 1),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: tokens.brandText,
+      selectionColor: tokens.brandPrimary.withValues(alpha: isDark ? 0.35 : 0.20),
+      selectionHandleColor: tokens.brandPrimary,
+    ),
+    scrollbarTheme: ScrollbarThemeData(
+      thumbVisibility: WidgetStateProperty.all(false),
+      thickness: WidgetStateProperty.all(6),
+      radius: const Radius.circular(8),
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.hovered) || states.contains(WidgetState.dragged)) {
+          return tokens.inkMuted.withValues(alpha: 0.65);
+        }
+        return tokens.inkMuted.withValues(alpha: 0.35);
+      }),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: tokens.surface,
       surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      titleTextStyle: TextStyle(
+        fontFamily: 'Figtree',
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        color: tokens.inkPrimary,
+      ),
+      contentTextStyle: TextStyle(
+        fontFamily: 'Figtree',
+        fontSize: 14,
+        color: tokens.inkSecondary,
+      ),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: tokens.surfaceElevated,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: tokens.border),
+      ),
+      textStyle: TextStyle(
+        fontFamily: 'Figtree',
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        color: tokens.inkPrimary,
+      ),
+    ),
+    cardTheme: CardThemeData(
+      color: tokens.surface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: tokens.border),
+      ),
+    ),
+    dataTableTheme: DataTableThemeData(
+      headingRowColor: WidgetStateProperty.all(tokens.tableHeaderBg),
+      dataRowColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return tokens.brandSoftBg;
+        if (states.contains(WidgetState.hovered)) return tokens.tableRowHover;
+        return tokens.surface;
+      }),
+      headingTextStyle: TextStyle(
+        fontFamily: 'Figtree',
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        color: tokens.inkSecondary,
+      ),
+      dataTextStyle: TextStyle(
+        fontFamily: 'Figtree',
+        fontSize: 13,
+        color: tokens.inkPrimary,
+      ),
+      dividerThickness: 1,
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: tokens.surfaceSubtle,
+      selectedColor: tokens.brandSoftBg,
+      labelStyle: TextStyle(
+        fontFamily: 'Figtree',
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: tokens.inkPrimary,
+      ),
+      side: BorderSide(color: tokens.border),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return Colors.white;
+        return isDark ? tokens.inkMuted : Colors.white;
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return tokens.brandPrimary;
+        return tokens.borderStrong;
+      }),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return tokens.brandPrimary;
+        return Colors.transparent;
+      }),
+      checkColor: WidgetStateProperty.all(Colors.white),
+      side: BorderSide(color: tokens.borderStrong, width: 1.5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+    ),
+    tabBarTheme: TabBarThemeData(
+      labelColor: tokens.brandText,
+      unselectedLabelColor: tokens.inkMuted,
+      indicatorColor: tokens.brandPrimary,
+      dividerColor: tokens.border,
+      labelStyle: const TextStyle(fontFamily: 'Figtree', fontSize: 13, fontWeight: FontWeight.w700),
+      unselectedLabelStyle: const TextStyle(fontFamily: 'Figtree', fontSize: 13, fontWeight: FontWeight.w500),
     ),
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
-        color: neutralDark.withValues(alpha: 0.9),
+        color: isDark ? const Color(0xFF060B0E) : const Color(0xFF0F172A).withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(6),
+        border: isDark ? Border.all(color: tokens.border) : null,
       ),
-      textStyle: const TextStyle(color: Colors.white, fontSize: 12),
+      textStyle: const TextStyle(fontFamily: 'Figtree', color: Colors.white, fontSize: 12),
       waitDuration: const Duration(milliseconds: 300),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      fillColor: tokens.inputFill,
+      hintStyle: TextStyle(color: tokens.inkMuted, fontSize: 13),
+      labelStyle: TextStyle(color: tokens.inkSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: borderSubtle),
+        borderSide: BorderSide(color: tokens.borderStrong),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: borderSubtle),
+        borderSide: BorderSide(color: tokens.borderStrong),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: primaryAccessibleText, width: 1.5),
+        borderSide: BorderSide(color: tokens.brandText, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: tokens.danger),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: tokens.danger, width: 1.5),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        textStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        padding: EdgeInsets.zero,
+        backgroundColor: tokens.brandPrimary,
+        foregroundColor: tokens.brandOnPrimary,
+        textStyle: const TextStyle(fontFamily: 'Figtree', fontWeight: FontWeight.w600, fontSize: 13),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF475569),
-        side: const BorderSide(color: Color(0xFFCBD5E1)),
+        foregroundColor: tokens.inkSecondary,
+        side: BorderSide(color: tokens.borderStrong),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: primary,
-        foregroundColor: Colors.white,
+        backgroundColor: tokens.brandPrimary,
+        foregroundColor: tokens.brandOnPrimary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: tokens.brandText,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     textTheme: TextTheme(
-      displayLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.w700, color: textPrimaryColor),
-      displayMedium: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textPrimaryColor),
-      displaySmall: TextStyle(
-        fontSize: 30,
-        fontWeight: FontWeight.bold,
-        foreground: Paint()
-          ..shader = const LinearGradient(
-            colors: <Color>[Color(0XFFAD1F61), Color(0XFF46006A)],
-          ).createShader(const Rect.fromLTWH(0.0, 0.0, 500.0, 70.0)),
+      displayLarge: TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.5,
+        color: tokens.inkPrimary,
       ),
-      bodyLarge: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: textPrimaryColor),
-      bodyMedium: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal, color: textPrimaryColor),
-      titleLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.normal, color: textPrimaryColor),
-      titleMedium: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.normal, color: textPrimaryColor),
-      titleSmall: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600, color: textPrimaryColor),
-      labelLarge: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: textPrimaryColor),
-      bodySmall: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal, color: textPrimaryColor),
+      displayMedium: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.2,
+        color: tokens.inkPrimary,
+      ),
+      displaySmall: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.4,
+        color: tokens.brandText,
+      ),
+      bodyLarge: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600, color: tokens.inkPrimary),
+      bodyMedium: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400, color: tokens.inkPrimary),
+      titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: tokens.inkPrimary),
+      titleMedium: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500, color: tokens.inkPrimary),
+      titleSmall: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600, color: tokens.inkPrimary),
+      labelLarge: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w700, color: tokens.inkPrimary),
+      bodySmall: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w400, color: tokens.inkMuted),
     ),
   );
 }
 
-// Dark Them
-ThemeData darkThemeData(BuildContext context) {
-  return ThemeData.dark().copyWith(
-    brightness: Brightness.dark,
-    primaryColor: const Color(0xFF86337c),
-    canvasColor: Colors.white,
-    scaffoldBackgroundColor: Colors.white,
-    cardTheme: CardThemeData(
-      color: const Color(0xFF141d26),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-    ),
-    iconTheme: const IconThemeData(color: Colors.white),
-    textTheme: TextTheme(
-      displayLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.w700, color: Colors.white),
-      displayMedium: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-      displaySmall: TextStyle(
-        fontSize: 30,
-        fontWeight: FontWeight.bold,
-        foreground: Paint()
-          ..shader = const LinearGradient(
-            colors: <Color>[Color(0XFFAD1F61), Color(0XFF46006A)],
-          ).createShader(const Rect.fromLTWH(0.0, 0.0, 500.0, 70.0)),
-      ),
-      bodyLarge: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white),
-      bodyMedium: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal, color: Colors.white),
-      titleLarge: const TextStyle(fontSize: 30, fontWeight: FontWeight.normal, color: Colors.white),
-      titleMedium: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.normal, color: Colors.white),
-      titleSmall: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600, color: Colors.white),
-      labelLarge: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.white),
-      bodySmall: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.normal, color: Colors.white),
-    ),
-  );
-}
+/// Legacy compatibility helpers.
+ThemeData theme(BuildContext context) => buildLightTheme(context);
+
+ThemeData darkThemeData(BuildContext context) => buildDarkTheme(context);
 
 AppBarTheme appBarTheme = const AppBarTheme(backgroundColor: Colors.transparent, elevation: 0);

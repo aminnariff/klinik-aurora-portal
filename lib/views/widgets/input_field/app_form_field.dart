@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/currency_formatter.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/upper_case_alpha_formatter.dart';
 
@@ -79,6 +79,7 @@ class _AppFormFieldState extends State<AppFormField> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final effectiveKeyboardType = widget.keyboardType ??
         (widget.isNumber || widget.isCurrency
             ? TextInputType.number
@@ -108,24 +109,24 @@ class _AppFormFieldState extends State<AppFormField> {
       style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w500,
-        color: widget.isEditable ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+        color: widget.isEditable ? colors.inkPrimary : colors.inkMuted,
       ),
-      cursorColor: primary,
+      cursorColor: colors.brandText,
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.normal,
-          color: Color(0xFF94A3B8),
+          color: colors.inkMuted,
         ),
         errorText: widget.errorText,
-        errorStyle: const TextStyle(
+        errorStyle: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: Color(0xFFDC2626),
+          color: colors.danger,
         ),
         filled: true,
-        fillColor: widget.isEditable ? Colors.white : const Color(0xFFF1F5F9),
+        fillColor: widget.isEditable ? colors.inputFill : colors.inputDisabledFill,
         contentPadding: EdgeInsets.symmetric(
           horizontal: 14,
           vertical: widget.maxLines > 1 ? 12 : 10,
@@ -144,7 +145,7 @@ class _AppFormFieldState extends State<AppFormField> {
                   icon: Icon(
                     _obscureText ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                     size: 18,
-                    color: const Color(0xFF94A3B8),
+                    color: colors.inkMuted,
                   ),
                   onPressed: () => setState(() => _obscureText = !_obscureText),
                 ),
@@ -153,27 +154,27 @@ class _AppFormFieldState extends State<AppFormField> {
         suffixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.0),
+          borderSide: BorderSide(color: colors.borderStrong, width: 1.0),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.0),
+          borderSide: BorderSide(color: colors.borderStrong, width: 1.0),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primary, width: 1.5),
+          borderSide: BorderSide(color: colors.brandText, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.0),
+          borderSide: BorderSide(color: colors.danger, width: 1.0),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
+          borderSide: BorderSide(color: colors.danger, width: 1.5),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+          borderSide: BorderSide(color: colors.border, width: 1.0),
         ),
       ),
     );
@@ -193,21 +194,21 @@ class _AppFormFieldState extends State<AppFormField> {
             children: [
               Text(
                 widget.label!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155),
+                  color: colors.inkSecondary,
                 ),
               ),
               if (widget.isRequired)
-                const Padding(
-                  padding: EdgeInsets.only(left: 3),
+                Padding(
+                  padding: const EdgeInsets.only(left: 3),
                   child: Text(
                     '*',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFFDC2626),
+                      color: colors.danger,
                     ),
                   ),
                 ),
@@ -215,7 +216,7 @@ class _AppFormFieldState extends State<AppFormField> {
                 const SizedBox(width: 4),
                 Tooltip(
                   message: widget.tooltip!,
-                  child: const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF94A3B8)),
+                  child: Icon(Icons.info_outline_rounded, size: 14, color: colors.inkMuted),
                 ),
               ],
             ],

@@ -178,17 +178,17 @@ class _UserHomepageState extends State<UserHomepage> {
         onChanged: (_) => filtering(page: 1),
         decoration: InputDecoration(
           hintText: 'Search patients…',
-          prefixIcon: const Icon(Icons.search, size: 20, color: Color(0xFF9CA3AF)),
+          prefixIcon: Icon(Icons.search, size: 20, color: appInkMuted),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: appSurface,
           contentPadding: const EdgeInsets.symmetric(vertical: 10),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: BorderSide(color: appBorder),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            borderSide: BorderSide(color: appBorder),
           ),
         ),
       ),
@@ -203,7 +203,7 @@ class _UserHomepageState extends State<UserHomepage> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+        side: BorderSide(color: appBorder),
       ),
       color: Colors.white,
       child: Padding(
@@ -230,7 +230,7 @@ class _UserHomepageState extends State<UserHomepage> {
                   const SizedBox(height: 2),
                   Text(
                     user.userPhone ?? 'No phone',
-                    style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF6B7280)),
+                    style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -256,7 +256,7 @@ class _UserHomepageState extends State<UserHomepage> {
 
   Widget desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -300,8 +300,8 @@ class _UserHomepageState extends State<UserHomepage> {
             icon: const Icon(Icons.tune_rounded, size: 16),
             label: const Text('Filter', style: TextStyle(fontSize: 13)),
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF374151),
-              side: const BorderSide(color: Color(0xFFD1D5DB)),
+              foregroundColor: appInkSecondary,
+              side: BorderSide(color: appBorderStrong),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -313,7 +313,7 @@ class _UserHomepageState extends State<UserHomepage> {
               resetAllFilter();
               filtering(enableDebounce: false, page: 1);
             },
-            icon: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF6B7280)),
+            icon: Icon(Icons.refresh_rounded, size: 18, color: appInkMuted),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF3F4F6),
@@ -351,23 +351,23 @@ class _UserHomepageState extends State<UserHomepage> {
         if (snapshot.userAllResponse!.isEmpty) {
           return Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: const Center(child: NoRecordsWidget()),
           );
         }
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             children: [
               Expanded(child: _dataTable(snapshot.userAllResponse!)),
-              const Divider(height: 1, color: Color(0xFFE5E7EB)),
+              Divider(height: 1, color: appBorder),
               _tableFooter(),
             ],
           ),
@@ -383,7 +383,7 @@ class _UserHomepageState extends State<UserHomepage> {
       isHorizontalScrollBarVisible: false,
       isVerticalScrollBarVisible: true,
       decoration: const BoxDecoration(),
-      headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+      headingRowColor: WidgetStateProperty.all(appCanvas),
       headingRowHeight: 44,
       dataRowHeight: 60,
       dividerThickness: 1,
@@ -393,7 +393,7 @@ class _UserHomepageState extends State<UserHomepage> {
           DataRow2(
             color: WidgetStateProperty.resolveWith<Color?>((states) {
               if (states.contains(WidgetState.hovered)) {
-                return const Color(0xFFF1F5F9);
+                return appSurfaceSubtle;
               }
               return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
             }),
@@ -437,7 +437,7 @@ class _UserHomepageState extends State<UserHomepage> {
                   ),
                   Text(
                     user.userEmail ?? '',
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+                    style: TextStyle(fontSize: 11, color: appInkMuted),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -471,7 +471,7 @@ class _UserHomepageState extends State<UserHomepage> {
       DataCell(_statusChip(user.userStatus == 1)),
       // Joined
       DataCell(
-        Text(dateConverter(user.createdDate) ?? '—', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+        Text(dateConverter(user.createdDate) ?? '—', style: TextStyle(fontSize: 12, color: appInkMuted)),
       ),
       // Actions
       DataCell(_actionMenu(user)),
@@ -483,7 +483,7 @@ class _UserHomepageState extends State<UserHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: active ? Colors.green.withAlpha(25) : Colors.red.withAlpha(25),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         active ? 'Active' : 'Inactive',
@@ -531,9 +531,9 @@ class _UserHomepageState extends State<UserHomepage> {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: appBorder),
         ),
-        child: const Icon(Icons.more_horiz_rounded, size: 16, color: Color(0xFF6B7280)),
+        child: Icon(Icons.more_horiz_rounded, size: 16, color: appInkMuted),
       ),
     );
   }
@@ -543,7 +543,7 @@ class _UserHomepageState extends State<UserHomepage> {
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF6B7280)),
+          Icon(icon, size: 16, color: appInkMuted),
           const SizedBox(width: 10),
           Text(label, style: const TextStyle(fontSize: 13)),
         ],
@@ -559,13 +559,13 @@ class _UserHomepageState extends State<UserHomepage> {
           Expanded(child: pagination()),
           Row(
             children: [
-              const Text('Rows: ', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+              Text('Rows: ', style: TextStyle(fontSize: 12, color: appInkMuted)),
               perPage(),
               const SizedBox(width: 16),
               if (!isMobile && !isTablet)
                 Text(
                   '${(_page * _pageSize) - _pageSize + 1}–${math.min(_page * _pageSize, _totalCount)} of $_totalCount',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
             ],
           ),
@@ -655,7 +655,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                 filtering(enableDebounce: false, page: 1);
                               },
                               style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Color(0xFFD1D5DB)),
+                                side: BorderSide(color: appBorderStrong),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                               ),
@@ -840,7 +840,7 @@ class _UserHomepageState extends State<UserHomepage> {
             size: item.columnSize ?? ColumnSize.M,
             label: Text(
               item.label,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted),
             ),
           ),
         )

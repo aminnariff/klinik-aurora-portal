@@ -11,6 +11,7 @@ import 'package:klinik_aurora_portal/views/homepage/branch_dashboard_view.dart';
 import 'package:klinik_aurora_portal/views/homepage/superadmin_dashboard_view.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:provider/provider.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
@@ -144,9 +145,9 @@ class _MainDashboardState extends State<MainDashboard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -168,10 +169,10 @@ class _MainDashboardState extends State<MainDashboard> {
                     isSuper && _selectedBranchId == null
                         ? 'Network Intelligence Dashboard'
                         : '${_selectedBranchName ?? userBranchName ?? "Clinic"} Operations Dashboard',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                       letterSpacing: -0.4,
                     ),
                   ),
@@ -187,7 +188,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     child: Text(
                       isSuper && _selectedBranchId == null ? 'EXECUTIVE' : 'BRANCH LEVEL',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.w800,
                         color: isSuper && _selectedBranchId == null
                             ? const Color(0xFF1D4ED8)
@@ -203,7 +204,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 isSuper && _selectedBranchId == null
                     ? 'Consolidated revenue, branch rankings, and patient volume across all clinics'
                     : 'Real-time daily appointments, doctor rosters, and patient queue',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 12, color: appInkMuted),
               ),
             ],
           ),
@@ -220,15 +221,15 @@ class _MainDashboardState extends State<MainDashboard> {
                       height: 38,
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
+                        color: appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(color: appBorder),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String?>(
                           value: _selectedBranchId,
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF64748B)),
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                          icon: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: appInkMuted),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: appInkPrimary),
                           items: [
                             const DropdownMenuItem<String?>(
                               value: null,
@@ -275,22 +276,22 @@ class _MainDashboardState extends State<MainDashboard> {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: (_isLoading || _isCooldownActive) ? const Color(0xFFF1F5F9) : const Color(0xFFF8FAFC),
+                      color: (_isLoading || _isCooldownActive) ? appSurfaceSubtle : appSurfaceSubtle,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      border: Border.all(color: appBorder),
                     ),
                     child: _isLoading
-                        ? const Center(
+                        ? Center(
                             child: SizedBox(
                               width: 16,
                               height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF64748B)),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: appInkMuted),
                             ),
                           )
                         : Icon(
                             Icons.refresh_rounded,
                             size: 18,
-                            color: (_isLoading || _isCooldownActive) ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                            color: (_isLoading || _isCooldownActive) ? appInkMuted : appInkSecondary,
                           ),
                   ),
                 ),

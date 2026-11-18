@@ -94,7 +94,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                   hintText: 'Search vouchers...',
                   prefixIcon: const Icon(Icons.search, size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -173,7 +173,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0xFFE5E7EB)),
+          side: BorderSide(color: appBorder),
         ),
         color: Colors.white,
         child: Padding(
@@ -190,7 +190,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                       color: primary.withAlpha(30),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.confirmation_number_rounded,
                       size: 18,
                       color: primary,
@@ -210,22 +210,22 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
               _mobileRow('Code', _codeCell(voucher.voucherCode)),
               _mobileRow('Points', Text(
                 '${voucher.voucherPoint ?? 0}',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                style: TextStyle(fontSize: 12, color: appInkSecondary),
               )),
               if (voucher.rewardId != null && voucher.rewardId!.isNotEmpty)
                 _mobileRow('Reward', Text(
                   voucher.rewardId!,
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                  style: TextStyle(fontSize: 12, color: appInkSecondary),
                   overflow: TextOverflow.ellipsis,
                 )),
               if (start != null || end != null)
                 _mobileRow('Period', Text(
                   '${start ?? '—'} → ${end ?? '—'}',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                  style: TextStyle(fontSize: 12, color: appInkSecondary),
                 )),
               _mobileRow('Created', Text(
                 dateConverter(voucher.createdDate) ?? '—',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+                style: TextStyle(fontSize: 12, color: appInkSecondary),
               )),
               const SizedBox(height: 10),
               Row(
@@ -255,7 +255,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
             width: 70,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              style: TextStyle(fontSize: 12, color: appInkMuted),
             ),
           ),
           Expanded(child: value),
@@ -268,7 +268,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
 
   Widget _desktopView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: appCanvas,
       body: Column(
         children: [
           _topBar(),
@@ -277,7 +277,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -317,7 +317,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                   hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
+                  fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -477,7 +477,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
 
   Widget _filterLabel(String text) => Text(
     text,
-    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted),
   );
 
   Widget _filterTextField(TextEditingController controller, String hint) {
@@ -512,7 +512,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                 minWidth: 750,
                 isHorizontalScrollBarVisible: true,
                 isVerticalScrollBarVisible: true,
-                headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+                headingRowColor: WidgetStateProperty.all(appCanvas),
                 headingRowHeight: 48,
                 dataRowHeight: 56,
                 decoration: const BoxDecoration(
@@ -538,7 +538,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                       ),
                       color: WidgetStateProperty.resolveWith<Color?>((states) {
                         if (states.contains(WidgetState.hovered)) {
-                          return const Color(0xFFF1F5F9);
+                          return appSurfaceSubtle;
                         }
                         return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
                       }),
@@ -547,17 +547,17 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                         DataCell(
                           Text(
                             items[i].voucherName ?? '—',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF111827),
+                              color: appInkPrimary,
                             ),
                           ),
                         ),
                         DataCell(
                           Text(
                             '${items[i].voucherPoint ?? '—'}',
-                            style: const TextStyle(fontSize: 13, color: Color(0xFF374151)),
+                            style: TextStyle(fontSize: 13, color: appInkSecondary),
                           ),
                         ),
                         DataCell(
@@ -569,7 +569,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                         DataCell(
                           Text(
                             dateConverter(items[i].createdDate) ?? '—',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                         ),
                         DataCell(_actionsMenu(items[i])),
@@ -591,10 +591,10 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
       size: size,
       label: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF6B7280),
+          color: appInkMuted,
           letterSpacing: 0.3,
         ),
       ),
@@ -603,7 +603,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
 
   Widget _codeCell(String? code) {
     if (code == null || code.isEmpty) {
-      return const Text('—', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13));
+      return Text('—', style: TextStyle(color: appInkMuted, fontSize: 13));
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -613,10 +613,10 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
       ),
       child: Text(
         code.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF374151),
+          color: appInkSecondary,
           fontFamily: 'monospace',
           letterSpacing: 0.5,
         ),
@@ -629,7 +629,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         isActive ? 'Active' : 'Inactive',
@@ -694,10 +694,10 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
         }
       },
       itemBuilder: (_) => [
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'edit',
           child: Row(children: [
-            Icon(Icons.edit_rounded, size: 16, color: Color(0xFF6B7280)),
+            Icon(Icons.edit_rounded, size: 16, color: appInkMuted),
             SizedBox(width: 10),
             Text('Edit Voucher', style: TextStyle(fontSize: 13)),
           ]),
@@ -724,7 +724,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
           color: Colors.grey.withAlpha(25),
           borderRadius: BorderRadius.circular(6),
         ),
-        child: const Icon(Icons.more_horiz, color: Color(0xFF374151), size: 18),
+        child: Icon(Icons.more_horiz, color: appInkSecondary, size: 18),
       ),
     );
   }

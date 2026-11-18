@@ -309,7 +309,7 @@ class _RegistrationChartState extends State<RegistrationChart> {
         width: 56,
         height: 24,
         alignment: Alignment.center,
-        child: Text(text, textAlign: TextAlign.center, style: headerStyle.copyWith(fontSize: 10)),
+        child: Text(text, textAlign: TextAlign.center, style: headerStyle.copyWith(fontSize: 11)),
       );
     }
 

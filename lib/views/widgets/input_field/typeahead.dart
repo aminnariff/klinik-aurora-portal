@@ -143,7 +143,7 @@ class DropdownSearch extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: errorColor, width: 1.0),
+                  borderSide: BorderSide(color: errorColor, width: 1.0),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 disabledBorder: OutlineInputBorder(

@@ -79,9 +79,9 @@ class _UserPointDetailState extends State<UserPointDetail> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: appSurface,
+      surfaceTintColor: Colors.transparent,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: math.min(900, MediaQuery.of(context).size.width * 0.9),
@@ -300,7 +300,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Row(
@@ -318,7 +318,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkMuted),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

@@ -122,7 +122,7 @@ class _NotificationScheduleEditorState extends State<NotificationScheduleEditor>
                     IconButton(
   tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded),
-                      color: const Color(0xFF637381),
+                      color: appInkMuted,
                       onPressed: _saving ? null : () => Navigator.of(context).pop(false),
                     ),
                   ],
@@ -152,7 +152,7 @@ class _NotificationScheduleEditorState extends State<NotificationScheduleEditor>
                         AppPadding.vertical(denominator: 2),
                         InputField(field: _body..onChanged = (_) => setState(() {})),
                         AppPadding.vertical(denominator: 2),
-                        const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                        Divider(height: 1, color: appBorder),
                         AppPadding.vertical(denominator: 2),
                         NotificationDeliveryField(
                           value: _scheduledFor,

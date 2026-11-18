@@ -168,7 +168,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                         title: Text('${item?.branchName}', style: AppTypography.bodyMedium(context)),
                                         subtitle: Row(
                                           children: [
-                                            const Icon(Icons.schedule_outlined, size: 12, color: Color(0xFF6B7280)),
+                                            Icon(Icons.schedule_outlined, size: 12, color: appInkMuted),
                                             const SizedBox(width: 4),
                                             Text(
                                               item?.serviceTime ?? '—',
@@ -185,7 +185,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                 ),
                                                 child: const Text(
                                                   'Custom',
-                                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
                                                 ),
                                               ),
                                             ],
@@ -200,7 +200,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                 ),
                                                 child: const Text(
                                                   'Rules Active',
-                                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFF4338CA)),
+                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF4338CA)),
                                                 ),
                                               ),
                                             ],

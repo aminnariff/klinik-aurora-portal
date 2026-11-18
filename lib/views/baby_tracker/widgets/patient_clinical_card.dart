@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class PatientClinicalCard extends StatelessWidget {
   final Map<String, dynamic> patient;
@@ -31,14 +32,14 @@ class PatientClinicalCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isOverdue
               ? const Color(0xFFFCA5A5)
               : alertStatus == 'low_kicks'
                   ? const Color(0xFFFCD34D)
-                  : const Color(0xFFE2E8F0),
+                  : appBorder,
           width: 1.0,
         ),
       ),
@@ -54,10 +55,10 @@ class PatientClinicalCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: isOverdue ? const Color(0xFFFEF2F2) : const Color(0xFFF1F5F9),
+                  color: isOverdue ? const Color(0xFFFEF2F2) : appSurfaceSubtle,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isOverdue ? const Color(0xFFFECACA) : const Color(0xFFE2E8F0),
+                    color: isOverdue ? const Color(0xFFFECACA) : appBorder,
                   ),
                 ),
                 alignment: Alignment.center,
@@ -66,7 +67,7 @@ class PatientClinicalCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF334155),
+                    color: isOverdue ? const Color(0xFFDC2626) : appInkSecondary,
                   ),
                 ),
               ),
@@ -77,10 +78,10 @@ class PatientClinicalCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: appInkPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -88,7 +89,7 @@ class PatientClinicalCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       '$phone • $branch',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 12, color: appInkMuted),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -156,7 +157,7 @@ class PatientClinicalCard extends StatelessWidget {
                       ? const Color(0xFF15803D)
                       : kicks > 0
                           ? const Color(0xFFD97706)
-                          : const Color(0xFF64748B),
+                          : appInkMuted,
                 ),
               ),
               const SizedBox(width: 8),
@@ -177,7 +178,7 @@ class PatientClinicalCard extends StatelessWidget {
           ),
 
           const Spacer(),
-          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          Divider(height: 1, color: appSurfaceSubtle),
           const SizedBox(height: 12),
 
           // Bottom Action Row (Comfortable, large tap targets, official WhatsApp branding)
@@ -218,8 +219,8 @@ class PatientClinicalCard extends StatelessWidget {
                     icon: const Icon(Icons.description_outlined, size: 14),
                     label: const Text('Buka Rekod', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF0F172A),
-                      side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
+                      foregroundColor: appInkPrimary,
+                      side: BorderSide(color: appBorderStrong, width: 1.2),
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       minimumSize: const Size(0, 40),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -307,9 +308,9 @@ class PatientClinicalCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -324,21 +325,21 @@ class PatientClinicalCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.bold,
-                      color: isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0F172A),
+                      color: isOverdue ? const Color(0xFFDC2626) : appInkPrimary,
                     ),
                   ),
                   if (trimester != null) ...[
                     const SizedBox(width: 6),
                     Text(
                       '• Trimester $trimester',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 11, color: appInkMuted),
                     ),
                   ],
                 ],
               ),
               Text(
                 'EDD: $edd',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
               ),
             ],
           ),
@@ -349,20 +350,20 @@ class PatientClinicalCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 5,
-              backgroundColor: const Color(0xFFE2E8F0),
+              backgroundColor: appBorder,
               valueColor: AlwaysStoppedAnimation<Color>(
                 isOverdue ? const Color(0xFFDC2626) : const Color(0xFF0284C7),
               ),
             ),
           ),
           const SizedBox(height: 4),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('W1', style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8))),
-              Text('W13 (T1)', style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8))),
-              Text('W27 (T2)', style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8))),
-              Text('W40 (EDD)', style: TextStyle(fontSize: 9, color: Color(0xFF64748B), fontWeight: FontWeight.bold)),
+              Text('W1', style: TextStyle(fontSize: 11, color: appInkMuted)),
+              Text('W13 (T1)', style: TextStyle(fontSize: 11, color: appInkMuted)),
+              Text('W27 (T2)', style: TextStyle(fontSize: 11, color: appInkMuted)),
+              Text('W40 (EDD)', style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.bold)),
             ],
           ),
         ],
@@ -380,16 +381,16 @@ class PatientClinicalCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, letterSpacing: 0.3, color: Color(0xFF64748B)),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.3, color: appInkMuted),
           ),
           const SizedBox(height: 3),
           Row(
@@ -404,7 +405,7 @@ class PatientClinicalCard extends StatelessWidget {
                 const SizedBox(width: 3),
                 Text(
                   unit,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 11, color: appInkMuted),
                 ),
               ],
             ],
@@ -412,7 +413,7 @@ class PatientClinicalCard extends StatelessWidget {
           const SizedBox(height: 1),
           Text(
             detail,
-            style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+            style: TextStyle(fontSize: 11, color: appInkMuted),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

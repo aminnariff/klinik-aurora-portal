@@ -8,6 +8,7 @@ import 'package:klinik_aurora_portal/controllers/dashboard/branch_operations_con
 import 'package:klinik_aurora_portal/models/dashboard/branch_operations_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/widgets/dashboard_metric_card.dart';
 import 'package:provider/provider.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class BranchDashboardView extends StatelessWidget {
   const BranchDashboardView({super.key});
@@ -228,9 +229,9 @@ class BranchDashboardView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -245,7 +246,7 @@ class BranchDashboardView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -253,13 +254,13 @@ class BranchDashboardView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                     ),
                   ),
                   SizedBox(height: 2),
                   Text(
                     'Completed vs Scheduled visits',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                    style: TextStyle(fontSize: 11, color: appInkMuted),
                   ),
                 ],
               ),
@@ -276,8 +277,8 @@ class BranchDashboardView extends StatelessWidget {
           SizedBox(
             height: 170,
             child: activity.isEmpty
-                ? const Center(
-                    child: Text('No appointment activity in the last 7 days', style: TextStyle(color: Color(0xFF94A3B8))),
+                ? Center(
+                    child: Text('No appointment activity in the last 7 days', style: TextStyle(color: appInkMuted)),
                   )
                 : BarChart(
                     BarChartData(
@@ -287,7 +288,7 @@ class BranchDashboardView extends StatelessWidget {
                         show: true,
                         drawVerticalLine: false,
                         horizontalInterval: math.max(1, (maxVal / 4).roundToDouble()),
-                        getDrawingHorizontalLine: (value) => const FlLine(color: Color(0xFFF1F5F9), strokeWidth: 1),
+                        getDrawingHorizontalLine: (value) => FlLine(color: appSurfaceSubtle, strokeWidth: 1),
                       ),
                       borderData: FlBorderData(show: false),
                       titlesData: FlTitlesData(
@@ -301,7 +302,7 @@ class BranchDashboardView extends StatelessWidget {
                               if (value == meta.max || value == 0) return const SizedBox();
                               return Text(
                                 value.toInt().toString(),
-                                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w600),
+                                style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w600),
                               );
                             },
                           ),
@@ -317,8 +318,8 @@ class BranchDashboardView extends StatelessWidget {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   activity[idx].dayName ?? '',
-                                  style: const TextStyle(
-                                    color: Color(0xFF64748B),
+                                  style: TextStyle(
+                                    color: appInkMuted,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -389,9 +390,9 @@ class BranchDashboardView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -409,29 +410,29 @@ class BranchDashboardView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Booking Heatmap',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '$monthName • $monthTotal bookings',
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Less',
-                    style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(width: 4),
-                  _buildHeatmapLegendBox(const Color(0xFFF1F5F9)),
+                  _buildHeatmapLegendBox(appSurfaceSubtle),
                   const SizedBox(width: 3),
                   _buildHeatmapLegendBox(const Color(0xFFCCFBF1)),
                   const SizedBox(width: 3),
@@ -439,9 +440,9 @@ class BranchDashboardView extends StatelessWidget {
                   const SizedBox(width: 3),
                   _buildHeatmapLegendBox(const Color(0xFF0D9488)),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     'More',
-                    style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -455,10 +456,10 @@ class BranchDashboardView extends StatelessWidget {
                 child: Center(
                   child: Text(
                     dayHeaders[colIndex],
-                    style: const TextStyle(
-                      fontSize: 10,
+                    style: TextStyle(
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF94A3B8),
+                      color: appInkMuted,
                     ),
                   ),
                 ),
@@ -487,11 +488,11 @@ class BranchDashboardView extends StatelessWidget {
                     Color bg;
                     Color fg;
                     if (total == 0) {
-                      bg = const Color(0xFFF8FAFC);
-                      fg = const Color(0xFF94A3B8);
+                      bg = appSurfaceSubtle;
+                      fg = appInkMuted;
                     } else if (total <= 3) {
                       bg = const Color(0xFFCCFBF1);
-                      fg = const Color(0xFF0F766E);
+                      fg = primary;
                     } else if (total <= 8) {
                       bg = const Color(0xFF5EEAD4);
                       fg = const Color(0xFF134E4A);
@@ -525,7 +526,7 @@ class BranchDashboardView extends StatelessWidget {
                                     Text(
                                       dayNumber.toString(),
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 11,
                                         fontWeight: isToday ? FontWeight.w800 : FontWeight.w600,
                                         color: fg,
                                         height: 1.1,
@@ -535,7 +536,7 @@ class BranchDashboardView extends StatelessWidget {
                                       Text(
                                         '$total',
                                         style: TextStyle(
-                                          fontSize: 8.5,
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w800,
                                           color: fg.withValues(alpha: 0.9),
                                           height: 1.1,
@@ -598,9 +599,9 @@ class BranchDashboardView extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: Color(0xFF64748B),
+            color: appInkMuted,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -613,9 +614,9 @@ class BranchDashboardView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -630,7 +631,7 @@ class BranchDashboardView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.queue_play_next_rounded, size: 18, color: Color(0xFF2563EB)),
                   SizedBox(width: 8),
@@ -639,7 +640,7 @@ class BranchDashboardView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
+                      color: appInkPrimary,
                     ),
                   ),
                 ],
@@ -664,13 +665,13 @@ class BranchDashboardView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 24),
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 children: [
                   Icon(Icons.check_circle_outline_rounded, size: 36, color: Color(0xFF16A34A)),
                   SizedBox(height: 8),
                   Text(
                     'No more scheduled patients for today',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 12, color: appInkMuted, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -680,7 +681,7 @@ class BranchDashboardView extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: queue.length,
-              separatorBuilder: (_, _) => const Divider(color: Color(0xFFF1F5F9), height: 1),
+              separatorBuilder: (_, _) => Divider(color: appSurfaceSubtle, height: 1),
               itemBuilder: (context, index) {
                 final item = queue[index];
                 String formattedTime = item.appointmentDatetime ?? '';
@@ -715,18 +716,18 @@ class BranchDashboardView extends StatelessWidget {
                           children: [
                             Text(
                               item.patientName ?? 'Patient',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF0F172A),
+                                color: appInkPrimary,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               item.serviceName ?? 'General Consultation',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: Color(0xFF64748B),
+                                color: appInkMuted,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -736,21 +737,21 @@ class BranchDashboardView extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
+                          color: appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: appBorder),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.person_rounded, size: 12, color: Color(0xFF64748B)),
+                            Icon(Icons.person_rounded, size: 12, color: appInkMuted),
                             const SizedBox(width: 4),
                             Text(
                               item.doctorName ?? 'Unassigned',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF334155),
+                                color: appInkSecondary,
                               ),
                             ),
                           ],
@@ -776,7 +777,7 @@ class BranchDashboardView extends StatelessWidget {
       const Color(0xFF2563EB), // Blue
       const Color(0xFF16A34A), // Green
       const Color(0xFFF59E0B), // Yellow/Amber
-      const Color(0xFF94A3B8), // Slate Gray
+      appInkMuted, // Slate Gray
     ];
 
     final int totalBookings = topServices.fold(0, (sum, s) => sum + (s.totalBookings ?? 0));
@@ -784,9 +785,9 @@ class BranchDashboardView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -798,12 +799,12 @@ class BranchDashboardView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Branch Monthly Performance',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              color: appInkPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -826,7 +827,7 @@ class BranchDashboardView extends StatelessWidget {
                     const Text(
                       'MONTH-TO-DATE REVENUE',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF15803D),
                         letterSpacing: 0.5,
@@ -846,7 +847,7 @@ class BranchDashboardView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: appSurface,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(color: Colors.green.withValues(alpha: 0.1), blurRadius: 4),
@@ -859,20 +860,20 @@ class BranchDashboardView extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Top Services This Month',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              color: appInkPrimary,
             ),
           ),
           const SizedBox(height: 10),
 
           if (topServices.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
-              child: Center(child: Text('No service booking data yet', style: TextStyle(color: Color(0xFF94A3B8)))),
+              child: Center(child: Text('No service booking data yet', style: TextStyle(color: appInkMuted))),
             )
           else ...[
             Row(
@@ -923,13 +924,13 @@ class BranchDashboardView extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 s.serviceName ?? 'Service',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             Text(
                               '$count ($pct%)',
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkPrimary),
                             ),
                           ],
                         ),

@@ -308,7 +308,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                         'Transfer Appointment',
                                         style: AppTypography.titleLarge(context).apply(
                                           fontWeightDelta: 2,
-                                          color: const Color(0xFF1E293B),
+                                          color: appInkPrimary,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
@@ -325,22 +325,22 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                               ),
                               IconButton(
   tooltip: 'Tutup',
-                                icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+                                icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
-                          const Divider(color: Color(0xFFF1F5F9), height: 1),
+                          Divider(color: appSurfaceSubtle, height: 1),
                           const SizedBox(height: 16),
 
                           // Summary Card
                           Container(
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
+                              color: appSurfaceSubtle,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                              border: Border.all(color: appBorder),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,7 +364,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                   ],
                                 ),
                                 const SizedBox(height: 10),
-                                const Divider(color: Color(0xFFE2E8F0), height: 1),
+                                Divider(color: appBorder, height: 1),
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
@@ -402,9 +402,9 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                 )
                               : Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: appSurface,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: const Color(0xFFCBD5E1)),
+                                    border: Border.all(color: appBorderStrong),
                                   ),
                                   padding: const EdgeInsets.symmetric(horizontal: 14),
                                   child: DropdownButtonHideUnderline(
@@ -420,10 +420,10 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                           value: b,
                                           child: Text(
                                             b.name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w500,
-                                              color: Color(0xFF1E293B),
+                                              color: appInkPrimary,
                                             ),
                                           ),
                                         );
@@ -446,13 +446,13 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: appSurface,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFCBD5E1)),
+                              border: Border.all(color: appBorderStrong),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.access_time_rounded, size: 18, color: Color(0xFF64748B)),
+                                Icon(Icons.access_time_rounded, size: 18, color: appInkMuted),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
@@ -463,8 +463,8 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                       fontSize: 13,
                                       fontWeight: _selectedDateTime != null ? FontWeight.w600 : FontWeight.normal,
                                       color: _selectedDateTime != null
-                                          ? const Color(0xFF0F172A)
-                                          : const Color(0xFF94A3B8),
+                                          ? appInkPrimary
+                                          : appInkMuted,
                                     ),
                                   ),
                                 ),
@@ -495,17 +495,17 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                             style: const TextStyle(fontSize: 13),
                             decoration: InputDecoration(
                               hintText: 'e.g. Patient requested Cheras branch (closer to home/office)',
-                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                              hintStyle: TextStyle(fontSize: 12, color: appInkMuted),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: appSurface,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                                borderSide: BorderSide(color: appBorderStrong),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                                borderSide: BorderSide(color: appBorderStrong),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -524,17 +524,17 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                             style: const TextStyle(fontSize: 13),
                             decoration: InputDecoration(
                               hintText: 'Optional staff notes',
-                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                              hintStyle: TextStyle(fontSize: 12, color: appInkMuted),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: appSurface,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                                borderSide: BorderSide(color: appBorderStrong),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                                borderSide: BorderSide(color: appBorderStrong),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -580,12 +580,12 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  side: const BorderSide(color: Color(0xFFCBD5E1)),
+                                  side: BorderSide(color: appBorderStrong),
                                 ),
                                 onPressed: () => Navigator.of(context).pop(),
-                                child: const Text(
+                                child: Text(
                                   'Cancel',
-                                  style: TextStyle(color: Color(0xFF475569), fontWeight: FontWeight.w600),
+                                  style: TextStyle(color: appInkSecondary, fontWeight: FontWeight.w600),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -622,10 +622,10 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
   Widget _fieldLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 12.5,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF334155),
+        color: appInkSecondary,
       ),
     );
   }
@@ -634,7 +634,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: color ?? const Color(0xFF64748B)),
+        Icon(icon, size: 16, color: color ?? appInkMuted),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -642,7 +642,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 11, color: appInkMuted),
               ),
               const SizedBox(height: 2),
               Text(
@@ -650,7 +650,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                 style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: color ?? const Color(0xFF1E293B),
+                  color: color ?? appInkPrimary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

@@ -19,6 +19,7 @@ import "package:klinik_aurora_portal/views/widgets/input_field/app_image_field.d
 import "package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart";
 import "package:klinik_aurora_portal/views/widgets/size.dart";
 import "package:provider/provider.dart";
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class BranchDetail extends StatefulWidget {
   final Data? branch;
@@ -125,8 +126,8 @@ class _BranchDetailState extends State<BranchDetail> {
         ),
         margin: EdgeInsets.all(isMobile ? 8 : 16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: appSurface,
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.14),
@@ -136,7 +137,7 @@ class _BranchDetailState extends State<BranchDetail> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           child: Material(
             color: Colors.white,
             child: Column(
@@ -169,9 +170,9 @@ class _BranchDetailState extends State<BranchDetail> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -180,15 +181,15 @@ class _BranchDetailState extends State<BranchDetail> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
+              gradient: LinearGradient(
+                colors: [primary, Color(0xFF14B8A6)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF0F766E).withValues(alpha: 0.25),
+                  color: primary.withValues(alpha: 0.25),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -208,10 +209,10 @@ class _BranchDetailState extends State<BranchDetail> {
                     Flexible(
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
+                          color: appInkPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -222,16 +223,16 @@ class _BranchDetailState extends State<BranchDetail> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: appBorder),
                         ),
                         child: Text(
                           code.toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF475569),
+                            color: appInkSecondary,
                             fontFamily: "monospace",
                           ),
                         ),
@@ -246,7 +247,7 @@ class _BranchDetailState extends State<BranchDetail> {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: active ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: active ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
                               ),
@@ -270,7 +271,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   isCreate
                       ? "Set up a new clinic location with complete operating hours & details"
                       : "Manage branch profile, physical location and operational schedules",
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -278,7 +279,7 @@ class _BranchDetailState extends State<BranchDetail> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
             splashRadius: 18,
             onPressed: () => context.pop(),
             tooltip: "Close",
@@ -302,20 +303,20 @@ class _BranchDetailState extends State<BranchDetail> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF8FAFC),
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+      decoration: BoxDecoration(
+        color: appSurfaceSubtle,
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
-          Expanded(child: _statCard("Location", location, Icons.location_on_outlined, const Color(0xFF0F766E))),
+          Expanded(child: _statCard("Location", location, Icons.location_on_outlined, primary)),
           const SizedBox(width: 10),
           Expanded(child: _statCard("Schedule", hours, Icons.access_time_rounded, const Color(0xFF0284C7))),
           const SizedBox(width: 10),
           Expanded(child: _statCard("Launch Date", launch, Icons.calendar_today_outlined, const Color(0xFF7C3AED))),
           if (!isMobile) ...[
             const SizedBox(width: 10),
-            Expanded(child: _statCard("Contact", phone, Icons.phone_outlined, const Color(0xFF475569))),
+            Expanded(child: _statCard("Contact", phone, Icons.phone_outlined, appInkSecondary)),
           ],
         ],
       ),
@@ -326,9 +327,9 @@ class _BranchDetailState extends State<BranchDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,12 +337,12 @@ class _BranchDetailState extends State<BranchDetail> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 12, color: const Color(0xFF94A3B8)),
+              Icon(icon, size: 12, color: appInkMuted),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -373,14 +374,14 @@ class _BranchDetailState extends State<BranchDetail> {
           ),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 14, color: const Color(0xFF0F766E)),
+        Icon(icon, size: 14, color: primary),
         const SizedBox(width: 6),
         Text(
           label.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
             letterSpacing: 0.8,
           ),
         ),
@@ -592,12 +593,12 @@ class _BranchDetailState extends State<BranchDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           "State *",
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -605,10 +606,10 @@ class _BranchDetailState extends State<BranchDetail> {
           height: 42,
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: _stateError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+              color: _stateError != null ? const Color(0xFFEF4444) : appBorderStrong,
               width: _stateError != null ? 1.5 : 1,
             ),
           ),
@@ -616,12 +617,12 @@ class _BranchDetailState extends State<BranchDetail> {
             child: DropdownButton<DropdownAttribute>(
               isExpanded: true,
               value: selectedStateItem,
-              hint: const Text(
+              hint: Text(
                 "Select State",
-                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                style: TextStyle(fontSize: 12, color: appInkMuted),
               ),
-              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF94A3B8)),
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+              icon: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: appInkMuted),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
               onChanged: (DropdownAttribute? selected) {
                 if (selected != null) {
                   setState(() {
@@ -635,7 +636,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   value: s,
                   child: Text(
                     s.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
                   ),
                 );
               }).toList(),
@@ -661,9 +662,9 @@ class _BranchDetailState extends State<BranchDetail> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -676,7 +677,7 @@ class _BranchDetailState extends State<BranchDetail> {
                   Container(
                     height: 160,
                     width: double.infinity,
-                    color: const Color(0xFFE2E8F0),
+                    color: appBorder,
                     child: Image.network(
                       resolvedUrl,
                       height: 160,
@@ -684,23 +685,23 @@ class _BranchDetailState extends State<BranchDetail> {
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
-                        return const Center(
+                        return Center(
                           child: SizedBox(
                             width: 24,
                             height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0F766E)),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: primary),
                           ),
                         );
                       },
                       errorBuilder: (context, error, stackTrace) => Container(
                         height: 160,
                         width: double.infinity,
-                        color: const Color(0xFFF1F5F9),
+                        color: appSurfaceSubtle,
                         alignment: Alignment.center,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.broken_image_rounded, size: 36, color: Color(0xFF94A3B8)),
+                            Icon(Icons.broken_image_rounded, size: 36, color: appInkMuted),
                             const SizedBox(height: 6),
                             Text(
                               'Unable to load preview image',
@@ -727,7 +728,7 @@ class _BranchDetailState extends State<BranchDetail> {
                           SizedBox(width: 4),
                           Text(
                             'Current Photo',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white),
                           ),
                         ],
                       ),
@@ -741,9 +742,9 @@ class _BranchDetailState extends State<BranchDetail> {
             Container(
               height: 90,
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: appSurfaceSubtle,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFCBD5E1)),
+                border: Border.all(color: appBorderStrong),
               ),
               alignment: Alignment.center,
               child: Column(
@@ -776,12 +777,12 @@ class _BranchDetailState extends State<BranchDetail> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           "Launch Date *",
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -798,7 +799,7 @@ class _BranchDetailState extends State<BranchDetail> {
                 isMobile ? (MediaQuery.of(context).size.width * 0.88) : 420,
                 380,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
             );
             if (results != null && results.isNotEmpty && results.first != null) {
               final formatted = dateConverter("${results.first}", format: "dd-MM-yyyy") ?? "";
@@ -813,10 +814,10 @@ class _BranchDetailState extends State<BranchDetail> {
             height: 42,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: _launchDateError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                color: _launchDateError != null ? const Color(0xFFEF4444) : appBorderStrong,
                 width: _launchDateError != null ? 1.5 : 1,
               ),
             ),
@@ -828,11 +829,11 @@ class _BranchDetailState extends State<BranchDetail> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: _launchDate.text.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                      color: _launchDate.text.isNotEmpty ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
+                      color: _launchDate.text.isNotEmpty ? appInkPrimary : appInkMuted,
                     ),
                   ),
                 ),
-                const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF94A3B8)),
+                Icon(Icons.calendar_today_outlined, size: 16, color: appInkMuted),
               ],
             ),
           ),
@@ -859,10 +860,10 @@ class _BranchDetailState extends State<BranchDetail> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: appInkSecondary,
           ),
         ),
         const SizedBox(height: 5),
@@ -873,10 +874,10 @@ class _BranchDetailState extends State<BranchDetail> {
             height: 42,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: appSurface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: _hoursError != null ? const Color(0xFFEF4444) : const Color(0xFFCBD5E1),
+                color: _hoursError != null ? const Color(0xFFEF4444) : appBorderStrong,
                 width: _hoursError != null ? 1.5 : 1,
               ),
             ),
@@ -888,11 +889,11 @@ class _BranchDetailState extends State<BranchDetail> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: timeText.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
-                      color: timeText.isNotEmpty ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
+                      color: timeText.isNotEmpty ? appInkPrimary : appInkMuted,
                     ),
                   ),
                 ),
-                const Icon(Icons.access_time_rounded, size: 16, color: Color(0xFF94A3B8)),
+                Icon(Icons.access_time_rounded, size: 16, color: appInkMuted),
               ],
             ),
           ),
@@ -908,10 +909,10 @@ class _BranchDetailState extends State<BranchDetail> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: is24 ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
+            color: is24 ? const Color(0xFFF0FDF4) : appSurfaceSubtle,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: is24 ? const Color(0xFF86EFAC) : const Color(0xFFE2E8F0),
+              color: is24 ? const Color(0xFF86EFAC) : appBorder,
             ),
           ),
           child: Row(
@@ -919,13 +920,13 @@ class _BranchDetailState extends State<BranchDetail> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: is24 ? const Color(0xFFDCFCE7) : const Color(0xFFE2E8F0),
+                  color: is24 ? const Color(0xFFDCFCE7) : appBorder,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
                   Icons.all_inclusive_rounded,
                   size: 16,
-                  color: is24 ? const Color(0xFF16A34A) : const Color(0xFF64748B),
+                  color: is24 ? const Color(0xFF16A34A) : appInkMuted,
                 ),
               ),
               const SizedBox(width: 12),
@@ -934,19 +935,19 @@ class _BranchDetailState extends State<BranchDetail> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       "Open 24 Hours",
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1E293B),
+                        color: appInkPrimary,
                       ),
                     ),
                     Text(
                       is24 ? "Clinic operates 24 hours daily" : "Specify custom opening & closing hours",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF64748B),
+                        color: appInkMuted,
                       ),
                     ),
                   ],
@@ -1084,9 +1085,9 @@ class _BranchDetailState extends State<BranchDetail> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFFAFAFA),
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,

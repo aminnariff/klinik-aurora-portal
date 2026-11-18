@@ -218,13 +218,13 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
       initialTime: initial,
       builder: (context, child) => Theme(
         data: ThemeData(
-          colorScheme: const ColorScheme.light(
+          colorScheme: ColorScheme.light(
             primary: primary,
             onPrimary: Colors.white,
-            surface: Colors.white,
-            onSurface: Color(0xFF111827),
+            surface: appSurface,
+            onSurface: appInkPrimary,
           ),
-          timePickerTheme: const TimePickerThemeData(backgroundColor: Colors.white),
+          timePickerTheme: TimePickerThemeData(backgroundColor: appSurface),
         ),
         child: child!,
       ),
@@ -277,10 +277,10 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.white : const Color(0xFFF9FAFB).withAlpha(150),
+                color: isSelected ? Colors.white : appCanvas.withAlpha(150),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isSelected ? primary.withAlpha(100) : const Color(0xFFE5E7EB),
+                  color: isSelected ? primary.withAlpha(100) : appBorder,
                   width: isSelected ? 1.5 : 1,
                 ),
                 boxShadow: isSelected
@@ -319,7 +319,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: isSelected ? const Color(0xFF111827) : Colors.grey[400],
+                              color: isSelected ? appInkPrimary : Colors.grey[400],
                             ),
                           ),
                           const Spacer(),
@@ -485,16 +485,16 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: appCanvas,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Quick Select Days',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B7280)),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
           ),
           const SizedBox(height: 6),
           Wrap(
@@ -550,7 +550,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                       Text(
                         isWeekdayMasterMode ? 'WEEKDAY' : 'WEEKEND',
                         style: const TextStyle(
-                          fontSize: 9,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           letterSpacing: 0.5,
@@ -609,7 +609,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
               const SizedBox(width: 8),
               const Text(
                 'Include Break Time',
-                style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -643,7 +643,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
               icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 14),
               label: const Text(
                 'Add Break Interval',
-                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
               ),
               style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 20)),
             ),
@@ -654,7 +654,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
             child: ElevatedButton(
               onPressed: _syncMasterToSelected,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
+                backgroundColor: appSurface,
                 foregroundColor: primary,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -708,7 +708,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 9, color: Colors.white70, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         InkWell(
@@ -758,7 +758,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 8, color: Colors.grey[500], fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.bold),
           ),
           Text(time.format(context), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
         ],

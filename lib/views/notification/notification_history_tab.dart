@@ -39,7 +39,7 @@ class _NotificationHistoryTabState extends State<NotificationHistoryTab> {
             IconButton(
               tooltip: 'Refresh',
               onPressed: _refresh,
-              icon: const Icon(Icons.refresh_rounded, color: primary),
+              icon: Icon(Icons.refresh_rounded, color: primary),
             ),
           ],
         ),
@@ -49,7 +49,7 @@ class _NotificationHistoryTabState extends State<NotificationHistoryTab> {
             future: _future,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: primary));
+                return Center(child: CircularProgressIndicator(color: primary));
               }
               if (snapshot.hasError || !responseCode(snapshot.data?.code)) {
                 return _ErrorState(onRetry: _refresh);
@@ -60,7 +60,7 @@ class _NotificationHistoryTabState extends State<NotificationHistoryTab> {
               }
               return ListView.separated(
                 itemCount: items.length,
-                separatorBuilder: (_, _) => const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                separatorBuilder: (_, _) => Divider(height: 1, color: appBorder),
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return Padding(
@@ -83,7 +83,7 @@ class _NotificationHistoryTabState extends State<NotificationHistoryTab> {
                               _formatDate(item.createdDate),
                               style: AppTypography.bodyMedium(
                                 context,
-                              ).apply(color: const Color(0xFF9CA3AF), fontSizeDelta: -3),
+                              ).apply(color: appInkMuted, fontSizeDelta: -3),
                             ),
                           ],
                         ),
@@ -94,7 +94,7 @@ class _NotificationHistoryTabState extends State<NotificationHistoryTab> {
                           overflow: TextOverflow.ellipsis,
                           style: AppTypography.bodyMedium(
                             context,
-                          ).apply(color: const Color(0xFF6B7280), fontSizeDelta: -1),
+                          ).apply(color: appInkMuted, fontSizeDelta: -1),
                         ),
                       ],
                     ),
@@ -129,7 +129,7 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.cloud_off_rounded, color: Color(0xFF9CA3AF), size: 40),
+          Icon(Icons.cloud_off_rounded, color: appInkMuted, size: 40),
           const SizedBox(height: 8),
           Text('Unable to load announcements.', style: AppTypography.bodyMedium(context)),
           const SizedBox(height: 12),

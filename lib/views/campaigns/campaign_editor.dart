@@ -297,7 +297,7 @@ class _CampaignEditorState extends State<CampaignEditor> {
                     IconButton(
   tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded),
-                      color: const Color(0xFF637381),
+                      color: appInkMuted,
                       onPressed: _saving ? null : () => Navigator.of(context).pop(false),
                     ),
                   ],
@@ -476,11 +476,11 @@ class _CampaignEditorState extends State<CampaignEditor> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: parsed ?? const Color(0xFFF1F5F9),
+              color: parsed ?? appSurfaceSubtle,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
-            child: parsed == null ? const Icon(Icons.block_rounded, size: 18, color: Color(0xFF9CA3AF)) : null,
+            child: parsed == null ? Icon(Icons.block_rounded, size: 18, color: appInkMuted) : null,
           ),
         ),
       ],
@@ -513,8 +513,8 @@ class _ThemePreview extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: background,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: appBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +529,7 @@ class _ThemePreview extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (_, _, _) => Container(
                       height: 56,
-                      color: const Color(0xFFF1F5F9),
+                      color: appSurfaceSubtle,
                       alignment: Alignment.center,
                       child: const Text('Banner unreachable', style: TextStyle(fontSize: 11)),
                     ),

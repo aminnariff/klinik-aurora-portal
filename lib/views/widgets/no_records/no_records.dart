@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class NoRecordsWidget extends StatelessWidget {
   final String title;
@@ -28,23 +29,23 @@ class NoRecordsWidget extends StatelessWidget {
               width: 68,
               height: 68,
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC), // slate-50
+                color: appSurfaceSubtle, // slate-50
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFE2E8F0)), // slate-200
+                border: Border.all(color: appBorder), // slate-200
               ),
               child: Icon(
                 icon,
                 size: 32,
-                color: const Color(0xFF94A3B8), // slate-400
+                color: appInkMuted, // slate-400
               ),
             ),
             const SizedBox(height: 16),
             AppSelectableText(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1E293B), // slate-800
+                color: appInkPrimary, // slate-800
                 letterSpacing: -0.2,
               ),
               textAlign: TextAlign.center,
@@ -55,9 +56,9 @@ class NoRecordsWidget extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 300),
                 child: AppSelectableText(
                   subtitle!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF64748B), // slate-500
+                    color: appInkMuted, // slate-500
                     height: 1.45,
                   ),
                   textAlign: TextAlign.center,

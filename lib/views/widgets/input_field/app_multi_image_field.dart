@@ -175,9 +175,9 @@ class _AppMultiImageFieldState extends State<AppMultiImageField> {
             padding: const EdgeInsets.all(16),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: appCanvas,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: appBorder),
             ),
             child: Text(
               'No images added yet. Click "Upload File" or "Paste URL" above.',
@@ -190,9 +190,9 @@ class _AppMultiImageFieldState extends State<AppMultiImageField> {
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
+                color: appCanvas,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: appBorder),
               ),
               child: Row(
                 children: [
@@ -223,7 +223,7 @@ class _AppMultiImageFieldState extends State<AppMultiImageField> {
                         const SizedBox(height: 2),
                         Text(
                           widget.images[i],
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
+                          style: TextStyle(fontSize: 11, color: appInkMuted),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
