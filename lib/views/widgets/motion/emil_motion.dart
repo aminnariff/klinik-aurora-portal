@@ -59,17 +59,21 @@ class _EmilPressableState extends State<EmilPressable> {
   @override
   Widget build(BuildContext context) {
     final reducedMotion = MediaQuery.disableAnimationsOf(context);
-    return Listener(
-      onPointerDown: (_) => _setPressed(true),
-      onPointerUp: (_) => _setPressed(false),
-      onPointerCancel: (_) => _setPressed(false),
-      child: AnimatedScale(
-        scale: (!reducedMotion && _isPressed) ? 0.97 : 1.0,
-        duration: reducedMotion
-            ? Duration.zero
-            : (_isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration),
-        curve: EmilMotion.easeOut,
-        child: widget.child,
+    return GestureDetector(
+      onTap: widget.enabled ? widget.onTap : null,
+      behavior: HitTestBehavior.opaque,
+      child: Listener(
+        onPointerDown: (_) => _setPressed(true),
+        onPointerUp: (_) => _setPressed(false),
+        onPointerCancel: (_) => _setPressed(false),
+        child: AnimatedScale(
+          scale: (!reducedMotion && _isPressed) ? 0.97 : 1.0,
+          duration: reducedMotion
+              ? Duration.zero
+              : (_isPressed ? EmilMotion.pressDuration : EmilMotion.releaseDuration),
+          curve: EmilMotion.easeOut,
+          child: widget.child,
+        ),
       ),
     );
   }

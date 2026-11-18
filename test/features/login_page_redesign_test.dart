@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/aurora/aurora_wave_mesh.dart';
 import 'package:klinik_aurora_portal/views/widgets/glass/app_glass.dart';
@@ -10,12 +11,17 @@ Widget _buildTestApp({ThemeMode themeMode = ThemeMode.dark}) {
   return MultiProvider(
     providers: [
       ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
+      ChangeNotifierProvider<DarkModeController>(create: (_) => DarkModeController(initialThemeMode: themeMode)),
     ],
-    child: MaterialApp(
-      themeMode: themeMode,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      home: const LoginPage(),
+    child: Consumer<DarkModeController>(
+      builder: (context, darkCtrl, _) {
+        return MaterialApp(
+          themeMode: darkCtrl.themeMode,
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          home: const LoginPage(),
+        );
+      },
     ),
   );
 }
@@ -34,6 +40,57 @@ void main() {
     expect(find.byType(AppGlassCard), findsOneWidget);
     expect(find.byType(AuroraWaveMesh), findsOneWidget);
     expect(find.text('Forgot password?'), findsOneWidget);
+  });
+
+  testWidgets('LoginPage floating toolbar toggles between Modern and Classic Split View', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    await tester.pumpWidget(_buildTestApp(themeMode: ThemeMode.dark));
+    await tester.pumpAndSettle();
+
+    // Initially in Modern View
+    expect(find.byType(AppGlassCard), findsOneWidget);
+    expect(find.byType(AuroraWaveMesh), findsOneWidget);
+
+    // Find and tap the layout toggle button in floating toolbar
+    final layoutToggle = find.byTooltip('Switch to Classic Split View');
+    expect(layoutToggle, findsOneWidget);
+    await tester.tap(layoutToggle);
+    await tester.pumpAndSettle();
+
+    // Now in Classic Split View
+    expect(find.text('Sign in to your account'), findsOneWidget);
+    expect(find.text('Enterprise Clinical Management System'), findsOneWidget);
+    expect(find.byType(AppGlassCard), findsNothing);
+
+    // Tap again to switch back to Modern View
+    final modernToggle = find.byTooltip('Switch to Modern Glass View');
+    expect(modernToggle, findsOneWidget);
+    await tester.tap(modernToggle);
+    await tester.pumpAndSettle();
+
+    // Back to Modern View
+    expect(find.byType(AppGlassCard), findsOneWidget);
+    expect(find.text('Welcome to'), findsOneWidget);
+  });
+
+  testWidgets('LoginPage floating toolbar toggles dark and light mode', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    await tester.pumpWidget(_buildTestApp(themeMode: ThemeMode.dark));
+    await tester.pumpAndSettle();
+
+    final darkToggle = find.byTooltip('Switch to Light Mode');
+    expect(darkToggle, findsOneWidget);
+    await tester.tap(darkToggle);
+    await tester.pumpAndSettle();
+
+    final lightToggle = find.byTooltip('Switch to Dark Mode');
+    expect(lightToggle, findsOneWidget);
   });
 
   testWidgets('LoginPage validates empty username and password fields on submit', (tester) async {

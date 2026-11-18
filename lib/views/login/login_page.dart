@@ -9,6 +9,7 @@ import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
+import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/controllers/password_recovery/password_recovery_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
@@ -115,16 +116,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _authPage() {
-    if (_useClassicLayout) {
-      return Scaffold(
-        backgroundColor: appCanvas,
-        body: _classicLayout(),
-      );
-    }
-    return _modernLayout();
-  }
-
-  Widget _modernLayout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -132,188 +123,192 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Atmospheric Aurora Borealis Glowing Veils
-          // 1. Top-Right Aurora Pink / Plum ambient glow
-          Positioned(
-            top: -140,
-            right: -100,
-            child: Container(
-              width: 580,
-              height: 580,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: isDark
-                      ? [
-                          const Color(0xFFDF6E98).withValues(alpha: 0.26),
-                          const Color(0xFF7E2D40).withValues(alpha: 0.14),
-                          Colors.transparent,
-                        ]
-                      : [
-                          const Color(0xFFDF6E98).withValues(alpha: 0.18),
-                          const Color(0xFFFCE7F0).withValues(alpha: 0.28),
-                          Colors.transparent,
-                        ],
-                  stops: const [0.0, 0.48, 1.0],
-                ),
-              ),
-            ),
-          ),
-
-          // 2. Center-Left Aurora Cyan Stream
-          Positioned(
-            top: MediaQuery.sizeOf(context).height * 0.18,
-            left: -150,
-            child: Container(
-              width: 540,
-              height: 540,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: isDark
-                      ? [
-                          const Color(0xFF6AD1E3).withValues(alpha: 0.22),
-                          const Color(0xFF1B545E).withValues(alpha: 0.10),
-                          Colors.transparent,
-                        ]
-                      : [
-                          const Color(0xFF6AD1E3).withValues(alpha: 0.18),
-                          const Color(0xFFD5F5FA).withValues(alpha: 0.30),
-                          Colors.transparent,
-                        ],
-                  stops: const [0.0, 0.52, 1.0],
-                ),
-              ),
-            ),
-          ),
-
-          // 3. Ambient glowing wave mesh at bottom
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: AuroraWaveMesh(
-              height: MediaQuery.sizeOf(context).width < 600 ? 220 : 300,
-            ),
-          ),
-
-          // Centered Floating Glassmorphic Auth Form
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Floating Brand Logo with Aurora Halo
-                      ScaleTransition(
-                        scale: _logoScale,
-                        child: FadeTransition(
-                          opacity: _logoFade,
-                          child: _logoAvatar(72),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Brand Header with Signature Aurora Gradient
-                      FadeTransition(
-                        opacity: _logoFade,
-                        child: Column(
-                          children: [
-                            Text(
-                              'Welcome to',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: appInkSecondary,
-                                letterSpacing: 0.3,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 3),
-                            ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [
-                                  Color(0xFFDF6E98),
-                                  Color(0xFF6AD1E3),
-                                ],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                              ).createShader(bounds),
-                              child: const Text(
-                                'Klinik Aurora',
-                                style: TextStyle(
-                                  fontSize: 27,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: -0.6,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              'Enterprise Healthcare Management Portal',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: appInkMuted,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Frosted Glass Auth Card with Aurora Hairline Border
-                      FadeTransition(
-                        opacity: _formFade,
-                        child: SlideTransition(
-                          position: _formSlide,
-                          child: AppGlassCard(
-                            auroraBorder: true,
-                            padding: const EdgeInsets.fromLTRB(26, 26, 26, 24),
-                            borderRadius: 16,
-                            blurSigma: 18,
-                            child: _formContent(),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Footer Assistance
-                      FadeTransition(
-                        opacity: _formFade,
-                        child: TextButton(
-                          onPressed: forgotPassword,
-                          style: TextButton.styleFrom(
-                            foregroundColor: appInkMuted,
-                            textStyle: const TextStyle(fontSize: 12),
-                          ),
-                          child: const Text('Having trouble signing in? Reset Password'),
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      // Layout Switcher Pill
-                      FadeTransition(
-                        opacity: _formFade,
-                        child: _layoutSwitchButton(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _useClassicLayout ? _classicLayout() : _modernLayout(),
+          _floatingToolbar(context),
         ],
       ),
+    );
+  }
+
+  Widget _modernLayout() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Atmospheric Aurora Borealis Glowing Veils
+        // 1. Top-Right Aurora Pink / Plum ambient glow
+        Positioned(
+          top: -140,
+          right: -100,
+          child: Container(
+            width: 580,
+            height: 580,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: isDark
+                    ? [
+                        const Color(0xFFDF6E98).withValues(alpha: 0.26),
+                        const Color(0xFF7E2D40).withValues(alpha: 0.14),
+                        Colors.transparent,
+                      ]
+                    : [
+                        const Color(0xFFDF6E98).withValues(alpha: 0.18),
+                        const Color(0xFFFCE7F0).withValues(alpha: 0.28),
+                        Colors.transparent,
+                      ],
+                stops: const [0.0, 0.48, 1.0],
+              ),
+            ),
+          ),
+        ),
+
+        // 2. Center-Left Aurora Cyan Stream
+        Positioned(
+          top: MediaQuery.sizeOf(context).height * 0.18,
+          left: -150,
+          child: Container(
+            width: 540,
+            height: 540,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: isDark
+                    ? [
+                        const Color(0xFF6AD1E3).withValues(alpha: 0.22),
+                        const Color(0xFF1B545E).withValues(alpha: 0.10),
+                        Colors.transparent,
+                      ]
+                    : [
+                        const Color(0xFF6AD1E3).withValues(alpha: 0.18),
+                        const Color(0xFFD5F5FA).withValues(alpha: 0.30),
+                        Colors.transparent,
+                      ],
+                stops: const [0.0, 0.52, 1.0],
+              ),
+            ),
+          ),
+        ),
+
+        // 3. Ambient glowing wave mesh at bottom
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: AuroraWaveMesh(
+            height: MediaQuery.sizeOf(context).width < 600 ? 220 : 300,
+          ),
+        ),
+
+        // Centered Floating Glassmorphic Auth Form
+        SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Floating Brand Logo with Aurora Halo
+                    ScaleTransition(
+                      scale: _logoScale,
+                      child: FadeTransition(
+                        opacity: _logoFade,
+                        child: _logoAvatar(72),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Brand Header with Signature Aurora Gradient
+                    FadeTransition(
+                      opacity: _logoFade,
+                      child: Column(
+                        children: [
+                          Text(
+                            'Welcome to',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: appInkSecondary,
+                              letterSpacing: 0.3,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 3),
+                          ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              colors: [
+                                Color(0xFFDF6E98),
+                                Color(0xFF6AD1E3),
+                              ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ).createShader(bounds),
+                            child: const Text(
+                              'Klinik Aurora',
+                              style: TextStyle(
+                                fontSize: 27,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: -0.6,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            'Enterprise Healthcare Management Portal',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: appInkMuted,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Frosted Glass Auth Card with Aurora Hairline Border
+                    FadeTransition(
+                      opacity: _formFade,
+                      child: SlideTransition(
+                        position: _formSlide,
+                        child: AppGlassCard(
+                          auroraBorder: true,
+                          padding: const EdgeInsets.fromLTRB(26, 26, 26, 24),
+                          borderRadius: 16,
+                          blurSigma: 18,
+                          child: _formContent(),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Footer Assistance
+                    FadeTransition(
+                      opacity: _formFade,
+                      child: TextButton(
+                        onPressed: forgotPassword,
+                        style: TextButton.styleFrom(
+                          foregroundColor: appInkMuted,
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                        child: const Text('Having trouble signing in? Reset Password'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -340,15 +335,35 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 440),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 36),
                   child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _formContent(),
-                        const SizedBox(height: 20),
-                        _layoutSwitchButton(),
-                      ],
+                    child: FadeTransition(
+                      opacity: _formFade,
+                      child: SlideTransition(
+                        position: _formSlide,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Sign in to your account',
+                              style: TextStyle(
+                                fontSize: 27,
+                                fontWeight: FontWeight.w800,
+                                color: appInkPrimary,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Enter your clinic credentials to access the management portal.',
+                              style: TextStyle(fontSize: 13.5, color: appInkSecondary),
+                            ),
+                            const SizedBox(height: 28),
+                            _formContent(),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -361,6 +376,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _mobileClassicLayout() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       children: [
         Container(
@@ -384,7 +401,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _logoAvatar(68),
+              _logoAvatar(72),
               const SizedBox(height: 8),
               const Text(
                 'Klinik Aurora',
@@ -393,7 +410,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               const SizedBox(height: 2),
               Text(
                 'Enterprise Management Portal',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12),
               ),
             ],
           ),
@@ -403,21 +420,41 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: FractionallySizedBox(
             heightFactor: 0.74,
             widthFactor: 1.0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: appSurface,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
-                boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 40, offset: Offset(0, -8))],
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _formContent(),
-                    const SizedBox(height: 20),
-                    _layoutSwitchButton(),
-                  ],
+            child: FadeTransition(
+              opacity: _formFade,
+              child: SlideTransition(
+                position: _formSlide,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
+                    boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 40, offset: Offset(0, -8))],
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(28, 28, 28, 28),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Sign in to your account',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: appInkPrimary,
+                            letterSpacing: -0.4,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Enter your clinic credentials to continue.',
+                          style: TextStyle(fontSize: 12.5, color: appInkSecondary),
+                        ),
+                        const SizedBox(height: 22),
+                        _formContent(),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -451,54 +488,66 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               height: 380,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.12),
+                color: Colors.white.withValues(alpha: 0.15),
               ),
             ),
           ),
           Positioned(
-            bottom: -100,
-            right: -100,
+            bottom: -60,
+            right: -60,
             child: Container(
-              width: 440,
-              height: 440,
+              width: 320,
+              height: 320,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.10),
+                color: Colors.white.withValues(alpha: 0.12),
               ),
             ),
           ),
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _logoAvatar(96),
+                  ScaleTransition(
+                    scale: _logoScale,
+                    child: FadeTransition(opacity: _logoFade, child: _logoAvatar(124)),
+                  ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Klinik Aurora',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: const Text(
+                      'Klinik Aurora',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.6,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Enterprise Clinical Management System',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.90),
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.2,
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Text(
+                      'Enterprise Clinical Management System',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.90),
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.2,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 28),
-                  Text(
-                    '© 2026 Klinik Aurora Group. All rights reserved.',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontSize: 12),
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Text(
+                      '© 2026 Klinik Aurora Group. All rights reserved.',
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontSize: 12),
+                    ),
                   ),
                 ],
               ),
@@ -509,39 +558,73 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _layoutSwitchButton() {
-    return EmilPressable(
-      onTap: () {
-        setState(() => _useClassicLayout = !_useClassicLayout);
-        try {
-          prefs.setBool('aurora_login_classic_layout', _useClassicLayout);
-        } catch (_) {}
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: appSurface.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: appBorder.withValues(alpha: 0.7)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              _useClassicLayout ? Icons.auto_awesome_rounded : Icons.view_sidebar_rounded,
-              size: 13,
-              color: appInkSecondary,
+  Widget _floatingToolbar(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Positioned(
+      top: 18,
+      right: 20,
+      child: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.88),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isDark ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.08),
             ),
-            const SizedBox(width: 6),
-            Text(
-              _useClassicLayout ? 'Switch to Modern Glass View' : 'Switch to Classic Split View',
-              style: TextStyle(
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
-                color: appInkSecondary,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Dark / Light Mode Toggle
+              Tooltip(
+                message: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+                child: IconButton(
+                  icon: Icon(
+                    isDark ? Icons.light_mode_rounded : Icons.dark_mode_outlined,
+                    size: 19,
+                    color: isDark ? const Color(0xFFFDB813) : const Color(0xFF475569),
+                  ),
+                  onPressed: () => context.read<DarkModeController>().toggleDarkMode(context),
+                  splashRadius: 20,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+              Container(
+                height: 16,
+                width: 1,
+                color: isDark ? Colors.white.withValues(alpha: 0.16) : Colors.black.withValues(alpha: 0.12),
+              ),
+              // View Switcher (Classic Split <-> Modern Aurora)
+              Tooltip(
+                message: _useClassicLayout ? 'Switch to Modern Glass View' : 'Switch to Classic Split View',
+                child: IconButton(
+                  icon: Icon(
+                    _useClassicLayout ? Icons.auto_awesome_rounded : Icons.vertical_split_rounded,
+                    size: 19,
+                    color: isDark ? const Color(0xFF6AD1E3) : const Color(0xFFDF6E98),
+                  ),
+                  onPressed: () {
+                    setState(() => _useClassicLayout = !_useClassicLayout);
+                    try {
+                      prefs.setBool('aurora_login_classic_layout', _useClassicLayout);
+                    } catch (_) {}
+                  },
+                  splashRadius: 20,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -654,7 +737,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: primary, width: 1.5),
+                  borderSide: BorderSide(
+                    color: _useClassicLayout ? const Color(0xFF0A6C74) : primary,
+                    width: 1.5,
+                  ),
                 ),
               ),
             ),
@@ -675,7 +761,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   ),
                   child: Text(
                     'Forgot password?',
-                    style: TextStyle(fontSize: 12, color: primaryAccessibleText, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _useClassicLayout ? const Color(0xFF0A6C74) : primaryAccessibleText,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -721,7 +811,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: primary, width: 1.5),
+                      borderSide: BorderSide(
+                        color: _useClassicLayout ? const Color(0xFF0A6C74) : primary,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 );
@@ -743,7 +836,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     child: Checkbox(
                       value: snapshot.remember,
                       onChanged: (v) => snapshot.remember = v ?? false,
-                      activeColor: primary,
+                      activeColor: _useClassicLayout ? const Color(0xFF0A6C74) : primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -759,7 +852,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
             const SizedBox(height: 22),
 
-            // Submit Button with Signature Aurora Gradient
+            // Submit Button
             EmilPressable(
               enabled: !_isLoggingIn,
               onTap: _handleLogin,
@@ -767,18 +860,22 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 width: double.infinity,
                 height: 46,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFDF6E98), // Aurora Pink
-                      Color(0xFF7E2D40), // Aurora Plum
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: _useClassicLayout
+                      ? null
+                      : const LinearGradient(
+                          colors: [
+                            Color(0xFFDF6E98), // Aurora Pink
+                            Color(0xFF7E2D40), // Aurora Plum
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  color: _useClassicLayout ? const Color(0xFF0A6C74) : null,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFDF6E98).withValues(alpha: 0.35),
+                      color: (_useClassicLayout ? const Color(0xFF0A6C74) : const Color(0xFFDF6E98))
+                          .withValues(alpha: 0.35),
                       blurRadius: 18,
                       offset: const Offset(0, 5),
                     ),
