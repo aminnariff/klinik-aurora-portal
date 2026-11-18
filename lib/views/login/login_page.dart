@@ -120,13 +120,68 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Ambient glowing wave mesh at bottom
+          // Atmospheric Aurora Borealis Glowing Veils
+          // 1. Top-Right Aurora Pink / Plum ambient glow
+          Positioned(
+            top: -140,
+            right: -100,
+            child: Container(
+              width: 580,
+              height: 580,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: isDark
+                      ? [
+                          const Color(0xFFDF6E98).withValues(alpha: 0.26),
+                          const Color(0xFF7E2D40).withValues(alpha: 0.14),
+                          Colors.transparent,
+                        ]
+                      : [
+                          const Color(0xFFDF6E98).withValues(alpha: 0.18),
+                          const Color(0xFFFCE7F0).withValues(alpha: 0.28),
+                          Colors.transparent,
+                        ],
+                  stops: const [0.0, 0.48, 1.0],
+                ),
+              ),
+            ),
+          ),
+
+          // 2. Center-Left Aurora Cyan Stream
+          Positioned(
+            top: MediaQuery.sizeOf(context).height * 0.18,
+            left: -150,
+            child: Container(
+              width: 540,
+              height: 540,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: isDark
+                      ? [
+                          const Color(0xFF6AD1E3).withValues(alpha: 0.22),
+                          const Color(0xFF1B545E).withValues(alpha: 0.10),
+                          Colors.transparent,
+                        ]
+                      : [
+                          const Color(0xFF6AD1E3).withValues(alpha: 0.18),
+                          const Color(0xFFD5F5FA).withValues(alpha: 0.30),
+                          Colors.transparent,
+                        ],
+                  stops: const [0.0, 0.52, 1.0],
+                ),
+              ),
+            ),
+          ),
+
+          // 3. Ambient glowing wave mesh at bottom
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: AuroraWaveMesh(
-              height: MediaQuery.sizeOf(context).width < 600 ? 200 : 280,
+              height: MediaQuery.sizeOf(context).width < 600 ? 220 : 300,
             ),
           ),
 
@@ -141,30 +196,51 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Floating Brand Logo
+                      // Floating Brand Logo with Aurora Halo
                       ScaleTransition(
                         scale: _logoScale,
                         child: FadeTransition(
                           opacity: _logoFade,
-                          child: _logoAvatar(68),
+                          child: _logoAvatar(72),
                         ),
                       ),
                       const SizedBox(height: 16),
 
-                      // Brand Header
+                      // Brand Header with Signature Aurora Gradient
                       FadeTransition(
                         opacity: _logoFade,
                         child: Column(
                           children: [
                             Text(
-                              'Welcome to Klinik Aurora',
+                              'Welcome to',
                               style: TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.w800,
-                                color: appInkPrimary,
-                                letterSpacing: -0.4,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: appInkSecondary,
+                                letterSpacing: 0.3,
                               ),
                               textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 3),
+                            ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                colors: [
+                                  Color(0xFFDF6E98),
+                                  Color(0xFF6AD1E3),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ).createShader(bounds),
+                              child: const Text(
+                                'Klinik Aurora',
+                                style: TextStyle(
+                                  fontSize: 27,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -0.6,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                             const SizedBox(height: 5),
                             Text(
@@ -181,12 +257,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       ),
                       const SizedBox(height: 24),
 
-                      // Frosted Glass Auth Card
+                      // Frosted Glass Auth Card with Aurora Hairline Border
                       FadeTransition(
                         opacity: _formFade,
                         child: SlideTransition(
                           position: _formSlide,
                           child: AppGlassCard(
+                            auroraBorder: true,
                             padding: const EdgeInsets.fromLTRB(26, 26, 26, 24),
                             borderRadius: 16,
                             blurSigma: 18,
@@ -230,9 +307,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 28,
-            offset: const Offset(0, 10),
+            color: const Color(0xFFDF6E98).withValues(alpha: 0.28),
+            blurRadius: 30,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: const Color(0xFF6AD1E3).withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -427,42 +509,64 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
             const SizedBox(height: 22),
 
-            // Submit Button
+            // Submit Button with Signature Aurora Gradient
             EmilPressable(
               enabled: !_isLoggingIn,
               onTap: _handleLogin,
-              child: SizedBox(
+              child: Container(
                 width: double.infinity,
-                height: 44,
-                child: ElevatedButton(
-                  onPressed: _isLoggingIn ? null : _handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
-                    disabledBackgroundColor: primary.withValues(alpha: 0.6),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    elevation: 0,
+                height: 46,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFDF6E98), // Aurora Pink
+                      Color(0xFF7E2D40), // Aurora Plum
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  child: _isLoggingIn
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Sign In',
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFDF6E98).withValues(alpha: 0.35),
+                      blurRadius: 18,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: _isLoggingIn ? null : _handleLogin,
+                    child: Center(
+                      child: _isLoggingIn
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                                SizedBox(width: 7),
+                                Icon(Icons.arrow_forward_rounded, size: 16, color: Colors.white),
+                              ],
                             ),
-                            SizedBox(width: 6),
-                            Icon(Icons.arrow_forward_rounded, size: 16),
-                          ],
-                        ),
+                    ),
+                  ),
                 ),
               ),
             ),

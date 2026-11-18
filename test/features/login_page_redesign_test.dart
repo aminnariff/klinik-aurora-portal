@@ -29,7 +29,8 @@ void main() {
     await tester.pumpWidget(_buildTestApp(themeMode: ThemeMode.dark));
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome to Klinik Aurora'), findsOneWidget);
+    expect(find.text('Welcome to'), findsOneWidget);
+    expect(find.text('Klinik Aurora'), findsOneWidget);
     expect(find.byType(AppGlassCard), findsOneWidget);
     expect(find.byType(AuroraWaveMesh), findsOneWidget);
     expect(find.text('Forgot password?'), findsOneWidget);
@@ -43,8 +44,8 @@ void main() {
     await tester.pumpWidget(_buildTestApp());
     await tester.pumpAndSettle();
 
-    // Verify submit button exists
-    final submitButton = find.byType(ElevatedButton);
+    // Verify submit button exists and tap it
+    final submitButton = find.text('Sign In');
     expect(submitButton, findsOneWidget);
     await tester.tap(submitButton);
     await tester.pumpAndSettle();

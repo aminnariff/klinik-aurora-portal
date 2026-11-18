@@ -30,23 +30,23 @@ class AuroraWaveMesh extends StatelessWidget {
               bottom: -40,
               left: 0,
               right: 0,
-              height: height * 0.9,
+              height: height * 0.95,
               child: Container(
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     center: Alignment.bottomCenter,
-                    radius: 0.9,
+                    radius: 1.0,
                     colors: isDark
                         ? [
-                            secondaryColor.withValues(alpha: 0.24),
-                            brandPink.withValues(alpha: 0.14),
-                            quaternaryColor.withValues(alpha: 0.05),
+                            secondaryColor.withValues(alpha: 0.35),
+                            brandPink.withValues(alpha: 0.24),
+                            quaternaryColor.withValues(alpha: 0.08),
                             Colors.transparent,
                           ]
                         : [
-                            const Color(0xFFD5F5FA).withValues(alpha: 0.40),
-                            const Color(0xFFFCE4EC).withValues(alpha: 0.30),
-                            const Color(0xFFF3E8FF).withValues(alpha: 0.10),
+                            const Color(0xFFD5F5FA).withValues(alpha: 0.55),
+                            const Color(0xFFFCE4EC).withValues(alpha: 0.45),
+                            const Color(0xFFF3E8FF).withValues(alpha: 0.15),
                             Colors.transparent,
                           ],
                     stops: const [0.0, 0.40, 0.70, 1.0],

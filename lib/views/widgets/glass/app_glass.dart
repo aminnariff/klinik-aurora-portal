@@ -56,6 +56,7 @@ class AppGlassCard extends StatelessWidget {
   final double borderRadius;
   final double blurSigma;
   final BoxConstraints? constraints;
+  final bool auroraBorder;
 
   const AppGlassCard({
     super.key,
@@ -64,31 +65,64 @@ class AppGlassCard extends StatelessWidget {
     this.borderRadius = 16.0,
     this.blurSigma = 18.0,
     this.constraints,
+    this.auroraBorder = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Widget cardBody = ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: AppGlass.surfaceFill(context),
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: auroraBorder ? null : AppGlass.hairlineBorder(context),
+          ),
+          child: child,
+        ),
+      ),
+    );
+
+    if (auroraBorder) {
+      cardBody = Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius + 1.0),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? const [
+                    Color(0x66DF6E98), // Rose
+                    Color(0x26DF6E98),
+                    Color(0x266AD1E3),
+                    Color(0x556AD1E3), // Cyan
+                  ]
+                : const [
+                    Color(0x4DDF6E98),
+                    Color(0x1FDF6E98),
+                    Color(0x1F6AD1E3),
+                    Color(0x386AD1E3),
+                  ],
+            stops: const [0.0, 0.35, 0.65, 1.0],
+          ),
+        ),
+        padding: const EdgeInsets.all(1.0),
+        child: cardBody,
+      );
+    }
+
     return Container(
       constraints: constraints,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: AppGlass.elevationShadow(context),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: AppGlass.surfaceFill(context),
-              borderRadius: BorderRadius.circular(borderRadius),
-              border: AppGlass.hairlineBorder(context),
-            ),
-            child: child,
-          ),
-        ),
-      ),
+      child: cardBody,
     );
   }
 }
