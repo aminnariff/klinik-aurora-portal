@@ -14,12 +14,11 @@ import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/password_recovery/password_recovery_controller.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/widgets/aurora/aurora_wave_mesh.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
+import 'package:klinik_aurora_portal/views/widgets/glass/app_glass.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
-import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -40,14 +39,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final ValueNotifier<bool> isObscure = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> isObscure = ValueNotifier<bool>(true);
   bool _isLoggingIn = false;
-
-  InputFieldAttribute emailAttribute = InputFieldAttribute(
-    controller: TextEditingController(text: ''),
-    hintText: 'information'.tr(gender: 'email'),
-    isEmail: true,
-  );
 
   late final AnimationController _entranceCtrl;
   late final AnimationController _logoCtrl;
@@ -61,51 +54,33 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _entranceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
-    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 260));
+    _entranceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 320));
+    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 320));
 
     _formFade = CurvedAnimation(parent: _entranceCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0));
     _formSlide = Tween<Offset>(
-      begin: const Offset(0, 0.03),
+      begin: const Offset(0, 0.04),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _entranceCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0)));
 
     _logoFade = CurvedAnimation(parent: _logoCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0));
     _logoScale = Tween<double>(
-      begin: 0.94,
+      begin: 0.92,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _logoCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0)));
 
     SchedulerBinding.instance.scheduleFrameCallback((_) async {
       _logoCtrl.forward();
-      Future.delayed(const Duration(milliseconds: 60), () {
-        if (mounted) _entranceCtrl.forward();
-      });
-
-      final authController = context.read<AuthController>();
-      await authController.init(context);
-
-      // Load remember-me credentials (runs regardless of init result)
-      final rememberMeCredentials = authController.getRememberMeCredentials();
-      final remember = prefs.getBool(rememberMe) ?? false;
-      context.read<AuthController>().remember = remember;
-      if (rememberMeCredentials != null && remember == true) {
-        usernameController.text = rememberMeCredentials[0];
-        passwordController.text = await authController.loadPassword();
-      }
+      await Future.delayed(const Duration(milliseconds: 80));
+      if (mounted) _entranceCtrl.forward();
     });
 
-    dismissLoading();
-    isSessionExpiredDialogOpen = false;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      dismissLoading();
-      if (mounted) {
-        final nav = Navigator.of(context, rootNavigator: true);
-        if (nav.canPop()) {
-          nav.popUntil((route) => route.isFirst);
-        }
+    try {
+      if (prefs.getBool(rememberMe) == true) {
+        usernameController.text = prefs.getString(username) ?? '';
+        passwordController.text = prefs.getString(password) ?? '';
       }
-    });
+    } catch (_) {}
   }
 
   @override
@@ -114,6 +89,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     _logoCtrl.dispose();
     usernameController.dispose();
     passwordController.dispose();
+    isObscure.dispose();
     super.dispose();
   }
 
@@ -140,212 +116,105 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _authPage() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: appCanvas,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth >= 768) return _desktopLayout();
-          return _mobileLayout();
-        },
-      ),
-    );
-  }
-
-  Widget _desktopLayout() {
-    return Row(
-      children: [
-        Expanded(flex: 5, child: _brandPanel()),
-        Expanded(flex: 7, child: _desktopFormPanel()),
-      ],
-    );
-  }
-
-  Widget _mobileLayout() {
-    return Stack(
-      children: [
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFDF6E98),
-                Color(0xFFDE8BA7),
-                Color(0xFF6AD1E3),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      backgroundColor: isDark ? const Color(0xFF070D12) : const Color(0xFFF8FAFC),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Ambient glowing wave mesh at bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: AuroraWaveMesh(
+              height: MediaQuery.sizeOf(context).width < 600 ? 200 : 280,
             ),
           ),
-        ),
-        // Subtle ambient glow
-        Positioned(
-          top: -60,
-          right: -60,
-          child: Container(
-            width: 240,
-            height: 240,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.15),
-            ),
-          ),
-        ),
-        // Logo area
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: MediaQuery.of(context).size.height * 0.28,
-          child: _mobileBrandHeader(),
-        ),
-        // Form card
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: FractionallySizedBox(
-            heightFactor: 0.76,
-            widthFactor: 1.0,
-            child: FadeTransition(
-              opacity: _formFade,
-              child: SlideTransition(
-                position: _formSlide,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: appSurface,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
-                    boxShadow: [BoxShadow(color: Color(0x26000000), blurRadius: 40, offset: Offset(0, -8))],
-                  ),
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(28, 28, 28, 28),
-                    child: _formContent(),
+
+          // Centered Floating Glassmorphic Auth Form
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Floating Brand Logo
+                      ScaleTransition(
+                        scale: _logoScale,
+                        child: FadeTransition(
+                          opacity: _logoFade,
+                          child: _logoAvatar(68),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Brand Header
+                      FadeTransition(
+                        opacity: _logoFade,
+                        child: Column(
+                          children: [
+                            Text(
+                              'Welcome to Klinik Aurora',
+                              style: TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.w800,
+                                color: appInkPrimary,
+                                letterSpacing: -0.4,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              'Enterprise Healthcare Management Portal',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: appInkMuted,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Frosted Glass Auth Card
+                      FadeTransition(
+                        opacity: _formFade,
+                        child: SlideTransition(
+                          position: _formSlide,
+                          child: AppGlassCard(
+                            padding: const EdgeInsets.fromLTRB(26, 26, 26, 24),
+                            borderRadius: 16,
+                            blurSigma: 18,
+                            child: _formContent(),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Footer Assistance
+                      FadeTransition(
+                        opacity: _formFade,
+                        child: TextButton(
+                          onPressed: forgotPassword,
+                          style: TextButton.styleFrom(
+                            foregroundColor: appInkMuted,
+                            textStyle: const TextStyle(fontSize: 12),
+                          ),
+                          child: const Text('Having trouble signing in? Reset Password'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _mobileBrandHeader() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ScaleTransition(
-          scale: _logoScale,
-          child: FadeTransition(opacity: _logoFade, child: _logoAvatar(76)),
-        ),
-        const SizedBox(height: 10),
-        FadeTransition(
-          opacity: _logoFade,
-          child: const Text(
-            'Klinik Aurora',
-            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.3),
-          ),
-        ),
-        const SizedBox(height: 2),
-        FadeTransition(
-          opacity: _logoFade,
-          child: Text(
-            'Enterprise Management Portal',
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w500),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _brandPanel() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFFDF6E98),
-            Color(0xFFDE8BA7),
-            Color(0xFF6AD1E3),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Stack(
-        clipBehavior: Clip.hardEdge,
-        children: [
-          // Subtle ambient radial glow circles
-          Positioned(
-            top: -80,
-            left: -80,
-            child: Container(
-              width: 380,
-              height: 380,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.15),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -60,
-            right: -60,
-            child: Container(
-              width: 320,
-              height: 320,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.12),
-              ),
-            ),
-          ),
-          // Center content
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Logo with clean white circle
-                  ScaleTransition(
-                    scale: _logoScale,
-                    child: FadeTransition(opacity: _logoFade, child: _logoAvatar(124)),
-                  ),
-                  const SizedBox(height: 24),
-                  // Clinic name
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: const Text(
-                      'Klinik Aurora',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.6,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  // Tagline
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: Text(
-                      'Enterprise Clinical Management System',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.90),
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.2,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: Text(
-                      '© 2026 Klinik Aurora Group. All rights reserved.',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontSize: 12),
-                    ),
-                  ),
-                ],
               ),
             ),
           ),
@@ -364,9 +233,9 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.14),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -377,42 +246,23 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _desktopFormPanel() {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 440),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 36),
-            child: FadeTransition(
-              opacity: _formFade,
-              child: SlideTransition(
-                position: _formSlide,
-                child: SingleChildScrollView(child: _formContent()),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _formContent() {
     return Consumer<AuthController>(
       builder: (context, snapshot, _) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Session Expired Banner (Non-blocking alert)
+            // Session Expired Alert
             ValueListenableBuilder<bool>(
               valueListenable: sessionExpiredNotice,
               builder: (context, hasExpired, _) {
                 if (!hasExpired) return const SizedBox.shrink();
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  margin: const EdgeInsets.only(bottom: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: appWarningSoft,
                     borderRadius: BorderRadius.circular(8),
@@ -420,13 +270,13 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline_rounded, color: Color(0xFFD97706), size: 18),
-                      const SizedBox(width: 10),
+                      const Icon(Icons.info_outline_rounded, color: Color(0xFFD97706), size: 16),
+                      const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
-                          'Your session has expired. Please sign in again to continue.',
+                          'Your session has expired. Please sign in again.',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFFB45309),
                           ),
@@ -435,7 +285,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       InkWell(
                         onTap: () => sessionExpiredNotice.value = false,
                         borderRadius: BorderRadius.circular(4),
-                        child: const Icon(Icons.close_rounded, size: 16, color: Color(0xFFB45309)),
+                        child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFFB45309)),
                       ),
                     ],
                   ),
@@ -443,49 +293,46 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
               },
             ),
 
-            // Header
-            Text(
-              'Sign in to your account',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: appInkPrimary,
-                letterSpacing: -0.4,
-              ),
-            ),
+            // Email / Username
+            _fieldLabel('Staff Email / Username'),
             const SizedBox(height: 6),
-            Text(
-              'Enter your clinic credentials to access the management portal.',
-              style: TextStyle(fontSize: 13.5, color: appInkMuted, fontWeight: FontWeight.w400),
-            ),
-            const SizedBox(height: 30),
-
-            _fieldLabel('Email / Username'),
-            const SizedBox(height: 7),
-            InputField(
-              field: InputFieldAttribute(
-                attribute: 'email',
-                controller: usernameController,
-                hintText: 'loginPage'.tr(gender: 'username'),
-                isEmail: true,
-                isEditableColor: appSurfaceSubtle,
-                errorMessage: snapshot.usernameError,
-                onFieldSubmitted: (_) => _handleLogin(),
-                prefixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 12),
-                    Icon(Icons.alternate_email_rounded, color: Colors.grey.shade500, size: 19),
-                    AppPadding.horizontal(denominator: 2),
-                  ],
+            TextFormField(
+              controller: usernameController,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => _handleLogin(),
+              onChanged: (_) {
+                if (snapshot.usernameError != null) {
+                  snapshot.usernameError = null;
+                }
+              },
+              style: TextStyle(fontSize: 14, color: appInkPrimary, fontWeight: FontWeight.w500),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: isDark ? const Color(0xBF0E171E) : const Color(0xF2F1F5F9),
+                hintText: 'e.g. staff@klinikaurora.com',
+                hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                prefixIcon: Icon(Icons.alternate_email_rounded, size: 18, color: appInkMuted),
+                errorText: snapshot.usernameError,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: appBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: appBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: primary, width: 1.5),
                 ),
               ),
-              width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
 
+            // Password Field
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -499,41 +346,62 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                   ),
                   child: Text(
                     'Forgot password?',
-                    style: TextStyle(fontSize: 13, color: primaryAccessibleText, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 12, color: primaryAccessibleText, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 7),
-            InputField(
-              field: InputFieldAttribute(
-                attribute: 'password',
-                controller: passwordController,
-                hintText: 'loginPage'.tr(gender: 'password'),
-                obscureText: true,
-                isPassword: true,
-                isEditableColor: appSurfaceSubtle,
-                errorMessage: snapshot.passwordError,
-                onFieldSubmitted: (_) => _handleLogin(),
-                prefixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 12),
-                    Icon(Icons.lock_outline_rounded, color: Colors.grey.shade500, size: 19),
-                    AppPadding.horizontal(denominator: 2),
-                  ],
-                ),
-                obsecureAction: () {
-                  isObscure.value = !isObscure.value;
-                  return null;
-                },
-              ),
-              width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
+            const SizedBox(height: 6),
+            ValueListenableBuilder<bool>(
+              valueListenable: isObscure,
+              builder: (context, obscure, _) {
+                return TextFormField(
+                  controller: passwordController,
+                  obscureText: obscure,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _handleLogin(),
+                  onChanged: (_) {
+                    if (snapshot.passwordError != null) {
+                      snapshot.passwordError = null;
+                    }
+                  },
+                  style: TextStyle(fontSize: 14, color: appInkPrimary, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: isDark ? const Color(0xBF0E171E) : const Color(0xF2F1F5F9),
+                    hintText: 'Enter your password',
+                    hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    prefixIcon: Icon(Icons.lock_outline_rounded, size: 18, color: appInkMuted),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                        size: 18,
+                        color: appInkMuted,
+                      ),
+                      onPressed: () => isObscure.value = !isObscure.value,
+                    ),
+                    errorText: snapshot.passwordError,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: appBorder),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: appBorder),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: primary, width: 1.5),
+                    ),
+                  ),
+                );
+              },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
+            // Remember Me
             GestureDetector(
               onTap: () => snapshot.remember = !snapshot.remember,
               behavior: HitTestBehavior.opaque,
@@ -541,8 +409,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: 18,
+                    height: 18,
                     child: Checkbox(
                       value: snapshot.remember,
                       onChanged: (v) => snapshot.remember = v ?? false,
@@ -551,56 +419,56 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
-                  const SizedBox(width: 9),
+                  const SizedBox(width: 8),
                   Text(
-                    'loginPage'.tr(gender: 'rememberMe'),
-                    style: TextStyle(fontSize: 13, color: appInkSecondary),
+                    'Remember me',
+                    style: TextStyle(fontSize: 12.5, color: appInkSecondary),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 26),
+            const SizedBox(height: 22),
 
+            // Submit Button
             EmilPressable(
               enabled: !_isLoggingIn,
               onTap: _handleLogin,
               child: SizedBox(
-                width: screenHeightByBreakpoint(80, 50, 380, useAbsoluteValueDesktop: true),
+                width: double.infinity,
+                height: 44,
                 child: ElevatedButton(
                   onPressed: _isLoggingIn ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primary,
                     disabledBackgroundColor: primary.withValues(alpha: 0.6),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
                   child: _isLoggingIn
                       ? const SizedBox(
-                          height: 20,
-                          width: 20,
+                          height: 18,
+                          width: 18,
                           child: CircularProgressIndicator(
-                            strokeWidth: 2.2,
+                            strokeWidth: 2.0,
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : Row(
+                      : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'loginPage'.tr(gender: 'signIn'),
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 0.3),
+                              'Sign In',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 0.3),
                             ),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward_rounded, size: 18),
+                            SizedBox(width: 6),
+                            Icon(Icons.arrow_forward_rounded, size: 16),
                           ],
                         ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
           ],
         );
       },
@@ -610,7 +478,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   Widget _fieldLabel(String label) {
     return Text(
       label,
-      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkSecondary),
+      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: appInkSecondary),
     );
   }
 
@@ -643,12 +511,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   Future<bool> validateField() async {
     bool temp = true;
-    if (usernameController.text.isEmpty) {
-      context.read<AuthController>().usernameError = ErrorMessage.required(field: 'loginPage'.tr(gender: 'username'));
+    if (usernameController.text.trim().isEmpty) {
+      context.read<AuthController>().usernameError = ErrorMessage.required(field: 'Email / Username');
       temp = false;
     }
     if (passwordController.text.isEmpty) {
-      context.read<AuthController>().passwordError = ErrorMessage.required(field: 'loginPage'.tr(gender: 'password'));
+      context.read<AuthController>().passwordError = ErrorMessage.required(field: 'Password');
       temp = false;
     }
     return temp;
@@ -657,7 +525,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void forgotPassword() {
     final initialEmail = usernameController.text.contains('@')
         ? usernameController.text.trim()
-        : emailAttribute.controller.text.trim();
+        : '';
 
     showDialog(
       context: context,
@@ -679,7 +547,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
 class _ForgotPasswordDialog extends StatefulWidget {
   final String initialEmail;
-
   const _ForgotPasswordDialog({required this.initialEmail});
 
   @override
@@ -688,8 +555,8 @@ class _ForgotPasswordDialog extends StatefulWidget {
 
 class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
   late final TextEditingController _controller;
-  String? _errorMessage;
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -752,14 +619,14 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
         child: Container(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
             color: appSurface,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: appBorder, width: 1.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.14),
+                color: Colors.black.withValues(alpha: 0.18),
                 offset: const Offset(0, 20),
                 blurRadius: 40,
               ),
@@ -769,201 +636,196 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                  // Header Row with Icon & Close Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [primary, primary.withValues(alpha: 0.8)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: primary.withValues(alpha: 0.35),
-                              offset: const Offset(0, 6),
-                              blurRadius: 14,
-                            ),
-                          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [primary, primary.withValues(alpha: 0.8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withValues(alpha: 0.35),
+                          offset: const Offset(0, 6),
+                          blurRadius: 14,
                         ),
-                        child: const Icon(
-                          Icons.lock_reset_rounded,
-                          color: Colors.white,
-                          size: 26,
-                        ),
-                      ),
-                      IconButton(
-  tooltip: 'Tutup',
-                        onPressed: () => context.pop(),
-                        icon: Icon(Icons.close_rounded, color: appInkMuted, size: 22),
-                        splashRadius: 20,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Title & Description
-                  Text(
-                    'Reset your password',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: appInkPrimary,
-                      letterSpacing: -0.3,
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.lock_reset_rounded,
+                      color: Colors.white,
+                      size: 24,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Enter your registered staff email address and we will send you a 6-digit verification code.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: appInkMuted,
-                      height: 1.45,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // Input Label
-                  Text(
-                    'STAFF EMAIL',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: appInkSecondary,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  // Sleek Custom Text Field
-                  TextFormField(
-                    controller: _controller,
-                    autofocus: true,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _submit(),
-                    onChanged: (_) {
-                      if (_errorMessage != null) {
-                        setState(() => _errorMessage = null);
-                      }
-                    },
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: appInkPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: appSurfaceSubtle,
-                      hintText: 'e.g. staff@klinikaurora.com',
-                      hintStyle: TextStyle(
-                        fontSize: 14,
-                        color: appInkMuted,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.alternate_email_rounded,
-                        color: appInkMuted,
-                        size: 19,
-                      ),
-                      suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                        valueListenable: _controller,
-                        builder: (context, value, _) {
-                          if (value.text.isEmpty) return const SizedBox.shrink();
-                          return IconButton(
-  tooltip: 'Kosongkan',
-                            icon: Icon(Icons.cancel_rounded, size: 18, color: appInkMuted),
-                            onPressed: () {
-                              _controller.clear();
-                              setState(() => _errorMessage = null);
-                            },
-                          );
-                        },
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: appBorder),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: appBorder),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: primary, width: 1.5),
-                      ),
-                    ),
-                  ),
-                  if (_errorMessage != null) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: appDangerSoft,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFFECACA)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.error_outline_rounded, color: Color(0xFFDC2626), size: 17),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              _errorMessage!,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFFDC2626),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-                  // Submit Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primary,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              'Send Verification Code',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                    ),
+                  IconButton(
+                    tooltip: 'Close',
+                    onPressed: () => context.pop(),
+                    icon: Icon(Icons.close_rounded, color: appInkMuted, size: 20),
+                    splashRadius: 18,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: 18),
+              Text(
+                'Reset your password',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: appInkPrimary,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Enter your registered staff email address and we will send you a 6-digit verification code.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: appInkMuted,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'STAFF EMAIL',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: appInkSecondary,
+                  letterSpacing: 0.6,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _controller,
+                autofocus: true,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => _submit(),
+                onChanged: (_) {
+                  if (_errorMessage != null) {
+                    setState(() => _errorMessage = null);
+                  }
+                },
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: appInkPrimary,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: appSurfaceSubtle,
+                  hintText: 'e.g. staff@klinikaurora.com',
+                  hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: appInkMuted,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.alternate_email_rounded,
+                    color: appInkMuted,
+                    size: 18,
+                  ),
+                  suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _controller,
+                    builder: (context, value, _) {
+                      if (value.text.isEmpty) return const SizedBox.shrink();
+                      return IconButton(
+                        tooltip: 'Clear',
+                        icon: Icon(Icons.cancel_rounded, size: 16, color: appInkMuted),
+                        onPressed: () {
+                          _controller.clear();
+                          setState(() => _errorMessage = null);
+                        },
+                      );
+                    },
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: appBorder),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: appBorder),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: primary, width: 1.5),
+                  ),
+                ),
+              ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: appDangerSoft,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFFECACA)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline_rounded, color: Color(0xFFDC2626), size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Color(0xFFDC2626),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Send Verification Code',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                ),
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 }
