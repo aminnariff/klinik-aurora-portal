@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/app_theme_preset.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/splash_theme_sync.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 
 enum TableDensity { compact, comfortable }
@@ -68,6 +69,9 @@ class DarkModeController extends ChangeNotifier {
         _tableDensity = savedDensity == 'compact' ? TableDensity.compact : TableDensity.comfortable;
       }
       _syncGlobalColors();
+      if (savedMode != null || savedPreset != null) {
+        _syncSplash();
+      }
       notifyListeners();
     } catch (_) {
       // Safe fallback in widget tests where Storage.init() was not called.
@@ -78,6 +82,7 @@ class DarkModeController extends ChangeNotifier {
     if (_themeMode == mode) return;
     _themeMode = mode;
     _syncGlobalColors();
+    _syncSplash();
     notifyListeners();
     try {
       await prefs.setString(_themeModeKey, _serializeThemeMode(mode));
@@ -88,6 +93,7 @@ class DarkModeController extends ChangeNotifier {
     if (_preset == preset) return;
     _preset = preset;
     _syncGlobalColors();
+    _syncSplash();
     notifyListeners();
     try {
       await prefs.setString(_themePresetKey, preset.id);
@@ -116,6 +122,7 @@ class DarkModeController extends ChangeNotifier {
     _preset = AuroraThemePreset.auroraPlum;
     _tableDensity = TableDensity.comfortable;
     _syncGlobalColors();
+    _syncSplash();
     if (changed) notifyListeners();
     try {
       await prefs.setString(_themeModeKey, _serializeThemeMode(_themeMode));
@@ -128,6 +135,13 @@ class DarkModeController extends ChangeNotifier {
     syncActiveBrandTheme(
       preset: _preset,
       isDark: _themeMode == ThemeMode.dark,
+    );
+  }
+
+  void _syncSplash() {
+    syncSplashAppearance(
+      themeMode: _serializeThemeMode(_themeMode),
+      presetId: _preset.id,
     );
   }
 

@@ -688,11 +688,12 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
           ],
         );
       default:
+        final completedLabel = _formatCompletedTime(item.completedAt);
         return Row(
           children: [
             Expanded(
               child: Text(
-                item.completedAt != null ? 'Done · ${item.completedAt!.split(' ').last.substring(0, 5)}' : _prettyStage(item.queueStatus),
+                completedLabel != null ? 'Done · $completedLabel' : _prettyStage(item.queueStatus),
                 style: TextStyle(fontSize: 11, color: colors.inkMuted, fontWeight: FontWeight.w600),
               ),
             ),
@@ -703,6 +704,15 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
           ],
         );
     }
+  }
+
+  String? _formatCompletedTime(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    final parsed = DateTime.tryParse(raw.trim());
+    if (parsed != null) return DateFormat('HH:mm').format(parsed.toLocal());
+    final parts = raw.trim().split(RegExp(r'[ T]'));
+    final tail = parts.isNotEmpty ? parts.last : raw.trim();
+    return tail.length >= 5 ? tail.substring(0, 5) : tail;
   }
 
   static String _prettyStage(String s) {

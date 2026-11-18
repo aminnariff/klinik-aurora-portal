@@ -43,12 +43,67 @@
     <!-- <title>Klinik Aurora</title> -->
     <link rel="manifest" href="manifest.json" />
 
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var mode = null;
+        var preset = "aurora_plum";
+        try {
+          mode = window.localStorage.getItem("aurora_portal_theme_mode");
+          preset = window.localStorage.getItem("aurora_portal_theme_preset") || "aurora_plum";
+        } catch (e) {}
+
+        var prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var isDark =
+          mode === "dark"
+            ? true
+            : mode === "light"
+              ? false
+              : prefersDark;
+
+        var presets = {
+          aurora_plum:    { light: "#7e2d40", lightPeak: "#df6e98", dark: "#f3a6b9", darkPeak: "#fda4af" },
+          aurora_berry:   { light: "#9d2b54", lightPeak: "#e11d74", dark: "#f5a3c3", darkPeak: "#fbcfe8" },
+          aurora_petrol:  { light: "#165e73", lightPeak: "#38bdf8", dark: "#7dd3e8", darkPeak: "#bae6fd" },
+          clinical_teal:  { light: "#0f766e", lightPeak: "#14b8a6", dark: "#5eead4", darkPeak: "#99f6e4" },
+          aurora_indigo:  { light: "#3730a3", lightPeak: "#6366f1", dark: "#a5b4fc", darkPeak: "#c7d2fe" },
+          aurora_emerald: { light: "#047857", lightPeak: "#10b981", dark: "#6ee7b7", darkPeak: "#a7f3d0" }
+        };
+        var p = presets[preset] || presets.aurora_plum;
+        var accent = isDark ? p.dark : p.light;
+        var peak = isDark ? p.darkPeak : p.lightPeak;
+
+        root.setAttribute("data-theme", isDark ? "dark" : "light");
+        root.style.setProperty("--splash-bg", isDark ? "#0b1217" : "#ffffff");
+        root.style.setProperty("--splash-accent", accent);
+        root.style.setProperty("--splash-accent-peak", peak);
+        root.style.setProperty(
+          "--splash-track",
+          isDark ? "rgba(255, 255, 255, 0.16)" : "rgba(15, 23, 42, 0.12)"
+        );
+        root.style.setProperty(
+          "--splash-loading",
+          isDark ? "#cbd5e1" : accent
+        );
+      })();
+    </script>
+
     <style>
+      :root {
+        --splash-bg: #ffffff;
+        --splash-accent: #7e2d40;
+        --splash-accent-peak: #df6e98;
+        --splash-track: rgba(126, 45, 64, 0.16);
+        --splash-loading: rgba(126, 45, 64, 0.9);
+      }
+
       html,
       body {
         height: 100%;
         margin: 0;
-        background-color: #ffffff;
+        background-color: var(--splash-bg);
       }
 
       #splash {
@@ -60,7 +115,7 @@
         align-items: center;
         justify-content: center;
         gap: 24px;
-        background-color: #ffffff;
+        background-color: var(--splash-bg);
         transition: opacity 0.4s ease-out;
       }
 
@@ -82,7 +137,7 @@
         font-size: 26px;
         font-weight: 700;
         letter-spacing: 1.5px;
-        color: #7e2d40;
+        color: var(--splash-accent);
         user-select: none;
       }
 
@@ -104,7 +159,7 @@
 
       #splash .splash-ekg .ekg-track {
         fill: none;
-        stroke: rgba(126, 45, 64, 0.16);
+        stroke: var(--splash-track);
         stroke-width: 2.5;
         stroke-linecap: round;
         stroke-linejoin: round;
@@ -112,7 +167,7 @@
 
       #splash .splash-ekg .ekg-pulse {
         fill: none;
-        stroke: #7e2d40;
+        stroke: var(--splash-accent);
         stroke-width: 2.5;
         stroke-linecap: round;
         stroke-linejoin: round;
@@ -128,33 +183,13 @@
         font-weight: 500;
         letter-spacing: 2px;
         text-transform: uppercase;
-        color: rgba(126, 45, 64, 0.9);
+        color: var(--splash-loading);
       }
 
       #splash .splash-loading .dot {
         display: inline-block;
         animation: splash-dot 1.4s ease-in-out infinite;
         animation-delay: calc(var(--i) * 0.2s);
-      }
-
-      @media (prefers-color-scheme: dark) {
-        html,
-        body,
-        #splash {
-          background-color: #0b1217;
-        }
-        #splash .splash-word {
-          color: #f3a6b9;
-        }
-        #splash .splash-ekg .ekg-track {
-          stroke: rgba(243, 166, 185, 0.2);
-        }
-        #splash .splash-ekg .ekg-pulse {
-          stroke: #f3a6b9;
-        }
-        #splash .splash-loading {
-          color: #cbd5e1;
-        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -188,12 +223,12 @@
         40%,
         100% {
           transform: translateY(0);
-          color: #7e2d40;
+          color: var(--splash-accent);
           opacity: 1;
         }
         20% {
           transform: translateY(-8px);
-          color: #df6e98;
+          color: var(--splash-accent-peak);
           opacity: 0.95;
         }
       }
