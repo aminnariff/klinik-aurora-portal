@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final TextEditingController passwordController = TextEditingController();
   final ValueNotifier<bool> isObscure = ValueNotifier<bool>(true);
   bool _isLoggingIn = false;
+  bool _useClassicLayout = false;
 
   late final AnimationController _entranceCtrl;
   late final AnimationController _logoCtrl;
@@ -73,6 +74,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     });
 
     try {
+      _useClassicLayout = prefs.getBool('aurora_login_classic_layout') ?? false;
       if (prefs.getBool(rememberMe) == true) {
         usernameController.text = prefs.getString(username) ?? '';
         passwordController.text = prefs.getString(password) ?? '';
@@ -113,6 +115,16 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   Widget _authPage() {
+    if (_useClassicLayout) {
+      return Scaffold(
+        backgroundColor: appCanvas,
+        body: _classicLayout(),
+      );
+    }
+    return _modernLayout();
+  }
+
+  Widget _modernLayout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -272,7 +284,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
                       // Footer Assistance
                       FadeTransition(
@@ -286,6 +298,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                           child: const Text('Having trouble signing in? Reset Password'),
                         ),
                       ),
+
+                      const SizedBox(height: 6),
+
+                      // Layout Switcher Pill
+                      FadeTransition(
+                        opacity: _formFade,
+                        child: _layoutSwitchButton(),
+                      ),
                     ],
                   ),
                 ),
@@ -293,6 +313,236 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _classicLayout() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 768) return _desktopClassicLayout();
+        return _mobileClassicLayout();
+      },
+    );
+  }
+
+  Widget _desktopClassicLayout() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        Expanded(flex: 5, child: _classicBrandPanel()),
+        Expanded(
+          flex: 7,
+          child: Container(
+            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 24),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _formContent(),
+                        const SizedBox(height: 20),
+                        _layoutSwitchButton(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _mobileClassicLayout() {
+    return Stack(
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFDF6E98),
+                Color(0xFFDE8BA7),
+                Color(0xFF6AD1E3),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: MediaQuery.sizeOf(context).height * 0.28,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _logoAvatar(68),
+              const SizedBox(height: 8),
+              const Text(
+                'Klinik Aurora',
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Enterprise Management Portal',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: FractionallySizedBox(
+            heightFactor: 0.74,
+            widthFactor: 1.0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: appSurface,
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
+                boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 40, offset: Offset(0, -8))],
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _formContent(),
+                    const SizedBox(height: 20),
+                    _layoutSwitchButton(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _classicBrandPanel() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFDF6E98),
+            Color(0xFFDE8BA7),
+            Color(0xFF6AD1E3),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          Positioned(
+            top: -80,
+            left: -80,
+            child: Container(
+              width: 380,
+              height: 380,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.12),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -100,
+            right: -100,
+            child: Container(
+              width: 440,
+              height: 440,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.10),
+              ),
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _logoAvatar(96),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Klinik Aurora',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Enterprise Clinical Management System',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.90),
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 28),
+                  Text(
+                    '© 2026 Klinik Aurora Group. All rights reserved.',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _layoutSwitchButton() {
+    return EmilPressable(
+      onTap: () {
+        setState(() => _useClassicLayout = !_useClassicLayout);
+        try {
+          prefs.setBool('aurora_login_classic_layout', _useClassicLayout);
+        } catch (_) {}
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: appSurface.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: appBorder.withValues(alpha: 0.7)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _useClassicLayout ? Icons.auto_awesome_rounded : Icons.view_sidebar_rounded,
+              size: 13,
+              color: appInkSecondary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              _useClassicLayout ? 'Switch to Modern Glass View' : 'Switch to Classic Split View',
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: appInkSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

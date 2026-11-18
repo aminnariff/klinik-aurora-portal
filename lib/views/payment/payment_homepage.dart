@@ -489,11 +489,11 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? appInkPrimary : appSurface,
+            color: selected ? primary : appSurface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: selected ? appInkPrimary : appBorder),
+            border: Border.all(color: selected ? primary : appBorder),
             boxShadow: selected
-                ? [BoxShadow(color: appInkPrimary.withAlpha(40), blurRadius: 6, offset: const Offset(0, 2))]
+                ? [BoxShadow(color: primary.withValues(alpha: 0.28), blurRadius: 6, offset: const Offset(0, 2))]
                 : null,
           ),
           child: Text(

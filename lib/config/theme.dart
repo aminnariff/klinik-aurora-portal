@@ -104,7 +104,15 @@ ThemeData _buildBaseTheme({
     hoverColor: tokens.tableRowHover,
     splashColor: tokens.brandPrimary.withValues(alpha: 0.10),
     highlightColor: tokens.brandPrimary.withValues(alpha: 0.06),
-    visualDensity: isCompact ? VisualDensity.compact : VisualDensity.adaptivePlatformDensity,
+    visualDensity: isCompact ? const VisualDensity(horizontal: -2, vertical: -2) : VisualDensity.adaptivePlatformDensity,
+    listTileTheme: ListTileThemeData(
+      dense: isCompact,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 10.0 : 16.0,
+        vertical: isCompact ? 0.0 : 4.0,
+      ),
+      minVerticalPadding: isCompact ? 4.0 : 10.0,
+    ),
     fontFamily: 'Figtree',
     iconTheme: IconThemeData(color: tokens.inkSecondary),
     dividerTheme: DividerThemeData(color: tokens.border, thickness: 1, space: 1),
@@ -158,6 +166,7 @@ ThemeData _buildBaseTheme({
       color: tokens.surface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
+      margin: EdgeInsets.all(isCompact ? 4.0 : 8.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(color: tokens.border),
@@ -238,9 +247,13 @@ ThemeData _buildBaseTheme({
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: tokens.inputFill,
-      hintStyle: TextStyle(color: tokens.inkMuted, fontSize: 13),
-      labelStyle: TextStyle(color: tokens.inkSecondary, fontSize: 13, fontWeight: FontWeight.w600),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      isDense: isCompact,
+      hintStyle: TextStyle(color: tokens.inkMuted, fontSize: isCompact ? 12 : 13),
+      labelStyle: TextStyle(color: tokens.inkSecondary, fontSize: isCompact ? 12 : 13, fontWeight: FontWeight.w600),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 11 : 14,
+        vertical: isCompact ? 9 : 12,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: tokens.borderStrong),
@@ -266,8 +279,8 @@ ThemeData _buildBaseTheme({
       style: ElevatedButton.styleFrom(
         backgroundColor: tokens.brandPrimary,
         foregroundColor: tokens.brandOnPrimary,
-        textStyle: const TextStyle(fontFamily: 'Figtree', fontWeight: FontWeight.w600, fontSize: 13),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        textStyle: TextStyle(fontFamily: 'Figtree', fontWeight: FontWeight.w600, fontSize: isCompact ? 12 : 13),
+        padding: EdgeInsets.symmetric(horizontal: isCompact ? 12 : 16, vertical: isCompact ? 6 : 10),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -275,6 +288,7 @@ ThemeData _buildBaseTheme({
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: tokens.inkSecondary,
+        padding: EdgeInsets.symmetric(horizontal: isCompact ? 12 : 16, vertical: isCompact ? 6 : 10),
         side: BorderSide(color: tokens.borderStrong),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),

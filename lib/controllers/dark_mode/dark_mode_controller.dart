@@ -19,7 +19,7 @@ class DarkModeController extends ChangeNotifier {
   static const String _tableDensityKey = 'portal_table_density';
 
   ThemeMode _themeMode = ThemeMode.light;
-  AuroraThemePreset _preset = AuroraThemePreset.auroraPlum;
+  AuroraThemePreset _preset = AuroraThemePreset.auroraBerry;
   TableDensity _tableDensity = TableDensity.comfortable;
 
   DarkModeController({

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
@@ -1225,6 +1226,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   void action(String? label) {
+    dismissLoading();
     switch (label) {
       case 'Dashboard':
         context.go(RouteNames.home);

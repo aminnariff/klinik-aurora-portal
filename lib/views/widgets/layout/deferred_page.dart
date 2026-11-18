@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 
@@ -46,7 +48,13 @@ class _DeferredPageState extends State<DeferredPage> {
     final key = widget.libraryKey;
     if (_loadedKeys.contains(key)) return;
 
-    final future = _inFlight.putIfAbsent(key, () => widget.loadLibrary());
+    final future = _inFlight.putIfAbsent(
+      key,
+      () => widget.loadLibrary().timeout(
+            const Duration(seconds: 12),
+            onTimeout: () => throw TimeoutException('Module load timed out. Please retry.'),
+          ),
+    );
     future.then((_) {
       _loadedKeys.add(key);
       _inFlight.remove(key);

@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
+import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
@@ -64,24 +65,35 @@ class _UtilizationHeatmapPageState extends State<UtilizationHeatmapPage> {
       _loading = true;
       _error = null;
     });
-    final now = DateTime.now();
-    final start = now.subtract(Duration(days: _windowDays - 1));
-    final fmt = DateFormat('yyyy-MM-dd');
-    final res = await UtilizationHeatmapController.fetch(
-      context,
-      branchId: _selectedBranchId,
-      startDate: fmt.format(start),
-      endDate: fmt.format(now),
-    );
-    if (!mounted) return;
-    if (responseCode(res.code) && res.data != null) {
+    try {
+      final now = DateTime.now();
+      final start = now.subtract(Duration(days: _windowDays - 1));
+      final fmt = DateFormat('yyyy-MM-dd');
+      final res = await UtilizationHeatmapController.fetch(
+        context,
+        branchId: _selectedBranchId,
+        startDate: fmt.format(start),
+        endDate: fmt.format(now),
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => ApiResponse(code: 408, message: 'Request timed out. Please retry.'),
+      );
+      if (!mounted) return;
+      if (responseCode(res.code) && res.data != null) {
+        setState(() {
+          _data = res.data;
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _error = res.message ?? 'Failed to load utilization heatmap.';
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _data = res.data;
-        _loading = false;
-      });
-    } else {
-      setState(() {
-        _error = res.message ?? 'Failed to load utilization heatmap.';
+        _error = 'Error loading utilization: $e';
         _loading = false;
       });
     }

@@ -125,10 +125,10 @@ enum AuroraThemePreset {
       : [primaryLight, gradientEndLight];
 
   static AuroraThemePreset fromId(String? id) {
-    if (id == null || id.isEmpty) return AuroraThemePreset.auroraPlum;
+    if (id == null || id.isEmpty) return AuroraThemePreset.auroraBerry;
     for (final preset in AuroraThemePreset.values) {
       if (preset.id == id) return preset;
     }
-    return AuroraThemePreset.auroraPlum;
+    return AuroraThemePreset.auroraBerry;
   }
 }

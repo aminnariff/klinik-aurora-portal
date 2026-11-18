@@ -47,10 +47,10 @@
       (function () {
         var root = document.documentElement;
         var mode = null;
-        var preset = "aurora_plum";
+        var preset = "aurora_berry";
         try {
           mode = window.localStorage.getItem("aurora_portal_theme_mode");
-          preset = window.localStorage.getItem("aurora_portal_theme_preset") || "aurora_plum";
+          preset = window.localStorage.getItem("aurora_portal_theme_preset") || "aurora_berry";
         } catch (e) {}
 
         var prefersDark =
@@ -71,7 +71,7 @@
           aurora_indigo:  { light: "#3730a3", lightPeak: "#6366f1", dark: "#a5b4fc", darkPeak: "#c7d2fe" },
           aurora_emerald: { light: "#047857", lightPeak: "#10b981", dark: "#6ee7b7", darkPeak: "#a7f3d0" }
         };
-        var p = presets[preset] || presets.aurora_plum;
+        var p = presets[preset] || presets.aurora_berry;
         var accent = isDark ? p.dark : p.light;
         var peak = isDark ? p.darkPeak : p.lightPeak;
 
