@@ -468,10 +468,10 @@ class _UserHomepageState extends State<UserHomepage> {
       DataCell(
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(color: primary.withAlpha(25), borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(color: primaryAccessibleText.withAlpha(28), borderRadius: BorderRadius.circular(8)),
           child: Text(
             '${user.totalPoint ?? 0}',
-            style: TextStyle(color: primary.withAlpha(230), fontWeight: FontWeight.w700, fontSize: 12),
+            style: TextStyle(color: primaryAccessibleText, fontWeight: FontWeight.w700, fontSize: 12),
           ),
         ),
       ),
@@ -495,16 +495,19 @@ class _UserHomepageState extends State<UserHomepage> {
   }
 
   Widget _statusChip(bool active) {
+    final fg = active
+        ? (appIsDarkMode ? const Color(0xFF34D399) : Colors.green.shade700)
+        : (appIsDarkMode ? const Color(0xFFF87171) : Colors.red.shade700);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: active ? Colors.green.withAlpha(25) : Colors.red.withAlpha(25),
+        color: active ? appSuccessSoft : appDangerSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         active ? 'Active' : 'Inactive',
         style: TextStyle(
-          color: active ? Colors.green.shade700 : Colors.red.shade700,
+          color: fg,
           fontWeight: FontWeight.w600,
           fontSize: 11,
         ),

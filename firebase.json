@@ -52,6 +52,15 @@
           ]
         },
         {
+          "source": "**/*.@(js|mjs|wasm)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, must-revalidate"
+            }
+          ]
+        },
+        {
           "source": "canvaskit/**",
           "headers": [
             {
@@ -70,7 +79,7 @@
           ]
         },
         {
-          "source": "**/*.@(wasm|otf|ttf|woff2|png|svg|webp)",
+          "source": "**/*.@(otf|ttf|woff2|png|svg|webp)",
           "headers": [
             {
               "key": "Cache-Control",
@@ -132,6 +141,15 @@
           ]
         },
         {
+          "source": "**/*.@(js|mjs|wasm)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, must-revalidate"
+            }
+          ]
+        },
+        {
           "source": "canvaskit/**",
           "headers": [
             {
@@ -150,7 +168,7 @@
           ]
         },
         {
-          "source": "**/*.@(wasm|otf|ttf|woff2|png|svg|webp)",
+          "source": "**/*.@(otf|ttf|woff2|png|svg|webp)",
           "headers": [
             {
               "key": "Cache-Control",
