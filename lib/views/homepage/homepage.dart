@@ -11,12 +11,14 @@ import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controlle
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
+import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/notification/notification_homepage.dart' deferred as notification_lib;
 import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/command_palette/command_palette_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/deferred_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
+import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:provider/provider.dart';
@@ -51,13 +53,17 @@ class _HomepageState extends State<Homepage> {
   static String _getItemCategory(String? label) {
     if (label == null) return '';
     if (label == 'Dashboard' ||
+        label == RouteNames.queueBoardDisplay ||
+        label == RouteNames.appointmentsDisplay ||
         label == RouteNames.patientsDisplay ||
         label == RouteNames.babyTrackerDisplay ||
-        label == RouteNames.appointmentsDisplay ||
+        label == RouteNames.trimesterRecallsDisplay ||
         label == RouteNames.doctorsDisplay ||
         label == RouteNames.servicesDisplay ||
         label == RouteNames.branchesDisplay ||
-        label == RouteNames.paymentsDisplay) {
+        label == RouteNames.utilizationHeatmapDisplay ||
+        label == RouteNames.paymentsDisplay ||
+        label == RouteNames.eodHandoverDisplay) {
       return 'Clinic Operations';
     }
     if (label == RouteNames.pointsDisplay ||
@@ -68,7 +74,7 @@ class _HomepageState extends State<Homepage> {
         label == RouteNames.promotionsDisplay) {
       return 'Loyalty & Marketing';
     }
-    if (label == RouteNames.adminsDisplay) {
+    if (label == RouteNames.adminsDisplay || label == RouteNames.auditLogDisplay) {
       return 'System & Settings';
     }
     return 'Other';
@@ -85,6 +91,18 @@ class _HomepageState extends State<Homepage> {
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
+          return const Icon(Icons.view_kanban_rounded, color: Colors.white);
+        },
+        label: RouteNames.queueBoardDisplay,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.event_rounded, color: Colors.white);
+        },
+        label: RouteNames.appointmentsDisplay,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
           return const Icon(Icons.people_rounded, color: Colors.white);
         },
         label: RouteNames.patientsDisplay,
@@ -97,9 +115,9 @@ class _HomepageState extends State<Homepage> {
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
-          return const Icon(Icons.event_rounded, color: Colors.white);
+          return const Icon(Icons.notification_important_rounded, color: Colors.white);
         },
-        label: RouteNames.appointmentsDisplay,
+        label: RouteNames.trimesterRecallsDisplay,
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
@@ -121,9 +139,21 @@ class _HomepageState extends State<Homepage> {
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
+          return const Icon(Icons.grid_on_rounded, color: Colors.white);
+        },
+        label: RouteNames.utilizationHeatmapDisplay,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
           return const Icon(Icons.receipt_long_rounded, color: Colors.white);
         },
         label: RouteNames.paymentsDisplay,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.fact_check_rounded, color: Colors.white);
+        },
+        label: RouteNames.eodHandoverDisplay,
       ),
 
       // --- Loyalty & Marketing ---
@@ -171,6 +201,12 @@ class _HomepageState extends State<Homepage> {
         },
         label: RouteNames.adminsDisplay,
       ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
+          return const Icon(Icons.policy_rounded, color: Colors.white);
+        },
+        label: RouteNames.auditLogDisplay,
+      ),
     ];
     getAuthController();
     super.initState();
@@ -185,7 +221,11 @@ class _HomepageState extends State<Homepage> {
           final isSonographer = auth.hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') && !isSuperAdmin;
 
           if (isSonographer) {
-            sideBarAttribute.retainWhere((element) => element.label == RouteNames.appointmentsDisplay);
+            sideBarAttribute.retainWhere(
+              (element) =>
+                  element.label == RouteNames.appointmentsDisplay ||
+                  element.label == RouteNames.queueBoardDisplay,
+            );
             pageController.selectIndex(0);
             context.goNamed(RouteNames.appointments);
           } else {
@@ -194,6 +234,9 @@ class _HomepageState extends State<Homepage> {
             }
             if (!auth.hasPermission('4ac042fa-ef2d-11ee-bd1b-cc801b09db2f') || !isSuperAdmin) {
               sideBarAttribute.removeWhere((element) => element.label == RouteNames.adminsDisplay);
+            }
+            if (!isSuperAdmin) {
+              sideBarAttribute.removeWhere((element) => element.label == RouteNames.auditLogDisplay);
             }
             if (!auth.hasPermission('a231db36-058d-11ef-943b-626efeb17d5e')) {
               sideBarAttribute.removeWhere((element) => element.label == RouteNames.pointsDisplay);
@@ -220,10 +263,18 @@ class _HomepageState extends State<Homepage> {
               sideBarAttribute.removeWhere((element) => element.label == RouteNames.servicesDisplay);
             }
             if (!auth.hasPermission('f57576c4-4d15-11f0-b054-1ff6746392b2')) {
-              sideBarAttribute.removeWhere((element) => element.label == RouteNames.paymentsDisplay);
+              sideBarAttribute.removeWhere(
+                (element) =>
+                    element.label == RouteNames.paymentsDisplay ||
+                    element.label == RouteNames.eodHandoverDisplay,
+              );
             }
             if (!auth.hasPermission('3b8e7d9d-ac51-11ef-a1b7-bc24115a1342')) {
-              sideBarAttribute.removeWhere((element) => element.label == RouteNames.appointmentsDisplay);
+              sideBarAttribute.removeWhere(
+                (element) =>
+                    element.label == RouteNames.appointmentsDisplay ||
+                    element.label == RouteNames.queueBoardDisplay,
+              );
             }
             if (!isSuperAdmin) {
               sideBarAttribute.removeWhere((element) => element.label == RouteNames.marketingDisplay);
@@ -280,6 +331,36 @@ class _HomepageState extends State<Homepage> {
         },
         const SingleActivator(LogicalKeyboardKey.keyK, control: true): () {
           CommandPaletteDialog.show(context);
+        },
+        const SingleActivator(LogicalKeyboardKey.slash, shift: true): () {
+          if (!PortalSearchFocusBus.isTypingInTextField()) {
+            KeyboardShortcutsDialog.show(context);
+          }
+        },
+        const SingleActivator(LogicalKeyboardKey.slash): () {
+          if (!PortalSearchFocusBus.isTypingInTextField()) {
+            if (!PortalSearchFocusBus.focusActive()) {
+              CommandPaletteDialog.show(context);
+            }
+          }
+        },
+        const SingleActivator(LogicalKeyboardKey.keyN): () {
+          if (!PortalSearchFocusBus.isTypingInTextField()) {
+            showDialog(
+              context: context,
+              builder: (_) => const AppointmentDetails(type: 'create'),
+            );
+          }
+        },
+        const SingleActivator(LogicalKeyboardKey.keyQ): () {
+          if (!PortalSearchFocusBus.isTypingInTextField()) {
+            context.go(RouteNames.queueBoard);
+          }
+        },
+        const SingleActivator(LogicalKeyboardKey.keyH): () {
+          if (!PortalSearchFocusBus.isTypingInTextField()) {
+            context.go(RouteNames.eodHandover);
+          }
         },
       },
       child: Focus(
@@ -786,6 +867,12 @@ class _HomepageState extends State<Homepage> {
           ),
           const Spacer(),
           IconButton(
+            icon: const Icon(Icons.keyboard_outlined, size: 20),
+            color: colors.inkSecondary,
+            tooltip: 'Keyboard Shortcuts (?)',
+            onPressed: () => KeyboardShortcutsDialog.show(context),
+          ),
+          IconButton(
             icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded, size: 20),
             color: colors.inkSecondary,
             tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
@@ -1165,6 +1252,16 @@ class _HomepageState extends State<Homepage> {
         context.go(RouteNames.payments);
       case RouteNames.marketingDisplay:
         context.go(RouteNames.marketing);
+      case RouteNames.queueBoardDisplay:
+        context.go(RouteNames.queueBoard);
+      case RouteNames.eodHandoverDisplay:
+        context.go(RouteNames.eodHandover);
+      case RouteNames.trimesterRecallsDisplay:
+        context.go(RouteNames.trimesterRecalls);
+      case RouteNames.utilizationHeatmapDisplay:
+        context.go(RouteNames.utilizationHeatmap);
+      case RouteNames.auditLogDisplay:
+        context.go(RouteNames.auditLog);
     }
   }
 

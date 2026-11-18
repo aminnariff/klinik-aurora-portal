@@ -29,6 +29,7 @@ import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart'
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
+import 'package:klinik_aurora_portal/views/widgets/patient/patient_quick_drawer.dart';
 import 'package:klinik_aurora_portal/views/widgets/no_records/no_records.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
@@ -428,11 +429,26 @@ class _UserHomepageState extends State<UserHomepage> {
                 children: [
                   AppTooltip(
                     message:
-                        '${notNullOrEmptyString(user.userNric) ? 'NRIC: ${user.userNric}\n' : ''}Email: ${user.userEmail ?? 'N/A'}',
-                    child: Text(
-                      user.userFullname?.titleCase() ?? user.userName ?? 'N/A',
-                      style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
-                      overflow: TextOverflow.ellipsis,
+                        'Open 360° Patient Profile\n${notNullOrEmptyString(user.userNric) ? 'NRIC: ${user.userNric}\n' : ''}Email: ${user.userEmail ?? 'N/A'}',
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(4),
+                      onTap: (user.userId ?? '').isNotEmpty
+                          ? () => PatientQuickDrawer.show(
+                                context,
+                                userId: user.userId!,
+                                patientName: user.userFullname?.titleCase() ?? user.userName,
+                              )
+                          : null,
+                      child: Text(
+                        user.userFullname?.titleCase() ?? user.userName ?? 'N/A',
+                        style: AppTypography.bodyMedium(context).copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: primaryAccessibleText,
+                          decoration: TextDecoration.underline,
+                          decorationColor: primaryAccessibleText.withValues(alpha: 0.35),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                   Text(

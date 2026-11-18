@@ -60,4 +60,19 @@ abstract final class RouteNames {
 
   static const admins = '/admin';
   static const adminsDisplay = 'Admins';
+
+  static const queueBoard = '/queue';
+  static const queueBoardDisplay = "Today's Flow";
+
+  static const eodHandover = '/eod-handover';
+  static const eodHandoverDisplay = 'EOD Handover';
+
+  static const trimesterRecalls = '/trimester-recalls';
+  static const trimesterRecallsDisplay = 'Scan Recalls';
+
+  static const utilizationHeatmap = '/utilization';
+  static const utilizationHeatmapDisplay = 'Utilization';
+
+  static const auditLog = '/audit-log';
+  static const auditLogDisplay = 'Audit Trail';
 }

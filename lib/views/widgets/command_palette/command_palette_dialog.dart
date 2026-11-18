@@ -7,6 +7,7 @@ import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
+import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 import 'package:provider/provider.dart';
 
 class CommandItem {
@@ -85,7 +86,49 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       subtitle: 'Switch between bright reception view and low-glare dark mode',
       onSelect: (ctx) => ctx.read<DarkModeController>().toggleDarkMode(ctx),
     ),
+    CommandItem(
+      title: 'Keyboard Shortcuts (?)',
+      category: 'Quick Actions',
+      icon: Icons.keyboard_rounded,
+      subtitle: 'View all power-user keyboard accelerators',
+      onSelect: (ctx) => KeyboardShortcutsDialog.show(ctx),
+    ),
     // Core Navigation
+    CommandItem(
+      title: "Today's Flow (Front-Desk Queue)",
+      category: 'Clinic Operations',
+      icon: Icons.view_kanban_outlined,
+      subtitle: 'Live check-in board, room assignments, and wait timers',
+      onSelect: (ctx) => ctx.goNamed(RouteNames.queueBoard),
+    ),
+    CommandItem(
+      title: 'Daily EOD Branch Handover',
+      category: 'Clinic Operations',
+      icon: Icons.fact_check_outlined,
+      subtitle: 'End-of-day cash/Fiuu reconciliation and shift export',
+      onSelect: (ctx) => ctx.goNamed(RouteNames.eodHandover),
+    ),
+    CommandItem(
+      title: 'Next-Trimester Scan Recalls',
+      category: 'Clinic Operations',
+      icon: Icons.notification_important_outlined,
+      subtitle: 'Follow up expectant mothers due for NT, Detail, or 4D/5D scans',
+      onSelect: (ctx) => ctx.goNamed(RouteNames.trimesterRecalls),
+    ),
+    CommandItem(
+      title: 'Branch Utilization Heatmap',
+      category: 'Clinic Operations',
+      icon: Icons.grid_on_rounded,
+      subtitle: 'Peak/idle hours and practitioner capacity alerts',
+      onSelect: (ctx) => ctx.goNamed(RouteNames.utilizationHeatmap),
+    ),
+    CommandItem(
+      title: 'Audit Trail & Activity Log',
+      category: 'System',
+      icon: Icons.policy_outlined,
+      subtitle: 'Super Admin searchable change history and JSON diff viewer',
+      onSelect: (ctx) => ctx.goNamed(RouteNames.auditLog),
+    ),
     CommandItem(
       title: 'Appointments',
       category: 'Navigation',

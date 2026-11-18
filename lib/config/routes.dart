@@ -10,9 +10,13 @@ import 'package:klinik_aurora_portal/privacy/privacy_policy.dart' deferred as pr
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart' deferred as admin_lib;
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart' deferred as payment_mismatch_lib;
+import 'package:klinik_aurora_portal/views/appointment/queue_board_page.dart' deferred as queue_board_lib;
+import 'package:klinik_aurora_portal/views/audit_log/audit_log_homepage.dart' deferred as audit_log_lib;
 import 'package:klinik_aurora_portal/views/baby_tracker/baby_tracker_homepage.dart' deferred as baby_tracker_lib;
+import 'package:klinik_aurora_portal/views/baby_tracker/trimester_recall_page.dart' deferred as trimester_recall_lib;
 import 'package:klinik_aurora_portal/views/branch/branch_homepage.dart' deferred as branch_lib;
 import 'package:klinik_aurora_portal/views/campaigns/marketing_homepage.dart' deferred as marketing_lib;
+import 'package:klinik_aurora_portal/views/dashboard/utilization_heatmap_page.dart' deferred as utilization_lib;
 import 'package:klinik_aurora_portal/views/delete_account/delete_account.dart' deferred as delete_account_lib;
 import 'package:klinik_aurora_portal/views/doctor/doctor_homepage.dart' deferred as doctor_lib;
 import 'package:klinik_aurora_portal/views/error/error.dart' deferred as error_lib;
@@ -22,6 +26,7 @@ import 'package:klinik_aurora_portal/views/homepage/no_permission.dart';
 import 'package:klinik_aurora_portal/views/login/login_page.dart';
 import 'package:klinik_aurora_portal/views/password_recovery/admin_password_recovery.dart' deferred as password_recovery_lib;
 import 'package:klinik_aurora_portal/views/payment/branch_summary_homepage.dart' deferred as branch_summary_lib;
+import 'package:klinik_aurora_portal/views/payment/eod_handover_page.dart' deferred as eod_handover_lib;
 import 'package:klinik_aurora_portal/views/payment/payment_homepage.dart' deferred as payment_lib;
 import 'package:klinik_aurora_portal/views/points/point_homepage.dart' deferred as points_lib;
 import 'package:klinik_aurora_portal/views/promotion/promotion_homepage.dart' deferred as promotion_lib;
@@ -103,6 +108,7 @@ final router = GoRouter(
       // 4c. Checking specific SuperAdmin guarded pages
       const requiresSuperAdmin = [
         RouteNames.admins,
+        RouteNames.auditLog,
         RouteNames.branches,
         RouteNames.promotions,
         RouteNames.branchPaymentSummary,
@@ -113,8 +119,11 @@ final router = GoRouter(
         return RouteNames.noPermission;
       }
 
-      // 4d. Sonographer restricted to only appointments
-      if (isSonographer && uri != RouteNames.appointments && uri != RouteNames.paymentMismatch) {
+      // 4d. Sonographer restricted to only appointments & today's queue
+      if (isSonographer &&
+          uri != RouteNames.appointments &&
+          uri != RouteNames.paymentMismatch &&
+          uri != RouteNames.queueBoard) {
         return RouteNames.noPermission;
       }
 
@@ -131,14 +140,16 @@ final router = GoRouter(
         RouteNames.rewards: '6e0fe1f8-2f1f-11ef-8db9-6677d190faa2',
         RouteNames.services: '0699ac1c-ac52-11ef-a1b7-bc24115a1342',
         RouteNames.payments: 'f57576c4-4d15-11f0-b054-1ff6746392b2',
+        RouteNames.eodHandover: 'f57576c4-4d15-11f0-b054-1ff6746392b2',
         RouteNames.appointments: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
+        RouteNames.queueBoard: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
         RouteNames.paymentMismatch: '3b8e7d9d-ac51-11ef-a1b7-bc24115a1342',
       };
 
       final requiredPermission = permissionMap[uri];
       if (requiredPermission != null && !permissions.contains(requiredPermission)) {
         final isSonographerOnAppointment =
-            uri == RouteNames.appointments && isSonographer;
+            (uri == RouteNames.appointments || uri == RouteNames.queueBoard) && isSonographer;
         if (!isSonographerOnAppointment) {
           return RouteNames.noPermission;
         }
@@ -442,6 +453,71 @@ final router = GoRouter(
               child: DeferredPage(
                 loadLibrary: voucher_lib.loadLibrary,
                 builder: (_) => Scaffold(body: voucher_lib.VoucherHomepage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.queueBoard,
+          path: RouteNames.queueBoard,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: queue_board_lib.loadLibrary,
+                builder: (_) => Scaffold(body: queue_board_lib.QueueBoardPage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.eodHandover,
+          path: RouteNames.eodHandover,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: eod_handover_lib.loadLibrary,
+                builder: (_) => Scaffold(body: eod_handover_lib.EodHandoverPage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.trimesterRecalls,
+          path: RouteNames.trimesterRecalls,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: trimester_recall_lib.loadLibrary,
+                builder: (_) => Scaffold(body: trimester_recall_lib.TrimesterRecallPage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.utilizationHeatmap,
+          path: RouteNames.utilizationHeatmap,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: utilization_lib.loadLibrary,
+                builder: (_) => Scaffold(body: utilization_lib.UtilizationHeatmapPage()),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteNames.auditLog,
+          path: RouteNames.auditLog,
+          parentNavigatorKey: _shellNavigatorKey,
+          pageBuilder: (context, state) {
+            return NoTransitionPage(
+              child: DeferredPage(
+                loadLibrary: audit_log_lib.loadLibrary,
+                builder: (_) => Scaffold(body: audit_log_lib.AuditLogHomepage()),
               ),
             );
           },

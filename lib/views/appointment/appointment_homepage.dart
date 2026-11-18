@@ -43,6 +43,7 @@ import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
+import 'package:klinik_aurora_portal/views/widgets/patient/patient_quick_drawer.dart';
 import 'package:klinik_aurora_portal/views/widgets/shimmer/table_skeleton.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
@@ -1462,10 +1463,26 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Flexible(
-                          child: Text(
-                            item.user?.userFullName?.titleCase() ?? 'N/A',
-                            style: AppTypography.bodyMedium(context).copyWith(fontSize: 13, fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(4),
+                            onTap: (item.user?.userId ?? '').isNotEmpty
+                                ? () => PatientQuickDrawer.show(
+                                      context,
+                                      userId: item.user!.userId!,
+                                      patientName: item.user?.userFullName?.titleCase(),
+                                    )
+                                : null,
+                            child: Text(
+                              item.user?.userFullName?.titleCase() ?? 'N/A',
+                              style: AppTypography.bodyMedium(context).copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: primaryAccessibleText,
+                                decoration: TextDecoration.underline,
+                                decorationColor: primaryAccessibleText.withValues(alpha: 0.35),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                         if (ageStr != null) ...[
@@ -1473,13 +1490,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF3F4F6),
+                              color: appSurfaceSubtle,
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(color: appBorder, width: 0.8),
                             ),
                             child: Text(
                               ageStr,
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
                             ),
                           ),
                         ],
