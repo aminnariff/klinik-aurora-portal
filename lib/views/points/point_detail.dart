@@ -185,6 +185,7 @@ class _PointDetailState extends State<PointDetail> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       backgroundColor: appSurface,
@@ -381,7 +382,7 @@ class _PointDetailState extends State<PointDetail> {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? appSurface : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
               ? [
@@ -724,7 +725,7 @@ class _PointDetailState extends State<PointDetail> {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(

@@ -211,6 +211,7 @@ class _RewardDetailState extends State<RewardDetail> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: EdgeInsets.symmetric(
@@ -488,7 +489,7 @@ class _RewardDetailState extends State<RewardDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFFF0FDF4) : appDangerSoft,
+        color: isActive ? appSuccessSoft : appDangerSoft,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: isActive ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA)),
       ),

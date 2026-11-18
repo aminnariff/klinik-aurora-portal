@@ -114,6 +114,7 @@ class _BranchDetailState extends State<BranchDetail> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final maxH = MediaQuery.of(context).size.height - (isMobile ? 32 : 64);
     final maxW = math.min(880.0, MediaQuery.of(context).size.width - (isMobile ? 16 : 32));
 
@@ -139,7 +140,7 @@ class _BranchDetailState extends State<BranchDetail> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Material(
-            color: Colors.white,
+            color: appSurface,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -171,7 +172,7 @@ class _BranchDetailState extends State<BranchDetail> {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
@@ -705,7 +706,7 @@ class _BranchDetailState extends State<BranchDetail> {
                             const SizedBox(height: 6),
                             Text(
                               'Unable to load preview image',
-                              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                              style: TextStyle(fontSize: 12, color: appInkMuted),
                             ),
                           ],
                         ),
@@ -750,11 +751,11 @@ class _BranchDetailState extends State<BranchDetail> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_photo_alternate_outlined, size: 28, color: Colors.grey.shade400),
+                  Icon(Icons.add_photo_alternate_outlined, size: 28, color: appInkMuted),
                   const SizedBox(height: 4),
                   Text(
                     'No branch photo uploaded yet',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 12, color: appInkMuted, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -791,7 +792,7 @@ class _BranchDetailState extends State<BranchDetail> {
             final results = await showCalendarDatePicker2Dialog(
               context: context,
               barrierDismissible: true,
-              dialogBackgroundColor: Colors.white,
+              dialogBackgroundColor: appSurface,
               config: CalendarDatePicker2WithActionButtonsConfig(
                 calendarViewMode: CalendarDatePicker2Mode.day,
               ),
@@ -909,7 +910,7 @@ class _BranchDetailState extends State<BranchDetail> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: is24 ? const Color(0xFFF0FDF4) : appSurfaceSubtle,
+            color: is24 ? appSuccessSoft : appSurfaceSubtle,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: is24 ? const Color(0xFF86EFAC) : appBorder,
@@ -979,7 +980,7 @@ class _BranchDetailState extends State<BranchDetail> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: active ? const Color(0xFFF0FDF4) : appDangerSoft,
+            color: active ? appSuccessSoft : appDangerSoft,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: active ? const Color(0xFF86EFAC) : const Color(0xFFFECACA),
@@ -1086,7 +1087,7 @@ class _BranchDetailState extends State<BranchDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(

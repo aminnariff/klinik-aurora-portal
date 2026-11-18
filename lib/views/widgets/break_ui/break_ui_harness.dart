@@ -162,6 +162,7 @@ class BreakUiDevHarness extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     // Only render in debug mode or if explicitly activated
     if (!kDebugMode) return const SizedBox.shrink();
 
@@ -177,9 +178,9 @@ class BreakUiDevHarness extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
             decoration: BoxDecoration(
-              color: appInkPrimary, // slate-800
+              color: const Color(0xFF1E293B), // slate-800
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: appInkSecondary, width: 1),
+              border: Border.all(color: const Color(0xFF334155), width: 1),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

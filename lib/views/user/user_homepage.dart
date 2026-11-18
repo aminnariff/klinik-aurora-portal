@@ -206,7 +206,7 @@ class _UserHomepageState extends State<UserHomepage> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: appBorder),
       ),
-      color: Colors.white,
+      color: appSurface,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
@@ -275,7 +275,7 @@ class _UserHomepageState extends State<UserHomepage> {
 
   Widget _topBar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
@@ -317,7 +317,7 @@ class _UserHomepageState extends State<UserHomepage> {
             icon: Icon(Icons.refresh_rounded, size: 18, color: appInkMuted),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFF3F4F6),
+              backgroundColor: appSurfaceSubtle,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
@@ -396,7 +396,7 @@ class _UserHomepageState extends State<UserHomepage> {
               if (states.contains(WidgetState.hovered)) {
                 return appSurfaceSubtle;
               }
-              return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+              return i % 2 == 0 ? appSurface : appTableRowAlt;
             }),
             onTap: () => _handleMenuSelection('update', users[i]),
             cells: _buildCells(users[i]),
@@ -516,7 +516,7 @@ class _UserHomepageState extends State<UserHomepage> {
     return PopupMenuButton<String>(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       offset: const Offset(0, 32),
-      color: Colors.white,
+      color: appSurfaceElevated,
       elevation: 4,
       tooltip: '',
       onSelected: (value) => _handleMenuSelection(value, user),
@@ -598,7 +598,7 @@ class _UserHomepageState extends State<UserHomepage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Material(
-            color: Colors.white,
+            color: appSurface,
             elevation: 8,
             borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
             child: SizedBox(

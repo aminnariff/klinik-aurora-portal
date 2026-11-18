@@ -201,7 +201,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
 
   Widget _header() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 14),
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -222,7 +222,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
                 Text('Payment Issues', style: AppTypography.bodyLarge(context).copyWith(fontWeight: FontWeight.w700)),
                 Text(
                   'Payment succeeded but the appointment is not in the schedule — needs manual follow-up.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ),
@@ -245,7 +245,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
 
   Widget _branchBar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
       margin: const EdgeInsets.only(bottom: 1),
       child: Row(
@@ -294,7 +294,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
             icon: Icon(Icons.refresh_rounded, size: 18, color: appInkMuted),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFF3F4F6),
+              backgroundColor: appSurfaceSubtle,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
@@ -337,7 +337,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
             rows: [
               for (int i = 0; i < _items.length; i++)
                 DataRow2(
-                  color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC)),
+                  color: WidgetStateProperty.all(i % 2 == 0 ? appSurface : appTableRowAlt),
                   cells: [
                     DataCell(_patientCell(_items[i])),
                     DataCell(_branchCell(_items[i])),
@@ -472,7 +472,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
   Widget _footer() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0xFFF3F4F6)))),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: appSurfaceSubtle))),
       child: Row(
         children: [
           Expanded(
@@ -488,7 +488,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!isMobile && !isTablet)
-                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: appInkMuted)),
               PerPageWidget(
                 _pageSize.toString(),
                 DropdownAttributeList(
@@ -503,7 +503,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
                 const SizedBox(width: 8),
                 Text(
                   '${((_page) * _pageSize) - _pageSize + 1}–${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ],

@@ -280,7 +280,7 @@ class _ModifierEditorState extends State<_ModifierEditor> {
     final results = await showCalendarDatePicker2Dialog(
       context: context,
       barrierDismissible: true,
-      dialogBackgroundColor: Colors.white,
+      dialogBackgroundColor: appSurface,
       config: CalendarDatePicker2WithActionButtonsConfig(
         calendarType: CalendarDatePicker2Type.single,
         currentDate: DateTime.now(),

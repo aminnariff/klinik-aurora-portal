@@ -220,7 +220,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
         data: ThemeData(
           colorScheme: ColorScheme.light(
             primary: primary,
-            onPrimary: Colors.white,
+            onPrimary: appSurface,
             surface: appSurface,
             onSurface: appInkPrimary,
           ),
@@ -260,6 +260,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return ListenableBuilder(
       listenable: widget.controller,
       builder: (context, _) {
@@ -277,7 +278,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.white : appCanvas.withAlpha(150),
+                color: isSelected ? appSurface : appCanvas.withAlpha(150),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: isSelected ? primary.withAlpha(100) : appBorder,
@@ -319,7 +320,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: isSelected ? appInkPrimary : Colors.grey[400],
+                              color: isSelected ? appInkPrimary : appInkMuted,
                             ),
                           ),
                           const Spacer(),
@@ -335,7 +336,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                               icon: copiedFromDay == day ? Icons.check_circle_rounded : Icons.copy_rounded,
                               tooltip: 'Copy timing',
                               onTap: () => _copySlots(day),
-                              color: copiedFromDay == day ? const Color(0xFF16A34A) : Colors.grey[500]!,
+                              color: copiedFromDay == day ? const Color(0xFF16A34A) : appInkMuted,
                             ),
                             _dayActionBtn(
                               icon: Icons.paste_rounded,
@@ -349,7 +350,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                     ),
                   ),
                   if (isSelected) ...[
-                    const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                    Divider(height: 1, color: appSurfaceSubtle),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                       child: Column(
@@ -361,7 +362,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                                 padding: const EdgeInsets.symmetric(vertical: 8),
                                 child: Text(
                                   'No time ranges defined yet.',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[400], fontStyle: FontStyle.italic),
+                                  style: TextStyle(fontSize: 12, color: appInkMuted, fontStyle: FontStyle.italic),
                                 ),
                               ),
                             )
@@ -379,7 +380,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                                 return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: itemInvalid ? Colors.red.withAlpha(10) : const Color(0xFFF3F4F6),
+                                    color: itemInvalid ? Colors.red.withAlpha(10) : appSurfaceSubtle,
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(color: itemInvalid ? Colors.red.shade200 : Colors.transparent),
                                   ),
@@ -395,7 +396,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
                                       }),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 6),
-                                        child: Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.grey[400]),
+                                        child: Icon(Icons.arrow_forward_rounded, size: 14, color: appInkMuted),
                                       ),
                                       _compactTimeChip('End', range.end, () async {
                                         final picked = await _showTimePicker(range.end);
@@ -744,7 +745,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
       onPressed: onTap,
       icon: Icon(icon, size: 18),
       tooltip: tooltip,
-      color: onTap != null ? color : Colors.grey[300],
+      color: onTap != null ? color : appBorderStrong,
       padding: const EdgeInsets.all(4),
       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
     );
@@ -758,7 +759,7 @@ class _WeeklyAvailabilityEditorState extends State<WeeklyAvailabilityEditor> {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.bold),
           ),
           Text(time.format(context), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
         ],

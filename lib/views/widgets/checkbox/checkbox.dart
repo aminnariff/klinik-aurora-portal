@@ -14,6 +14,7 @@ class CheckBoxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Transform.scale(
       scale: 1.5,
       child: Checkbox(
@@ -40,6 +41,6 @@ class CheckBoxWidget extends StatelessWidget {
         ? Colors.grey
         : value == true
             ? primary
-            : Colors.white;
+            : appInputFill;
   }
 }

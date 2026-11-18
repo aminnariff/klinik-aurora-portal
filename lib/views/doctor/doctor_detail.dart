@@ -182,6 +182,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Dialog(
       backgroundColor: appSurface,
       surfaceTintColor: Colors.transparent,
@@ -216,7 +217,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
       padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
       decoration: BoxDecoration(
         color: appCanvas,
-        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
@@ -434,7 +435,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                     width: 140,
                                     fit: BoxFit.cover,
                                     errorBuilder: (_, _, _) => Container(
-                                      color: const Color(0xFFF3F4F6),
+                                      color: appSurfaceSubtle,
                                       alignment: Alignment.center,
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
@@ -574,7 +575,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(

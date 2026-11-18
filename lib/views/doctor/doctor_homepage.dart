@@ -177,7 +177,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: appBorder),
       ),
-      color: Colors.white,
+      color: appSurface,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
@@ -230,7 +230,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
 
   Widget _topBar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
@@ -256,7 +256,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
             icon: Icon(Icons.refresh_rounded, size: 18, color: appInkMuted),
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFF3F4F6),
+              backgroundColor: appSurfaceSubtle,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
@@ -368,7 +368,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
       rows: docs
           .map(
             (doc) => DataRow2(
-              color: WidgetStateProperty.all(Colors.white),
+              color: WidgetStateProperty.all(appSurface),
               cells: [
                 // Name + avatar
                 DataCell(
@@ -467,7 +467,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     Color fg = const Color(0xFF1D4ED8);
     switch (type) {
       case 2:
-        bg = const Color(0xFFF3E8FF);
+        bg = appPurpleSoft;
         fg = const Color(0xFF7E22CE);
         break;
       case 3:
@@ -475,7 +475,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         fg = const Color(0xFF047857);
         break;
       case 4:
-        bg = const Color(0xFFFFF1F2);
+        bg = appDangerSoft;
         fg = const Color(0xFFBE123C);
         break;
       case 5:
@@ -508,7 +508,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     return PopupMenuButton<String>(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       offset: Offset(0, 32),
-      color: Colors.white,
+      color: appSurfaceElevated,
       elevation: 4,
       tooltip: '',
       onSelected: (value) => _handleMenu(value, doc),
@@ -592,7 +592,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Material(
-            color: Colors.white,
+            color: appSurface,
             elevation: 8,
             borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
             child: SizedBox(

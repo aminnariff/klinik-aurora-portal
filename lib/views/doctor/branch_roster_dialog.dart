@@ -416,7 +416,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
     final results = await showCalendarDatePicker2Dialog(
       context: context,
       barrierDismissible: true,
-      dialogBackgroundColor: Colors.white,
+      dialogBackgroundColor: appSurface,
       config: CalendarDatePicker2WithActionButtonsConfig(
         calendarType: CalendarDatePicker2Type.multi,
         currentDate: today,
@@ -460,7 +460,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               onPrimary: Colors.white,
               surface: appSurface,
               surfaceTint: Colors.transparent,
-              surfaceContainerHighest: Color(0xFFF3F4F6),
+              surfaceContainerHighest: appSurfaceSubtle,
               onSurface: Color(0xFF1F2937),
               onSurfaceVariant: Color(0xFF4B5563),
             ),
@@ -473,7 +473,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               ),
               hourMinuteColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return const Color(0xFFF3F4F6);
+                  return appSurfaceSubtle;
                 }
                 return appCanvas;
               }),
@@ -494,7 +494,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               dayPeriodBorderSide: BorderSide(color: appBorder),
               dayPeriodColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return const Color(0xFFF3F4F6);
+                  return appSurfaceSubtle;
                 }
                 return Colors.white;
               }),
@@ -602,7 +602,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   Expanded(
                     child: Text(
                       'Multi-staff capacity enables automatically whenever 2+ practitioners have active shifts.',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontStyle: FontStyle.italic),
+                      style: TextStyle(fontSize: 12, color: appInkMuted, fontStyle: FontStyle.italic),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -786,7 +786,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6),
+                  color: appSurfaceSubtle,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -994,7 +994,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3F4F6),
+                    color: appSurfaceSubtle,
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: appBorder),
                   ),
@@ -1178,7 +1178,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
             // View Mode Toggle (Calendar vs List)
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F4F6),
+                color: appSurfaceSubtle,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: appBorder),
               ),
@@ -1250,7 +1250,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? appSurface : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
           boxShadow: isSelected
               ? [
@@ -1383,7 +1383,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   if (!isWithinMonth) {
                     return Container(
                       constraints: const BoxConstraints(minHeight: 110),
-                      color: const Color(0xFFFAFAFA),
+                      color: appSurfaceSubtle,
                     );
                   }
 
@@ -1397,7 +1397,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                   return Container(
                     constraints: const BoxConstraints(minHeight: 110),
                     padding: const EdgeInsets.all(6),
-                    color: isToday ? primary.withAlpha(8) : Colors.white,
+                    color: isToday ? primary.withAlpha(8) : appSurface,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1605,7 +1605,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
     Color fg = const Color(0xFF1D4ED8);
     switch (type) {
       case 2:
-        bg = const Color(0xFFF3E8FF);
+        bg = appPurpleSoft;
         fg = const Color(0xFF7E22CE);
         break;
       case 3:
@@ -1613,7 +1613,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
         fg = const Color(0xFF047857);
         break;
       case 4:
-        bg = const Color(0xFFFFF1F2);
+        bg = appDangerSoft;
         fg = const Color(0xFFBE123C);
         break;
       case 5:

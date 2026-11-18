@@ -37,7 +37,7 @@ class _MarketingHomepageState extends State<MarketingHomepage> with SingleTicker
         children: [
           Container(
             width: double.infinity,
-            color: Colors.white,
+            color: appSurface,
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

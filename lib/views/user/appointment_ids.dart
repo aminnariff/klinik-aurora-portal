@@ -51,7 +51,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
+                border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
               ),
               child: Row(
                 children: [
@@ -75,7 +75,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                         ),
                         Text(
                           'Total: ${widget.response?.total ?? 0} appointment(s)',
-                          style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade500),
+                          style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                         ),
                       ],
                     ),
@@ -83,7 +83,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                   IconButton(
   tooltip: 'Tutup',
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(Icons.close, color: Colors.grey.shade400),
+                    icon: Icon(Icons.close, color: appInkMuted),
                   ),
                 ],
               ),
@@ -130,7 +130,7 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
       decoration: BoxDecoration(
         color: appSurface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: appSurfaceSubtle),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Material(
@@ -175,14 +175,14 @@ class _UserAppointmentIdsState extends State<UserAppointmentIds> {
                       const SizedBox(height: 4),
                       Text(
                         'ID: ${item.appointmentId}',
-                        style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontFamily: 'Monospace'),
+                        style: TextStyle(color: appInkMuted, fontSize: 12, fontFamily: 'Monospace'),
                       ),
                     ],
                   ),
                 ),
 
                 // Action Arrow
-                Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey.shade300),
+                Icon(Icons.arrow_forward_ios_rounded, size: 14, color: appBorderStrong),
               ],
             ),
           ),

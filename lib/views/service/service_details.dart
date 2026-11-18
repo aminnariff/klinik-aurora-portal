@@ -135,6 +135,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final isMobile = screenWidth(100) < 768;
     final maxW = isMobile ? screenWidth(96) : math.min(940.0, screenWidth(92));
     final maxH = screenHeight(90);
@@ -157,7 +158,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Material(
-            color: Colors.white,
+            color: appSurface,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -189,7 +190,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
@@ -572,7 +573,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
-                        color: hasImage ? const Color(0xFFE0F2FE) : appSurfaceSubtle,
+                        color: hasImage ? appInfoSoft : appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -644,7 +645,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
                               height: 6,
                               margin: const EdgeInsets.only(right: 5),
                               decoration: BoxDecoration(
-                                color: isActive ? Colors.white : const Color(0xFF246E7A),
+                                color: isActive ? appSurface : const Color(0xFF246E7A),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -754,7 +755,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(

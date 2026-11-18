@@ -87,7 +87,7 @@ void showWhatsAppTemplateDialog({
                           const SizedBox(height: 4),
                           Text(
                             'To: $name ($phone)',
-                            style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade600),
+                            style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                           ),
                         ],
                       ),
@@ -110,7 +110,7 @@ void showWhatsAppTemplateDialog({
                           'Suggested Templates',
                           style: AppTypography.bodyMedium(
                             context,
-                          ).copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade800),
+                          ).copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: appInkSecondary),
                         ),
                         const SizedBox(height: 12),
                         if (renderedTemplates.isEmpty)
@@ -119,7 +119,7 @@ void showWhatsAppTemplateDialog({
                             child: Center(
                               child: Text(
                                 'No templates available.',
-                                style: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade500),
+                                style: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                               ),
                             ),
                           )
@@ -135,9 +135,9 @@ void showWhatsAppTemplateDialog({
                                   child: Ink(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.shade50,
+                                      color: appSurfaceSubtle,
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.grey.shade200),
+                                      border: Border.all(color: appBorder),
                                     ),
                                     child: Row(
                                       children: [
@@ -169,21 +169,21 @@ void showWhatsAppTemplateDialog({
                           'Or write a custom message',
                           style: AppTypography.bodyMedium(
                             context,
-                          ).copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade800),
+                          ).copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: appInkSecondary),
                         ),
                         const SizedBox(height: 12),
                         TextField(
                           controller: customController,
                           decoration: InputDecoration(
                             hintText: 'Type your message here...',
-                            hintStyle: AppTypography.bodyMedium(context).apply(color: Colors.grey.shade400),
+                            hintStyle: AppTypography.bodyMedium(context).apply(color: appInkMuted),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
+                              borderSide: BorderSide(color: appBorderStrong),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
+                              borderSide: BorderSide(color: appBorderStrong),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -201,13 +201,13 @@ void showWhatsAppTemplateDialog({
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Icon(Icons.info_outline_rounded, size: 14, color: Colors.grey.shade600),
+                            Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
                             const SizedBox(width: 6),
                             Text(
                               'Tap a tag to insert into your custom message',
                               style: AppTypography.bodyMedium(
                                 context,
-                              ).copyWith(fontSize: 12, color: Colors.grey.shade600),
+                              ).copyWith(fontSize: 12, color: appInkMuted),
                             ),
                           ],
                         ),

@@ -166,6 +166,7 @@ class _AdminDetailState extends State<AdminDetail> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final maxH = MediaQuery.of(context).size.height - (isMobile ? 32 : 64);
     final maxW = math.min(880.0, MediaQuery.of(context).size.width - (isMobile ? 16 : 32));
 
@@ -191,7 +192,7 @@ class _AdminDetailState extends State<AdminDetail> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Material(
-            color: Colors.white,
+            color: appSurface,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -221,7 +222,7 @@ class _AdminDetailState extends State<AdminDetail> {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
@@ -793,7 +794,7 @@ class _AdminDetailState extends State<AdminDetail> {
                 width: cardWidth,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected ? preset.color.withValues(alpha: 0.08) : Colors.white,
+                  color: isSelected ? preset.color.withValues(alpha: 0.08) : appSurface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isSelected ? preset.color : appBorder,
@@ -822,7 +823,7 @@ class _AdminDetailState extends State<AdminDetail> {
                         if (isSelected)
                           Icon(Icons.check_circle_rounded, size: 16, color: preset.color)
                         else
-                          Icon(Icons.radio_button_unchecked_rounded, size: 16, color: Colors.grey.shade300),
+                          Icon(Icons.radio_button_unchecked_rounded, size: 16, color: appBorderStrong),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -882,7 +883,7 @@ class _AdminDetailState extends State<AdminDetail> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
+                  color: appInfoSoft,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -1044,7 +1045,7 @@ class _AdminDetailState extends State<AdminDetail> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isChecked ? const Color(0xFFEEF2FF) : Colors.white,
+                        color: isChecked ? appInfoSoft : appSurface,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: isChecked ? const Color(0xFF6366F1) : appBorder,
@@ -1088,7 +1089,7 @@ class _AdminDetailState extends State<AdminDetail> {
                               onTap: () => _showAddOrEditPermissionDialog(permission: p),
                               child: Padding(
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(Icons.edit_outlined, size: 13, color: Colors.grey.shade400),
+                                child: Icon(Icons.edit_outlined, size: 13, color: appInkMuted),
                               ),
                             ),
                           ],
@@ -1123,7 +1124,7 @@ class _AdminDetailState extends State<AdminDetail> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEEF2FF),
+                    color: appInfoSoft,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -1287,7 +1288,7 @@ class _AdminDetailState extends State<AdminDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(

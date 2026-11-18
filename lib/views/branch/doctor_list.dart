@@ -109,7 +109,7 @@ class _DoctorListState extends State<DoctorList> {
                                           isHorizontalScrollBarVisible: true,
                                           isVerticalScrollBarVisible: true,
                                           columns: columns(),
-                                          headingRowColor: WidgetStateProperty.all(Colors.white),
+                                          headingRowColor: WidgetStateProperty.all(appTableHeaderBg),
                                           headingRowHeight: 51,
                                           decoration: const BoxDecoration(),
                                           border: TableBorder(
@@ -142,7 +142,7 @@ class _DoctorListState extends State<DoctorList> {
                                             )
                                               DataRow(
                                                 color: WidgetStateProperty.all(
-                                                  index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+                                                  index % 2 == 1 ? appSurface : appTableRowAlt,
                                                 ),
                                                 cells: [
                                                   DataCell(

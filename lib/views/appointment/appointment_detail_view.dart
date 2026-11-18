@@ -31,6 +31,7 @@ class AppointmentDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final data = response?.data;
     final maxH = MediaQuery.of(context).size.height - (isMobile ? 32 : 64);
     final maxW = math.min(840.0, MediaQuery.of(context).size.width - 16);
@@ -75,7 +76,7 @@ class AppointmentDetailsView extends StatelessWidget {
                               ],
                             ),
                       const SizedBox(height: 20),
-                      const Divider(color: Color(0xFFF3F4F6), height: 1),
+                      Divider(color: appSurfaceSubtle, height: 1),
                       const SizedBox(height: 20),
                       // Fee row
                       isMobile
@@ -99,14 +100,14 @@ class AppointmentDetailsView extends StatelessWidget {
                       if (data?.appointmentRating != null ||
                           (data?.appointmentFeedback != null && data!.appointmentFeedback!.isNotEmpty)) ...[
                         const SizedBox(height: 20),
-                        const Divider(color: Color(0xFFF3F4F6), height: 1),
+                        Divider(color: appSurfaceSubtle, height: 1),
                         const SizedBox(height: 20),
                         _feedbackSection(context, data),
                       ],
                       // Transfer history timeline
                       if (data?.transferHistory != null && data!.transferHistory!.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        const Divider(color: Color(0xFFF3F4F6), height: 1),
+                        Divider(color: appSurfaceSubtle, height: 1),
                         const SizedBox(height: 20),
                         _transferHistorySection(context, data.transferHistory!),
                       ],
@@ -251,7 +252,7 @@ class AppointmentDetailsView extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(isMobile ? 12 : 20, 14, 8, 14),
       decoration: BoxDecoration(
         color: appCanvas,
-        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
@@ -270,7 +271,7 @@ class AppointmentDetailsView extends StatelessWidget {
                 if (data?.appointmentId != null)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(6)),
                     child: Text(
                       '#${data!.appointmentId!.substring(0, math.min(8, data.appointmentId!.length)).toUpperCase()}',
                       style: TextStyle(fontSize: 11, color: appInkMuted, fontFamily: 'monospace'),
@@ -912,7 +913,7 @@ class AppointmentDetailsView extends StatelessWidget {
                 width: 140,
                 child: Text(
                   'Original Appt',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ),
               Expanded(
@@ -1009,7 +1010,7 @@ class AppointmentDetailsView extends StatelessWidget {
                 (i) => Icon(
                   i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
                   size: 18,
-                  color: i < rating ? const Color(0xFFF59E0B) : Colors.grey.shade300,
+                  color: i < rating ? const Color(0xFFF59E0B) : appBorderStrong,
                 ),
               ),
               const SizedBox(width: 6),
@@ -1127,13 +1128,13 @@ class AppointmentDetailsView extends StatelessWidget {
       child: InkWell(
         onTap: () => _copyToClipboard(context, text, label),
         borderRadius: BorderRadius.circular(4),
-        hoverColor: const Color(0xFFEEF2FF),
+        hoverColor: appInfoSoft,
         child: Padding(
           padding: const EdgeInsets.all(3.0),
           child: Icon(
             Icons.copy_rounded,
             size: 13,
-            color: Colors.grey[400],
+            color: appInkMuted,
           ),
         ),
       ),
@@ -1146,7 +1147,7 @@ class AppointmentDetailsView extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(6),
-        hoverColor: const Color(0xFFEEF2FF),
+        hoverColor: appInfoSoft,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           child: Row(

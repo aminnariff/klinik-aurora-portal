@@ -38,10 +38,14 @@ Color get secondaryAccessibleText =>
     _activeIsDark ? const Color(0xFF6AD1E3) : const Color(0xFF007A93);
 
 // Live Theme-Aware Semantic Surface, Border & Ink Tokens (Light & Dark Mode)
+bool get appIsDarkMode => _activeIsDark;
 Color get appCanvas => _activeIsDark ? const Color(0xFF0B1217) : const Color(0xFFF6F8FA);
 Color get appSurface => _activeIsDark ? const Color(0xFF111B22) : const Color(0xFFFFFFFF);
 Color get appSurfaceSubtle => _activeIsDark ? const Color(0xFF17242D) : const Color(0xFFF1F5F9);
 Color get appSurfaceElevated => _activeIsDark ? const Color(0xFF1C2B36) : const Color(0xFFFFFFFF);
+Color get appTableHeaderBg => _activeIsDark ? const Color(0xFF15212B) : const Color(0xFFF8FAFC);
+Color get appTableRowAlt => _activeIsDark ? const Color(0xFF142029) : const Color(0xFFFAFAFC);
+Color get appInputFill => _activeIsDark ? const Color(0xFF0E171E) : const Color(0xFFFFFFFF);
 Color get appBorder => _activeIsDark ? const Color(0xFF243644) : const Color(0xFFE2E8F0);
 Color get appBorderStrong => _activeIsDark ? const Color(0xFF334B5E) : const Color(0xFFCBD5E1);
 Color get appInkPrimary => _activeIsDark ? const Color(0xFFF1F5F9) : const Color(0xFF0F172A);

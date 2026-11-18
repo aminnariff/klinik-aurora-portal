@@ -19,6 +19,7 @@ class SuperadminDashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Consumer3<DashboardController, BranchPerformanceController, ServicePerformanceController>(
       builder: (context, dashCtrl, branchCtrl, serviceCtrl, _) {
         final data = dashCtrl.dashboardResponse?.data;

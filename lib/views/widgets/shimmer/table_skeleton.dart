@@ -19,9 +19,10 @@ class AppTableSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Shimmer.fromColors(
       baseColor: appSurfaceSubtle, // slate-100
-      highlightColor: Colors.white,
+      highlightColor: shimmerHighlightColor,
       period: const Duration(milliseconds: 1400),
       child: Padding(
         padding: padding,

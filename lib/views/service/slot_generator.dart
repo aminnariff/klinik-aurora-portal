@@ -114,7 +114,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
               const SizedBox(height: 8),
               Text(
                 'Follow these steps to generate a complex schedule in seconds:',
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 13, color: appInkMuted),
               ),
               const SizedBox(height: 24),
               _guideStep(
@@ -195,7 +195,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
               children: [
                 Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 4),
-                Text(description, style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.4)),
+                Text(description, style: TextStyle(fontSize: 12, color: appInkMuted, height: 1.4)),
               ],
             ),
           ),
@@ -233,7 +233,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                       Text('Weekly Slot Generator', style: AppTypography.displayMedium(context)),
                       Text(
                         'Fast-track your schedule by syncing working hours across days.',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 12, color: appInkMuted),
                       ),
                     ],
                   ),
@@ -260,7 +260,7 @@ class _WeeklySlotGeneratorState extends State<WeeklySlotGenerator> {
                         icon: Icons.unarchive_rounded,
                         label: 'Load',
                         onTap: _loadAllSlotsFromPrefs,
-                        color: Colors.grey[600]!,
+                        color: appInkMuted,
                       ),
                     ],
                   ),

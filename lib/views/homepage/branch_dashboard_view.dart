@@ -15,6 +15,7 @@ class BranchDashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Consumer<BranchOperationsController>(
       builder: (context, controller, _) {
         final data = controller.branchOperationsResponse?.data;
@@ -814,7 +815,7 @@ class BranchDashboardView extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFF0FDF4),
+              color: appSuccessSoft,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: const Color(0xFFBBF7D0)),
             ),

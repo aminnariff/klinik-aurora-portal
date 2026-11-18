@@ -47,7 +47,7 @@ class _ChannelCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isSelected ? primary.withAlpha(15) : Colors.white,
+            color: isSelected ? primary.withAlpha(15) : appSurface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: isSelected ? primary : appBorder, width: isSelected ? 2 : 1),
           ),

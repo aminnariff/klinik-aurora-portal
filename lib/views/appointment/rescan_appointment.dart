@@ -120,7 +120,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                   label: Text('$mins mins'),
                                   selected: isSelected,
                                   selectedColor: primary,
-                                  backgroundColor: const Color(0xFFF3F4F6),
+                                  backgroundColor: appSurfaceSubtle,
                                   labelStyle: TextStyle(
                                     color: isSelected ? Colors.white : appInkSecondary,
                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,

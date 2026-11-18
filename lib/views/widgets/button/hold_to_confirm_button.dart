@@ -87,6 +87,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return AnimatedScale(
       scale: _isHolding ? 0.97 : 1.0,
       duration: _isHolding ? EmilMotion.pressDuration : EmilMotion.releaseDuration,

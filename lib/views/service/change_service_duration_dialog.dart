@@ -270,6 +270,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final serviceName = widget.serviceBranch.serviceName ?? 'Service';
     final branchName = widget.serviceBranch.branchName ?? 'Branch';
     final isOverridden = _hasCustomOverride;
@@ -316,7 +317,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                           const SizedBox(height: 2),
                           Text(
                             '$serviceName • $branchName',
-                            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -354,7 +355,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                               const SizedBox(width: 8),
                               Text(
                                 'HQ Standard Duration:',
-                                style: TextStyle(fontSize: 13, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                                style: TextStyle(fontSize: 13, color: appInkSecondary, fontWeight: FontWeight.w500),
                               ),
                               const Spacer(),
                               Container(
@@ -381,7 +382,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                               const SizedBox(width: 8),
                               Text(
                                 'Current Status:',
-                                style: TextStyle(fontSize: 13, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                                style: TextStyle(fontSize: 13, color: appInkSecondary, fontWeight: FontWeight.w500),
                               ),
                               const Spacer(),
                               Container(
@@ -429,7 +430,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                             duration: const Duration(milliseconds: 150),
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
-                              color: isSelected ? primary.withAlpha(25) : Colors.white,
+                              color: isSelected ? primary.withAlpha(25) : appSurface,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: isSelected ? primary : appBorderStrong,
@@ -532,7 +533,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF3F4F6),
+                        color: appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
@@ -541,7 +542,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                           const SizedBox(width: 6),
                           Text(
                             'Will be set to: ',
-                            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: 12, color: appInkMuted),
                           ),
                           Text(
                             _currentConfiguredDuration,
@@ -592,7 +593,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                         ),
                                         Text(
                                           'Configure separate weekday, weekend, or date-specific durations',
-                                          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                                          style: TextStyle(fontSize: 11, color: appInkMuted),
                                         ),
                                       ],
                                     ),
@@ -639,7 +640,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                             ),
                                             Text(
                                               'Overrides standard duration on weekdays',
-                                              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                              style: TextStyle(fontSize: 11, color: appInkMuted),
                                             ),
                                           ],
                                         ),
@@ -694,7 +695,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                             ),
                                             Text(
                                               'Overrides standard duration on weekends',
-                                              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                              style: TextStyle(fontSize: 11, color: appInkMuted),
                                             ),
                                           ],
                                         ),
@@ -749,7 +750,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                           ),
                                           Text(
                                             'For promotional campaigns or special clinic events',
-                                            style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                            style: TextStyle(fontSize: 11, color: appInkMuted),
                                           ),
                                         ],
                                       ),
@@ -915,7 +916,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
-                      child: Text('Cancel', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                      child: Text('Cancel', style: TextStyle(color: appInkSecondary, fontSize: 13)),
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(

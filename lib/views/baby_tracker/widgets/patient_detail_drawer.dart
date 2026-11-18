@@ -233,7 +233,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                   tooltip: 'Buka WhatsApp',
                   icon: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF059669), size: 18),
                   style: IconButton.styleFrom(
-                    backgroundColor: const Color(0xFFF0FDF4),
+                    backgroundColor: appSuccessSoft,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
@@ -368,7 +368,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.directions_walk_rounded, size: 40, color: Colors.grey.shade400),
+              Icon(Icons.directions_walk_rounded, size: 40, color: appInkMuted),
               const SizedBox(height: 10),
               Text(
                 _trackerError ?? 'Tiada rekod tendangan.',
@@ -637,7 +637,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isChecked ? appSurfaceSubtle : Colors.white,
+                    color: isChecked ? appSurfaceSubtle : appSurface,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: isChecked ? appBorder : appBorderStrong,

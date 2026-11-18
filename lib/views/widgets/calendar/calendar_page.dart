@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class CalendarPage extends StatefulWidget {
   final int startMonth;
@@ -25,6 +26,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     int displayMonth = widget.startMonth + currentMonthIndex;
     int displayYear = widget.year + ((displayMonth - 1) ~/ 12);
     displayMonth = ((displayMonth - 1) % 12) + 1;
@@ -47,7 +49,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 dayLabels[index],
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: (index == 0 || index == 6) ? Colors.grey : Colors.black,
+                  color: (index == 0 || index == 6) ? Colors.grey : appInkPrimary,
                 ),
               ),
             ),
@@ -76,12 +78,12 @@ class _CalendarPageState extends State<CalendarPage> {
           final isWeekend = (j == 0 || j == 6);
           Color textColor =
               isPast
-                  ? Colors.grey.shade400
+                  ? appInkMuted
                   : isWeekend
                   ? Colors.grey
-                  : Colors.black;
+                  : appInkPrimary;
 
-          // textColor = (j == 0 || j == 6) ? Colors.grey : Colors.black;
+          // textColor = (j == 0 || j == 6) ? Colors.grey : appInkPrimary;
 
           weekRow.add(
             GestureDetector(

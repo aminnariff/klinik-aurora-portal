@@ -25,6 +25,7 @@ class DashboardMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),

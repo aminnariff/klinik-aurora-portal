@@ -55,6 +55,7 @@ class _ButtonState extends State<Button> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final effectiveBorderRadius = widget.borderRadius ?? 8.0;
     final reducedMotion = MediaQuery.disableAnimationsOf(context);
     final effectiveGradient = widget.gradient ??

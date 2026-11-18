@@ -57,6 +57,7 @@ class AppointmentStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     // fallback to grey/Unknown if status is not found or null
     final color = appointmentStatusColors[status] ?? appInkMuted;
     String label = getAppointmentStatusLabel(status);

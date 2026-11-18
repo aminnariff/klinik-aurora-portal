@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:klinik_aurora_portal/config/app_theme_preset.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/theme.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_queue_controller.dart';
 import 'package:klinik_aurora_portal/controllers/audit_log/audit_log_controller.dart';
@@ -7,6 +11,7 @@ import 'package:klinik_aurora_portal/controllers/baby_tracker/patient_recall_con
 import 'package:klinik_aurora_portal/controllers/dashboard/eod_handover_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/utilization_heatmap_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/patient_summary_controller.dart';
+import 'package:klinik_aurora_portal/views/widgets/layout/deferred_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 
 void main() {
@@ -227,6 +232,110 @@ void main() {
       expect(find.text('GLOBAL NAVIGATION'), findsOneWidget);
       expect(find.text('CLINIC ACTIONS'), findsOneWidget);
       expect(find.text('⌘K'), findsOneWidget);
+    });
+  });
+
+  group('DeferredPage route switching regression', () {
+    testWidgets('never invokes target builder before target loadLibrary completes', (tester) async {
+      bool libALoaded = false;
+      bool libBLoaded = false;
+      final libBCompleter = Completer<void>();
+
+      Widget wrap(Widget child) => MaterialApp(
+            home: Builder(
+              builder: (context) => Theme(
+                data: buildDarkTheme(context),
+                child: child,
+              ),
+            ),
+          );
+
+      await tester.pumpWidget(
+        wrap(
+          DeferredPage(
+            libraryKey: 'test-lib-a',
+            loadLibrary: () async {
+              libALoaded = true;
+            },
+            builder: (_) {
+              if (!libALoaded) throw StateError('libA not loaded');
+              return const Text('Loaded A');
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Loaded A'), findsOneWidget);
+
+      // Switch to libB in the same widget slot (no key) — must wait for libBCompleter
+      await tester.pumpWidget(
+        wrap(
+          DeferredPage(
+            libraryKey: 'test-lib-b',
+            loadLibrary: () async {
+              await libBCompleter.future;
+              libBLoaded = true;
+            },
+            builder: (_) {
+              if (!libBLoaded) throw StateError('DeferredLoadException: libB not loaded');
+              return const Text('Loaded B');
+            },
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Loaded B'), findsNothing);
+
+      libBCompleter.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Loaded B'), findsOneWidget);
+    });
+  });
+
+  group('Dark mode semantic surface & ink tokens', () {
+    tearDown(() {
+      syncActiveBrandTheme(preset: AuroraThemePreset.auroraPlum, isDark: false);
+    });
+
+    test('dark mode keeps all table/dialog surfaces dark and ink light', () {
+      syncActiveBrandTheme(preset: AuroraThemePreset.auroraPlum, isDark: true);
+
+      for (final surface in [
+        appCanvas,
+        appSurface,
+        appSurfaceSubtle,
+        appSurfaceElevated,
+        appTableHeaderBg,
+        appTableRowAlt,
+        appInputFill,
+      ]) {
+        expect(surface.computeLuminance(), lessThan(0.08));
+      }
+
+      for (final ink in [appInkPrimary, appInkSecondary, appInkMuted]) {
+        expect(ink.computeLuminance(), greaterThan(0.30));
+      }
+    });
+
+    test('light mode keeps all table/dialog surfaces light and ink dark', () {
+      syncActiveBrandTheme(preset: AuroraThemePreset.auroraPlum, isDark: false);
+
+      for (final surface in [
+        appCanvas,
+        appSurface,
+        appSurfaceSubtle,
+        appSurfaceElevated,
+        appTableHeaderBg,
+        appTableRowAlt,
+        appInputFill,
+      ]) {
+        expect(surface.computeLuminance(), greaterThan(0.85));
+      }
+
+      for (final ink in [appInkPrimary, appInkSecondary, appInkMuted]) {
+        expect(ink.computeLuminance(), lessThan(0.25));
+      }
     });
   });
 }

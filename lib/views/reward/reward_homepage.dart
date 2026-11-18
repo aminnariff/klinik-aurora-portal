@@ -106,7 +106,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
 
   Widget _topBar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       margin: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -122,8 +122,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
                 },
                 decoration: InputDecoration(
                   hintText: 'Search rewards...',
-                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
+                  hintStyle: TextStyle(color: appInkMuted, fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: appInkMuted, size: 20),
                   filled: true,
                   fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
@@ -146,7 +146,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
           _toolbarButton(
             icon: Icons.refresh_rounded,
             label: 'Reset',
-            color: Colors.grey[600]!,
+            color: appInkMuted,
             onTap: () {
               _searchController.clear();
               resetAllFilter();
@@ -201,7 +201,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         return Align(
           alignment: Alignment.centerRight,
           child: Material(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(16),
               bottomLeft: Radius.circular(16),
@@ -359,7 +359,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                         if (states.contains(WidgetState.hovered)) {
                           return appSurfaceSubtle;
                         }
-                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                        return i % 2 == 0 ? appSurface : appTableRowAlt;
                       }),
                       cells: [
                         DataCell(_rewardNameCell(items[i])),
@@ -451,7 +451,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F9FF),
+        color: appInfoSoft,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFBAE6FD)),
       ),
@@ -587,8 +587,8 @@ class _RewardHomepageState extends State<RewardHomepage> {
   Widget _tableFooter() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF3F4F6))),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
@@ -607,7 +607,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
               if (!isMobile && !isTablet)
                 Text(
                   'Rows per page: ',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               PerPageWidget(
                 _pageSize.toString(),
@@ -623,7 +623,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                 const SizedBox(width: 8),
                 Text(
                   '${((_page) * _pageSize) - _pageSize + 1}–${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ],
@@ -675,7 +675,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                   _MobileActionButton(
                     icon: Icons.refresh_rounded,
                     tooltip: 'Reset',
-                    color: Colors.grey[600]!,
+                    color: appInkMuted,
                     onTap: () {
                       _searchController.clear();
                       resetAllFilter();
@@ -727,7 +727,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(color: appBorder),
         ),
-        color: Colors.white,
+        color: appSurface,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(

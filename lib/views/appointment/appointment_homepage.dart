@@ -436,7 +436,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     }
 
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 8),
       child: Row(
         children: [
@@ -505,7 +505,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             color: appInkMuted,
             tooltip: 'Reset filters',
             style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFF3F4F6),
+              backgroundColor: appSurfaceSubtle,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               padding: const EdgeInsets.all(8),
             ),
@@ -563,7 +563,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Material(
-              color: Colors.white,
+              color: appSurface,
               elevation: 8,
               borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
               child: SizedBox(
@@ -1152,7 +1152,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isMobile ? Colors.transparent : Colors.white,
+                    color: isMobile ? Colors.transparent : appSurface,
                     borderRadius: BorderRadius.circular(12),
                     border: isMobile ? null : Border.all(color: appBorder),
                   ),
@@ -1169,7 +1169,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           isHorizontalScrollBarVisible: true,
                           isVerticalScrollBarVisible: false,
                           fixedLeftColumns: 1,
-                          fixedColumnsColor: Colors.white,
+                          fixedColumnsColor: appSurface,
                           fixedCornerColor: appCanvas,
                           columns: columns(),
                           headingRowColor: WidgetStateProperty.all(appCanvas),
@@ -1301,7 +1301,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFF3F4F6),
+                                          color: appSurfaceSubtle,
                                           borderRadius: BorderRadius.circular(4),
                                           border: Border.all(color: appBorder, width: 0.8),
                                         ),
@@ -1319,7 +1319,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF3F4F6),
+                                    color: appSurfaceSubtle,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -1446,7 +1446,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   DataRow2 _buildDataRow(BuildContext context, Data item, int index, AuthController authController) {
     return DataRow2(
       onTap: () => _handleMenuSelection('update', item),
-      color: WidgetStateProperty.all(index.isEven ? Colors.white : const Color(0xFFFAFAFA)),
+      color: WidgetStateProperty.all(index.isEven ? appSurface : appTableRowAlt),
       cells: [
         DataCell(
           Builder(
@@ -1541,7 +1541,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: item.rosterConflict == true ? appDangerSoft : const Color(0xFFF3F4F6),
+              color: item.rosterConflict == true ? appDangerSoft : appSurfaceSubtle,
               borderRadius: BorderRadius.circular(6),
               border: item.rosterConflict == true ? Border.all(color: const Color(0xFFEF4444), width: 1) : null,
             ),
@@ -1647,7 +1647,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               PopupMenuButton<String>(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 offset: const Offset(0, 32),
-                color: Colors.white,
+                color: appSurfaceElevated,
                 tooltip: '',
                 onSelected: (value) => _handleMenuSelection(value, item),
                 itemBuilder: (_) {
@@ -1783,7 +1783,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
 
   Widget _buildPaginationBar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
       child: Row(
         children: [
@@ -2001,7 +2001,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                     itemCount: serviceList.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                    separatorBuilder: (_, _) => Divider(height: 1, color: appSurfaceSubtle),
                     itemBuilder: (context, i) {
                       final item = serviceList[i];
                       return ListTile(
@@ -2009,7 +2009,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE0F2FE),
+                            color: appInfoSoft,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(Icons.medical_services_rounded, size: 16, color: Color(0xFF0284C7)),
@@ -2370,7 +2370,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
 
             // Segmented Category Filter Bar + Expand/Collapse All
             Container(
-              color: Colors.white,
+              color: appSurface,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
@@ -2652,7 +2652,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4),
+        color: appSuccessSoft,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF86EFAC)),
       ),

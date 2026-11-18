@@ -310,7 +310,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFFF1F5), Color(0xFFFFFFFF)],
+          colors: [appDangerSoft, Color(0xFFFFFFFF)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -470,7 +470,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                 isActive: _isHospitalBag,
                 onTap: () => setState(() => _isHospitalBag = !_isHospitalBag),
                 activeColor: const Color(0xFF0284C7),
-                activeBgColor: const Color(0xFFF0F9FF),
+                activeBgColor: appInfoSoft,
                 activeIcon: Icons.medical_services_rounded,
                 inactiveIcon: Icons.medical_services_outlined,
                 title: 'Beg Hospital',
@@ -499,7 +499,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
         decoration: BoxDecoration(
-          color: isActive ? activeBgColor : Colors.white,
+          color: isActive ? activeBgColor : appSurface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isActive ? activeColor : appBorder,
@@ -559,7 +559,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
   Widget _buildRightColumn() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF9FB),
+        color: appDangerSoft,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFFFE4E6), width: 1.2),
       ),
@@ -584,7 +584,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE0F2FE),
+                  color: appInfoSoft,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(

@@ -217,7 +217,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(6)),
                     child: Text(
                       'All Branches',
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
@@ -270,7 +270,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFF2196F3) : Colors.white,
+            color: selected ? const Color(0xFF2196F3) : appSurface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: selected ? const Color(0xFF2196F3) : appBorder),
             boxShadow: selected
@@ -582,14 +582,14 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.store_outlined, size: 48, color: Colors.grey.shade300),
+            Icon(Icons.store_outlined, size: 48, color: appBorderStrong),
             const SizedBox(height: 12),
             Text(
               'No branch data for this period',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 14, color: appInkMuted, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 4),
-            Text('Try selecting a different date range', style: TextStyle(fontSize: 12, color: Colors.grey.shade400)),
+            Text('Try selecting a different date range', style: TextStyle(fontSize: 12, color: appInkMuted)),
           ],
         ),
       ),
@@ -625,7 +625,7 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
         ),
         for (int i = 0; i < data.length; i++)
           TableRow(
-            decoration: BoxDecoration(color: i.isEven ? Colors.white : const Color(0xFFFAFAFA)),
+            decoration: BoxDecoration(color: i.isEven ? appSurface : appTableRowAlt),
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

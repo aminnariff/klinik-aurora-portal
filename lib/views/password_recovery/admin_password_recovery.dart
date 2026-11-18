@@ -248,6 +248,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     if (_currentToken == null || _currentToken!.isEmpty) {
       return _invalidSessionScreen();
     }
@@ -347,13 +348,13 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.shield_outlined, size: 14, color: Colors.grey.shade500),
+                            Icon(Icons.shield_outlined, size: 14, color: appInkMuted),
                             const SizedBox(width: 6),
                             Text(
                               'Authorized Healthcare Personnel · 256-bit Encrypted Session',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade500,
+                                color: appInkMuted,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -382,7 +383,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
               height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: appSurface, width: 2),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
@@ -416,7 +417,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade500,
+                    color: appInkMuted,
                   ),
                 ),
               ],
@@ -482,7 +483,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
 
     final submittedPinTheme = defaultPinTheme.copyWith(
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4),
+        color: appSuccessSoft,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF86EFAC), width: 1.5),
       ),
@@ -578,7 +579,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF0FDF4),
+              color: appSuccessSoft,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFFBBF7D0)),
             ),
@@ -646,14 +647,14 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.schedule_rounded, size: 12, color: Colors.grey.shade600),
+                          Icon(Icons.schedule_rounded, size: 12, color: appInkMuted),
                           const SizedBox(width: 4),
                           Text(
                             'Resend in ${_countdown}s',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade600,
+                              color: appInkMuted,
                             ),
                           ),
                         ],
@@ -810,7 +811,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             children: [
               Text(
                 'Password strength:',
-                style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 11.5, color: appInkMuted, fontWeight: FontWeight.w500),
               ),
               Text(
                 _strengthLabel,
@@ -961,7 +962,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isMet ? appSuccessSoft : Colors.white,
+        color: isMet ? appSuccessSoft : appSurface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isMet ? const Color(0xFFA7F3D0) : appBorder,
@@ -973,7 +974,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
           Icon(
             isMet ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
             size: 13,
-            color: isMet ? const Color(0xFF059669) : Colors.grey.shade400,
+            color: isMet ? const Color(0xFF059669) : appInkMuted,
           ),
           const SizedBox(width: 6),
           Expanded(
@@ -982,7 +983,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isMet ? FontWeight.w700 : FontWeight.w500,
-                color: isMet ? const Color(0xFF047857) : Colors.grey.shade600,
+                color: isMet ? const Color(0xFF047857) : appInkMuted,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -1140,7 +1141,7 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             decoration: BoxDecoration(
               color: appSurface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white, width: 1.5),
+              border: Border.all(color: appSurface, width: 1.5),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),

@@ -132,7 +132,7 @@ class _PointHomepageState extends State<PointHomepage> {
             // ── Mobile Header & Segmented Tab Switcher ──
             Container(
               padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 12),
-              color: Colors.white,
+              color: appSurface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -152,7 +152,7 @@ class _PointHomepageState extends State<PointHomepage> {
                             onTap: () => setState(() => _selectedMobileTab = 0),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: _selectedMobileTab == 0 ? Colors.white : Colors.transparent,
+                                color: _selectedMobileTab == 0 ? appSurface : Colors.transparent,
                                 borderRadius: BorderRadius.circular(9),
                                 boxShadow: _selectedMobileTab == 0
                                     ? [
@@ -171,7 +171,7 @@ class _PointHomepageState extends State<PointHomepage> {
                                   Icon(
                                     Icons.receipt_long_rounded,
                                     size: 18,
-                                    color: _selectedMobileTab == 0 ? secondaryColor : Colors.grey.shade600,
+                                    color: _selectedMobileTab == 0 ? secondaryColor : appInkMuted,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -179,7 +179,7 @@ class _PointHomepageState extends State<PointHomepage> {
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: _selectedMobileTab == 0 ? FontWeight.w600 : FontWeight.w500,
-                                      color: _selectedMobileTab == 0 ? secondaryColor : Colors.grey.shade700,
+                                      color: _selectedMobileTab == 0 ? secondaryColor : appInkSecondary,
                                     ),
                                   ),
                                 ],
@@ -192,7 +192,7 @@ class _PointHomepageState extends State<PointHomepage> {
                             onTap: () => setState(() => _selectedMobileTab = 1),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: _selectedMobileTab == 1 ? Colors.white : Colors.transparent,
+                                color: _selectedMobileTab == 1 ? appSurface : Colors.transparent,
                                 borderRadius: BorderRadius.circular(9),
                                 boxShadow: _selectedMobileTab == 1
                                     ? [
@@ -211,7 +211,7 @@ class _PointHomepageState extends State<PointHomepage> {
                                   Icon(
                                     Icons.history_rounded,
                                     size: 18,
-                                    color: _selectedMobileTab == 1 ? const Color(0xFF2ECC40) : Colors.grey.shade600,
+                                    color: _selectedMobileTab == 1 ? const Color(0xFF2ECC40) : appInkMuted,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -219,7 +219,7 @@ class _PointHomepageState extends State<PointHomepage> {
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: _selectedMobileTab == 1 ? FontWeight.w600 : FontWeight.w500,
-                                      color: _selectedMobileTab == 1 ? const Color(0xFF2ECC40) : Colors.grey.shade700,
+                                      color: _selectedMobileTab == 1 ? const Color(0xFF2ECC40) : appInkSecondary,
                                     ),
                                   ),
                                 ],
@@ -305,13 +305,13 @@ class _PointHomepageState extends State<PointHomepage> {
                           style: AppTypography.bodyLarge(context).apply(fontWeightDelta: 2)),
                       Text(
                         'Search patient by Mobile or IC to award walk-in points.',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(fontSize: 12, color: appInkMuted),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.help_outline_rounded, color: Colors.grey.shade600, size: 20),
+                  icon: Icon(Icons.help_outline_rounded, color: appInkMuted, size: 20),
                   tooltip: 'How Points Work',
                   onPressed: _showTermsAndConditions,
                 ),
@@ -422,11 +422,11 @@ class _PointHomepageState extends State<PointHomepage> {
           ),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 17, color: Colors.grey.shade700),
+        Icon(icon, size: 17, color: appInkSecondary),
         const SizedBox(width: 6),
         Text(
           title,
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade800),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: appInkSecondary),
         ),
       ],
     );
@@ -478,7 +478,7 @@ class _PointHomepageState extends State<PointHomepage> {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? appSurface : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
               ? [
@@ -496,7 +496,7 @@ class _PointHomepageState extends State<PointHomepage> {
             Icon(
               icon,
               size: 15,
-              color: isSelected ? secondaryColor : Colors.grey.shade600,
+              color: isSelected ? secondaryColor : appInkMuted,
             ),
             const SizedBox(width: 6),
             Text(
@@ -504,7 +504,7 @@ class _PointHomepageState extends State<PointHomepage> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? secondaryColor : Colors.grey.shade700,
+                color: isSelected ? secondaryColor : appInkSecondary,
               ),
             ),
           ],
@@ -531,11 +531,11 @@ class _PointHomepageState extends State<PointHomepage> {
                   style: const TextStyle(fontSize: 13),
                   decoration: InputDecoration(
                     hintText: hint,
-                    hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+                    hintStyle: TextStyle(fontSize: 12, color: appInkMuted),
                     prefixIcon: Icon(
                       isPhone ? Icons.phone_android_rounded : Icons.badge_outlined,
                       size: 17,
-                      color: Colors.grey.shade600,
+                      color: appInkMuted,
                     ),
                     prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                     isDense: true,
@@ -688,7 +688,7 @@ class _PointHomepageState extends State<PointHomepage> {
                 icon: const Icon(Icons.swap_horiz_rounded, size: 15),
                 label: const Text('Change', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.grey.shade700,
+                  foregroundColor: appInkSecondary,
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -741,11 +741,11 @@ class _PointHomepageState extends State<PointHomepage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 11, color: Colors.grey.shade600),
+          Icon(icon, size: 11, color: appInkMuted),
           const SizedBox(width: 4),
           Text(
             text,
-            style: TextStyle(fontSize: 10.5, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 10.5, color: appInkSecondary, fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -767,7 +767,7 @@ class _PointHomepageState extends State<PointHomepage> {
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
             child: Text(
               '${patients.length} matching patients found. Select one to award points:',
-              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 11.5, color: appInkMuted, fontWeight: FontWeight.w500),
             ),
           ),
           const Divider(height: 1),
@@ -794,7 +794,7 @@ class _PointHomepageState extends State<PointHomepage> {
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5)),
                   subtitle: Text(
                     '${item.userPhone ?? ''}  ·  IC: ${item.userNric ?? 'N/A'}  ·  ${item.totalPoint ?? 0} pts',
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 11, color: appInkMuted),
                   ),
                   trailing: ElevatedButton(
                     onPressed: () {
@@ -831,12 +831,12 @@ class _PointHomepageState extends State<PointHomepage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, color: Colors.grey.shade500, size: 15),
+          Icon(Icons.info_outline_rounded, color: appInkMuted, size: 15),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Search patient by Mobile Number or IC above to view balance and award points.',
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 11, color: appInkMuted),
             ),
           ),
         ],
@@ -852,7 +852,7 @@ class _PointHomepageState extends State<PointHomepage> {
       children: [
         Text(
           'Qualifying Items (Bonus Points)',
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
         ),
         const SizedBox(height: 6),
         Wrap(
@@ -866,7 +866,7 @@ class _PointHomepageState extends State<PointHomepage> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? secondaryColor : Colors.grey.shade700,
+                  color: isSelected ? secondaryColor : appInkSecondary,
                 ),
               ),
               selected: isSelected,
@@ -907,7 +907,7 @@ class _PointHomepageState extends State<PointHomepage> {
         gradient: LinearGradient(
           colors: points > 0
               ? [const Color(0xFFFFF8E1), const Color(0xFFFFECB3)]
-              : [const Color(0xFFF5F5F5), const Color(0xFFEEEEEE)],
+              : [appSurfaceSubtle, appSurfaceSubtle],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: points > 0 ? Colors.amber.shade300 : const Color(0xFFE0E0E0)),
@@ -959,8 +959,8 @@ class _PointHomepageState extends State<PointHomepage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF2ECC40),
           foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey.shade200,
-          disabledForegroundColor: Colors.grey.shade500,
+          disabledBackgroundColor: appBorder,
+          disabledForegroundColor: appInkMuted,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: isReady ? 1 : 0,
         ),
@@ -1014,13 +1014,13 @@ class _PointHomepageState extends State<PointHomepage> {
                         ),
                         child: Text(
                           '$_totalCount total',
-                          style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                          style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w500),
                         ),
                       ),
                     const SizedBox(width: 4),
                     IconButton(
                       icon: const Icon(Icons.refresh_rounded, size: 18),
-                      color: Colors.grey.shade600,
+                      color: appInkMuted,
                       tooltip: 'Refresh Log',
                       onPressed: () => runFiltering(),
                     ),
@@ -1077,14 +1077,14 @@ class _PointHomepageState extends State<PointHomepage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.receipt_long_outlined, size: 44, color: Colors.grey.shade300),
+          Icon(Icons.receipt_long_outlined, size: 44, color: appBorderStrong),
           const SizedBox(height: 10),
           Text(
             'No points activity yet',
-            style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w500, fontSize: 13),
+            style: TextStyle(color: appInkMuted, fontWeight: FontWeight.w500, fontSize: 13),
           ),
           const SizedBox(height: 4),
-          Text('Record a payment to award points.', style: TextStyle(color: Colors.grey.shade400, fontSize: 11)),
+          Text('Record a payment to award points.', style: TextStyle(color: appInkMuted, fontSize: 11)),
         ],
       ),
     );
@@ -1131,7 +1131,7 @@ class _PointHomepageState extends State<PointHomepage> {
                             const SizedBox(height: 2),
                             Text(
                               item.pointDescription!,
-                              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                              style: TextStyle(fontSize: 11, color: appInkMuted),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1139,7 +1139,7 @@ class _PointHomepageState extends State<PointHomepage> {
                           const SizedBox(height: 4),
                           Text(
                             'Recorded by ${item.createdByFullname ?? 'Staff'}  ·  ${dateConverter(item.createdDate) ?? 'N/A'}',
-                            style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+                            style: TextStyle(fontSize: 11, color: appInkMuted),
                           ),
                         ],
                       ),
@@ -1178,12 +1178,12 @@ class _PointHomepageState extends State<PointHomepage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.info_outline_rounded, size: 14, color: Colors.grey.shade600),
+          Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
               'RM 10 = 1 pt  ·  10 pts = RM 1 discount  ·  12-month expiry',
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -1370,7 +1370,7 @@ class _PointHomepageState extends State<PointHomepage> {
               children: [
                 const Text('•  ', style: TextStyle(color: Colors.grey)),
                 Expanded(
-                  child: Text(bullet, style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.4)),
+                  child: Text(bullet, style: TextStyle(fontSize: 13, color: appInkSecondary, height: 1.4)),
                 ),
               ],
             ),

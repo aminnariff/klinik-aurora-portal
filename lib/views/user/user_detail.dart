@@ -398,6 +398,7 @@ class _UserDetailState extends State<UserDetail> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final maxH = MediaQuery.of(context).size.height - (isMobile ? 32 : 64);
     final maxW = math.min(640.0, MediaQuery.of(context).size.width - 24);
 
@@ -419,7 +420,7 @@ class _UserDetailState extends State<UserDetail> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Material(
-            color: Colors.white,
+            color: appSurface,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -459,7 +460,7 @@ class _UserDetailState extends State<UserDetail> {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 16, 16),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
@@ -469,7 +470,7 @@ class _UserDetailState extends State<UserDetail> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: appInkPrimary,
+              color: primary,
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
@@ -751,7 +752,7 @@ class _UserDetailState extends State<UserDetail> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
         decoration: BoxDecoration(
-          color: isPrimary ? primary.withValues(alpha: 0.08) : Colors.white,
+          color: isPrimary ? primary.withValues(alpha: 0.08) : appSurface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isPrimary ? primary.withValues(alpha: 0.3) : appBorder,
@@ -1346,7 +1347,7 @@ class _UserDetailState extends State<UserDetail> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(

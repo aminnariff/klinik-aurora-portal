@@ -374,7 +374,7 @@ class _Segment extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
+            color: isSelected ? appSurface : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             boxShadow: isSelected ? [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 4)] : null,
           ),

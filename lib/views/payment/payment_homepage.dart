@@ -489,7 +489,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? appInkPrimary : Colors.white,
+            color: selected ? appInkPrimary : appSurface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: selected ? appInkPrimary : appBorder),
             boxShadow: selected
@@ -610,7 +610,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
         subtitle: 'ATV RM $atv',
         icon: Icons.trending_up_rounded,
         accent: const Color(0xFFDF6E98),
-        bg: const Color(0xFFFDF2F8),
+        bg: appDangerSoft,
         valueColor: appInkPrimary,
       ),
     ];
@@ -1196,7 +1196,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDF2F8),
+                  color: appDangerSoft,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: const Color(0xFFFBCFE8)),
                 ),
@@ -1355,14 +1355,14 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade300),
+            Icon(Icons.receipt_long_outlined, size: 48, color: appBorderStrong),
             const SizedBox(height: 12),
             Text(
               'No payment data for this period',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 14, color: appInkMuted, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 4),
-            Text('Try selecting a different date range', style: TextStyle(fontSize: 12, color: Colors.grey.shade400)),
+            Text('Try selecting a different date range', style: TextStyle(fontSize: 12, color: appInkMuted)),
           ],
         ),
       ),
@@ -1562,7 +1562,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             final rowRate = rowTotal > 0 ? (rowSucc / rowTotal) * 100 : 0.0;
 
             return TableRow(
-              decoration: BoxDecoration(color: i.isEven ? Colors.white : const Color(0xFFFAFAFA)),
+              decoration: BoxDecoration(color: i.isEven ? appSurface : appTableRowAlt),
               children: [
                 if (isSuperAdmin)
                   Padding(
@@ -1634,7 +1634,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           decoration: BoxDecoration(
                             color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0
                                 ? appDangerSoft
-                                : const Color(0xFFF3F4F6),
+                                : appSurfaceSubtle,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: (int.tryParse(sortedData[i].failedPayments ?? '0') ?? 0) > 0

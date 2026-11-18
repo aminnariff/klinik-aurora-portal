@@ -37,7 +37,7 @@
 //                 height: isMobile ? 65.h : 60.h,
 //                 child: Card(
 //                   elevation: 2.0,
-//                   color: Colors.white,
+//                   color: appSurface,
 //                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
 //                   // decoration: const BoxDecoration(
 //                   //   borderRadius: BorderRadius.all(Radius.circular(15)),

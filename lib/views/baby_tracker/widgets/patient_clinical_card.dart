@@ -15,6 +15,7 @@ class PatientClinicalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final name = patient['patientName'] ?? 'Pesakit';
     final phone = patient['patientPhone'] ?? '-';
     final branch = patient['branchName'] ?? 'Klinik Aurora';
@@ -283,7 +284,7 @@ class PatientClinicalCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4),
+        color: appSuccessSoft,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: appSuccessSoft),
       ),

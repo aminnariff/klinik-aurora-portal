@@ -177,6 +177,8 @@ final router = GoRouter(
         token ??= state.uri.queryParameters['token'];
         email ??= state.uri.queryParameters['email'];
         return DeferredPage(
+          key: const ValueKey(RouteNames.passwordRecovery),
+          libraryKey: RouteNames.passwordRecovery,
           loadLibrary: password_recovery_lib.loadLibrary,
           builder: (_) => password_recovery_lib.AdminPasswordRecoveryPage(token: token, email: email),
         );
@@ -187,6 +189,8 @@ final router = GoRouter(
       path: RouteNames.deleteAccount,
       builder: (BuildContext context, GoRouterState state) {
         return DeferredPage(
+          key: const ValueKey(RouteNames.deleteAccount),
+          libraryKey: RouteNames.deleteAccount,
           loadLibrary: delete_account_lib.loadLibrary,
           builder: (_) => delete_account_lib.DeleteAccountPage(),
         );
@@ -197,6 +201,8 @@ final router = GoRouter(
       path: RouteNames.privacyPolicy,
       builder: (BuildContext context, GoRouterState state) {
         return DeferredPage(
+          key: const ValueKey(RouteNames.privacyPolicy),
+          libraryKey: RouteNames.privacyPolicy,
           loadLibrary: privacy_policy_lib.loadLibrary,
           builder: (_) => privacy_policy_lib.PrivacyPolicy(),
         );
@@ -207,6 +213,8 @@ final router = GoRouter(
       path: RouteNames.termsAndConditions,
       builder: (BuildContext context, GoRouterState state) {
         return DeferredPage(
+          key: const ValueKey(RouteNames.termsAndConditions),
+          libraryKey: RouteNames.privacyPolicy,
           loadLibrary: privacy_policy_lib.loadLibrary,
           builder: (_) => privacy_policy_lib.TermsAndConditions(),
         );
@@ -217,6 +225,8 @@ final router = GoRouter(
       path: RouteNames.refundPolicy,
       builder: (BuildContext context, GoRouterState state) {
         return DeferredPage(
+          key: const ValueKey(RouteNames.refundPolicy),
+          libraryKey: RouteNames.privacyPolicy,
           loadLibrary: privacy_policy_lib.loadLibrary,
           builder: (_) => privacy_policy_lib.RefundPolicy(),
         );
@@ -241,6 +251,7 @@ final router = GoRouter(
       navigatorKey: _shellNavigatorKey,
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
+          key: state.pageKey,
           child: Homepage(location: state.uri.toString(), child: child),
         );
       },
@@ -250,7 +261,7 @@ final router = GoRouter(
           path: RouteNames.home,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: MainDashboard()));
+            return NoTransitionPage(key: state.pageKey, child: const Scaffold(body: MainDashboard()));
           },
         ),
         GoRoute(
@@ -259,7 +270,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.points),
+                libraryKey: RouteNames.points,
                 loadLibrary: points_lib.loadLibrary,
                 builder: (_) => Scaffold(body: points_lib.PointHomepage()),
               ),
@@ -272,7 +286,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.patients),
+                libraryKey: RouteNames.patients,
                 loadLibrary: user_lib.loadLibrary,
                 builder: (_) => Scaffold(body: user_lib.UserHomepage()),
               ),
@@ -285,7 +302,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.babyTracker),
+                libraryKey: RouteNames.babyTracker,
                 loadLibrary: baby_tracker_lib.loadLibrary,
                 builder: (_) => Scaffold(body: baby_tracker_lib.BabyTrackerHomepage()),
               ),
@@ -298,7 +318,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.rewards),
+                libraryKey: RouteNames.rewards,
                 loadLibrary: reward_lib.loadLibrary,
                 builder: (_) => Scaffold(body: reward_lib.RewardHomepage()),
               ),
@@ -311,7 +334,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.payments),
+                libraryKey: RouteNames.payments,
                 loadLibrary: payment_lib.loadLibrary,
                 builder: (_) => Scaffold(body: payment_lib.PaymentSummaryPage()),
               ),
@@ -324,7 +350,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.branchPaymentSummary),
+                libraryKey: RouteNames.branchPaymentSummary,
                 loadLibrary: branch_summary_lib.loadLibrary,
                 builder: (_) => Scaffold(body: branch_summary_lib.BranchPaymentSummaryPage()),
               ),
@@ -337,7 +366,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.rewardHistory),
+                libraryKey: RouteNames.rewardHistory,
                 loadLibrary: reward_history_lib.loadLibrary,
                 builder: (_) => Scaffold(body: reward_history_lib.RewardHistoryHomepage()),
               ),
@@ -350,7 +382,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.marketing),
+                libraryKey: RouteNames.marketing,
                 loadLibrary: marketing_lib.loadLibrary,
                 builder: (_) => Scaffold(body: marketing_lib.MarketingHomepage()),
               ),
@@ -363,7 +398,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.branches),
+                libraryKey: RouteNames.branches,
                 loadLibrary: branch_lib.loadLibrary,
                 builder: (_) => Scaffold(body: branch_lib.BranchHomepage()),
               ),
@@ -375,7 +413,7 @@ final router = GoRouter(
           path: RouteNames.appointments,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return const NoTransitionPage(child: Scaffold(body: AppointmentHomepage()));
+            return NoTransitionPage(key: state.pageKey, child: const Scaffold(body: AppointmentHomepage()));
           },
         ),
         GoRoute(
@@ -384,7 +422,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.paymentMismatch),
+                libraryKey: RouteNames.paymentMismatch,
                 loadLibrary: payment_mismatch_lib.loadLibrary,
                 builder: (_) => Scaffold(body: payment_mismatch_lib.PaymentMismatchPage()),
               ),
@@ -397,7 +438,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.services),
+                libraryKey: RouteNames.services,
                 loadLibrary: service_lib.loadLibrary,
                 builder: (_) => Scaffold(body: service_lib.ServiceHomepage()),
               ),
@@ -410,7 +454,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.admins),
+                libraryKey: RouteNames.admins,
                 loadLibrary: admin_lib.loadLibrary,
                 builder: (_) => Scaffold(body: admin_lib.AdminHomepage()),
               ),
@@ -423,7 +470,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.promotions),
+                libraryKey: RouteNames.promotions,
                 loadLibrary: promotion_lib.loadLibrary,
                 builder: (_) => Scaffold(body: promotion_lib.PromotionHomepage()),
               ),
@@ -437,7 +487,10 @@ final router = GoRouter(
           pageBuilder: (context, state) {
             final String? branchId = state.extra as String?;
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.doctors),
+                libraryKey: RouteNames.doctors,
                 loadLibrary: doctor_lib.loadLibrary,
                 builder: (_) => Scaffold(body: doctor_lib.DoctorHomepage(branchId: branchId)),
               ),
@@ -450,7 +503,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.vouchers),
+                libraryKey: RouteNames.vouchers,
                 loadLibrary: voucher_lib.loadLibrary,
                 builder: (_) => Scaffold(body: voucher_lib.VoucherHomepage()),
               ),
@@ -463,7 +519,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.queueBoard),
+                libraryKey: RouteNames.queueBoard,
                 loadLibrary: queue_board_lib.loadLibrary,
                 builder: (_) => Scaffold(body: queue_board_lib.QueueBoardPage()),
               ),
@@ -476,7 +535,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.eodHandover),
+                libraryKey: RouteNames.eodHandover,
                 loadLibrary: eod_handover_lib.loadLibrary,
                 builder: (_) => Scaffold(body: eod_handover_lib.EodHandoverPage()),
               ),
@@ -489,7 +551,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.trimesterRecalls),
+                libraryKey: RouteNames.trimesterRecalls,
                 loadLibrary: trimester_recall_lib.loadLibrary,
                 builder: (_) => Scaffold(body: trimester_recall_lib.TrimesterRecallPage()),
               ),
@@ -502,7 +567,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.utilizationHeatmap),
+                libraryKey: RouteNames.utilizationHeatmap,
                 loadLibrary: utilization_lib.loadLibrary,
                 builder: (_) => Scaffold(body: utilization_lib.UtilizationHeatmapPage()),
               ),
@@ -515,7 +583,10 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             return NoTransitionPage(
+              key: state.pageKey,
               child: DeferredPage(
+                key: const ValueKey(RouteNames.auditLog),
+                libraryKey: RouteNames.auditLog,
                 loadLibrary: audit_log_lib.loadLibrary,
                 builder: (_) => Scaffold(body: audit_log_lib.AuditLogHomepage()),
               ),
@@ -526,6 +597,8 @@ final router = GoRouter(
     ),
   ],
   errorBuilder: (context, state) => DeferredPage(
+    key: const ValueKey('error-page'),
+    libraryKey: 'error-page',
     loadLibrary: error_lib.loadLibrary,
     builder: (_) => error_lib.ErrorPage(error: state.error),
   ),

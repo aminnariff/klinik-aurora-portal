@@ -18,6 +18,7 @@ class NoRecordsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),

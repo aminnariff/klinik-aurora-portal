@@ -54,7 +54,7 @@ class ShimmerContainer extends StatelessWidget {
         for (int index = 0; index < 6; index++)
           Card(
             elevation: 2.0,
-            color: Colors.white,
+            color: appSurface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
               side: BorderSide(color: Colors.grey.withAlpha(opacityCalculation(.4)), width: 1),
@@ -62,7 +62,7 @@ class ShimmerContainer extends StatelessWidget {
             child: Container(
               height: 70,
               padding: EdgeInsets.symmetric(horizontal: screenPadding),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.grey[200]),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: appBorder),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,

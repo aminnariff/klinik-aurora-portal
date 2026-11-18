@@ -135,7 +135,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
 
   Widget _buildToolbar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding * 0.6),
       child: isMobile
           ? Column(
@@ -283,7 +283,7 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
       stream: rebuild.stream,
       builder: (context, _) {
         return Container(
-          color: Colors.white,
+          color: appSurface,
           padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: 10),
           child: Row(
             children: [
@@ -578,7 +578,7 @@ class _PromotionCardState extends State<_PromotionCard> {
 
   Widget _buildPlaceholder({bool loading = false}) {
     return Container(
-      color: const Color(0xFFF3F4F6),
+      color: appSurfaceSubtle,
       child: Center(
         child: loading
             ? CircularProgressIndicator(color: primary, strokeWidth: 2)

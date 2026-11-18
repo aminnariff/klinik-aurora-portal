@@ -103,6 +103,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final isSuper = context.watch<AuthController>().isSuperAdmin;
     final userBranchId = context.watch<AuthController>().authenticationResponse?.data?.user?.branchId;
     final branches = context.watch<BranchController>().branchAllResponse?.data?.data ?? [];
@@ -182,7 +183,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     decoration: BoxDecoration(
                       color: isSuper && _selectedBranchId == null
                           ? appInfoSoft
-                          : const Color(0xFFF0FDF4),
+                          : appSuccessSoft,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(

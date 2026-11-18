@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
 
 enum ToastType { error, info, success }
 
@@ -36,7 +35,7 @@ abstract class AppToast {
     messenger.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: appInkPrimary,
+        backgroundColor: const Color(0xFF1E293B),
         elevation: 12,
         margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

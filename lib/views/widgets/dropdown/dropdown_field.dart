@@ -151,7 +151,7 @@ class _AppDropdownState extends State<AppDropdown> {
               Icons.keyboard_arrow_down_rounded,
               color: isEditable
                   ? appInkMuted
-                  : Colors.grey.shade400,
+                  : appInkMuted,
             ),
             iconSize: 22,
             iconEnabledColor: appInkMuted,

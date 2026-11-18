@@ -108,7 +108,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
         data: ThemeData(
           colorScheme: ColorScheme.light(
             primary: primary,
-            onPrimary: Colors.white,
+            onPrimary: appSurface,
             surface: appSurface,
             onSurface: appInkPrimary,
           ),
@@ -347,11 +347,11 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.event_note_rounded, size: 64, color: Colors.grey[200]),
+                              Icon(Icons.event_note_rounded, size: 64, color: appBorder),
                               const SizedBox(height: 16),
                               Text(
                                 'No slots configured',
-                                style: TextStyle(color: Colors.grey[400], fontWeight: FontWeight.bold),
+                                style: TextStyle(color: appInkMuted, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -367,7 +367,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                               decoration: BoxDecoration(
                                 color: appSurface,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFF3F4F6)),
+                                border: Border.all(color: appSurfaceSubtle),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withAlpha(5),
@@ -408,7 +408,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                                             ),
                                             Text(
                                               '$selectedCount dates picked',
-                                              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                              style: TextStyle(fontSize: 11, color: appInkMuted),
                                             ),
                                           ],
                                         ),
@@ -537,7 +537,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text('Overview of scheduled appointments.', style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                Text('Overview of scheduled appointments.', style: TextStyle(fontSize: 11, color: appInkMuted)),
                 const SizedBox(height: 20),
                 Expanded(child: _buildDateGroupedSummary()),
                 if (widget.branchId != null) ...[
@@ -611,7 +611,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
               const SizedBox(height: 12),
               Text(
                 '💡 Tip: Data is automatically pruned! We only keep Today and Future dates to save storage and optimize performance.',
-                style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Colors.grey[500]),
+                style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: appInkMuted),
               ),
               const SizedBox(height: 16),
               Row(
@@ -662,7 +662,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
               children: [
                 Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 4),
-                Text(description, style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.4)),
+                Text(description, style: TextStyle(fontSize: 12, color: appInkMuted, height: 1.4)),
               ],
             ),
           ),
@@ -678,10 +678,10 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: onTap == null ? Colors.grey[100] : primary.withAlpha(20),
+          color: onTap == null ? appSurfaceSubtle : primary.withAlpha(20),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, size: 18, color: onTap == null ? Colors.grey[400] : primary),
+        child: Icon(icon, size: 18, color: onTap == null ? appInkMuted : primary),
       ),
     );
   }
@@ -777,7 +777,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: Colors.grey[400],
+                      color: appInkMuted,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -820,7 +820,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                       fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.w500,
                       color: isSelected
                           ? Colors.white
-                          : (isPast ? Colors.grey[300] : (isToday ? primary : appInkSecondary)),
+                          : (isPast ? appBorderStrong : (isToday ? primary : appInkSecondary)),
                     ),
                   ),
                 ),
@@ -849,7 +849,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
     final sortedDates = grouped.keys.toList()..sort();
     if (sortedDates.isEmpty) {
       return Center(
-        child: Text('No dates scheduled', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
+        child: Text('No dates scheduled', style: TextStyle(fontSize: 12, color: appInkMuted)),
       );
     }
     return ListView.builder(
@@ -887,7 +887,7 @@ class _MultiTimeCalendarPageState extends State<MultiTimeCalendarPage> {
                       (t) => Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF3F4F6),
+                          color: appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -1021,7 +1021,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                       const SizedBox(height: 4),
                       Text(
                         'Push ${widget.slotCount} slots to multiple services',
-                        style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 13, color: appInkMuted),
                       ),
                     ],
                   ),
@@ -1032,7 +1032,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF7ED),
+                color: appWarningSoft,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFFFFEDD5)),
               ),
@@ -1117,7 +1117,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: isSelected ? primary.withAlpha(5) : Colors.white,
+                        color: isSelected ? primary.withAlpha(5) : appSurface,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: isSelected ? primary.withAlpha(100) : appBorder,
@@ -1129,7 +1129,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: isSelected ? primary.withAlpha(20) : const Color(0xFFF3F4F6),
+                              color: isSelected ? primary.withAlpha(20) : appSurfaceSubtle,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -1154,7 +1154,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                                 if (s.serviceTime != null || s.doctorType != null)
                                   Text(
                                     '${s.serviceTime ?? '—'} • ${doctorType(s.doctorType)}',
-                                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                                    style: TextStyle(fontSize: 11, color: appInkMuted),
                                   ),
                               ],
                             ),
@@ -1185,7 +1185,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                     ),
                     child: Text(
                       'Cancel',
-                      style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold),
+                      style: TextStyle(color: appInkMuted, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

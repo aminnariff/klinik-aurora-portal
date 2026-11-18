@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 
 class SelectionCalendarView extends StatefulWidget {
   final int startMonth;
@@ -90,7 +91,7 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
                 dayLabels[index],
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: (index == 0 || index == 6) ? Colors.grey : Colors.black,
+                  color: (index == 0 || index == 6) ? Colors.grey : appInkPrimary,
                 ),
               ),
             ),
@@ -139,10 +140,10 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
                   style: TextStyle(
                     fontSize: 14,
                     color: isDisabled
-                        ? Colors.grey.shade400
+                        ? appInkMuted
                         : (j == 0 || j == 6)
-                        ? Colors.black
-                        : Colors.black,
+                        ? appInkPrimary
+                        : appInkPrimary,
                     fontWeight: isToday || isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -218,7 +219,7 @@ class _SelectionCalendarViewState extends State<SelectionCalendarView> {
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.disabled)) {
-                    return Colors.grey.shade300;
+                    return appBorderStrong;
                   }
                   return Colors.blue;
                 }),

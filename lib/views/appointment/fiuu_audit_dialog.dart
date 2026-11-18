@@ -104,6 +104,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ConstrainedBox(
@@ -208,7 +209,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: selected ? appInfoSoft : Colors.white,
+          color: selected ? appInfoSoft : appSurface,
           border: Border.all(color: selected ? primary : appBorder),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -312,7 +313,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
             children: [
               _tag('Our state: ${d.currentState}', appDangerSoft, const Color(0xFF991B1B)),
               _tag('Fiuu: paid', appSuccessSoft, const Color(0xFF166534)),
-              _tag('bill_id: ${d.billId}', const Color(0xFFF3F4F6), appInkSecondary),
+              _tag('bill_id: ${d.billId}', appSurfaceSubtle, appInkSecondary),
             ],
           ),
         ],

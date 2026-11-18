@@ -316,7 +316,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                         'Move this appointment to another branch',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Colors.grey.shade600,
+                                          color: appInkMuted,
                                         ),
                                       ),
                                     ],
@@ -412,7 +412,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                       isExpanded: true,
                                       hint: Text(
                                         'Select destination clinic branch...',
-                                        style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                                        style: TextStyle(color: appInkMuted, fontSize: 13),
                                       ),
                                       value: selectedTargetBranch,
                                       items: targetBranches.map((b) {

@@ -206,7 +206,7 @@ class _AppMultiImageFieldState extends State<AppMultiImageField> {
                       errorBuilder: (_, _, _) => Container(
                         width: 56,
                         height: 56,
-                        color: const Color(0xFFF3F4F6),
+                        color: appSurfaceSubtle,
                         child: const Icon(Icons.broken_image, size: 20, color: Colors.grey),
                       ),
                     ),

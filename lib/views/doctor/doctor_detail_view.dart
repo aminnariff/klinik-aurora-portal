@@ -15,6 +15,7 @@ class DoctorDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -205,13 +206,13 @@ class DoctorDetailView extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
       decoration: BoxDecoration(
         color: appCanvas,
-        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: appInfoSoft, borderRadius: BorderRadius.circular(8)),
             child: const Icon(Icons.person_rounded, size: 16, color: Color(0xFF6366F1)),
           ),
           const SizedBox(width: 10),

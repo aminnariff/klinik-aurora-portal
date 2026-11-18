@@ -64,6 +64,7 @@ class AppDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final style = _DialogStyle.of(attribute.type);
 
     return CallbackShortcuts(

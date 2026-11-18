@@ -148,7 +148,7 @@ class _ToggleOption extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
+            color: isSelected ? appSurface : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             boxShadow: isSelected ? [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 4)] : null,
           ),
@@ -183,16 +183,16 @@ class _DateField extends StatelessWidget {
     final results = await showCalendarDatePicker2Dialog(
       context: context,
       barrierDismissible: true,
-      dialogBackgroundColor: Colors.white,
+      dialogBackgroundColor: appSurface,
       config: CalendarDatePicker2WithActionButtonsConfig(
         calendarType: CalendarDatePicker2Type.single,
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(const Duration(days: 365)),
         selectedDayHighlightColor: primary,
-        weekdayLabelTextStyle: TextStyle(color: Colors.grey.shade600),
+        weekdayLabelTextStyle: TextStyle(color: appInkMuted),
         controlsTextStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         selectedDayTextStyle: const TextStyle(color: Colors.white),
-        dayTextStyle: const TextStyle(color: Colors.black87),
+        dayTextStyle: TextStyle(color: appInkPrimary),
         openedFromDialog: true,
       ),
       value: [value],

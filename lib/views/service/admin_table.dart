@@ -29,7 +29,7 @@
 //                         alignment: Alignment.center,
 //                         children: [
 //                           Container(
-//                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white),
+//                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: appSurface),
 //                             padding: const EdgeInsets.all(5),
 //                             child: DataTable2(
 //                               columnSpacing: 12,
@@ -38,7 +38,7 @@
 //                               isHorizontalScrollBarVisible: true,
 //                               isVerticalScrollBarVisible: true,
 //                               columns: columns(),
-//                               headingRowColor: WidgetStateProperty.all(Colors.white),
+//                               headingRowColor: WidgetStateProperty.all(appTableHeaderBg),
 //                               headingRowHeight: 51,
 //                               decoration: const BoxDecoration(),
 //                               border: TableBorder(
@@ -52,7 +52,7 @@
 //                                 for (int index = 0; index < (snapshot.servicesResponse?.data?.length ?? 0); index++)
 //                                   DataRow(
 //                                     color: WidgetStateProperty.all(
-//                                       index % 2 == 1 ? Colors.white : const Color(0xFFF3F2F7),
+//                                       index % 2 == 1 ? appSurface : appTableRowAlt,
 //                                     ),
 //                                     cells: [
 //                                       DataCell(
@@ -142,7 +142,7 @@
 //                                                   Container(
 //                                                     padding: const EdgeInsets.all(4),
 //                                                     // decoration: const BoxDecoration(
-//                                                     //   color: Colors.white,
+//                                                     //   color: appSurface,
 //                                                     //   shape: BoxShape.circle,
 //                                                     // ),
 //                                                     child: Icon(Icons.more_vert, color: Colors.grey),

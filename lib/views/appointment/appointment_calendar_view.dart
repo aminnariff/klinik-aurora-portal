@@ -84,7 +84,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
 
   Widget _buildCalendar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       child: TableCalendar(
         firstDay: DateTime(2020, 1, 1),
         lastDay: DateTime(2030, 12, 31),
@@ -265,7 +265,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
             Container(
               width: 56,
               height: 56,
-              decoration: const BoxDecoration(color: Color(0xFFF3F4F6), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: appSurfaceSubtle, shape: BoxShape.circle),
               child: Icon(Icons.event_busy_rounded, size: 28, color: appInkMuted),
             ),
             const SizedBox(height: 12),
@@ -308,7 +308,7 @@ class _AppointmentCalendarViewState extends State<AppointmentCalendarView> {
         .join();
 
     return Material(
-      color: Colors.white,
+      color: appSurface,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: () => _openDetail(context, apt),

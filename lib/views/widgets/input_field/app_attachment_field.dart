@@ -98,6 +98,7 @@ class _AppAttachmentFieldState extends State<AppAttachmentField> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final url = widget.controller.text.trim();
     final hasUrl = url.isNotEmpty;
 

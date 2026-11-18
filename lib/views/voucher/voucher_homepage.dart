@@ -71,6 +71,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
   }
 
@@ -117,7 +118,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                   _MobileActionButton(
                     icon: Icons.refresh_rounded,
                     tooltip: 'Reset',
-                    color: Colors.grey[600]!,
+                    color: appInkMuted,
                     onTap: () {
                       _searchController.clear();
                       resetAllFilter();
@@ -175,7 +176,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(color: appBorder),
         ),
-        color: Colors.white,
+        color: appSurface,
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -298,7 +299,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
 
   Widget _topBar() {
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       margin: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -314,8 +315,8 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                 },
                 decoration: InputDecoration(
                   hintText: 'Search vouchers...',
-                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
+                  hintStyle: TextStyle(color: appInkMuted, fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: appInkMuted, size: 20),
                   filled: true,
                   fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
@@ -338,7 +339,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
           _toolbarButton(
             icon: Icons.refresh_rounded,
             label: 'Reset',
-            color: Colors.grey[600]!,
+            color: appInkMuted,
             onTap: () {
               _searchController.clear();
               resetAllFilter();
@@ -390,7 +391,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
       builder: (_) => Align(
         alignment: Alignment.centerRight,
         child: Material(
-          color: Colors.white,
+          color: appSurface,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(16),
             bottomLeft: Radius.circular(16),
@@ -540,7 +541,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                         if (states.contains(WidgetState.hovered)) {
                           return appSurfaceSubtle;
                         }
-                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                        return i % 2 == 0 ? appSurface : appTableRowAlt;
                       }),
                       cells: [
                         DataCell(_codeCell(items[i].voucherCode)),
@@ -608,7 +609,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
+        color: appSurfaceSubtle,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -646,7 +647,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
     return PopupMenuButton<String>(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       offset: const Offset(0, 36),
-      color: Colors.white,
+      color: appSurfaceElevated,
       tooltip: '',
       onSelected: (value) async {
         if (value == 'edit') {
@@ -732,8 +733,8 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
   Widget _tableFooter() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF3F4F6))),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
@@ -742,7 +743,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!isMobile && !isTablet)
-                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: appInkMuted)),
               perPage(),
               if (!isMobile && !isTablet) ...[
                 const SizedBox(width: 8),
@@ -750,7 +751,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                   '${((_page) * _pageSize) - _pageSize + 1}–'
                   '${(_page * _pageSize < _totalCount) ? _page * _pageSize : _totalCount}'
                   ' of $_totalCount',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ],
@@ -862,6 +863,7 @@ class _MobileActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Tooltip(
       message: tooltip,
       child: InkWell(

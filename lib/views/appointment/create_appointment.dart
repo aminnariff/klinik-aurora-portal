@@ -69,38 +69,38 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     controller: TextEditingController(),
     isEditable: false,
     labelText: 'appointmentPage'.tr(gender: 'patientName'),
-    isEditableColor: Colors.white,
-    uneditableColor: Colors.white,
+    isEditableColor: appInputFill,
+    uneditableColor: appSurfaceSubtle,
   );
   final InputFieldAttribute patientContactNoController = InputFieldAttribute(
     controller: TextEditingController(),
     isEditable: false,
     labelText: 'appointmentPage'.tr(gender: 'patientContactNo'),
     isNumber: true,
-    isEditableColor: Colors.white,
-    uneditableColor: Colors.white,
+    isEditableColor: appInputFill,
+    uneditableColor: appSurfaceSubtle,
   );
   final InputFieldAttribute patientEmailController = InputFieldAttribute(
     controller: TextEditingController(),
     isEditable: false,
     labelText: 'appointmentPage'.tr(gender: 'patientEmail'),
-    isEditableColor: Colors.white,
-    uneditableColor: Colors.white,
+    isEditableColor: appInputFill,
+    uneditableColor: appSurfaceSubtle,
   );
   final InputFieldAttribute appointmentNoteController = InputFieldAttribute(
     controller: TextEditingController(),
     lineNumber: 3,
     maxCharacter: 500,
     labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
-    isEditableColor: Colors.white,
-    uneditableColor: Colors.white,
+    isEditableColor: appInputFill,
+    uneditableColor: appSurfaceSubtle,
   );
   final InputFieldAttribute dueDateController = InputFieldAttribute(
     controller: TextEditingController(),
     labelText: 'appointmentPage'.tr(gender: 'dueDate'),
     isNumber: true,
-    isEditableColor: Colors.white,
-    uneditableColor: Colors.white,
+    isEditableColor: appInputFill,
+    uneditableColor: appSurfaceSubtle,
   );
   List<DropdownAttribute> branches = [];
   final TextEditingController dateTimeController = TextEditingController();
@@ -658,7 +658,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Material(
-            color: Colors.white,
+            color: appSurface,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -668,7 +668,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
                         decoration: BoxDecoration(
                           color: appCanvas,
-                          border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                          border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
                         ),
                         child: Row(
                           children: [
@@ -689,7 +689,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF3F4F6),
+                                        color: appSurfaceSubtle,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
@@ -1065,7 +1065,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 Icon(
                                                                   Icons.info_outline_rounded,
                                                                   size: 13,
-                                                                  color: Colors.grey.shade500,
+                                                                  color: appInkMuted,
                                                                 ),
                                                                 const SizedBox(width: 6),
                                                                 Flexible(
@@ -1073,7 +1073,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     'Select appointment date to check eligibility',
                                                                     style: TextStyle(
                                                                       fontSize: 12,
-                                                                      color: Colors.grey.shade600,
+                                                                      color: appInkMuted,
                                                                     ),
                                                                   ),
                                                                 ),
@@ -1162,8 +1162,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     color: _feeWaived
                                                                         ? appInfoSoft
                                                                         : _bookingFeeCollected
-                                                                        ? const Color(0xFFF0FDF4)
-                                                                        : const Color(0xFFFFF7ED),
+                                                                        ? appSuccessSoft
+                                                                        : appWarningSoft,
                                                                     borderRadius: BorderRadius.circular(8),
                                                                     border: Border.all(
                                                                       color: _feeWaived
@@ -1378,7 +1378,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     vertical: 9,
                                                                   ),
                                                                   decoration: BoxDecoration(
-                                                                    color: const Color(0xFFF0FDF4),
+                                                                    color: appSuccessSoft,
                                                                     borderRadius: BorderRadius.circular(8),
                                                                     border: Border.all(color: const Color(0xFF86EFAC)),
                                                                   ),
@@ -1626,7 +1626,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   label: Text('$mins mins'),
                                                   selected: isSelected,
                                                   selectedColor: primary,
-                                                  backgroundColor: const Color(0xFFF3F4F6),
+                                                  backgroundColor: appSurfaceSubtle,
                                                   labelStyle: TextStyle(
                                                     color: isSelected ? Colors.white : appInkSecondary,
                                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -1671,7 +1671,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             value: _service?.name,
                                                             fieldColor: widget.type == 'update'
                                                                 ? textFormFieldUneditableColor
-                                                                : Colors.white,
+                                                                : appInputFill,
                                                             borderColor: appBorderStrong,
                                                             isEditable: widget.type == 'create',
                                                             onChanged: (p0) {
@@ -1736,7 +1736,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                     margin: const EdgeInsets.only(top: 6),
                                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xFFFFF7ED),
+                                                      color: appWarningSoft,
                                                       borderRadius: BorderRadius.circular(8),
                                                       border: Border.all(
                                                         color: const Color(0xFFFB923C).withAlpha(80),
@@ -1812,7 +1812,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   Container(
                                                     padding: const EdgeInsets.all(12),
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xFFFFF7ED),
+                                                      color: appWarningSoft,
                                                       borderRadius: BorderRadius.circular(8),
                                                       border: Border.all(
                                                         color: const Color(0xFFFB923C).withAlpha(80),
@@ -2051,7 +2051,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: 14),
       decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA),
+        color: appSurfaceSubtle,
         border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
@@ -2080,16 +2080,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     var results = await showCalendarDatePicker2Dialog(
       context: context,
       barrierDismissible: true,
-      dialogBackgroundColor: Colors.white,
+      dialogBackgroundColor: appSurface,
       config: CalendarDatePicker2WithActionButtonsConfig(
         calendarType: CalendarDatePicker2Type.single,
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(Duration(days: 365)),
         selectedDayHighlightColor: Colors.blue,
-        weekdayLabelTextStyle: TextStyle(color: Colors.grey.shade600),
+        weekdayLabelTextStyle: TextStyle(color: appInkMuted),
         controlsTextStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         selectedDayTextStyle: TextStyle(color: Colors.white),
-        dayTextStyle: TextStyle(color: Colors.black87),
+        dayTextStyle: TextStyle(color: appInkPrimary),
         disableModePicker: false,
         // okButtonText: '', // hide default buttons
         // cancelButtonText: '',
@@ -2228,13 +2228,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       child: InkWell(
         onTap: () => _copyToClipboard(text, label),
         borderRadius: BorderRadius.circular(4),
-        hoverColor: const Color(0xFFEEF2FF),
+        hoverColor: appInfoSoft,
         child: Padding(
           padding: const EdgeInsets.all(3.0),
           child: Icon(
             Icons.copy_rounded,
             size: 13,
-            color: Colors.grey[400],
+            color: appInkMuted,
           ),
         ),
       ),
@@ -2247,7 +2247,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(6),
-        hoverColor: const Color(0xFFEEF2FF),
+        hoverColor: appInfoSoft,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           child: Row(
@@ -2773,7 +2773,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       label: Text('$mins mins'),
                       selected: isSelected,
                       selectedColor: primary,
-                      backgroundColor: const Color(0xFFF3F4F6),
+                      backgroundColor: appSurfaceSubtle,
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : appInkSecondary,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -2818,7 +2818,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 labelText: 'appointmentPage'.tr(gender: 'status'),
                                 isEditable: true,
                                 value: _status?.name,
-                                fieldColor: Colors.white,
+                                fieldColor: appInputFill,
                                 borderColor: appBorderStrong,
                                 onChanged: (p0) {
                                   _status = p0;
@@ -2837,7 +2837,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFF7ED),
+                            color: appWarningSoft,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: const Color(0xFFFB923C).withAlpha(80)),
                           ),
@@ -2990,12 +2990,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.info_outline_rounded, size: 13, color: Colors.grey.shade500),
+                              Icon(Icons.info_outline_rounded, size: 13, color: appInkMuted),
                               const SizedBox(width: 6),
                               Flexible(
                                 child: Text(
                                   'Select appointment date to check eligibility',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                  style: TextStyle(fontSize: 12, color: appInkMuted),
                                 ),
                               ),
                             ],
@@ -3378,7 +3378,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             height: 48,
             padding: EdgeInsets.symmetric(horizontal: isCoolingDown ? 10 : 12),
             decoration: BoxDecoration(
-              color: isDisabled ? const Color(0xFFF3F4F6) : const Color(0xFFEEF2FF),
+              color: isDisabled ? appSurfaceSubtle : appInfoSoft,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: isDisabled ? appBorder : const Color(0xFFC7D2FE),

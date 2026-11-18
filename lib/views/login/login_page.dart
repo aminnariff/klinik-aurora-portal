@@ -745,6 +745,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

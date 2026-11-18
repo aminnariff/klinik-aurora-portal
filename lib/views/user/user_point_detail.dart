@@ -95,7 +95,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
+                border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
               ),
               child: Row(
                 children: [
@@ -123,7 +123,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                           'View and manage customer loyalty points',
                           style: AppTypography.bodyMedium(
                             context,
-                          ).apply(color: Colors.grey.shade500, fontSizeDelta: -1),
+                          ).apply(color: appInkMuted, fontSizeDelta: -1),
                         ),
                       ],
                     ),
@@ -153,7 +153,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                   IconButton(
   tooltip: 'Tutup',
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(Icons.close, color: Colors.grey.shade400),
+                    icon: Icon(Icons.close, color: appInkMuted),
                   ),
                 ],
               ),
@@ -202,7 +202,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                         // Table Section
                         Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade200),
+                            border: Border.all(color: appBorder),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           clipBehavior: Clip.antiAlias,
@@ -216,7 +216,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                                     columnSpacing: 16,
                                     horizontalMargin: 16,
                                     minWidth: 800,
-                                    headingRowColor: WidgetStateProperty.all(Colors.grey.shade50),
+                                    headingRowColor: WidgetStateProperty.all(appSurfaceSubtle),
                                     headingRowHeight: 52,
                                     dataRowHeight: 60,
                                     columns: columns(),
@@ -273,7 +273,7 @@ class _UserPointDetailState extends State<UserPointDetail> {
                                               dateConverter(item.date) ?? 'N/A',
                                               style: AppTypography.bodyMedium(
                                                 context,
-                                              ).apply(color: Colors.grey.shade600),
+                                              ).apply(color: appInkMuted),
                                             ),
                                           ),
                                         ],

@@ -13,6 +13,7 @@ class DashboardStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Consumer2<DashboardController, BranchPerformanceController>(
       builder: (context, dashCtrl, perfCtrl, _) {
         final data = dashCtrl.dashboardResponse?.data;
@@ -38,6 +39,7 @@ class _DesktopStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final currencyFormatter = NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenPadding),
@@ -121,6 +123,7 @@ class _MobileStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final gap = screenPadding / 2;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenPadding),
@@ -218,6 +221,7 @@ class _UserDonutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     final total = data?.totalUser ?? 0;
     final active = data?.totalActiveUser ?? 0;
     final inactive = (total - active).clamp(0, total);
@@ -324,6 +328,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Expanded(
       child: Container(
         decoration: BoxDecoration(

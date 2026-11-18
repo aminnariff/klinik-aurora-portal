@@ -892,6 +892,8 @@ class _HomepageState extends State<Homepage> {
               onPressed: () => showDialog(
                 context: context,
                 builder: (_) => DeferredPage(
+                  key: const ValueKey('notification-modal'),
+                  libraryKey: 'notification-modal',
                   loadLibrary: notification_lib.loadLibrary,
                   builder: (_) => notification_lib.NotificationHomepage(),
                 ),
@@ -1210,6 +1212,8 @@ class _HomepageState extends State<Homepage> {
         context: context,
         builder: (BuildContext context) {
           return DeferredPage(
+            key: const ValueKey('notification-modal'),
+            libraryKey: 'notification-modal',
             loadLibrary: notification_lib.loadLibrary,
             builder: (_) => notification_lib.NotificationHomepage(),
           );

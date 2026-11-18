@@ -112,7 +112,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   Widget _topBar() {
     final isSuperAdmin = context.read<AuthController>().isSuperAdmin == true;
     return Container(
-      color: Colors.white,
+      color: appSurface,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       margin: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -128,8 +128,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 },
                 decoration: InputDecoration(
                   hintText: 'Search services...',
-                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
+                  hintStyle: TextStyle(color: appInkMuted, fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: appInkMuted, size: 20),
                   filled: true,
                   fillColor: appCanvas,
                   contentPadding: EdgeInsets.zero,
@@ -162,7 +162,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             _toolbarButton(
               icon: Icons.refresh_rounded,
               label: 'Reset',
-              color: Colors.grey[600]!,
+              color: appInkMuted,
               onTap: () {
                 _searchController.clear();
                 resetAllFilter();
@@ -190,7 +190,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             _toolbarButton(
               icon: Icons.refresh_rounded,
               label: 'Refresh',
-              color: Colors.grey[600]!,
+              color: appInkMuted,
               onTap: () => filtering(enableDebounce: false, page: 1),
             ),
           ],
@@ -225,7 +225,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         return Align(
           alignment: Alignment.centerRight,
           child: Material(
-            color: Colors.white,
+            color: appSurface,
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
             elevation: 8,
             child: SizedBox(
@@ -356,7 +356,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                         if (states.contains(WidgetState.hovered)) {
                           return appSurfaceSubtle;
                         }
-                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                        return i % 2 == 0 ? appSurface : appTableRowAlt;
                       }),
                       onTap: () => _handleMenuSelection('update', items[i]),
                       cells: [
@@ -409,7 +409,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     return PopupMenuButton<String>(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       offset: const Offset(0, 36),
-      color: Colors.white,
+      color: appSurfaceElevated,
       tooltip: '',
       onSelected: (value) => _handleMenuSelection(value, service),
       itemBuilder: (_) => [
@@ -492,7 +492,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                         if (states.contains(WidgetState.hovered)) {
                           return appSurfaceSubtle;
                         }
-                        return i % 2 == 0 ? Colors.white : const Color(0xFFFAFAFC);
+                        return i % 2 == 0 ? appSurface : appTableRowAlt;
                       }),
                       onTap: () => _openBranchServiceTimingOptions(items[i]),
                       cells: [
@@ -557,7 +557,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       icon: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F4F6),
+          color: appSurfaceSubtle,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: appBorder),
         ),
@@ -750,7 +750,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         catLower.contains('massage') ||
         catLower.contains('skin')) {
       // Spa / Aesthetics / Therapist
-      bg = const Color(0xFFFCE7F3);
+      bg = appDangerSoft;
       fg = const Color(0xFFBE185D);
       icon = Icons.spa_rounded;
     } else if (doctorType == 5 || catLower.contains('diet') || catLower.contains('nutri') || catLower.contains('weight')) {
@@ -760,12 +760,12 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       icon = Icons.eco_rounded;
     } else if (catLower.contains('blood') || catLower.contains('lab') || catLower.contains('test') || catLower.contains('screening')) {
       // Laboratory / Blood test
-      bg = const Color(0xFFF3E8FF);
+      bg = appPurpleSoft;
       fg = const Color(0xFF7E22CE);
       icon = Icons.science_rounded;
     } else {
       // General Doctor / Consultation / Medical
-      bg = const Color(0xFFEEF2FF);
+      bg = appInfoSoft;
       fg = const Color(0xFF4338CA);
       icon = Icons.medical_services_rounded;
     }
@@ -879,7 +879,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     final label = doctorType(type);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: appInfoSoft, borderRadius: BorderRadius.circular(6)),
       child: Text(
         label,
         style: const TextStyle(fontSize: 11, color: Color(0xFF4338CA), fontWeight: FontWeight.w500),
@@ -909,8 +909,8 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
   Widget _tableFooter() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF3F4F6))),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: appSurfaceSubtle)),
       ),
       child: Row(
         children: [
@@ -927,7 +927,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (!isMobile && !isTablet)
-                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text('Rows per page: ', style: TextStyle(fontSize: 12, color: appInkMuted)),
               PerPageWidget(
                 _pageSize.toString(),
                 DropdownAttributeList(
@@ -942,7 +942,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 const SizedBox(width: 8),
                 Text(
                   '${((_page) * _pageSize) - _pageSize + 1}–${((_page) * _pageSize < _totalCount) ? ((_page) * _pageSize) : _totalCount} of $_totalCount',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
               ],
             ],
@@ -1056,7 +1056,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                       _MobileActionButton(
                         icon: Icons.refresh_rounded,
                         tooltip: isSuperAdmin ? 'Reset' : 'Refresh',
-                        color: Colors.grey[600]!,
+                        color: appInkMuted,
                         onTap: () {
                           if (isSuperAdmin) {
                             _searchController.clear();
@@ -1114,7 +1114,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: appBorder),
       ),
-      color: Colors.white,
+      color: appSurface,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -1247,7 +1247,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Material(
-                color: Colors.white,
+                color: appSurface,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1256,7 +1256,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     Container(
                       padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
                       decoration: BoxDecoration(
-                        color: Color(0xFFFAFAFA),
+                        color: appSurfaceSubtle,
                         border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
                       ),
                       child: Row(
@@ -1313,7 +1313,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                           _timingOptionCard(
                             icon: Icons.timer_outlined,
                             iconColor: const Color(0xFF0284C7),
-                            iconBg: const Color(0xFFE0F2FE),
+                            iconBg: appInfoSoft,
                             title: 'Edit Service Timing & Duration',
                             badgeText: 'Duration & Rules',
                             subtitle: 'Adjust appointment duration (e.g. 15m, 30m, 1h) and customize weekday/weekend rules.',

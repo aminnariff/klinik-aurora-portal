@@ -266,7 +266,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _selectedTab == 0 ? appDangerSoft : const Color(0xFFF3F4F6),
+                          color: _selectedTab == 0 ? appDangerSoft : appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: _selectedTab == 0 ? const Color(0xFFFCA5A5) : Colors.transparent,
@@ -300,7 +300,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _selectedTab == 1 ? appInfoSoft : const Color(0xFFF3F4F6),
+                          color: _selectedTab == 1 ? appInfoSoft : appSurfaceSubtle,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: _selectedTab == 1 ? const Color(0xFFBFDBFE) : Colors.transparent,
@@ -344,11 +344,11 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.search_off_rounded, size: 40, color: Colors.grey.shade400),
+                            Icon(Icons.search_off_rounded, size: 40, color: appInkMuted),
                             const SizedBox(height: 12),
                             Text(
                               _searchQuery.isNotEmpty ? 'No matches for "$_searchQuery"' : 'No records found',
-                              style: TextStyle(fontSize: 14, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                              style: TextStyle(fontSize: 14, color: appInkMuted, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -454,7 +454,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF3F4F6),
+                        color: appSurfaceSubtle,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -488,7 +488,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                 ),
                 if (_isFailed) ...[
                   const SizedBox(height: 10),
-                  const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                  Divider(height: 1, color: appSurfaceSubtle),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -544,7 +544,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: const Color(0xFF16A34A),
                                 side: const BorderSide(color: Color(0xFF86EFAC)),
-                                backgroundColor: const Color(0xFFF0FDF4),
+                                backgroundColor: appSuccessSoft,
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 minimumSize: const Size(0, 32),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

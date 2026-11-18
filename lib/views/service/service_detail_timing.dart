@@ -93,6 +93,7 @@ class _TimeListManagerState extends State<TimeListManager> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +114,7 @@ class _TimeListManagerState extends State<TimeListManager> {
                       padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
                       decoration: BoxDecoration(
                         color: appCanvas,
-                        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
+                        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
                       ),
                       child: Row(
                         children: [
@@ -169,7 +170,7 @@ class _TimeListManagerState extends State<TimeListManager> {
                             Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: Colors.grey.shade300,
+                                color: appBorderStrong,
                               ),
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               child: Row(
@@ -178,7 +179,7 @@ class _TimeListManagerState extends State<TimeListManager> {
                                   Text(timeList[index]),
                                   IconButton(
   tooltip: 'Tutup',
-                                    icon: const Icon(Icons.close, color: Colors.black),
+                                    icon: Icon(Icons.close, color: appInkPrimary),
                                     onPressed: () => _removeTimeFromList(index),
                                   ),
                                 ],
