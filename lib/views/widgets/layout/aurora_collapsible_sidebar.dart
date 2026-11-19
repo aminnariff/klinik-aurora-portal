@@ -50,7 +50,7 @@ class AuroraCollapsibleSidebar extends StatefulWidget {
   static const List<NavGroup> groups = [
     NavGroup(
       key: 'clinical',
-      title: 'Clinical & Practice',
+      title: 'Doctors & Scans',
       icon: Icons.medical_services_outlined,
       itemLabels: [
         RouteNames.babyTrackerDisplay,
@@ -63,7 +63,7 @@ class AuroraCollapsibleSidebar extends StatefulWidget {
     ),
     NavGroup(
       key: 'finance',
-      title: 'Finance & Cashier',
+      title: 'Billing & Cashier',
       icon: Icons.account_balance_wallet_outlined,
       itemLabels: [
         RouteNames.paymentsDisplay,
@@ -72,7 +72,7 @@ class AuroraCollapsibleSidebar extends StatefulWidget {
     ),
     NavGroup(
       key: 'loyalty',
-      title: 'Loyalty & Marketing',
+      title: 'Points & Promos',
       icon: Icons.card_giftcard_rounded,
       itemLabels: [
         RouteNames.pointsDisplay,
@@ -85,7 +85,7 @@ class AuroraCollapsibleSidebar extends StatefulWidget {
     ),
     NavGroup(
       key: 'system',
-      title: 'System & Governance',
+      title: 'Staff & Settings',
       icon: Icons.admin_panel_settings_outlined,
       itemLabels: [
         RouteNames.adminsDisplay,
@@ -218,7 +218,7 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
                 children: [
                   // --- Pinned Core Workspace ---
                   if (extended)
-                    _buildSectionHeader('Core Workspace', Icons.workspace_premium_rounded),
+                    _buildSectionHeader('Main'),
                   for (final label in AuroraCollapsibleSidebar.pinnedLabels) ...[
                     if (_findItemByLabel(label) != null)
                       _buildMenuItem(
@@ -436,23 +436,17 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
     );
   }
 
-  Widget _buildSectionHeader(String label, IconData icon) {
+  Widget _buildSectionHeader(String label) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(6, 10, 6, 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 12, color: Colors.white.withValues(alpha: 0.45)),
-          const SizedBox(width: 6),
-          Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.45),
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.1,
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.fromLTRB(10, 12, 10, 4),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.45),
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.1,
+        ),
       ),
     );
   }
@@ -497,67 +491,35 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Accordion Group Header
+          // Accordion Group Header (Clean Minimal Category)
           InkWell(
             onTap: () => _toggleGroup(group.key),
             borderRadius: BorderRadius.circular(8),
             hoverColor: Colors.white.withValues(alpha: 0.10),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
               child: Row(
                 children: [
-                  Icon(
-                    group.icon,
-                    size: 16,
-                    color: hasActiveChild ? const Color(0xFF34D399) : const Color(0xCCFFFFFF),
-                  ),
-                  const SizedBox(width: 9),
                   Expanded(
                     child: Text(
-                      group.title,
+                      group.title.toUpperCase(),
                       style: TextStyle(
-                        color: hasActiveChild ? Colors.white : const Color(0xE6FFFFFF),
-                        fontSize: 12.5,
-                        fontWeight: hasActiveChild ? FontWeight.w700 : FontWeight.w600,
-                        letterSpacing: 0.2,
+                        color: Colors.white.withValues(alpha: hasActiveChild ? 0.95 : 0.65),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (hasActiveChild && !isExpanded)
-                    Container(
-                      width: 6,
-                      height: 6,
-                      margin: const EdgeInsets.only(right: 6),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF34D399),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '${availableItems.length}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white.withValues(alpha: 0.65),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
                   AnimatedRotation(
                     turns: isExpanded ? 0.25 : 0.0,
                     duration: const Duration(milliseconds: 200),
                     child: Icon(
                       Icons.chevron_right_rounded,
                       size: 16,
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: Colors.white.withValues(alpha: hasActiveChild ? 0.8 : 0.45),
                     ),
                   ),
                 ],
@@ -572,7 +534,7 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
             alignment: Alignment.topCenter,
             child: isExpanded
                 ? Padding(
-                    padding: const EdgeInsets.only(left: 10, top: 2, bottom: 4),
+                    padding: const EdgeInsets.only(left: 4, top: 2, bottom: 4),
                     child: Column(
                       children: [
                         for (final item in availableItems)
@@ -631,23 +593,12 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
           hoverColor: Colors.white.withValues(alpha: 0.12),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: extended ? (isChild ? 10 : 10) : 0,
+              horizontal: extended ? (isChild ? 12 : 10) : 0,
               vertical: 8,
             ),
             child: Row(
               mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
               children: [
-                if (isChild && extended) ...[
-                  Container(
-                    width: 4,
-                    height: 4,
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF34D399) : Colors.white.withValues(alpha: 0.35),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
                 _buildItemIcon(item, isSelected),
                 if (extended) ...[
                   const SizedBox(width: 10),
@@ -663,15 +614,6 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (isSelected)
-                    Container(
-                      width: 5,
-                      height: 5,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
                 ],
               ],
             ),

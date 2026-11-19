@@ -23,19 +23,19 @@ abstract final class RouteNames {
   static const patientsDisplay = 'Patients';
 
   static const babyTracker = '/aurora-baby';
-  static const babyTrackerDisplay = 'Aurora Baby';
+  static const babyTrackerDisplay = 'Baby Tracker';
 
   static const doctors = '/pic';
-  static const doctorsDisplay = 'Practitioners';
+  static const doctorsDisplay = 'Doctors';
 
   static const services = '/service';
-  static const servicesDisplay = 'Services';
+  static const servicesDisplay = 'Services & Pricing';
 
   static const branches = '/branch';
   static const branchesDisplay = 'Branches';
 
   static const payments = '/payment-summary';
-  static const paymentsDisplay = 'Payment Report';
+  static const paymentsDisplay = 'Payment Records';
 
   static const branchPaymentSummary = '/branch-payment-summary';
   static const branchPaymentSummaryDisplay = 'Branch Summary';
@@ -50,7 +50,7 @@ abstract final class RouteNames {
   static const rewardsDisplay = 'Rewards';
 
   static const rewardHistory = '/reward-history';
-  static const rewardHistoryDisplay = 'Manage Rewards';
+  static const rewardHistoryDisplay = 'Redemption History';
 
   static const marketing = '/admin/marketing';
   static const marketingDisplay = 'Campaigns';
@@ -59,20 +59,20 @@ abstract final class RouteNames {
   static const promotionsDisplay = 'Promotions';
 
   static const admins = '/admin';
-  static const adminsDisplay = 'Admins';
+  static const adminsDisplay = 'Staff Accounts';
 
   static const queueBoard = '/queue';
-  static const queueBoardDisplay = "Today's Flow";
+  static const queueBoardDisplay = "Today's Queue";
 
   static const eodHandover = '/eod-handover';
-  static const eodHandoverDisplay = 'EOD Handover';
+  static const eodHandoverDisplay = 'Daily Closing (EOD)';
 
   static const trimesterRecalls = '/trimester-recalls';
-  static const trimesterRecallsDisplay = 'Scan Recalls';
+  static const trimesterRecallsDisplay = 'Patient Follow-Up';
 
   static const utilizationHeatmap = '/utilization';
-  static const utilizationHeatmapDisplay = 'Utilization';
+  static const utilizationHeatmapDisplay = 'Peak Hours & Capacity';
 
   static const auditLog = '/audit-log';
-  static const auditLogDisplay = 'Audit Trail';
+  static const auditLogDisplay = 'Activity Logs';
 }
