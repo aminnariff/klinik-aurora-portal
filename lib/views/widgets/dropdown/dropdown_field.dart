@@ -34,8 +34,8 @@ class _AppDropdownState extends State<AppDropdown> {
         floatingLabelBehavior:
             widget.attributeList.floatingLabelBehavior ?? FloatingLabelBehavior.always,
         labelStyle: widget.attributeList.labelStyle ??
-            TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
-        floatingLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: primary),
+            TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appInkMuted),
+        floatingLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: primary),
         hintText: widget.attributeList.labelText == null ? widget.attributeList.hintText : null,
         hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
         filled: true,
@@ -45,7 +45,7 @@ class _AppDropdownState extends State<AppDropdown> {
         errorText: widget.attributeList.errorMessage,
         errorStyle: const TextStyle(fontSize: 12, color: Color(0xFFDC2626)),
         contentPadding: widget.attributeList.contentPadding ??
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         prefixIcon: widget.attributeList.prefixIcon != null
             ? Padding(
                 padding: const EdgeInsets.only(left: 12, right: 8),
@@ -212,12 +212,22 @@ class _AppDropdownState extends State<AppDropdown> {
     }
 
     if (widget.attributeList.width != null) {
-      content = SizedBox(
+      return SizedBox(
         width: widget.attributeList.width,
         child: content,
       );
     }
 
-    return content;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.hasBoundedWidth) {
+          return SizedBox(
+            width: constraints.maxWidth,
+            child: content,
+          );
+        }
+        return content;
+      },
+    );
   }
 }

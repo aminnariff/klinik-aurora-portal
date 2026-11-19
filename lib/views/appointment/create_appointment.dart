@@ -232,6 +232,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       }
     }
 
+    if (widget.type == 'create') {
+      _status = DropdownAttribute('1', 'Booked');
+    }
+
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       if (widget.type == 'update' && widget.appointment?.appointmentId != null) {
         AppointmentController.detail(context, appointmentId: widget.appointment!.appointmentId).then((val) {
@@ -1570,7 +1574,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         _extraSectionLabel('Appointment Details', Icons.event_note_rounded),
-                                        const SizedBox(height: 10),
+                                        const SizedBox(height: 12),
                                         if (widget.type == 'update')
                                           labelValue(
                                             'Branch',
@@ -1583,65 +1587,61 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             builder: (context, snapshot) {
                                               return Consumer<AuthController>(
                                                 builder: (context, authController, _) {
-                                                  return Column(
-                                                    children: [
-                                                      AppDropdown(
-                                                        attributeList: DropdownAttributeList(
-                                                          authController.isSuperAdmin ? branches : [],
-                                                          labelText: 'appointmentPage'.tr(gender: 'branch'),
-                                                          prefixIcon: Icon(Icons.store_rounded, size: 18, color: appInkMuted),
-                                                          isEditable: authController.isSuperAdmin,
-                                                          fieldColor: authController.isSuperAdmin
-                                                              ? appSurface
-                                                              : appSurfaceSubtle,
-                                                          borderColor: appBorderStrong,
-                                                          value: _appointmentBranch?.name,
-                                                          onChanged: (p0) {
-                                                            _appointmentBranch = p0;
-                                                            _service = null;
-                                                            serviceList = [];
-                                                            availableDateTime = [];
-                                                            dateTimeController.clear();
-                                                            if (_appointmentBranch != null) {
-                                                              ServiceBranchController.available(
-                                                                context,
-                                                                branchId: _appointmentBranch?.key,
-                                                              ).then((value) {
-                                                                if (responseCode(value.code)) {
-                                                                  context
-                                                                          .read<ServiceBranchController>()
-                                                                          .serviceBranchAvailableResponse =
-                                                                      value.data;
-                                                                  if (value.data != null) {
-                                                                    for (service_branch_available_model.Data item
-                                                                        in value.data?.data ?? []) {
-                                                                      serviceList.add(
-                                                                        DropdownAttribute(
-                                                                          item.serviceBranchId ?? '',
-                                                                          item.serviceName ?? '',
-                                                                        ),
-                                                                      );
-                                                                    }
-                                                                  }
-                                                                  serviceList.sort(
-                                                                    (a, b) => a.name.compareTo(b.name),
+                                                  return AppDropdown(
+                                                    attributeList: DropdownAttributeList(
+                                                      authController.isSuperAdmin ? branches : [],
+                                                      labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                                      prefixIcon: Icon(Icons.store_rounded, size: 18, color: appInkMuted),
+                                                      isEditable: authController.isSuperAdmin,
+                                                      fieldColor: authController.isSuperAdmin
+                                                          ? appSurface
+                                                          : appSurfaceSubtle,
+                                                      borderColor: appBorderStrong,
+                                                      value: _appointmentBranch?.name,
+                                                      onChanged: (p0) {
+                                                        _appointmentBranch = p0;
+                                                        _service = null;
+                                                        serviceList = [];
+                                                        availableDateTime = [];
+                                                        dateTimeController.clear();
+                                                        if (_appointmentBranch != null) {
+                                                          ServiceBranchController.available(
+                                                            context,
+                                                            branchId: _appointmentBranch?.key,
+                                                          ).then((value) {
+                                                            if (responseCode(value.code)) {
+                                                              context
+                                                                      .read<ServiceBranchController>()
+                                                                      .serviceBranchAvailableResponse =
+                                                                  value.data;
+                                                              if (value.data != null) {
+                                                                for (service_branch_available_model.Data item
+                                                                    in value.data?.data ?? []) {
+                                                                  serviceList.add(
+                                                                    DropdownAttribute(
+                                                                      item.serviceBranchId ?? '',
+                                                                      item.serviceName ?? '',
+                                                                    ),
                                                                   );
-                                                                  rebuildDropdown.add(DateTime.now());
                                                                 }
-                                                              });
-                                                            } else {
+                                                              }
+                                                              serviceList.sort(
+                                                                (a, b) => a.name.compareTo(b.name),
+                                                              );
                                                               rebuildDropdown.add(DateTime.now());
                                                             }
-                                                          },
-                                                        ),
-                                                      ),
-                                                    ],
+                                                          });
+                                                        } else {
+                                                          rebuildDropdown.add(DateTime.now());
+                                                        }
+                                                      },
+                                                    ),
                                                   );
                                                 },
                                               );
                                             },
                                           ),
-                                        const SizedBox(height: 14),
+                                        const SizedBox(height: 16),
                                         if (widget.type == 'update') ...[
                                           Row(
                                             children: [
@@ -1752,64 +1752,58 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             builder: (context, snapshot) {
                                               return Consumer<ServiceBranchController>(
                                                 builder: (context, serviceBranchController, _) {
-                                                  return Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: AppDropdown(
-                                                          attributeList: DropdownAttributeList(
-                                                            serviceList,
-                                                            labelText: 'appointmentPage'.tr(gender: 'service'),
-                                                            prefixIcon: Icon(Icons.medical_services_outlined, size: 18, color: appInkMuted),
-                                                            value: _service?.name,
-                                                            fieldColor: widget.type == 'update'
-                                                                ? appSurfaceSubtle
-                                                                : appSurface,
-                                                            borderColor: appBorderStrong,
-                                                            isEditable: widget.type == 'create',
-                                                            onChanged: (p0) {
-                                                              _service = p0;
-                                                              rebuild.add(DateTime.now());
-                                                              try {
-                                                                _status = appointmentStatus.firstWhere(
-                                                                  (element) => element.key == '1',
+                                                  return AppDropdown(
+                                                    attributeList: DropdownAttributeList(
+                                                      serviceList,
+                                                      labelText: 'appointmentPage'.tr(gender: 'service'),
+                                                      prefixIcon: Icon(Icons.medical_services_outlined, size: 18, color: appInkMuted),
+                                                      value: _service?.name,
+                                                      fieldColor: widget.type == 'update'
+                                                          ? appSurfaceSubtle
+                                                          : appSurface,
+                                                      borderColor: appBorderStrong,
+                                                      isEditable: widget.type == 'create',
+                                                      onChanged: (p0) {
+                                                        _service = p0;
+                                                        rebuild.add(DateTime.now());
+                                                        try {
+                                                          _status = appointmentStatus.firstWhere(
+                                                            (element) => element.key == '1',
+                                                          );
+                                                          try {
+                                                            selectedService = context
+                                                                .read<ServiceBranchController>()
+                                                                .serviceBranchAvailableResponse
+                                                                ?.data
+                                                                ?.firstWhere(
+                                                                  (e) => e.serviceBranchId == p0?.key,
                                                                 );
-                                                                try {
-                                                                  selectedService = context
-                                                                      .read<ServiceBranchController>()
-                                                                      .serviceBranchAvailableResponse
-                                                                      ?.data
-                                                                      ?.firstWhere(
-                                                                        (e) => e.serviceBranchId == p0?.key,
-                                                                      );
-                                                                  rebuild.add(DateTime.now());
-                                                                } catch (e) {
-                                                                  debugPrint(e.toString());
-                                                                }
-                                                              } catch (e) {
-                                                                debugPrint(e.toString());
-                                                              }
-                                                              ServiceBranchAvailableDtController.getAvailableSlot(
-                                                                context,
-                                                                serviceBranchId: _service?.key,
-                                                                branchId: _appointmentBranch?.key ?? widget.appointment?.branch?.branchId,
-                                                                serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : selectedService?.serviceTime,
-                                                                durationMinutes: _isCurrentRescan ? _rescanDuration : null,
-                                                              ).then((value) {
-                                                                if (responseCode(value.code)) {
-                                                                  context
-                                                                          .read<ServiceBranchAvailableDtController>()
-                                                                          .serviceBranchAvailableTimingResponse =
-                                                                      value.data;
-                                                                  availableDateTime = value.data?.slots ?? [];
-                                                                  rebuild.add(DateTime.now());
-                                                                  rebuildDropdown.add(DateTime.now());
-                                                                }
-                                                              });
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
+                                                            rebuild.add(DateTime.now());
+                                                          } catch (e) {
+                                                            debugPrint(e.toString());
+                                                          }
+                                                        } catch (e) {
+                                                          debugPrint(e.toString());
+                                                        }
+                                                        ServiceBranchAvailableDtController.getAvailableSlot(
+                                                          context,
+                                                          serviceBranchId: _service?.key,
+                                                          branchId: _appointmentBranch?.key ?? widget.appointment?.branch?.branchId,
+                                                          serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : selectedService?.serviceTime,
+                                                          durationMinutes: _isCurrentRescan ? _rescanDuration : null,
+                                                        ).then((value) {
+                                                          if (responseCode(value.code)) {
+                                                            context
+                                                                    .read<ServiceBranchAvailableDtController>()
+                                                                    .serviceBranchAvailableTimingResponse =
+                                                                value.data;
+                                                            availableDateTime = value.data?.slots ?? [];
+                                                            rebuild.add(DateTime.now());
+                                                            rebuildDropdown.add(DateTime.now());
+                                                          }
+                                                        });
+                                                      },
+                                                    ),
                                                   );
                                                 },
                                               );
@@ -1858,7 +1852,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             );
                                           },
                                         ),
-                                        const SizedBox(height: 14),
+                                        const SizedBox(height: 16),
                                         StreamBuilder<DateTime>(
                                           stream: rebuildDropdown.stream,
                                           builder: (context, snapshot) {
@@ -1946,67 +1940,66 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             );
                                           },
                                         ),
-                                        const SizedBox(height: 14),
+                                        const SizedBox(height: 16),
                                         Consumer<ServiceBranchAvailableDtController>(
                                           builder: (context, snapshot, _) {
                                             return _isLocked
                                                 ? labelValue('Slots', dateTimeController.text)
-                                                : Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                                    children: [
-                                                      Expanded(
-                                                        child: GestureDetector(
-                                                          onTap: _selectAppointmentSlot,
-                                                          child: InputDecorator(
-                                                            decoration: InputDecoration(
-                                                              labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
-                                                              floatingLabelBehavior: FloatingLabelBehavior.always,
-                                                              labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
-                                                              filled: true,
-                                                              fillColor: appSurface,
-                                                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                                              border: OutlineInputBorder(
-                                                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                                                borderRadius: BorderRadius.circular(8),
-                                                              ),
-                                                              enabledBorder: OutlineInputBorder(
-                                                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                                                borderRadius: BorderRadius.circular(8),
-                                                              ),
-                                                              focusedBorder: OutlineInputBorder(
-                                                                borderSide: BorderSide(color: primary, width: 1.5),
-                                                                borderRadius: BorderRadius.circular(8),
-                                                              ),
-                                                              prefixIcon: Padding(
-                                                                padding: const EdgeInsets.only(left: 12, right: 8),
-                                                                child: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
-                                                              ),
-                                                              prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                                                              suffixIcon: Icon(Icons.date_range_rounded, size: 18, color: appInkMuted),
-                                                            ),
-                                                            child: Text(
-                                                              dateTimeController.text.isEmpty
-                                                                  ? 'Select appointment slot'
-                                                                  : dateTimeController.text,
-                                                              style: TextStyle(
-                                                                fontSize: 13,
-                                                                fontWeight: FontWeight.w500,
-                                                                color: dateTimeController.text.isEmpty ? appInkMuted : textPrimaryColor,
-                                                              ),
-                                                            ),
-                                                          ),
+                                                : GestureDetector(
+                                                    onTap: _selectAppointmentSlot,
+                                                    child: InputDecorator(
+                                                      decoration: InputDecoration(
+                                                        labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                                                        labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                                        filled: true,
+                                                        fillColor: appSurface,
+                                                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                                        border: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                        ),
+                                                        enabledBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                        ),
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: primary, width: 1.5),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                        ),
+                                                        prefixIcon: Padding(
+                                                          padding: const EdgeInsets.only(left: 12, right: 8),
+                                                          child: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
+                                                        ),
+                                                        prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                                                        suffixIcon: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            _buildRefreshSlotButton(inline: true),
+                                                            const SizedBox(width: 4),
+                                                            Icon(Icons.date_range_rounded, size: 18, color: appInkMuted),
+                                                            const SizedBox(width: 10),
+                                                          ],
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 8),
-                                                      _buildRefreshSlotButton(),
-                                                    ],
+                                                      child: Text(
+                                                        dateTimeController.text.isEmpty
+                                                            ? 'Select appointment slot'
+                                                            : dateTimeController.text,
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: dateTimeController.text.isEmpty ? appInkMuted : textPrimaryColor,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   );
                                           },
                                         ),
                                         const SizedBox(height: 20),
                                         if (_status?.key != '6') ...[
                                           _extraSectionLabel('Attachment', Icons.attach_file_rounded),
-                                          const SizedBox(height: 10),
+                                          const SizedBox(height: 12),
                                           AppAttachmentField(
                                             controller: _attachmentUrlController,
                                             folder: 'appointment',
@@ -2014,13 +2007,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                           ),
                                           const SizedBox(height: 20),
                                           _extraSectionLabel('Referral Letter (PDF)', Icons.description_outlined),
-                                          const SizedBox(height: 10),
+                                          const SizedBox(height: 12),
                                           AppAttachmentField(
                                             controller: _referralLetterUrlController,
                                             folder: 'referral-letters',
                                             onChanged: () => setState(() {}),
                                           ),
-                                          const SizedBox(height: 6),
+                                          const SizedBox(height: 8),
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
@@ -3357,59 +3350,59 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                   );
                 },
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
               Consumer<ServiceBranchAvailableDtController>(
                 builder: (context, snapshot, _) {
                   return _isLocked
                       ? labelValue('Slots', dateTimeController.text)
-                      : Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: _selectAppointmentSlot,
-                                child: InputDecorator(
-                                  decoration: InputDecoration(
-                                    labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
-                                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                                    labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
-                                    filled: true,
-                                    fillColor: appSurface,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: primary, width: 1.5),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    prefixIcon: Padding(
-                                      padding: const EdgeInsets.only(left: 12, right: 8),
-                                      child: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
-                                    ),
-                                    prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                                    suffixIcon: Icon(Icons.date_range_rounded, size: 18, color: appInkMuted),
-                                  ),
-                                  child: Text(
-                                    dateTimeController.text.isEmpty
-                                        ? 'Select appointment slot'
-                                        : dateTimeController.text,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      color: dateTimeController.text.isEmpty ? appInkMuted : textPrimaryColor,
-                                    ),
-                                  ),
-                                ),
+                      : GestureDetector(
+                          onTap: _selectAppointmentSlot,
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                              floatingLabelBehavior: FloatingLabelBehavior.always,
+                              labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                              filled: true,
+                              fillColor: appSurface,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: primary, width: 1.5),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(left: 12, right: 8),
+                                child: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
+                              ),
+                              prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                              suffixIcon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildRefreshSlotButton(inline: true),
+                                  const SizedBox(width: 4),
+                                  Icon(Icons.date_range_rounded, size: 18, color: appInkMuted),
+                                  const SizedBox(width: 10),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            _buildRefreshSlotButton(),
-                          ],
+                            child: Text(
+                              dateTimeController.text.isEmpty
+                                  ? 'Select appointment slot'
+                                  : dateTimeController.text,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: dateTimeController.text.isEmpty ? appInkMuted : textPrimaryColor,
+                              ),
+                            ),
+                          ),
                         );
                 },
               ),
@@ -3848,9 +3841,50 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     }
   }
 
-  Widget _buildRefreshSlotButton() {
+  Widget _buildRefreshSlotButton({bool inline = false}) {
     final bool isCoolingDown = _refreshCooldownSeconds > 0;
     final bool isDisabled = isCoolingDown || _isRefreshingSlots || _isLocked;
+
+    if (inline) {
+      return Tooltip(
+        message: isCoolingDown
+            ? 'Wait ${_refreshCooldownSeconds}s to refresh slots'
+            : 'Refresh available slots',
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isDisabled ? null : () => _triggerSlotRefresh(userInitiated: true),
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: _isRefreshingSlots
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+                    )
+                  : isCoolingDown
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.refresh_rounded, size: 15, color: Color(0xFF4F46E5)),
+                            const SizedBox(width: 3),
+                            Text(
+                              '${_refreshCooldownSeconds}s',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
+                            ),
+                          ],
+                        )
+                      : Icon(
+                          Icons.refresh_rounded,
+                          size: 18,
+                          color: isDisabled ? appInkMuted.withAlpha(120) : const Color(0xFF4F46E5),
+                        ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Tooltip(
       message: isCoolingDown
