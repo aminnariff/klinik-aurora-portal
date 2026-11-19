@@ -64,7 +64,28 @@ class AppointmentDetails extends StatefulWidget {
   final String type;
   final List<String>? tabs;
   final Function? refreshData;
-  const AppointmentDetails({super.key, this.appointment, required this.type, this.tabs, this.refreshData});
+  final String? initialUserId;
+  final String? initialUserName;
+  final String? initialUserPhone;
+  final String? initialUserEmail;
+  final String? initialBranchId;
+  final String? initialDueDate;
+  final String? initialNote;
+
+  const AppointmentDetails({
+    super.key,
+    this.appointment,
+    required this.type,
+    this.tabs,
+    this.refreshData,
+    this.initialUserId,
+    this.initialUserName,
+    this.initialUserPhone,
+    this.initialUserEmail,
+    this.initialBranchId,
+    this.initialDueDate,
+    this.initialNote,
+  });
 
   @override
   State<AppointmentDetails> createState() => _AppointmentDetailsState();
@@ -173,13 +194,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   @override
   void initState() {
-    _selectedUserId = widget.appointment?.user?.userId;
+    _selectedUserId = widget.appointment?.user?.userId ?? widget.initialUserId;
     _selectedUserNric = widget.appointment?.user?.userNric;
-    patientNameController.controller.text = widget.appointment?.user?.userFullName?.titleCase() ?? '';
-    patientContactNoController.controller.text = widget.appointment?.user?.userPhone ?? '';
-    patientEmailController.controller.text = widget.appointment?.user?.userEmail ?? '';
-    appointmentNoteController.controller.text = widget.appointment?.appointmentNote ?? '';
-    dueDateController.controller.text = dateConverter(widget.appointment?.customerDueDate, format: 'dd-MM-yyyy') ?? '';
+    patientNameController.controller.text =
+        widget.appointment?.user?.userFullName?.titleCase() ?? widget.initialUserName?.titleCase() ?? '';
+    patientContactNoController.controller.text =
+        widget.appointment?.user?.userPhone ?? widget.initialUserPhone ?? '';
+    patientEmailController.controller.text =
+        widget.appointment?.user?.userEmail ?? widget.initialUserEmail ?? '';
+    appointmentNoteController.controller.text =
+        widget.appointment?.appointmentNote ?? widget.initialNote ?? '';
+    dueDateController.controller.text =
+        dateConverter(widget.appointment?.customerDueDate, format: 'dd-MM-yyyy') ?? widget.initialDueDate ?? '';
     _attachmentUrlController.text = widget.appointment?.appointmentAttachmentUrl ?? '';
     _referralLetterUrlController.text = widget.appointment?.appointmentReferralLetterUrl ?? '';
 
@@ -240,6 +266,34 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           if (item != null) {
             _appointmentBranch = DropdownAttribute(item.branchId ?? '', item.branchName ?? '');
           }
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+      }
+      if (widget.type == 'create' && widget.initialBranchId != null) {
+        try {
+          final branchList = context.read<BranchController>().branchAllResponse?.data?.data ?? [];
+          final match = branchList.firstWhere(
+            (element) => element.branchId == widget.initialBranchId,
+            orElse: () => branch_model.Data(branchId: widget.initialBranchId, branchName: 'Branch'),
+          );
+          _appointmentBranch = DropdownAttribute(match.branchId ?? '', match.branchName ?? '');
+          ServiceBranchController.available(
+            context,
+            branchId: widget.initialBranchId,
+          ).then((value) {
+            if (responseCode(value.code)) {
+              if (value.data != null) {
+                serviceList.clear();
+                for (service_branch_available_model.Data item in value.data?.data ?? []) {
+                  serviceList.add(DropdownAttribute(item.serviceBranchId ?? '', item.serviceName ?? ''));
+                }
+              }
+              serviceList.sort((a, b) => a.name.compareTo(b.name));
+              context.read<ServiceBranchController>().serviceBranchAvailableResponse = value.data;
+              rebuildDropdown.add(DateTime.now());
+            }
+          });
         } catch (e) {
           debugPrint(e.toString());
         }

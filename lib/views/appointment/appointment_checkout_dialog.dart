@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_checkout_controller.dart';
+import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
@@ -828,81 +829,195 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
     );
   }
 
+  (String nextTitle, String nextDesc, int bonusPts) _getNextMilestoneRecommendation() {
+    final key = _preview?.detectedMilestone?.key;
+    switch (key) {
+      case 'nt_scan':
+        return (
+          'W18–24 Detail Anomaly Scan',
+          'Comprehensive organ anatomy & defect screening. Ideal window: ~6–8 weeks from now.',
+          100,
+        );
+      case 'detail_scan':
+        return (
+          'W26–32 4D/5D HD Live Baby Scan',
+          'Real-time facial features & emotional bonding ultrasound. Ideal window: ~6–8 weeks from now.',
+          100,
+        );
+      case 'scan_4d5d':
+        return (
+          'W33–36 Growth & Position Doppler Scan',
+          'Late pregnancy fetal biometry, placental check & amniotic fluid. Ideal window: ~4–6 weeks from now.',
+          50,
+        );
+      case 'growth_scan':
+        return (
+          'Postnatal & Newborn Care Visit',
+          '6-week maternal healing, newborn health check & lactation support.',
+          50,
+        );
+      default:
+        return (
+          'Next Follow-Up Appointment',
+          'Lock in the patient\'s next clinical visit or routine scan before they leave the counter.',
+          0,
+        );
+    }
+  }
+
   Widget _buildReceiptView(AppColors colors) {
     final res = _result!;
+    final nextMilestone = _getNextMilestoneRecommendation();
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Center(
-          child: Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: colors.successSoftBg,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.check_circle_rounded, color: colors.success, size: 32),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Center(
-          child: Text(
-            'Visit Completed & Receipt Generated',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: colors.inkPrimary),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Center(
-          child: Text(
-            'Collected RM ${res.netCollected.toStringAsFixed(2)} · Awarded +${res.pointsAwarded} Aurora Points',
-            style: TextStyle(fontSize: 13, color: colors.inkMuted),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: colors.surfaceSubtle,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: colors.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _receiptRow('Patient', res.patientName, colors.inkPrimary),
-              _receiptRow('Service', res.serviceName, colors.inkPrimary),
-              _receiptRow('Amount Paid at Counter', 'RM ${res.netCollected.toStringAsFixed(2)}', colors.brandText),
-              _receiptRow('Points Awarded', '+${res.pointsAwarded} pts', _purpleAccent),
-              _receiptRow('New Patient Points Balance', '${res.newTotalPoints} pts', colors.success),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: AppButton.secondary(
-                text: 'Close Window',
-                onPressed: () => Navigator.of(context).pop(true),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: colors.successSoftBg,
+                shape: BoxShape.circle,
               ),
+              child: Icon(Icons.check_circle_rounded, color: colors.success, size: 32),
             ),
-            if (res.whatsappUrl != null && res.whatsappUrl!.isNotEmpty) ...[
-              const SizedBox(width: 10),
-              Expanded(
-                child: AppButton.primary(
-                  text: 'Share WhatsApp Receipt',
-                  icon: const Icon(Icons.send_rounded, size: 15),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(
+              'Visit Completed & Receipt Generated',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: colors.inkPrimary),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: Text(
+              'Collected RM ${res.netCollected.toStringAsFixed(2)} · Awarded +${res.pointsAwarded} Aurora Points',
+              style: TextStyle(fontSize: 13, color: colors.inkMuted),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Receipt Summary Box
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: colors.surfaceSubtle,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: colors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _receiptRow('Patient', res.patientName, colors.inkPrimary),
+                _receiptRow('Service', res.serviceName, colors.inkPrimary),
+                _receiptRow('Amount Paid at Counter', 'RM ${res.netCollected.toStringAsFixed(2)}', colors.brandText),
+                _receiptRow('Points Awarded', '+${res.pointsAwarded} pts', _purpleAccent),
+                _receiptRow('New Patient Points Balance', '${res.newTotalPoints} pts', colors.success),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Secure Next Appointment Recommendation Card
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: colors.brandSoftBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: colors.brandBorder),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.calendar_month_rounded, color: colors.brandPrimary, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Secure Next Appointment (Recommended)',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: colors.brandText),
+                    ),
+                    if (nextMilestone.$3 > 0) ...[
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _purpleAccent,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '+${nextMilestone.$3} Pts Bonus',
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  nextMilestone.$1,
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: colors.inkPrimary),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  nextMilestone.$2,
+                  style: TextStyle(fontSize: 12, color: colors.inkMuted),
+                ),
+                const SizedBox(height: 12),
+                AppButton.primary(
+                  text: 'Book Next Appointment Now (Pre-filled)',
+                  icon: const Icon(Icons.add_task_rounded, size: 15),
+                  height: 38,
                   onPressed: () {
-                    launchWebUrl(res.whatsappUrl!, webOnlyWindowName: '_blank');
+                    Navigator.of(context).pop(true);
+                    showDialog(
+                      context: context,
+                      builder: (_) => AppointmentDetails(
+                        type: 'create',
+                        initialUserId: _preview?.userId,
+                        initialUserName: _preview?.patientName,
+                        initialUserPhone: _preview?.patientPhone,
+                        initialBranchId: _preview?.branchId,
+                        initialNote: 'Follow-up booking after completing ${_preview?.serviceName}',
+                        refreshData: () => widget.onCompleted?.call(),
+                      ),
+                    );
                   },
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Standard Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.secondary(
+                  text: 'Close Window',
+                  onPressed: () => Navigator.of(context).pop(true),
+                ),
               ),
+              if (res.whatsappUrl != null && res.whatsappUrl!.isNotEmpty) ...[
+                const SizedBox(width: 10),
+                Expanded(
+                  child: AppButton.primary(
+                    text: 'Share WhatsApp Receipt',
+                    icon: const Icon(Icons.send_rounded, size: 15),
+                    onPressed: () {
+                      launchWebUrl(res.whatsappUrl!, webOnlyWindowName: '_blank');
+                    },
+                  ),
+                ),
+              ],
             ],
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

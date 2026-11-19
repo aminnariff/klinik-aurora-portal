@@ -12,6 +12,7 @@ import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/views/appointment/appointment_checkout_dialog.dart';
+import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_filter_field.dart';
@@ -139,6 +140,21 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
     if (done == true && mounted) {
       _fetch(silent: true);
     }
+  }
+
+  void _openNextAppointmentDialog(QueueAppointmentItem item) {
+    showDialog(
+      context: context,
+      builder: (_) => AppointmentDetails(
+        type: 'create',
+        initialUserId: item.userId,
+        initialUserName: item.patientName,
+        initialUserPhone: item.patientPhone,
+        initialBranchId: item.branchId,
+        initialNote: 'Follow-up booking after completing ${item.serviceName}',
+        refreshData: () => _fetch(silent: true),
+      ),
+    );
   }
 
   Future<void> _promptRoomAndMove(QueueAppointmentItem item) async {
@@ -689,6 +705,15 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               ),
             ] else ...[
               // Completed or No-show
+              if (isDone) ...[
+                AppButton.primary(
+                  text: 'Book Next',
+                  height: 32,
+                  icon: const Icon(Icons.calendar_month_rounded, size: 13),
+                  onPressed: () => _openNextAppointmentDialog(item),
+                ),
+                const SizedBox(width: 6),
+              ],
               AppButton.secondary(
                 text: isDone ? 'Receipt' : 'Reopen',
                 height: 32,
@@ -984,6 +1009,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
         );
       default:
         final completedLabel = _formatCompletedTime(item.completedAt);
+        final isDone = item.queueStatus == 'completed';
         return Row(
           children: [
             Expanded(
@@ -992,6 +1018,14 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                 style: TextStyle(fontSize: 11, color: colors.inkMuted, fontWeight: FontWeight.w600),
               ),
             ),
+            if (isDone) ...[
+              AppButton.secondary(
+                text: 'Next',
+                height: 28,
+                onPressed: () => _openNextAppointmentDialog(item),
+              ),
+              const SizedBox(width: 4),
+            ],
             TextButton(
               onPressed: () => _advance(item, 'scheduled'),
               child: const Text('Reopen', style: TextStyle(fontSize: 12)),

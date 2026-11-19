@@ -338,6 +338,25 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   void _handleMenuSelection(String value, Data appointment) async {
+    if (value == 'book_next') {
+      showDialog(
+        context: context,
+        builder: (_) => AppointmentDetails(
+          type: 'create',
+          initialUserId: appointment.user?.userId,
+          initialUserName: appointment.user?.userFullName,
+          initialUserPhone: appointment.user?.userPhone,
+          initialUserEmail: appointment.user?.userEmail,
+          initialBranchId: appointment.branch?.branchId,
+          initialNote: 'Follow-up booking after completing ${appointment.service?.serviceName ?? 'consultation'}',
+          refreshData: () {
+            getDashboard();
+            filtering();
+          },
+        ),
+      );
+      return;
+    }
     if (value == 'checkout') {
       final appointmentId = appointment.appointmentId;
       if (appointmentId == null) return;
@@ -1682,6 +1701,20 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           ],
                         ),
                       ),
+                    PopupMenuItem<String>(
+                      value: 'book_next',
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.calendar_month_rounded,
+                            size: 20,
+                            color: Color(0xFF2563EB),
+                          ),
+                          const SizedBox(width: 8),
+                          Text('Book Next Appointment', style: AppTypography.bodyMedium(context)),
+                        ],
+                      ),
+                    ),
                     PopupMenuItem<String>(
                       value: 'update',
                       child: Row(
