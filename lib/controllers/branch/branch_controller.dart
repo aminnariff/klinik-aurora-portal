@@ -47,14 +47,16 @@ class BranchController extends ChangeNotifier {
         .then((value) {
           debugPrint('Branch getAll raw response: code=${value.code} data=${value.data}');
           try {
-            final parsed = BranchAllResponse.fromJson(value.data);
+            final parsed = (value.data != null && value.data is Map<String, dynamic>)
+                ? BranchAllResponse.fromJson(value.data)
+                : null;
             debugPrint(
-              'Branch getAll parsed: message=${parsed.message} data count=${parsed.data?.length} totalPage=${parsed.totalPage}',
+              'Branch getAll parsed: message=${parsed?.message} data count=${parsed?.data?.length} totalPage=${parsed?.totalPage}',
             );
-            return ApiResponse(code: value.code, data: parsed);
+            return ApiResponse(code: value.code, data: parsed, message: value.message);
           } catch (e) {
             debugPrint('Branch getAll parse error: $e');
-            return ApiResponse(code: 400, message: e.toString());
+            return ApiResponse(code: 400, message: value.message ?? e.toString());
           }
         });
   }

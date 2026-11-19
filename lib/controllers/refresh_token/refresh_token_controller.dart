@@ -14,9 +14,15 @@ class RefreshTokenController extends ChangeNotifier {
         )
         .then((value) {
           try {
-            return ApiResponse(code: value.code, data: AuthResponse.fromJson(value.data));
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: (value.data != null && value.data is Map<String, dynamic>)
+                  ? AuthResponse.fromJson(value.data)
+                  : null,
+            );
           } catch (e) {
-            return ApiResponse(code: 400, message: e.toString());
+            return ApiResponse(code: 400, message: value.message ?? e.toString());
           }
         });
   }

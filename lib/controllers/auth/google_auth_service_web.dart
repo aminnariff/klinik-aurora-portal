@@ -33,7 +33,20 @@ class GoogleAuthService {
       }
       final jsString = await promise.toDart;
       final raw = jsString.toDart;
-      final map = jsonDecode(raw) as Map<String, dynamic>;
+      if (raw.isEmpty) {
+        return GoogleAuthResult(
+          success: false,
+          error: 'Empty response from Google Sign-In',
+        );
+      }
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) {
+        return GoogleAuthResult(
+          success: false,
+          error: 'Invalid Google Sign-In response',
+        );
+      }
+      final map = decoded;
       return GoogleAuthResult(
         success: map['success'] == true,
         idToken: map['idToken'] as String?,

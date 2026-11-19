@@ -75,7 +75,11 @@ class User {
     userFullname = json['userFullname'];
     branchId = json['branchId'];
     isSuperadmin = json['isSuperadmin'];
-    permissions = json['permissions'].cast<String>();
+    if (json['permissions'] != null && json['permissions'] is List) {
+      permissions = (json['permissions'] as List).map((e) => e.toString()).toList();
+    } else {
+      permissions = <String>[];
+    }
   }
 
   Map<String, dynamic> toJson() {
