@@ -11,16 +11,20 @@ import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/branch/branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
-import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
+import 'package:klinik_aurora_portal/views/appointment/appointment_checkout_dialog.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_filter_field.dart';
+import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
 import 'package:klinik_aurora_portal/views/widgets/patient/patient_quick_drawer.dart';
 import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:provider/provider.dart';
 
-/// Receptionist Front-Desk Queue & Check-In Board ("Today's Flow") (#1).
+enum _ScheduleViewMode { timeline, kanban }
+
+/// Today's Schedule & Appointments Hub.
+/// Daily bookings, counter check-in, and instant checkout with loyalty points reward.
 class QueueBoardPage extends StatefulWidget {
   static const routeName = RouteNames.queueBoard;
   static const displayName = RouteNames.queueBoardDisplay;
@@ -43,6 +47,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
   String? _error;
   QueueBoardData? _board;
   final Set<String> _updatingIds = {};
+  _ScheduleViewMode _viewMode = _ScheduleViewMode.timeline;
 
   @override
   void initState() {
@@ -101,7 +106,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
       });
     } else {
       setState(() {
-        _error = res.message ?? 'Failed to load queue board.';
+        _error = res.message ?? "Failed to load today's schedule.";
         _loading = false;
       });
     }
@@ -122,6 +127,17 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
       _fetch(silent: true);
     } else {
       AppToast.snackbar(context, res.message ?? 'Failed to update status.');
+    }
+  }
+
+  Future<void> _openCheckoutDialog(QueueAppointmentItem item) async {
+    final done = await AppointmentCheckoutDialog.show(
+      context,
+      appointmentId: item.appointmentId,
+      onCompleted: () => _fetch(silent: true),
+    );
+    if (done == true && mounted) {
+      _fetch(silent: true);
     }
   }
 
@@ -206,12 +222,27 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
     }
   }
 
+  void _whatsappPatient(QueueAppointmentItem item) {
+    final raw = item.patientPhone.replaceAll(RegExp(r'\D'), '');
+    if (raw.isEmpty) {
+      AppToast.snackbar(context, 'No phone number on record for this patient.');
+      return;
+    }
+    final full = raw.startsWith('0') ? '6$raw' : (raw.startsWith('60') ? raw : '60$raw');
+    final msg = Uri.encodeComponent(
+      'Assalamualaikum / Hi ${item.patientName}, ini dari Klinik Aurora berkenaan temujanji anda (${item.serviceName}) hari ini. Kami sedia membantu.',
+    );
+    launchWebUrl('https://wa.me/$full?text=$msg', webOnlyWindowName: '_blank');
+  }
+
   List<QueueAppointmentItem> _filtered(String stage) {
     final q = _searchCtrl.text.trim().toLowerCase();
     return (_board?.items ?? []).where((item) {
-      final matchesStage = stage == 'done'
-          ? (item.queueStatus == 'completed' || item.queueStatus == 'no_show')
-          : item.queueStatus == stage;
+      final matchesStage = stage == 'all'
+          ? true
+          : stage == 'done'
+              ? (item.queueStatus == 'completed' || item.queueStatus == 'no_show')
+              : item.queueStatus == stage;
       if (!matchesStage) return false;
       if (q.isEmpty) return true;
       return item.patientName.toLowerCase().contains(q) ||
@@ -245,12 +276,12 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Today's Flow · Front-Desk Queue",
+                      "Today's Schedule & Appointments",
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: colors.inkPrimary),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Check patients in, assign rooms, monitor live wait times, and complete visits in one click.',
+                      'View daily booked appointments, check patients in, and complete visits with automatic counter math & points reward.',
                       style: TextStyle(fontSize: 13, color: colors.inkMuted),
                     ),
                   ],
@@ -340,13 +371,37 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                           ),
                         ),
                       ),
-                    AppButton.secondary(
-                      text: 'Book Walk-In (N)',
-                      icon: Icon(Icons.person_add_alt_1_rounded, size: 16, color: colors.inkSecondary),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (_) => const AppointmentDetails(type: 'create'),
-                      ).then((_) => _fetch(silent: true)),
+                    // View Toggle (Timeline vs Kanban)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: colors.border),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Timeline List View',
+                            icon: Icon(
+                              Icons.view_agenda_rounded,
+                              size: 18,
+                              color: _viewMode == _ScheduleViewMode.timeline ? colors.brandPrimary : colors.inkMuted,
+                            ),
+                            onPressed: () => setState(() => _viewMode = _ScheduleViewMode.timeline),
+                          ),
+                          Container(width: 1, height: 20, color: colors.border),
+                          IconButton(
+                            tooltip: 'Kanban Column View',
+                            icon: Icon(
+                              Icons.view_column_rounded,
+                              size: 18,
+                              color: _viewMode == _ScheduleViewMode.kanban ? colors.brandPrimary : colors.inkMuted,
+                            ),
+                            onPressed: () => setState(() => _viewMode = _ScheduleViewMode.kanban),
+                          ),
+                        ],
+                      ),
                     ),
                     AppButton.primary(
                       text: 'Refresh',
@@ -375,6 +430,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                     onClear: () => setState(() {}),
                   ),
                 ),
+                _kpiPill(context, 'Total Bookings', '${_board?.total ?? 0}', colors.inkPrimary),
                 _kpiPill(context, 'Scheduled', '${_board?.scheduled ?? 0}', colors.info),
                 _kpiPill(context, 'Checked In', '${_board?.checkedIn ?? 0}', colors.warning),
                 _kpiPill(context, 'In Room', '${_board?.inRoom ?? 0}', colors.brandText),
@@ -390,45 +446,15 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
             ),
             const SizedBox(height: 14),
 
-            // ── Kanban Columns ───────────────────────────────────────────
+            // ── Main Content View ─────────────────────────────────────────
             Expanded(
               child: _loading
                   ? Center(child: CircularProgressIndicator(color: colors.brandPrimary))
                   : _error != null
                       ? Center(child: Text(_error!, style: TextStyle(color: colors.danger)))
-                      : LayoutBuilder(
-                          builder: (context, constraints) {
-                            final cols = [
-                              _column(context, 'Scheduled', 'scheduled', colors.info, Icons.schedule_rounded),
-                              _column(context, 'Checked In', 'checked_in', colors.warning, Icons.how_to_reg_rounded),
-                              _column(context, 'In Scan / Room', 'in_room', colors.brandText, Icons.medical_services_rounded),
-                              _column(context, 'Completed / No-Show', 'done', colors.success, Icons.check_circle_outline_rounded),
-                            ];
-                            if (constraints.maxWidth >= 1040) {
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  for (int i = 0; i < cols.length; i++) ...[
-                                    if (i > 0) const SizedBox(width: 12),
-                                    Expanded(child: cols[i]),
-                                  ],
-                                ],
-                              );
-                            }
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  for (int i = 0; i < cols.length; i++) ...[
-                                    if (i > 0) const SizedBox(width: 12),
-                                    SizedBox(width: 310, child: cols[i]),
-                                  ],
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                      : _viewMode == _ScheduleViewMode.timeline
+                          ? _buildTimelineView(colors)
+                          : _buildKanbanView(colors),
             ),
           ],
         ),
@@ -436,22 +462,285 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
     );
   }
 
-  Widget _kpiPill(BuildContext context, String label, String value, Color accent) {
-    final colors = context.appColors;
+  // ── Timeline Schedule List View ──────────────────────────────────────
+  Widget _buildTimelineView(AppColors colors) {
+    final allItems = _filtered('all');
+
+    if (allItems.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.event_available_rounded, size: 48, color: colors.inkMuted),
+            const SizedBox(height: 12),
+            Text(
+              "No bookings scheduled for ${DateFormat('dd MMM yyyy').format(_selectedDate)}",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.inkPrimary),
+            ),
+            const SizedBox(height: 4),
+            Text('Try selecting another date or clear your search query.', style: TextStyle(fontSize: 12, color: colors.inkMuted)),
+          ],
+        ),
+      );
+    }
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: colors.border),
       ),
+      child: ListView.separated(
+        padding: const EdgeInsets.all(12),
+        itemCount: allItems.length,
+        separatorBuilder: (_, _) => Divider(height: 12, color: colors.border.withValues(alpha: 0.6)),
+        itemBuilder: (context, idx) {
+          final item = allItems[idx];
+          return _timelineRow(colors, item);
+        },
+      ),
+    );
+  }
+
+  Widget _timelineRow(AppColors colors, QueueAppointmentItem item) {
+    final isDone = item.queueStatus == 'completed';
+    final isNoShow = item.queueStatus == 'no_show';
+    final isBusy = _updatingIds.contains(item.appointmentId);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDone
+            ? colors.surfaceSubtle.withValues(alpha: 0.5)
+            : isNoShow
+                ? colors.danger.withValues(alpha: 0.04)
+                : colors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isNoShow
+              ? colors.danger.withValues(alpha: 0.3)
+              : isDone
+                  ? colors.border
+                  : colors.brandBorder.withValues(alpha: 0.4),
+        ),
+      ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('$label: ', style: TextStyle(fontSize: 12, color: colors.inkMuted, fontWeight: FontWeight.w500)),
-          Text(value, style: TextStyle(fontSize: 13, color: accent, fontWeight: FontWeight.w800)),
+          // Time Slot Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: colors.brandSoftBg,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  item.appointmentTime,
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: colors.brandText),
+                ),
+                Text(
+                  _prettyStage(item.queueStatus),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _stageColor(colors, item.queueStatus)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+
+          // Patient Name & Clinical Details
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: item.userId.isNotEmpty
+                      ? () => PatientQuickDrawer.show(context, userId: item.userId, patientName: item.patientName)
+                      : null,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          item.patientName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: colors.brandText,
+                            decoration: TextDecoration.underline,
+                            decorationColor: colors.brandBorder,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.open_in_new_rounded, size: 12, color: colors.inkMuted),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(
+                      item.serviceName,
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.inkSecondary),
+                    ),
+                    if (item.doctorName != null && item.doctorName!.isNotEmpty) ...[
+                      Text(' · ', style: TextStyle(color: colors.inkMuted)),
+                      Flexible(
+                        child: Text(
+                          item.doctorName!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 11, color: colors.inkMuted),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+
+          // Payment & Status Pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: item.isPaid ? colors.successSoftBg : colors.warningSoftBg,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              item.isPaid ? 'Deposit Paid' : 'Unpaid',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: item.isPaid ? colors.success : colors.warning,
+              ),
+            ),
+          ),
+          if (item.queueStatus == 'checked_in' && item.waitMinutes > 0) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: item.waitMinutes >= 20 ? colors.dangerSoftBg : colors.warningSoftBg,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                '${item.waitMinutes}m wait',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: item.waitMinutes >= 20 ? colors.danger : colors.warning,
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(width: 14),
+
+          // Action Strip
+          if (isBusy)
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2, color: colors.brandPrimary),
+            )
+          else ...[
+            // WhatsApp Contact Button
+            IconButton(
+              tooltip: 'Message Patient via WhatsApp',
+              icon: Icon(Icons.chat_bubble_outline_rounded, size: 17, color: colors.success),
+              onPressed: () => _whatsappPatient(item),
+            ),
+            const SizedBox(width: 4),
+
+            // Action based on status
+            if (item.queueStatus == 'scheduled') ...[
+              AppButton.primary(
+                text: 'Check In',
+                height: 32,
+                onPressed: () => _advance(item, 'checked_in'),
+              ),
+              const SizedBox(width: 6),
+              IconButton(
+                tooltip: 'Mark No-Show',
+                icon: Icon(Icons.person_off_outlined, size: 17, color: colors.danger),
+                onPressed: () => _advance(item, 'no_show'),
+              ),
+            ] else if (item.queueStatus == 'checked_in' || item.queueStatus == 'in_room') ...[
+              if (item.queueStatus == 'checked_in') ...[
+                AppButton.secondary(
+                  text: 'To Room',
+                  height: 32,
+                  onPressed: () => _promptRoomAndMove(item),
+                ),
+                const SizedBox(width: 6),
+              ],
+              AppButton.primary(
+                text: 'Complete & Checkout',
+                height: 32,
+                icon: const Icon(Icons.point_of_sale_rounded, size: 14),
+                onPressed: () => _openCheckoutDialog(item),
+              ),
+            ] else ...[
+              // Completed or No-show
+              AppButton.secondary(
+                text: isDone ? 'Receipt' : 'Reopen',
+                height: 32,
+                onPressed: () {
+                  if (isDone) {
+                    _openCheckoutDialog(item);
+                  } else {
+                    _advance(item, 'scheduled');
+                  }
+                },
+              ),
+            ],
+          ],
         ],
       ),
+    );
+  }
+
+  // ── Kanban Column View ──────────────────────────────────────────────
+  Widget _buildKanbanView(AppColors colors) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cols = [
+          _column(context, 'Scheduled', 'scheduled', colors.info, Icons.schedule_rounded),
+          _column(context, 'Checked In', 'checked_in', colors.warning, Icons.how_to_reg_rounded),
+          _column(context, 'In Scan / Room', 'in_room', colors.brandText, Icons.medical_services_rounded),
+          _column(context, 'Completed / No-Show', 'done', colors.success, Icons.check_circle_outline_rounded),
+        ];
+        if (constraints.maxWidth >= 1040) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (int i = 0; i < cols.length; i++) ...[
+                if (i > 0) const SizedBox(width: 12),
+                Expanded(child: cols[i]),
+              ],
+            ],
+          );
+        }
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (int i = 0; i < cols.length; i++) ...[
+                if (i > 0) const SizedBox(width: 12),
+                SizedBox(width: 310, child: cols[i]),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -511,7 +800,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                     padding: const EdgeInsets.all(10),
                     itemCount: items.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, idx) => _patientCard(context, items[idx]),
+                    itemBuilder: (context, idx) => _kanbanCard(context, items[idx]),
                   ),
           ),
         ],
@@ -519,7 +808,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
     );
   }
 
-  Widget _patientCard(BuildContext context, QueueAppointmentItem item) {
+  Widget _kanbanCard(BuildContext context, QueueAppointmentItem item) {
     final colors = context.appColors;
     final busy = _updatingIds.contains(item.appointmentId);
     final isNoShow = item.queueStatus == 'no_show';
@@ -557,7 +846,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  item.isPaid ? 'Paid' : 'Unpaid',
+                  item.isPaid ? 'Deposit Paid' : 'Unpaid',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -632,13 +921,13 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               ),
             )
           else
-            _actionStrip(context, item),
+            _kanbanActionStrip(context, item),
         ],
       ),
     );
   }
 
-  Widget _actionStrip(BuildContext context, QueueAppointmentItem item) {
+  Widget _kanbanActionStrip(BuildContext context, QueueAppointmentItem item) {
     final colors = context.appColors;
     switch (item.queueStatus) {
       case 'scheduled':
@@ -647,7 +936,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
             Expanded(
               child: AppButton.primary(
                 text: 'Check In',
-                height: 34,
+                height: 32,
                 onPressed: () => _advance(item, 'checked_in'),
               ),
             ),
@@ -663,17 +952,20 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
         return Row(
           children: [
             Expanded(
-              child: AppButton.primary(
-                text: 'Move to Room',
-                height: 34,
+              child: AppButton.secondary(
+                text: 'To Room',
+                height: 32,
                 onPressed: () => _promptRoomAndMove(item),
               ),
             ),
             const SizedBox(width: 6),
-            IconButton(
-              tooltip: 'Return to Scheduled',
-              onPressed: () => _advance(item, 'scheduled'),
-              icon: Icon(Icons.undo_rounded, size: 18, color: colors.inkMuted),
+            Expanded(
+              child: AppButton.primary(
+                text: 'Checkout',
+                height: 32,
+                icon: const Icon(Icons.point_of_sale_rounded, size: 13),
+                onPressed: () => _openCheckoutDialog(item),
+              ),
             ),
           ],
         );
@@ -682,9 +974,10 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
           children: [
             Expanded(
               child: AppButton.primary(
-                text: 'Complete Visit',
-                height: 34,
-                onPressed: () => _advance(item, 'completed'),
+                text: 'Complete & Checkout',
+                height: 32,
+                icon: const Icon(Icons.point_of_sale_rounded, size: 14),
+                onPressed: () => _openCheckoutDialog(item),
               ),
             ),
           ],
@@ -705,6 +998,40 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
             ),
           ],
         );
+    }
+  }
+
+  Widget _kpiPill(BuildContext context, String label, String value, Color accent) {
+    final colors = context.appColors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('$label: ', style: TextStyle(fontSize: 12, color: colors.inkMuted, fontWeight: FontWeight.w500)),
+          Text(value, style: TextStyle(fontSize: 13, color: accent, fontWeight: FontWeight.w800)),
+        ],
+      ),
+    );
+  }
+
+  Color _stageColor(AppColors colors, String stage) {
+    switch (stage) {
+      case 'checked_in':
+        return colors.warning;
+      case 'in_room':
+        return colors.brandText;
+      case 'completed':
+        return colors.success;
+      case 'no_show':
+        return colors.danger;
+      default:
+        return colors.info;
     }
   }
 

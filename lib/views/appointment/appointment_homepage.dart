@@ -26,6 +26,7 @@ import 'package:klinik_aurora_portal/models/appointment/appointment_response.dar
 import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/views/appointment/appointment_calendar_view.dart';
+import 'package:klinik_aurora_portal/views/appointment/appointment_checkout_dialog.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/appointment/date_range_dashboard.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_mismatch_view.dart';
@@ -337,6 +338,19 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   void _handleMenuSelection(String value, Data appointment) async {
+    if (value == 'checkout') {
+      final appointmentId = appointment.appointmentId;
+      if (appointmentId == null) return;
+      AppointmentCheckoutDialog.show(
+        context,
+        appointmentId: appointmentId,
+        onCompleted: () {
+          getDashboard();
+          filtering();
+        },
+      );
+      return;
+    }
     if (value == 'update') {
       showDialog(
         context: context,
@@ -1653,6 +1667,21 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   final isLocked = [2, 6, 8].contains(item.appointmentStatus);
                   final canTransfer = item.appointmentStatus == 1 || item.appointmentStatus == 3;
                   return [
+                    if (!isLocked)
+                      PopupMenuItem<String>(
+                        value: 'checkout',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.point_of_sale_rounded,
+                              size: 20,
+                              color: Color(0xFF059669),
+                            ),
+                            const SizedBox(width: 8),
+                            Text('Counter Checkout & Points', style: AppTypography.bodyMedium(context)),
+                          ],
+                        ),
+                      ),
                     PopupMenuItem<String>(
                       value: 'update',
                       child: Row(

@@ -146,7 +146,7 @@ class PatientRecallController {
       endpoint: 'admin/baby-tracker/recalls/send',
       data: {
         'userId': userId,
-        'branchId': ?branchId,
+        if (branchId != null && branchId.isNotEmpty) 'branchId': branchId,
         'milestoneKey': milestoneKey,
         'gestationalWeek': gestationalWeek,
         'channel': channel,

@@ -62,7 +62,7 @@ abstract final class RouteNames {
   static const adminsDisplay = 'Staff Accounts';
 
   static const queueBoard = '/queue';
-  static const queueBoardDisplay = "Today's Queue";
+  static const queueBoardDisplay = "Today's Schedule";
 
   static const eodHandover = '/eod-handover';
   static const eodHandoverDisplay = 'Daily Closing (EOD)';
