@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:klinik_aurora_portal/config/app_theme_preset.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
+import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/theme.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_queue_controller.dart';
 import 'package:klinik_aurora_portal/controllers/audit_log/audit_log_controller.dart';
@@ -12,6 +13,7 @@ import 'package:klinik_aurora_portal/controllers/dashboard/eod_handover_controll
 import 'package:klinik_aurora_portal/controllers/dashboard/utilization_heatmap_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/patient_summary_controller.dart';
 import 'package:klinik_aurora_portal/models/user/create_user_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/layout/aurora_collapsible_sidebar.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/deferred_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 
@@ -359,6 +361,18 @@ void main() {
       expect(res.data?.userPhone, '01122334455');
       expect(res.data?.userNric, '980102-14-5566');
       expect(res.data?.userEmail, 'walkin.01122334455@klinikaurora.internal');
+    });
+
+    test('AuroraCollapsibleSidebar defines 4 pinned items and 4 accordion groups', () {
+      expect(AuroraCollapsibleSidebar.pinnedLabels.length, 4);
+      expect(AuroraCollapsibleSidebar.pinnedLabels, contains('Dashboard'));
+      expect(AuroraCollapsibleSidebar.pinnedLabels, contains(RouteNames.queueBoardDisplay));
+      expect(AuroraCollapsibleSidebar.pinnedLabels, contains(RouteNames.appointmentsDisplay));
+      expect(AuroraCollapsibleSidebar.pinnedLabels, contains(RouteNames.patientsDisplay));
+
+      expect(AuroraCollapsibleSidebar.groups.length, 4);
+      final keys = AuroraCollapsibleSidebar.groups.map((g) => g.key).toList();
+      expect(keys, ['clinical', 'finance', 'loyalty', 'system']);
     });
   });
 }
