@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
+import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/config/version.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/activity_handler_controller.dart';
@@ -334,6 +335,14 @@ class _HomepageState extends State<Homepage> {
             context.go(RouteNames.eodHandover);
           }
         },
+        const SingleActivator(LogicalKeyboardKey.bracketLeft, meta: true): () {
+          pageController.toggleExtended();
+          prefs.setBool('aurora_sidebar_extended', pageController.extended);
+        },
+        const SingleActivator(LogicalKeyboardKey.bracketLeft, control: true): () {
+          pageController.toggleExtended();
+          prefs.setBool('aurora_sidebar_extended', pageController.extended);
+        },
       },
       child: Focus(
         autofocus: true,
@@ -341,8 +350,9 @@ class _HomepageState extends State<Homepage> {
           backgroundColor: colors.canvas,
           body: Row(
         children: [
-          Consumer<TopBarController>(
-            builder: (ctxMain, snapshot, child) {
+          AnimatedBuilder(
+            animation: pageController,
+            builder: (ctxMain, child) {
               return AuroraCollapsibleSidebar(
                 controller: pageController,
                 allItems: sideBarAttribute,
@@ -380,6 +390,23 @@ class _HomepageState extends State<Homepage> {
       padding: EdgeInsets.symmetric(horizontal: screenPadding),
       child: Row(
         children: [
+          // Sidebar Toggle Button
+          AnimatedBuilder(
+            animation: pageController,
+            builder: (context, _) => IconButton(
+              icon: Icon(
+                pageController.extended ? Icons.menu_open_rounded : Icons.menu_rounded,
+                size: 20,
+                color: colors.inkSecondary,
+              ),
+              tooltip: pageController.extended ? 'Collapse Sidebar (⌘[)' : 'Expand Sidebar (⌘[)',
+              onPressed: () {
+                pageController.toggleExtended();
+                prefs.setBool('aurora_sidebar_extended', pageController.extended);
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
           // Quick Search / Command Palette trigger pill
           InkWell(
             onTap: () => CommandPaletteDialog.show(context),

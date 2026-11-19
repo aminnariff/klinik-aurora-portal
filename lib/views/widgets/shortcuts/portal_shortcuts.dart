@@ -55,6 +55,7 @@ class KeyboardShortcutsDialog extends StatelessWidget {
       title: 'Global Navigation',
       items: [
         _ShortcutRow(['⌘K', 'Ctrl+K'], 'Open Quick Search & Command Palette'),
+        _ShortcutRow(['⌘[', 'Ctrl+['], 'Toggle Collapsible Sidebar'),
         _ShortcutRow(['?'], 'Open Keyboard Shortcuts Cheat Sheet'),
         _ShortcutRow(['/'], 'Focus active page search bar'),
         _ShortcutRow(['Esc'], 'Close active dialog, drawer, or search'),

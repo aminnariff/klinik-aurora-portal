@@ -112,14 +112,44 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
       _expandedGroups = {'clinical', 'finance'};
     }
 
-    widget.controller.addListener(_autoExpandActiveGroup);
+    if (!widget.isMobileDrawer) {
+      final savedExtended = prefs.getBool('aurora_sidebar_extended');
+      if (savedExtended != null && savedExtended != widget.controller.extended) {
+        widget.controller.setExtended(savedExtended);
+      }
+    }
+
+    widget.controller.addListener(_onControllerChanged);
     _autoExpandActiveGroup();
   }
 
   @override
+  void didUpdateWidget(covariant AuroraCollapsibleSidebar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+    }
+  }
+
+  @override
   void dispose() {
-    widget.controller.removeListener(_autoExpandActiveGroup);
+    widget.controller.removeListener(_onControllerChanged);
     super.dispose();
+  }
+
+  void _onControllerChanged() {
+    _autoExpandActiveGroup();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _toggleSidebarExtended() {
+    widget.controller.toggleExtended();
+    if (!widget.isMobileDrawer) {
+      prefs.setBool('aurora_sidebar_extended', widget.controller.extended);
+    }
   }
 
   void _autoExpandActiveGroup() {
@@ -200,6 +230,7 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
       width: width,
+      clipBehavior: Clip.hardEdge,
       decoration: containerDecoration,
       child: SafeArea(
         top: !widget.isMobileDrawer,
@@ -301,22 +332,29 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
                     ),
                   ],
                 )
-              : Container(
-                  width: 40,
-                  height: 40,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+              : Tooltip(
+                  message: 'Expand Sidebar',
+                  child: InkWell(
+                    onTap: _toggleSidebarExtended,
                     borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.12),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Image.asset('assets/icons/logo/klinik-aurora.png', fit: BoxFit.contain),
+                    ),
                   ),
-                  child: Image.asset('assets/icons/logo/klinik-aurora.png', fit: BoxFit.contain),
                 ),
         ),
         if (extended)
@@ -343,92 +381,100 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
 
               final initial = fullName.isNotEmpty ? fullName[0].toUpperCase() : 'A';
 
-              return Container(
-                margin: const EdgeInsets.fromLTRB(10, 0, 10, 8),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                ),
-                child: Row(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.22),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            initial,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFF246E7A), width: 1.5),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
+                return Container(
+                  clipBehavior: Clip.hardEdge,
+                  margin: const EdgeInsets.fromLTRB(10, 0, 10, 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: SizedBox(
+                      width: 213,
+                      child: Row(
                         children: [
-                          Text(
-                            fullName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                            decoration: BoxDecoration(
-                              color: roleBg.withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: roleBg.withValues(alpha: 0.5)),
-                            ),
-                            child: Text(
-                              roleTitle,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w600,
+                          Stack(
+                            children: [
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.22),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  initial,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                  ),
+                                ),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10B981),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: const Color(0xFF246E7A), width: 1.5),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  fullName,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                  decoration: BoxDecoration(
+                                    color: roleBg.withValues(alpha: 0.25),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: roleBg.withValues(alpha: 0.5)),
+                                  ),
+                                  child: Text(
+                                    roleTitle,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              );
+                  ),
+                );
             },
           ),
       ],
@@ -672,9 +718,13 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
                   const Icon(Icons.palette_outlined, color: Color(0xE6FFFFFF), size: 19),
                   if (extended) ...[
                     const SizedBox(width: 10),
-                    const Text(
-                      'Appearance',
-                      style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                    const Expanded(
+                      child: Text(
+                        'Appearance',
+                        style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                        maxLines: 1,
+                        overflow: TextOverflow.clip,
+                      ),
                     ),
                   ],
                 ],
@@ -706,9 +756,13 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
                   const Icon(Icons.logout_rounded, color: Color(0xD9FFFFFF), size: 19),
                   if (extended) ...[
                     const SizedBox(width: 10),
-                    const Text(
-                      'Logout',
-                      style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                    const Expanded(
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                        maxLines: 1,
+                        overflow: TextOverflow.clip,
+                      ),
                     ),
                   ],
                 ],
@@ -720,28 +774,36 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
         // Desktop Toggle Expand/Collapse Button
         if (!widget.isMobileDrawer) ...[
           const SizedBox(height: 2),
-          InkWell(
-            onTap: () => widget.controller.toggleExtended(),
-            borderRadius: BorderRadius.circular(8),
-            hoverColor: Colors.white.withValues(alpha: 0.12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              child: Row(
-                mainAxisAlignment: extended ? MainAxisAlignment.end : MainAxisAlignment.center,
-                children: [
-                  if (extended) ...[
-                    Text(
-                      'Collapse Sidebar',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 11),
+          Tooltip(
+            message: extended ? 'Collapse Sidebar (⌘[)' : 'Expand Sidebar (⌘[)',
+            child: InkWell(
+              onTap: _toggleSidebarExtended,
+              borderRadius: BorderRadius.circular(8),
+              hoverColor: Colors.white.withValues(alpha: 0.12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                child: Row(
+                  mainAxisAlignment: extended ? MainAxisAlignment.end : MainAxisAlignment.center,
+                  children: [
+                    if (extended) ...[
+                      const Expanded(
+                        child: Text(
+                          'Collapse Sidebar',
+                          style: TextStyle(color: Color(0x80FFFFFF), fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Icon(
+                      extended ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: Colors.white.withValues(alpha: 0.65),
                     ),
-                    const SizedBox(width: 8),
                   ],
-                  Icon(
-                    extended ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
-                    size: 14,
-                    color: Colors.white.withValues(alpha: 0.65),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
