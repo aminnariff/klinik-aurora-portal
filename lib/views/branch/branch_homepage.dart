@@ -477,8 +477,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                               });
                               filtering(page: 1);
                             },
-                            width: 280,
-                          ),
+                                                      ),
                         ),
                         const SizedBox(height: 16),
                         _filterLabel('Status'),
@@ -495,8 +494,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                               });
                               filtering(page: 1);
                             },
-                            width: 280,
-                          ),
+                                                      ),
                         ),
                         const Spacer(),
                         SizedBox(

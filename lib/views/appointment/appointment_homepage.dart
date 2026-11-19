@@ -452,6 +452,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   : AppDropdown(
                       attributeList: DropdownAttributeList(
                         branches,
+                        prefixIcon: Icon(Icons.store_rounded, size: 16, color: appInkMuted),
                         isEditable: true,
                         value: _appointmentBranch?.name,
                         onChanged: (p0) {
@@ -710,10 +711,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return StreamBuilder<DateTime>(
       stream: rebuildDropdown.stream,
       builder: (context, snapshot) {
-        final panelWidth = math.min(320.0, MediaQuery.of(context).size.width * 0.92) - 40;
         return AppDropdown(
           attributeList: DropdownAttributeList(
             [DropdownAttribute('', 'All Services'), ...serviceList],
+            prefixIcon: Icon(Icons.medical_services_outlined, size: 18, color: appInkMuted),
             isEditable: true,
             hintText: 'All Services',
             value: _appointmentService?.name,
@@ -724,7 +725,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               });
               rebuildDropdown.add(DateTime.now());
             },
-            width: isMobile ? panelWidth : 280,
           ),
         );
       },
@@ -735,10 +735,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     return StreamBuilder<DateTime>(
       stream: rebuildDropdown.stream,
       builder: (context, snapshot) {
-        final panelWidth = math.min(320.0, MediaQuery.of(context).size.width * 0.92) - 40;
         return AppDropdown(
           attributeList: DropdownAttributeList(
             [DropdownAttribute('', 'All Practitioner Types'), ...doctorTypeList],
+            prefixIcon: Icon(Icons.badge_outlined, size: 18, color: appInkMuted),
             isEditable: true,
             hintText: 'All Practitioner Types',
             value: _appointmentDoctorType?.name,
@@ -749,7 +749,6 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               });
               rebuildDropdown.add(DateTime.now());
             },
-            width: isMobile ? panelWidth : 280,
           ),
         );
       },

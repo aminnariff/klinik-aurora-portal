@@ -532,28 +532,11 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 880) {
-          return Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [...chips, exportButton],
-          );
-        }
-
-        return Row(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: chips.map((chip) => Padding(padding: const EdgeInsets.only(right: 8), child: chip)).toList(),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            exportButton,
-          ],
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [...chips, exportButton],
         );
       },
     );
@@ -1969,17 +1952,19 @@ class _SummaryCard extends StatelessWidget {
                       const SizedBox(width: 6),
                       Flexible(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: config.bg,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: config.accent.withAlpha(40)),
                           ),
-                          child: Text(
-                            config.subtitle!,
-                            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: config.accent),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              config.subtitle!,
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: config.accent),
+                              maxLines: 1,
+                            ),
                           ),
                         ),
                       ),

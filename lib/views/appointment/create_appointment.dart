@@ -922,14 +922,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                    _buildPatientProfileCard(),
-                                                  AppPadding.vertical(denominator: 1),
+                                                  const SizedBox(height: 14),
                                                   _isLocked
                                                       ? appointmentNoteController.controller.text != ''
                                                             ? labelValue(
                                                                 'Notes',
                                                                 appointmentNoteController.controller.text,
                                                               )
-                                                            : SizedBox()
+                                                            : const SizedBox()
                                                       : TextField(
                                                           controller: appointmentNoteController.controller,
                                                           style: const TextStyle(fontSize: 13),
@@ -938,12 +938,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
                                                             labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
                                                             prefixIcon: Padding(
-                                                              padding: EdgeInsets.only(bottom: 40),
+                                                              padding: const EdgeInsets.only(bottom: 36),
                                                               child: Icon(Icons.edit_note_rounded, size: 18, color: appInkMuted),
                                                             ),
                                                             filled: true,
                                                             fillColor: appSurface,
-                                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                                             border: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
                                                               borderSide: BorderSide(color: appBorderStrong),
@@ -954,11 +954,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                                                              borderSide: BorderSide(color: primary, width: 1.5),
                                                             ),
                                                           ),
                                                         ),
-                                                  AppPadding.vertical(denominator: 2),
+                                                  const SizedBox(height: 14),
                                                   // Staff-only note — never shown to the patient. Covers rare cases
                                                   // like branch transfers ("transferred from/to Branch X").
                                                   _isLocked
@@ -967,7 +967,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 'Admin Remark (internal)',
                                                                 widget.appointment?.adminRemark ?? '',
                                                               )
-                                                            : SizedBox()
+                                                            : const SizedBox()
                                                       : TextField(
                                                           controller: _adminRemarkController,
                                                           style: const TextStyle(fontSize: 13),
@@ -979,7 +979,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               color: appInkMuted,
                                                             ),
                                                             prefixIcon: Padding(
-                                                              padding: EdgeInsets.only(bottom: 40),
+                                                              padding: const EdgeInsets.only(bottom: 36),
                                                               child: Icon(
                                                                 Icons.lock_outline_rounded,
                                                                 size: 16,
@@ -989,7 +989,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             filled: true,
                                                             fillColor: appSurface,
                                                             contentPadding: const EdgeInsets.symmetric(
-                                                              horizontal: 12,
+                                                              horizontal: 14,
                                                               vertical: 10,
                                                             ),
                                                             border: OutlineInputBorder(
@@ -1002,58 +1002,55 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             ),
                                                             focusedBorder: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
-                                                              borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                                                              borderSide: BorderSide(color: primary, width: 1.5),
                                                             ),
                                                           ),
                                                         ),
-                                                  AppPadding.vertical(denominator: 2),
+                                                  const SizedBox(height: 14),
                                                   if ((widget.appointment?.service?.dueDateToggle == 1) ||
-                                                      selectedService?.dueDateToggle == 1)
+                                                      selectedService?.dueDateToggle == 1) ...[
                                                     _isLocked
                                                         ? dateTimeController.text != ''
                                                               ? labelValue('Due Date', dateTimeController.text)
-                                                              : SizedBox()
+                                                              : const SizedBox()
                                                         : GestureDetector(
                                                             onTap: () async {
                                                               dueDateCalendar();
                                                             },
-                                                            child: SizedBox(
-                                                              width: screenWidthByBreakpoint(90, 70, 30),
-                                                              child: InputDecorator(
-                                                                decoration: InputDecoration(
-                                                                  labelText: 'appointmentPage'.tr(gender: 'dueDate'),
-                                                                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                                                                  labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
-                                                                  filled: true,
-                                                                  fillColor: appSurface,
-                                                                  contentPadding: EdgeInsets.fromLTRB(
-                                                                    screenPadding / 2,
-                                                                    screenPadding / 3,
-                                                                    screenPadding / 3,
-                                                                    screenPadding / 3,
-                                                                  ),
-                                                                  border: OutlineInputBorder(
-                                                                    borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                                                    borderRadius: BorderRadius.circular(8),
-                                                                  ),
-                                                                  enabledBorder: OutlineInputBorder(
-                                                                    borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                                                    borderRadius: BorderRadius.circular(8),
-                                                                  ),
-                                                                  suffixIcon: Icon(Icons.calendar_month_rounded, size: 20, color: appInkMuted),
+                                                            child: InputDecorator(
+                                                              decoration: InputDecoration(
+                                                                labelText: 'appointmentPage'.tr(gender: 'dueDate'),
+                                                                floatingLabelBehavior: FloatingLabelBehavior.always,
+                                                                labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                                                filled: true,
+                                                                fillColor: appSurface,
+                                                                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                                                border: OutlineInputBorder(
+                                                                  borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                                                  borderRadius: BorderRadius.circular(8),
                                                                 ),
-                                                                child: Text(
-                                                                  dueDateController.controller.text.isEmpty
-                                                                      ? 'Select due date (EDD)'
-                                                                      : dueDateController.controller.text,
-                                                                  style: TextStyle(
-                                                                    fontSize: 14,
-                                                                    color: dueDateController.controller.text.isEmpty ? Colors.grey : textPrimaryColor,
-                                                                  ),
+                                                                enabledBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                                                  borderRadius: BorderRadius.circular(8),
+                                                                ),
+                                                                focusedBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(color: primary, width: 1.5),
+                                                                  borderRadius: BorderRadius.circular(8),
+                                                                ),
+                                                                suffixIcon: Icon(Icons.calendar_month_rounded, size: 20, color: appInkMuted),
+                                                              ),
+                                                              child: Text(
+                                                                dueDateController.controller.text.isEmpty
+                                                                    ? 'Select due date (EDD)'
+                                                                    : dueDateController.controller.text,
+                                                                style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: dueDateController.controller.text.isEmpty ? Colors.grey : textPrimaryColor,
                                                                 ),
                                                               ),
                                                             ),
                                                           ),
+                                                  ],
                                                   if (((notNullOrEmptyString(
                                                                 widget.appointment?.service?.eddRequired,
                                                               ) &&
@@ -1509,6 +1506,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                         attributeList: DropdownAttributeList(
                                                           authController.isSuperAdmin ? branches : [],
                                                           labelText: 'appointmentPage'.tr(gender: 'branch'),
+                                                          prefixIcon: Icon(Icons.store_rounded, size: 18, color: appInkMuted),
                                                           isEditable: authController.isSuperAdmin,
                                                           fieldColor: authController.isSuperAdmin
                                                               ? Colors.white
@@ -1552,9 +1550,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               rebuildDropdown.add(DateTime.now());
                                                             }
                                                           },
-                                                          width: isMobile
-                                                              ? MediaQuery.of(context).size.width - 112
-                                                              : 331,
                                                         ),
                                                       ),
                                                     ],
@@ -1563,7 +1558,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                               );
                                             },
                                           ),
-                                        AppPadding.vertical(denominator: 2),
+                                        const SizedBox(height: 14),
                                         if (widget.type == 'update') ...[
                                           Row(
                                             children: [
@@ -1679,11 +1674,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                       Expanded(
                                                         child: AppDropdown(
                                                           attributeList: DropdownAttributeList(
-                                                            width: isMobile
-                                                              ? MediaQuery.of(context).size.width - 112
-                                                              : 331,
                                                             serviceList,
                                                             labelText: 'appointmentPage'.tr(gender: 'service'),
+                                                            prefixIcon: Icon(Icons.medical_services_outlined, size: 18, color: appInkMuted),
                                                             value: _service?.name,
                                                             fieldColor: widget.type == 'update'
                                                                 ? textFormFieldUneditableColor
@@ -1782,47 +1775,41 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             );
                                           },
                                         ),
-                                        AppPadding.vertical(denominator: 2),
+                                        const SizedBox(height: 14),
                                         StreamBuilder<DateTime>(
                                           stream: rebuildDropdown.stream,
                                           builder: (context, snapshot) {
                                             return Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Row(
-                                                  children: [
-                                                    _isLocked
-                                                        ? labelValue('Status', _status?.name ?? '')
-                                                        : AppDropdown(
-                                                            attributeList: DropdownAttributeList(
-                                                              widget.type == 'update' ? getAppointmentStatus() : [],
-                                                              isEditable: widget.type == 'update',
-                                                              fieldColor: widget.type == 'update'
-                                                                  ? Colors.white
-                                                                  : textFormFieldUneditableColor,
-                                                              borderColor: appBorderStrong,
-                                                              labelText: 'appointmentPage'.tr(gender: 'status'),
-                                                              value: _status?.name,
-                                                              onChanged: (p0) {
-                                                                _status = p0;
-                                                                if (_status?.key == '6' &&
-                                                                    appointmentNoteController
-                                                                        .controller
-                                                                        .text
-                                                                        .isEmpty) {
-                                                                  appointmentNoteController.controller.text =
-                                                                      "Refund request has been submitted to HQ for processing. Please allow approximately 7-14 business days for completion.";
-                                                                }
-                                                                rebuild.add(DateTime.now());
-                                                                rebuildDropdown.add(DateTime.now());
-                                                              },
-                                                              width: isMobile
-                                                              ? MediaQuery.of(context).size.width - 112
-                                                              : 331,
-                                                            ),
-                                                          ),
-                                                  ],
-                                                ),
+                                                _isLocked
+                                                    ? labelValue('Status', _status?.name ?? '')
+                                                    : AppDropdown(
+                                                        attributeList: DropdownAttributeList(
+                                                          widget.type == 'update' ? getAppointmentStatus() : [],
+                                                          isEditable: widget.type == 'update',
+                                                          fieldColor: widget.type == 'update'
+                                                              ? Colors.white
+                                                              : textFormFieldUneditableColor,
+                                                          borderColor: appBorderStrong,
+                                                          prefixIcon: Icon(Icons.rule_rounded, size: 18, color: appInkMuted),
+                                                          labelText: 'appointmentPage'.tr(gender: 'status'),
+                                                          value: _status?.name,
+                                                          onChanged: (p0) {
+                                                            _status = p0;
+                                                            if (_status?.key == '6' &&
+                                                                appointmentNoteController
+                                                                    .controller
+                                                                    .text
+                                                                    .isEmpty) {
+                                                              appointmentNoteController.controller.text =
+                                                                  "Refund request has been submitted to HQ for processing. Please allow approximately 7-14 business days for completion.";
+                                                            }
+                                                            rebuild.add(DateTime.now());
+                                                            rebuildDropdown.add(DateTime.now());
+                                                          },
+                                                        ),
+                                                      ),
                                                 if (_status?.key == '2' || _status?.key == '6') ...[
                                                   const SizedBox(height: 10),
                                                   Container(
@@ -1882,13 +1869,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             return _isLocked
                                                 ? labelValue('Slots', dateTimeController.text)
                                                 : Row(
-                                                    mainAxisSize: MainAxisSize.min,
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: [
-                                                      GestureDetector(
-                                                        onTap: _selectAppointmentSlot,
-                                                        child: SizedBox(
-                                                          width: screenWidthByBreakpoint(90, 70, 30),
+                                                      Expanded(
+                                                        child: GestureDetector(
+                                                          onTap: _selectAppointmentSlot,
                                                           child: InputDecorator(
                                                             decoration: InputDecoration(
                                                               labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
@@ -1896,12 +1881,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
                                                               filled: true,
                                                               fillColor: appSurface,
-                                                              contentPadding: EdgeInsets.fromLTRB(
-                                                                screenPadding / 2,
-                                                                screenPadding / 3,
-                                                                screenPadding / 3,
-                                                                screenPadding / 3,
-                                                              ),
+                                                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                                               border: OutlineInputBorder(
                                                                 borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                                                 borderRadius: BorderRadius.circular(8),
@@ -1910,15 +1890,25 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                 borderSide: BorderSide(color: appBorderStrong, width: 1.0),
                                                                 borderRadius: BorderRadius.circular(8),
                                                               ),
-                                                              suffixIcon: Icon(Icons.date_range_rounded, size: 20, color: appInkMuted),
+                                                              focusedBorder: OutlineInputBorder(
+                                                                borderSide: BorderSide(color: primary, width: 1.5),
+                                                                borderRadius: BorderRadius.circular(8),
+                                                              ),
+                                                              prefixIcon: Padding(
+                                                                padding: const EdgeInsets.only(left: 12, right: 8),
+                                                                child: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
+                                                              ),
+                                                              prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                                                              suffixIcon: Icon(Icons.date_range_rounded, size: 18, color: appInkMuted),
                                                             ),
                                                             child: Text(
                                                               dateTimeController.text.isEmpty
                                                                   ? 'Select appointment slot'
                                                                   : dateTimeController.text,
                                                               style: TextStyle(
-                                                                fontSize: 14,
-                                                                color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
+                                                                fontSize: 13,
+                                                                fontWeight: FontWeight.w500,
+                                                                color: dateTimeController.text.isEmpty ? appInkMuted : textPrimaryColor,
                                                               ),
                                                             ),
                                                           ),
@@ -1930,24 +1920,24 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                   );
                                           },
                                         ),
-                                        AppPadding.vertical(denominator: 2),
+                                        const SizedBox(height: 20),
                                         if (_status?.key != '6') ...[
                                           _extraSectionLabel('Attachment', Icons.attach_file_rounded),
-                                          const SizedBox(height: 8),
+                                          const SizedBox(height: 10),
                                           AppAttachmentField(
                                             controller: _attachmentUrlController,
                                             folder: 'appointment',
                                             onChanged: () => setState(() {}),
                                           ),
-                                          SizedBox(height: 12),
+                                          const SizedBox(height: 20),
                                           _extraSectionLabel('Referral Letter (PDF)', Icons.description_outlined),
-                                          SizedBox(height: 8),
+                                          const SizedBox(height: 10),
                                           AppAttachmentField(
                                             controller: _referralLetterUrlController,
                                             folder: 'referral-letters',
                                             onChanged: () => setState(() {}),
                                           ),
-                                          SizedBox(height: 6),
+                                          const SizedBox(height: 6),
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
@@ -2449,115 +2439,123 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           ],
         ),
         const SizedBox(height: 10),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: appCanvas,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: appBorderStrong),
+        TextField(
+          controller: _patientSearchCtrl,
+          style: const TextStyle(fontSize: 13),
+          decoration: InputDecoration(
+            labelText: 'Search existing patient (Name, Phone, or IC)',
+            labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
+            hintText: 'Type Name or Phone or IC...',
+            prefixIcon: const Icon(Icons.search_rounded, size: 18),
+            suffixIcon: _isSearchingPatients
+                ? const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : (_patientSearchCtrl.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, size: 16),
+                        onPressed: () {
+                          _patientSearchCtrl.clear();
+                          setState(() => _patientSearchResults.clear());
+                        },
+                      )
+                    : null),
+            filled: true,
+            fillColor: appSurface,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: appBorderStrong),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: appBorderStrong),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: primary, width: 1.5),
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _patientSearchCtrl,
-                style: const TextStyle(fontSize: 13),
-                decoration: InputDecoration(
-                  labelText: 'Search existing patient (Name, Phone, or IC)',
-                  labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
-                  hintText: 'Type Name or Phone or IC...',
-                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
-                  suffixIcon: _isSearchingPatients
-                      ? const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      : (_patientSearchCtrl.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 16),
-                              onPressed: () {
-                                _patientSearchCtrl.clear();
-                                setState(() => _patientSearchResults.clear());
-                              },
-                            )
-                          : null),
-                  filled: true,
-                  fillColor: appSurface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: appBorderStrong),
-                  ),
-                ),
-                onChanged: _onPatientSearchChanged,
+          onChanged: _onPatientSearchChanged,
+        ),
+        if (_patientSearchResults.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: appSurface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: appBorderStrong),
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 180),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: _patientSearchResults.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, idx) {
+                  final u = _patientSearchResults[idx];
+                  return ListTile(
+                    dense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    leading: CircleAvatar(
+                      radius: 14,
+                      backgroundColor: const Color(0xFF6366F1).withAlpha(30),
+                      child: Text(
+                        (u.userFullname ?? 'P').isNotEmpty ? (u.userFullname ?? 'P')[0].toUpperCase() : 'P',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+                      ),
+                    ),
+                    title: Text(
+                      u.userFullname ?? 'Unnamed Patient',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
+                    subtitle: Text(
+                      '${u.userPhone ?? '-'} · IC: ${u.userNric ?? 'No IC'}',
+                      style: TextStyle(fontSize: 11, color: appInkMuted),
+                    ),
+                    trailing: AppButton.secondary(
+                      text: 'Select',
+                      height: 28,
+                      onPressed: () => _selectPatient(u),
+                    ),
+                  );
+                },
               ),
-              if (_patientSearchResults.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 180),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: _patientSearchResults.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, idx) {
-                      final u = _patientSearchResults[idx];
-                      return ListTile(
-                        dense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        leading: CircleAvatar(
-                          radius: 14,
-                          backgroundColor: const Color(0xFF6366F1).withAlpha(30),
-                          child: Text(
-                            (u.userFullname ?? 'P').isNotEmpty ? (u.userFullname ?? 'P')[0].toUpperCase() : 'P',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
-                          ),
-                        ),
-                        title: Text(
-                          u.userFullname ?? 'Unnamed Patient',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                        ),
-                        subtitle: Text(
-                          '${u.userPhone ?? '-'} · IC: ${u.userNric ?? 'No IC'}',
-                          style: TextStyle(fontSize: 11, color: appInkMuted),
-                        ),
-                        trailing: AppButton.secondary(
-                          text: 'Select',
-                          height: 28,
-                          onPressed: () => _selectPatient(u),
-                        ),
-                      );
-                    },
-                  ),
+            ),
+          ),
+        ] else if (_patientSearchCtrl.text.trim().length >= 2 && !_isSearchingPatients) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: appSurface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: appBorder),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
+                const SizedBox(width: 6),
+                Text(
+                  'No matching patient found.',
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
                 ),
-              ] else if (_patientSearchCtrl.text.trim().length >= 2 && !_isSearchingPatients) ...[
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
-                      const SizedBox(width: 6),
-                      Text(
-                        'No matching patient found.',
-                        style: TextStyle(fontSize: 12, color: appInkMuted),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: _openQuickRegisterDialog,
-                        child: const Text('Register as New Walk-In', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                      ),
-                    ],
-                  ),
+                const Spacer(),
+                TextButton(
+                  onPressed: _openQuickRegisterDialog,
+                  child: const Text('Register as New Walk-In', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                 ),
               ],
-            ],
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -3207,6 +3205,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               attributeList: DropdownAttributeList(
                                 getAppointmentStatus(),
                                 labelText: 'appointmentPage'.tr(gender: 'status'),
+                                prefixIcon: Icon(Icons.rule_rounded, size: 18, color: appInkMuted),
                                 isEditable: true,
                                 value: _status?.name,
                                 fieldColor: appInputFill,
@@ -3220,7 +3219,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   rebuild.add(DateTime.now());
                                   rebuildDropdown.add(DateTime.now());
                                 },
-                                width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
                               ),
                             ),
                       if (_status?.key == '2' || _status?.key == '6') ...[
@@ -3274,39 +3272,41 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: _selectAppointmentSlot,
-                                child: SizedBox(
-                                  width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
-                                  child: InputDecorator(
-                                    decoration: InputDecoration(
-                                      labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
-                                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                                      labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
-                                      filled: true,
-                                      fillColor: appSurface,
-                                      contentPadding: EdgeInsets.fromLTRB(
-                                        screenPadding / 2,
-                                        screenPadding / 3,
-                                        screenPadding / 3,
-                                        screenPadding / 3,
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      suffixIcon: Icon(Icons.date_range_rounded, size: 20, color: appInkMuted),
+                                child: InputDecorator(
+                                  decoration: InputDecoration(
+                                    labelText: 'appointmentPage'.tr(gender: 'appointmentDateTime'),
+                                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                                    labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                                    filled: true,
+                                    fillColor: appSurface,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Text(
-                                      dateTimeController.text.isEmpty
-                                          ? 'Select appointment slot'
-                                          : dateTimeController.text,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: dateTimeController.text.isEmpty ? Colors.grey : textPrimaryColor,
-                                      ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: primary, width: 1.5),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    prefixIcon: Padding(
+                                      padding: const EdgeInsets.only(left: 12, right: 8),
+                                      child: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
+                                    ),
+                                    prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                                    suffixIcon: Icon(Icons.date_range_rounded, size: 18, color: appInkMuted),
+                                  ),
+                                  child: Text(
+                                    dateTimeController.text.isEmpty
+                                        ? 'Select appointment slot'
+                                        : dateTimeController.text,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: dateTimeController.text.isEmpty ? appInkMuted : textPrimaryColor,
                                     ),
                                   ),
                                 ),
@@ -3326,39 +3326,41 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                         : const SizedBox())
                     : GestureDetector(
                         onTap: dueDateCalendar,
-                        child: SizedBox(
-                          width: isMobile ? MediaQuery.of(context).size.width - 112 : 331,
-                          child: InputDecorator(
-                            decoration: InputDecoration(
-                              labelText: 'appointmentPage'.tr(gender: 'dueDate'),
-                              floatingLabelBehavior: FloatingLabelBehavior.always,
-                              labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
-                              filled: true,
-                              fillColor: appSurface,
-                              contentPadding: EdgeInsets.fromLTRB(
-                                screenPadding / 2,
-                                screenPadding / 3,
-                                screenPadding / 3,
-                                screenPadding / 3,
-                              ),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: appBorderStrong, width: 1.0),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              suffixIcon: Icon(Icons.calendar_month_rounded, size: 20, color: appInkMuted),
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'appointmentPage'.tr(gender: 'dueDate'),
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            labelStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+                            filled: true,
+                            fillColor: appSurface,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Text(
-                              dueDateController.controller.text.isEmpty
-                                  ? 'Select due date (EDD)'
-                                  : dueDateController.controller.text,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: dueDateController.controller.text.isEmpty ? Colors.grey : textPrimaryColor,
-                              ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: appBorderStrong, width: 1.0),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: primary, width: 1.5),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.only(left: 12, right: 8),
+                              child: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
+                            ),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                            suffixIcon: Icon(Icons.calendar_month_rounded, size: 18, color: appInkMuted),
+                          ),
+                          child: Text(
+                            dueDateController.controller.text.isEmpty
+                                ? 'Select due date (EDD)'
+                                : dueDateController.controller.text,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: dueDateController.controller.text.isEmpty ? appInkMuted : textPrimaryColor,
                             ),
                           ),
                         ),
@@ -3766,7 +3768,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           borderRadius: BorderRadius.circular(8),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            height: 48,
+            height: 42,
             padding: EdgeInsets.symmetric(horizontal: isCoolingDown ? 10 : 12),
             decoration: BoxDecoration(
               color: isDisabled ? appSurfaceSubtle : appInfoSoft,

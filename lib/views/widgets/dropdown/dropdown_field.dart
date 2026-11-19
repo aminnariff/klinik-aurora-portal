@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
-import 'package:klinik_aurora_portal/views/widgets/size.dart';
 
 class AppDropdown extends StatefulWidget {
   final DropdownAttributeList attributeList;
@@ -35,25 +34,29 @@ class _AppDropdownState extends State<AppDropdown> {
         floatingLabelBehavior:
             widget.attributeList.floatingLabelBehavior ?? FloatingLabelBehavior.always,
         labelStyle: widget.attributeList.labelStyle ??
-            Theme.of(context).textTheme.bodyMedium?.apply(color: textPrimaryColor),
+            TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appInkSecondary),
+        floatingLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: primary),
         hintText: widget.attributeList.labelText == null ? widget.attributeList.hintText : null,
-        hintStyle: Theme.of(context).textTheme.bodyMedium?.apply(color: Colors.grey),
+        hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
         filled: true,
         fillColor: widget.attributeList.fieldColor ??
-            (isEditable ? textFormFieldEditableColor : textFormFieldUneditableColor),
+            (isEditable ? appSurface : appSurfaceSubtle),
         enabled: isEditable,
         errorText: widget.attributeList.errorMessage,
         errorStyle: const TextStyle(fontSize: 12, color: Color(0xFFDC2626)),
-        contentPadding: EdgeInsets.fromLTRB(
-          screenPadding / 2,
-          screenPadding / 3,
-          screenPadding / 3,
-          screenPadding / 3,
-        ),
+        contentPadding: widget.attributeList.contentPadding ??
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        prefixIcon: widget.attributeList.prefixIcon != null
+            ? Padding(
+                padding: const EdgeInsets.only(left: 12, right: 8),
+                child: widget.attributeList.prefixIcon,
+              )
+            : null,
+        prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
         border: OutlineInputBorder(
           borderSide: BorderSide(
             color: widget.attributeList.borderColor ??
-                (isEditable ? appBorder : Colors.transparent),
+                (isEditable ? appBorderStrong : Colors.transparent),
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
@@ -61,7 +64,7 @@ class _AppDropdownState extends State<AppDropdown> {
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: widget.attributeList.borderColor ??
-                (isEditable ? appBorder : Colors.transparent),
+                (isEditable ? appBorderStrong : Colors.transparent),
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
@@ -79,19 +82,16 @@ class _AppDropdownState extends State<AppDropdown> {
           borderRadius: BorderRadius.circular(8.0),
         ),
         disabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.transparent, width: 0.0),
+          borderSide: BorderSide(
+            color: widget.attributeList.borderColor ?? appBorder,
+            width: 1.0,
+          ),
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton2<DropdownAttribute?>(
           isExpanded: true,
-          // Without this, dropdown_button2 wraps the CLOSED button's
-          // displayed value in a SizedBox sized to menuItemStyleData.height
-          // (meant for the OPEN menu's list items) — forcing the button
-          // taller than a same-content InputField regardless of any padding
-          // here. isDense lets the closed button size to its natural
-          // content height instead, matching InputField.
           isDense: true,
           enableFeedback: true,
           onMenuStateChange: (isOpen) => setState(() => _isOpen = isOpen),
@@ -109,9 +109,11 @@ class _AppDropdownState extends State<AppDropdown> {
                           ? widget.attributeList.value.toString()
                           : widget.attributeList.value.toString().titleCase())
                       : (widget.attributeList.hintText ?? 'Select'),
-                  style: Theme.of(context).textTheme.bodyMedium?.apply(
-                        color: hasValue ? appInkPrimary : Colors.grey,
-                      ),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: hasValue ? FontWeight.w500 : FontWeight.normal,
+                    color: hasValue ? appInkPrimary : appInkMuted,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -125,7 +127,11 @@ class _AppDropdownState extends State<AppDropdown> {
                     widget.attributeList.titleCase == true
                         ? item.name.titleCase()
                         : item.name,
-                    style: Theme.of(context).textTheme.bodyMedium?.apply(),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: appInkPrimary,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -136,10 +142,6 @@ class _AppDropdownState extends State<AppDropdown> {
                   widget.attributeList.onChanged?.call(selected);
                 }
               : null,
-          // The InputDecorator above now draws the field's box/border/fill/padding;
-          // this button itself stays a bare, borderless, paddingless child —
-          // the same relationship EditableText has to TextFormField's own
-          // InputDecorator.
           buttonStyleData: widget.attributeList.buttonStyleData ??
               const ButtonStyleData(
                 padding: EdgeInsets.zero,
@@ -151,19 +153,19 @@ class _AppDropdownState extends State<AppDropdown> {
               Icons.keyboard_arrow_down_rounded,
               color: isEditable
                   ? appInkMuted
-                  : appInkMuted,
+                  : appInkMuted.withAlpha(100),
             ),
-            iconSize: 22,
+            iconSize: 20,
             iconEnabledColor: appInkMuted,
             iconDisabledColor: Colors.grey,
           ),
           dropdownStyleData: DropdownStyleData(
-            maxHeight: 260,
+            maxHeight: 280,
             padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               color: appSurfaceElevated,
-              border: Border.all(color: appBorder),
+              border: Border.all(color: appBorderStrong),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha(15),

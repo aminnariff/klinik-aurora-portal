@@ -116,10 +116,10 @@ class DarkModeController extends ChangeNotifier {
 
   Future<void> resetToDefaults() async {
     final changed = _themeMode != ThemeMode.light ||
-        _preset != AuroraThemePreset.auroraPlum ||
+        _preset != AuroraThemePreset.auroraBerry ||
         _tableDensity != TableDensity.comfortable;
     _themeMode = ThemeMode.light;
-    _preset = AuroraThemePreset.auroraPlum;
+    _preset = AuroraThemePreset.auroraBerry;
     _tableDensity = TableDensity.comfortable;
     _syncGlobalColors();
     _syncSplash();

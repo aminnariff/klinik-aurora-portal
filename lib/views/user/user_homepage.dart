@@ -645,8 +645,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                       rebuildDropdown.add(DateTime.now());
                                       filtering(page: 1);
                                     },
-                                    width: 280,
-                                  ),
+                                                                      ),
                                 ),
                                 const SizedBox(height: 12),
                                 AppDropdown(
@@ -659,8 +658,7 @@ class _UserHomepageState extends State<UserHomepage> {
                                       rebuildDropdown.add(DateTime.now());
                                       filtering(page: 1);
                                     },
-                                    width: 280,
-                                  ),
+                                                                      ),
                                 ),
                               ],
                             ),

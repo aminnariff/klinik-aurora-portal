@@ -274,8 +274,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                                   rebuildDropdown.add(DateTime.now());
                                   filtering(page: 1);
                                 },
-                                width: 280,
-                              ),
+                                                              ),
                             );
                           },
                         ),

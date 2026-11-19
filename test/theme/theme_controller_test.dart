@@ -60,11 +60,11 @@ void main() {
   });
 
   group('DarkModeController', () {
-    test('defaults to Light mode and Aurora Plum preset', () {
+    test('defaults to Light mode and Aurora Berry preset', () {
       final ctrl = DarkModeController();
       expect(ctrl.themeMode, ThemeMode.light);
-      expect(ctrl.preset, AuroraThemePreset.auroraPlum);
-      expect(primary, AuroraThemePreset.auroraPlum.primaryLight);
+      expect(ctrl.preset, AuroraThemePreset.auroraBerry);
+      expect(primary, AuroraThemePreset.auroraBerry.primaryLight);
     });
 
     test('switches preset and dark mode live and resets cleanly', () async {
@@ -85,9 +85,9 @@ void main() {
 
       await ctrl.resetToDefaults();
       expect(ctrl.themeMode, ThemeMode.light);
-      expect(ctrl.preset, AuroraThemePreset.auroraPlum);
+      expect(ctrl.preset, AuroraThemePreset.auroraBerry);
       expect(ctrl.tableDensity, TableDensity.comfortable);
-      expect(primary, AuroraThemePreset.auroraPlum.primaryLight);
+      expect(primary, AuroraThemePreset.auroraBerry.primaryLight);
       expect(appSurface, const Color(0xFFFFFFFF));
       expect(appDangerSoft, const Color(0xFFFEF2F2));
     });
@@ -115,7 +115,7 @@ void main() {
       expect(find.text('Appearance & Theme'), findsOneWidget);
       expect(find.text('Workspace Density'), findsOneWidget);
       expect(find.text('Aurora Plum'), findsWidgets);
-      expect(find.text('Aurora Berry'), findsOneWidget);
+      expect(find.text('Aurora Berry'), findsWidgets);
 
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
@@ -125,18 +125,18 @@ void main() {
       await tester.pumpAndSettle();
       expect(ctrl.tableDensity, TableDensity.compact);
 
-      await tester.ensureVisible(find.text('Aurora Berry'));
+      await tester.ensureVisible(find.text('Aurora Plum').first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Aurora Berry'));
+      await tester.tap(find.text('Aurora Plum').first);
       await tester.pumpAndSettle();
-      expect(ctrl.preset, AuroraThemePreset.auroraBerry);
+      expect(ctrl.preset, AuroraThemePreset.auroraPlum);
 
       await tester.ensureVisible(find.text('Reset Default'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Reset Default'));
       await tester.pumpAndSettle();
       expect(ctrl.themeMode, ThemeMode.light);
-      expect(ctrl.preset, AuroraThemePreset.auroraPlum);
+      expect(ctrl.preset, AuroraThemePreset.auroraBerry);
       expect(ctrl.tableDensity, TableDensity.comfortable);
     });
   });

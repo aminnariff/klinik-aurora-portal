@@ -20,6 +20,8 @@ class DropdownAttributeList {
   Color? borderColor;
   bool? titleCase;
   String? tooltip;
+  Widget? prefixIcon;
+  EdgeInsetsGeometry? contentPadding;
 
   DropdownAttributeList(
     this.items, {
@@ -40,6 +42,8 @@ class DropdownAttributeList {
     this.borderColor,
     this.titleCase = false,
     this.tooltip,
+    this.prefixIcon,
+    this.contentPadding,
   });
 }
 

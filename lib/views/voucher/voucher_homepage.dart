@@ -446,8 +446,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
                           setLocalState(() => rebuildDropdown.add(DateTime.now()));
                           filtering(page: 1);
                         },
-                        width: 280,
-                      ),
+                                              ),
                     ),
                     const Spacer(),
                     SizedBox(

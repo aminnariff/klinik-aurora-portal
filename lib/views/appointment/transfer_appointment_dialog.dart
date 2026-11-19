@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_v
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
+import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/extension/string.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
@@ -400,42 +401,21 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                                     child: CircularProgressIndicator(strokeWidth: 2),
                                   ),
                                 )
-                              : Container(
-                                  decoration: BoxDecoration(
-                                    color: appSurface,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: appBorderStrong),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<DropdownAttribute>(
-                                      isExpanded: true,
-                                      hint: Text(
-                                        'Select destination clinic branch...',
-                                        style: TextStyle(color: appInkMuted, fontSize: 13),
-                                      ),
-                                      value: selectedTargetBranch,
-                                      items: targetBranches.map((b) {
-                                        return DropdownMenuItem<DropdownAttribute>(
-                                          value: b,
-                                          child: Text(
-                                            b.name,
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500,
-                                              color: appInkPrimary,
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (val) {
-                                        setState(() {
-                                          selectedTargetBranch = val;
-                                          _selectedDateTime = null; // reset slot on branch change
-                                        });
-                                        rebuild.add(DateTime.now());
-                                      },
-                                    ),
+                              : AppDropdown(
+                                  attributeList: DropdownAttributeList(
+                                    targetBranches,
+                                    hintText: 'Select destination clinic branch...',
+                                    prefixIcon: Icon(Icons.store_rounded, size: 18, color: appInkMuted),
+                                    value: selectedTargetBranch?.name,
+                                    fieldColor: appSurface,
+                                    borderColor: appBorderStrong,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        selectedTargetBranch = val;
+                                        _selectedDateTime = null; // reset slot on branch change
+                                      });
+                                      rebuild.add(DateTime.now());
+                                    },
                                   ),
                                 ),
                           const SizedBox(height: 16),

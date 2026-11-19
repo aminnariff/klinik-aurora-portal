@@ -535,8 +535,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                                   setFilterState(() {});
                                   filtering(page: 1);
                                 },
-                                width: 280,
-                              ),
+                                                              ),
                             );
                           },
                         ),

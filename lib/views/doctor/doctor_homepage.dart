@@ -624,8 +624,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 rebuildDropdown.add(DateTime.now());
                                 filtering(page: 1);
                               },
-                              width: 260,
-                            ),
+                                                          ),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -648,8 +647,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
                                 rebuildDropdown.add(DateTime.now());
                                 filtering(page: 1);
                               },
-                              width: 260,
-                            ),
+                                                          ),
                           ),
                         ),
                         const SizedBox(height: 20),

@@ -308,6 +308,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                         )
                         .toList(),
                     labelText: 'Branch',
+                    prefixIcon: Icon(Icons.store_rounded, size: 18, color: appInkMuted),
                     isEditable: isSuper,
                     fieldColor: isSuper ? textFormFieldEditableColor : textFormFieldUneditableColor,
                     onChanged: (selected) {
@@ -332,6 +333,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               attributeList: DropdownAttributeList(
                 doctorTypeList,
                 labelText: 'Practitioner Type',
+                prefixIcon: Icon(Icons.badge_outlined, size: 18, color: appInkMuted),
                 isEditable: true,
                 fieldColor: textFormFieldEditableColor,
                 onChanged: (selected) {

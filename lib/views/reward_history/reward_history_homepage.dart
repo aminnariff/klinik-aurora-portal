@@ -243,8 +243,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                       rebuildDropdown.add(DateTime.now());
                                       filtering(page: 1);
                                     },
-                                    width: 280,
-                                  ),
+                                                                      ),
                                 ),
                                 const SizedBox(height: 10),
                                 AppDropdown(
@@ -257,8 +256,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
                                       rebuildDropdown.add(DateTime.now());
                                       filtering(page: 1);
                                     },
-                                    width: 280,
-                                  ),
+                                                                      ),
                                 ),
                               ],
                             );

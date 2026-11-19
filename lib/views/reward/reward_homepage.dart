@@ -257,8 +257,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
                                   rebuildDropdown.add(DateTime.now());
                                   filtering(page: 1);
                                 },
-                                width: 280,
-                              ),
+                                                              ),
                             );
                           },
                         ),
