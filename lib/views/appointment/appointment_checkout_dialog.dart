@@ -889,34 +889,61 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                   style: TextStyle(fontSize: 12, color: colors.inkMuted),
                 ),
                 const SizedBox(height: 12),
-                AppButton.primary(
-                  text: 'Tempah Slot Imbasan Ini (Pra-isi Data)',
-                  icon: const Icon(Icons.add_task_rounded, size: 15),
-                  height: 38,
-                  onPressed: () {
-                    final key = _preview?.detectedMilestone?.key;
-                    final nextKeyword = switch (key) {
-                      'nt_scan' => 'detail',
-                      'detail_scan' => '4d',
-                      'scan_4d5d' => 'growth',
-                      _ => null,
-                    };
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    AppButton.primary(
+                      text: 'Imbasan Seterusnya: ${nextMilestone.$1}',
+                      icon: const Icon(Icons.arrow_forward_rounded, size: 14),
+                      height: 36,
+                      onPressed: () {
+                        final key = _preview?.detectedMilestone?.key;
+                        final nextKeyword = switch (key) {
+                          'nt_scan' => 'detail',
+                          'detail_scan' => '4d',
+                          'scan_4d5d' => 'growth',
+                          _ => null,
+                        };
 
-                    Navigator.of(context).pop(true);
-                    showDialog(
-                      context: context,
-                      builder: (_) => AppointmentDetails(
-                        type: 'create',
-                        initialUserId: _preview?.userId,
-                        initialUserName: _preview?.patientName,
-                        initialUserPhone: _preview?.patientPhone,
-                        initialBranchId: _preview?.branchId,
-                        initialServiceKeyword: nextKeyword,
-                        initialNote: 'Follow-up ${nextMilestone.$1} after completing ${_preview?.serviceName}',
-                        refreshData: () => widget.onCompleted?.call(),
-                      ),
-                    );
-                  },
+                        Navigator.of(context).pop(true);
+                        showDialog(
+                          context: context,
+                          builder: (_) => AppointmentDetails(
+                            type: 'create',
+                            initialUserId: _preview?.userId,
+                            initialUserName: _preview?.patientName,
+                            initialUserPhone: _preview?.patientPhone,
+                            initialBranchId: _preview?.branchId,
+                            initialServiceKeyword: nextKeyword,
+                            initialNote: 'Follow-up ${nextMilestone.$1} after completing ${_preview?.serviceName}',
+                            refreshData: () => widget.onCompleted?.call(),
+                          ),
+                        );
+                      },
+                    ),
+                    AppButton.secondary(
+                      text: 'Susulan / Ulang Servis Sama (1–2 Minggu)',
+                      icon: const Icon(Icons.replay_rounded, size: 14),
+                      height: 36,
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        showDialog(
+                          context: context,
+                          builder: (_) => AppointmentDetails(
+                            type: 'create',
+                            initialUserId: _preview?.userId,
+                            initialUserName: _preview?.patientName,
+                            initialUserPhone: _preview?.patientPhone,
+                            initialBranchId: _preview?.branchId,
+                            initialServiceKeyword: _preview?.serviceName,
+                            initialNote: 'Routine follow-up / rescan for ${_preview?.serviceName} (Review in 1–2 weeks)',
+                            refreshData: () => widget.onCompleted?.call(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
