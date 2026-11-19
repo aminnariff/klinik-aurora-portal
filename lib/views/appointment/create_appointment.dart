@@ -901,17 +901,20 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                constraints: BoxConstraints(
-                                  maxWidth: isMobile ? MediaQuery.of(context).size.width - 32 : 900,
-                                  minWidth: isMobile ? 0 : 700,
-                                ),
-                                child: Builder(
-                                  builder: (context) {
-                                    if (widget.type == 'update') {
-                                      return _buildUpdateLayout(context);
-                                    }
-                                    Widget wrapExpanded(Widget child) => isMobile ? child : Expanded(child: child);
+                              Builder(
+                                builder: (context) {
+                                  final isCompact = MediaQuery.of(context).size.width < 768;
+                                  return Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth: isCompact ? MediaQuery.of(context).size.width - 32 : 900,
+                                      minWidth: isCompact ? 0 : math.min(700.0, MediaQuery.of(context).size.width - 64),
+                                    ),
+                                    child: Builder(
+                                      builder: (context) {
+                                        if (widget.type == 'update') {
+                                          return _buildUpdateLayout(context);
+                                        }
+                                        Widget wrapExpanded(Widget child) => isCompact ? child : Expanded(child: child);
                                     final leftColumn = Consumer<ServiceBranchController>(
                                       builder: (context, serviceBranchController, _) {
                                         return StreamBuilder<DateTime>(
@@ -1959,20 +1962,22 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                         ],
                                       ],
                                     );
-                                    final rightColumn = isMobile ? rightColumnContent : Expanded(child: rightColumnContent);
+                                    final rightColumn = isCompact ? rightColumnContent : Expanded(child: rightColumnContent);
 
-                                    return isMobile
+                                    return isCompact
                                         ? Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [leftColumn, AppPadding.vertical(), rightColumn],
+                                            children: [leftColumn, const SizedBox(height: 20), rightColumn],
                                           )
                                         : Row(
                                             crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [leftColumn, AppPadding.horizontal(), rightColumn],
+                                            children: [leftColumn, const SizedBox(width: 24), rightColumn],
                                           );
                                   },
                                 ),
-                              ),
+                              );
+                            },
+                          ),
                               const SizedBox(height: 16),
                               StreamBuilder<DateTime>(
                                 stream: rebuild.stream,
@@ -3859,7 +3864,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 children: [
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: isMobile ? screenWidth(92) : 560.0,
+                      maxWidth: math.min(560.0, MediaQuery.of(context).size.width - 32),
                       maxHeight: MediaQuery.of(context).size.height * 0.85,
                     ),
                     child: CardContainer(

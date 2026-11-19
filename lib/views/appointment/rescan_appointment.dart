@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -302,7 +303,7 @@ class _RescanAppointmentState extends State<RescanAppointment> {
                                             children: [
                                               Container(
                                                 constraints: BoxConstraints(
-                                                  maxWidth: isMobile ? screenWidth(92) : 560.0,
+                                                  maxWidth: math.min(560.0, MediaQuery.of(dialogContext).size.width - 32),
                                                   maxHeight: MediaQuery.of(dialogContext).size.height * 0.85,
                                                 ),
                                                 child: CardContainer(
