@@ -125,14 +125,12 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
     return net > 0 ? net : 0.0;
   }
 
-  int get _basePoints => math.max(0, _netCollected.floor());
+  int get _basePoints => math.max(0, (_netCollected / 10).floor());
 
-  int get _milestoneBonusPoints {
-    if (!_awardMilestoneBonus) return 0;
-    return _preview?.detectedMilestone?.bonusPoints ?? 0;
-  }
+  // Milestone bonus points are kept inactive by default (proposal only)
+  int get _milestoneBonusPoints => 0;
 
-  int get _totalPointsToAward => _basePoints + _milestoneBonusPoints;
+  int get _totalPointsToAward => _basePoints;
 
   void _addPresetItem(String name, double price) {
     setState(() {
@@ -634,94 +632,31 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
           ),
           const SizedBox(height: 16),
 
-          // ── Pregnancy Milestone Bonus Loyalty Card ───────────────────
-          if (p.detectedMilestone != null) ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _purpleSoftBg,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: _purpleAccent.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: _purpleAccent.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.auto_awesome_rounded, color: _purpleAccent, size: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              p.detectedMilestone!.label,
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _purpleAccent),
-                            ),
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: _purpleAccent,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                '+${p.detectedMilestone!.bonusPoints} pts bonus',
-                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Pregnancy scan milestone reward will be credited directly.',
-                          style: TextStyle(fontSize: 11, color: colors.inkMuted),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: _awardMilestoneBonus,
-                    activeThumbColor: _purpleAccent,
-                    onChanged: (val) => setState(() => _awardMilestoneBonus = val),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-          ],
-
           // ── Points Summary Banner ────────────────────────────────────
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             decoration: BoxDecoration(
               color: colors.surfaceSubtle,
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: colors.border),
             ),
             child: Row(
               children: [
-                Icon(Icons.stars_rounded, size: 18, color: colors.warning),
-                const SizedBox(width: 8),
+                Icon(Icons.stars_rounded, size: 20, color: colors.warning),
+                const SizedBox(width: 10),
                 Expanded(
                   child: RichText(
                     text: TextSpan(
-                      style: TextStyle(fontSize: 12, color: colors.inkPrimary),
+                      style: TextStyle(fontSize: 12.5, color: colors.inkPrimary),
                       children: [
-                        const TextSpan(text: 'Points to Award: '),
+                        const TextSpan(text: 'Mata Ganjaran (RM 10 = 1 Mata): '),
                         TextSpan(
                           text: '+$_totalPointsToAward pts ',
                           style: TextStyle(fontWeight: FontWeight.w800, color: colors.brandText),
                         ),
                         TextSpan(
                           text: '(${p.currentPoints} ➔ ${p.currentPoints + _totalPointsToAward} pts)',
-                          style: TextStyle(color: colors.inkMuted, fontSize: 11),
+                          style: TextStyle(color: colors.inkMuted, fontSize: 11.5),
                         ),
                       ],
                     ),
@@ -922,7 +857,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
           ),
           const SizedBox(height: 16),
 
-          // Secure Next Appointment Recommendation Card
+          // Gentle Next Appointment Recommendation Card
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -938,23 +873,9 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                     Icon(Icons.calendar_month_rounded, color: colors.brandPrimary, size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      'Secure Next Appointment (Recommended)',
+                      'Cadangan Imbasan Seterusnya (Pilihan)',
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: colors.brandText),
                     ),
-                    if (nextMilestone.$3 > 0) ...[
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: _purpleAccent,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '+${nextMilestone.$3} Pts Bonus',
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -964,12 +885,12 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  nextMilestone.$2,
+                  '${nextMilestone.$2} · Pesakit boleh memilih untuk tempah awal sekiranya berminat.',
                   style: TextStyle(fontSize: 12, color: colors.inkMuted),
                 ),
                 const SizedBox(height: 12),
                 AppButton.primary(
-                  text: 'Book Next Appointment Now (Pre-filled)',
+                  text: 'Tempah Slot Imbasan Ini (Pra-isi Data)',
                   icon: const Icon(Icons.add_task_rounded, size: 15),
                   height: 38,
                   onPressed: () {

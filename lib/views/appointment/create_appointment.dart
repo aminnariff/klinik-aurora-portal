@@ -29,6 +29,7 @@ import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as 
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_response.dart'
     as service_branch_available_model;
+import 'package:klinik_aurora_portal/views/appointment/appointment_checkout_dialog.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_detail_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
 import 'package:klinik_aurora_portal/views/appointment/rescan_appointment.dart';
@@ -346,9 +347,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         rebuildDropdown.add(DateTime.now());
       }
       try {
-        _status = appointmentStatus.firstWhere(
-          (element) => element.key == widget.appointment?.appointmentStatus.toString(),
-        );
+        if (widget.type == 'create') {
+          _status = appointmentStatus.firstWhere(
+            (element) => element.key == '1',
+            orElse: () => DropdownAttribute('1', 'Booked'),
+          );
+        } else {
+          _status = appointmentStatus.firstWhere(
+            (element) => element.key == widget.appointment?.appointmentStatus.toString(),
+            orElse: () => appointmentStatus.first,
+          );
+        }
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -979,7 +988,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                    _buildPatientProfileCard(),
-                                                  const SizedBox(height: 14),
+                                                  const SizedBox(height: 16),
                                                   _isLocked
                                                       ? appointmentNoteController.controller.text != ''
                                                             ? labelValue(
@@ -990,17 +999,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                       : TextField(
                                                           controller: appointmentNoteController.controller,
                                                           style: const TextStyle(fontSize: 13),
+                                                          minLines: 2,
                                                           maxLines: 3,
                                                           decoration: InputDecoration(
                                                             labelText: 'appointmentPage'.tr(gender: 'appointmentNote'),
                                                             labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
                                                             prefixIcon: Padding(
-                                                              padding: const EdgeInsets.only(bottom: 36),
+                                                              padding: const EdgeInsets.only(bottom: 22),
                                                               child: Icon(Icons.edit_note_rounded, size: 18, color: appInkMuted),
                                                             ),
                                                             filled: true,
                                                             fillColor: appSurface,
-                                                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                                             border: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
                                                               borderSide: BorderSide(color: appBorderStrong),
@@ -1015,7 +1025,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             ),
                                                           ),
                                                         ),
-                                                  const SizedBox(height: 14),
+                                                  const SizedBox(height: 16),
                                                   // Staff-only note — never shown to the patient. Covers rare cases
                                                   // like branch transfers ("transferred from/to Branch X").
                                                   _isLocked
@@ -1028,6 +1038,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                       : TextField(
                                                           controller: _adminRemarkController,
                                                           style: const TextStyle(fontSize: 13),
+                                                          minLines: 2,
                                                           maxLines: 3,
                                                           decoration: InputDecoration(
                                                             labelText: 'Admin Remark (internal — not shown to patient)',
@@ -1036,7 +1047,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               color: appInkMuted,
                                                             ),
                                                             prefixIcon: Padding(
-                                                              padding: const EdgeInsets.only(bottom: 36),
+                                                              padding: const EdgeInsets.only(bottom: 22),
                                                               child: Icon(
                                                                 Icons.lock_outline_rounded,
                                                                 size: 16,
@@ -1047,7 +1058,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             fillColor: appSurface,
                                                             contentPadding: const EdgeInsets.symmetric(
                                                               horizontal: 14,
-                                                              vertical: 10,
+                                                              vertical: 12,
                                                             ),
                                                             border: OutlineInputBorder(
                                                               borderRadius: BorderRadius.circular(8),
@@ -1063,7 +1074,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             ),
                                                           ),
                                                         ),
-                                                  const SizedBox(height: 14),
+                                                  const SizedBox(height: 16),
                                                   if ((widget.appointment?.service?.dueDateToggle == 1) ||
                                                       selectedService?.dueDateToggle == 1) ...[
                                                     _isLocked
@@ -1566,8 +1577,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           prefixIcon: Icon(Icons.store_rounded, size: 18, color: appInkMuted),
                                                           isEditable: authController.isSuperAdmin,
                                                           fieldColor: authController.isSuperAdmin
-                                                              ? Colors.white
-                                                              : textFormFieldUneditableColor,
+                                                              ? appSurface
+                                                              : appSurfaceSubtle,
                                                           borderColor: appBorderStrong,
                                                           value: _appointmentBranch?.name,
                                                           onChanged: (p0) {
@@ -1736,8 +1747,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                             prefixIcon: Icon(Icons.medical_services_outlined, size: 18, color: appInkMuted),
                                                             value: _service?.name,
                                                             fieldColor: widget.type == 'update'
-                                                                ? textFormFieldUneditableColor
-                                                                : appInputFill,
+                                                                ? appSurfaceSubtle
+                                                                : appSurface,
                                                             borderColor: appBorderStrong,
                                                             isEditable: widget.type == 'create',
                                                             onChanged: (p0) {
@@ -1843,15 +1854,17 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                     ? labelValue('Status', _status?.name ?? '')
                                                     : AppDropdown(
                                                         attributeList: DropdownAttributeList(
-                                                          widget.type == 'update' ? getAppointmentStatus() : [],
+                                                          widget.type == 'update'
+                                                              ? getAppointmentStatus()
+                                                              : [DropdownAttribute('1', 'Booked')],
                                                           isEditable: widget.type == 'update',
                                                           fieldColor: widget.type == 'update'
-                                                              ? Colors.white
-                                                              : textFormFieldUneditableColor,
+                                                              ? appSurface
+                                                              : appSurfaceSubtle,
                                                           borderColor: appBorderStrong,
                                                           prefixIcon: Icon(Icons.rule_rounded, size: 18, color: appInkMuted),
                                                           labelText: 'appointmentPage'.tr(gender: 'status'),
-                                                          value: _status?.name,
+                                                          value: _status?.name ?? 'Booked',
                                                           onChanged: (p0) {
                                                             _status = p0;
                                                             if (_status?.key == '6' &&
@@ -4146,56 +4159,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           showDialogError(context, e.toString());
         });
       } else {
-        // ── Completion check for unpaid booking fee ──
-        final needsCompletionCheck =
-            _status?.key == '5' &&
+        // ── Appointment Completion Checkout & Loyalty Points Flow ──
+        if (_status?.key == '5' &&
             widget.appointment?.appointmentStatus != 5 &&
-            (double.tryParse(widget.appointment?.service?.serviceBookingFee ?? '0') ?? 0) > 0;
-
-        final alreadyPaid = isBookingFeePaid(
-          widget.appointment?.appointmentNote,
-          payments: widget.appointment?.payment,
-        );
-
-        if (needsCompletionCheck && !alreadyPaid && !_bookingFeeCollected) {
+            widget.appointment?.appointmentId != null) {
           dismissLoading();
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Unpaid Booking Fee'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'This appointment has an unpaid booking fee. Please confirm collection and enter receipt no. before completing.',
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _receiptNumberController,
-                    decoration: const InputDecoration(
-                      labelText: 'Receipt No. / Ref No.',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.receipt_long),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_receiptNumberController.text.trim().isEmpty) {
-                      showDialogError(context, 'Please enter a receipt number');
-                      return;
-                    }
-                    _bookingFeeCollected = true;
-                    Navigator.pop(context);
-                    _submitAppointment(); // Re-trigger save
-                  },
-                  child: const Text('Collect & Complete'),
-                ),
-              ],
-            ),
+          AppointmentCheckoutDialog.show(
+            context,
+            appointmentId: widget.appointment!.appointmentId!,
+            onCompleted: () {
+              Navigator.of(context).pop(true);
+              widget.refreshData?.call();
+            },
           );
           return;
         }

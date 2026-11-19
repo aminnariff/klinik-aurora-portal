@@ -363,10 +363,9 @@ void main() {
       expect(res.data?.userEmail, 'walkin.01122334455@klinikaurora.internal');
     });
 
-    test('AuroraCollapsibleSidebar defines 4 pinned items and 4 accordion groups', () {
-      expect(AuroraCollapsibleSidebar.pinnedLabels.length, 4);
+    test('AuroraCollapsibleSidebar defines 3 pinned items and 4 accordion groups', () {
+      expect(AuroraCollapsibleSidebar.pinnedLabels.length, 3);
       expect(AuroraCollapsibleSidebar.pinnedLabels, contains('Dashboard'));
-      expect(AuroraCollapsibleSidebar.pinnedLabels, contains(RouteNames.queueBoardDisplay));
       expect(AuroraCollapsibleSidebar.pinnedLabels, contains(RouteNames.appointmentsDisplay));
       expect(AuroraCollapsibleSidebar.pinnedLabels, contains(RouteNames.patientsDisplay));
 

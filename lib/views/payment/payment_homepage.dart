@@ -532,11 +532,35 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [...chips, exportButton],
+        final isNarrow = constraints.maxWidth < 820;
+        final chipsList = SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: chips.map((chip) => Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: chip,
+            )).toList(),
+          ),
+        );
+
+        if (isNarrow) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              chipsList,
+              const SizedBox(height: 10),
+              exportButton,
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(child: chipsList),
+            const SizedBox(width: 12),
+            exportButton,
+          ],
         );
       },
     );
@@ -610,8 +634,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
-        if (w >= 1200) {
-          // Large desktop: 6 columns, equal heights
+        if (w >= 1480) {
+          // Extra wide desktop: 6 columns, equal heights
           return IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -626,8 +650,10 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               }).toList(),
             ),
           );
-        } else if (w >= 700) {
-          // Tablet / compact desktop: 3 columns x 2 rows (Counts top, Financial bottom)
+        } else if (w >= 900) {
+          // Standard desktop & tablet landscape: 3 columns x 2 rows
+          // Row 1: Volume metrics (Total, Successful, Rescue)
+          // Row 2: Financial metrics (Paid, Refunded, Net Revenue)
           return Column(
             children: [
               IntrinsicHeight(
@@ -657,8 +683,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
               ),
             ],
           );
-        } else if (w >= 420) {
-          // Small tablet / large phone: 2 columns x 3 rows
+        } else if (w >= 540) {
+          // Tablet portrait / large mobile: 2 columns x 3 rows
           return Column(
             children: [
               IntrinsicHeight(

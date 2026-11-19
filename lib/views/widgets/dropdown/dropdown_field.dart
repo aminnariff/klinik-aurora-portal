@@ -45,7 +45,7 @@ class _AppDropdownState extends State<AppDropdown> {
         errorText: widget.attributeList.errorMessage,
         errorStyle: const TextStyle(fontSize: 12, color: Color(0xFFDC2626)),
         contentPadding: widget.attributeList.contentPadding ??
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         prefixIcon: widget.attributeList.prefixIcon != null
             ? Padding(
                 padding: const EdgeInsets.only(left: 12, right: 8),
@@ -55,16 +55,14 @@ class _AppDropdownState extends State<AppDropdown> {
         prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
         border: OutlineInputBorder(
           borderSide: BorderSide(
-            color: widget.attributeList.borderColor ??
-                (isEditable ? appBorderStrong : Colors.transparent),
+            color: widget.attributeList.borderColor ?? appBorderStrong,
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: widget.attributeList.borderColor ??
-                (isEditable ? appBorderStrong : Colors.transparent),
+            color: widget.attributeList.borderColor ?? appBorderStrong,
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),
@@ -83,7 +81,7 @@ class _AppDropdownState extends State<AppDropdown> {
         ),
         disabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: widget.attributeList.borderColor ?? appBorder,
+            color: widget.attributeList.borderColor ?? appBorderStrong,
             width: 1.0,
           ),
           borderRadius: BorderRadius.circular(8.0),

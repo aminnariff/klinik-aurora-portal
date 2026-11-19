@@ -38,10 +38,9 @@ class AuroraCollapsibleSidebar extends StatefulWidget {
     this.isMobileDrawer = false,
   });
 
-  /// The 4 always-visible, pinned core workspace items
+  /// The 3 always-visible, pinned core workspace items
   static const List<String> pinnedLabels = [
     'Dashboard',
-    RouteNames.queueBoardDisplay,
     RouteNames.appointmentsDisplay,
     RouteNames.patientsDisplay,
   ];

@@ -56,7 +56,7 @@ void main() {
       expect(data.suggestedAddOns.first.price, 45.0);
     });
 
-    test('Checkout math calculates correct gross, balance and points with add-ons', () {
+    test('Checkout math calculates correct gross, balance and points with RM 10 = 1 pt', () {
       const basePrice = 150.0;
       const bookingDeposit = 30.0;
       final addOns = [
@@ -76,10 +76,9 @@ void main() {
       final balancePayable = grossTotal - bookingDeposit;
       expect(balancePayable, 205.0); // 235 - 30
 
-      final basePoints = balancePayable.floor();
-      const milestoneBonus = 100;
-      final totalPoints = basePoints + milestoneBonus;
-      expect(totalPoints, 305); // 205 + 100
+      // Clinic formula: Spend RM 100 = 10 pts (RM 10 = 1 pt)
+      final basePoints = (balancePayable / 10).floor();
+      expect(basePoints, 20); // 205 / 10 = 20 pts
     });
 
     test('CheckoutResultData correctly parses result and WhatsApp receipt', () {
