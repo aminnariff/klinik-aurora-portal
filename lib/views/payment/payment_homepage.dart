@@ -274,23 +274,28 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 if (channels.isNotEmpty || (isSuperAdmin && branchCount >= 2)) ...[
                   const SizedBox(height: 14),
                   if (channels.isNotEmpty && isSuperAdmin && branchCount >= 2)
-                    isMobile
-                        ? Column(
+                    LayoutBuilder(
+                      builder: (context, c) {
+                        if (c.maxWidth < 950) {
+                          return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildChannelBreakdown(controller),
                               const SizedBox(height: 14),
                               _buildBranchOverview(controller),
                             ],
-                          )
-                        : Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: _buildChannelBreakdown(controller)),
-                              const SizedBox(width: 14),
-                              Expanded(child: _buildBranchOverview(controller)),
-                            ],
-                          )
+                          );
+                        }
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildChannelBreakdown(controller)),
+                            const SizedBox(width: 14),
+                            Expanded(child: _buildBranchOverview(controller)),
+                          ],
+                        );
+                      },
+                    )
                   else if (channels.isNotEmpty)
                     _buildChannelBreakdown(controller)
                   else
@@ -525,28 +530,32 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       ),
     );
 
-    if (isMobile) {
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [...chips, exportButton],
-      );
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 880) {
+          return Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [...chips, exportButton],
+          );
+        }
 
-    return Row(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: chips.map((chip) => Padding(padding: const EdgeInsets.only(right: 8), child: chip)).toList(),
+        return Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: chips.map((chip) => Padding(padding: const EdgeInsets.only(right: 8), child: chip)).toList(),
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        exportButton,
-      ],
+            const SizedBox(width: 8),
+            exportButton,
+          ],
+        );
+      },
     );
   }
 
@@ -615,46 +624,104 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
       ),
     ];
 
-    if (isMobile) {
-      return Column(
-        children: [
-          Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        if (w >= 1200) {
+          // Large desktop: 6 columns, equal heights
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: cards.asMap().entries.map((e) {
+                final isLast = e.key == cards.length - 1;
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: isLast ? 0 : 10),
+                    child: _SummaryCard(config: e.value),
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        } else if (w >= 700) {
+          // Tablet / compact desktop: 3 columns x 2 rows (Counts top, Financial bottom)
+          return Column(
             children: [
-              Expanded(child: _SummaryCard(config: cards[0])),
-              const SizedBox(width: 10),
-              Expanded(child: _SummaryCard(config: cards[1])),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _SummaryCard(config: cards[0])),
+                    const SizedBox(width: 10),
+                    Expanded(child: _SummaryCard(config: cards[1])),
+                    const SizedBox(width: 10),
+                    Expanded(child: _SummaryCard(config: cards[2])),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _SummaryCard(config: cards[3])),
+                    const SizedBox(width: 10),
+                    Expanded(child: _SummaryCard(config: cards[4])),
+                    const SizedBox(width: 10),
+                    Expanded(child: _SummaryCard(config: cards[5])),
+                  ],
+                ),
+              ),
             ],
-          ),
-          const SizedBox(height: 10),
-          Row(
+          );
+        } else if (w >= 420) {
+          // Small tablet / large phone: 2 columns x 3 rows
+          return Column(
             children: [
-              Expanded(child: _SummaryCard(config: cards[2])),
-              const SizedBox(width: 10),
-              Expanded(child: _SummaryCard(config: cards[3])),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _SummaryCard(config: cards[0])),
+                    const SizedBox(width: 10),
+                    Expanded(child: _SummaryCard(config: cards[1])),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _SummaryCard(config: cards[2])),
+                    const SizedBox(width: 10),
+                    Expanded(child: _SummaryCard(config: cards[3])),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _SummaryCard(config: cards[4])),
+                    const SizedBox(width: 10),
+                    Expanded(child: _SummaryCard(config: cards[5])),
+                  ],
+                ),
+              ),
             ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: _SummaryCard(config: cards[4])),
-              const SizedBox(width: 10),
-              Expanded(child: _SummaryCard(config: cards[5])),
-            ],
-          ),
-        ],
-      );
-    }
-
-    return Row(
-      children: cards.asMap().entries.map((e) {
-        final isLast = e.key == cards.length - 1;
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: isLast ? 0 : 10),
-            child: _SummaryCard(config: e.value),
-          ),
-        );
-      }).toList(),
+          );
+        } else {
+          // Narrow mobile: 1 column vertical stack
+          return Column(
+            children: cards.map((c) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _SummaryCard(config: c),
+            )).toList(),
+          );
+        }
+      },
     );
   }
 
@@ -1215,84 +1282,92 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             ],
           ),
           const SizedBox(height: 14),
-          AspectRatio(
-            aspectRatio: isMobile ? 1.8 : 3.8,
-            child: BarChart(
-              BarChartData(
-                maxY: maxY == 0 ? 10 : maxY * 1.25,
-                barTouchData: BarTouchData(
-                  touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => appInkPrimary,
-                    tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      return BarTooltipItem(
-                        '${dates[group.x]}\n',
-                        TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500),
-                        children: [
-                          TextSpan(
-                            text: 'RM ${rod.toY.toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+          LayoutBuilder(
+            builder: (context, c) {
+              final isCompact = c.maxWidth < 650;
+              final isMid = c.maxWidth < 1000;
+              final ar = isCompact ? 1.8 : (isMid ? 2.5 : 3.5);
+              final rodWidth = isCompact ? 12.0 : (isMid ? 18.0 : 24.0);
+              return AspectRatio(
+                aspectRatio: ar,
+                child: BarChart(
+                  BarChartData(
+                    maxY: maxY == 0 ? 10 : maxY * 1.25,
+                    barTouchData: BarTouchData(
+                      touchTooltipData: BarTouchTooltipData(
+                        getTooltipColor: (_) => appInkPrimary,
+                        tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                          return BarTooltipItem(
+                            '${dates[group.x]}\n',
+                            TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500),
+                            children: [
+                              TextSpan(
+                                text: 'RM ${rod.toY.toStringAsFixed(2)}',
+                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    titlesData: FlTitlesData(
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 56,
+                          getTitlesWidget: (value, meta) {
+                            if (value == meta.max || value == 0) return const SizedBox();
+                            return Text('RM ${value.toInt()}', style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500));
+                          },
+                        ),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 28,
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
+                            if (index < 0 || index >= dates.length) return const SizedBox();
+                            return SideTitleWidget(
+                              meta: meta,
+                              child: Text(
+                                convertToDayMonth(dates[index]),
+                                style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    gridData: FlGridData(
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (_) => FlLine(color: appSurfaceSubtle, strokeWidth: 1),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    barGroups: List.generate(dates.length, (i) {
+                      return BarChartGroupData(
+                        x: i,
+                        barRods: [
+                          BarChartRodData(
+                            toY: values[i],
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFDF6E98), Color(0xFF7E2D40)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                            width: rodWidth,
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                           ),
                         ],
                       );
-                    },
+                    }),
                   ),
                 ),
-                titlesData: FlTitlesData(
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 56,
-                      getTitlesWidget: (value, meta) {
-                        if (value == meta.max || value == 0) return const SizedBox();
-                        return Text('RM ${value.toInt()}', style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500));
-                      },
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 28,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index < 0 || index >= dates.length) return const SizedBox();
-                        return SideTitleWidget(
-                          meta: meta,
-                          child: Text(
-                            convertToDayMonth(dates[index]),
-                            style: TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                gridData: FlGridData(
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => FlLine(color: appSurfaceSubtle, strokeWidth: 1),
-                ),
-                borderData: FlBorderData(show: false),
-                barGroups: List.generate(dates.length, (i) {
-                  return BarChartGroupData(
-                    x: i,
-                    barRods: [
-                      BarChartRodData(
-                        toY: values[i],
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFDF6E98), Color(0xFF7E2D40)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        width: isMobile ? 12 : 24,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-                      ),
-                    ],
-                  );
-                }),
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -1878,47 +1953,64 @@ class _SummaryCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      width: 34,
-                      height: 34,
+                      width: 32,
+                      height: 32,
                       decoration: BoxDecoration(color: config.bg, borderRadius: BorderRadius.circular(8)),
                       child: Icon(config.icon, color: config.accent, size: 16),
                     ),
-                    if (config.subtitle != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                        decoration: BoxDecoration(
-                          color: config.bg,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: config.accent.withAlpha(40)),
-                        ),
-                        child: Text(
-                          config.subtitle!,
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: config.accent),
+                    if (config.subtitle != null) ...[
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: config.bg,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: config.accent.withAlpha(40)),
+                          ),
+                          child: Text(
+                            config.subtitle!,
+                            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: config.accent),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  config.value,
-                  style: TextStyle(
-                    fontSize: isMobile ? 17 : 19,
-                    fontWeight: FontWeight.w800,
-                    color: appInkPrimary,
-                    letterSpacing: -0.5,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    config.value,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                      color: appInkPrimary,
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text(
-                      config.label,
-                      style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: appInkMuted),
+                    Expanded(
+                      child: Text(
+                        config.label,
+                        style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: appInkMuted),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     if (config.onTap != null) ...[
                       const SizedBox(width: 4),

@@ -22,10 +22,14 @@ class DashboardStats extends StatelessWidget {
         final months = perfCtrl.branchPerformanceResponse?.data?.last3Months ?? [];
         final thisMonthTotal = months.isNotEmpty ? months.last.total : null;
 
-        if (isMobile) {
-          return _MobileStats(data: data, thisMonthAppointments: thisMonthTotal);
-        }
-        return _DesktopStats(data: data, thisMonthAppointments: thisMonthTotal);
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 768) {
+              return _MobileStats(data: data, thisMonthAppointments: thisMonthTotal);
+            }
+            return _DesktopStats(data: data, thisMonthAppointments: thisMonthTotal);
+          },
+        );
       },
     );
   }
