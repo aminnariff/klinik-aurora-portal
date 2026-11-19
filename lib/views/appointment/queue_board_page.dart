@@ -158,6 +158,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                   TextField(
                     controller: ctrl,
                     autofocus: true,
+                    onSubmitted: (val) => Navigator.of(ctx).pop(val.trim().isNotEmpty ? val.trim() : 'Scan Room 1'),
                     decoration: const InputDecoration(
                       labelText: 'Room Label',
                       hintText: 'e.g. Scan Room 1, Consultation A',
@@ -171,7 +172,8 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                         .map(
                           (preset) => ActionChip(
                             label: Text(preset),
-                            onPressed: () => ctrl.text = preset,
+                            backgroundColor: colors.surfaceSubtle,
+                            onPressed: () => Navigator.of(ctx).pop(preset),
                           ),
                         )
                         .toList(),
@@ -339,8 +341,8 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                         ),
                       ),
                     AppButton.secondary(
-                      text: 'Book (N)',
-                      icon: Icon(Icons.add_rounded, size: 16, color: colors.inkSecondary),
+                      text: 'Book Walk-In (N)',
+                      icon: Icon(Icons.person_add_alt_1_rounded, size: 16, color: colors.inkSecondary),
                       onPressed: () => showDialog(
                         context: context,
                         builder: (_) => const AppointmentDetails(type: 'create'),

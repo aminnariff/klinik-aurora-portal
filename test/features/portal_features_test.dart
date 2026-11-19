@@ -11,6 +11,7 @@ import 'package:klinik_aurora_portal/controllers/baby_tracker/patient_recall_con
 import 'package:klinik_aurora_portal/controllers/dashboard/eod_handover_controller.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/utilization_heatmap_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/patient_summary_controller.dart';
+import 'package:klinik_aurora_portal/models/user/create_user_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/deferred_page.dart';
 import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 
@@ -336,6 +337,28 @@ void main() {
       for (final ink in [appInkPrimary, appInkSecondary, appInkMuted]) {
         expect(ink.computeLuminance(), lessThan(0.25));
       }
+    });
+
+    test('CreateUserResponse correctly parses quick walk-in patient payload', () {
+      final res = CreateUserResponse.fromJson({
+        'message': 'Successfully create new user!',
+        'userId': 'uuid-1234-abcd',
+        'data': {
+          'userId': 'uuid-1234-abcd',
+          'userFullName': 'Farah Nabilah',
+          'userName': 'walkin_01122334455',
+          'userPhone': '01122334455',
+          'userEmail': 'walkin.01122334455@klinikaurora.internal',
+          'userNric': '980102-14-5566',
+          'branchId': 'branch-1',
+        },
+      });
+
+      expect(res.userId, 'uuid-1234-abcd');
+      expect(res.data?.userFullName, 'Farah Nabilah');
+      expect(res.data?.userPhone, '01122334455');
+      expect(res.data?.userNric, '980102-14-5566');
+      expect(res.data?.userEmail, 'walkin.01122334455@klinikaurora.internal');
     });
   });
 }

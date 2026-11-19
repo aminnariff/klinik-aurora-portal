@@ -37,6 +37,12 @@ import 'package:klinik_aurora_portal/views/appointment/whatsapp_feature.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/button.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/copy_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/calendar/selection_calendar_view.dart';
+import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
+import 'package:klinik_aurora_portal/models/user/create_user_request.dart';
+import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
+import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
+import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
+import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -65,6 +71,13 @@ class AppointmentDetails extends StatefulWidget {
 }
 
 class _AppointmentDetailsState extends State<AppointmentDetails> {
+  String? _selectedUserId;
+  String? _selectedUserNric;
+  final TextEditingController _patientSearchCtrl = TextEditingController();
+  List<UserResponse> _patientSearchResults = [];
+  bool _isSearchingPatients = false;
+  final Debouncer _patientDebouncer = Debouncer(milliseconds: 300);
+
   final InputFieldAttribute patientNameController = InputFieldAttribute(
     controller: TextEditingController(),
     isEditable: false,
@@ -147,6 +160,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   @override
   void dispose() {
+    _patientSearchCtrl.dispose();
     _cooldownTimer?.cancel();
     super.dispose();
   }
@@ -159,6 +173,8 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   @override
   void initState() {
+    _selectedUserId = widget.appointment?.user?.userId;
+    _selectedUserNric = widget.appointment?.user?.userNric;
     patientNameController.controller.text = widget.appointment?.user?.userFullName?.titleCase() ?? '';
     patientContactNoController.controller.text = widget.appointment?.user?.userPhone ?? '';
     patientEmailController.controller.text = widget.appointment?.user?.userEmail ?? '';
@@ -2271,10 +2287,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   Widget _buildPatientProfileCard() {
+    if (widget.type == 'create' && _selectedUserId == null) {
+      return _buildPatientSearchAndQuickRegisterCard();
+    }
+
     final patientName = patientNameController.controller.text.isNotEmpty
         ? patientNameController.controller.text
         : (widget.appointment?.user?.userFullName ?? 'Unknown Patient');
-    final patientNric = widget.appointment?.user?.userNric;
+    final patientNric = _selectedUserNric ?? widget.appointment?.user?.userNric;
     final patientPhone = patientContactNoController.controller.text.isNotEmpty
         ? patientContactNoController.controller.text
         : (widget.appointment?.user?.userPhone ?? '');
@@ -2289,16 +2309,36 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _extraSectionLabel('Patient', Icons.person_rounded),
-            _copyInlineAction(
-              label: 'Copy Details',
-              onTap: () {
-                final buffer = StringBuffer();
-                if (patientName.isNotEmpty && patientName != 'Unknown Patient') buffer.writeln(patientName);
-                if (notNullOrEmptyString(patientNric)) buffer.writeln(patientNric);
-                if (patientPhone.isNotEmpty) buffer.writeln(patientPhone);
-                if (patientEmail.isNotEmpty) buffer.writeln(patientEmail);
-                _copyToClipboard(buffer.toString().trim(), 'patient details');
-              },
+            Row(
+              children: [
+                if (widget.type == 'create')
+                  _copyInlineAction(
+                    label: 'Change Patient',
+                    onTap: () {
+                      setState(() {
+                        _selectedUserId = null;
+                        _selectedUserNric = null;
+                        patientNameController.controller.clear();
+                        patientContactNoController.controller.clear();
+                        patientEmailController.controller.clear();
+                        _patientSearchResults.clear();
+                        _patientSearchCtrl.clear();
+                      });
+                    },
+                  ),
+                if (widget.type == 'create') const SizedBox(width: 8),
+                _copyInlineAction(
+                  label: 'Copy Details',
+                  onTap: () {
+                    final buffer = StringBuffer();
+                    if (patientName.isNotEmpty && patientName != 'Unknown Patient') buffer.writeln(patientName);
+                    if (notNullOrEmptyString(patientNric)) buffer.writeln(patientNric);
+                    if (patientPhone.isNotEmpty) buffer.writeln(patientPhone);
+                    if (patientEmail.isNotEmpty) buffer.writeln(patientEmail);
+                    _copyToClipboard(buffer.toString().trim(), 'patient details');
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -2390,6 +2430,357 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         ),
       ],
     );
+  }
+
+  Widget _buildPatientSearchAndQuickRegisterCard() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _extraSectionLabel('Patient (Required)', Icons.person_search_rounded),
+            AppButton.primary(
+              text: '+ Quick Register Walk-In',
+              icon: const Icon(Icons.person_add_rounded, size: 14),
+              height: 30,
+              onPressed: _openQuickRegisterDialog,
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: appCanvas,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: appBorderStrong),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: _patientSearchCtrl,
+                style: const TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  labelText: 'Search existing patient (Name, Phone, or IC)',
+                  labelStyle: TextStyle(fontSize: 12, color: appInkMuted),
+                  hintText: 'Type Name or Phone or IC...',
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
+                  suffixIcon: _isSearchingPatients
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : (_patientSearchCtrl.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 16),
+                              onPressed: () {
+                                _patientSearchCtrl.clear();
+                                setState(() => _patientSearchResults.clear());
+                              },
+                            )
+                          : null),
+                  filled: true,
+                  fillColor: appSurface,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: appBorderStrong),
+                  ),
+                ),
+                onChanged: _onPatientSearchChanged,
+              ),
+              if (_patientSearchResults.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 180),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: _patientSearchResults.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, idx) {
+                      final u = _patientSearchResults[idx];
+                      return ListTile(
+                        dense: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        leading: CircleAvatar(
+                          radius: 14,
+                          backgroundColor: const Color(0xFF6366F1).withAlpha(30),
+                          child: Text(
+                            (u.userFullname ?? 'P').isNotEmpty ? (u.userFullname ?? 'P')[0].toUpperCase() : 'P',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+                          ),
+                        ),
+                        title: Text(
+                          u.userFullname ?? 'Unnamed Patient',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(
+                          '${u.userPhone ?? '-'} · IC: ${u.userNric ?? 'No IC'}',
+                          style: TextStyle(fontSize: 11, color: appInkMuted),
+                        ),
+                        trailing: AppButton.secondary(
+                          text: 'Select',
+                          height: 28,
+                          onPressed: () => _selectPatient(u),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ] else if (_patientSearchCtrl.text.trim().length >= 2 && !_isSearchingPatients) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
+                      const SizedBox(width: 6),
+                      Text(
+                        'No matching patient found.',
+                        style: TextStyle(fontSize: 12, color: appInkMuted),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: _openQuickRegisterDialog,
+                        child: const Text('Register as New Walk-In', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _selectPatient(UserResponse u) {
+    setState(() {
+      _selectedUserId = u.userId;
+      _selectedUserNric = u.userNric;
+      patientNameController.controller.text = u.userFullname ?? '';
+      patientContactNoController.controller.text = u.userPhone ?? '';
+      patientEmailController.controller.text = u.userEmail ?? '';
+      _patientSearchResults.clear();
+      _patientSearchCtrl.clear();
+    });
+    rebuild.add(DateTime.now());
+  }
+
+  void _onPatientSearchChanged(String query) {
+    final q = query.trim();
+    if (q.length < 2) {
+      setState(() => _patientSearchResults.clear());
+      return;
+    }
+    _patientDebouncer.run(() async {
+      if (!mounted) return;
+      setState(() => _isSearchingPatients = true);
+      final res = await UserController.getAll(
+        context,
+        1,
+        10,
+        userFullName: q,
+        userPhone: q,
+        userNric: q,
+      );
+      if (mounted) {
+        setState(() {
+          _isSearchingPatients = false;
+          _patientSearchResults = res.data?.data ?? [];
+        });
+      }
+    });
+  }
+
+  Future<void> _openQuickRegisterDialog() async {
+    final nameCtrl = TextEditingController(text: _patientSearchCtrl.text.trim());
+    final phoneCtrl = TextEditingController();
+    final nricCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    final user = await showDialog<UserResponse>(
+      context: context,
+      builder: (ctx) {
+        bool saving = false;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return Dialog(
+              backgroundColor: appSurface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: appBorderStrong),
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6366F1).withAlpha(25),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.person_add_rounded, size: 20, color: Color(0xFF6366F1)),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Quick Walk-In Registration',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                                  ),
+                                  Text(
+                                    'Register in 10 seconds for walk-in appointment.',
+                                    style: TextStyle(fontSize: 12, color: appInkMuted),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        TextFormField(
+                          controller: nameCtrl,
+                          autofocus: true,
+                          style: const TextStyle(fontSize: 13),
+                          decoration: const InputDecoration(
+                            labelText: 'Full Name *',
+                            hintText: 'e.g. Siti Aminah binti Razali',
+                            prefixIcon: Icon(Icons.person_outline_rounded, size: 18),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Full Name is required' : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: phoneCtrl,
+                          keyboardType: TextInputType.phone,
+                          style: const TextStyle(fontSize: 13),
+                          decoration: const InputDecoration(
+                            labelText: 'Mobile Phone Number *',
+                            hintText: 'e.g. 0123456789',
+                            prefixIcon: Icon(Icons.phone_outlined, size: 18),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Phone number is required' : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: nricCtrl,
+                          style: const TextStyle(fontSize: 13),
+                          decoration: const InputDecoration(
+                            labelText: 'NRIC / Passport (Optional)',
+                            hintText: 'e.g. 950101-10-1234',
+                            prefixIcon: Icon(Icons.badge_outlined, size: 18),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: emailCtrl,
+                          keyboardType: TextInputType.emailAddress,
+                          style: const TextStyle(fontSize: 13),
+                          decoration: InputDecoration(
+                            labelText: 'Email Address (Optional)',
+                            hintText: 'Leave blank to auto-generate',
+                            prefixIcon: const Icon(Icons.email_outlined, size: 18),
+                            helperText: 'Auto-generates walkin internal ID if omitted.',
+                            helperStyle: TextStyle(fontSize: 11, color: appInkMuted),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            AppButton.secondary(
+                              text: 'Cancel',
+                              onPressed: () => Navigator.of(ctx).pop(),
+                            ),
+                            const SizedBox(width: 8),
+                            AppButton.primary(
+                              text: saving ? 'Registering...' : 'Register & Select',
+                              onPressed: saving
+                                  ? null
+                                  : () async {
+                                      if (!formKey.currentState!.validate()) return;
+                                      setDialogState(() => saving = true);
+                                      final auth = context.read<AuthController>();
+                                      final branchId = _appointmentBranch?.key ??
+                                          auth.authenticationResponse?.data?.user?.branchId;
+                                      final rawPhone = phoneCtrl.text.trim();
+                                      final rawName = nameCtrl.text.trim();
+                                      final rawNric = nricCtrl.text.trim();
+                                      final rawEmail = emailCtrl.text.trim().toLowerCase();
+
+                                      final res = await UserController.create(
+                                        context,
+                                        CreateUserRequest(
+                                          userFullname: rawName,
+                                          userName: 'walkin_${rawPhone.replaceAll(RegExp(r'[^0-9]'), '')}',
+                                          userPhone: rawPhone,
+                                          userNric: rawNric.isNotEmpty ? rawNric : null,
+                                          userEmail: rawEmail.isNotEmpty ? rawEmail : null,
+                                          userPassword: 'aurora123',
+                                          userRetypePassword: 'aurora123',
+                                          branchId: branchId,
+                                        ),
+                                      );
+                                      if (!ctx.mounted) return;
+                                      if (responseCode(res.code) && res.data != null) {
+                                        final newId = res.data?.userId ?? res.data?.data?.userId;
+                                        Navigator.of(ctx).pop(
+                                          UserResponse(
+                                            userId: newId,
+                                            userFullname: rawName,
+                                            userPhone: rawPhone,
+                                            userNric: rawNric.isNotEmpty ? rawNric : null,
+                                            userEmail: rawEmail.isNotEmpty ? rawEmail : (res.data?.data?.userEmail ?? ''),
+                                          ),
+                                        );
+                                      } else {
+                                        setDialogState(() => saving = false);
+                                        AppToast.snackbar(ctx, res.message ?? 'Failed to register patient.');
+                                      }
+                                    },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (user != null && mounted) {
+      _selectPatient(user);
+      AppToast.snackbar(context, 'Patient registered & selected: ${user.userFullname}');
+    }
   }
 
   Widget _buildFeesSection() {
@@ -3635,7 +4026,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         AppointmentController.create(
           context,
           CreateAppointmentRequest(
-            userId: widget.appointment?.user?.userId,
+            userId: _selectedUserId ?? widget.appointment?.user?.userId,
             serviceBranchId: _service?.key,
             appointmentDateTime: convertMalaysiaTimeToUtc(dateTimeController.text, plainFormat: true),
             appointmentNote: _buildNote(),
@@ -3871,7 +4262,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   bool validate() {
     bool temp = true;
-    if (patientNameController.controller.text == '') {
+    if (widget.type == 'create' && (_selectedUserId == null || patientNameController.controller.text.trim().isEmpty)) {
+      temp = false;
+      showDialogError(context, 'Please search and select or quick-register a patient.');
+      return false;
+    } else if (patientNameController.controller.text == '') {
       temp = false;
       patientNameController.errorMessage = ErrorMessage.required(field: patientNameController.labelText);
     }
