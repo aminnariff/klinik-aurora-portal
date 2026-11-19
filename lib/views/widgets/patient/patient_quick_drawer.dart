@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/state_machines/appointment_state_machine.dart';
 import 'package:klinik_aurora_portal/controllers/user/patient_summary_controller.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
@@ -404,7 +404,8 @@ class _PatientQuickDrawerState extends State<PatientQuickDrawer> with SingleTick
       separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, idx) {
         final item = list[idx];
-        final stColor = appointmentStatusColors[item.appointmentStatus] ?? colors.inkMuted;
+        final stState = AppointmentState.fromCode(item.appointmentStatus);
+        final stColor = stState.color;
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -430,7 +431,7 @@ class _PatientQuickDrawerState extends State<PatientQuickDrawer> with SingleTick
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      _statusName(item.appointmentStatus),
+                      stState.label,
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: stColor),
                     ),
                   ),
@@ -563,28 +564,5 @@ class _PatientQuickDrawerState extends State<PatientQuickDrawer> with SingleTick
         );
       },
     );
-  }
-
-  static String _statusName(int status) {
-    switch (status) {
-      case 1:
-        return 'Booked';
-      case 2:
-        return 'Cancelled';
-      case 3:
-        return 'Rescheduled';
-      case 4:
-        return 'Pending Pay';
-      case 5:
-        return 'Completed';
-      case 6:
-        return 'Refunded';
-      case 7:
-        return 'No-Show';
-      case 8:
-        return 'Transferred';
-      default:
-        return 'Status $status';
-    }
   }
 }

@@ -29,6 +29,7 @@ import 'package:klinik_aurora_portal/models/branch/branch_all_response.dart' as 
 import 'package:klinik_aurora_portal/models/document/file_attribute.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_available_response.dart'
     as service_branch_available_model;
+import 'package:klinik_aurora_portal/state_machines/appointment_state_machine.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_checkout_dialog.dart';
 import 'package:klinik_aurora_portal/views/appointment/appointment_detail_view.dart';
 import 'package:klinik_aurora_portal/views/appointment/payment_details.dart';
@@ -817,32 +818,42 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (widget.type == 'update' && widget.appointment?.appointmentStatus == 1) ...[
-                                  _headerQuickAction(
-                                    label: 'Mark Completed',
-                                    icon: Icons.check_circle_outline_rounded,
-                                    color: const Color(0xFF059669),
-                                    onTap: () => _quickUpdateStatus(5, 'Completed'),
+                                if (widget.type == 'update') ...[
+                                  Builder(
+                                    builder: (context) {
+                                      final currentState = AppointmentState.fromCode(widget.appointment?.appointmentStatus);
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (currentState.canBeCompleted) ...[
+                                            _headerQuickAction(
+                                              label: 'Mark Completed',
+                                              icon: Icons.check_circle_outline_rounded,
+                                              color: const Color(0xFF059669),
+                                              onTap: () => _quickUpdateStatus(AppointmentState.completed.statusCode, AppointmentState.completed.label),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            _headerQuickAction(
+                                              label: 'Mark No-Show',
+                                              icon: Icons.person_off_outlined,
+                                              color: const Color(0xFFD97706),
+                                              onTap: () => _quickUpdateStatus(AppointmentState.noShow.statusCode, AppointmentState.noShow.label),
+                                            ),
+                                            const SizedBox(width: 6),
+                                          ],
+                                          if (currentState.canBeTransferred) ...[
+                                            _headerQuickAction(
+                                              label: 'Transfer Branch',
+                                              icon: Icons.swap_horiz_rounded,
+                                              color: const Color(0xFF2563EB),
+                                              onTap: () => _openTransferBranchDialog(),
+                                            ),
+                                            const SizedBox(width: 8),
+                                          ],
+                                        ],
+                                      );
+                                    },
                                   ),
-                                  const SizedBox(width: 6),
-                                  _headerQuickAction(
-                                    label: 'Mark No-Show',
-                                    icon: Icons.person_off_outlined,
-                                    color: const Color(0xFFD97706),
-                                    onTap: () => _quickUpdateStatus(6, 'No-Show'),
-                                  ),
-                                  const SizedBox(width: 6),
-                                ],
-                                if (widget.type == 'update' &&
-                                    (widget.appointment?.appointmentStatus == 1 ||
-                                        widget.appointment?.appointmentStatus == 3)) ...[
-                                  _headerQuickAction(
-                                    label: 'Transfer Branch',
-                                    icon: Icons.swap_horiz_rounded,
-                                    color: const Color(0xFF2563EB),
-                                    onTap: () => _openTransferBranchDialog(),
-                                  ),
-                                  const SizedBox(width: 8),
                                 ],
                                 if (widget.type == 'update')
                                   CopyButton(
@@ -905,39 +916,43 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                _isUnlocked
-                                    ? Icons.lock_open_rounded
-                                    : widget.appointment?.appointmentStatus == 2
-                                    ? Icons.cancel_rounded
-                                    : widget.appointment?.appointmentStatus == 8
-                                    ? Icons.swap_horiz_rounded
-                                    : Icons.lock_outline_rounded,
-                                size: 16,
-                                color: _isUnlocked
-                                    ? const Color(0xFF16A34A)
-                                    : widget.appointment?.appointmentStatus == 2
-                                    ? const Color(0xFFDC2626)
-                                    : widget.appointment?.appointmentStatus == 8
-                                    ? const Color(0xFF7C3AED)
-                                    : const Color(0xFFD97706),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _isUnlocked
+                              Builder(
+                                builder: (context) {
+                                  final apptState = AppointmentState.fromCode(widget.appointment?.appointmentStatus);
+                                  final icon = _isUnlocked
+                                      ? Icons.lock_open_rounded
+                                      : apptState == AppointmentState.cancelled
+                                          ? Icons.cancel_rounded
+                                          : apptState == AppointmentState.transferred
+                                              ? Icons.swap_horiz_rounded
+                                              : Icons.lock_outline_rounded;
+                                  final color = _isUnlocked ? const Color(0xFF16A34A) : apptState.color;
+                                  final msg = _isUnlocked
                                       ? 'Appointment unlocked for editing. You can now modify status, date/time slot, and notes.'
-                                      : widget.appointment?.appointmentStatus == 2
-                                      ? 'This appointment was cancelled.${(widget.appointment?.adminRemark != null && widget.appointment!.adminRemark!.isNotEmpty) ? ' Reason: ${widget.appointment!.adminRemark}' : (widget.appointment?.appointmentNote != null && widget.appointment!.appointmentNote!.isNotEmpty ? ' (${widget.appointment!.appointmentNote})' : '')}'
-                                      : widget.appointment?.appointmentStatus == 8
-                                      ? 'This appointment was marked as Transferred. Check destination branch for schedule.'
-                                      : 'This appointment is marked as ${_getStatusName(widget.appointment?.appointmentStatus)}.',
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    color: appInkSecondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                                      : apptState == AppointmentState.cancelled
+                                          ? 'This appointment was cancelled.${(widget.appointment?.adminRemark != null && widget.appointment!.adminRemark!.isNotEmpty) ? ' Reason: ${widget.appointment!.adminRemark}' : (widget.appointment?.appointmentNote != null && widget.appointment!.appointmentNote!.isNotEmpty ? ' (${widget.appointment!.appointmentNote})' : '')}'
+                                          : apptState == AppointmentState.transferred
+                                              ? 'This appointment was marked as Transferred. Check destination branch for schedule.'
+                                              : 'This appointment is marked as ${apptState.label}.';
+                                  return Expanded(
+                                    child: Row(
+                                      children: [
+                                        Icon(icon, size: 16, color: color),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            msg,
+                                            style: TextStyle(
+                                              fontSize: 12.5,
+                                              color: appInkSecondary,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
                               if (!_isUnlocked) ...[
                                 const SizedBox(width: 8),
@@ -1858,9 +1873,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               ? getAppointmentStatus()
                                                               : [DropdownAttribute('1', 'Booked')],
                                                           isEditable: widget.type == 'update',
-                                                          fieldColor: widget.type == 'update'
-                                                              ? appSurface
-                                                              : appSurfaceSubtle,
+                                                          fieldColor: appSurface,
                                                           borderColor: appBorderStrong,
                                                           prefixIcon: Icon(Icons.rule_rounded, size: 18, color: appInkMuted),
                                                           labelText: 'appointmentPage'.tr(gender: 'status'),
@@ -1933,7 +1946,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                             );
                                           },
                                         ),
-                                        AppPadding.vertical(),
+                                        const SizedBox(height: 14),
                                         Consumer<ServiceBranchAvailableDtController>(
                                           builder: (context, snapshot, _) {
                                             return _isLocked
@@ -2203,10 +2216,20 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   List<DropdownAttribute> getAppointmentStatus() {
+    final current = AppointmentState.fromCode(widget.appointment?.appointmentStatus);
+    final allowedStates = <AppointmentState>{current, ...current.allowedNextStates};
+
     if (context.read<AuthController>().hasPermission('c54a2d91-499c-11f0-9169-bc24115a1342') == false) {
-      return appointmentStatus;
+      return allowedStates
+          .map((s) => DropdownAttribute(s.statusCode.toString(), s.label))
+          .toList();
     } else {
-      return [DropdownAttribute('5', 'Completed')];
+      final filtered = allowedStates
+          .where((s) => s == current || s == AppointmentState.completed)
+          .toList();
+      return filtered
+          .map((s) => DropdownAttribute(s.statusCode.toString(), s.label))
+          .toList();
     }
   }
 
@@ -3280,7 +3303,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                 prefixIcon: Icon(Icons.rule_rounded, size: 18, color: appInkMuted),
                                 isEditable: true,
                                 value: _status?.name,
-                                fieldColor: appInputFill,
+                                fieldColor: appSurface,
                                 borderColor: appBorderStrong,
                                 onChanged: (p0) {
                                   _status = p0;

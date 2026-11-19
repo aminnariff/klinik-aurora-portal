@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
+import 'package:klinik_aurora_portal/state_machines/appointment_state_machine.dart';
 import 'package:klinik_aurora_portal/views/widgets/tooltip/app_tooltip.dart';
 
 Widget showStatus(bool? value, {String? valueText, Color? valueColor}) {
@@ -57,10 +56,9 @@ class AppointmentStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Theme.of(context);
-    // fallback to grey/Unknown if status is not found or null
-    final color = appointmentStatusColors[status] ?? appInkMuted;
-    String label = getAppointmentStatusLabel(status);
+    final apptState = AppointmentState.fromCode(status);
+    final color = apptState.color;
+    String label = apptState.label;
     if (isUppercase) label = label.toUpperCase();
 
     return Container(
