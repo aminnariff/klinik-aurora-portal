@@ -894,6 +894,14 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                   icon: const Icon(Icons.add_task_rounded, size: 15),
                   height: 38,
                   onPressed: () {
+                    final key = _preview?.detectedMilestone?.key;
+                    final nextKeyword = switch (key) {
+                      'nt_scan' => 'detail',
+                      'detail_scan' => '4d',
+                      'scan_4d5d' => 'growth',
+                      _ => null,
+                    };
+
                     Navigator.of(context).pop(true);
                     showDialog(
                       context: context,
@@ -903,7 +911,8 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                         initialUserName: _preview?.patientName,
                         initialUserPhone: _preview?.patientPhone,
                         initialBranchId: _preview?.branchId,
-                        initialNote: 'Follow-up booking after completing ${_preview?.serviceName}',
+                        initialServiceKeyword: nextKeyword,
+                        initialNote: 'Follow-up ${nextMilestone.$1} after completing ${_preview?.serviceName}',
                         refreshData: () => widget.onCompleted?.call(),
                       ),
                     );

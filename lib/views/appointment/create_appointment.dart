@@ -73,6 +73,7 @@ class AppointmentDetails extends StatefulWidget {
   final String? initialBranchId;
   final String? initialDueDate;
   final String? initialNote;
+  final String? initialServiceKeyword;
 
   const AppointmentDetails({
     super.key,
@@ -87,6 +88,7 @@ class AppointmentDetails extends StatefulWidget {
     this.initialBranchId,
     this.initialDueDate,
     this.initialNote,
+    this.initialServiceKeyword,
   });
 
   @override
@@ -296,6 +298,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 }
               }
               serviceList.sort((a, b) => a.name.compareTo(b.name));
+              if (widget.initialServiceKeyword != null && widget.initialServiceKeyword!.isNotEmpty) {
+                final kw = widget.initialServiceKeyword!.toLowerCase();
+                try {
+                  final matched = serviceList.firstWhere(
+                    (s) => s.name.toLowerCase().contains(kw),
+                  );
+                  _service = matched;
+                  try {
+                    selectedService = value.data?.data?.firstWhere((e) => e.serviceBranchId == matched.key);
+                  } catch (_) {}
+                } catch (_) {}
+              }
               context.read<ServiceBranchController>().serviceBranchAvailableResponse = value.data;
               rebuildDropdown.add(DateTime.now());
             }
