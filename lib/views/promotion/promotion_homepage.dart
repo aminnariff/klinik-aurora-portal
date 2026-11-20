@@ -510,7 +510,7 @@ class _PromotionCardState extends State<_PromotionCard> {
         // Image or placeholder
         hasImage
             ? Image.network(
-                resolveImageUrl(images.first.path),
+                resolveImageUrl(images.first.path), cacheWidth: 600,
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => _buildPlaceholder(),
                 loadingBuilder: (_, child, progress) {

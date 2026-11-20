@@ -47,6 +47,7 @@ class BranchDashboardView extends StatelessWidget {
                         children: [
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 0,
                               label: 'Seen vs Scheduled',
                               value: seenRatioValue,
                               accentColor: const Color(0xFF0D9488), // Teal
@@ -60,6 +61,7 @@ class BranchDashboardView extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 1,
                               label: 'Remaining Visits',
                               value: upcomingCount.toString(),
                               accentColor: const Color(0xFF2563EB), // Blue
@@ -76,6 +78,7 @@ class BranchDashboardView extends StatelessWidget {
                         children: [
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 2,
                               label: 'Doctors on Duty',
                               value: onDutyCount.toString(),
                               accentColor: const Color(0xFFD97706), // Amber
@@ -87,6 +90,7 @@ class BranchDashboardView extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 3,
                               label: 'Cancelled / No-Show',
                               value: cancelledCount.toString(),
                               accentColor: const Color(0xFFDC2626), // Red
@@ -105,6 +109,7 @@ class BranchDashboardView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 0,
                         label: 'Seen vs Scheduled',
                         value: seenRatioValue,
                         accentColor: const Color(0xFF0D9488), // Teal
@@ -118,6 +123,7 @@ class BranchDashboardView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 1,
                         label: 'Remaining Visits',
                         value: upcomingCount.toString(),
                         accentColor: const Color(0xFF2563EB), // Blue
@@ -130,6 +136,7 @@ class BranchDashboardView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 2,
                         label: 'Doctors on Duty',
                         value: onDutyCount.toString(),
                         accentColor: const Color(0xFFD97706), // Amber
@@ -141,6 +148,7 @@ class BranchDashboardView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 3,
                         label: 'Cancelled / No-Show',
                         value: cancelledCount.toString(),
                         accentColor: const Color(0xFFDC2626), // Red

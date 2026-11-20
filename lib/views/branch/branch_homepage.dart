@@ -608,7 +608,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
                                 clipBehavior: Clip.antiAlias,
                                 child: (items[i].branchImage != null && items[i].branchImage!.trim().isNotEmpty)
                                     ? Image.network(
-                                        resolveImageUrl(items[i].branchImage),
+                                        resolveImageUrl(items[i].branchImage), cacheWidth: 600,
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error, stackTrace) => Center(
                                           child: Icon(Icons.storefront_rounded, size: 20, color: primary),

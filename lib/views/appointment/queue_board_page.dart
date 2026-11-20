@@ -164,7 +164,10 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               if (item.roomLabel case final room?) ListTile(title: const Text('Room'), subtitle: Text(room)),
               const Divider(),
               if (item.userId.isNotEmpty)
-                action('Patient profile', () => PatientQuickDrawer.show(context, userId: item.userId, patientName: item.patientName)),
+                action(
+                  'Patient profile',
+                  () => PatientQuickDrawer.show(context, userId: item.userId, patientName: item.patientName),
+                ),
               if (item.queueStatus == 'scheduled') ...[
                 action('Check in', () => _advance(item, 'checked_in')),
                 action('Mark no-show', () => _advance(item, 'no_show')),
@@ -267,15 +270,9 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      AppButton.secondary(
-                        text: 'Cancel',
-                        onPressed: () => Navigator.of(ctx).pop(),
-                      ),
+                      AppButton.secondary(text: 'Cancel', onPressed: () => Navigator.of(ctx).pop()),
                       const SizedBox(width: 8),
-                      AppButton.primary(
-                        text: 'Move to Room',
-                        onPressed: () => Navigator.of(ctx).pop(ctrl.text.trim()),
-                      ),
+                      AppButton.primary(text: 'Move to Room', onPressed: () => Navigator.of(ctx).pop(ctrl.text.trim())),
                     ],
                   ),
                 ],
@@ -428,10 +425,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                             items: [
                               const DropdownMenuItem<String?>(value: null, child: Text('All Branches')),
                               for (final b in _branches)
-                                DropdownMenuItem<String?>(
-                                  value: b.branchId,
-                                  child: Text(b.branchName ?? 'Branch'),
-                                ),
+                                DropdownMenuItem<String?>(value: b.branchId, child: Text(b.branchName ?? 'Branch')),
                             ],
                             onChanged: (v) {
                               setState(() => _selectedBranchId = v);
@@ -520,7 +514,9 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               child: _loading
                   ? Center(child: CircularProgressIndicator(color: colors.brandPrimary))
                   : _error != null
-                      ? Center(child: Text(_error!, style: TextStyle(color: colors.danger)))
+                  ? Center(
+                      child: Text(_error!, style: TextStyle(color: colors.danger)),
+                    )
                       : _viewMode == _ScheduleViewMode.timeline
                           ? _buildTimelineView(colors)
                           : _buildKanbanView(colors),
@@ -547,7 +543,10 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.inkPrimary),
             ),
             const SizedBox(height: 4),
-            Text('Try selecting another date or clear your search query.', style: TextStyle(fontSize: 12, color: colors.inkMuted)),
+            Text(
+              'Try selecting another date or clear your search query.',
+              style: TextStyle(fontSize: 12, color: colors.inkMuted),
+            ),
           ],
         ),
       );
@@ -599,10 +598,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
           // Time Slot Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: colors.brandSoftBg,
-              borderRadius: BorderRadius.circular(8),
-            ),
+            decoration: BoxDecoration(color: colors.brandSoftBg, borderRadius: BorderRadius.circular(8)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -612,7 +608,11 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
                 ),
                 Text(
                   _prettyStage(item.queueStatus),
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _stageColor(colors, item.queueStatus)),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: _stageColor(colors, item.queueStatus),
+                  ),
                 ),
               ],
             ),
@@ -728,11 +728,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
 
             // Action based on status
             if (item.queueStatus == 'scheduled') ...[
-              AppButton.primary(
-                text: 'Check In',
-                height: 32,
-                onPressed: () => _advance(item, 'checked_in'),
-              ),
+              AppButton.primary(text: 'Check In', height: 32, onPressed: () => _advance(item, 'checked_in')),
               const SizedBox(width: 6),
               IconButton(
                 tooltip: 'Mark No-Show',
@@ -741,11 +737,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               ),
             ] else if (item.queueStatus == 'checked_in' || item.queueStatus == 'in_room') ...[
               if (item.queueStatus == 'checked_in') ...[
-                AppButton.secondary(
-                  text: 'To Room',
-                  height: 32,
-                  onPressed: () => _promptRoomAndMove(item),
-                ),
+                AppButton.secondary(text: 'To Room', height: 32, onPressed: () => _promptRoomAndMove(item)),
                 const SizedBox(width: 6),
               ],
               AppButton.primary(
@@ -797,10 +789,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (int i = 0; i < cols.length; i++) ...[
-                if (i > 0) const SizedBox(width: 12),
-                Expanded(child: cols[i]),
-              ],
+              for (int i = 0; i < cols.length; i++) ...[if (i > 0) const SizedBox(width: 12), Expanded(child: cols[i])],
             ],
           );
         }
@@ -867,10 +856,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
           Expanded(
             child: items.isEmpty
                 ? Center(
-                    child: Text(
-                      'No patients here',
-                      style: TextStyle(fontSize: 12, color: colors.inkMuted),
-                    ),
+                    child: Text('No patients here', style: TextStyle(fontSize: 12, color: colors.inkMuted)),
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(10),
@@ -894,9 +880,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isNoShow ? colors.danger.withValues(alpha: 0.4) : colors.border,
-        ),
+        border: Border.all(color: isNoShow ? colors.danger.withValues(alpha: 0.4) : colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -905,10 +889,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                decoration: BoxDecoration(
-                  color: colors.brandSoftBg,
-                  borderRadius: BorderRadius.circular(6),
-                ),
+                decoration: BoxDecoration(color: colors.brandSoftBg, borderRadius: BorderRadius.circular(6)),
                 child: Text(
                   item.appointmentTime,
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: colors.brandText),
@@ -1008,11 +989,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
         return Row(
           children: [
             Expanded(
-              child: AppButton.primary(
-                text: 'Check In',
-                height: 32,
-                onPressed: () => _advance(item, 'checked_in'),
-              ),
+              child: AppButton.primary(text: 'Check In', height: 32, onPressed: () => _advance(item, 'checked_in')),
             ),
             const SizedBox(width: 6),
             IconButton(
@@ -1026,11 +1003,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
         return Row(
           children: [
             Expanded(
-              child: AppButton.secondary(
-                text: 'To Room',
-                height: 32,
-                onPressed: () => _promptRoomAndMove(item),
-              ),
+              child: AppButton.secondary(text: 'To Room', height: 32, onPressed: () => _promptRoomAndMove(item)),
             ),
             const SizedBox(width: 6),
             Expanded(
@@ -1068,11 +1041,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               ),
             ),
             if (isDone) ...[
-              AppButton.secondary(
-                text: 'Next',
-                height: 28,
-                onPressed: () => _openNextAppointmentDialog(item),
-              ),
+              AppButton.secondary(text: 'Next', height: 28, onPressed: () => _openNextAppointmentDialog(item)),
               const SizedBox(width: 4),
             ],
             TextButton(
@@ -1096,8 +1065,14 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label: ', style: TextStyle(fontSize: 12, color: colors.inkMuted, fontWeight: FontWeight.w500)),
-          Text(value, style: TextStyle(fontSize: 13, color: accent, fontWeight: FontWeight.w800)),
+          Text(
+            '$label: ',
+            style: TextStyle(fontSize: 12, color: colors.inkMuted, fontWeight: FontWeight.w500),
+          ),
+          Text(
+            value,
+            style: TextStyle(fontSize: 13, color: accent, fontWeight: FontWeight.w800),
+          ),
         ],
       ),
     );

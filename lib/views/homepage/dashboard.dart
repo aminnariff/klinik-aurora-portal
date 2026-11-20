@@ -1,3 +1,5 @@
+import '../widgets/aurora/aurora_empty_state.dart';
+import '../widgets/shimmer/table_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -23,7 +25,9 @@ class MainDashboard extends StatefulWidget {
 class _MainDashboardState extends State<MainDashboard> {
   String? _selectedBranchId; // null = Network View for superadmin
   String? _selectedBranchName;
-  bool _isLoading = false;
+  bool _isLoading = true;
+  String? _loadedBranchId;
+  int _loadGeneration = 0;
   DateTime? _lastRefreshTime;
   static const Duration _cooldownDuration = Duration(seconds: 5);
 
@@ -48,9 +52,13 @@ class _MainDashboardState extends State<MainDashboard> {
 
   void _loadData() {
     if (!mounted) return;
+    final generation = ++_loadGeneration;
+    bool current() => mounted && generation == _loadGeneration;
     setState(() => _isLoading = true);
 
-    final isSuper = context.read<AuthController>().isSuperAdmin;
+    final auth = context.read<AuthController>();
+    final isSuper = auth.isSuperAdmin;
+    final branchId = isSuper ? _selectedBranchId : auth.authenticationResponse?.data?.user?.branchId;
 
     if (isSuper) {
       // Load branches for switcher dropdown
@@ -64,39 +72,41 @@ class _MainDashboardState extends State<MainDashboard> {
         // Load Superadmin Network data
         Future.wait([
           DashboardController.get(context).then((val) {
-            if (responseCode(val.code) && mounted) {
+            if (responseCode(val.code) && current()) {
               context.read<DashboardController>().dashboardResponse = val.data;
             }
           }),
           BranchPerformanceController.get(context).then((val) {
-            if (responseCode(val.code) && mounted) {
+            if (responseCode(val.code) && current()) {
               context.read<BranchPerformanceController>().branchPerformanceResponse = val.data;
             }
           }),
           ServicePerformanceController.get(context).then((val) {
-            if (responseCode(val.code) && mounted) {
+            if (responseCode(val.code) && current()) {
               context.read<ServicePerformanceController>().servicePerformanceResponse = val.data;
             }
           }),
         ]).whenComplete(() {
-          if (mounted) setState(() => _isLoading = false);
+          if (current()) setState(() => _isLoading = false);
         });
       } else {
         // Superadmin viewing a specific branch's operations
         BranchOperationsController.get(context, branchId: _selectedBranchId).then((val) {
-          if (responseCode(val.code) && mounted) {
+          if (responseCode(val.code) && current()) {
+            _loadedBranchId = branchId;
             context.read<BranchOperationsController>().branchOperationsResponse = val.data;
           }
-          if (mounted) setState(() => _isLoading = false);
+          if (current()) setState(() => _isLoading = false);
         });
       }
     } else {
       // Branch Admin: load their clinic's real-time operations
       BranchOperationsController.get(context).then((val) {
-        if (responseCode(val.code) && mounted) {
+        if (responseCode(val.code) && current()) {
+          _loadedBranchId = branchId;
           context.read<BranchOperationsController>().branchOperationsResponse = val.data;
         }
-        if (mounted) setState(() => _isLoading = false);
+        if (current()) setState(() => _isLoading = false);
       });
     }
   }
@@ -110,6 +120,11 @@ class _MainDashboardState extends State<MainDashboard> {
     final userBranch = branches.where((b) => b.branchId == userBranchId).firstOrNull;
     final branchOpsName = context.watch<BranchOperationsController>().branchOperationsResponse?.data?.branchName;
     final activeBranchName = _selectedBranchName ?? userBranch?.branchName ?? branchOpsName;
+    final network = isSuper && _selectedBranchId == null;
+    final hasData = network
+        ? context.watch<DashboardController>().dashboardResponse != null
+        : _loadedBranchId == (isSuper ? _selectedBranchId : userBranchId) &&
+              context.watch<BranchOperationsController>().branchOperationsResponse != null;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(screenPadding, 8, screenPadding, 16),
@@ -124,12 +139,19 @@ class _MainDashboardState extends State<MainDashboard> {
               const SizedBox(height: 12),
 
               // ── Main Content ─────────────────────────────────────────────
-              if (_isLoading)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 48),
-                  child: Center(child: CircularProgressIndicator()),
+              if (_isLoading) const LinearProgressIndicator(minHeight: 2),
+              if (_isLoading && !hasData)
+                const SizedBox(height: 300, child: AppTableSkeleton(rows: 5))
+              else if (!hasData)
+                Center(
+                  child: AuroraEmptyState(
+                    icon: Icons.cloud_off_outlined,
+                    title: 'Dashboard could not be loaded',
+                    actionLabel: 'Retry',
+                    onAction: _loadData,
+                  ),
                 )
-              else if (isSuper && _selectedBranchId == null)
+              else if (network)
                 const SuperadminDashboardView()
               else
                 const BranchDashboardView(),
@@ -149,13 +171,7 @@ class _MainDashboardState extends State<MainDashboard> {
         color: appSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: appBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2))],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -181,9 +197,7 @@ class _MainDashboardState extends State<MainDashboard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: isSuper && _selectedBranchId == null
-                          ? appInfoSoft
-                          : appSuccessSoft,
+                      color: isSuper && _selectedBranchId == null ? appInfoSoft : appSuccessSoft,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -191,9 +205,7 @@ class _MainDashboardState extends State<MainDashboard> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: isSuper && _selectedBranchId == null
-                            ? const Color(0xFF1D4ED8)
-                            : const Color(0xFF15803D),
+                        color: isSuper && _selectedBranchId == null ? const Color(0xFF1D4ED8) : const Color(0xFF15803D),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -215,8 +227,9 @@ class _MainDashboardState extends State<MainDashboard> {
               if (isSuper) ...[
                 Builder(
                   builder: (context) {
-                    final sortedBranches = List.from(branches)
-                      ..sort((a, b) => (a.branchName ?? '').toLowerCase().compareTo((b.branchName ?? '').toLowerCase()));
+                    final sortedBranches = List.from(
+                      branches,
+                    )..sort((a, b) => (a.branchName ?? '').toLowerCase().compareTo((b.branchName ?? '').toLowerCase()));
 
                     return Container(
                       height: 38,
@@ -232,15 +245,10 @@ class _MainDashboardState extends State<MainDashboard> {
                           icon: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: appInkMuted),
                           style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: appInkPrimary),
                           items: [
-                            const DropdownMenuItem<String?>(
-                              value: null,
-                              child: Text('All Branches (Network View)'),
-                            ),
+                            const DropdownMenuItem<String?>(value: null, child: Text('All Branches (Network View)')),
                             ...sortedBranches.map(
-                              (b) => DropdownMenuItem<String?>(
-                                value: b.branchId,
-                                child: Text(b.branchName ?? 'Branch'),
-                              ),
+                              (b) =>
+                                  DropdownMenuItem<String?>(value: b.branchId, child: Text(b.branchName ?? 'Branch')),
                             ),
                           ],
                           onChanged: (val) {
@@ -249,7 +257,10 @@ class _MainDashboardState extends State<MainDashboard> {
                               if (val == null) {
                                 _selectedBranchName = null;
                               } else {
-                                final match = branches.firstWhere((b) => b.branchId == val, orElse: () => branches.first);
+                                final match = branches.firstWhere(
+                                  (b) => b.branchId == val,
+                                  orElse: () => branches.first,
+                                );
                                 _selectedBranchName = match.branchName;
                               }
                             });
@@ -268,8 +279,8 @@ class _MainDashboardState extends State<MainDashboard> {
                 message: _isLoading
                     ? 'Refreshing...'
                     : _isCooldownActive
-                        ? 'Please wait a moment'
-                        : 'Refresh data',
+                    ? 'Please wait a moment'
+                    : 'Refresh data',
                 child: InkWell(
                   onTap: (_isLoading || _isCooldownActive) ? null : _handleManualRefresh,
                   borderRadius: BorderRadius.circular(8),

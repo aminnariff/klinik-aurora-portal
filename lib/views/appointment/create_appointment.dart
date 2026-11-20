@@ -1548,7 +1548,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                                                         screenPadding,
                                                                                                       ),
                                                                                                   child: Image.network(
-                                                                                                    '${Environment.imageUrl}${selectedFiles[index].path}',
+                                                                                                    '${Environment.imageUrl}${selectedFiles[index].path}', cacheWidth: 600,
                                                                                                   ),
                                                                                                 )
                                                                                               : const SizedBox(),
@@ -3047,7 +3047,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           Padding(
                             padding: EdgeInsets.all(screenPadding),
                             child: Image.network(
-                              '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 2 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
+                              '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 2 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}', cacheWidth: 600,
                             ),
                           ),
                         ),
@@ -3072,7 +3072,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           Padding(
                             padding: EdgeInsets.all(screenPadding),
                             child: Image.network(
-                              '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 4 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}',
+                              '${Environment.imageUrl}${widget.appointment?.payment?.cast<Payment?>().firstWhere((e) => e?.paymentType == 4 && e?.paymentStatus == 1, orElse: () => null)?.paymentAsset ?? ''}', cacheWidth: 600,
                             ),
                           ),
                         ),

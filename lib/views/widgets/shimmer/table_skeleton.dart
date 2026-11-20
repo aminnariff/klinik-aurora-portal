@@ -1,139 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
 
-/// Emil Kowalski perceived-performance table skeleton:
-/// Replaces solitary spinning wheels with layout-preserving bone placeholders.
-/// Eliminates layout shift when network requests resolve.
+import '../../../config/app_colors.dart';
+
 class AppTableSkeleton extends StatelessWidget {
+  const AppTableSkeleton({super.key, this.rows = 6, this.rowHeight = 48, this.padding = const EdgeInsets.all(16)});
+
   final int rows;
   final double rowHeight;
   final EdgeInsets padding;
 
-  const AppTableSkeleton({
-    super.key,
-    this.rows = 6,
-    this.rowHeight = 48.0,
-    this.padding = const EdgeInsets.all(16.0),
-  });
-
   @override
   Widget build(BuildContext context) {
-    Theme.of(context);
+    final colors = context.appColors;
+    Widget line(double width, double height) => FractionallySizedBox(
+      widthFactor: width,
+      alignment: Alignment.centerLeft,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(color: colors.surfaceSubtle, borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+
+    Widget columns(int row) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: [
+          for (var i = 0; i < 5; i++)
+            Expanded(flex: i == 0 ? 2 : 1, child: line(.42 + .12 * ((i + row) % 4), i == 3 && row != 0 ? 18 : 10)),
+        ],
+      ),
+    );
+
+    final content = Padding(
+      padding: padding,
+      child: Column(
+        children: [
+          SizedBox(height: 34, child: columns(0)),
+          Expanded(
+            child: ListView.separated(
+              primary: false,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: rows,
+              separatorBuilder: (_, _) => Divider(height: 1, color: colors.border),
+              itemBuilder: (_, index) => SizedBox(height: rowHeight, child: columns(index + 1)),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (MediaQuery.disableAnimationsOf(context)) return content;
     return Shimmer.fromColors(
-      baseColor: appSurfaceSubtle, // slate-100
-      highlightColor: shimmerHighlightColor,
-      period: const Duration(milliseconds: 1400),
-      child: Padding(
-        padding: padding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Table Header row
-            Container(
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: appSurfaceSubtle,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  _headerBone(120),
-                  const SizedBox(width: 24),
-                  _headerBone(100),
-                  const SizedBox(width: 24),
-                  _headerBone(80),
-                  const SizedBox(width: 24),
-                  _headerBone(70),
-                  const Spacer(),
-                  _headerBone(60),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Rows
-            Expanded(
-              child: ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: rows,
-                separatorBuilder: (_, _) => Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: appSurfaceSubtle,
-                ),
-                itemBuilder: (context, index) {
-                  // Vary widths slightly so placeholder looks like realistic table rows
-                  final nameWidth = 100.0 + (index % 3) * 20.0;
-                  final serviceWidth = 85.0 + (index % 2) * 15.0;
-
-                  return SizedBox(
-                    height: rowHeight,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Row(
-                        children: [
-                          // Column 1: Patient Name & ref
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _bone(nameWidth, 13),
-                              const SizedBox(height: 5),
-                              _bone(65, 10),
-                            ],
-                          ),
-                          const SizedBox(width: 32),
-                          // Column 2: Service
-                          _bone(serviceWidth, 13),
-                          const SizedBox(width: 32),
-                          // Column 3: Doctor / Branch
-                          _bone(75, 13),
-                          const SizedBox(width: 32),
-                          // Column 4: Status pill placeholder
-                          Container(
-                            width: 76,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: appSurface,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          const Spacer(),
-                          // Column 5: Date / Actions
-                          _bone(70, 13),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _headerBone(double width) {
-    return Container(
-      width: width,
-      height: 12,
-      decoration: BoxDecoration(
-        color: appSurface,
-        borderRadius: BorderRadius.circular(6),
-      ),
-    );
-  }
-
-  Widget _bone(double width, double height) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: appSurface,
-        borderRadius: BorderRadius.circular(4),
-      ),
+      baseColor: colors.surfaceSubtle,
+      highlightColor: colors.surfaceElevated,
+      period: const Duration(milliseconds: 1200),
+      loop: 2,
+      child: content,
     );
   }
 }

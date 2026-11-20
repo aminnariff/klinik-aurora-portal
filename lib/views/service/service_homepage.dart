@@ -722,7 +722,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         ),
         clipBehavior: Clip.antiAlias,
         child: Image.network(
-          resolveImageUrl(image.trim()),
+          resolveImageUrl(image.trim()), cacheWidth: 600,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) => _fallbackServiceBadge(doctorType, category),
         ),

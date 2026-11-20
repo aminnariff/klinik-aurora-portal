@@ -1,3 +1,5 @@
+import '../widgets/motion/aurora_table_hover.dart';
+import '../../config/app_colors.dart';
 import '../widgets/motion/aurora_inspector_drawer.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -451,10 +453,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                   if (!_isCalendarView) _buildPaginationBar(),
                 ],
               ),
-              BreakUiDevHarness(
-                currentMode: _breakUiMode,
-                onModeChanged: (m) => setState(() => _breakUiMode = m),
-              ),
+              BreakUiDevHarness(currentMode: _breakUiMode, onModeChanged: (m) => setState(() => _breakUiMode = m)),
             ],
           ),
         );
@@ -482,7 +481,12 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       child: Row(
         children: [
           if (authController.isSuperAdmin) ...[
-            Text('Branch', style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF4B5563))),
+            Text(
+              'Branch',
+              style: AppTypography.bodyMedium(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF4B5563)),
+            ),
             const SizedBox(width: 8),
             SizedBox(
               width: isMobile ? 150 : 220,
@@ -532,7 +536,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           OutlinedButton.icon(
             onPressed: _showFilterPanel,
             icon: const Icon(Icons.tune_rounded, size: 15),
-            label: Text(_hasActiveFilters() ? 'Filter •' : 'Filter', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            label: Text(
+              _hasActiveFilters() ? 'Filter •' : 'Filter',
+              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+            ),
             style: OutlinedButton.styleFrom(
               foregroundColor: _hasActiveFilters() ? primary : appInkSecondary,
               side: BorderSide(color: _hasActiveFilters() ? primary : appBorderStrong),
@@ -641,11 +648,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                       Expanded(
                                         child: Text(
                                           _currentDateRange?.shortLabel ?? 'All Time',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
-                                            color: primary,
-                                          ),
+                                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: primary),
                                         ),
                                       ),
                                     ],
@@ -1290,13 +1293,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
         color: appSurface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: appBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(8),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Material(
         color: Colors.transparent,
@@ -1310,10 +1307,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    width: 5,
-                    color: statusColor,
-                  ),
+                  Container(width: 5, color: statusColor),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(14),
@@ -1348,7 +1342,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                         ),
                                         child: Text(
                                           deriveAgeFromNric(apt.user?.userNric)!,
-                                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF4B5563),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -1384,11 +1382,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                               Expanded(
                                 child: Text(
                                   dateDisplay,
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    color: appInkSecondary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(fontSize: 12.5, color: appInkSecondary, fontWeight: FontWeight.w600),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1403,10 +1397,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                               Expanded(
                                 child: Text(
                                   serviceName,
-                                  style: const TextStyle(
-                                    fontSize: 12.5,
-                                    color: Color(0xFF4B5563),
-                                  ),
+                                  style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1421,10 +1412,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                               Expanded(
                                 child: Text(
                                   branchName,
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    color: appInkMuted,
-                                  ),
+                                  style: TextStyle(fontSize: 12.5, color: appInkMuted),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1435,10 +1423,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           Row(
                             children: [
                               _buildStatusBadge(apt.appointmentStatus),
-                              if (hasBookingFee) ...[
-                                const SizedBox(width: 8),
-                                _buildPaymentBadge(isFeePaid ? 1 : 0),
-                              ],
+                              if (hasBookingFee) ...[const SizedBox(width: 8), _buildPaymentBadge(isFeePaid ? 1 : 0)],
                               const Spacer(),
                               Icon(Icons.chevron_right_rounded, size: 20, color: appInkMuted),
                             ],
@@ -1470,9 +1455,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           const SizedBox(height: 14),
           Text(
             'No ${_tabs[_selectedTabIndex].toLowerCase()} appointments',
-            style: AppTypography.bodyMedium(
-              context,
-            ).copyWith(fontWeight: FontWeight.w600, color: appInkSecondary),
+            style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600, color: appInkSecondary),
           ),
           const SizedBox(height: 4),
           Text(
@@ -1485,11 +1468,15 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   DataRow2 _buildDataRow(BuildContext context, Data item, int index, AuthController authController) {
-    return DataRow2(
+    return withAuroraRowHover(context, DataRow2(
       onTap: () => _handleMenuSelection('update', item),
-      color: WidgetStateProperty.resolveWith((states) =>
-          states.contains(WidgetState.hovered) ? context.appColors.tableRowHover :
-          index.isEven ? appSurface : appTableRowAlt),
+      color: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.hovered)
+            ? context.appColors.tableRowHover
+            : index.isEven
+            ? appSurface
+            : appTableRowAlt,
+      ),
       cells: [
         DataCell(
           Builder(
@@ -1640,10 +1627,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               return [
                 Text(parts[0], style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w500)),
                 if (parts.length > 1)
-                  Text(
-                    parts[1],
-                    style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: appInkMuted),
-                  ),
+                  Text(parts[1], style: AppTypography.bodyMedium(context).apply(fontSizeDelta: -3, color: appInkMuted)),
               ];
             }(),
           ),
@@ -1702,11 +1686,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         value: 'checkout',
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.point_of_sale_rounded,
-                              size: 20,
-                              color: Color(0xFF059669),
-                            ),
+                            const Icon(Icons.point_of_sale_rounded, size: 20, color: Color(0xFF059669)),
                             const SizedBox(width: 8),
                             Text('Counter Checkout & Points', style: AppTypography.bodyMedium(context)),
                           ],
@@ -1716,11 +1696,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                       value: 'book_next',
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.calendar_month_rounded,
-                            size: 20,
-                            color: Color(0xFF2563EB),
-                          ),
+                          const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF2563EB)),
                           const SizedBox(width: 8),
                           Text('Book Next Appointment', style: AppTypography.bodyMedium(context)),
                         ],
@@ -1745,11 +1721,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         value: 'transfer',
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.swap_horiz_rounded,
-                              size: 20,
-                              color: Color(0xFF2563EB),
-                            ),
+                            const Icon(Icons.swap_horiz_rounded, size: 20, color: Color(0xFF2563EB)),
                             const SizedBox(width: 8),
                             Text('Transfer Branch', style: AppTypography.bodyMedium(context)),
                           ],
@@ -1767,7 +1739,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           ),
         ),
       ],
-    );
+    ));
   }
 
   Widget _buildStatusBadge(int? status) {
@@ -1957,9 +1929,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                 )
               : Text(
                   item.label,
-                  style: AppTypography.bodyMedium(
-                    context,
-                  ).copyWith(fontWeight: FontWeight.w600, color: appInkMuted),
+                  style: AppTypography.bodyMedium(context).copyWith(fontWeight: FontWeight.w600, color: appInkMuted),
                 ),
           size: item.columnSize ?? ColumnSize.M,
         ),
@@ -2080,10 +2050,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         leading: Container(
                           width: 32,
                           height: 32,
-                          decoration: BoxDecoration(
-                            color: appInfoSoft,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                          decoration: BoxDecoration(color: appInfoSoft, borderRadius: BorderRadius.circular(8)),
                           child: const Icon(Icons.medical_services_rounded, size: 16, color: Color(0xFF0284C7)),
                         ),
                         title: Text(item.name, style: AppTypography.bodyMedium(context)),
@@ -2093,18 +2060,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           DateTime now = DateTime.now();
                           List<String> availableDateTime = [];
                           List<String> tempExceptionDateTime = [];
-                          ServiceBranchAvailableDtController.getAvailableSlot(context, serviceBranchId: item.key).then((
-                            value,
-                          ) {
+                          ServiceBranchAvailableDtController.getAvailableSlot(context, serviceBranchId: item.key)
+                              .then((value) {
                             if (responseCode(value.code)) {
                               context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableTimingResponse =
                                   value.data;
                               availableDateTime = value.data?.slots?.isNotEmpty == true
                                   ? (value.data?.slots ?? [])
                                   : [];
-                              ServiceBranchExceptionController.get(context, 1, 999, serviceBranchId: item.key).then((
-                                value,
-                              ) async {
+                                  ServiceBranchExceptionController.get(context, 1, 999, serviceBranchId: item.key)
+                                      .then((value) async {
                                 dismissLoading();
                                 if (responseCode(value.code)) {
                                   context.read<ServiceBranchExceptionController>().serviceBranchExceptionResponse =
@@ -2117,7 +2082,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                       .difference(tempExceptionDateTime.toSet())
                                       .toList();
                                   availableDateTime = removePastDates(result);
-                                  availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
+                                          availableDateTime.sort(
+                                            (a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)),
+                                          );
 
                                   if (availableDateTime.isEmpty) {
                                     showDialogError(context, 'No available slots for this service.');
@@ -2153,7 +2120,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                     ),
                                   );
                                 } else {
-                                  showDialogError(context, value.message ?? 'Failed to load schedule exceptions');
+                                          showDialogError(
+                                            context,
+                                            value.message ?? 'Failed to load schedule exceptions',
+                                          );
                                 }
                               }).catchError((e) {
                                 dismissLoading();
@@ -2181,10 +2151,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 
   void showAppointmentGuidelineDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => const _AppointmentGuidelineDialog(),
-    );
+    showDialog(context: context, builder: (_) => const _AppointmentGuidelineDialog());
   }
 }
 
@@ -2462,9 +2429,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                                 decoration: BoxDecoration(
                                   color: isSelected ? appInkPrimary : appSurfaceSubtle,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: isSelected ? appInkPrimary : appBorder,
-                                  ),
+                                  border: Border.all(color: isSelected ? appInkPrimary : appBorder),
                                 ),
                                 child: Text(
                                   cat,
@@ -2551,10 +2516,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
       decoration: BoxDecoration(
         color: appSurface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isExpanded ? item.iconColor.withAlpha(90) : appBorder,
-          width: isExpanded ? 1.5 : 1.0,
-        ),
+        border: Border.all(color: isExpanded ? item.iconColor.withAlpha(90) : appBorder, width: isExpanded ? 1.5 : 1.0),
         boxShadow: [
           BoxShadow(
             color: isExpanded ? item.iconColor.withAlpha(15) : Colors.black.withAlpha(5),
@@ -2592,11 +2554,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                             Flexible(
                               child: Text(
                                 item.title,
-                                style: TextStyle(
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: appInkPrimary,
-                                ),
+                                style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: appInkPrimary),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -2617,11 +2575,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                         const SizedBox(height: 3),
                         Text(
                           item.highlight,
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: item.iconColor,
-                          ),
+                          style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: item.iconColor),
                         ),
                       ],
                     ),
@@ -2629,10 +2583,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: appSurfaceSubtle,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+                    decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(6)),
                     child: Icon(
                       isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                       size: 16,
@@ -2660,10 +2611,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                             width: 18,
                             height: 18,
                             margin: const EdgeInsets.only(top: 1, right: 8),
-                            decoration: BoxDecoration(
-                              color: appSurfaceSubtle,
-                              borderRadius: BorderRadius.circular(9),
-                            ),
+                            decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(9)),
                             child: Center(
                               child: Text(
                                 '${sIdx + 1}',

@@ -27,9 +27,11 @@ class ShimmerContainer extends StatelessWidget {
     );
   }
 
-  Widget wrapWidgetWithShimmer(Widget child) {
-    return Shimmer.fromColors(baseColor: shimmerBaseColor, highlightColor: shimmerHighlightColor, child: child);
-  }
+  Widget wrapWidgetWithShimmer(Widget child) => Builder(
+    builder: (context) => MediaQuery.disableAnimationsOf(context)
+        ? child
+        : Shimmer.fromColors(baseColor: shimmerBaseColor, highlightColor: shimmerHighlightColor, loop: 2, child: child),
+  );
 
   Widget text({double? width, double? height}) {
     Widget child = Container(

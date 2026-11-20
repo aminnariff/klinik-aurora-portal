@@ -1,4 +1,5 @@
-import '../widgets/shimmer/app_table_skeleton.dart';
+import '../widgets/motion/aurora_table_hover.dart';
+import '../widgets/shimmer/table_skeleton.dart';
 import '../widgets/motion/aurora_inspector_drawer.dart';
 import '../widgets/aurora/aurora_empty_state.dart';
 import 'dart:async';
@@ -352,7 +353,10 @@ class _UserHomepageState extends State<UserHomepage> {
         if (snapshot.userAllResponse == null) {
           if (_filterLoading) {
             return const Column(
-              children: [LinearProgressIndicator(minHeight: 2), Expanded(child: AppTableSkeleton(rows: 8))],
+              children: [
+                LinearProgressIndicator(minHeight: 2),
+                Expanded(child: AppTableSkeleton(rows: 8)),
+              ],
             );
           }
           return Center(child: AuroraEmptyState(
@@ -360,7 +364,8 @@ class _UserHomepageState extends State<UserHomepage> {
             title: 'Patients could not be loaded',
             actionLabel: 'Retry',
             onAction: () => filtering(enableDebounce: false),
-          ));
+            ),
+          );
         }
         if (snapshot.userAllResponse!.isEmpty) {
           return Container(
@@ -405,7 +410,7 @@ class _UserHomepageState extends State<UserHomepage> {
       columns: columns(),
       rows: [
         for (int i = 0; i < users.length; i++)
-          DataRow2(
+          withAuroraRowHover(context, DataRow2(
             color: WidgetStateProperty.resolveWith<Color?>((states) {
               if (states.contains(WidgetState.hovered)) {
                 return appSurfaceSubtle;
@@ -414,7 +419,7 @@ class _UserHomepageState extends State<UserHomepage> {
             }),
             onTap: () => _handleMenuSelection('update', users[i]),
             cells: _buildCells(users[i]),
-          ),
+          )),
       ],
     );
   }
@@ -500,9 +505,7 @@ class _UserHomepageState extends State<UserHomepage> {
       // Status
       DataCell(_statusChip(user.userStatus == 1)),
       // Joined
-      DataCell(
-        Text(dateConverter(user.createdDate) ?? '—', style: TextStyle(fontSize: 12, color: appInkMuted)),
-      ),
+      DataCell(Text(dateConverter(user.createdDate) ?? '—', style: TextStyle(fontSize: 12, color: appInkMuted))),
       // Actions
       DataCell(_actionMenu(user)),
     ];
@@ -514,17 +517,10 @@ class _UserHomepageState extends State<UserHomepage> {
         : (appIsDarkMode ? const Color(0xFFF87171) : Colors.red.shade700);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: active ? appSuccessSoft : appDangerSoft,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: active ? appSuccessSoft : appDangerSoft, borderRadius: BorderRadius.circular(8)),
       child: Text(
         active ? 'Active' : 'Inactive',
-        style: TextStyle(
-          color: fg,
-          fontWeight: FontWeight.w600,
-          fontSize: 11,
-        ),
+        style: TextStyle(color: fg, fontWeight: FontWeight.w600, fontSize: 11),
       ),
     );
   }
@@ -708,11 +704,7 @@ class _UserHomepageState extends State<UserHomepage> {
   }
 
   Widget _filterField(TextEditingController controller, String label) {
-    return AppFilterField(
-      controller: controller,
-      hintText: label,
-      onChanged: (_) => filtering(page: 1),
-    );
+    return AppFilterField(controller: controller, hintText: label, onChanged: (_) => filtering(page: 1));
   }
 
 

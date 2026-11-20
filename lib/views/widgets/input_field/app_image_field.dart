@@ -289,7 +289,7 @@ class _AppImageFieldState extends State<AppImageField> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    resolvedUrl,
+                    resolvedUrl, cacheWidth: 600,
                     height: widget.previewHeight,
                     width: safeWidth,
                     fit: BoxFit.cover,

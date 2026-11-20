@@ -680,7 +680,7 @@ class _BranchDetailState extends State<BranchDetail> {
                     width: double.infinity,
                     color: appBorder,
                     child: Image.network(
-                      resolvedUrl,
+                      resolvedUrl, cacheWidth: 1200,
                       height: 160,
                       width: double.infinity,
                       fit: BoxFit.cover,

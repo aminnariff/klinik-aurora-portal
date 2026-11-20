@@ -46,6 +46,7 @@ class SuperadminDashboardView extends StatelessWidget {
                         children: [
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 0,
                               label: 'Network Revenue',
                               value: revenueThisMonth,
                               accentColor: const Color(0xFF16A34A), // Green
@@ -57,6 +58,7 @@ class SuperadminDashboardView extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 1,
                               label: 'Total Appointments',
                               value: totalAppointments,
                               accentColor: const Color(0xFF2563EB), // Blue
@@ -72,6 +74,7 @@ class SuperadminDashboardView extends StatelessWidget {
                         children: [
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 2,
                               label: 'Doctors on Duty',
                               value: doctorsOnDuty,
                               accentColor: const Color(0xFF0D9488), // Teal
@@ -83,6 +86,7 @@ class SuperadminDashboardView extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 3,
                               label: 'Active Clinics',
                               value: totalBranches,
                               accentColor: const Color(0xFFD97706), // Amber
@@ -94,6 +98,7 @@ class SuperadminDashboardView extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: DashboardMetricCard(
+                              index: 4,
                               label: 'Total Patients',
                               value: totalUsers,
                               accentColor: const Color(0xFF7C3AED), // Purple/Blue
@@ -112,6 +117,7 @@ class SuperadminDashboardView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 0,
                         label: 'Network Revenue',
                         value: revenueThisMonth,
                         accentColor: const Color(0xFF16A34A), // Green
@@ -123,6 +129,7 @@ class SuperadminDashboardView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 1,
                         label: 'Total Appointments',
                         value: totalAppointments,
                         accentColor: const Color(0xFF2563EB), // Blue
@@ -134,6 +141,7 @@ class SuperadminDashboardView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 2,
                         label: 'Doctors on Duty',
                         value: doctorsOnDuty,
                         accentColor: const Color(0xFF0D9488), // Teal
@@ -145,6 +153,7 @@ class SuperadminDashboardView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 3,
                         label: 'Active Clinics',
                         value: totalBranches,
                         accentColor: const Color(0xFFD97706), // Amber
@@ -156,6 +165,7 @@ class SuperadminDashboardView extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: DashboardMetricCard(
+                        index: 4,
                         label: 'Total Patients',
                         value: totalUsers,
                         accentColor: const Color(0xFF7C3AED), // Purple/Blue

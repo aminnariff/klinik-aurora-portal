@@ -523,7 +523,7 @@ class _ThemePreview extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    theme.bannerUrl!,
+                    theme.bannerUrl!, cacheWidth: 600,
                     height: 56,
                     width: double.infinity,
                     fit: BoxFit.cover,

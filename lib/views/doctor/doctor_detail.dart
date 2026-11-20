@@ -432,7 +432,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                                     border: Border.all(color: appBorder),
                                   ),
                                   child: Image.network(
-                                    resolvedUrl,
+                                    resolvedUrl, cacheWidth: 600,
                                     height: 140,
                                     width: 140,
                                     fit: BoxFit.cover,

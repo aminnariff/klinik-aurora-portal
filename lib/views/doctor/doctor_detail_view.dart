@@ -135,7 +135,7 @@ class DoctorDetailView extends StatelessWidget {
                                           ClipRRect(
                                             borderRadius: BorderRadius.circular(12),
                                             child: Image.network(
-                                              resolveImageUrl(doctor.doctorImage),
+                                              resolveImageUrl(doctor.doctorImage), cacheWidth: 1200,
                                               height: 360,
                                               width: double.infinity,
                                               fit: BoxFit.cover,

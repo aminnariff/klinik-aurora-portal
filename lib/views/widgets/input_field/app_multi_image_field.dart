@@ -199,7 +199,7 @@ class _AppMultiImageFieldState extends State<AppMultiImageField> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: Image.network(
-                      resolveImageUrl(widget.images[i]),
+                      resolveImageUrl(widget.images[i]), cacheWidth: 600,
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,

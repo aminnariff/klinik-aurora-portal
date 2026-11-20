@@ -1297,15 +1297,12 @@ class Aurora3DWombVisualizer extends StatefulWidget {
   State<Aurora3DWombVisualizer> createState() => _Aurora3DWombVisualizerState();
 }
 
-class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with TickerProviderStateMixin {
+class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> {
   late int _currentWeek;
   late bool _isExpanded;
 
   double _userYaw = 0.0;
   double _userPitch = 0.0;
-
-  late final AnimationController _heartbeatController;
-  late final AnimationController _idleController;
 
   static const List<int> _quickJumpWeeks = [8, 12, 20, 28, 36, 40];
 
@@ -1315,17 +1312,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
     _currentWeek = widget.initialWeek.clamp(1, 40);
     _isExpanded = widget.initiallyExpanded;
 
-    // Doppler heartbeat pulse at ~140 bpm (428ms cycle)
-    _heartbeatController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 430),
-    )..repeat();
 
-    // Smooth idle auto-rotation precession (22s full turn)
-    _idleController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 22),
-    )..repeat();
   }
 
   @override
@@ -1339,13 +1326,6 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
         });
       }
     }
-  }
-
-  @override
-  void dispose() {
-    _heartbeatController.dispose();
-    _idleController.dispose();
-    super.dispose();
   }
 
   void _resetView() {
@@ -1491,16 +1471,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
                 color: const Color(0xFF64748B),
               ),
               onPressed: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                  if (_isExpanded) {
-                    _heartbeatController.repeat();
-                    _idleController.repeat();
-                  } else {
-                    _heartbeatController.stop();
-                    _idleController.stop();
-                  }
-                });
+                setState(() => _isExpanded = !_isExpanded);
               },
             ),
         ],
@@ -1537,22 +1508,17 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
               behavior: HitTestBehavior.opaque,
               onPanUpdate: _onPanUpdate,
               onDoubleTap: _resetView,
-              child: AnimatedBuilder(
-                animation: Listenable.merge([_heartbeatController, _idleController]),
-                builder: (context, _) {
-                  return RepaintBoundary(
-                    child: CustomPaint(
-                      size: const Size(260, 260),
-                      painter: _WombOrbPainter(
-                        week: _currentWeek,
-                        userYaw: _userYaw,
-                        userPitch: _userPitch,
-                        idlePrecession: _idleController.value * 2 * math.pi,
-                        heartbeatProgress: _heartbeatController.value,
-                      ),
-                    ),
-                  );
-                },
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  size: const Size(260, 260),
+                  painter: _WombOrbPainter(
+                    week: _currentWeek,
+                    userYaw: _userYaw,
+                    userPitch: _userPitch,
+                    idlePrecession: 0,
+                    heartbeatProgress: 0,
+                  ),
+                ),
               ),
             ),
             // Doppler FHR Badge in top right
@@ -1576,18 +1542,7 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    AnimatedBuilder(
-                      animation: _heartbeatController,
-                      builder: (context, _) {
-                        final pulse = _heartbeatController.value < 0.22
-                            ? math.sin((_heartbeatController.value / 0.22) * math.pi)
-                            : 0.0;
-                        return Transform.scale(
-                          scale: 1.0 + 0.25 * pulse,
-                          child: const Icon(Icons.favorite_rounded, color: Color(0xFFE11D48), size: 12),
-                        );
-                      },
-                    ),
+                    const Icon(Icons.favorite_rounded, color: Color(0xFFE11D48), size: 12),
                     const SizedBox(width: 4),
                     Text(
                       bio.fhrRange == '-' ? 'Denyutan: -' : 'FHR: ${bio.fhrRange}',
@@ -1979,63 +1934,23 @@ class _Aurora3DWombVisualizerState extends State<Aurora3DWombVisualizer> with Ti
 // Mini 3D Womb Orb (Lightweight component for dialogs & patient profiles)
 // ---------------------------------------------------------------------------
 
-class Mini3DWombOrb extends StatefulWidget {
+class Mini3DWombOrb extends StatelessWidget {
+  const Mini3DWombOrb({super.key, required this.week, this.size = 100});
+
   final int week;
   final double size;
 
-  const Mini3DWombOrb({
-    super.key,
-    required this.week,
-    this.size = 100,
-  });
-
   @override
-  State<Mini3DWombOrb> createState() => _Mini3DWombOrbState();
-}
-
-class _Mini3DWombOrbState extends State<Mini3DWombOrb> with TickerProviderStateMixin {
-  late AnimationController _heartbeatController;
-  late AnimationController _idleController;
-
-  @override
-  void initState() {
-    super.initState();
-    _heartbeatController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 430),
-    )..repeat();
-
-    _idleController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 12),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _heartbeatController.dispose();
-    _idleController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_heartbeatController, _idleController]),
-        builder: (context, _) {
-          return RepaintBoundary(child: CustomPaint(
-            size: Size(widget.size, widget.size),
-            painter: _WombOrbPainter(
-              week: widget.week.clamp(1, 40),
-              userYaw: 0.0,
-              userPitch: 0.0,
-              idlePrecession: _idleController.value * 2 * math.pi,
-              heartbeatProgress: _heartbeatController.value,
-            ),
-          ));
-        },
+  Widget build(BuildContext context) => RepaintBoundary(
+    child: CustomPaint(
+      size: Size.square(size),
+      painter: _WombOrbPainter(
+        week: week.clamp(1, 40),
+        userYaw: 0,
+        userPitch: 0,
+        idlePrecession: 0,
+        heartbeatProgress: 0,
       ),
-    );
-  }
+    ),
+  );
 }

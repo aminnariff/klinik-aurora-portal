@@ -178,7 +178,7 @@ class _CampaignImageFieldState extends State<CampaignImageField> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
-                  value,
+                  value, cacheWidth: 600,
                   height: 64,
                   width: 110,
                   fit: BoxFit.cover,

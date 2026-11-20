@@ -5,11 +5,7 @@ import '../glass/app_glass.dart';
 import 'emil_motion.dart';
 
 abstract final class AuroraInspectorDrawer {
-  static Future<T?> show<T>(
-    BuildContext context, {
-    required String label,
-    required WidgetBuilder builder,
-  }) {
+  static Future<T?> show<T>(BuildContext context, {required String label, required WidgetBuilder builder}) {
     final reduce = MediaQuery.disableAnimationsOf(context);
     return showGeneralDialog<T>(
       context: context,
@@ -30,7 +26,17 @@ abstract final class AuroraInspectorDrawer {
               type: MaterialType.transparency,
               child: CallbackShortcuts(
                 bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.of(context).pop()},
-                child: Focus(autofocus: true, child: Builder(builder: builder)),
+                child: Focus(
+                  autofocus: true,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => MediaQuery(
+                      data: MediaQuery.of(
+                        context,
+                      ).copyWith(size: Size(constraints.maxWidth, MediaQuery.sizeOf(context).height)),
+                      child: Builder(builder: builder),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -40,8 +46,7 @@ abstract final class AuroraInspectorDrawer {
           ? child
           : SlideTransition(
               position: animation.drive(
-                Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
-                    .chain(CurveTween(curve: EmilMotion.easeDrawer)),
+                Tween(begin: const Offset(1.0, 0.0), end: Offset.zero).chain(CurveTween(curve: EmilMotion.easeDrawer)),
               ),
               child: child,
             ),

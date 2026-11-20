@@ -542,7 +542,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
               color: appBorder,
               child: hasImage
                   ? Image.network(
-                      resolved,
+                      resolved, cacheWidth: 1200,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Center(
                         child: Icon(Icons.broken_image_rounded, color: appInkMuted, size: 28),

@@ -427,7 +427,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
     if (doc.doctorImage != null) {
       return CircleAvatar(
         radius: 20,
-        backgroundImage: NetworkImage(resolveImageUrl(doc.doctorImage)),
+        backgroundImage: ResizeImage(NetworkImage(resolveImageUrl(doc.doctorImage)), width: 240),
         onBackgroundImageError: (_, _) {},
         backgroundColor: color.withAlpha(40),
         child: null,

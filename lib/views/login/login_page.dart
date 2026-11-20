@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
@@ -55,8 +54,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _entranceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 320));
-    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 320));
+    _entranceCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 240));
+    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 240));
 
     _formFade = CurvedAnimation(parent: _entranceCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0));
     _formSlide = Tween<Offset>(
@@ -70,12 +69,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       end: 1.0,
     ).animate(CurvedAnimation(parent: _logoCtrl, curve: const Cubic(0.23, 1.0, 0.32, 1.0)));
 
-    SchedulerBinding.instance.scheduleFrameCallback((_) async {
-      _logoCtrl.forward();
-      await Future.delayed(const Duration(milliseconds: 80));
-      if (mounted) _entranceCtrl.forward();
-    });
-
     try {
       _useClassicLayout = prefs.getBool('aurora_login_classic_layout') ?? false;
       if (prefs.getBool(rememberMe) == true) {
@@ -83,6 +76,18 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
         passwordController.text = prefs.getString(password) ?? '';
       }
     } catch (_) {}
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _logoCtrl.value = 1;
+      _entranceCtrl.value = 1;
+    } else {
+      _logoCtrl.forward();
+      _entranceCtrl.forward();
+    }
   }
 
   @override
@@ -1114,7 +1119,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   Widget _loadingScreen() {
     return Scaffold(
       backgroundColor: appCanvas,
-      body: Center(child: SizedBox(width: 140, child: Lottie.asset('assets/lottie/simple-loading.json', width: 140))),
+      body: Center(child: SizedBox(width: 140, child: Lottie.asset(
+        'assets/lottie/simple-loading.json',
+        width: 140,
+        animate: !MediaQuery.disableAnimationsOf(context),
+      ))),
     );
   }
 }

@@ -46,12 +46,7 @@ class EmilPressable extends StatefulWidget {
   final VoidCallback? onTap;
   final bool enabled;
 
-  const EmilPressable({
-    super.key,
-    required this.child,
-    this.onTap,
-    this.enabled = true,
-  });
+  const EmilPressable({super.key, required this.child, this.onTap, this.enabled = true});
 
   @override
   State<EmilPressable> createState() => _EmilPressableState();
@@ -110,11 +105,7 @@ class EmilModalTransition extends StatelessWidget {
       builder: (context, progress, c) {
         return Opacity(
           opacity: progress,
-          child: Transform.scale(
-            scale: 0.95 + (0.05 * progress),
-            alignment: Alignment.center,
-            child: c,
-          ),
+          child: Transform.scale(scale: 0.95 + (0.05 * progress), alignment: Alignment.center, child: c),
         );
       },
       child: child,
@@ -134,9 +125,7 @@ abstract final class AuroraPageRoute {
   static Page<T> shellFade<T>(BuildContext context, {LocalKey? key, required Widget child}) =>
       _page(context, key, child, AuroraTransitionType.shellFade);
 
-  static Page<T> _page<T>(
-    BuildContext context, LocalKey? key, Widget child, AuroraTransitionType type,
-  ) {
+  static Page<T> _page<T>(BuildContext context, LocalKey? key, Widget child, AuroraTransitionType type) {
     if (MediaQuery.disableAnimationsOf(context)) {
       return NoTransitionPage<T>(key: key, child: child);
     }
@@ -154,6 +143,16 @@ abstract final class AuroraPageRoute {
       transitionsBuilder: (context, animation, secondary, child) {
         if (MediaQuery.disableAnimationsOf(context)) return child;
         final progress = animation.drive(CurveTween(curve: EmilMotion.easeOut));
+        if (shell) {
+          return FadeTransition(
+            opacity: progress,
+            child: AnimatedBuilder(
+              animation: progress,
+              child: child,
+              builder: (_, child) => Transform.translate(offset: Offset(0, (1 - progress.value) * 6), child: child),
+            ),
+          );
+        }
         return FadeTransition(
           opacity: progress,
           child: SlideTransition(
@@ -228,13 +227,29 @@ class AuroraSheetTransition extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 36,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.outline,
-                    borderRadius: BorderRadius.circular(999),
+                Semantics(
+                  button: true,
+                  label: MaterialLocalizations.of(context).closeButtonLabel,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.of(context).pop(),
+                    onVerticalDragEnd: (details) {
+                      if ((details.primaryVelocity ?? 0) > 100) Navigator.of(context).pop();
+                    },
+                    child: SizedBox(
+                      width: 80,
+                      height: 28,
+                      child: Center(
+                        child: Container(
+                          width: 36,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.outline,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Flexible(child: child),
@@ -247,22 +262,42 @@ class AuroraSheetTransition extends StatelessWidget {
   }
 }
 
-Future<T?> showAuroraModalSheet<T>({
-  required BuildContext context,
-  required WidgetBuilder builder,
-}) {
+Future<T?> showAuroraModalSheet<T>({required BuildContext context, required WidgetBuilder builder}) {
   final reduce = MediaQuery.disableAnimationsOf(context);
-  return showModalBottomSheet<T>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    sheetAnimationStyle: reduce
-        ? AnimationStyle.noAnimation
-        : const AnimationStyle(
-            duration: EmilMotion.pageDuration,
-            reverseDuration: EmilMotion.pageReverseDuration,
+  final navigator = Navigator.of(context);
+  final themes = InheritedTheme.capture(from: context, to: navigator.context);
+  return navigator.push<T>(
+    PageRouteBuilder<T>(
+      opaque: false,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black54,
+      transitionDuration: reduce ? Duration.zero : EmilMotion.pageDuration,
+      reverseTransitionDuration: reduce ? Duration.zero : EmilMotion.pageReverseDuration,
+      pageBuilder: (context, animation, _) => SafeArea(
+        bottom: false,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: SizedBox(
+                width: double.infinity,
+                child: SlideTransition(
+                  position: animation.drive(
+                    Tween(
+                      begin: reduce ? Offset.zero : const Offset(0, 1),
+                      end: Offset.zero,
+                    ).chain(CurveTween(curve: EmilMotion.easeDrawer)),
+                  ),
+                  child: themes.wrap(AuroraSheetTransition(child: Builder(builder: builder))),
+                ),
+              ),
+            ),
           ),
-    builder: (context) => AuroraSheetTransition(child: Builder(builder: builder)),
+        ),
+      ),
+    ),
   );
 }

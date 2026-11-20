@@ -417,7 +417,7 @@ class _HomepageState extends State<Homepage> {
         border: Border(bottom: BorderSide(color: colors.border)),
       ),
       padding: EdgeInsets.symmetric(horizontal: screenPadding),
-      child: Row(
+      child: LayoutBuilder(builder: (context, constraints) => Row(
         children: [
           // Sidebar Toggle Button
           AnimatedBuilder(
@@ -460,8 +460,8 @@ class _HomepageState extends State<Homepage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.search_rounded, size: 16, color: colors.inkMuted),
-                  if (MediaQuery.sizeOf(context).width >= 640) const SizedBox(width: 8),
-                  if (MediaQuery.sizeOf(context).width >= 640) Text(
+                  if (constraints.maxWidth >= 480) const SizedBox(width: 8),
+                  if (constraints.maxWidth >= 480) Text(
                     'Quick Search...',
                     style: TextStyle(fontSize: 12, color: colors.inkMuted, fontWeight: FontWeight.w500),
                   ),
@@ -483,7 +483,7 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
           const SizedBox(width: 4),
-          IconButton(
+          if (constraints.maxWidth >= 420) IconButton(
             icon: const Icon(Icons.keyboard_outlined, size: 20),
             color: colors.inkSecondary,
             tooltip: 'Keyboard Shortcuts (?)',
@@ -495,13 +495,13 @@ class _HomepageState extends State<Homepage> {
             tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
             onPressed: () => themeCtrl.toggleDarkMode(context),
           ),
-          IconButton(
+          if (constraints.maxWidth >= 420) IconButton(
             icon: const Icon(Icons.palette_outlined, size: 20),
             color: colors.inkSecondary,
             tooltip: 'Appearance & Theme Settings',
             onPressed: () => AppearanceSettingsDialog.show(context),
           ),
-          if (context.read<AuthController>().isSuperAdmin) ...[
+          if (constraints.maxWidth >= 380 && context.read<AuthController>().isSuperAdmin) ...[
             IconButton(
               icon: const Icon(Icons.notifications_outlined, size: 20),
               color: colors.inkSecondary,
@@ -570,13 +570,15 @@ class _HomepageState extends State<Homepage> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Consumer<AuthController>(
+                  if (constraints.maxWidth >= 560) Consumer<AuthController>(
                     builder: (context, authController, _) => Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
                           authController.authenticationResponse?.data?.user?.userFullname ?? 'N/A',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -610,7 +612,7 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
         ],
-      ),
+      )),
     );
   }
 
@@ -626,17 +628,18 @@ class _HomepageState extends State<Homepage> {
         foregroundColor: Colors.white,
         elevation: 0,
         titleSpacing: 0,
-        title: Row(
-          children: [
-            Image.asset('assets/icons/logo/klinik-aurora.png', width: 32, height: 32),
-            const SizedBox(width: 8),
-            const Text(
-              'Aurora Admin',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
+        title: Text(
+          _breadcrumb,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search_rounded, color: Colors.white),
+            tooltip: 'Quick Search (⌘K)',
+            onPressed: () => CommandPaletteDialog.show(context),
+          ),
           IconButton(
             icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded, size: 20, color: Colors.white),
             tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',

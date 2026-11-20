@@ -12,7 +12,13 @@ class AppLoading {
       // ..indicatorSize = 200.0
       // ..radius = 10.0
       ..indicatorWidget = CardContainer(
-        Lottie.asset('assets/lottie/simple-loading.json', width: 140),
+        Builder(
+          builder: (context) => Lottie.asset(
+            'assets/lottie/simple-loading.json',
+            width: 140,
+            animate: !MediaQuery.disableAnimationsOf(context),
+          ),
+        ),
         margin: EdgeInsets.zero,
       )
       ..progressColor = Colors.white

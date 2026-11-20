@@ -50,6 +50,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
+      animationBehavior: AnimationBehavior.preserve,
     );
 
     _controller.addStatusListener((status) {
@@ -76,6 +77,10 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
   void _onTapUp() {
     if (_isCompleted) return;
     setState(() => _isHolding = false);
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.reset();
+      return;
+    }
     if (_controller.value < 1.0) {
       _controller.animateBack(
         0.0,
@@ -88,9 +93,10 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
   @override
   Widget build(BuildContext context) {
     Theme.of(context);
+    final reduce = MediaQuery.disableAnimationsOf(context);
     return AnimatedScale(
-      scale: _isHolding ? 0.97 : 1.0,
-      duration: _isHolding ? EmilMotion.pressDuration : EmilMotion.releaseDuration,
+      scale: !reduce && _isHolding ? 0.97 : 1.0,
+      duration: reduce ? Duration.zero : (_isHolding ? EmilMotion.pressDuration : EmilMotion.releaseDuration),
       curve: EmilMotion.easeOut,
       child: SizedBox(
         width: widget.width,
@@ -119,7 +125,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
                   builder: (context, _) {
                     return FractionallySizedBox(
                       alignment: Alignment.centerLeft,
-                      widthFactor: _controller.value,
+                      widthFactor: reduce ? (_isCompleted ? 1 : 0) : _controller.value,
                       child: Container(
                         color: widget.progressColor,
                       ),
@@ -132,7 +138,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
                     child: AnimatedBuilder(
                       animation: _controller,
                       builder: (context, _) {
-                        final isFilledPastHalf = _controller.value > 0.55;
+                        final isFilledPastHalf = reduce ? _isCompleted : _controller.value > 0.55;
                         final currentTextColor = isFilledPastHalf ? Colors.white : widget.textColor;
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,

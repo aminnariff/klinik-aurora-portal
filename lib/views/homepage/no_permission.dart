@@ -36,8 +36,8 @@ class NoPermission extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // ── Animated gradient background ──────────────────────────
-          Positioned.fill(child: _AnimatedGradientBackground()),
+          // ── Gradient background ──────────────────────────
+          Positioned.fill(child: _PermissionBackdrop()),
 
           // ── Decorative blobs ───────────────────────────────────────
           Positioned(top: -120, right: -100, child: _Bloob(size: 340, color: Colors.white.withAlpha(8))),
@@ -262,60 +262,18 @@ class NoPermission extends StatelessWidget {
   }
 }
 
-// ── Animated gradient background ──────────────────────────────────────────────
-class _AnimatedGradientBackground extends StatefulWidget {
+// ── Gradient background ──────────────────────────────────────────────
+class _PermissionBackdrop extends StatelessWidget {
   @override
-  State<_AnimatedGradientBackground> createState() => _AnimatedGradientBackgroundState();
-}
-
-class _AnimatedGradientBackgroundState extends State<_AnimatedGradientBackground> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _CustomAnimatedBuilder(
-      listenable: _controller,
-      builder: (context, _) {
-        return Container(
+  Widget build(BuildContext context) => const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color.lerp(const Color(0xFF1A0A0A), const Color(0xFF2D0A1A), _controller.value)!,
-                Color.lerp(const Color(0xFF2D0A1A), const Color(0xFF0D0D1A), _controller.value)!,
-                Color.lerp(const Color(0xFF0D0D1A), const Color(0xFF1A0A0A), _controller.value)!,
-              ],
+        colors: [Color(0xFF1A0A0A), Color(0xFF2D0A1A), Color(0xFF0D0D1A)],
             ),
           ),
         );
-      },
-    );
-  }
-}
-
-// ── AnimatedBuilder for non-ticker animations ─────────────────────────────────
-class _CustomAnimatedBuilder extends AnimatedWidget {
-  final Widget Function(BuildContext context, Widget? child) builder;
-
-  const _CustomAnimatedBuilder({required super.listenable, required this.builder});
-
-  @override
-  Widget build(BuildContext context) {
-    return builder(context, null);
-  }
 }
 
 // ── Decorative bloobs ─────────────────────────────────────────────────────────

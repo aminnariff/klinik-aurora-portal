@@ -557,7 +557,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(9),
               child: Image.network(
-                resolveImageUrl(existingUrl),
+                resolveImageUrl(existingUrl), cacheWidth: 1200,
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => Center(
                   child: Icon(Icons.broken_image_rounded, size: 36, color: appInkMuted),
