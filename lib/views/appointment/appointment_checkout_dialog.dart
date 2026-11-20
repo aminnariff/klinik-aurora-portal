@@ -2,8 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/controllers/api_controller.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_checkout_controller.dart';
+import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
@@ -12,14 +14,100 @@ import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 const Color _purpleAccent = Color(0xFF7C3AED);
 const Color _purpleSoftBg = Color(0xFFF5F3FF);
 
+/// Signature of [AppointmentCheckoutController.fetchPreview].
+typedef CheckoutPreviewLoader = Future<ApiResponse<CheckoutPreviewData>> Function(
+  BuildContext context,
+  String appointmentId,
+);
+
+/// Signature of [AppointmentCheckoutController.submitCheckout].
+typedef CheckoutSubmitter = Future<ApiResponse<CheckoutResultData>> Function(
+  BuildContext context,
+  String appointmentId, {
+  required double basePrice,
+  required double bookingFeePaid,
+  required List<CheckoutAddOnItem> extraItems,
+  required double netCollected,
+  required String paymentMethod,
+  bool awardPoints,
+  required int basePoints,
+  required int milestoneBonusPoints,
+  String? milestoneKey,
+  String? milestoneName,
+  String? adminNotes,
+});
+
+/// The scan the counter should offer to book next, given the pregnancy
+/// milestone the patient has just completed.
+class NextMilestoneRecommendation {
+  final String title;
+  final String description;
+  final int bonusPoints;
+
+  /// Matched case-insensitively against branch service names to preselect the
+  /// next scan in the booking form. Null when there is no specific scan to
+  /// advance to, so the cashier picks the service by hand.
+  final String? serviceKeyword;
+
+  const NextMilestoneRecommendation({
+    required this.title,
+    required this.description,
+    required this.bonusPoints,
+    this.serviceKeyword,
+  });
+}
+
+/// Scans advance NT/dating → Detail → 4D/5D → Growth, then postnatal care.
+NextMilestoneRecommendation nextMilestoneAfter(String? completedMilestoneKey) {
+  return switch (completedMilestoneKey) {
+    'nt_scan' => const NextMilestoneRecommendation(
+        title: 'W18–24 Detail Anomaly Scan',
+        description: 'Comprehensive organ anatomy & defect screening. Ideal window: ~6–8 weeks from now.',
+        bonusPoints: 100,
+        serviceKeyword: 'detail',
+      ),
+    'detail_scan' => const NextMilestoneRecommendation(
+        title: 'W26–32 4D/5D HD Live Baby Scan',
+        description: 'Real-time facial features & emotional bonding ultrasound. Ideal window: ~6–8 weeks from now.',
+        bonusPoints: 100,
+        serviceKeyword: '4d',
+      ),
+    'scan_4d5d' => const NextMilestoneRecommendation(
+        title: 'W33–36 Growth & Position Doppler Scan',
+        description:
+            'Late pregnancy fetal biometry, placental check & amniotic fluid. Ideal window: ~4–6 weeks from now.',
+        bonusPoints: 50,
+        serviceKeyword: 'growth',
+      ),
+    'growth_scan' => const NextMilestoneRecommendation(
+        title: 'Postnatal & Newborn Care Visit',
+        description: '6-week maternal healing, newborn health check & lactation support.',
+        bonusPoints: 50,
+      ),
+    _ => const NextMilestoneRecommendation(
+        title: 'Next Follow-Up Appointment',
+        description: 'Lock in the patient\'s next clinical visit or routine scan before they leave the counter.',
+        bonusPoints: 0,
+      ),
+  };
+}
+
 class AppointmentCheckoutDialog extends StatefulWidget {
   final String appointmentId;
   final VoidCallback? onCompleted;
+
+  /// API seams. Default to the live controllers; tests pass fakes.
+  final CheckoutPreviewLoader loadPreview;
+  final CheckoutSubmitter submitCheckout;
+  final AvailableServicesLoader loadRebookingServices;
 
   const AppointmentCheckoutDialog({
     super.key,
     required this.appointmentId,
     this.onCompleted,
+    this.loadPreview = AppointmentCheckoutController.fetchPreview,
+    this.submitCheckout = AppointmentCheckoutController.submitCheckout,
+    this.loadRebookingServices = ServiceBranchController.available,
   });
 
   static Future<bool?> show(
@@ -87,7 +175,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
       _error = null;
     });
 
-    final res = await AppointmentCheckoutController.fetchPreview(context, widget.appointmentId);
+    final res = await widget.loadPreview(context, widget.appointmentId);
     if (!mounted) return;
 
     if (responseCode(res.code) && res.data != null) {
@@ -157,7 +245,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
     if (_submitting) return;
     setState(() => _submitting = true);
 
-    final res = await AppointmentCheckoutController.submitCheckout(
+    final res = await widget.submitCheckout(
       context,
       widget.appointmentId,
       basePrice: _basePrice,
@@ -764,45 +852,30 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
     );
   }
 
-  (String nextTitle, String nextDesc, int bonusPts) _getNextMilestoneRecommendation() {
-    final key = _preview?.detectedMilestone?.key;
-    switch (key) {
-      case 'nt_scan':
-        return (
-          'W18–24 Detail Anomaly Scan',
-          'Comprehensive organ anatomy & defect screening. Ideal window: ~6–8 weeks from now.',
-          100,
-        );
-      case 'detail_scan':
-        return (
-          'W26–32 4D/5D HD Live Baby Scan',
-          'Real-time facial features & emotional bonding ultrasound. Ideal window: ~6–8 weeks from now.',
-          100,
-        );
-      case 'scan_4d5d':
-        return (
-          'W33–36 Growth & Position Doppler Scan',
-          'Late pregnancy fetal biometry, placental check & amniotic fluid. Ideal window: ~4–6 weeks from now.',
-          50,
-        );
-      case 'growth_scan':
-        return (
-          'Postnatal & Newborn Care Visit',
-          '6-week maternal healing, newborn health check & lactation support.',
-          50,
-        );
-      default:
-        return (
-          'Next Follow-Up Appointment',
-          'Lock in the patient\'s next clinical visit or routine scan before they leave the counter.',
-          0,
-        );
-    }
+  /// Closes checkout and opens the booking form pre-filled for this patient.
+  void _openRebooking({required String? serviceKeyword, required String note}) {
+    final preview = _preview;
+    final onCompleted = widget.onCompleted;
+    Navigator.of(context).pop(true);
+    showDialog(
+      context: context,
+      builder: (_) => AppointmentDetails(
+        type: 'create',
+        initialUserId: preview?.userId,
+        initialUserName: preview?.patientName,
+        initialUserPhone: preview?.patientPhone,
+        initialBranchId: preview?.branchId,
+        initialServiceKeyword: serviceKeyword,
+        initialNote: note,
+        refreshData: () => onCompleted?.call(),
+        loadAvailableServices: widget.loadRebookingServices,
+      ),
+    );
   }
 
   Widget _buildReceiptView(AppColors colors) {
     final res = _result!;
-    final nextMilestone = _getNextMilestoneRecommendation();
+    final nextMilestone = nextMilestoneAfter(_preview?.detectedMilestone?.key);
 
     return SingleChildScrollView(
       child: Column(
@@ -880,12 +953,12 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  nextMilestone.$1,
+                  nextMilestone.title,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: colors.inkPrimary),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${nextMilestone.$2} · Pesakit boleh memilih untuk tempah awal sekiranya berminat.',
+                  '${nextMilestone.description} · Pesakit boleh memilih untuk tempah awal sekiranya berminat.',
                   style: TextStyle(fontSize: 12, color: colors.inkMuted),
                 ),
                 const SizedBox(height: 12),
@@ -894,54 +967,22 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                   runSpacing: 8,
                   children: [
                     AppButton.primary(
-                      text: 'Imbasan Seterusnya: ${nextMilestone.$1}',
+                      text: 'Imbasan Seterusnya: ${nextMilestone.title}',
                       icon: const Icon(Icons.arrow_forward_rounded, size: 14),
                       height: 36,
-                      onPressed: () {
-                        final key = _preview?.detectedMilestone?.key;
-                        final nextKeyword = switch (key) {
-                          'nt_scan' => 'detail',
-                          'detail_scan' => '4d',
-                          'scan_4d5d' => 'growth',
-                          _ => null,
-                        };
-
-                        Navigator.of(context).pop(true);
-                        showDialog(
-                          context: context,
-                          builder: (_) => AppointmentDetails(
-                            type: 'create',
-                            initialUserId: _preview?.userId,
-                            initialUserName: _preview?.patientName,
-                            initialUserPhone: _preview?.patientPhone,
-                            initialBranchId: _preview?.branchId,
-                            initialServiceKeyword: nextKeyword,
-                            initialNote: 'Follow-up ${nextMilestone.$1} after completing ${_preview?.serviceName}',
-                            refreshData: () => widget.onCompleted?.call(),
-                          ),
-                        );
-                      },
+                      onPressed: () => _openRebooking(
+                        serviceKeyword: nextMilestone.serviceKeyword,
+                        note: 'Follow-up ${nextMilestone.title} after completing ${_preview?.serviceName}',
+                      ),
                     ),
                     AppButton.secondary(
                       text: 'Susulan / Ulang Servis Sama (1–2 Minggu)',
                       icon: const Icon(Icons.replay_rounded, size: 14),
                       height: 36,
-                      onPressed: () {
-                        Navigator.of(context).pop(true);
-                        showDialog(
-                          context: context,
-                          builder: (_) => AppointmentDetails(
-                            type: 'create',
-                            initialUserId: _preview?.userId,
-                            initialUserName: _preview?.patientName,
-                            initialUserPhone: _preview?.patientPhone,
-                            initialBranchId: _preview?.branchId,
-                            initialServiceKeyword: _preview?.serviceName,
-                            initialNote: 'Routine follow-up / rescan for ${_preview?.serviceName} (Review in 1–2 weeks)',
-                            refreshData: () => widget.onCompleted?.call(),
-                          ),
-                        );
-                      },
+                      onPressed: () => _openRebooking(
+                        serviceKeyword: _preview?.serviceName,
+                        note: 'Routine follow-up / rescan for ${_preview?.serviceName} (Review in 1–2 weeks)',
+                      ),
                     ),
                   ],
                 ),

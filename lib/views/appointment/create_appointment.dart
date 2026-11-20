@@ -13,6 +13,7 @@ import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/flavor.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
+import 'package:klinik_aurora_portal/controllers/api_controller.dart' show ApiResponse;
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
@@ -61,6 +62,21 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
+/// Signature of [ServiceBranchController.available].
+typedef AvailableServicesLoader = Future<ApiResponse<service_branch_available_model.ServiceBranchAvailableResponse>>
+    Function(BuildContext context, {String? branchId});
+
+/// Preselects the service for a re-booking: the first entry in [services]
+/// whose name contains [keyword], ignoring case. Null when nothing matches.
+DropdownAttribute? matchServiceByKeyword(List<DropdownAttribute> services, String? keyword) {
+  if (keyword == null || keyword.isEmpty) return null;
+  final kw = keyword.toLowerCase();
+  for (final s in services) {
+    if (s.name.toLowerCase().contains(kw)) return s;
+  }
+  return null;
+}
+
 class AppointmentDetails extends StatefulWidget {
   final Data? appointment;
   final String type;
@@ -74,6 +90,10 @@ class AppointmentDetails extends StatefulWidget {
   final String? initialDueDate;
   final String? initialNote;
   final String? initialServiceKeyword;
+
+  /// API seam for the branch service list. Defaults to the live controller;
+  /// tests pass a fake.
+  final AvailableServicesLoader loadAvailableServices;
 
   const AppointmentDetails({
     super.key,
@@ -89,6 +109,7 @@ class AppointmentDetails extends StatefulWidget {
     this.initialDueDate,
     this.initialNote,
     this.initialServiceKeyword,
+    this.loadAvailableServices = ServiceBranchController.available,
   });
 
   @override
@@ -249,7 +270,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         }).catchError((_) {});
       }
       if (context.read<AuthController>().isSuperAdmin == false && widget.type == 'create') {
-        ServiceBranchController.available(
+        widget.loadAvailableServices(
           context,
           branchId: context.read<AuthController>().authenticationResponse?.data?.user?.branchId,
         ).then((value) {
@@ -286,7 +307,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             orElse: () => branch_model.Data(branchId: widget.initialBranchId, branchName: 'Branch'),
           );
           _appointmentBranch = DropdownAttribute(match.branchId ?? '', match.branchName ?? '');
-          ServiceBranchController.available(
+          widget.loadAvailableServices(
             context,
             branchId: widget.initialBranchId,
           ).then((value) {
@@ -298,16 +319,11 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 }
               }
               serviceList.sort((a, b) => a.name.compareTo(b.name));
-              if (widget.initialServiceKeyword != null && widget.initialServiceKeyword!.isNotEmpty) {
-                final kw = widget.initialServiceKeyword!.toLowerCase();
+              final matched = matchServiceByKeyword(serviceList, widget.initialServiceKeyword);
+              if (matched != null) {
+                _service = matched;
                 try {
-                  final matched = serviceList.firstWhere(
-                    (s) => s.name.toLowerCase().contains(kw),
-                  );
-                  _service = matched;
-                  try {
-                    selectedService = value.data?.data?.firstWhere((e) => e.serviceBranchId == matched.key);
-                  } catch (_) {}
+                  selectedService = value.data?.data?.firstWhere((e) => e.serviceBranchId == matched.key);
                 } catch (_) {}
               }
               context.read<ServiceBranchController>().serviceBranchAvailableResponse = value.data;
@@ -1619,7 +1635,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                         availableDateTime = [];
                                                         dateTimeController.clear();
                                                         if (_appointmentBranch != null) {
-                                                          ServiceBranchController.available(
+                                                          widget.loadAvailableServices(
                                                             context,
                                                             branchId: _appointmentBranch?.key,
                                                           ).then((value) {
