@@ -1,16 +1,17 @@
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:klinik_aurora_portal/config/color.dart';
 
 /// Ambient glowing wave mesh with multi-frequency harmonic sine waves
 /// and precision particle points, optimized for zero idle CPU/GPU consumption.
 class AuroraWaveMesh extends StatelessWidget {
   final double height;
+  final Color? accentColor;
 
   const AuroraWaveMesh({
     super.key,
     this.height = 260,
+    this.accentColor,
   });
 
   @override
@@ -38,14 +39,14 @@ class AuroraWaveMesh extends StatelessWidget {
                     radius: 1.0,
                     colors: isDark
                         ? [
-                            secondaryColor.withValues(alpha: 0.35),
-                            brandPink.withValues(alpha: 0.24),
-                            quaternaryColor.withValues(alpha: 0.08),
+                            const Color(0xFF246E7A).withValues(alpha: 0.35),
+                            (accentColor ?? const Color(0xFFA83E58)).withValues(alpha: 0.24),
+                            const Color(0xFF7E2D40).withValues(alpha: 0.08),
                             Colors.transparent,
                           ]
                         : [
                             const Color(0xFFD5F5FA).withValues(alpha: 0.55),
-                            const Color(0xFFFCE4EC).withValues(alpha: 0.45),
+                            (accentColor ?? const Color(0xFFFCE4EC)).withValues(alpha: accentColor == null ? 0.45 : 0.16),
                             const Color(0xFFF3E8FF).withValues(alpha: 0.15),
                             Colors.transparent,
                           ],
@@ -58,7 +59,7 @@ class AuroraWaveMesh extends StatelessWidget {
             // High-precision vector wave mesh
             Positioned.fill(
               child: CustomPaint(
-                painter: _AuroraMeshPainter(isDark: isDark),
+                painter: _AuroraMeshPainter(isDark: isDark, accentColor: accentColor),
               ),
             ),
           ],
@@ -71,7 +72,9 @@ class AuroraWaveMesh extends StatelessWidget {
 class _AuroraMeshPainter extends CustomPainter {
   final bool isDark;
 
-  const _AuroraMeshPainter({required this.isDark});
+  final Color? accentColor;
+
+  const _AuroraMeshPainter({required this.isDark, required this.accentColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -106,7 +109,10 @@ class _AuroraMeshPainter extends CustomPainter {
         strokeColor = Color.fromRGBO(r, g, b, alpha);
       }
 
-      basePaint.color = strokeColor;
+      final tint = accentColor;
+      basePaint.color = tint == null
+          ? strokeColor
+          : Color.lerp(strokeColor, tint.withValues(alpha: strokeColor.a), 0.75)!;
       final path = Path();
       final particleOffsets = <Offset>[];
 
@@ -136,7 +142,7 @@ class _AuroraMeshPainter extends CustomPainter {
 
       // Draw particle points
       final pointPaint = Paint()
-        ..color = strokeColor.withValues(alpha: (strokeColor.a * 1.3).clamp(0.0, 1.0))
+        ..color = basePaint.color.withValues(alpha: (strokeColor.a * 1.3).clamp(0.0, 1.0))
         ..strokeWidth = 2.4
         ..strokeCap = StrokeCap.round
         ..isAntiAlias = true;
@@ -147,6 +153,6 @@ class _AuroraMeshPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _AuroraMeshPainter oldDelegate) {
-    return oldDelegate.isDark != isDark;
+    return oldDelegate.isDark != isDark || oldDelegate.accentColor != accentColor;
   }
 }

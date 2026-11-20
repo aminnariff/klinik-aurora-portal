@@ -1,3 +1,4 @@
+import '../widgets/motion/aurora_inspector_drawer.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -129,6 +130,58 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
     } else {
       AppToast.snackbar(context, res.message ?? 'Failed to update status.');
     }
+  }
+
+  void _inspect(QueueAppointmentItem item) {
+    AuroraInspectorDrawer.show<void>(
+      context,
+      label: 'Queue inspector',
+      builder: (drawerContext) {
+        Widget action(String label, VoidCallback callback) => ListTile(
+          title: Text(label),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () {
+            Navigator.of(drawerContext).pop();
+            callback();
+          },
+        );
+
+        return SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              ListTile(
+                title: Text(item.patientName, style: Theme.of(drawerContext).textTheme.titleLarge),
+                subtitle: Text(item.serviceName),
+                trailing: IconButton(
+                  tooltip: 'Close inspector',
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Navigator.of(drawerContext).pop(),
+                ),
+              ),
+              ListTile(title: const Text('Queue status'), subtitle: Text(_prettyStage(item.queueStatus))),
+              ListTile(title: const Text('Appointment time'), subtitle: Text(item.appointmentTime)),
+              if (item.roomLabel case final room?) ListTile(title: const Text('Room'), subtitle: Text(room)),
+              const Divider(),
+              if (item.userId.isNotEmpty)
+                action('Patient profile', () => PatientQuickDrawer.show(context, userId: item.userId, patientName: item.patientName)),
+              if (item.queueStatus == 'scheduled') ...[
+                action('Check in', () => _advance(item, 'checked_in')),
+                action('Mark no-show', () => _advance(item, 'no_show')),
+              ],
+              if (item.queueStatus == 'checked_in') action('Move to room', () => _promptRoomAndMove(item)),
+              if (item.queueStatus == 'checked_in' || item.queueStatus == 'in_room')
+                action('Complete and check out', () => _openCheckoutDialog(item)),
+              if (item.queueStatus == 'completed') ...[
+                action('Payment and receipt', () => _openCheckoutDialog(item)),
+                action('Book next appointment', () => _openNextAppointmentDialog(item)),
+              ],
+              if (item.queueStatus == 'no_show') action('Reopen', () => _advance(item, 'scheduled')),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _openCheckoutDialog(QueueAppointmentItem item) async {
@@ -573,9 +626,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: item.userId.isNotEmpty
-                      ? () => PatientQuickDrawer.show(context, userId: item.userId, patientName: item.patientName)
-                      : null,
+                  onTap: () => _inspect(item),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -898,9 +949,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
           ),
           const SizedBox(height: 8),
           InkWell(
-            onTap: item.userId.isNotEmpty
-                ? () => PatientQuickDrawer.show(context, userId: item.userId, patientName: item.patientName)
-                : null,
+            onTap: () => _inspect(item),
             borderRadius: BorderRadius.circular(4),
             child: Row(
               children: [

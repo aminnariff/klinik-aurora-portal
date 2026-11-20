@@ -1,3 +1,6 @@
+import '../widgets/shimmer/app_table_skeleton.dart';
+import '../widgets/motion/aurora_inspector_drawer.dart';
+import '../widgets/aurora/aurora_empty_state.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -347,7 +350,17 @@ class _UserHomepageState extends State<UserHomepage> {
     return Consumer<UserController>(
       builder: (context, snapshot, _) {
         if (snapshot.userAllResponse == null) {
-          return const Center(child: CircularProgressIndicator(color: secondaryColor));
+          if (_filterLoading) {
+            return const Column(
+              children: [LinearProgressIndicator(minHeight: 2), Expanded(child: AppTableSkeleton(rows: 8))],
+            );
+          }
+          return Center(child: AuroraEmptyState(
+            icon: Icons.cloud_off_outlined,
+            title: 'Patients could not be loaded',
+            actionLabel: 'Retry',
+            onAction: () => filtering(enableDebounce: false),
+          ));
         }
         if (snapshot.userAllResponse!.isEmpty) {
           return Container(
@@ -367,6 +380,7 @@ class _UserHomepageState extends State<UserHomepage> {
           ),
           child: Column(
             children: [
+            if (_filterLoading) const LinearProgressIndicator(minHeight: 2),
               Expanded(child: _dataTable(snapshot.userAllResponse!)),
               Divider(height: 1, color: appBorder),
               _tableFooter(),
@@ -741,8 +755,9 @@ class _UserHomepageState extends State<UserHomepage> {
         builder: (_) => UserPointDetail(user: user),
       );
     } else if (value == 'update') {
-      showDialog(
-        context: context,
+      AuroraInspectorDrawer.show<void>(
+        context,
+        label: 'Patient inspector',
         builder: (_) => UserDetail(user: user, type: 'update'),
       );
     } else if (value == 'enableDisable') {
@@ -802,8 +817,13 @@ class _UserHomepageState extends State<UserHomepage> {
     enableDebounce ? _debouncer.run(() => runFiltering(page: page)) : runFiltering(page: page);
   }
 
+  int _filterRequest = 0;
+  bool _filterLoading = true;
+
   void runFiltering({bool enableDebounce = true, int? page}) {
-    showLoading();
+    if (!mounted) return;
+    final request = ++_filterRequest;
+    if (!_filterLoading) setState(() => _filterLoading = true);
     if (page != null) _page = page;
     UserController.getAll(
       context,
@@ -823,14 +843,16 @@ class _UserHomepageState extends State<UserHomepage> {
                 : null
           : null,
     ).then((value) {
-      dismissLoading();
+      if (!mounted || request != _filterRequest) return;
+          setState(() => _filterLoading = false);
       if (responseCode(value.code)) {
         _totalCount = value.data?.totalCount ?? 0;
         _totalPage = value.data?.totalPage ?? ((value.data?.data?.length ?? 0) / _pageSize).ceil();
         context.read<UserController>().userAllResponse = value.data?.data;
       }
     }).catchError((e) {
-      dismissLoading();
+      if (!mounted || request != _filterRequest) return;
+          setState(() => _filterLoading = false);
     });
   }
 

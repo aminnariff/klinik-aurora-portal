@@ -1,4 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../glass/app_glass.dart';
 
 /// Emil Kowalski's animation curves and durations tailored for Flutter UI.
 ///
@@ -8,6 +13,12 @@ import 'package:flutter/material.dart';
 /// 3. Never animate entry from scale(0); start from scale(0.95) with opacity.
 /// 4. Buttons must feel responsive: scale(0.97) on active press.
 abstract class EmilMotion {
+  static const pageDuration = Duration(milliseconds: 240);
+  static const pageReverseDuration = Duration(milliseconds: 190);
+  static const shellFadeDuration = Duration(milliseconds: 160);
+  static const staggerStep = Duration(milliseconds: 35);
+  static const Curve easeDrawer = Cubic(0.32, 0.72, 0.0, 1.0);
+
   /// Strong ease-out: starts fast, feels instant.
   /// Matches CSS cubic-bezier(0.23, 1, 0.32, 1).
   static const Curve easeOut = Cubic(0.23, 1.0, 0.32, 1.0);
@@ -109,4 +120,149 @@ class EmilModalTransition extends StatelessWidget {
       child: child,
     );
   }
+}
+
+enum AuroraTransitionType { drillIn, modalUp, shellFade }
+
+abstract final class AuroraPageRoute {
+  static Page<T> drillIn<T>(BuildContext context, {LocalKey? key, required Widget child}) =>
+      _page(context, key, child, AuroraTransitionType.drillIn);
+
+  static Page<T> modalUp<T>(BuildContext context, {LocalKey? key, required Widget child}) =>
+      _page(context, key, child, AuroraTransitionType.modalUp);
+
+  static Page<T> shellFade<T>(BuildContext context, {LocalKey? key, required Widget child}) =>
+      _page(context, key, child, AuroraTransitionType.shellFade);
+
+  static Page<T> _page<T>(
+    BuildContext context, LocalKey? key, Widget child, AuroraTransitionType type,
+  ) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return NoTransitionPage<T>(key: key, child: child);
+    }
+    final shell = type == AuroraTransitionType.shellFade;
+    final offset = switch (type) {
+      AuroraTransitionType.drillIn => const Offset(0.04, 0),
+      AuroraTransitionType.modalUp => const Offset(0, 0.08),
+      AuroraTransitionType.shellFade => const Offset(0, 0.015),
+    };
+    return CustomTransitionPage<T>(
+      key: key,
+      child: child,
+      transitionDuration: shell ? EmilMotion.shellFadeDuration : EmilMotion.pageDuration,
+      reverseTransitionDuration: shell ? EmilMotion.shellFadeDuration : EmilMotion.pageReverseDuration,
+      transitionsBuilder: (context, animation, secondary, child) {
+        if (MediaQuery.disableAnimationsOf(context)) return child;
+        final progress = animation.drive(CurveTween(curve: EmilMotion.easeOut));
+        return FadeTransition(
+          opacity: progress,
+          child: SlideTransition(
+            position: progress.drive(Tween(begin: offset, end: Offset.zero)),
+            textDirection: Directionality.maybeOf(context),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class AuroraStaggerItem extends StatelessWidget {
+  const AuroraStaggerItem({super.key, required this.index, required this.child});
+
+  final int index;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (index >= 6 || MediaQuery.disableAnimationsOf(context)) return child;
+    final delay = EmilMotion.staggerStep.inMilliseconds * index.clamp(0, 5);
+    const entrance = 105;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: delay + entrance),
+      curve: Interval(delay / (delay + entrance), 1, curve: EmilMotion.easeOut),
+      child: child,
+      builder: (context, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(offset: Offset(0, 12 * (1 - value)), child: child),
+      ),
+    );
+  }
+}
+
+class AuroraCountUp extends StatelessWidget {
+  const AuroraCountUp({super.key, required this.value, required this.builder});
+
+  final num value;
+  final Widget Function(BuildContext, num) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return builder(context, value);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: value.toDouble()),
+      duration: const Duration(milliseconds: 380),
+      curve: EmilMotion.easeOut,
+      builder: (context, value, _) => builder(context, value),
+    );
+  }
+}
+
+class AuroraSheetTransition extends StatelessWidget {
+  const AuroraSheetTransition({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    const radius = BorderRadius.vertical(top: Radius.circular(20));
+    return ClipRRect(
+      borderRadius: radius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+        child: Material(
+          color: AppGlass.surfaceFill(context),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.outline,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+                Flexible(child: child),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<T?> showAuroraModalSheet<T>({
+  required BuildContext context,
+  required WidgetBuilder builder,
+}) {
+  final reduce = MediaQuery.disableAnimationsOf(context);
+  return showModalBottomSheet<T>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    sheetAnimationStyle: reduce
+        ? AnimationStyle.noAnimation
+        : const AnimationStyle(
+            duration: EmilMotion.pageDuration,
+            reverseDuration: EmilMotion.pageReverseDuration,
+          ),
+    builder: (context) => AuroraSheetTransition(child: Builder(builder: builder)),
+  );
 }

@@ -1,3 +1,4 @@
+import '../widgets/motion/aurora_inspector_drawer.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -261,11 +262,15 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
     enableDebounce ? _debouncer.run(() => runFiltering(page: page)) : runFiltering(page: page);
   }
 
+  int _filterRequest = 0;
+  bool _filterLoading = true;
+
   void runFiltering({bool enableDebounce = true, int? page}) {
-    showLoading();
+    if (!mounted) return;
+    final request = ++_filterRequest;
+    if (!_filterLoading) setState(() => _filterLoading = true);
     if (page != null) _page = page;
     final searchText = _searchController.text.trim();
-    context.read<AppointmentController>().appointmentResponse = null;
     AppointmentController()
         .get(
           context,
@@ -291,14 +296,16 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           doctorType: _appointmentDoctorType?.key,
         )
         .then((value) {
-          dismissLoading();
+          if (!mounted || request != _filterRequest) return;
+          setState(() => _filterLoading = false);
           context.read<AppointmentController>().appointmentResponse = value;
           setState(() {
             _totalPage = value.data?.totalPage ?? 0;
             _totalCount = value.data?.totalCount ?? 0;
           });
         }).catchError((e) {
-          dismissLoading();
+          if (!mounted || request != _filterRequest) return;
+          setState(() => _filterLoading = false);
         });
   }
 
@@ -371,8 +378,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       return;
     }
     if (value == 'update') {
-      showDialog(
-        context: context,
+      AuroraInspectorDrawer.show<void>(
+        context,
+        label: 'Appointment inspector',
         builder: (BuildContext context) {
           return AppointmentDetails(
             type: 'update',
@@ -1175,10 +1183,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             data = apptController.appointmentResponse?.data?.data ?? [];
             break;
         }
-        final isLoading = _breakUiMode == BreakUiMode.live && apptController.appointmentResponse == null;
+        final isLoading = _breakUiMode == BreakUiMode.live && _filterLoading && apptController.appointmentResponse == null;
 
         return Column(
           children: [
+            if (_filterLoading) const LinearProgressIndicator(minHeight: 2),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
@@ -1478,7 +1487,9 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   DataRow2 _buildDataRow(BuildContext context, Data item, int index, AuthController authController) {
     return DataRow2(
       onTap: () => _handleMenuSelection('update', item),
-      color: WidgetStateProperty.all(index.isEven ? appSurface : appTableRowAlt),
+      color: WidgetStateProperty.resolveWith((states) =>
+          states.contains(WidgetState.hovered) ? context.appColors.tableRowHover :
+          index.isEven ? appSurface : appTableRowAlt),
       cells: [
         DataCell(
           Builder(

@@ -62,6 +62,29 @@ class BranchRosterController extends ChangeNotifier {
     );
   }
 
+  static Future<ApiResponse<dynamic>> update(
+    BuildContext context, {
+    required String rosterId,
+    String? doctorId,
+    String? rosterDate,
+    String? startTime,
+    String? endTime,
+    bool force = false,
+  }) async {
+    return ApiController().call(
+      context,
+      method: Method.put,
+      endpoint: 'admin/branch-roster/$rosterId${force ? '?force=true' : ''}',
+      data: {
+        if (notNullOrEmptyString(doctorId)) 'doctorId': doctorId,
+        if (notNullOrEmptyString(rosterDate)) 'rosterDate': rosterDate,
+        if (notNullOrEmptyString(startTime)) 'startTime': startTime,
+        if (notNullOrEmptyString(endTime)) 'endTime': endTime,
+        if (force) 'force': true,
+      },
+    );
+  }
+
   static Future<ApiResponse<dynamic>> delete(
     BuildContext context, {
     required String rosterId,

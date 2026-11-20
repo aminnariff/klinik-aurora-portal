@@ -1,3 +1,4 @@
+import '../views/widgets/motion/emil_motion.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -261,7 +262,7 @@ final router = GoRouter(
           path: RouteNames.home,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(key: state.pageKey, child: const Scaffold(body: MainDashboard()));
+            return AuroraPageRoute.shellFade(context, key: state.pageKey, child: const Scaffold(body: MainDashboard()));
           },
         ),
         GoRoute(
@@ -269,7 +270,7 @@ final router = GoRouter(
           path: RouteNames.points,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.points),
@@ -285,7 +286,7 @@ final router = GoRouter(
           path: RouteNames.patients,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.patients),
@@ -301,7 +302,7 @@ final router = GoRouter(
           path: RouteNames.babyTracker,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.babyTracker),
@@ -317,7 +318,7 @@ final router = GoRouter(
           path: RouteNames.rewards,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.rewards),
@@ -333,7 +334,7 @@ final router = GoRouter(
           path: RouteNames.payments,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.payments),
@@ -349,7 +350,7 @@ final router = GoRouter(
           path: RouteNames.branchPaymentSummary,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.branchPaymentSummary),
@@ -365,7 +366,7 @@ final router = GoRouter(
           path: RouteNames.rewardHistory,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.rewardHistory),
@@ -381,7 +382,7 @@ final router = GoRouter(
           path: RouteNames.marketing,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.marketing),
@@ -397,7 +398,7 @@ final router = GoRouter(
           path: RouteNames.branches,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.branches),
@@ -413,7 +414,7 @@ final router = GoRouter(
           path: RouteNames.appointments,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(key: state.pageKey, child: const Scaffold(body: AppointmentHomepage()));
+            return AuroraPageRoute.shellFade(context, key: state.pageKey, child: const Scaffold(body: AppointmentHomepage()));
           },
         ),
         GoRoute(
@@ -421,7 +422,7 @@ final router = GoRouter(
           path: RouteNames.paymentMismatch,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.paymentMismatch),
@@ -437,7 +438,7 @@ final router = GoRouter(
           path: RouteNames.services,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.services),
@@ -453,7 +454,7 @@ final router = GoRouter(
           path: RouteNames.admins,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.admins),
@@ -469,7 +470,7 @@ final router = GoRouter(
           path: RouteNames.promotions,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.promotions),
@@ -486,7 +487,7 @@ final router = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
             final String? branchId = state.extra as String?;
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.doctors),
@@ -502,7 +503,7 @@ final router = GoRouter(
           path: RouteNames.vouchers,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.vouchers),
@@ -518,7 +519,7 @@ final router = GoRouter(
           path: RouteNames.queueBoard,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.queueBoard),
@@ -534,7 +535,7 @@ final router = GoRouter(
           path: RouteNames.eodHandover,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.eodHandover),
@@ -550,7 +551,7 @@ final router = GoRouter(
           path: RouteNames.trimesterRecalls,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.trimesterRecalls),
@@ -566,7 +567,7 @@ final router = GoRouter(
           path: RouteNames.utilizationHeatmap,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.utilizationHeatmap),
@@ -582,7 +583,7 @@ final router = GoRouter(
           path: RouteNames.auditLog,
           parentNavigatorKey: _shellNavigatorKey,
           pageBuilder: (context, state) {
-            return NoTransitionPage(
+            return AuroraPageRoute.shellFade(context, 
               key: state.pageKey,
               child: DeferredPage(
                 key: const ValueKey(RouteNames.auditLog),

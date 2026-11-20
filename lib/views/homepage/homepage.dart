@@ -364,7 +364,7 @@ class _HomepageState extends State<Homepage> {
           Expanded(
             child: Column(
               children: [
-                if (widget.location == '/') _buildTopBar(context),
+                _buildTopBar(context),
                 Expanded(child: sideBarAttribute.isEmpty ? const NoPermission() : widget.child),
               ],
             ),
@@ -374,6 +374,35 @@ class _HomepageState extends State<Homepage> {
     ),
   ),
 );
+  }
+
+  String get _breadcrumb {
+    final path = Uri.tryParse(widget.location ?? '/')?.path ?? '/';
+    const labels = {
+      RouteNames.home: 'Dashboard',
+      RouteNames.appointments: RouteNames.appointmentsDisplay,
+      RouteNames.paymentMismatch: RouteNames.paymentMismatchDisplay,
+      RouteNames.patients: RouteNames.patientsDisplay,
+      RouteNames.babyTracker: RouteNames.babyTrackerDisplay,
+      RouteNames.doctors: RouteNames.doctorsDisplay,
+      RouteNames.services: RouteNames.servicesDisplay,
+      RouteNames.branches: RouteNames.branchesDisplay,
+      RouteNames.payments: RouteNames.paymentsDisplay,
+      RouteNames.branchPaymentSummary: RouteNames.branchPaymentSummaryDisplay,
+      RouteNames.points: RouteNames.pointsDisplay,
+      RouteNames.vouchers: RouteNames.vouchersDisplay,
+      RouteNames.rewards: RouteNames.rewardsDisplay,
+      RouteNames.rewardHistory: RouteNames.rewardHistoryDisplay,
+      RouteNames.marketing: RouteNames.marketingDisplay,
+      RouteNames.promotions: RouteNames.promotionsDisplay,
+      RouteNames.admins: RouteNames.adminsDisplay,
+      RouteNames.queueBoard: RouteNames.queueBoardDisplay,
+      RouteNames.eodHandover: RouteNames.eodHandoverDisplay,
+      RouteNames.trimesterRecalls: RouteNames.trimesterRecallsDisplay,
+      RouteNames.utilizationHeatmap: RouteNames.utilizationHeatmapDisplay,
+      RouteNames.auditLog: RouteNames.auditLogDisplay,
+    };
+    return labels[path] ?? 'Klinik Aurora';
   }
 
   Widget _buildTopBar(BuildContext context) {
@@ -407,6 +436,15 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
           const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _breadcrumb,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: colors.inkPrimary),
+            ),
+          ),
+          const SizedBox(width: 8),
           // Quick Search / Command Palette trigger pill
           InkWell(
             onTap: () => CommandPaletteDialog.show(context),
@@ -422,12 +460,12 @@ class _HomepageState extends State<Homepage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.search_rounded, size: 16, color: colors.inkMuted),
-                  const SizedBox(width: 8),
-                  Text(
+                  if (MediaQuery.sizeOf(context).width >= 640) const SizedBox(width: 8),
+                  if (MediaQuery.sizeOf(context).width >= 640) Text(
                     'Quick Search...',
                     style: TextStyle(fontSize: 12, color: colors.inkMuted, fontWeight: FontWeight.w500),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -444,7 +482,7 @@ class _HomepageState extends State<Homepage> {
               ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.keyboard_outlined, size: 20),
             color: colors.inkSecondary,

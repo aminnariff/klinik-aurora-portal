@@ -6,7 +6,7 @@ import 'package:klinik_aurora_portal/state_machines/appointment_state_machine.da
 import 'package:klinik_aurora_portal/controllers/user/patient_summary_controller.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
-import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
+import '../motion/aurora_inspector_drawer.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 
 /// Slide-over 360° Patient Clinical Profile drawer.
@@ -29,23 +29,10 @@ class PatientQuickDrawer extends StatefulWidget {
     String? patientName,
   }) {
     if (userId.trim().isEmpty) return Future.value();
-    final reducedMotion = MediaQuery.disableAnimationsOf(context);
-    return showGeneralDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Patient 360 Profile',
-      barrierColor: const Color(0x800F172A),
-      transitionDuration: reducedMotion ? Duration.zero : EmilMotion.modalDuration,
-      pageBuilder: (ctx, _, _) => Align(
-        alignment: Alignment.centerRight,
-        child: PatientQuickDrawer(userId: userId, initialName: patientName),
-      ),
-      transitionBuilder: (ctx, anim, _, child) {
-        if (reducedMotion) return child;
-        final slide = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
-            .animate(CurvedAnimation(parent: anim, curve: EmilMotion.easeOut));
-        return SlideTransition(position: slide, child: child);
-      },
+    return AuroraInspectorDrawer.show<void>(
+      context,
+      label: 'Patient 360 Profile',
+      builder: (_) => PatientQuickDrawer(userId: userId, initialName: patientName),
     );
   }
 

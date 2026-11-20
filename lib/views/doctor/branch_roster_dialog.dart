@@ -350,6 +350,365 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
     }
   }
 
+  TimeOfDay _parseTimeOfDay(String? t) {
+    if (t == null || t.isEmpty) return const TimeOfDay(hour: 9, minute: 0);
+    final parts = t.split(':');
+    if (parts.length >= 2) {
+      return TimeOfDay(
+        hour: int.tryParse(parts[0]) ?? 9,
+        minute: int.tryParse(parts[1]) ?? 0,
+      );
+    }
+    return const TimeOfDay(hour: 9, minute: 0);
+  }
+
+  String _formatTimeOfDayToSql(TimeOfDay tod) {
+    final h = tod.hour.toString().padLeft(2, '0');
+    final m = tod.minute.toString().padLeft(2, '0');
+    return '$h:$m:00';
+  }
+
+  Future<void> _handleEditShift(BranchRosterItem item) async {
+    String? editDoctorId = item.doctorId;
+    DateTime editDate = DateTime.tryParse(item.rosterDate ?? '') ?? DateTime.now();
+    TimeOfDay editStart = _parseTimeOfDay(item.startTime);
+    TimeOfDay editEnd = _parseTimeOfDay(item.endTime);
+
+    final saved = await showDialog<bool>(
+      context: context,
+      barrierColor: dialogBarrierColor,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            final startMinutes = editStart.hour * 60 + editStart.minute;
+            final endMinutes = editEnd.hour * 60 + editEnd.minute;
+            final isValidTime = startMinutes < endMinutes;
+
+            return Dialog(
+              backgroundColor: appSurface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: appSurfaceSubtle,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(Icons.edit_calendar_rounded, size: 20, color: primary),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Edit Practitioner Shift',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1E293B)),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                            onPressed: () => Navigator.of(dialogCtx).pop(false),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Doctor Selection
+                      const Text('Practitioner', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: 42,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: appBorderStrong),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: _doctors.any((d) => d.doctorId == editDoctorId) ? editDoctorId : null,
+                            hint: const Text('Select Practitioner', style: TextStyle(fontSize: 13)),
+                            items: _doctors.map((d) {
+                              return DropdownMenuItem(
+                                value: d.doctorId,
+                                child: Text(d.doctorName ?? 'Practitioner', style: const TextStyle(fontSize: 13)),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              if (val != null) setDialogState(() => editDoctorId = val);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Shift Date
+                      const Text('Shift Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                      const SizedBox(height: 6),
+                      InkWell(
+                        onTap: () async {
+                          final today = DateUtils.dateOnly(DateTime.now());
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: editDate.isBefore(today) ? today : editDate,
+                            firstDate: today,
+                            lastDate: today.add(const Duration(days: 365)),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(primary: primary),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+                          if (picked != null) {
+                            setDialogState(() => editDate = picked);
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          height: 42,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: appBorderStrong),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today_rounded, size: 16, color: primary),
+                              const SizedBox(width: 8),
+                              Text(
+                                DateFormat('EEEE, dd MMM yyyy').format(editDate),
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF1E293B)),
+                              ),
+                              const Spacer(),
+                              Icon(Icons.arrow_drop_down, color: appInkMuted),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Shift Hours (Start & End)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Start Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                                const SizedBox(height: 6),
+                                InkWell(
+                                  onTap: () async {
+                                    final picked = await showTimePicker(
+                                      context: context,
+                                      initialTime: editStart,
+                                    );
+                                    if (picked != null) {
+                                      setDialogState(() => editStart = picked);
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Container(
+                                    height: 42,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: appBorderStrong),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.access_time_rounded, size: 16, color: primary),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          editStart.format(context),
+                                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('End Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                                const SizedBox(height: 6),
+                                InkWell(
+                                  onTap: () async {
+                                    final picked = await showTimePicker(
+                                      context: context,
+                                      initialTime: editEnd,
+                                    );
+                                    if (picked != null) {
+                                      setDialogState(() => editEnd = picked);
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Container(
+                                    height: 42,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: appBorderStrong),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.access_time_filled_rounded, size: 16, color: primary),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          editEnd.format(context),
+                                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (!isValidTime) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Start time must be before end time',
+                          style: TextStyle(fontSize: 11, color: Colors.red.shade600),
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+
+                      // Actions
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () => Navigator.of(dialogCtx).pop(false),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: appInkSecondary,
+                              side: BorderSide(color: appBorderStrong),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: const Text('Cancel'),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton(
+                            onPressed: (!isValidTime || editDoctorId == null)
+                                ? null
+                                : () {
+                                    Navigator.of(dialogCtx).pop(true);
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: const Text('Save Changes', style: TextStyle(fontWeight: FontWeight.w600)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (saved == true && mounted) {
+      final dateStr = DateFormat('yyyy-MM-dd').format(editDate);
+      final startStr = _formatTimeOfDayToSql(editStart);
+      final endStr = _formatTimeOfDayToSql(editEnd);
+
+      showLoading();
+      final res = await BranchRosterController.update(
+        context,
+        rosterId: item.rosterId!,
+        doctorId: editDoctorId,
+        rosterDate: dateStr,
+        startTime: startStr,
+        endTime: endStr,
+      );
+      dismissLoading();
+
+      if (res.code == 422 ||
+          (res.data is Map &&
+              (res.data['error'] == 'ACTIVE_APPOINTMENTS' ||
+                  res.data['code'] == 'ACTIVE_APPOINTMENTS'))) {
+        final data = res.data;
+        final count = (data is Map) ? (data['affectedCount'] ?? 0) : 0;
+        final list = (data is Map && data['affectedAppointments'] is List)
+            ? (data['affectedAppointments'] as List)
+            : [];
+        final patientSummary = list.take(5).map((a) {
+          final dt = a['appointmentDatetime']?.toString() ?? '';
+          final timeStr = formatToDisplayTime(dt);
+          final outsideFlag = (a['isOutsideNewHours'] == true) ? ' [Outside New Hours]' : '';
+          return '• ${a['patientName']} ($timeStr)$outsideFlag';
+        }).join('\n');
+        final moreNotice = list.length > 5 ? '\n...and ${list.length - 5} more.' : '';
+
+        final msg = (data is Map && data['message'] != null)
+            ? data['message']
+            : '$count booking(s) will be affected by this shift change.';
+
+        final proceed = await showConfirmDialog(
+          context,
+          '$msg\n\n'
+          '$patientSummary$moreNotice\n\n'
+          'Updating this shift will automatically update or reassign these appointment(s).\n\n'
+          'Proceed to update shift?',
+          title: 'Active Bookings Affected',
+        );
+
+        if (proceed == true && mounted) {
+          showLoading();
+          final forceRes = await BranchRosterController.update(
+            context,
+            rosterId: item.rosterId!,
+            doctorId: editDoctorId,
+            rosterDate: dateStr,
+            startTime: startStr,
+            endTime: endStr,
+            force: true,
+          );
+          dismissLoading();
+
+          if (mounted && responseCode(forceRes.code)) {
+            showDialogSuccess(context, 'Shift updated successfully.');
+            _loadRosterShifts();
+          } else if (mounted) {
+            showDialogError(context, forceRes.message ?? 'Failed to update shift.');
+          }
+        }
+      } else if (responseCode(res.code)) {
+        showDialogSuccess(context, 'Shift updated successfully.');
+        _loadRosterShifts();
+      } else {
+        showDialogError(context, res.message ?? 'Failed to update shift.');
+      }
+    }
+  }
+
   Future<void> _handleDeleteShift(BranchRosterItem item) async {
     final confirmed = await showConfirmDialog(
       context,
@@ -1479,12 +1838,24 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                     ],
                                   ),
                                 ),
-                                InkWell(
-                                  onTap: () => _handleDeleteShift(shift),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 2),
-                                    child: Icon(Icons.close_rounded, size: 12, color: Colors.red.shade400),
-                                  ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    InkWell(
+                                      onTap: () => _handleEditShift(shift),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        child: Icon(Icons.edit_outlined, size: 12, color: docColor),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () => _handleDeleteShift(shift),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 2),
+                                        child: Icon(Icons.close_rounded, size: 12, color: Colors.red.shade400),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -1585,10 +1956,20 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                 DataCell(_doctorTypeChip(shift.doctorType)),
                 DataCell(Text('${_formatTime(shift.startTime)} - ${_formatTime(shift.endTime)}')),
                 DataCell(
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, size: 16, color: Colors.red),
-                    tooltip: 'Delete Shift',
-                    onPressed: () => _handleDeleteShift(shift),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit_outlined, size: 16, color: appInkSecondary),
+                        tooltip: 'Edit Shift',
+                        onPressed: () => _handleEditShift(shift),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline_rounded, size: 16, color: Colors.red),
+                        tooltip: 'Delete Shift',
+                        onPressed: () => _handleDeleteShift(shift),
+                      ),
+                    ],
                   ),
                 ),
               ],

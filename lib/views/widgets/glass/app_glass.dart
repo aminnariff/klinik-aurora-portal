@@ -57,6 +57,8 @@ class AppGlassCard extends StatelessWidget {
   final double blurSigma;
   final BoxConstraints? constraints;
   final bool auroraBorder;
+  final bool enableBlur;
+  final bool elevated;
 
   const AppGlassCard({
     super.key,
@@ -66,26 +68,32 @@ class AppGlassCard extends StatelessWidget {
     this.blurSigma = 18.0,
     this.constraints,
     this.auroraBorder = false,
+    this.enableBlur = true,
+    this.elevated = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    Widget contents = Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: AppGlass.surfaceFill(context),
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: auroraBorder ? null : AppGlass.hairlineBorder(context),
+      ),
+      child: child,
+    );
+    if (enableBlur) {
+      contents = BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+        child: contents,
+      );
+    }
     Widget cardBody = ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            color: AppGlass.surfaceFill(context),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: auroraBorder ? null : AppGlass.hairlineBorder(context),
-          ),
-          child: child,
-        ),
-      ),
+      child: contents,
     );
 
     if (auroraBorder) {
@@ -120,7 +128,7 @@ class AppGlassCard extends StatelessWidget {
       constraints: constraints,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: AppGlass.elevationShadow(context),
+        boxShadow: elevated ? AppGlass.elevationShadow(context) : null,
       ),
       child: cardBody,
     );
