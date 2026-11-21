@@ -15,6 +15,7 @@ import 'package:klinik_aurora_portal/models/point_management/point_modifier.dart
 import 'package:klinik_aurora_portal/models/point_management/user_points_response.dart' as user_model;
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
+import 'package:klinik_aurora_portal/views/widgets/aurora/aurora_3d_star_badge.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -136,7 +137,13 @@ class _PointHomepageState extends State<PointHomepage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Points Management', style: AppTypography.titleLarge(context).apply(fontWeightDelta: 2)),
+                  Row(
+                    children: [
+                      const Aurora3DStarBadge(size: 26),
+                      const SizedBox(width: 10),
+                      Text('Points Management', style: AppTypography.titleLarge(context).apply(fontWeightDelta: 2)),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   Container(
                     height: 44,
@@ -288,14 +295,7 @@ class _PointHomepageState extends State<PointHomepage> {
             // Title row
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: secondaryColor.withAlpha(25),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.receipt_long_rounded, color: secondaryColor, size: 22),
-                ),
+                const Aurora3DStarBadge(size: 36),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -707,7 +707,7 @@ class _PointHomepageState extends State<PointHomepage> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.stars_rounded, color: Color(0xFF2ECC40), size: 20),
+                const Aurora3DStarBadge(size: 20),
                 const SizedBox(width: 8),
                 const Text(
                   'Current Balance:',
@@ -1178,8 +1178,8 @@ class _PointHomepageState extends State<PointHomepage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
-          const SizedBox(width: 6),
+          const Aurora3DStarBadge(size: 16),
+          const SizedBox(width: 8),
           Flexible(
             child: Text(
               'RM 10 = 1 pt  ·  10 pts = RM 1 discount  ·  12-month expiry',
@@ -1294,16 +1294,9 @@ class _PointHomepageState extends State<PointHomepage> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: secondaryColor.withAlpha(20),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.gavel_rounded, color: secondaryColor, size: 20),
-                    ),
+                    const Aurora3DStarBadge(size: 32),
                     const SizedBox(width: 12),
-                    Text('Terms & Conditions', style: AppTypography.bodyLarge(context).apply(fontWeightDelta: 2)),
+                    Text('How Points Work', style: AppTypography.bodyLarge(context).apply(fontWeightDelta: 2)),
                     const Spacer(),
                     IconButton(
   tooltip: 'Tutup',
