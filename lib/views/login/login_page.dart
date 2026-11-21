@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -143,62 +144,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Atmospheric Aurora Borealis Glowing Veils
-        // 1. Top-Right Aurora Pink / Plum ambient glow
-        Positioned(
-          top: -140,
-          right: -100,
-          child: Container(
-            width: 580,
-            height: 580,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: isDark
-                    ? [
-                        const Color(0xFFDF6E98).withValues(alpha: 0.26),
-                        const Color(0xFF7E2D40).withValues(alpha: 0.14),
-                        Colors.transparent,
-                      ]
-                    : [
-                        const Color(0xFFDF6E98).withValues(alpha: 0.18),
-                        const Color(0xFFFCE7F0).withValues(alpha: 0.28),
-                        Colors.transparent,
-                      ],
-                stops: const [0.0, 0.48, 1.0],
-              ),
-            ),
-          ),
-        ),
+        // Slushy glowing aurora circles (zero harsh rings)
+        _slushyAuroraBackground(isDark),
 
-        // 2. Center-Left Aurora Cyan Stream
-        Positioned(
-          top: MediaQuery.sizeOf(context).height * 0.18,
-          left: -150,
-          child: Container(
-            width: 540,
-            height: 540,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: isDark
-                    ? [
-                        const Color(0xFF6AD1E3).withValues(alpha: 0.22),
-                        const Color(0xFF1B545E).withValues(alpha: 0.10),
-                        Colors.transparent,
-                      ]
-                    : [
-                        const Color(0xFF6AD1E3).withValues(alpha: 0.18),
-                        const Color(0xFFD5F5FA).withValues(alpha: 0.30),
-                        Colors.transparent,
-                      ],
-                stops: const [0.0, 0.52, 1.0],
-              ),
-            ),
-          ),
-        ),
-
-        // 3. Ambient glowing wave mesh at bottom
+        // Ambient glowing wave mesh at bottom
         Positioned(
           bottom: 0,
           left: 0,
@@ -316,6 +265,177 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _slushyAuroraBackground(bool isDark) {
+    final screenH = MediaQuery.sizeOf(context).height;
+    final screenW = MediaQuery.sizeOf(context).width;
+
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 1. Base canvas gradient wash
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? const [
+                        Color(0xFF070D12),
+                        Color(0xFF0C141E),
+                        Color(0xFF070D12),
+                      ]
+                    : const [
+                        Color(0xFFFCF4F7), // warm soft blush
+                        Color(0xFFF3FAFC), // soft cyan glow
+                        Color(0xFFF8FAFC), // clean slate
+                      ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+
+          // 2. Glowing Slushy Aurora Blobs with Deep Gaussian Blur (Zero Rings!)
+          Positioned.fill(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 95, sigmaY: 95),
+              child: Stack(
+                children: [
+                  // Top-Right Aurora Rose / Pink glow orb
+                  Positioned(
+                    top: -100,
+                    right: -80,
+                    child: Container(
+                      width: 520,
+                      height: 520,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark
+                            ? const Color(0xFFDF6E98).withValues(alpha: 0.28)
+                            : const Color(0xFFDF6E98).withValues(alpha: 0.24),
+                      ),
+                    ),
+                  ),
+                  // Center-Left Aurora Cyan glow orb
+                  Positioned(
+                    top: screenH * 0.12,
+                    left: -120,
+                    child: Container(
+                      width: 500,
+                      height: 500,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark
+                            ? const Color(0xFF6AD1E3).withValues(alpha: 0.24)
+                            : const Color(0xFF6AD1E3).withValues(alpha: 0.26),
+                      ),
+                    ),
+                  ),
+                  // Bottom-Right Warm Plum / Berry glow orb
+                  Positioned(
+                    bottom: -100,
+                    right: screenW * 0.15,
+                    child: Container(
+                      width: 460,
+                      height: 460,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark
+                            ? const Color(0xFF7E2D40).withValues(alpha: 0.25)
+                            : const Color(0xFFDE8BA7).withValues(alpha: 0.22),
+                      ),
+                    ),
+                  ),
+                  // Bottom-Left Mint / Soft Cyan glow orb
+                  Positioned(
+                    bottom: -80,
+                    left: -60,
+                    child: Container(
+                      width: 400,
+                      height: 400,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark
+                            ? const Color(0xFF1B545E).withValues(alpha: 0.22)
+                            : const Color(0xFF6AD1E3).withValues(alpha: 0.20),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 3. Iconic Slushy Translucent Circles (from the classic login design!)
+          // Clean, organic floating orbs that give depth without harsh rings
+          Positioned(
+            top: -60,
+            left: -60,
+            child: Container(
+              width: 320,
+              height: 320,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: isDark ? 0.04 : 0.50),
+                border: Border.all(
+                  color: (isDark ? Colors.white : const Color(0xFFDF6E98)).withValues(alpha: isDark ? 0.06 : 0.14),
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenH * 0.22,
+            right: -50,
+            child: Container(
+              width: 240,
+              height: 240,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: isDark ? 0.03 : 0.45),
+                border: Border.all(
+                  color: (isDark ? Colors.white : const Color(0xFF6AD1E3)).withValues(alpha: isDark ? 0.05 : 0.14),
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -50,
+            left: screenW * 0.25,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: isDark ? 0.03 : 0.40),
+                border: Border.all(
+                  color: (isDark ? Colors.white : const Color(0xFFDE8BA7)).withValues(alpha: isDark ? 0.05 : 0.12),
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 120,
+            right: 40,
+            child: Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: isDark ? 0.02 : 0.35),
+                border: Border.all(
+                  color: (isDark ? Colors.white : const Color(0xFF6AD1E3)).withValues(alpha: isDark ? 0.04 : 0.10),
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

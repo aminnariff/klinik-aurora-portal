@@ -45,9 +45,9 @@ class AuroraWaveMesh extends StatelessWidget {
                             Colors.transparent,
                           ]
                         : [
-                            const Color(0xFFD5F5FA).withValues(alpha: 0.55),
-                            (accentColor ?? const Color(0xFFFCE4EC)).withValues(alpha: accentColor == null ? 0.45 : 0.16),
-                            const Color(0xFFF3E8FF).withValues(alpha: 0.15),
+                            const Color(0xFFD5F5FA).withValues(alpha: 0.22),
+                            (accentColor ?? const Color(0xFFFCE4EC)).withValues(alpha: accentColor == null ? 0.14 : 0.08),
+                            const Color(0xFFF3E8FF).withValues(alpha: 0.05),
                             Colors.transparent,
                           ],
                     stops: const [0.0, 0.40, 0.70, 1.0],
@@ -102,10 +102,10 @@ class _AuroraMeshPainter extends CustomPainter {
         final alpha = (0.16 + ((1.0 - lineProgress) * 0.42)).clamp(0.0, 1.0);
         strokeColor = Color.fromRGBO(r, g, b, alpha);
       } else {
-        final r = (0 + (223 * lineProgress)).round();
-        final g = (122 - (12 * lineProgress)).round();
-        final b = (147 + (5 * lineProgress)).round();
-        final alpha = (0.12 + ((1.0 - lineProgress) * 0.28)).clamp(0.0, 1.0);
+        final r = (106 + (117 * lineProgress)).round();
+        final g = (209 - (99 * lineProgress)).round();
+        final b = (227 - (75 * lineProgress)).round();
+        final alpha = (0.02 + ((1.0 - lineProgress) * 0.06)).clamp(0.0, 1.0);
         strokeColor = Color.fromRGBO(r, g, b, alpha);
       }
 
@@ -142,8 +142,8 @@ class _AuroraMeshPainter extends CustomPainter {
 
       // Draw particle points
       final pointPaint = Paint()
-        ..color = basePaint.color.withValues(alpha: (strokeColor.a * 1.3).clamp(0.0, 1.0))
-        ..strokeWidth = 2.4
+        ..color = basePaint.color.withValues(alpha: isDark ? (strokeColor.a * 1.3).clamp(0.0, 1.0) : (strokeColor.a * 0.4).clamp(0.0, 1.0))
+        ..strokeWidth = isDark ? 2.4 : 1.2
         ..strokeCap = StrokeCap.round
         ..isAntiAlias = true;
 
