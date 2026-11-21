@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
@@ -531,7 +532,7 @@ class _PointHomepageState extends State<PointHomepage> {
           ),
           child: Row(
             children: [
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Icon(
                 isPhone ? Icons.phone_android_rounded : Icons.badge_outlined,
                 size: 18,
@@ -546,6 +547,11 @@ class _PointHomepageState extends State<PointHomepage> {
                     hintText: hint,
                     hintStyle: TextStyle(fontSize: 12.5, color: appInkMuted),
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -704,30 +710,11 @@ class _PointHomepageState extends State<PointHomepage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.verified_rounded, size: 11, color: Color(0xFF10B981)),
-                                SizedBox(width: 3),
-                                Text(
-                                  'MEMBER',
-                                  style: TextStyle(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF10B981),
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          const SizedBox(width: 6),
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            size: 16,
+                            color: Color(0xFF10B981),
                           ),
                         ],
                       ),
@@ -850,33 +837,33 @@ class _PointHomepageState extends State<PointHomepage> {
   Widget _buildStep2PaymentSection() {
     final amountText = _amount.controller.text;
     final totalPoints = _calculateTotalPoints(amountText);
-    final rmDiscountValue = (totalPoints / 10).toStringAsFixed(2);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionHeader(
           '2',
-          'Payment & Clinical Scan Billing',
-          'Enter counter bill amount or tap ultrasound scan preset.',
+          'Payment & Bill Amount',
+          'Enter bill amount or tap a quick preset.',
           Icons.payments_outlined,
         ),
         const SizedBox(height: 12),
 
-        // Big Monetary Input Box with integrated Live Points Counter
+        // Monetary Input Box with integrated Live Points Counter
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          height: 46,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             color: appSurface,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: totalPoints > 0 ? secondaryColor.withValues(alpha: 0.6) : appBorderStrong,
-              width: totalPoints > 0 ? 1.5 : 1.0,
+              width: totalPoints > 0 ? 1.4 : 1.0,
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 6,
+                blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
             ],
@@ -887,9 +874,9 @@ class _PointHomepageState extends State<PointHomepage> {
               Text(
                 'RM',
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: appInkMuted,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: appInkSecondary,
                 ),
               ),
               const SizedBox(width: 10),
@@ -897,22 +884,29 @@ class _PointHomepageState extends State<PointHomepage> {
                 child: TextField(
                   controller: _amount.controller,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d{0,4}(\.\d{0,2})?')),
+                  ],
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: appInkPrimary,
-                    letterSpacing: 0.5,
                   ),
                   decoration: InputDecoration(
                     hintText: '0.00',
                     hintStyle: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                       color: appInkMuted.withValues(alpha: 0.5),
                     ),
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
                     isDense: true,
-                    contentPadding: EdgeInsets.zero,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   onChanged: (val) {
                     setState(() {
@@ -921,60 +915,45 @@ class _PointHomepageState extends State<PointHomepage> {
                   },
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               // Dynamic Points badge embedded inside amount box
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: totalPoints > 0
                         ? [const Color(0xFFF59E0B), const Color(0xFFD97706)]
                         : [appSurfaceSubtle, appSurfaceSubtle],
                   ),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   boxShadow: totalPoints > 0
                       ? [
                           BoxShadow(
                             color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                            blurRadius: 6,
+                            offset: const Offset(0, 1),
                           ),
                         ]
                       : [],
                 ),
-                child: Column(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.stars_rounded,
-                          size: 16,
-                          color: totalPoints > 0 ? Colors.white : appInkMuted,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          totalPoints > 0 ? '+$totalPoints pts' : '0 pts',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: totalPoints > 0 ? Colors.white : appInkMuted,
-                          ),
-                        ),
-                      ],
+                    Icon(
+                      Icons.stars_rounded,
+                      size: 14,
+                      color: totalPoints > 0 ? Colors.white : appInkMuted,
                     ),
-                    if (totalPoints > 0)
-                      Text(
-                        '≈ RM $rmDiscountValue value',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
+                    const SizedBox(width: 4),
+                    Text(
+                      totalPoints > 0 ? '+$totalPoints pts' : '0 pts',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: totalPoints > 0 ? Colors.white : appInkMuted,
                       ),
+                    ),
                   ],
                 ),
               ),
@@ -1134,10 +1113,14 @@ class _PointHomepageState extends State<PointHomepage> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                   leading: CircleAvatar(
                     radius: 15,
-                    backgroundColor: secondaryColor.withAlpha(25),
+                    backgroundColor: secondaryColor.withValues(alpha: appIsDarkMode ? 0.35 : 0.15),
                     child: Text(
                       _getInitials(item.userFullname),
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: tertiaryColor),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: appIsDarkMode ? Colors.white : tertiaryColor,
+                      ),
                     ),
                   ),
                   title: Text(item.userFullname ?? 'N/A',
@@ -1370,10 +1353,14 @@ class _PointHomepageState extends State<PointHomepage> {
                         children: [
                           CircleAvatar(
                             radius: 9,
-                            backgroundColor: secondaryColor.withValues(alpha: 0.2),
+                            backgroundColor: secondaryColor.withValues(alpha: appIsDarkMode ? 0.35 : 0.2),
                             child: Text(
                               _getInitials(p.userFullname),
-                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: tertiaryColor),
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: appIsDarkMode ? Colors.white : tertiaryColor,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -1406,122 +1393,53 @@ class _PointHomepageState extends State<PointHomepage> {
   }
 
   Widget _quickAmountPresets() {
-    final presets = [
-      {'label': 'RM 80', 'sub': 'Dating Scan', 'val': 80.0},
-      {'label': 'RM 150', 'sub': 'Detail Scan', 'val': 150.0},
-      {'label': 'RM 200', 'sub': '4D / 5D Scan', 'val': 200.0},
-      {'label': 'RM 250', 'sub': 'Full Scan', 'val': 250.0},
-    ];
+    final presets = [50, 80, 100, 150, 200, 250];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.medical_services_outlined, size: 13, color: appInkMuted),
-            const SizedBox(width: 6),
-            Text(
-              'Ultrasound Scan Presets:',
-              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: appInkMuted),
-            ),
-            const Spacer(),
-            EmilPressable(
-              onTap: () {
-                final current = double.tryParse(_amount.controller.text) ?? 0.0;
-                final next = current + 50.0;
-                setState(() {
-                  _amount.controller.text = next.toStringAsFixed(0);
-                  if (_amount.errorMessage != null) _amount.errorMessage = null;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: secondaryColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: secondaryColor.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add_rounded, size: 12, color: secondaryColor),
-                    Text(
-                      'RM 50',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: secondaryColor),
-                    ),
-                  ],
-                ),
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: presets.map((val) {
+        final currentVal = double.tryParse(_amount.controller.text) ?? 0.0;
+        final isMatch = (currentVal - val).abs() < 0.01;
+
+        return EmilPressable(
+          onTap: () {
+            setState(() {
+              _amount.controller.text = val.toString();
+              if (_amount.errorMessage != null) _amount.errorMessage = null;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: isMatch ? secondaryColor.withValues(alpha: 0.15) : appSurface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isMatch ? secondaryColor : appBorderStrong,
+                width: isMatch ? 1.4 : 1.0,
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: presets.map((preset) {
-            final val = preset['val'] as double;
-            final currentVal = double.tryParse(_amount.controller.text) ?? 0.0;
-            final isMatch = (currentVal - val).abs() < 0.01;
-
-            return EmilPressable(
-              onTap: () {
-                setState(() {
-                  _amount.controller.text = val.toStringAsFixed(0);
-                  if (_amount.errorMessage != null) _amount.errorMessage = null;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isMatch ? secondaryColor.withValues(alpha: 0.15) : appSurface,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isMatch ? secondaryColor : appBorderStrong,
-                    width: isMatch ? 1.5 : 1.0,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isMatch) ...[
+                  Icon(Icons.check_rounded, size: 13, color: secondaryColor),
+                  const SizedBox(width: 4),
+                ],
+                Text(
+                  'RM $val',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: isMatch ? FontWeight.w700 : FontWeight.w600,
+                    color: isMatch ? secondaryColor : appInkPrimary,
                   ),
-                  boxShadow: isMatch
-                      ? [
-                          BoxShadow(
-                            color: secondaryColor.withValues(alpha: 0.2),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : [],
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isMatch) ...[
-                      Icon(Icons.check_circle_rounded, size: 13, color: secondaryColor),
-                      const SizedBox(width: 5),
-                    ],
-                    Text(
-                      preset['label'] as String,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w800,
-                        color: isMatch ? secondaryColor : appInkPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      '· ${preset['sub']}',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: isMatch ? secondaryColor.withValues(alpha: 0.9) : appInkMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -1530,7 +1448,6 @@ class _PointHomepageState extends State<PointHomepage> {
     final currentPoints = patient.totalPoint ?? 0;
     final earned = _calculateTotalPoints(_amount.controller.text);
     final newTotal = currentPoints + earned;
-    final newRmValue = (newTotal / 10).toStringAsFixed(2);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -1587,19 +1504,19 @@ class _PointHomepageState extends State<PointHomepage> {
           ),
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: appSurface.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Row(
               children: [
-                Icon(Icons.record_voice_over_rounded, size: 13, color: appInkMuted),
+                Icon(Icons.info_outline_rounded, size: 13, color: appInkMuted),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Frontdesk prompt: "Puan ${patient.userFullname}, anda kini ada $newTotal mata (bernilai RM $newRmValue diskaun)!"',
-                    style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: appInkSecondary),
+                    '10 points = RM 1.00 redemption discount on upcoming visits.',
+                    style: TextStyle(fontSize: 11, color: appInkMuted),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -1814,6 +1731,16 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
     final parts = fullname.trim().split(RegExp(r'\s+'));
     if (parts.length == 1) return parts.first.substring(0, parts.first.length.clamp(1, 2)).toUpperCase();
     return (parts.first[0] + parts.last[0]).toUpperCase();
+  }
+
+  String _cleanStaffOrBranch(String? text) {
+    if (text == null || text.trim().isEmpty) return 'Staff';
+    return text
+        .replaceAll('Klinik Aurora ', '')
+        .replaceAll('Klinik Aurora', '')
+        .replaceAll('KLINIK AURORA ', '')
+        .replaceAll('KLINIK AURORA', '')
+        .trim();
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -2101,9 +2028,12 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
                             children: [
                               Icon(Icons.schedule_rounded, size: 11, color: appInkMuted),
                               const SizedBox(width: 4),
-                              Text(
-                                '${dateConverter(item.createdDate) ?? 'N/A'}  ·  by ${item.createdByFullname ?? 'Staff'}',
-                                style: TextStyle(fontSize: 10.5, color: appInkMuted),
+                              Expanded(
+                                child: Text(
+                                  '${dateConverter(item.createdDate) ?? 'N/A'}  ·  by ${_cleanStaffOrBranch(item.createdByFullname)}',
+                                  style: TextStyle(fontSize: 10.5, color: appInkMuted),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
