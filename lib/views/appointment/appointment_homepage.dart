@@ -1,6 +1,5 @@
 import '../widgets/motion/aurora_table_hover.dart';
 import '../../config/app_colors.dart';
-import '../widgets/motion/aurora_inspector_drawer.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -380,9 +379,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       return;
     }
     if (value == 'update') {
-      AuroraInspectorDrawer.show<void>(
-        context,
-        label: 'Appointment inspector',
+      showDialog(
+        context: context,
         builder: (BuildContext context) {
           return AppointmentDetails(
             type: 'update',
