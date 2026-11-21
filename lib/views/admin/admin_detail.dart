@@ -1079,7 +1079,7 @@ class _AdminDetailState extends State<AdminDetail> {
                               fontWeight: isChecked ? FontWeight.w600 : FontWeight.w400,
                               color: isChecked
                                   ? (Theme.of(context).brightness == Brightness.dark || appIsDarkMode
-                                      ? const Color(0xFFC7D2FE)
+                                      ? const Color(0xFFE0E7FF)
                                       : const Color(0xFF312E81))
                                   : appInkPrimary,
                             ),

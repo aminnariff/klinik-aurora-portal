@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -59,6 +60,8 @@ class _PointHomepageState extends State<PointHomepage> {
   final TextEditingController _searchController = TextEditingController(text: kDebugMode ? '012' : '');
   String? _searchError;
   UserResponse? _selectedPatient;
+  final List<UserResponse> _recentPatients = [];
+  bool _filterTodayOnly = false;
 
   int _selectedMobileTab = 0;
 
@@ -327,6 +330,9 @@ class _PointHomepageState extends State<PointHomepage> {
             _buildSearchModePills(),
             const SizedBox(height: 10),
 
+            // Recent patients quick-select strip
+            _recentPatientsStrip(),
+
             // Search input field with search button suffix
             _buildSearchInputField(),
 
@@ -382,9 +388,18 @@ class _PointHomepageState extends State<PointHomepage> {
                 _pointsPreviewChip(),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
+
+            // Quick scan amount presets
+            _quickAmountPresets(),
+            const SizedBox(height: 12),
 
             _buildModifiersSection(),
+
+            if (_selectedPatient != null && _calculateTotalPoints(_amount.controller.text) > 0) ...[
+              const SizedBox(height: 14),
+              _liveBalancePreviewCard(),
+            ],
 
             const SizedBox(height: 20),
             const Divider(),
@@ -801,6 +816,7 @@ class _PointHomepageState extends State<PointHomepage> {
                       setState(() {
                         _selectedPatient = item;
                       });
+                      _addRecentPatient(item);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
@@ -968,6 +984,482 @@ class _PointHomepageState extends State<PointHomepage> {
     );
   }
 
+  void _addRecentPatient(UserResponse patient) {
+    setState(() {
+      _recentPatients.removeWhere((p) => p.userId == patient.userId);
+      _recentPatients.insert(0, patient);
+      if (_recentPatients.length > 5) {
+        _recentPatients.removeLast();
+      }
+    });
+  }
+
+  Widget _recentPatientsStrip() {
+    if (_recentPatients.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.history_rounded, size: 13, color: appInkMuted),
+              const SizedBox(width: 4),
+              Text(
+                'Recent Patients (Quick Select):',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: _recentPatients.map((p) {
+                final isSelected = _selectedPatient?.userId == p.userId;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      setState(() {
+                        _selectedPatient = p;
+                        _searchError = null;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isSelected ? secondaryColor.withValues(alpha: 0.15) : appSurfaceSubtle,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isSelected ? secondaryColor : appBorder,
+                          width: isSelected ? 1.2 : 1.0,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 9,
+                            backgroundColor: secondaryColor.withValues(alpha: 0.2),
+                            child: Text(
+                              _getInitials(p.userFullname),
+                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: tertiaryColor),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            p.userFullname ?? 'Patient',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                              color: isSelected ? secondaryColor : appInkPrimary,
+                            ),
+                          ),
+                          if (p.totalPoint != null) ...[
+                            const SizedBox(width: 4),
+                            Text(
+                              '(${p.totalPoint} pts)',
+                              style: TextStyle(fontSize: 10, color: appInkMuted),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _quickAmountPresets() {
+    final presets = [
+      {'label': 'RM 80', 'sub': 'Dating', 'val': 80.0},
+      {'label': 'RM 150', 'sub': 'Detail', 'val': 150.0},
+      {'label': 'RM 200', 'sub': '4D/5D', 'val': 200.0},
+      {'label': 'RM 250', 'sub': 'Full', 'val': 250.0},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Quick Scan Presets:',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
+            ),
+            const Spacer(),
+            InkWell(
+              borderRadius: BorderRadius.circular(4),
+              onTap: () {
+                final current = double.tryParse(_amount.controller.text) ?? 0.0;
+                final next = current + 50.0;
+                setState(() {
+                  _amount.controller.text = next.toStringAsFixed(0);
+                  if (_amount.errorMessage != null) _amount.errorMessage = null;
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Text(
+                  '+RM 50',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: accessibleAccent(const Color(0xFF4F46E5)),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: presets.map((preset) {
+            final val = preset['val'] as double;
+            final currentVal = double.tryParse(_amount.controller.text) ?? 0.0;
+            final isMatch = (currentVal - val).abs() < 0.01;
+
+            return InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                setState(() {
+                  _amount.controller.text = val.toStringAsFixed(0);
+                  if (_amount.errorMessage != null) _amount.errorMessage = null;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isMatch ? secondaryColor.withValues(alpha: 0.15) : appSurface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isMatch ? secondaryColor : appBorder,
+                    width: isMatch ? 1.3 : 1.0,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      preset['label'] as String,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: isMatch ? secondaryColor : appInkPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${preset['sub']})',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: isMatch ? secondaryColor.withValues(alpha: 0.8) : appInkMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _liveBalancePreviewCard() {
+    final patient = _selectedPatient!;
+    final currentPoints = patient.totalPoint ?? 0;
+    final earned = _calculateTotalPoints(_amount.controller.text);
+    final newTotal = currentPoints + earned;
+    final newRmValue = (newTotal / 10).toStringAsFixed(2);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: appInfoSoft,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: accessibleAccent(const Color(0xFF6366F1)).withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Aurora3DStarBadge(size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Live Points Balance Preview',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: appInfoText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _balanceStepTile(
+                  label: 'Current',
+                  value: '$currentPoints pts',
+                  color: appInkSecondary,
+                ),
+              ),
+              Icon(Icons.arrow_forward_rounded, size: 16, color: appInkMuted),
+              Expanded(
+                child: _balanceStepTile(
+                  label: 'This Payment',
+                  value: '+$earned pts',
+                  color: const Color(0xFF10B981),
+                ),
+              ),
+              Icon(Icons.arrow_forward_rounded, size: 16, color: appInkMuted),
+              Expanded(
+                child: _balanceStepTile(
+                  label: 'New Balance',
+                  value: '$newTotal pts',
+                  color: accessibleAccent(const Color(0xFF4F46E5)),
+                  bold: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: appSurface.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.record_voice_over_rounded, size: 13, color: appInkMuted),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Frontdesk prompt: "Puan ${patient.userFullname}, anda kini ada $newTotal mata (bernilai RM $newRmValue diskaun)!"',
+                    style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: appInkSecondary),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _balanceStepTile({
+    required String label,
+    required String value,
+    required Color color,
+    bool bold = false,
+  }) {
+    return Column(
+      children: [
+        Text(label, style: TextStyle(fontSize: 10.5, color: appInkMuted)),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: bold ? 13 : 12,
+            fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _sendWhatsAppPointsReceipt({
+    required UserResponse patient,
+    required int earnedPoints,
+    required double paymentAmount,
+    required int newTotalPoints,
+  }) async {
+    final rawPhone = (patient.userPhone ?? '').replaceAll(RegExp(r'[^0-9]'), '');
+    if (rawPhone.isEmpty) {
+      showDialogError(context, 'Patient has no phone number recorded.');
+      return;
+    }
+    final formattedPhone = rawPhone.startsWith('60')
+        ? rawPhone
+        : (rawPhone.startsWith('0') ? '6$rawPhone' : '60$rawPhone');
+    final rmValue = (newTotalPoints / 10).toStringAsFixed(2);
+    final patientName = patient.userFullname ?? 'Pelanggan';
+
+    final text = '''
+*KLINIK AURORA — PENYATA MATA GANJARAN (AURORA REWARDS)* 🌟
+
+Assalamualaikum & Salam Sejahtera *$patientName*,
+
+Mata ganjaran kesetiaan anda telah berjaya dikreditkan ke akaun Klinik Aurora anda:
+
+💵 *Jumlah Bayaran:* RM ${paymentAmount.toStringAsFixed(2)}
+⭐ *Mata Diperoleh:* +$earnedPoints pts
+🏆 *Jumlah Terkini:* $newTotalPoints pts (Bernilai ~RM $rmValue)
+
+_Tebus mata ganjaran anda untuk diskaun rawatan, konsultasi & imbasan seterusnya di mana-mana cawangan Klinik Aurora._
+
+Layari aplikasi Klinik Aurora untuk semakan baki dan temujanji anda.
+Terima kasih kerana mempercayai Klinik Aurora! 🌸
+''';
+
+    final uri = Uri.parse('https://wa.me/$formattedPhone?text=${Uri.encodeComponent(text)}');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      showDialogError(context, 'Could not open WhatsApp.');
+    }
+  }
+
+  void _showAwardSuccessDialog({
+    required UserResponse patient,
+    required int earnedPoints,
+    required double paymentAmount,
+    required int newTotalPoints,
+  }) {
+    final rmValue = (newTotalPoints / 10).toStringAsFixed(2);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext ctx) {
+        return Dialog(
+          backgroundColor: appSurface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            width: 440,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Aurora3DStarBadge(size: 52),
+                const SizedBox(height: 14),
+                Text(
+                  'Points Awarded Successfully!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: appInkPrimary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Awarded +$earnedPoints pts to ${patient.userFullname}',
+                  style: TextStyle(fontSize: 13, color: appInkSecondary),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2ECC40).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF2ECC40).withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          const Text(
+                            'NEW TOTAL BALANCE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E822B),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$newTotalPoints pts',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF1E822B)),
+                          ),
+                          Text(
+                            '≈ RM $rmValue redemption value',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // 1-Tap WhatsApp Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 42,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _sendWhatsAppPointsReceipt(
+                        patient: patient,
+                        earnedPoints: earnedPoints,
+                        paymentAmount: paymentAmount,
+                        newTotalPoints: newTotalPoints,
+                      );
+                    },
+                    icon: const Icon(Icons.send_rounded, size: 16, color: Colors.white),
+                    label: const Text(
+                      '1-Tap WhatsApp Receipt to Patient',
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25D366),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 38,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: appInkPrimary,
+                      side: BorderSide(color: appBorderStrong),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  bool _isToday(String? dateStr) {
+    if (dateStr == null) return false;
+    try {
+      final d = DateTime.tryParse(dateStr);
+      if (d != null) {
+        final now = DateTime.now();
+        return d.year == now.year && d.month == now.month && d.day == now.day;
+      }
+    } catch (_) {}
+    return false;
+  }
+
   String _getInitials(String? fullname) {
     if (fullname == null || fullname.trim().isEmpty) return 'P';
     final parts = fullname.trim().split(RegExp(r'\s+'));
@@ -983,7 +1475,11 @@ class _PointHomepageState extends State<PointHomepage> {
     return CardContainer(
       Consumer<PointManagementController>(
         builder: (context, snapshot, _) {
-          final items = snapshot.userPointsResponse?.data ?? [];
+          final allItems = snapshot.userPointsResponse?.data ?? [];
+          final todayItems = allItems.where((it) => _isToday(it.createdDate)).toList();
+          final items = _filterTodayOnly ? todayItems : allItems;
+          final todayCount = todayItems.length;
+          final todayPoints = todayItems.fold<int>(0, (sum, it) => sum + (it.totalPoint ?? 0));
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1005,7 +1501,7 @@ class _PointHomepageState extends State<PointHomepage> {
                     const SizedBox(width: 10),
                     Text('Points Activity Log', style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 2)),
                     const Spacer(),
-                    if (items.isNotEmpty)
+                    if (allItems.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
@@ -1027,6 +1523,98 @@ class _PointHomepageState extends State<PointHomepage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 8),
+
+              // Segmented Shift Switcher: [ All History ] [ Today's Shift ]
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenPadding),
+                child: Row(
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => setState(() => _filterTodayOnly = false),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: !_filterTodayOnly ? secondaryColor.withValues(alpha: 0.15) : appSurfaceSubtle,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: !_filterTodayOnly ? secondaryColor : appBorder),
+                        ),
+                        child: Text(
+                          'All History ($_totalCount)',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: !_filterTodayOnly ? FontWeight.w700 : FontWeight.w500,
+                            color: !_filterTodayOnly ? secondaryColor : appInkSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => setState(() => _filterTodayOnly = true),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _filterTodayOnly ? const Color(0xFF2ECC40).withValues(alpha: 0.15) : appSurfaceSubtle,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: _filterTodayOnly ? const Color(0xFF2ECC40) : appBorder),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.today_rounded,
+                              size: 13,
+                              color: _filterTodayOnly ? const Color(0xFF2ECC40) : appInkMuted,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "Today's Shift ($todayCount)",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: _filterTodayOnly ? FontWeight.w700 : FontWeight.w500,
+                                color: _filterTodayOnly ? const Color(0xFF2ECC40) : appInkSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_filterTodayOnly) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenPadding),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2ECC40).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFF2ECC40).withValues(alpha: 0.25)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.bolt_rounded, size: 14, color: Color(0xFF2ECC40)),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '$todayCount patients rewarded · $todayPoints pts issued today',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1E822B),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               const Divider(height: 1),
 
@@ -1229,6 +1817,7 @@ class _PointHomepageState extends State<PointHomepage> {
           setState(() {
             _selectedPatient = results.first;
           });
+          _addRecentPatient(results.first);
         }
       } else {
         showDialogError(context, 'No patient found matching "$query".');
@@ -1242,6 +1831,7 @@ class _PointHomepageState extends State<PointHomepage> {
   Future<void> _confirmAwardPoints(UserResponse item, int totalPoint) async {
     final selected = _availableModifiers.where((m) => _selectedModifiers.contains(m.id)).toList();
     final bonusLine = selected.isEmpty ? '' : '\n\nBonuses: ${selected.map((m) => m.itemName).join(', ')}';
+    final paymentAmount = double.tryParse(_amount.controller.text) ?? 0.0;
 
     if (await showConfirmDialog(
       context,
@@ -1253,7 +1843,7 @@ class _PointHomepageState extends State<PointHomepage> {
         CreatePointRequest(
           userId: item.userId,
           totalPoint: totalPoint,
-          amount: double.tryParse(_amount.controller.text),
+          amount: paymentAmount,
           modifierIds: selected.map((m) => m.id).toList(),
           pointDescription:
               'Earned $totalPoint point${totalPoint == 1 ? '' : 's'} for RM ${_amount.controller.text} payment${selected.isNotEmpty ? ' (Includes bonuses)' : ''}',
@@ -1261,14 +1851,21 @@ class _PointHomepageState extends State<PointHomepage> {
       ).then((value) {
         dismissLoading();
         if (responseCode(value.code)) {
-          showDialogSuccess(context, 'Points awarded to ${item.userFullname}.');
+          final newTotal = (item.totalPoint ?? 0) + totalPoint;
           setState(() {
             // Live update patient balance in hero card!
-            item.totalPoint = (item.totalPoint ?? 0) + totalPoint;
+            item.totalPoint = newTotal;
             _amount.controller.text = '';
             _selectedModifiers.clear();
           });
+          _addRecentPatient(item);
           runFiltering();
+          _showAwardSuccessDialog(
+            patient: item,
+            earnedPoints: totalPoint,
+            paymentAmount: paymentAmount,
+            newTotalPoints: newTotal,
+          );
         } else {
           showDialogError(context, value.message ?? value.data?.message ?? 'error'.tr(gender: 'err-7'));
         }

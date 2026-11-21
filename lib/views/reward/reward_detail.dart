@@ -510,14 +510,14 @@ class _RewardDetailState extends State<RewardDetail> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                    color: isActive ? appSuccessText : appDangerText,
                   ),
                 ),
                 Text(
                   isActive ? 'Patients can redeem this item' : 'Hidden from patient reward catalog',
                   style: TextStyle(
                     fontSize: 11,
-                    color: isActive ? const Color(0xFF166534) : const Color(0xFF991B1B),
+                    color: isActive ? appSuccessText : appDangerText,
                   ),
                 ),
               ],

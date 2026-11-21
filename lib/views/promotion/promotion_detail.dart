@@ -521,14 +521,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: _promotionStatus ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                    color: _promotionStatus ? appSuccessText : appDangerText,
                   ),
                 ),
                 Text(
                   _promotionStatus ? 'Publicly visible to patients' : 'Hidden from promotions list',
                   style: TextStyle(
                     fontSize: 11,
-                    color: _promotionStatus ? const Color(0xFF166534) : const Color(0xFF991B1B),
+                    color: _promotionStatus ? appSuccessText : appDangerText,
                   ),
                 ),
               ],

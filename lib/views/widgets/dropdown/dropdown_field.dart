@@ -25,7 +25,7 @@ class _AppDropdownState extends State<AppDropdown> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 768;
     final hasLongItem = widget.attributeList.items.any((it) => it.name.length > 20);
-    final autoMenuWidth = hasLongItem ? (isMobile ? 320.0 : 420.0) : null;
+    final autoMenuWidth = hasLongItem ? (isMobile ? 340.0 : 460.0) : null;
     final effectiveMenuWidth = widget.attributeList.menuWidth ?? autoMenuWidth;
 
     // Wrapped in InputDecorator (the same chrome TextFormField uses under the

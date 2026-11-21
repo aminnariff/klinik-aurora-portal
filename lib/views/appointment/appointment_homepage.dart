@@ -487,7 +487,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             ),
             const SizedBox(width: 8),
             SizedBox(
-              width: isMobile ? 200 : 280,
+              width: isMobile ? 220 : 320,
               child: !_branchesLoaded && branches.isEmpty
                   ? Center(
                       child: Text('Loading...', style: TextStyle(fontSize: 12, color: appInkMuted)),
@@ -512,8 +512,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             _refreshCalendarCounts();
                           }
                         },
-                        width: isMobile ? 200 : 280,
-                        menuWidth: isMobile ? 320 : 420,
+                        width: isMobile ? 220 : 320,
+                        menuWidth: isMobile ? 340 : 460,
                       ),
                     ),
             ),

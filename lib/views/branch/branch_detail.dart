@@ -1020,7 +1020,7 @@ class _BranchDetailState extends State<BranchDetail> {
                           : "Branch is hidden from new bookings and patient listings",
                       style: TextStyle(
                         fontSize: 11,
-                        color: active ? const Color(0xFF166534) : const Color(0xFFB91C1C),
+                        color: active ? appSuccessText : appDangerText,
                       ),
                     ),
                   ],

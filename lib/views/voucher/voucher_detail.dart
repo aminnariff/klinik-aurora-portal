@@ -592,14 +592,14 @@ class _VoucherDetailState extends State<VoucherDetail> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                    color: isActive ? appSuccessText : appDangerText,
                   ),
                 ),
                 Text(
                   isActive ? 'Visible and redeemable by patients' : 'Hidden from patient redemption catalog',
                   style: TextStyle(
                     fontSize: 11,
-                    color: isActive ? const Color(0xFF166534) : const Color(0xFF991B1B),
+                    color: isActive ? appSuccessText : appDangerText,
                   ),
                 ),
               ],
