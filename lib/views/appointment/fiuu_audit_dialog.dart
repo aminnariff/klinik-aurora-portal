@@ -171,7 +171,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
                       color: appDangerSoft,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(_error!, style: const TextStyle(color: Color(0xFFB91C1C), fontSize: 13)),
+                    child: Text(_error!, style: TextStyle(color: appDangerText, fontSize: 13)),
                   ),
                 ],
                 const SizedBox(height: 12),
@@ -297,7 +297,7 @@ class _FiuuAuditDialogState extends State<FiuuAuditDialog> {
               ),
               Text(
                 amount != null ? currencyFormatter.format(amount) : (d.paymentAmount ?? '—'),
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF15803D)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appSuccessText),
               ),
             ],
           ),

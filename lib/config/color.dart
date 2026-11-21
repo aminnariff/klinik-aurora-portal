@@ -73,32 +73,69 @@ Color get appTooltipBg => _activeIsDark ? const Color(0xFF1E293B) : const Color(
 Color get appTooltipText => const Color(0xFFF8FAFC);
 Color get appTooltipBorder => _activeIsDark ? const Color(0xFF334155) : const Color(0xFF1E293B);
 
-/// Automatically brightens saturated light-mode colors (e.g. dark green, dark blue)
+/// Automatically brightens saturated light-mode colors (e.g. dark green, dark blue, indigo, amber, red)
 /// into high-contrast WCAG 4.5:1+ pastels in dark mode.
 Color accessibleAccent(Color color) {
   if (!_activeIsDark) return color;
+  // Greens
   if (color == const Color(0xFF16A34A) ||
       color == const Color(0xFF15803D) ||
+      color == const Color(0xFF166534) ||
+      color == const Color(0xFF065F46) ||
+      color == const Color(0xFF047857) ||
       color == const Color(0xFF059669)) {
     return const Color(0xFF4ADE80);
   }
+  // Blues
   if (color == const Color(0xFF2563EB) ||
       color == const Color(0xFF1D4ED8) ||
-      color == const Color(0xFF1E40AF)) {
+      color == const Color(0xFF1E40AF) ||
+      color == const Color(0xFF1E3A8A)) {
     return const Color(0xFF60A5FA);
   }
-  if (color == const Color(0xFF0D9488) || color == const Color(0xFF0F766E)) {
+  // Indigos / Purples
+  if (color == const Color(0xFF4F46E5) ||
+      color == const Color(0xFF6366F1) ||
+      color == const Color(0xFF4338CA) ||
+      color == const Color(0xFF3730A3) ||
+      color == const Color(0xFF312E81)) {
+    return const Color(0xFFA5B4FC);
+  }
+  // Sky / Cyans
+  if (color == const Color(0xFF0284C7) ||
+      color == const Color(0xFF0369A1) ||
+      color == const Color(0xFF075985)) {
+    return const Color(0xFF38BDF8);
+  }
+  // Teals
+  if (color == const Color(0xFF0D9488) ||
+      color == const Color(0xFF0F766E) ||
+      color == const Color(0xFF115E59) ||
+      color == const Color(0xFF134E4A)) {
     return const Color(0xFF2DD4BF);
   }
+  // Ambers / Browns / Oranges
   if (color == const Color(0xFFD97706) ||
       color == const Color(0xFFB45309) ||
+      color == const Color(0xFF92400E) ||
+      color == const Color(0xFF9A3412) ||
+      color == const Color(0xFFC2410C) ||
+      color == const Color(0xFFEA580C) ||
       color == const Color(0xFFF59E0B)) {
     return const Color(0xFFFBBF24);
   }
-  if (color == const Color(0xFF7C3AED) || color == const Color(0xFF6D28D9)) {
+  // Violets / Purples
+  if (color == const Color(0xFF7C3AED) ||
+      color == const Color(0xFF6D28D9) ||
+      color == const Color(0xFF5B21B6)) {
     return const Color(0xFFA78BFA);
   }
-  if (color == const Color(0xFFDC2626) || color == const Color(0xFFB91C1C)) {
+  // Reds
+  if (color == const Color(0xFFDC2626) ||
+      color == const Color(0xFFB91C1C) ||
+      color == const Color(0xFF991B1B) ||
+      color == const Color(0xFF7F1D1D) ||
+      color == const Color(0xFFEF4444)) {
     return const Color(0xFFF87171);
   }
   return color;

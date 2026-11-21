@@ -1292,11 +1292,11 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.security_outlined, size: 12, color: Color(0xFF92400E)),
+                                          Icon(Icons.security_outlined, size: 12, color: appWarningText),
                                           const SizedBox(width: 4),
                                           Text(
                                             'Keselamatan: $safety',
-                                            style: const TextStyle(fontSize: 11, color: Color(0xFF92400E)),
+                                            style: TextStyle(fontSize: 11, color: appWarningText),
                                           ),
                                         ],
                                       ),
@@ -1311,11 +1311,11 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.tips_and_updates_outlined, size: 12, color: Color(0xFF065F46)),
+                                          Icon(Icons.tips_and_updates_outlined, size: 12, color: appSuccessText),
                                           const SizedBox(width: 4),
                                           Text(
                                             'Tip: $savingTip',
-                                            style: const TextStyle(fontSize: 11, color: Color(0xFF065F46)),
+                                            style: TextStyle(fontSize: 11, color: appSuccessText),
                                           ),
                                         ],
                                       ),

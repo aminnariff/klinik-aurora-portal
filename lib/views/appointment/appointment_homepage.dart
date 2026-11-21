@@ -1395,7 +1395,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                               Expanded(
                                 child: Text(
                                   serviceName,
-                                  style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                                  style: TextStyle(fontSize: 12.5, color: appInkSecondary),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),

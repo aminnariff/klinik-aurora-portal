@@ -881,7 +881,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
       decoration: BoxDecoration(color: appInfoSoft, borderRadius: BorderRadius.circular(6)),
       child: Text(
         label,
-        style: const TextStyle(fontSize: 11, color: Color(0xFF4338CA), fontWeight: FontWeight.w500),
+        style: TextStyle(fontSize: 11, color: appInfoText, fontWeight: FontWeight.w500),
         overflow: TextOverflow.ellipsis,
       ),
     );
@@ -899,7 +899,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+          color: isActive ? appSuccessText : appDangerText,
         ),
       ),
     );

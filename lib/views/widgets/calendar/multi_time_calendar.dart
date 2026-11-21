@@ -1034,35 +1034,35 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
               decoration: BoxDecoration(
                 color: appWarningSoft,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFFFEDD5)),
+                border: Border.all(color: appIsDarkMode ? const Color(0xFF78350F) : const Color(0xFFFFEDD5)),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.warning_amber_rounded, color: Color(0xFFEA580C), size: 18),
-                      SizedBox(width: 8),
+                      Icon(Icons.warning_amber_rounded, color: appWarningText, size: 18),
+                      const SizedBox(width: 8),
                       Text(
                         'Critical Sync Warnings',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF9A3412)),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: appWarningText),
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     '• This action will OVERRIDE all existing timing for the selected services, even if they have different slot intervals.',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF9A3412), height: 1.4),
+                    style: TextStyle(fontSize: 11, color: appWarningText, height: 1.4),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     '• Safety: Bookings will still be blocked if the same practitioner (Doctor Type) is already scheduled during these times.',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF9A3412), height: 1.4),
+                    style: TextStyle(fontSize: 11, color: appWarningText, height: 1.4),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     '• Pruning: We automatically remove all past dates to optimize system performance and storage.',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF9A3412), height: 1.4, fontStyle: FontStyle.italic),
+                    style: TextStyle(fontSize: 11, color: appWarningText, height: 1.4, fontStyle: FontStyle.italic),
                   ),
                 ],
               ),

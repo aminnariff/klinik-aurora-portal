@@ -562,7 +562,7 @@ class _AdminDetailState extends State<AdminDetail> {
             if (isSuperAdmin)
               TextButton.icon(
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF4F46E5),
+                  foregroundColor: accessibleAccent(const Color(0xFF4F46E5)),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -597,7 +597,7 @@ class _AdminDetailState extends State<AdminDetail> {
           width: 3,
           height: 14,
           decoration: BoxDecoration(
-            color: const Color(0xFF4F46E5),
+            color: accessibleAccent(const Color(0xFF4F46E5)),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -794,10 +794,10 @@ class _AdminDetailState extends State<AdminDetail> {
                 width: cardWidth,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected ? preset.color.withValues(alpha: 0.08) : appSurface,
+                  color: isSelected ? accessibleAccent(preset.color).withValues(alpha: 0.12) : appSurface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isSelected ? preset.color : appBorder,
+                    color: isSelected ? accessibleAccent(preset.color) : appBorder,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -810,18 +810,18 @@ class _AdminDetailState extends State<AdminDetail> {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: isSelected ? preset.color : preset.color.withValues(alpha: 0.12),
+                            color: isSelected ? accessibleAccent(preset.color) : accessibleAccent(preset.color).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Icon(
                             preset.icon,
                             size: 16,
-                            color: isSelected ? Colors.white : preset.color,
+                            color: isSelected ? Colors.white : accessibleAccent(preset.color),
                           ),
                         ),
                         const Spacer(),
                         if (isSelected)
-                          Icon(Icons.check_circle_rounded, size: 16, color: preset.color)
+                          Icon(Icons.check_circle_rounded, size: 16, color: accessibleAccent(preset.color))
                         else
                           Icon(Icons.radio_button_unchecked_rounded, size: 16, color: appBorderStrong),
                       ],
@@ -832,7 +832,7 @@ class _AdminDetailState extends State<AdminDetail> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: isSelected ? preset.color : appInkPrimary,
+                        color: isSelected ? accessibleAccent(preset.color) : appInkPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -842,7 +842,7 @@ class _AdminDetailState extends State<AdminDetail> {
                       preset.subtitle,
                       style: TextStyle(
                         fontSize: 11,
-                        color: isSelected ? preset.color.withValues(alpha: 0.9) : appInkMuted,
+                        color: isSelected ? accessibleAccent(preset.color).withValues(alpha: 0.9) : appInkMuted,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -888,7 +888,11 @@ class _AdminDetailState extends State<AdminDetail> {
                 ),
                 child: Text(
                   "${selectedPermission.length}/${allPermissions.length} selected",
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF4F46E5)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: accessibleAccent(const Color(0xFF4F46E5)),
+                  ),
                 ),
               ),
               const Spacer(),
@@ -906,7 +910,14 @@ class _AdminDetailState extends State<AdminDetail> {
                         .toList();
                   });
                 },
-                child: const Text("Select All", style: TextStyle(fontSize: 11, color: Color(0xFF4F46E5))),
+                child: Text(
+                  "Select All",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: accessibleAccent(const Color(0xFF4F46E5)),
+                  ),
+                ),
               ),
               const SizedBox(width: 4),
               TextButton(
@@ -1048,7 +1059,8 @@ class _AdminDetailState extends State<AdminDetail> {
                         color: isChecked ? appInfoSoft : appSurface,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: isChecked ? const Color(0xFF6366F1) : appBorder,
+                          color: isChecked ? accessibleAccent(const Color(0xFF6366F1)) : appBorder,
+                          width: isChecked ? 1.2 : 1.0,
                         ),
                       ),
                       child: Row(
@@ -1057,7 +1069,7 @@ class _AdminDetailState extends State<AdminDetail> {
                           Icon(
                             isChecked ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
                             size: 16,
-                            color: isChecked ? const Color(0xFF4F46E5) : appInkMuted,
+                            color: isChecked ? accessibleAccent(const Color(0xFF4F46E5)) : appInkMuted,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -1065,7 +1077,9 @@ class _AdminDetailState extends State<AdminDetail> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: isChecked ? FontWeight.w600 : FontWeight.w400,
-                              color: isChecked ? const Color(0xFF312E81) : appInkPrimary,
+                              color: isChecked
+                                  ? (appIsDarkMode ? const Color(0xFFC7D2FE) : const Color(0xFF312E81))
+                                  : appInkPrimary,
                             ),
                           ),
                           if (isInactive) ...[
@@ -1076,9 +1090,9 @@ class _AdminDetailState extends State<AdminDetail> {
                                 color: appDangerSoft,
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Text(
+                              child: Text(
                                 "Inactive",
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFDC2626)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appDangerText),
                               ),
                             ),
                           ],
@@ -1130,7 +1144,7 @@ class _AdminDetailState extends State<AdminDetail> {
                   child: Icon(
                     isEditing ? Icons.edit_note_rounded : Icons.add_moderator_rounded,
                     size: 20,
-                    color: const Color(0xFF4F46E5),
+                    color: accessibleAccent(const Color(0xFF4F46E5)),
                   ),
                 ),
                 const SizedBox(width: 12),

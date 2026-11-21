@@ -2489,7 +2489,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     Expanded(
                       child: AppSelectableText(
                         patientNric!,
-                        style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                        style: TextStyle(fontSize: 12.5, color: appInkSecondary),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -2507,7 +2507,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     Expanded(
                       child: AppSelectableText(
                         patientPhone,
-                        style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                        style: TextStyle(fontSize: 12.5, color: appInkSecondary),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -2525,7 +2525,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     Expanded(
                       child: AppSelectableText(
                         patientEmail,
-                        style: const TextStyle(fontSize: 12.5, color: Color(0xFF4B5563)),
+                        style: TextStyle(fontSize: 12.5, color: appInkSecondary),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -2624,10 +2624,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     leading: CircleAvatar(
                       radius: 14,
-                      backgroundColor: const Color(0xFF6366F1).withAlpha(30),
+                      backgroundColor: accessibleAccent(const Color(0xFF6366F1)).withAlpha(30),
                       child: Text(
                         (u.userFullname ?? 'P').isNotEmpty ? (u.userFullname ?? 'P')[0].toUpperCase() : 'P',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: accessibleAccent(const Color(0xFF6366F1))),
                       ),
                     ),
                     title: Text(
@@ -2937,10 +2937,10 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    children: const [
-                      Icon(Icons.payments_outlined, size: 14, color: Color(0xFF0369A1)),
-                      SizedBox(width: 6),
-                      Text('Booking Fee', style: TextStyle(fontSize: 12, color: Color(0xFF4B5563))),
+                    children: [
+                      Icon(Icons.payments_outlined, size: 14, color: accessibleAccent(const Color(0xFF0369A1))),
+                      const SizedBox(width: 6),
+                      Text('Booking Fee', style: TextStyle(fontSize: 12, color: appInkSecondary)),
                     ],
                   ),
                   Row(
@@ -2952,7 +2952,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                             : (widget.appointment?.service?.serviceBookingFee != null
                                 ? 'RM ${widget.appointment!.service!.serviceBookingFee}'
                                 : 'N/A'),
-                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF0369A1)),
+                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: accessibleAccent(const Color(0xFF0369A1))),
                       ),
                       const SizedBox(width: 6),
                       showPaymentStatus(
@@ -2968,22 +2968,22 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 ],
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Divider(height: 1, color: appBorder),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    children: const [
-                      Icon(Icons.receipt_long_outlined, size: 14, color: Color(0xFF6366F1)),
-                      SizedBox(width: 6),
-                      Text('Service Price', style: TextStyle(fontSize: 12, color: Color(0xFF4B5563))),
+                    children: [
+                      Icon(Icons.receipt_long_outlined, size: 14, color: accessibleAccent(const Color(0xFF6366F1))),
+                      const SizedBox(width: 6),
+                      Text('Service Price', style: TextStyle(fontSize: 12, color: appInkSecondary)),
                     ],
                   ),
                   Text(
                     servicePrice != null ? 'RM ${servicePrice.toStringAsFixed(2)}' : '—',
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF6366F1)),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: accessibleAccent(const Color(0xFF6366F1))),
                   ),
                 ],
               ),
@@ -3888,16 +3888,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               child: _isRefreshingSlots
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: accessibleAccent(const Color(0xFF4F46E5))),
                     )
                   : isCoolingDown
                       ? Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.refresh_rounded, size: 15, color: Color(0xFF4F46E5)),
+                            Icon(Icons.refresh_rounded, size: 15, color: accessibleAccent(const Color(0xFF4F46E5))),
                             const SizedBox(width: 3),
                             Text(
                               '${_refreshCooldownSeconds}s',
@@ -3908,7 +3908,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       : Icon(
                           Icons.refresh_rounded,
                           size: 18,
-                          color: isDisabled ? appInkMuted.withAlpha(120) : const Color(0xFF4F46E5),
+                          color: isDisabled ? appInkMuted.withAlpha(120) : accessibleAccent(const Color(0xFF4F46E5)),
                         ),
             ),
           ),
@@ -3933,7 +3933,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               color: isDisabled ? appSurfaceSubtle : appInfoSoft,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: isDisabled ? appBorder : const Color(0xFFC7D2FE),
+                color: isDisabled
+                    ? appBorder
+                    : (appIsDarkMode ? const Color(0xFF1E3A8A) : const Color(0xFFC7D2FE)),
                 width: 1,
               ),
             ),
@@ -3942,16 +3944,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (_isRefreshingSlots)
-                  const SizedBox(
+                  SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: accessibleAccent(const Color(0xFF4F46E5))),
                   )
                 else
                   Icon(
                     Icons.refresh_rounded,
                     size: 18,
-                    color: isDisabled ? appInkMuted : const Color(0xFF4F46E5),
+                    color: isDisabled ? appInkMuted : accessibleAccent(const Color(0xFF4F46E5)),
                   ),
                 if (isCoolingDown) ...[
                   const SizedBox(width: 4),

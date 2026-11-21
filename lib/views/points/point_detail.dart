@@ -621,14 +621,20 @@ class _PointDetailState extends State<PointDetail> {
                   decoration: BoxDecoration(
                     color: isSufficient ? appInfoSoft : appDangerSoft,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: isSufficient ? const Color(0xFFBFDBFE) : const Color(0xFFFECACA)),
+                    border: Border.all(
+                      color: isSufficient
+                          ? (appIsDarkMode ? const Color(0xFF1E3A8A) : const Color(0xFFBFDBFE))
+                          : (appIsDarkMode ? const Color(0xFF7F1D1D) : const Color(0xFFFECACA)),
+                    ),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         isSufficient ? Icons.info_outline_rounded : Icons.warning_amber_rounded,
                         size: 16,
-                        color: isSufficient ? const Color(0xFF1D4ED8) : const Color(0xFFDC2626),
+                        color: isSufficient
+                            ? accessibleAccent(const Color(0xFF1D4ED8))
+                            : accessibleAccent(const Color(0xFFDC2626)),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -639,7 +645,7 @@ class _PointDetailState extends State<PointDetail> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: isSufficient ? const Color(0xFF1E40AF) : const Color(0xFFB91C1C),
+                            color: isSufficient ? appInfoText : appDangerText,
                           ),
                         ),
                       ),

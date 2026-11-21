@@ -243,16 +243,16 @@ class PatientClinicalCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: appDangerSoft,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFFECACA)),
+          border: Border.all(color: appIsDarkMode ? const Color(0xFF7F1D1D) : const Color(0xFFFECACA)),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.alarm_rounded, size: 12, color: Color(0xFFDC2626)),
-            SizedBox(width: 4),
+            Icon(Icons.alarm_rounded, size: 12, color: appDangerText),
+            const SizedBox(width: 4),
             Text(
               'Overdue',
-              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: appDangerText),
             ),
           ],
         ),
@@ -265,16 +265,16 @@ class PatientClinicalCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: appWarningSoft,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFFDE68A)),
+          border: Border.all(color: appIsDarkMode ? const Color(0xFF78350F) : const Color(0xFFFDE68A)),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning_amber_rounded, size: 12, color: Color(0xFFD97706)),
-            SizedBox(width: 4),
+            Icon(Icons.warning_amber_rounded, size: 12, color: appWarningText),
+            const SizedBox(width: 4),
             Text(
               'Pergerakan Rendah',
-              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: appWarningText),
             ),
           ],
         ),
@@ -286,16 +286,16 @@ class PatientClinicalCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appSuccessSoft,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: appSuccessSoft),
+        border: Border.all(color: appIsDarkMode ? const Color(0xFF166534) : const Color(0xFFBBF7D0)),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle_outline_rounded, size: 12, color: Color(0xFF15803D)),
-          SizedBox(width: 4),
+          Icon(Icons.check_circle_outline_rounded, size: 12, color: appSuccessText),
+          const SizedBox(width: 4),
           Text(
             'Stabil',
-            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: appSuccessText),
           ),
         ],
       ),

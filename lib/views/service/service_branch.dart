@@ -172,7 +172,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                             const SizedBox(width: 4),
                                             Text(
                                               item?.serviceTime ?? '—',
-                                              style: const TextStyle(fontSize: 12, color: Color(0xFF4B5563)),
+                                              style: TextStyle(fontSize: 12, color: appInkSecondary),
                                             ),
                                             if (item?.branchServiceTime != null && item!.branchServiceTime!.trim().isNotEmpty) ...[
                                               const SizedBox(width: 6),
@@ -181,11 +181,11 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                 decoration: BoxDecoration(
                                                   color: appWarningSoft,
                                                   borderRadius: BorderRadius.circular(4),
-                                                  border: Border.all(color: const Color(0xFFFDE68A)),
+                                                  border: Border.all(color: appIsDarkMode ? const Color(0xFF78350F) : const Color(0xFFFDE68A)),
                                                 ),
-                                                child: const Text(
+                                                child: Text(
                                                   'Custom',
-                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appWarningText),
                                                 ),
                                               ),
                                             ],
@@ -196,11 +196,11 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                                 decoration: BoxDecoration(
                                                   color: appInfoSoft,
                                                   borderRadius: BorderRadius.circular(4),
-                                                  border: Border.all(color: const Color(0xFFC7D2FE)),
+                                                  border: Border.all(color: appIsDarkMode ? const Color(0xFF1E3A8A) : const Color(0xFFC7D2FE)),
                                                 ),
-                                                child: const Text(
+                                                child: Text(
                                                   'Rules Active',
-                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF4338CA)),
+                                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInfoText),
                                                 ),
                                               ),
                                             ],

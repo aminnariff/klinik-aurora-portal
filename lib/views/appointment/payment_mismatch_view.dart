@@ -418,7 +418,7 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
       children: [
         Text(
           amount != null ? currencyFormatter.format(amount) : (item.paymentAmount ?? '—'),
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF15803D)),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appSuccessText),
         ),
         Text(
           '${item.gatewayLabel}${item.paymentReceiptNo != null && item.paymentReceiptNo!.isNotEmpty ? ' · ${item.paymentReceiptNo}' : ''}',
@@ -433,9 +433,9 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
               margin: const EdgeInsets.only(top: 3),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(color: appWarningSoft, borderRadius: BorderRadius.circular(10)),
-              child: const Text(
+              child: Text(
                 '⚠ record shows Failed',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appWarningText),
               ),
             ),
           ),
@@ -450,19 +450,19 @@ class _PaymentMismatchPageState extends State<PaymentMismatchPage> {
       child: OutlinedButton.icon(
         onPressed: isResolving ? null : () => _reclaimSlot(item),
         icon: isResolving
-            ? const SizedBox(
+            ? SizedBox(
                 width: 14,
                 height: 14,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF059669)),
+                child: CircularProgressIndicator(strokeWidth: 2, color: accessibleAccent(const Color(0xFF059669))),
               )
-            : const Icon(Icons.event_available_rounded, size: 15, color: Color(0xFF059669)),
+            : Icon(Icons.event_available_rounded, size: 15, color: accessibleAccent(const Color(0xFF059669))),
         label: Text(
           isResolving ? 'Working…' : 'Reclaim',
-          style: const TextStyle(fontSize: 12, color: Color(0xFF059669), fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 12, color: accessibleAccent(const Color(0xFF059669)), fontWeight: FontWeight.w600),
         ),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          side: const BorderSide(color: Color(0xFFA7F3D0)),
+          side: BorderSide(color: appIsDarkMode ? const Color(0xFF166534) : const Color(0xFFA7F3D0)),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),

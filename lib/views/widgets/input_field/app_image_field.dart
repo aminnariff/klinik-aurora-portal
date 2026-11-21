@@ -262,17 +262,17 @@ class _AppImageFieldState extends State<AppImageField> {
             decoration: BoxDecoration(
               color: appWarningSoft,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFFFDE68A)),
+              border: Border.all(color: appIsDarkMode ? const Color(0xFF78350F) : const Color(0xFFFDE68A)),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFD97706)),
-                SizedBox(width: 6),
+                Icon(Icons.info_outline_rounded, size: 14, color: appWarningText),
+                const SizedBox(width: 6),
                 Flexible(
                   child: Text(
                     'Image modified — click Update/Create to apply changes.',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF92400E)),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: appWarningText),
                   ),
                 ),
               ],
