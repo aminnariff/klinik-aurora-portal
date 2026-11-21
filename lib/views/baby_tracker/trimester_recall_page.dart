@@ -291,7 +291,6 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
                     child: _modeTab(
                       tab: _RecallTab.scanRecalls,
                       label: 'Clinical Scan Recalls',
-                      icon: Icons.baby_changing_station_rounded,
                       badge: _scanData != null ? '${_scanData!.pendingOutreachCount}' : null,
                       colors: colors,
                     ),
@@ -301,7 +300,6 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
                     child: _modeTab(
                       tab: _RecallTab.pointsReengagement,
                       label: 'Points Re-Engagement',
-                      icon: Icons.stars_rounded,
                       badge: _pointsData != null ? '${_pointsData!.uncontactedCount}' : null,
                       colors: colors,
                     ),
@@ -311,7 +309,6 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
                     child: _modeTab(
                       tab: _RecallTab.milestoneRules,
                       label: 'Milestone Bonus Scheme',
-                      icon: Icons.military_tech_rounded,
                       colors: colors,
                     ),
                   ),
@@ -357,7 +354,6 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
   Widget _modeTab({
     required _RecallTab tab,
     required String label,
-    required IconData icon,
     String? badge,
     required AppColors colors,
   }) {
@@ -381,8 +377,6 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 16, color: selected ? colors.brandPrimary : colors.inkMuted),
-            const SizedBox(width: 8),
             Flexible(
               child: Text(
                 label,
@@ -946,15 +940,9 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.military_tech_rounded, size: 24, color: colors.brandPrimary),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Pregnancy Scan Milestone Loyalty Rewards (Admin Scheme)',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: colors.inkPrimary),
-                    ),
-                  ],
+                Text(
+                  'Pregnancy Scan Milestone Loyalty Rewards (Admin Scheme)',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: colors.inkPrimary),
                 ),
                 const SizedBox(height: 6),
                 Text(
