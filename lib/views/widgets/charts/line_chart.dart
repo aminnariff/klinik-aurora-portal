@@ -26,8 +26,18 @@ class LineChartWidget extends StatelessWidget {
     minY: 0,
   );
 
-  LineTouchData get lineTouchData1 =>
-      LineTouchData(handleBuiltInTouches: true, touchTooltipData: LineTouchTooltipData());
+  LineTouchData get lineTouchData1 => LineTouchData(
+    handleBuiltInTouches: true,
+    touchTooltipData: LineTouchTooltipData(
+      getTooltipColor: (_) => appTooltipBg,
+      getTooltipItems: (spots) => spots.map((spot) {
+        return LineTooltipItem(
+          spot.y.toString(),
+          TextStyle(color: appTooltipText, fontWeight: FontWeight.bold, fontSize: 12),
+        );
+      }).toList(),
+    ),
+  );
 
   FlTitlesData get titlesData1 => FlTitlesData(
     bottomTitles: AxisTitles(sideTitles: bottomTitles),

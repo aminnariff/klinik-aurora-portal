@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/branch_performance_controller.dart';
 import 'package:klinik_aurora_portal/models/dashboard/branch_performance_response.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
@@ -220,7 +219,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
           maxY: maxY == 0 ? 10 : maxY * 1.3,
           barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
-              getTooltipColor: (_) => Colors.blueGrey.withAlpha(opacityCalculation(.85)),
+              getTooltipColor: (_) => appTooltipBg,
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                 final day = days[group.x];
                 final buffer = StringBuffer('${day.dd} ${day.mmm}\n');
@@ -236,7 +235,7 @@ class _BranchPerformanceChartState extends State<BranchPerformanceChart> {
                   if (count > 0) buffer.write('$b: $count\n');
                 }
                 buffer.write('Total: ${day.total ?? 0}');
-                return BarTooltipItem(buffer.toString(), const TextStyle(color: Colors.white, fontSize: 11));
+                return BarTooltipItem(buffer.toString(), TextStyle(color: appTooltipText, fontSize: 11, fontWeight: FontWeight.w600));
               },
             ),
           ),

@@ -60,6 +60,50 @@ Color get appInfoSoft => _activeIsDark ? const Color(0xFF0E2738) : const Color(0
 Color get appPurpleSoft => _activeIsDark ? const Color(0xFF271B3D) : const Color(0xFFF5F3FF);
 Color get appTealSoft => _activeIsDark ? const Color(0xFF0E2E30) : const Color(0xFFF0FDFA);
 
+// Live Theme-Aware Status Pill Text Colors (High-contrast, WCAG AA/AAA compliant)
+Color get appDangerText => _activeIsDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C);
+Color get appSuccessText => _activeIsDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D);
+Color get appWarningText => _activeIsDark ? const Color(0xFFFDE047) : const Color(0xFFB45309);
+Color get appInfoText => _activeIsDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8);
+Color get appPurpleText => _activeIsDark ? const Color(0xFFD8B4FE) : const Color(0xFF6D28D9);
+Color get appTealText => _activeIsDark ? const Color(0xFF5EEAD4) : const Color(0xFF0F766E);
+
+// Live Theme-Aware Chart Tooltip Styling (Always dark high-contrast pill with crisp white text)
+Color get appTooltipBg => _activeIsDark ? const Color(0xFF1E293B) : const Color(0xFF0F172A);
+Color get appTooltipText => const Color(0xFFF8FAFC);
+Color get appTooltipBorder => _activeIsDark ? const Color(0xFF334155) : const Color(0xFF1E293B);
+
+/// Automatically brightens saturated light-mode colors (e.g. dark green, dark blue)
+/// into high-contrast WCAG 4.5:1+ pastels in dark mode.
+Color accessibleAccent(Color color) {
+  if (!_activeIsDark) return color;
+  if (color == const Color(0xFF16A34A) ||
+      color == const Color(0xFF15803D) ||
+      color == const Color(0xFF059669)) {
+    return const Color(0xFF4ADE80);
+  }
+  if (color == const Color(0xFF2563EB) ||
+      color == const Color(0xFF1D4ED8) ||
+      color == const Color(0xFF1E40AF)) {
+    return const Color(0xFF60A5FA);
+  }
+  if (color == const Color(0xFF0D9488) || color == const Color(0xFF0F766E)) {
+    return const Color(0xFF2DD4BF);
+  }
+  if (color == const Color(0xFFD97706) ||
+      color == const Color(0xFFB45309) ||
+      color == const Color(0xFFF59E0B)) {
+    return const Color(0xFFFBBF24);
+  }
+  if (color == const Color(0xFF7C3AED) || color == const Color(0xFF6D28D9)) {
+    return const Color(0xFFA78BFA);
+  }
+  if (color == const Color(0xFFDC2626) || color == const Color(0xFFB91C1C)) {
+    return const Color(0xFFF87171);
+  }
+  return color;
+}
+
 Color get neutralDark => appInkPrimary;
 Color get neutralMuted => appInkMuted;
 Color get borderSubtle => appBorder;

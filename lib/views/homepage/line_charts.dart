@@ -40,7 +40,13 @@ class LineChartWidget extends StatelessWidget {
   LineTouchData get lineTouchData1 => LineTouchData(
     handleBuiltInTouches: true,
     touchTooltipData: LineTouchTooltipData(
-      // tooltipBgColor: Colors.blueGrey.withAlpha(opacityCalculation(.8)),
+      getTooltipColor: (_) => appTooltipBg,
+      getTooltipItems: (spots) => spots.map((spot) {
+        return LineTooltipItem(
+          spot.y.toString(),
+          TextStyle(color: appTooltipText, fontWeight: FontWeight.bold, fontSize: 12),
+        );
+      }).toList(),
     ),
   );
 

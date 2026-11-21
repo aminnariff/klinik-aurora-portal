@@ -49,7 +49,8 @@ class _DashboardMetricCardState extends State<DashboardMetricCard> {
   }
 
   Widget _accentBar(bool reduce) {
-    final track = Container(height: 3.5, color: widget.accentColor);
+    final color = accessibleAccent(widget.accentColor);
+    final track = Container(height: 3.5, color: color);
     if (!_valueChanged || reduce) return track;
     return Stack(
       children: [
@@ -142,10 +143,10 @@ class _DashboardMetricCardState extends State<DashboardMetricCard> {
                             Container(
                               padding: const EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                color: widget.accentColor.withValues(alpha: 0.1),
+                                color: accessibleAccent(widget.accentColor).withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: Icon(widget.icon, size: 14, color: widget.accentColor),
+                              child: Icon(widget.icon, size: 14, color: accessibleAccent(widget.accentColor)),
                             ),
                         ],
                       ),
@@ -162,7 +163,7 @@ class _DashboardMetricCardState extends State<DashboardMetricCard> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: widget.subtitleColor ?? widget.accentColor,
+                            color: accessibleAccent(widget.subtitleColor ?? widget.accentColor),
                           ),
                         ),
                       ],
@@ -173,8 +174,8 @@ class _DashboardMetricCardState extends State<DashboardMetricCard> {
                           child: LinearProgressIndicator(
                             value: widget.progress!.clamp(0.0, 1.0),
                             minHeight: 4,
-                            backgroundColor: widget.accentColor.withValues(alpha: 0.12),
-                            valueColor: AlwaysStoppedAnimation<Color>(widget.accentColor),
+                            backgroundColor: accessibleAccent(widget.accentColor).withValues(alpha: 0.14),
+                            valueColor: AlwaysStoppedAnimation<Color>(accessibleAccent(widget.accentColor)),
                           ),
                         ),
                       ],

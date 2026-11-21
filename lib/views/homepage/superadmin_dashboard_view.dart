@@ -287,7 +287,7 @@ class SuperadminDashboardView extends StatelessWidget {
                       maxY: maxY * 1.25,
                       lineTouchData: LineTouchData(
                         touchTooltipData: LineTouchTooltipData(
-                          getTooltipColor: (_) => appInkPrimary,
+                          getTooltipColor: (_) => appTooltipBg,
                           getTooltipItems: (touchedSpots) {
                             return touchedSpots.map((spot) {
                               final idx = spot.x.toInt();
@@ -298,7 +298,7 @@ class SuperadminDashboardView extends StatelessWidget {
                               final val = spot.y;
                               return LineTooltipItem(
                                 '$mName ${item?.year ?? ''}\nRM ${val.toStringAsFixed(2)}',
-                                const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                                TextStyle(color: appTooltipText, fontSize: 11, fontWeight: FontWeight.w600),
                               );
                             }).toList();
                           },
@@ -357,7 +357,7 @@ class SuperadminDashboardView extends StatelessWidget {
                             return FlSpot(idx.toDouble(), rev);
                           }).toList(),
                           isCurved: true,
-                          color: const Color(0xFF16A34A), // Green
+                          color: accessibleAccent(const Color(0xFF16A34A)),
                           barWidth: 3,
                           isStrokeCapRound: true,
                           dotData: FlDotData(
@@ -365,8 +365,8 @@ class SuperadminDashboardView extends StatelessWidget {
                             getDotPainter: (spot, percent, barData, index) {
                               return FlDotCirclePainter(
                                 radius: 4,
-                                color: const Color(0xFF16A34A),
-                                strokeColor: Colors.white,
+                                color: accessibleAccent(const Color(0xFF16A34A)),
+                                strokeColor: appSurface,
                                 strokeWidth: 2,
                               );
                             },
@@ -377,8 +377,8 @@ class SuperadminDashboardView extends StatelessWidget {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                const Color(0xFF16A34A).withValues(alpha: 0.2),
-                                const Color(0xFF16A34A).withValues(alpha: 0.0),
+                                accessibleAccent(const Color(0xFF16A34A)).withValues(alpha: 0.2),
+                                accessibleAccent(const Color(0xFF16A34A)).withValues(alpha: 0.0),
                               ],
                             ),
                           ),
@@ -429,8 +429,8 @@ class SuperadminDashboardView extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.leaderboard_rounded, size: 18, color: Color(0xFF2563EB)),
-                  SizedBox(width: 8),
+                  Icon(Icons.leaderboard_rounded, size: 18, color: accessibleAccent(const Color(0xFF2563EB))),
+                  const SizedBox(width: 8),
                   Text(
                     'Branch Performance Ranking',
                     style: TextStyle(
@@ -467,11 +467,11 @@ class SuperadminDashboardView extends StatelessWidget {
                 final pct = maxVal > 0 ? (count / maxVal) : 0.0;
 
                 final rankColor = rank == 1
-                    ? const Color(0xFF16A34A) // Green (1st)
+                    ? accessibleAccent(const Color(0xFF16A34A)) // Green (1st)
                     : rank == 2
-                        ? const Color(0xFF2563EB) // Blue (2nd)
+                        ? accessibleAccent(const Color(0xFF2563EB)) // Blue (2nd)
                         : rank == 3
-                            ? const Color(0xFFD97706) // Amber (3rd)
+                            ? accessibleAccent(const Color(0xFFD97706)) // Amber (3rd)
                             : appInkMuted;
 
                 return Column(
@@ -602,7 +602,7 @@ class SuperadminDashboardView extends StatelessWidget {
                         ),
                         Text(
                           '$count bookings  (RM ${revenue.toStringAsFixed(0)})',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF16A34A)),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appSuccessText),
                         ),
                       ],
                     ),
@@ -613,7 +613,7 @@ class SuperadminDashboardView extends StatelessWidget {
                         value: pct,
                         minHeight: 6,
                         backgroundColor: appSurfaceSubtle,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2563EB)),
+                        valueColor: AlwaysStoppedAnimation<Color>(accessibleAccent(const Color(0xFF2563EB))),
                       ),
                     ),
                   ],

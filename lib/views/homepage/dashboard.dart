@@ -245,7 +245,7 @@ class _MainDashboardState extends State<MainDashboard> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: isSuper && _selectedBranchId == null ? const Color(0xFF1D4ED8) : const Color(0xFF15803D),
+                        color: isSuper && _selectedBranchId == null ? appInfoText : appSuccessText,
                         letterSpacing: 0.5,
                       ),
                     ),

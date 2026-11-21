@@ -1304,16 +1304,16 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                     maxY: maxY == 0 ? 10 : maxY * 1.25,
                     barTouchData: BarTouchData(
                       touchTooltipData: BarTouchTooltipData(
-                        getTooltipColor: (_) => appInkPrimary,
+                        getTooltipColor: (_) => appTooltipBg,
                         tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
                           return BarTooltipItem(
                             '${dates[group.x]}\n',
-                            TextStyle(color: appInkMuted, fontSize: 11, fontWeight: FontWeight.w500),
+                            const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.w500),
                             children: [
                               TextSpan(
                                 text: 'RM ${rod.toY.toStringAsFixed(2)}',
-                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                                style: TextStyle(color: appTooltipText, fontSize: 12, fontWeight: FontWeight.w700),
                               ),
                             ],
                           );

@@ -276,9 +276,9 @@ class BranchDashboardView extends StatelessWidget {
               ),
               Row(
                 children: [
-                  _buildLegendIndicator(const Color(0xFF16A34A), 'Completed'),
+                  _buildLegendIndicator(accessibleAccent(const Color(0xFF16A34A)), 'Completed'),
                   const SizedBox(width: 12),
-                  _buildLegendIndicator(const Color(0xFF2563EB), 'Scheduled'),
+                  _buildLegendIndicator(accessibleAccent(const Color(0xFF2563EB)), 'Scheduled'),
                 ],
               ),
             ],
@@ -297,12 +297,12 @@ class BranchDashboardView extends StatelessWidget {
                         touchTooltipData: BarTouchTooltipData(
                           fitInsideHorizontally: true,
                           fitInsideVertically: true,
-                          getTooltipColor: (_) => appInkPrimary,
+                          getTooltipColor: (_) => appTooltipBg,
                           getTooltipItem: (group, groupIndex, rod, rodIndex) {
                             final item = activity[group.x];
                             return BarTooltipItem(
                               '${item.dayName ?? ''}\nCompleted: ${item.completed ?? 0}\nScheduled: ${item.scheduled ?? 0}',
-                              TextStyle(color: appSurface, fontSize: 12, fontWeight: FontWeight.w600),
+                              TextStyle(color: appTooltipText, fontSize: 12, fontWeight: FontWeight.w600),
                             );
                           },
                         ),
@@ -366,13 +366,13 @@ class BranchDashboardView extends StatelessWidget {
                           barRods: [
                             BarChartRodData(
                               toY: completed,
-                              color: const Color(0xFF16A34A),
+                              color: accessibleAccent(const Color(0xFF16A34A)),
                               width: 14,
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                             ),
                             BarChartRodData(
                               toY: scheduled,
-                              color: const Color(0xFF2563EB),
+                              color: accessibleAccent(const Color(0xFF2563EB)),
                               width: 14,
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                             ),
@@ -459,11 +459,11 @@ class BranchDashboardView extends StatelessWidget {
                   const SizedBox(width: 4),
                   _buildHeatmapLegendBox(appSurfaceSubtle),
                   const SizedBox(width: 3),
-                  _buildHeatmapLegendBox(const Color(0xFFCCFBF1)),
+                  _buildHeatmapLegendBox(appIsDarkMode ? const Color(0xFF133E3B) : const Color(0xFFCCFBF1)),
                   const SizedBox(width: 3),
-                  _buildHeatmapLegendBox(const Color(0xFF5EEAD4)),
+                  _buildHeatmapLegendBox(appIsDarkMode ? const Color(0xFF0E4E4A) : const Color(0xFF5EEAD4)),
                   const SizedBox(width: 3),
-                  _buildHeatmapLegendBox(const Color(0xFF0D9488)),
+                  _buildHeatmapLegendBox(accessibleAccent(const Color(0xFF0D9488))),
                   const SizedBox(width: 4),
                   Text(
                     'More',
@@ -516,13 +516,13 @@ class BranchDashboardView extends StatelessWidget {
                       bg = appSurfaceSubtle;
                       fg = appInkMuted;
                     } else if (total <= 3) {
-                      bg = const Color(0xFFCCFBF1);
-                      fg = primary;
+                      bg = appIsDarkMode ? const Color(0xFF133E3B) : const Color(0xFFCCFBF1);
+                      fg = appIsDarkMode ? const Color(0xFF5EEAD4) : primary;
                     } else if (total <= 8) {
-                      bg = const Color(0xFF5EEAD4);
-                      fg = const Color(0xFF134E4A);
+                      bg = appIsDarkMode ? const Color(0xFF0E4E4A) : const Color(0xFF5EEAD4);
+                      fg = appIsDarkMode ? const Color(0xFF99F6E4) : const Color(0xFF134E4A);
                     } else {
-                      bg = const Color(0xFF0D9488);
+                      bg = accessibleAccent(const Color(0xFF0D9488));
                       fg = Colors.white;
                     }
 
@@ -539,7 +539,7 @@ class BranchDashboardView extends StatelessWidget {
                               color: bg,
                               borderRadius: BorderRadius.circular(6),
                               border: isToday
-                                  ? Border.all(color: const Color(0xFF2563EB), width: 1.8)
+                                  ? Border.all(color: accessibleAccent(const Color(0xFF2563EB)), width: 1.8)
                                   : Border.all(color: Colors.transparent),
                             ),
                             child: Stack(
@@ -658,8 +658,8 @@ class BranchDashboardView extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.queue_play_next_rounded, size: 18, color: Color(0xFF2563EB)),
-                  SizedBox(width: 8),
+                  Icon(Icons.queue_play_next_rounded, size: 18, color: accessibleAccent(const Color(0xFF2563EB))),
+                  const SizedBox(width: 8),
                   Text(
                     'Next Patients Today',
                     style: TextStyle(
@@ -672,14 +672,14 @@ class BranchDashboardView extends StatelessWidget {
               ),
               InkWell(
                 onTap: () => context.go('/appointment'),
-                child: const Row(
+                child: Row(
                   children: [
                     Text(
                       'View Board',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF2563EB)),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInfoText),
                     ),
-                    SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF2563EB)),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_rounded, size: 12, color: appInfoText),
                   ],
                 ),
               ),
@@ -692,8 +692,8 @@ class BranchDashboardView extends StatelessWidget {
               alignment: Alignment.center,
               child: Column(
                 children: [
-                  Icon(Icons.check_circle_outline_rounded, size: 36, color: Color(0xFF16A34A)),
-                  SizedBox(height: 8),
+                  Icon(Icons.check_circle_outline_rounded, size: 36, color: accessibleAccent(const Color(0xFF16A34A))),
+                  const SizedBox(height: 8),
                   Text(
                     'No more scheduled patients for today',
                     style: TextStyle(fontSize: 12, color: appInkMuted, fontWeight: FontWeight.w600),
@@ -727,10 +727,10 @@ class BranchDashboardView extends StatelessWidget {
                         ),
                         child: Text(
                           formattedTime,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF1D4ED8),
+                            color: appInfoText,
                           ),
                         ),
                       ),
@@ -799,9 +799,9 @@ class BranchDashboardView extends StatelessWidget {
     final topServices = data?.topServices ?? [];
 
     final colors = [
-      const Color(0xFF2563EB), // Blue
-      const Color(0xFF16A34A), // Green
-      const Color(0xFFF59E0B), // Yellow/Amber
+      accessibleAccent(const Color(0xFF2563EB)), // Blue
+      accessibleAccent(const Color(0xFF16A34A)), // Green
+      accessibleAccent(const Color(0xFFF59E0B)), // Yellow/Amber
       appInkMuted, // Slate Gray
     ];
 
@@ -841,7 +841,7 @@ class BranchDashboardView extends StatelessWidget {
             decoration: BoxDecoration(
               color: appSuccessSoft,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFBBF7D0)),
+              border: Border.all(color: appIsDarkMode ? const Color(0xFF166534) : const Color(0xFFBBF7D0)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -849,22 +849,22 @@ class BranchDashboardView extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'MONTH-TO-DATE REVENUE',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF15803D),
+                        color: appSuccessText,
                         letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       currencyFormatter.format(revenue),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF15803D),
+                        color: appSuccessText,
                       ),
                     ),
                   ],
@@ -878,7 +878,7 @@ class BranchDashboardView extends StatelessWidget {
                       BoxShadow(color: Colors.green.withValues(alpha: 0.1), blurRadius: 4),
                     ],
                   ),
-                  child: const Icon(Icons.payments_rounded, color: Color(0xFF16A34A), size: 20),
+                  child: Icon(Icons.payments_rounded, color: accessibleAccent(const Color(0xFF16A34A)), size: 20),
                 ),
               ],
             ),

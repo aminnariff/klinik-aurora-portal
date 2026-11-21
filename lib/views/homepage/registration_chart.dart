@@ -240,11 +240,11 @@ class _RegistrationChartState extends State<RegistrationChart> {
     return LineTouchData(
       handleBuiltInTouches: true,
       touchTooltipData: LineTouchTooltipData(
-        getTooltipColor: (_) => Colors.blueGrey.withAlpha(opacityCalculation(.85)),
+        getTooltipColor: (_) => appTooltipBg,
         getTooltipItems: (spots) => spots.map((spot) {
           return LineTooltipItem(
             getLabel(spot),
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+            TextStyle(color: appTooltipText, fontWeight: FontWeight.bold, fontSize: 12),
           );
         }).toList(),
       ),

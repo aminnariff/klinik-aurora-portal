@@ -5,7 +5,6 @@ import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/payment/payment_controller.dart';
 import 'package:klinik_aurora_portal/models/payment/branch_payment_summary_response.dart';
-import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
@@ -450,11 +449,11 @@ class _BranchPaymentSummaryPageState extends State<BranchPaymentSummaryPage> {
                 maxY: maxVal == 0 ? 10 : maxVal * 1.3,
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => Colors.blueGrey.withAlpha(opacityCalculation(.85)),
+                    getTooltipColor: (_) => appTooltipBg,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
                         '${branches[group.x]}\nRM ${rod.toY.toStringAsFixed(2)}',
-                        const TextStyle(color: Colors.white, fontSize: 11),
+                        TextStyle(color: appTooltipText, fontSize: 11, fontWeight: FontWeight.w600),
                       );
                     },
                   ),

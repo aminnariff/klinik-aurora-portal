@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/dashboard/dashboard_controller.dart';
 import 'package:klinik_aurora_portal/models/dashboard/dashboard_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
@@ -126,7 +127,7 @@ class _Graph2WidgetState extends State<Graph2Widget> {
   LineTouchData get lineTouchData => LineTouchData(
     handleBuiltInTouches: true,
     touchTooltipData: LineTouchTooltipData(
-      getTooltipColor: (touchedSpot) => Colors.blueGrey.withAlpha(opacityCalculation(.8)),
+      getTooltipColor: (touchedSpot) => appTooltipBg,
       getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
         return touchedBarSpots.map((barSpot) {
           final flSpot = barSpot;
@@ -135,12 +136,12 @@ class _Graph2WidgetState extends State<Graph2Widget> {
           }
           return LineTooltipItem(
             '${flSpot.y.toInt()} \n',
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            TextStyle(color: appTooltipText, fontWeight: FontWeight.bold),
             children: [
               TextSpan(
                 text: 'Registrations',
-                style: TextStyle(
-                  color: Colors.white.withAlpha(opacityCalculation(.8)),
+                style: const TextStyle(
+                  color: Color(0xFF94A3B8),
                   fontWeight: FontWeight.normal,
                   fontSize: 11,
                 ),
