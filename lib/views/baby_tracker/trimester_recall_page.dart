@@ -98,46 +98,52 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
       _error = null;
     });
 
-    if (_activeTab == _RecallTab.scanRecalls) {
-      final res = await PatientRecallController.fetch(
-        context,
-        branchId: _selectedBranchId,
-        milestone: _milestone,
-        onlyUnbooked: _onlyUnbooked,
-      );
-      if (!mounted) return;
-      if (responseCode(res.code) && res.data != null) {
+    try {
+      if (_activeTab == _RecallTab.scanRecalls) {
+        final res = await PatientRecallController.fetch(
+          context,
+          branchId: _selectedBranchId,
+          milestone: _milestone,
+          onlyUnbooked: _onlyUnbooked,
+        );
+        if (!mounted) return;
+        if (responseCode(res.code) && res.data != null) {
+          setState(() {
+            _scanData = res.data;
+          });
+        } else {
+          setState(() {
+            _error = res.message ?? 'Failed to load recall reminders.';
+          });
+        }
+      } else if (_activeTab == _RecallTab.pointsReengagement) {
+        final res = await PointsReengagementController.fetch(
+          context,
+          branchId: _selectedBranchId,
+          minPoints: 50,
+          onlyUnbooked: _onlyUnbooked,
+        );
+        if (!mounted) return;
+        if (responseCode(res.code) && res.data != null) {
+          setState(() {
+            _pointsData = res.data;
+          });
+        } else {
+          setState(() {
+            _error = res.message ?? 'Failed to load points re-engagement list.';
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
-          _scanData = res.data;
-          _loading = false;
-        });
-      } else {
-        setState(() {
-          _error = res.message ?? 'Failed to load recall reminders.';
-          _loading = false;
+          _error = 'Error loading follow-up data: $e';
         });
       }
-    } else if (_activeTab == _RecallTab.pointsReengagement) {
-      final res = await PointsReengagementController.fetch(
-        context,
-        branchId: _selectedBranchId,
-        minPoints: 50,
-        onlyUnbooked: _onlyUnbooked,
-      );
-      if (!mounted) return;
-      if (responseCode(res.code) && res.data != null) {
-        setState(() {
-          _pointsData = res.data;
-          _loading = false;
-        });
-      } else {
-        setState(() {
-          _error = res.message ?? 'Failed to load points re-engagement list.';
-          _loading = false;
-        });
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
       }
-    } else {
-      setState(() => _loading = false);
     }
   }
 
@@ -319,7 +325,23 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
               child: _loading
                   ? Center(child: CircularProgressIndicator(color: colors.brandPrimary))
                   : _error != null
-                      ? Center(child: Text(_error!, style: TextStyle(color: colors.danger)))
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.sync_problem_rounded, size: 44, color: colors.danger),
+                              const SizedBox(height: 12),
+                              Text(_error!, style: TextStyle(color: colors.danger, fontSize: 13, fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                onPressed: _fetch,
+                                icon: const Icon(Icons.refresh_rounded, size: 16),
+                                label: const Text('Retry'),
+                                style: ElevatedButton.styleFrom(backgroundColor: colors.brandPrimary, foregroundColor: Colors.white),
+                              ),
+                            ],
+                          ),
+                        )
                       : _activeTab == _RecallTab.scanRecalls
                           ? _buildScanRecallsView(colors, isNarrow)
                           : _activeTab == _RecallTab.pointsReengagement

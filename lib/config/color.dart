@@ -62,7 +62,7 @@ Color get appTealSoft => _activeIsDark ? const Color(0xFF0E2E30) : const Color(0
 
 // Live Theme-Aware Status Pill Text Colors (High-contrast, WCAG AA/AAA compliant)
 Color get appDangerText => _activeIsDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C);
-Color get appSuccessText => _activeIsDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D);
+Color get appSuccessText => _activeIsDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D);
 Color get appWarningText => _activeIsDark ? const Color(0xFFFDE047) : const Color(0xFFB45309);
 Color get appInfoText => _activeIsDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8);
 Color get appPurpleText => _activeIsDark ? const Color(0xFFD8B4FE) : const Color(0xFF6D28D9);

@@ -31,6 +31,14 @@ class DarkModeController extends ChangeNotifier {
     if (initialPreset != null) _preset = initialPreset;
     if (initialTableDensity != null) _tableDensity = initialTableDensity;
     _syncGlobalColors();
+    try {
+      WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged = () {
+        if (_themeMode == ThemeMode.system) {
+          _syncGlobalColors();
+          notifyListeners();
+        }
+      };
+    } catch (_) {}
   }
 
   ThemeMode get themeMode => _themeMode;
@@ -132,9 +140,12 @@ class DarkModeController extends ChangeNotifier {
   }
 
   void _syncGlobalColors() {
+    final isDark = _themeMode == ThemeMode.dark ||
+        (_themeMode == ThemeMode.system &&
+            WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark);
     syncActiveBrandTheme(
       preset: _preset,
-      isDark: _themeMode == ThemeMode.dark,
+      isDark: isDark,
     );
   }
 

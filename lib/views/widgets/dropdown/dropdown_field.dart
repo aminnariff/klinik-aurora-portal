@@ -22,6 +22,12 @@ class _AppDropdownState extends State<AppDropdown> {
     final hasValue =
         widget.attributeList.value != null && widget.attributeList.value != '';
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
+    final hasLongItem = widget.attributeList.items.any((it) => it.name.length > 20);
+    final autoMenuWidth = hasLongItem ? (isMobile ? 320.0 : 420.0) : null;
+    final effectiveMenuWidth = widget.attributeList.menuWidth ?? autoMenuWidth;
+
     // Wrapped in InputDecorator (the same chrome TextFormField uses under the
     // hood) rather than a plain Text-above-a-box, so the label floats inside
     // the field the same way InputField's does — same size, same position,
@@ -158,7 +164,7 @@ class _AppDropdownState extends State<AppDropdown> {
             iconDisabledColor: Colors.grey,
           ),
           dropdownStyleData: DropdownStyleData(
-            width: widget.attributeList.menuWidth,
+            width: effectiveMenuWidth,
             maxHeight: 280,
             padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(

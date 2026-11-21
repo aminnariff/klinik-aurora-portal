@@ -25,7 +25,13 @@ enum Method { get, post, put, delete, patch }
 enum BaseUrl { portal }
 
 class ApiController {
-  final Dio _dio = Dio();
+  final Dio _dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 20),
+      sendTimeout: const Duration(seconds: 10),
+    ),
+  );
   String getDomain(BaseUrl baseUrl) {
     if (baseUrl == BaseUrl.portal) {
       return Environment.appUrl;
@@ -67,7 +73,8 @@ class ApiController {
         Headers.contentTypeHeader: 'application/json',
         'Authorization': 'Bearer $token',
       },
-      receiveTimeout: const Duration(seconds: 15),
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 20),
       sendTimeout: const Duration(seconds: 10),
     );
   }
@@ -75,7 +82,8 @@ class ApiController {
   Options unauthenticatedHeaders() {
     return Options(
       headers: {Headers.acceptHeader: '*/*', Headers.contentTypeHeader: 'application/json'},
-      receiveTimeout: const Duration(seconds: 15),
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 20),
       sendTimeout: const Duration(seconds: 10),
     );
   }
@@ -234,11 +242,25 @@ class ApiController {
           debugPrint(
             'ERROR: url -> $url | data -> $data | code -> ${e.response?.statusCode}  | message -> ${e.response?.data?['message']} | ${e.error}',
           );
-          if (e.isNoConnectionError) {
-            debugPrint('Internet connection is now offline');
-          } else {
-            dismissLoading();
-            if (e.response?.statusCode == 401 && isAuthenticated == false) {
+          dismissLoading();
+
+          if (e.type == DioExceptionType.connectionTimeout ||
+              e.type == DioExceptionType.receiveTimeout ||
+              e.type == DioExceptionType.sendTimeout) {
+            return ApiResponse(
+              code: 408,
+              message: 'Request timed out. Please check your internet connection and try again.',
+            );
+          }
+
+          if (e.isNoConnectionError || e.type == DioExceptionType.connectionError) {
+            return ApiResponse(
+              code: 503,
+              message: 'Unable to connect to server. Please check your internet connection.',
+            );
+          }
+
+          if (e.response?.statusCode == 401 && isAuthenticated == false) {
               String? serverMessage;
               if (e.response?.data is Map && e.response?.data['message'] != null) {
                 serverMessage = e.response?.data['message']?.toString();
@@ -352,7 +374,6 @@ class ApiController {
                 data: e.response?.data,
               );
             }
-          }
         }
         return ApiResponse(code: 400, message: 'An Error Occurred.');
       }

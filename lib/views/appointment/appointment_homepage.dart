@@ -487,7 +487,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
             ),
             const SizedBox(width: 8),
             SizedBox(
-              width: isMobile ? 180 : 270,
+              width: isMobile ? 200 : 280,
               child: !_branchesLoaded && branches.isEmpty
                   ? Center(
                       child: Text('Loading...', style: TextStyle(fontSize: 12, color: appInkMuted)),
@@ -512,8 +512,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             _refreshCalendarCounts();
                           }
                         },
-                        width: isMobile ? 180 : 270,
-                        menuWidth: isMobile ? 280 : 340,
+                        width: isMobile ? 200 : 280,
+                        menuWidth: isMobile ? 320 : 420,
                       ),
                     ),
             ),
@@ -2194,6 +2194,134 @@ class _SopTask {
   });
 }
 
+class Aurora3DStarBadge extends StatefulWidget {
+  final double size;
+  const Aurora3DStarBadge({super.key, this.size = 38});
+
+  @override
+  State<Aurora3DStarBadge> createState() => _Aurora3DStarBadgeState();
+}
+
+class _Aurora3DStarBadgeState extends State<Aurora3DStarBadge> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final progress = _controller.value;
+        final angle = progress * 2 * math.pi;
+        return Container(
+          width: widget.size,
+          height: widget.size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFF59E0B).withAlpha(50),
+                blurRadius: 10,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.002)
+              ..rotateY(angle)
+              ..rotateX(0.12),
+            child: CustomPaint(
+              size: Size(widget.size, widget.size),
+              painter: _Aurora3DStarPainter(progress: progress),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Aurora3DStarPainter extends CustomPainter {
+  final double progress;
+  _Aurora3DStarPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final outerR = size.width * 0.46;
+    final innerR = outerR * 0.48;
+
+    final path = Path();
+    const points = 5;
+    for (int i = 0; i < points * 2; i++) {
+      final r = i.isEven ? outerR : innerR;
+      final a = (i * math.pi / points) - math.pi / 2;
+      final x = cx + r * math.cos(a);
+      final y = cy + r * math.sin(a);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    path.close();
+
+    final sweepAngle = (progress * 2 * math.pi) % (2 * math.pi);
+    final gradient = LinearGradient(
+      begin: Alignment(math.cos(sweepAngle), math.sin(sweepAngle)),
+      end: Alignment(-math.cos(sweepAngle), -math.sin(sweepAngle)),
+      colors: const [
+        Color(0xFFFFFBEB),
+        Color(0xFFFDE68A),
+        Color(0xFFF59E0B),
+        Color(0xFFD97706),
+        Color(0xFF92400E),
+        Color(0xFFFFFBEB),
+      ],
+      stops: const [0.0, 0.2, 0.45, 0.7, 0.85, 1.0],
+    );
+
+    final paint = Paint()
+      ..shader = gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(path, paint);
+
+    final borderPaint = Paint()
+      ..color = Colors.white.withAlpha(160)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawPath(path, borderPaint);
+
+    final corePaint = Paint()
+      ..shader = RadialGradient(
+        colors: const [Colors.white, Color(0xFFFDE047), Color(0xFFD97706)],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: innerR * 0.7));
+    canvas.drawCircle(Offset(cx, cy), innerR * 0.5, corePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _Aurora3DStarPainter oldDelegate) => oldDelegate.progress != progress;
+}
+
 class _AppointmentGuidelineDialog extends StatefulWidget {
   const _AppointmentGuidelineDialog();
 
@@ -2202,9 +2330,69 @@ class _AppointmentGuidelineDialog extends StatefulWidget {
 }
 
 class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog> {
-  int _currentStep = 0;
+  final ScrollController _scrollController = ScrollController();
+  final List<GlobalKey> _stepKeys = List.generate(_steps.length, (_) => GlobalKey());
+  final GlobalKey _checklistKey = GlobalKey();
+  int _focusedStep = 0;
   final Set<int> _checkedChecklist = {};
-  bool _viewingAllSteps = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    int detected = _focusedStep;
+    for (int i = 0; i < _stepKeys.length; i++) {
+      final ctx = _stepKeys[i].currentContext;
+      if (ctx != null) {
+        final box = ctx.findRenderObject() as RenderBox?;
+        if (box != null && box.hasSize) {
+          final pos = box.localToGlobal(Offset.zero);
+          if (pos.dy <= 340) {
+            detected = i;
+          }
+        }
+      }
+    }
+    if (detected != _focusedStep && mounted) {
+      setState(() => _focusedStep = detected);
+    }
+  }
+
+  void _scrollToStep(int idx) {
+    if (idx < 0 || idx >= _steps.length) return;
+    setState(() => _focusedStep = idx);
+    final ctx = _stepKeys[idx].currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 380),
+        curve: Curves.easeInOutCubic,
+        alignment: 0.05,
+      );
+    }
+  }
+
+  void _scrollToChecklist() {
+    final ctx = _checklistKey.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 380),
+        curve: Curves.easeInOutCubic,
+        alignment: 0.05,
+      );
+    }
+  }
 
   static const List<_SopStep> _steps = [
     _SopStep(
@@ -2371,23 +2559,23 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 768;
-    final currentStepData = _steps[_currentStep];
+    final isDark = Theme.of(context).brightness == Brightness.dark || appIsDarkMode;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 40, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 36, vertical: 20),
       clipBehavior: Clip.antiAlias,
       child: Container(
-        width: isMobile ? double.infinity : 760,
+        width: isMobile ? double.infinity : 860,
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
-        color: appSurfaceSubtle,
+        color: appCanvas,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Executive Gradient Header
+            // Executive Gradient Header with Rotating 3D Metallic Star Badge
             Container(
-              padding: const EdgeInsets.fromLTRB(22, 16, 16, 16),
+              padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFFDF6E98), Color(0xFF7E2D40)],
@@ -2397,16 +2585,8 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
               ),
               child: Row(
                 children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(40),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.menu_book_rounded, color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 12),
+                  const Aurora3DStarBadge(size: 38),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2422,8 +2602,10 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Frontdesk Standard Operating Procedures (SOP) & Stepper Flow',
-                          style: TextStyle(fontSize: 12, color: Colors.white.withAlpha(220)),
+                          'Interactive Frontdesk Standard Operating Procedures (SOP) & Stepper',
+                          style: TextStyle(fontSize: 12, color: Colors.white.withAlpha(225)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -2437,268 +2619,101 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
               ),
             ),
 
-            // Stepper Navigation Tabs Bar + Progress Track
-            Container(
-              color: appSurface,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _steps.asMap().entries.map((entry) {
-                              final idx = entry.key;
-                              final step = entry.value;
-                              final isActive = _currentStep == idx && !_viewingAllSteps;
-                              final isCompleted = _currentStep > idx && !_viewingAllSteps;
+            if (isMobile) _buildMobileMilestoneStrip(isDark),
 
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _viewingAllSteps = false;
-                                      _currentStep = idx;
-                                    });
-                                  },
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6.5),
-                                    decoration: BoxDecoration(
-                                      color: isActive
-                                          ? primary
-                                          : (isCompleted ? appSuccessSoft : appSurfaceSubtle),
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: isActive
-                                            ? primary
-                                            : (isCompleted
-                                                ? (appIsDarkMode ? const Color(0xFF166534) : const Color(0xFF86EFAC))
-                                                : appBorder),
-                                        width: isActive ? 1.5 : 1.0,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 18,
-                                          height: 18,
-                                          decoration: BoxDecoration(
-                                            color: isActive
-                                                ? Colors.white.withAlpha(50)
-                                                : (isCompleted
-                                                    ? accessibleAccent(const Color(0xFF16A34A)).withAlpha(35)
-                                                    : appBorder),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Center(
-                                            child: isCompleted
-                                                ? Icon(Icons.check_rounded, size: 12, color: accessibleAccent(const Color(0xFF16A34A)))
-                                                : Text(
-                                                    '${idx + 1}',
-                                                    style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.w800,
-                                                      color: isActive ? Colors.white : appInkMuted,
-                                                    ),
-                                                  ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 7),
-                                        Text(
-                                          step.shortTitle,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-                                            color: isActive
-                                                ? Colors.white
-                                                : (isCompleted ? appSuccessText : appInkSecondary),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Toggle View All / Stepper Mode
-                      InkWell(
-                        onTap: () => setState(() => _viewingAllSteps = !_viewingAllSteps),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: _viewingAllSteps ? primary : appSurfaceSubtle,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: _viewingAllSteps ? primary : appBorder),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                _viewingAllSteps ? Icons.view_carousel_rounded : Icons.view_agenda_rounded,
-                                size: 14,
-                                color: _viewingAllSteps ? Colors.white : appInkSecondary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _viewingAllSteps ? 'Stepper' : 'View All',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: _viewingAllSteps ? Colors.white : appInkSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // Progress Track
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: _viewingAllSteps ? 1.0 : (_currentStep + 1) / _steps.length,
-                      minHeight: 3,
-                      backgroundColor: appSurfaceSubtle,
-                      valueColor: AlwaysStoppedAnimation<Color>(accessibleAccent(primary)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Divider(height: 1, color: appBorder),
-
-            // Animated Step Body / Scrollable Content
+            // Continuous Scrollable Single-Page Stepper Content
             Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: _viewingAllSteps
-                    ? Column(
+              child: isMobile
+                  ? SingleChildScrollView(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          for (final s in _steps) ...[
-                            _buildStepCardBlock(s),
-                            const SizedBox(height: 14),
-                          ],
-                          _buildChecklistSection(),
+                          for (int i = 0; i < _steps.length; i++)
+                            _buildStepCardBlock(_steps[i], i, isDark),
+                          _buildChecklistSection(isDark),
                         ],
-                      )
-                    : AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 280),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        transitionBuilder: (child, animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(0.04, 0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: KeyedSubtree(
-                          key: ValueKey<int>(_currentStep),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildStepHeader(currentStepData),
-                              const SizedBox(height: 12),
-                              for (final task in currentStepData.tasks)
-                                _buildTaskCard(task, currentStepData.accentColor),
-                              if (currentStepData.ruleCallout != null)
-                                _buildRuleBox(
-                                  currentStepData.ruleTitle ?? 'Operational Rule',
-                                  currentStepData.ruleCallout!,
-                                  isWarning: currentStepData.isWarningRule,
-                                ),
-                              if (_currentStep == _steps.length - 1) ...[
-                                const SizedBox(height: 8),
-                                _buildChecklistSection(),
+                      ),
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Left 3D Stepper Milestone Navigation Rail
+                        _buildDesktopStepperRail(isDark),
+                        // Right Continuous Feed
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.all(18),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                for (int i = 0; i < _steps.length; i++)
+                                  _buildStepCardBlock(_steps[i], i, isDark),
+                                _buildChecklistSection(isDark),
                               ],
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-              ),
+                      ],
+                    ),
             ),
 
-            // Stepper Bottom Navigation Footer
+            // Stepper Bottom Status & Navigation Footer
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: appSurface,
                 border: Border(top: BorderSide(color: appBorder)),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: SizedBox(
+                      width: 90,
+                      child: LinearProgressIndicator(
+                        value: (_focusedStep + 1) / _steps.length,
+                        minHeight: 6,
+                        backgroundColor: appSurfaceSubtle,
+                        valueColor: AlwaysStoppedAnimation<Color>(accessibleAccent(primary)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Step ${_focusedStep + 1} of ${_steps.length}: ${_steps[_focusedStep].shortTitle}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: appInkSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   OutlinedButton.icon(
-                    onPressed: _currentStep > 0 && !_viewingAllSteps
-                        ? () => setState(() => _currentStep--)
-                        : null,
-                    icon: const Icon(Icons.arrow_back_rounded, size: 16),
-                    label: const Text('Previous'),
+                    onPressed: _scrollToChecklist,
+                    icon: const Icon(Icons.fact_check_rounded, size: 14),
+                    label: const Text('Checklist', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: appInkPrimary,
-                      disabledForegroundColor: appInkMuted.withAlpha(100),
                       side: BorderSide(color: appBorder),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _viewingAllSteps
-                            ? 'Overview (${_steps.length} Steps)'
-                            : 'Step ${_currentStep + 1} of ${_steps.length}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: appInkMuted,
-                        ),
-                      ),
-                    ],
-                  ),
+                  const SizedBox(width: 8),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      if (_viewingAllSteps || _currentStep >= _steps.length - 1) {
-                        Navigator.of(context).pop();
-                      } else {
-                        setState(() => _currentStep++);
-                      }
-                    },
-                    icon: Icon(
-                      _viewingAllSteps || _currentStep >= _steps.length - 1
-                          ? Icons.check_circle_rounded
-                          : Icons.arrow_forward_rounded,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                    label: Text(
-                      _viewingAllSteps || _currentStep >= _steps.length - 1 ? 'Got It' : 'Next Step',
-                      style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
-                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.check_rounded, size: 15, color: Colors.white),
+                    label: const Text('Got It', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       elevation: 0,
                     ),
@@ -2712,68 +2727,171 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
     );
   }
 
-  Widget _buildStepHeader(_SopStep step) {
+  Widget _buildDesktopStepperRail(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      width: 220,
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: appBorder),
+        border: Border(right: BorderSide(color: appBorder)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: accessibleAccent(step.accentColor).withAlpha(25),
-              borderRadius: BorderRadius.circular(10),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+            child: Text(
+              'SOP WORKFLOW',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: appInkMuted,
+                letterSpacing: 0.8,
+              ),
             ),
-            child: Icon(step.icon, color: accessibleAccent(step.accentColor), size: 20),
           ),
-          const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                      decoration: BoxDecoration(
-                        color: accessibleAccent(step.accentColor).withAlpha(25),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'STEP ${step.number}',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: accessibleAccent(step.accentColor),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        step.title,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: appInkPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              itemCount: _steps.length,
+              itemBuilder: (context, idx) {
+                final step = _steps[idx];
+                final isFocused = _focusedStep == idx;
+                final isPast = _focusedStep > idx;
+
+                return InkWell(
+                  onTap: () => _scrollToStep(idx),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isFocused
+                          ? accessibleAccent(step.accentColor).withAlpha(isDark ? 35 : 20)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isFocused
+                            ? accessibleAccent(step.accentColor).withAlpha(isDark ? 100 : 70)
+                            : Colors.transparent,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  step.description,
-                  style: TextStyle(fontSize: 12, color: appInkSecondary),
-                ),
-              ],
+                    child: Row(
+                      children: [
+                        // 3D Milestone Node
+                        Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isFocused
+                                ? accessibleAccent(step.accentColor)
+                                : (isPast
+                                    ? accessibleAccent(step.accentColor).withAlpha(40)
+                                    : appSurfaceSubtle),
+                            border: Border.all(
+                              color: isFocused
+                                  ? Colors.white
+                                  : (isPast
+                                      ? accessibleAccent(step.accentColor)
+                                      : appBorder),
+                              width: isFocused ? 1.8 : 1.2,
+                            ),
+                            boxShadow: [
+                              if (isFocused)
+                                BoxShadow(
+                                  color: accessibleAccent(step.accentColor).withAlpha(70),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                            ],
+                          ),
+                          child: Center(
+                            child: isPast
+                                ? Icon(
+                                    Icons.check_rounded,
+                                    size: 14,
+                                    color: accessibleAccent(step.accentColor),
+                                  )
+                                : Text(
+                                    '${step.number}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      color: isFocused ? Colors.white : appInkMuted,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                step.shortTitle,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isFocused ? FontWeight.w700 : FontWeight.w500,
+                                  color: isFocused
+                                      ? (isDark ? Colors.white : accessibleAccent(step.accentColor))
+                                      : appInkSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Divider(height: 1, color: appBorder),
+          // Checklist Quick Shortcut at bottom of rail
+          InkWell(
+            onTap: _scrollToChecklist,
+            borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(14)),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              color: isDark ? const Color(0xFF062319) : const Color(0xFFF0FDF4),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.checklist_rounded,
+                    size: 18,
+                    color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF16A34A),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Closing Checklist',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${_checkedChecklist.length}/${_checklistItems.length}',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF166534),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -2781,38 +2899,184 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
     );
   }
 
-  Widget _buildStepCardBlock(_SopStep step) {
+  Widget _buildMobileMilestoneStrip(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      color: appSurface,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (int i = 0; i < _steps.length; i++) ...[
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: InkWell(
+                  onTap: () => _scrollToStep(i),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _focusedStep == i
+                          ? accessibleAccent(_steps[i].accentColor)
+                          : appSurfaceSubtle,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _focusedStep == i
+                            ? accessibleAccent(_steps[i].accentColor)
+                            : appBorder,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${i + 1}. ${_steps[i].shortTitle}',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: _focusedStep == i ? FontWeight.w700 : FontWeight.w500,
+                            color: _focusedStep == i ? Colors.white : appInkSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            // Checklist chip
+            InkWell(
+              onTap: _scrollToChecklist,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF059669) : const Color(0xFF86EFAC),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.checklist_rounded,
+                      size: 13,
+                      color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF16A34A),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Checklist (${_checkedChecklist.length}/${_checklistItems.length})',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepCardBlock(_SopStep step, int idx, bool isDark) {
+    final isFocused = _focusedStep == idx;
+
+    return Container(
+      key: _stepKeys[idx],
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: appBorder),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isFocused ? accessibleAccent(step.accentColor) : appBorder,
+          width: isFocused ? 1.8 : 1.0,
+        ),
+        boxShadow: [
+          if (isFocused)
+            BoxShadow(
+              color: accessibleAccent(step.accentColor).withAlpha(isDark ? 45 : 30),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            )
+          else
+            BoxShadow(
+              color: Colors.black.withAlpha(isDark ? 20 : 6),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 28,
-                height: 28,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  color: accessibleAccent(step.accentColor).withAlpha(25),
-                  borderRadius: BorderRadius.circular(7),
+                  color: accessibleAccent(step.accentColor).withAlpha(isDark ? 40 : 25),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: accessibleAccent(step.accentColor).withAlpha(isDark ? 80 : 50),
+                  ),
                 ),
-                child: Icon(step.icon, color: accessibleAccent(step.accentColor), size: 16),
+                child: Icon(step.icon, color: accessibleAccent(step.accentColor), size: 18),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  'Step ${step.number}: ${step.title}',
-                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: appInkPrimary),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: accessibleAccent(step.accentColor).withAlpha(isDark ? 40 : 25),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'STEP ${step.number}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: accessibleAccent(step.accentColor),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            step.title,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: appInkPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      step.description,
+                      style: TextStyle(fontSize: 12, color: appInkSecondary),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           for (final task in step.tasks)
             _buildTaskCard(task, step.accentColor),
           if (step.ruleCallout != null)
@@ -2956,21 +3220,31 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
     );
   }
 
-  Widget _buildChecklistSection() {
+  Widget _buildChecklistSection(bool isDark) {
     final doneCount = _checkedChecklist.length;
     final totalCount = _checklistItems.length;
     final isAllDone = doneCount == totalCount;
 
     return Container(
+      key: _checklistKey,
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: appSuccessSoft,
-        borderRadius: BorderRadius.circular(10),
+        color: isDark ? const Color(0xFF062319) : const Color(0xFFF0FDF4),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: appIsDarkMode ? const Color(0xFF166534) : const Color(0xFF86EFAC),
+          color: isDark ? const Color(0xFF059669) : const Color(0xFF86EFAC),
+          width: 1.2,
         ),
+        boxShadow: [
+          if (isDark)
+            BoxShadow(
+              color: const Color(0xFF10B981).withAlpha(20),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2979,52 +3253,64 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
             children: [
               Row(
                 children: [
-                  Icon(Icons.checklist_rounded,
-                      color: accessibleAccent(const Color(0xFF16A34A)), size: 18),
-                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.checklist_rounded,
+                      color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF16A34A),
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
                   Text(
                     'Daily Frontdesk Closing Checklist',
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: appSuccessText,
+                      color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D),
+                      letterSpacing: -0.2,
                     ),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: isAllDone
-                      ? accessibleAccent(const Color(0xFF16A34A))
-                      : (appIsDarkMode ? const Color(0xFF133E3B) : const Color(0xFFD1FAE5)),
-                  borderRadius: BorderRadius.circular(10),
+                      ? (isDark ? const Color(0xFF059669) : const Color(0xFF16A34A))
+                      : (isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7)),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isAllDone
-                        ? accessibleAccent(const Color(0xFF16A34A))
-                        : (appIsDarkMode ? const Color(0xFF166534) : const Color(0xFF86EFAC)),
+                    color: isDark ? const Color(0xFF34D399) : const Color(0xFF86EFAC),
                   ),
                 ),
                 child: Text(
                   '$doneCount / $totalCount Completed',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w700,
-                    color: isAllDone ? Colors.white : appSuccessText,
+                    color: isAllDone
+                        ? Colors.white
+                        : (isDark ? const Color(0xFFA7F3D0) : const Color(0xFF166534)),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'Tap items below to check off your daily operational closing tasks:',
             style: TextStyle(
-              fontSize: 11.5,
-              color: appSuccessText.withValues(alpha: 0.9),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF166534),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           for (int i = 0; i < _checklistItems.length; i++) ...[
             InkWell(
               onTap: () {
@@ -3038,7 +3324,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
               },
               borderRadius: BorderRadius.circular(6),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -3046,9 +3332,9 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                       _checkedChecklist.contains(i)
                           ? Icons.check_box_rounded
                           : Icons.check_box_outline_blank_rounded,
-                      size: 18,
+                      size: 19,
                       color: _checkedChecklist.contains(i)
-                          ? accessibleAccent(const Color(0xFF16A34A))
+                          ? (isDark ? const Color(0xFF34D399) : const Color(0xFF16A34A))
                           : appInkMuted,
                     ),
                     const SizedBox(width: 8),
@@ -3056,8 +3342,10 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                       child: Text(
                         _checklistItems[i],
                         style: TextStyle(
-                          fontSize: 12,
-                          color: _checkedChecklist.contains(i) ? appSuccessText : appInkPrimary,
+                          fontSize: 12.5,
+                          color: _checkedChecklist.contains(i)
+                              ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D))
+                              : (isDark ? const Color(0xFFF1F5F9) : const Color(0xFF0F172A)),
                           decoration: _checkedChecklist.contains(i) ? TextDecoration.lineThrough : null,
                           fontWeight: _checkedChecklist.contains(i) ? FontWeight.w500 : FontWeight.w600,
                         ),
