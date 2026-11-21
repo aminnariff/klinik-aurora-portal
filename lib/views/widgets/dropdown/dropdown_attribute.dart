@@ -15,6 +15,7 @@ class DropdownAttributeList {
   final bool isEditable;
   Function(DropdownAttribute?)? onChanged;
   double? width;
+  double? menuWidth;
   ButtonStyleData? buttonStyleData;
   Color? fieldColor;
   Color? borderColor;
@@ -37,6 +38,7 @@ class DropdownAttributeList {
     this.isEditable = true,
     required this.onChanged,
     this.width,
+    this.menuWidth,
     this.buttonStyleData,
     this.fieldColor,
     this.borderColor,

@@ -483,11 +483,11 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
               'Branch',
               style: AppTypography.bodyMedium(
                 context,
-              ).copyWith(fontWeight: FontWeight.w600, color: const Color(0xFF4B5563)),
+              ).copyWith(fontWeight: FontWeight.w600, color: appInkSecondary),
             ),
             const SizedBox(width: 8),
             SizedBox(
-              width: isMobile ? 150 : 220,
+              width: isMobile ? 180 : 270,
               child: !_branchesLoaded && branches.isEmpty
                   ? Center(
                       child: Text('Loading...', style: TextStyle(fontSize: 12, color: appInkMuted)),
@@ -512,7 +512,8 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                             _refreshCalendarCounts();
                           }
                         },
-                        width: isMobile ? 150 : 220,
+                        width: isMobile ? 180 : 270,
+                        menuWidth: isMobile ? 280 : 340,
                       ),
                     ),
             ),

@@ -38,11 +38,12 @@ class AuroraCollapsibleSidebar extends StatefulWidget {
     this.isMobileDrawer = false,
   });
 
-  /// The 3 always-visible, pinned core workspace items
+  /// The always-visible, pinned core workspace items
   static const List<String> pinnedLabels = [
     'Dashboard',
     RouteNames.appointmentsDisplay,
     RouteNames.patientsDisplay,
+    RouteNames.pointsDisplay,
   ];
 
   /// The 4 collapsible accordion groups
@@ -71,10 +72,9 @@ class AuroraCollapsibleSidebar extends StatefulWidget {
     ),
     NavGroup(
       key: 'loyalty',
-      title: 'Points & Promos',
+      title: 'Vouchers & Promos',
       icon: Icons.card_giftcard_rounded,
       itemLabels: [
-        RouteNames.pointsDisplay,
         RouteNames.vouchersDisplay,
         RouteNames.rewardsDisplay,
         RouteNames.rewardHistoryDisplay,

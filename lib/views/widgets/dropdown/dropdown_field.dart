@@ -158,6 +158,7 @@ class _AppDropdownState extends State<AppDropdown> {
             iconDisabledColor: Colors.grey,
           ),
           dropdownStyleData: DropdownStyleData(
+            width: widget.attributeList.menuWidth,
             maxHeight: 280,
             padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(

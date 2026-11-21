@@ -82,6 +82,12 @@ class _HomepageState extends State<Homepage> {
       ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
+          return const Icon(Icons.stars_rounded, color: Colors.white);
+        },
+        label: RouteNames.pointsDisplay,
+      ),
+      SidebarXItem(
+        iconBuilder: (selected, hovered) {
           return const Icon(Icons.pregnant_woman_rounded, color: Colors.white);
         },
         label: RouteNames.babyTrackerDisplay,
@@ -130,12 +136,6 @@ class _HomepageState extends State<Homepage> {
       ),
 
       // --- Loyalty & Marketing ---
-      SidebarXItem(
-        iconBuilder: (selected, hovered) {
-          return const Icon(Icons.stars_rounded, color: Colors.white);
-        },
-        label: RouteNames.pointsDisplay,
-      ),
       SidebarXItem(
         iconBuilder: (selected, hovered) {
           return const Icon(Icons.confirmation_number_rounded, color: Colors.white);
