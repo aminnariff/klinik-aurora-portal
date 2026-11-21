@@ -1,3 +1,4 @@
+import 'widgets/dashboard_panel.dart';
 import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -182,7 +183,10 @@ class SuperadminDashboardView extends StatelessWidget {
             const SizedBox(height: 12),
 
             // ── 2. 6-Month Revenue Trajectory Area Chart ─────────────────────────
-            _buildRevenueTrajectoryCard(context, data?.revenueByMonth ?? []),
+            DashboardPanel(
+              order: 0,
+              child: _buildRevenueTrajectoryCard(context, data?.revenueByMonth ?? []),
+            ),
 
             const SizedBox(height: 12),
 
@@ -190,8 +194,8 @@ class SuperadminDashboardView extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final isCompact = constraints.maxWidth < 900;
-                final leaderboardWidget = _buildBranchLeaderboardCard(context, branchCtrl.branchPerformanceResponse?.data);
-                final serviceWidget = _buildNetworkServicesCard(context, serviceCtrl.servicePerformanceResponse?.data?.services ?? []);
+                final leaderboardWidget = DashboardPanel(order: 1, child: _buildBranchLeaderboardCard(context, branchCtrl.branchPerformanceResponse?.data));
+                final serviceWidget = DashboardPanel(order: 2, child: _buildNetworkServicesCard(context, serviceCtrl.servicePerformanceResponse?.data?.services ?? []));
 
                 if (isCompact) {
                   return Column(
@@ -275,6 +279,7 @@ class SuperadminDashboardView extends StatelessWidget {
                     child: Text('No revenue history available', style: TextStyle(color: appInkMuted)),
                   )
                 : LineChart(
+                    duration: Duration.zero,
                     LineChartData(
                       minX: 0,
                       maxX: math.max(1, (revenueList.length - 1).toDouble()),

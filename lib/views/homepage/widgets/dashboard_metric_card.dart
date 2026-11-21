@@ -36,6 +36,37 @@ class _DashboardMetricCardState extends State<DashboardMetricCard> {
   static final _leadingNumber = RegExp(r'^([^0-9-]*)(-?[\d,]+(?:\.\d+)?)(.*)$');
 
   bool _hovered = false;
+  bool _valueChanged = false;
+  int _changeSequence = 0;
+
+  @override
+  void didUpdateWidget(covariant DashboardMetricCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) {
+      _valueChanged = true;
+      _changeSequence++;
+    }
+  }
+
+  Widget _accentBar(bool reduce) {
+    final track = Container(height: 3.5, color: widget.accentColor);
+    if (!_valueChanged || reduce) return track;
+    return Stack(
+      children: [
+        track,
+        Positioned.fill(
+          child: TweenAnimationBuilder<double>(
+            key: ValueKey(_changeSequence),
+            tween: Tween(begin: .75, end: 0),
+            duration: EmilMotion.pageDuration,
+            curve: EmilMotion.easeOut,
+            child: ColoredBox(color: appInkPrimary),
+            builder: (_, opacity, child) => Opacity(opacity: opacity, child: child),
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget _number(BuildContext context) {
     final match = _leadingNumber.firstMatch(widget.value);
@@ -86,7 +117,7 @@ class _DashboardMetricCardState extends State<DashboardMetricCard> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Top colored accent bar (3px)
-                Container(height: 3.5, color: widget.accentColor),
+                _accentBar(reduce),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                   child: Column(
@@ -119,7 +150,11 @@ class _DashboardMetricCardState extends State<DashboardMetricCard> {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: _number(context)),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Semantics(label: widget.value, excludeSemantics: true, child: _number(context)),
+                      ),
                       if (widget.subtitle != null) ...[
                         const SizedBox(height: 4),
                         Text(

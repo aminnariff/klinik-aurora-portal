@@ -1,3 +1,4 @@
+import 'widgets/dashboard_panel.dart';
 import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -168,8 +169,8 @@ class BranchDashboardView extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final isCompact = constraints.maxWidth < 950;
-                final weeklyWidget = _buildWeeklyActivityCard(context, data?.weeklyActivity ?? []);
-                final heatmapWidget = _buildMonthlyHeatmapCard(context, data?.monthlyHeatmap ?? []);
+                final weeklyWidget = DashboardPanel(order: 0, child: _buildWeeklyActivityCard(context, data?.weeklyActivity ?? []));
+                final heatmapWidget = DashboardPanel(order: 1, child: _buildMonthlyHeatmapCard(context, data?.monthlyHeatmap ?? []));
 
                 if (isCompact) {
                   return Column(
@@ -198,8 +199,8 @@ class BranchDashboardView extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 final isCompact = constraints.maxWidth < 900;
-                final queueWidget = _buildLiveQueueCard(context, data?.upcomingQueue ?? []);
-                final performanceWidget = _buildBranchPerformanceCard(context, data);
+                final queueWidget = DashboardPanel(order: 2, child: _buildLiveQueueCard(context, data?.upcomingQueue ?? []));
+                final performanceWidget = DashboardPanel(order: 3, child: _buildBranchPerformanceCard(context, data));
 
                 if (isCompact) {
                   return Column(
@@ -290,7 +291,22 @@ class BranchDashboardView extends StatelessWidget {
                     child: Text('No appointment activity in the last 7 days', style: TextStyle(color: appInkMuted)),
                   )
                 : BarChart(
+                    duration: Duration.zero,
                     BarChartData(
+                      barTouchData: BarTouchData(
+                        touchTooltipData: BarTouchTooltipData(
+                          fitInsideHorizontally: true,
+                          fitInsideVertically: true,
+                          getTooltipColor: (_) => appInkPrimary,
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            final item = activity[group.x];
+                            return BarTooltipItem(
+                              '${item.dayName ?? ''}\nCompleted: ${item.completed ?? 0}\nScheduled: ${item.scheduled ?? 0}',
+                              TextStyle(color: appSurface, fontSize: 12, fontWeight: FontWeight.w600),
+                            );
+                          },
+                        ),
+                      ),
                       maxY: maxVal * 1.25,
                       alignment: BarChartAlignment.spaceAround,
                       gridData: FlGridData(
@@ -891,6 +907,7 @@ class BranchDashboardView extends StatelessWidget {
                   height: 90,
                   width: 90,
                   child: PieChart(
+                    duration: Duration.zero,
                     PieChartData(
                       sectionsSpace: 2,
                       centerSpaceRadius: 24,
