@@ -22,9 +22,9 @@ import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
-import 'package:klinik_aurora_portal/views/widgets/input_field/input_field.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/input_field_attribute.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
+import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/table/data_per_page.dart';
@@ -295,35 +295,17 @@ class _PointHomepageState extends State<PointHomepage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title row
-            Row(
-              children: [
-                const Aurora3DStarBadge(size: 36),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Record Payment & Award Points',
-                          style: AppTypography.bodyLarge(context).apply(fontWeightDelta: 2)),
-                      Text(
-                        'Search patient by Mobile or IC to award walk-in points.',
-                        style: TextStyle(fontSize: 12, color: appInkMuted),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.help_outline_rounded, color: appInkMuted, size: 20),
-                  tooltip: 'How Points Work',
-                  onPressed: _showTermsAndConditions,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+            // ── Elevated Terminal Header ──
+            _buildTerminalHeader(),
+            const SizedBox(height: 18),
 
             // ── Step 1: Find Patient ──
-            _sectionHeader('1', 'Find Patient', Icons.person_search_outlined),
+            _sectionHeader(
+              '1',
+              'Identify Patient',
+              'Search patient by Mobile Number or MyKad to link transaction.',
+              Icons.person_search_outlined,
+            ),
             const SizedBox(height: 10),
 
             // Mode Selector Pills: [ Mobile Number ] [ IC Number ]
@@ -333,7 +315,7 @@ class _PointHomepageState extends State<PointHomepage> {
             // Recent patients quick-select strip
             _recentPatientsStrip(),
 
-            // Search input field with search button suffix
+            // Search input field with integrated action
             _buildSearchInputField(),
 
             // Selected Patient Hero Card OR Results List OR Empty placeholder
@@ -357,49 +339,8 @@ class _PointHomepageState extends State<PointHomepage> {
             const Divider(),
             const SizedBox(height: 14),
 
-            // ── Step 2: Payment & Bonus Items ──
-            _sectionHeader('2', 'Payment & Bonus Items', Icons.payments_outlined),
-            const SizedBox(height: 10),
-
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: InputField(
-                    field: InputFieldAttribute(
-                      controller: _amount.controller,
-                      labelText: _amount.labelText,
-                      prefixText: _amount.prefixText,
-                      errorMessage: _amount.errorMessage,
-                      isCurrency: true,
-                      maxCharacter: 9,
-                      isEditable: true,
-                      onChanged: (value) {
-                        setState(() {
-                          if (_amount.errorMessage != null) {
-                            _amount.errorMessage = null;
-                          }
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                _pointsPreviewChip(),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            // Quick scan amount presets
-            _quickAmountPresets(),
-            const SizedBox(height: 12),
-
-            _buildModifiersSection(),
-
-            if (_selectedPatient != null && _calculateTotalPoints(_amount.controller.text) > 0) ...[
-              const SizedBox(height: 14),
-              _liveBalancePreviewCard(),
-            ],
+            // ── Step 2: Payment & Clinical Scan Billing ──
+            _buildStep2PaymentSection(),
 
             const SizedBox(height: 20),
             const Divider(),
@@ -419,30 +360,640 @@ class _PointHomepageState extends State<PointHomepage> {
     );
   }
 
-  Widget _sectionHeader(String number, String title, IconData icon) {
+  Widget _buildTerminalHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: appIsDarkMode
+              ? [const Color(0xFF1E1728), const Color(0xFF111B22)]
+              : [const Color(0xFFFBF4F8), const Color(0xFFFFFFFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: appIsDarkMode ? const Color(0xFF33253B) : const Color(0xFFF3E8F0),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Aurora3DStarBadge(size: 38),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Frontdesk Points POS',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: appInkPrimary,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bolt_rounded, size: 11, color: Color(0xFF10B981)),
+                          SizedBox(width: 2),
+                          Text(
+                            'LIVE TERMINAL',
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF10B981),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Record walk-in scans & payments to reward loyalty points in real-time.',
+                  style: TextStyle(fontSize: 12, color: appInkMuted),
+                ),
+              ],
+            ),
+          ),
+          InkWell(
+            onTap: _showTermsAndConditions,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: appSurface.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: appBorder),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
+                  const SizedBox(width: 6),
+                  Text(
+                    'RM 10 = 1 pt',
+                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: appInkSecondary),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionHeader(String number, String title, String subtitle, IconData icon) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 22,
-          height: 22,
+          width: 24,
+          height: 24,
+          margin: const EdgeInsets.only(top: 1),
           decoration: BoxDecoration(
-            color: secondaryColor,
-            borderRadius: BorderRadius.circular(6),
+            gradient: LinearGradient(
+              colors: [secondaryColor, const Color(0xFF0D9488)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(7),
+            boxShadow: [
+              BoxShadow(
+                color: secondaryColor.withValues(alpha: 0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
           child: Center(
             child: Text(
               number,
-              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800),
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        Icon(icon, size: 17, color: appInkSecondary),
-        const SizedBox(width: 6),
-        Text(
-          title,
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: appInkSecondary),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: appInkPrimary),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(fontSize: 11.5, color: appInkMuted),
+              ),
+            ],
+          ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildSearchInputField() {
+    final isPhone = _searchType == PatientSearchType.phone;
+    final hint = isPhone ? 'Enter mobile number (e.g. 0123456789)...' : 'Enter MyKad number (e.g. 950101-10-1234)...';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 44,
+          decoration: BoxDecoration(
+            color: appSurface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: appBorderStrong),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 12),
+              Icon(
+                isPhone ? Icons.phone_android_rounded : Icons.badge_outlined,
+                size: 18,
+                color: appInkMuted,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(fontSize: 13.5, color: appInkPrimary, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: TextStyle(fontSize: 12.5, color: appInkMuted),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onSubmitted: (_) => _handleSearch(),
+                ),
+              ),
+              if (_searchController.text.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.close_rounded, size: 16, color: appInkMuted),
+                  splashRadius: 16,
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchError = null;
+                    });
+                  },
+                ),
+              const SizedBox(width: 4),
+              EmilPressable(
+                onTap: _handleSearch,
+                child: Container(
+                  height: 36,
+                  margin: const EdgeInsets.only(right: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [secondaryColor, const Color(0xFF0284C7)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: secondaryColor.withValues(alpha: 0.35),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.search_rounded, size: 16, color: Colors.white),
+                      SizedBox(width: 6),
+                      Text(
+                        'Find Patient',
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_searchError != null) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 6),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline_rounded, size: 13, color: errorColor),
+                const SizedBox(width: 4),
+                Text(
+                  _searchError!,
+                  style: TextStyle(color: errorColor, fontSize: 11.5, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _selectedPatientHeroCard() {
+    final item = _selectedPatient!;
+    final currentPoints = item.totalPoint ?? 0;
+    final rmValue = (currentPoints / 10).toStringAsFixed(2);
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: appIsDarkMode
+              ? [const Color(0xFF16202C), const Color(0xFF0F171F)]
+              : [const Color(0xFFF0FDF4), const Color(0xFFFFFFFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: appIsDarkMode ? const Color(0xFF1F3A4D) : const Color(0xFFBBF7D0),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Top header strip
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar with glowing ring
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF6AD1E3), Color(0xFF0D9488)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF6AD1E3).withValues(alpha: 0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      _getInitials(item.userFullname),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              item.userFullname ?? 'N/A',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                                color: appInkPrimary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.verified_rounded, size: 11, color: Color(0xFF10B981)),
+                                SizedBox(width: 3),
+                                Text(
+                                  'MEMBER',
+                                  style: TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF10B981),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          _infoPill(Icons.phone_rounded, item.userPhone ?? 'No Phone'),
+                          _infoPill(Icons.badge_rounded, item.userNric ?? 'No IC'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                EmilPressable(
+                  onTap: () => setState(() => _selectedPatient = null),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: appSurfaceSubtle,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: appBorder),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.swap_horiz_rounded, size: 14, color: appInkSecondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Change',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Bottom Vault Spotlight Bar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: appIsDarkMode ? const Color(0xFF101B24) : const Color(0xFFECFDF5),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(13),
+                bottomRight: Radius.circular(13),
+              ),
+              border: Border(
+                top: BorderSide(
+                  color: appIsDarkMode ? const Color(0xFF1A2C3A) : const Color(0xFFD1FAE5),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Aurora3DStarBadge(size: 24),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'LOYALTY VAULT BALANCE',
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF059669),
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '$currentPoints',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF10B981),
+                          ),
+                        ),
+                        const Text(
+                          ' pts',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF10B981),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    '≈ RM $rmValue off next visit',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF10B981),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStep2PaymentSection() {
+    final amountText = _amount.controller.text;
+    final totalPoints = _calculateTotalPoints(amountText);
+    final rmDiscountValue = (totalPoints / 10).toStringAsFixed(2);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(
+          '2',
+          'Payment & Clinical Scan Billing',
+          'Enter counter bill amount or tap ultrasound scan preset.',
+          Icons.payments_outlined,
+        ),
+        const SizedBox(height: 12),
+
+        // Big Monetary Input Box with integrated Live Points Counter
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: appSurface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: totalPoints > 0 ? secondaryColor.withValues(alpha: 0.6) : appBorderStrong,
+              width: totalPoints > 0 ? 1.5 : 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'RM',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: appInkMuted,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _amount.controller,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: appInkPrimary,
+                    letterSpacing: 0.5,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: '0.00',
+                    hintStyle: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: appInkMuted.withValues(alpha: 0.5),
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      if (_amount.errorMessage != null) _amount.errorMessage = null;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Dynamic Points badge embedded inside amount box
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: totalPoints > 0
+                        ? [const Color(0xFFF59E0B), const Color(0xFFD97706)]
+                        : [appSurfaceSubtle, appSurfaceSubtle],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: totalPoints > 0
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.stars_rounded,
+                          size: 16,
+                          color: totalPoints > 0 ? Colors.white : appInkMuted,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          totalPoints > 0 ? '+$totalPoints pts' : '0 pts',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: totalPoints > 0 ? Colors.white : appInkMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (totalPoints > 0)
+                      Text(
+                        '≈ RM $rmDiscountValue value',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Quick Scan Presets (Tactile Clinical Ultrasound Chips)
+        _quickAmountPresets(),
+
+        const SizedBox(height: 14),
+        _buildModifiersSection(),
+
+        if (_selectedPatient != null && totalPoints > 0) ...[
+          const SizedBox(height: 14),
+          _liveBalancePreviewCard(),
+        ],
       ],
     );
   }
@@ -528,223 +1079,7 @@ class _PointHomepageState extends State<PointHomepage> {
     );
   }
 
-  Widget _buildSearchInputField() {
-    final isPhone = _searchType == PatientSearchType.phone;
-    final hint = isPhone ? 'e.g. 0123456789' : 'e.g. 950101101234 or 950101-10-1234';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 40,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  style: const TextStyle(fontSize: 13),
-                  decoration: InputDecoration(
-                    hintText: hint,
-                    hintStyle: TextStyle(fontSize: 12, color: appInkMuted),
-                    prefixIcon: Icon(
-                      isPhone ? Icons.phone_android_rounded : Icons.badge_outlined,
-                      size: 17,
-                      color: appInkMuted,
-                    ),
-                    prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                    isDense: true,
-                    filled: true,
-                    fillColor: appSurfaceSubtle,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: appBorder),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: appBorder),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: primary, width: 1.5),
-                    ),
-                  ),
-                  onSubmitted: (_) => _handleSearch(),
-                ),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton.icon(
-                onPressed: _handleSearch,
-                icon: const Icon(Icons.search, size: 16),
-                label: const Text('Search', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  elevation: 0,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (_searchError != null) ...[
-          const SizedBox(height: 4),
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              _searchError!,
-              style: TextStyle(color: errorColor, fontSize: 11, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _selectedPatientHeroCard() {
-    final item = _selectedPatient!;
-    final currentPoints = item.totalPoint ?? 0;
-    final rmValue = (currentPoints / 10).toStringAsFixed(2);
-
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: appSurface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: secondaryColor.withAlpha(90), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(4),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: secondaryColor.withAlpha(25),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    _getInitials(item.userFullname),
-                    style: const TextStyle(
-                      color: tertiaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            item.userFullname ?? 'N/A',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2ECC40).withAlpha(20),
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: const Color(0xFF2ECC40).withAlpha(50)),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.check_circle, size: 10, color: Color(0xFF2ECC40)),
-                              SizedBox(width: 3),
-                              Text(
-                                'Verified Member',
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 3,
-                      children: [
-                        _infoPill(Icons.phone_outlined, item.userPhone ?? 'No Phone'),
-                        _infoPill(Icons.badge_outlined, item.userNric ?? 'No IC'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () {
-                  setState(() {
-                    _selectedPatient = null;
-                  });
-                },
-                icon: const Icon(Icons.swap_horiz_rounded, size: 15),
-                label: const Text('Change', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-                style: TextButton.styleFrom(
-                  foregroundColor: appInkSecondary,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Current balance spotlight container
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2ECC40).withAlpha(12),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF2ECC40).withAlpha(40)),
-            ),
-            child: Row(
-              children: [
-                const Aurora3DStarBadge(size: 20),
-                const SizedBox(width: 8),
-                const Text(
-                  'Current Balance:',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF1E822B), fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '$currentPoints pts',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E822B)),
-                ),
-                const Spacer(),
-                Text(
-                  '≈ RM $rmValue redemption value',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _infoPill(IconData icon, String text) {
     return Container(
@@ -911,41 +1246,6 @@ class _PointHomepageState extends State<PointHomepage> {
     );
   }
 
-  Widget _pointsPreviewChip() {
-    final amount = _amount.controller.text;
-    final points = amount.isNotEmpty ? _calculateTotalPoints(amount) : 0;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.only(top: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: points > 0
-              ? [const Color(0xFFFFF8E1), const Color(0xFFFFECB3)]
-              : [appSurfaceSubtle, appSurfaceSubtle],
-        ),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: points > 0 ? Colors.amber.shade300 : const Color(0xFFE0E0E0)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.stars_rounded, size: 18, color: points > 0 ? Colors.amber.shade700 : Colors.grey),
-          const SizedBox(width: 6),
-          Text(
-            points > 0 ? '+$points pts' : '0 pts',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-              color: points > 0 ? Colors.amber.shade800 : Colors.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _awardPointsButton() {
     final amountText = _amount.controller.text;
     final amount = double.tryParse(amountText) ?? 0.0;
@@ -954,31 +1254,58 @@ class _PointHomepageState extends State<PointHomepage> {
 
     String buttonLabel;
     if (_selectedPatient == null) {
-      buttonLabel = 'Select Patient to Award Points';
+      buttonLabel = '1. Select Patient to Award Points';
     } else if (amount <= 0) {
-      buttonLabel = 'Enter Payment Amount to Award Points';
+      buttonLabel = '2. Enter Amount or Tap Scan Preset';
     } else {
-      buttonLabel = 'Award $totalPoints Points to ${_selectedPatient!.userFullname}';
+      buttonLabel = 'Award $totalPoints Points & Send WhatsApp Receipt';
     }
 
-    return SizedBox(
-      width: double.infinity,
-      height: 44,
-      child: ElevatedButton.icon(
-        onPressed: isReady ? () => _confirmAwardPoints(_selectedPatient!, totalPoints) : null,
-        icon: const Icon(Icons.stars_rounded, size: 18),
-        label: Text(
-          buttonLabel,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          overflow: TextOverflow.ellipsis,
+    return EmilPressable(
+      enabled: isReady,
+      onTap: isReady ? () => _confirmAwardPoints(_selectedPatient!, totalPoints) : null,
+      child: Container(
+        width: double.infinity,
+        height: 48,
+        decoration: BoxDecoration(
+          gradient: isReady
+              ? const LinearGradient(
+                  colors: [Color(0xFF10B981), Color(0xFF059669)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isReady ? null : appBorder,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isReady
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : [],
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2ECC40),
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: appBorder,
-          disabledForegroundColor: appInkMuted,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          elevation: isReady ? 1 : 0,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isReady ? Icons.stars_rounded : Icons.lock_outline_rounded,
+              size: 20,
+              color: isReady ? Colors.white : appInkMuted,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              buttonLabel,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 13.5,
+                color: isReady ? Colors.white : appInkMuted,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1080,10 +1407,10 @@ class _PointHomepageState extends State<PointHomepage> {
 
   Widget _quickAmountPresets() {
     final presets = [
-      {'label': 'RM 80', 'sub': 'Dating', 'val': 80.0},
-      {'label': 'RM 150', 'sub': 'Detail', 'val': 150.0},
-      {'label': 'RM 200', 'sub': '4D/5D', 'val': 200.0},
-      {'label': 'RM 250', 'sub': 'Full', 'val': 250.0},
+      {'label': 'RM 80', 'sub': 'Dating Scan', 'val': 80.0},
+      {'label': 'RM 150', 'sub': 'Detail Scan', 'val': 150.0},
+      {'label': 'RM 200', 'sub': '4D / 5D Scan', 'val': 200.0},
+      {'label': 'RM 250', 'sub': 'Full Scan', 'val': 250.0},
     ];
 
     return Column(
@@ -1091,13 +1418,14 @@ class _PointHomepageState extends State<PointHomepage> {
       children: [
         Row(
           children: [
+            Icon(Icons.medical_services_outlined, size: 13, color: appInkMuted),
+            const SizedBox(width: 6),
             Text(
-              'Quick Scan Presets:',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInkMuted),
+              'Ultrasound Scan Presets:',
+              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: appInkMuted),
             ),
             const Spacer(),
-            InkWell(
-              borderRadius: BorderRadius.circular(4),
+            EmilPressable(
               onTap: () {
                 final current = double.tryParse(_amount.controller.text) ?? 0.0;
                 final next = current + 50.0;
@@ -1106,64 +1434,85 @@ class _PointHomepageState extends State<PointHomepage> {
                   if (_amount.errorMessage != null) _amount.errorMessage = null;
                 });
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                child: Text(
-                  '+RM 50',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: accessibleAccent(const Color(0xFF4F46E5)),
-                  ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: secondaryColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: secondaryColor.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded, size: 12, color: secondaryColor),
+                    Text(
+                      'RM 50',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: secondaryColor),
+                    ),
+                  ],
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Wrap(
-          spacing: 6,
-          runSpacing: 6,
+          spacing: 8,
+          runSpacing: 8,
           children: presets.map((preset) {
             final val = preset['val'] as double;
             final currentVal = double.tryParse(_amount.controller.text) ?? 0.0;
             final isMatch = (currentVal - val).abs() < 0.01;
 
-            return InkWell(
-              borderRadius: BorderRadius.circular(8),
+            return EmilPressable(
               onTap: () {
                 setState(() {
                   _amount.controller.text = val.toStringAsFixed(0);
                   if (_amount.errorMessage != null) _amount.errorMessage = null;
                 });
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: isMatch ? secondaryColor.withValues(alpha: 0.15) : appSurface,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isMatch ? secondaryColor : appBorder,
-                    width: isMatch ? 1.3 : 1.0,
+                    color: isMatch ? secondaryColor : appBorderStrong,
+                    width: isMatch ? 1.5 : 1.0,
                   ),
+                  boxShadow: isMatch
+                      ? [
+                          BoxShadow(
+                            color: secondaryColor.withValues(alpha: 0.2),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : [],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (isMatch) ...[
+                      Icon(Icons.check_circle_rounded, size: 13, color: secondaryColor),
+                      const SizedBox(width: 5),
+                    ],
                     Text(
                       preset['label'] as String,
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
                         color: isMatch ? secondaryColor : appInkPrimary,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 5),
                     Text(
-                      '(${preset['sub']})',
+                      '· ${preset['sub']}',
                       style: TextStyle(
-                        fontSize: 10.5,
-                        color: isMatch ? secondaryColor.withValues(alpha: 0.8) : appInkMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: isMatch ? secondaryColor.withValues(alpha: 0.9) : appInkMuted,
                       ),
                     ),
                   ],
@@ -1680,68 +2029,121 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
 
   Widget _historyCard(user_model.Data item) {
     final isPositive = (item.totalPoint ?? 0) > 0;
-    final accentColor = isPositive ? const Color(0xFF2ECC40) : errorColor;
+    final accentColor = isPositive ? const Color(0xFF10B981) : const Color(0xFFEF4444);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
       decoration: BoxDecoration(
-        color: appSurface,
+        color: appIsDarkMode ? const Color(0xFF131D26) : appSurface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFF0F0F0)),
+        border: Border.all(
+          color: appIsDarkMode ? const Color(0xFF1E2D3A) : const Color(0xFFE2E8F0),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: IntrinsicHeight(
         child: Row(
           children: [
-            // Accent strip
+            // Sleek 3.5px rounded indicator
             Container(
-              width: 4,
+              width: 3.5,
+              margin: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: accentColor,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
-            // Content
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 child: Row(
                   children: [
+                    // Avatar
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: accentColor.withValues(alpha: 0.12),
+                      child: Text(
+                        _getInitials(item.username),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: accentColor),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             item.username ?? 'Patient',
-                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                              color: appInkPrimary,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (item.pointDescription != null && item.pointDescription!.isNotEmpty) ...[
                             const SizedBox(height: 2),
                             Text(
                               item.pointDescription!,
-                              style: TextStyle(fontSize: 11, color: appInkMuted),
+                              style: TextStyle(fontSize: 11, color: appInkSecondary),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                           const SizedBox(height: 4),
-                          Text(
-                            'Recorded by ${item.createdByFullname ?? 'Staff'}  ·  ${dateConverter(item.createdDate) ?? 'N/A'}',
-                            style: TextStyle(fontSize: 11, color: appInkMuted),
+                          Row(
+                            children: [
+                              Icon(Icons.schedule_rounded, size: 11, color: appInkMuted),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${dateConverter(item.createdDate) ?? 'N/A'}  ·  by ${item.createdByFullname ?? 'Staff'}',
+                                style: TextStyle(fontSize: 10.5, color: appInkMuted),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: accentColor.withAlpha(15),
-                        borderRadius: BorderRadius.circular(6),
+                        color: accentColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: accentColor.withValues(alpha: 0.3)),
                       ),
-                      child: Text(
-                        isPositive ? '+${item.totalPoint}' : '${item.totalPoint}',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: accentColor),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isPositive ? Icons.add_rounded : Icons.remove_rounded,
+                            size: 13,
+                            color: accentColor,
+                          ),
+                          Text(
+                            '${(item.totalPoint ?? 0).abs()}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              color: accentColor,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            'pts',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 10,
+                              color: accentColor,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
