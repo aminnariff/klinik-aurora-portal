@@ -1749,17 +1749,17 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       case 1:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: const Color(0xFFD1FAE5), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: appSuccessSoft, borderRadius: BorderRadius.circular(12)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF059669)),
+              Icon(Icons.check_circle_rounded, size: 18, color: accessibleAccent(const Color(0xFF059669))),
               const SizedBox(width: 4),
               Text(
                 'Paid',
                 style: AppTypography.bodyMedium(
                   context,
-                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF065F46)),
+                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: appSuccessText),
               ),
             ],
           ),
@@ -1771,13 +1771,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.cancel_rounded, size: 18, color: Color(0xFFEF4444)),
+              Icon(Icons.cancel_rounded, size: 18, color: accessibleAccent(const Color(0xFFEF4444))),
               const SizedBox(width: 4),
               Text(
                 'Failed',
                 style: AppTypography.bodyMedium(
                   context,
-                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF991B1B)),
+                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: appDangerText),
               ),
             ],
           ),
@@ -1789,13 +1789,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.hourglass_empty_rounded, size: 18, color: Color(0xFFD97706)),
+              Icon(Icons.hourglass_empty_rounded, size: 18, color: accessibleAccent(const Color(0xFFD97706))),
               const SizedBox(width: 4),
               Text(
                 'Unpaid',
                 style: AppTypography.bodyMedium(
                   context,
-                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF92400E)),
+                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: appWarningText),
               ),
             ],
           ),
@@ -1810,13 +1810,13 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.block_rounded, size: 18, color: Color(0xFF2563EB)),
+          Icon(Icons.block_rounded, size: 18, color: accessibleAccent(const Color(0xFF2563EB))),
           const SizedBox(width: 4),
           Text(
             'No Payment',
             style: AppTypography.bodyMedium(
               context,
-            ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF1E40AF)),
+            ).copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: appInfoText),
           ),
         ],
       ),
@@ -1997,10 +1997,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD1FAE5),
+                          color: appSuccessSoft,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.calendar_month_rounded, color: Color(0xFF059669), size: 18),
+                        child: Icon(Icons.calendar_month_rounded, color: accessibleAccent(const Color(0xFF059669)), size: 18),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -2049,7 +2049,7 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(color: appInfoSoft, borderRadius: BorderRadius.circular(8)),
-                          child: const Icon(Icons.medical_services_rounded, size: 16, color: Color(0xFF0284C7)),
+                          child: Icon(Icons.medical_services_rounded, size: 16, color: accessibleAccent(const Color(0xFF0284C7))),
                         ),
                         title: Text(item.name, style: AppTypography.bodyMedium(context)),
                         trailing: Icon(Icons.chevron_right_rounded, color: appInkMuted),
@@ -2153,27 +2153,43 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
   }
 }
 
-class _GuidelineItemData {
-  final String category;
-  final String tag;
-  final Color tagColor;
-  final IconData icon;
-  final Color iconColor;
+class _SopStep {
+  final int number;
   final String title;
-  final String highlight;
-  final List<String> steps;
-  final String? alertTip;
+  final String shortTitle;
+  final String description;
+  final IconData icon;
+  final Color accentColor;
+  final List<_SopTask> tasks;
+  final String? ruleTitle;
+  final String? ruleCallout;
+  final bool isWarningRule;
 
-  const _GuidelineItemData({
-    required this.category,
-    required this.tag,
-    required this.tagColor,
-    required this.icon,
-    required this.iconColor,
+  const _SopStep({
+    required this.number,
     required this.title,
-    required this.highlight,
-    required this.steps,
-    this.alertTip,
+    required this.shortTitle,
+    required this.description,
+    required this.icon,
+    required this.accentColor,
+    required this.tasks,
+    this.ruleTitle,
+    this.ruleCallout,
+    this.isWarningRule = false,
+  });
+}
+
+class _SopTask {
+  final String title;
+  final String description;
+  final IconData icon;
+  final String? badge;
+
+  const _SopTask({
+    required this.title,
+    required this.description,
+    required this.icon,
+    this.badge,
   });
 }
 
@@ -2185,168 +2201,183 @@ class _AppointmentGuidelineDialog extends StatefulWidget {
 }
 
 class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog> {
-  String _selectedCategory = 'All';
+  int _currentStep = 0;
   final Set<int> _checkedChecklist = {};
-  final Set<String> _expandedTitles = {};
+  bool _viewingAllSteps = false;
 
-  void _toggleExpand(String title) {
-    setState(() {
-      if (_expandedTitles.contains(title)) {
-        _expandedTitles.remove(title);
-      } else {
-        _expandedTitles.add(title);
-      }
-    });
-  }
-
-  void _toggleExpandAll() {
-    setState(() {
-      if (_expandedTitles.length >= _items.length) {
-        _expandedTitles.clear();
-      } else {
-        _expandedTitles.addAll(_items.map((e) => e.title));
-      }
-    });
-  }
-
-  static const List<String> _categories = [
-    'All',
-    'Arrival & Status',
-    'Reschedule & Policy',
-    'Transfers & Services',
-    'Payments & Refunds',
-    'Daily SOP Checklist',
-  ];
-
-  static const List<_GuidelineItemData> _items = [
-    _GuidelineItemData(
-      category: 'Arrival & Status',
-      tag: 'STEP-BY-STEP',
-      tagColor: Color(0xFF10B981),
+  static const List<_SopStep> _steps = [
+    _SopStep(
+      number: 1,
+      shortTitle: '1. Check-In',
+      title: 'Patient Arrival & Queue Verification',
+      description: 'Verify appointments, handle walk-in registrations, and keep the clinic queue moving.',
       icon: Icons.how_to_reg_rounded,
-      iconColor: Color(0xFF10B981),
-      title: 'Patient Arrival & Consultation Lifecycle',
-      highlight: 'Mark "Completed" right after consultation & counter payment.',
-      steps: [
-        'Check patient into today\'s schedule (click "Refresh" in the top-right to ensure newly booked app appointments appear).',
-        'Once doctor completes consultation and patient finishes counter payment, immediately set status to "Completed".',
-        'If doctor is running behind schedule, tap the green WhatsApp icon to send the waiting patient an estimated consultation time.',
+      accentColor: Color(0xFF2563EB),
+      tasks: [
+        _SopTask(
+          title: 'Sync Latest Bookings',
+          description: 'Tap "Refresh" in the top-right toolbar to fetch newly created mobile app bookings for today.',
+          icon: Icons.sync_rounded,
+          badge: 'SYNC',
+        ),
+        _SopTask(
+          title: 'Walk-In Registration',
+          description: 'Always search Phone Number or IC/Passport first to prevent duplicate accounts. Record counter payment (Cash, QR, Terminal) in remarks.',
+          icon: Icons.person_add_alt_1_rounded,
+          badge: 'WALK-IN',
+        ),
+        _SopTask(
+          title: '1-Tap WhatsApp Ping',
+          description: 'If the doctor is running behind schedule, tap the green WhatsApp icon to notify the waiting patient with an updated time without saving their number.',
+          icon: Icons.chat_rounded,
+          badge: 'FAST NOTIFY',
+        ),
       ],
-      alertTip: '⚠️ Midnight Rule: The system automatically marks un-updated appointments as "No-Show" at 12:00 AM daily. Update statuses promptly before ending your shift!',
+      ruleTitle: 'Doctor Schedule Check',
+      ruleCallout: 'Always confirm the assigned practitioner is on duty for today\'s branch roster before sending the patient to the consultation room.',
+      isWarningRule: false,
     ),
-    _GuidelineItemData(
-      category: 'Arrival & Status',
-      tag: 'COUNTER BOOKING',
-      tagColor: Color(0xFF0891B2),
-      icon: Icons.person_add_alt_1_rounded,
-      iconColor: Color(0xFF0891B2),
-      title: 'Booking Walk-ins & In-Clinic Patients',
-      highlight: 'Search phone/IC first to avoid creating duplicate patient accounts.',
-      steps: [
-        'Always verify if the patient already has an account using their Phone Number or IC/Passport.',
-        'If collecting an in-clinic deposit (Cash, DuitNow QR, Card terminal), enter the transaction receipt / reference code in remarks.',
-        'Patients can also book directly anytime on the Aurora Mobile App without clinic staff assistance.',
-      ],
-      alertTip: '💡 Pro Tip: Walk-in patients can download the Aurora App while waiting to track upcoming visits and loyalty points.',
-    ),
-    _GuidelineItemData(
-      category: 'Reschedule & Policy',
-      tag: '24-HOUR POLICY',
-      tagColor: Color(0xFF2563EB),
-      icon: Icons.schedule_rounded,
-      iconColor: Color(0xFF2563EB),
-      title: 'Rescheduling: Patient App vs Clinic Staff',
-      highlight: 'Patients can only self-reschedule if MORE than 24 hours remain.',
-      steps: [
-        'More than 24 Hours Away: Patient can reschedule themselves directly inside the Aurora Mobile App.',
-        'Less than 24 Hours (Same-Day): Patient app is locked to protect clinic slot allocation. Only Clinic Staff can reschedule via this portal.',
-        'Example: Now is 1:00 PM. Appointment tomorrow 3:00 PM (26h away) → ✅ Patient self-reschedules in app. Appointment today 3:00 PM (2h away) → 🛑 Staff must verify doctor slot & reschedule manually.',
-      ],
-      alertTip: 'Always check doctor and room availability before confirming a same-day reschedule requested by the patient.',
-    ),
-    _GuidelineItemData(
-      category: 'Transfers & Services',
-      tag: 'BRANCH TRANSFER',
-      tagColor: Color(0xFF7C3AED),
-      icon: Icons.storefront_rounded,
-      iconColor: Color(0xFF7C3AED),
-      title: 'Transferring Patient to Another Aurora Branch',
-      highlight: 'Follow the 3-step inter-branch protocol to prevent double bookings.',
-      steps: [
-        'Step 1: Contact receiving clinic via WhatsApp/call to verify doctor & slot availability.',
-        'Step 2: Receiving branch adds the new appointment on their portal schedule.',
-        'Step 3: Origin branch updates existing appointment status to "Transferred" with remarks indicating target branch.',
-      ],
-      alertTip: 'Never delete an appointment when transferring — marking "Transferred" preserves audit history for both clinics.',
-    ),
-    _GuidelineItemData(
-      category: 'Transfers & Services',
-      tag: 'TREATMENT CHANGE',
-      tagColor: Color(0xFFD97706),
+    _SopStep(
+      number: 2,
+      shortTitle: '2. Consultation',
+      title: 'Doctor Hand-Off & Status Flow',
+      description: 'Track real-time patient progress from the waiting area into the consultation room.',
       icon: Icons.medical_services_rounded,
-      iconColor: Color(0xFFD97706),
-      title: 'Switching Appointment Service / Treatment',
-      highlight: 'Never overwrite notes if price or duration differs — refund & rebook instead.',
-      steps: [
-        'Step 1: Process a refund for the current appointment so payment ledgers balance.',
-        'Step 2: Create a new booking with the patient\'s newly selected treatment/service.',
+      accentColor: Color(0xFF7C3AED),
+      tasks: [
+        _SopTask(
+          title: 'Call Patient & Room Hand-off',
+          description: 'Doctor calls patient into room. Clinical ultrasound scans and medical records are completed in the consult room.',
+          icon: Icons.meeting_room_rounded,
+          badge: 'IN-PROGRESS',
+        ),
+        _SopTask(
+          title: 'Real-Time Queue Tracking',
+          description: 'Frontdesk monitors queue status on the live board. Mark status promptly to ensure accurate waiting times.',
+          icon: Icons.query_builder_rounded,
+          badge: 'QUEUE',
+        ),
       ],
-      alertTip: 'This ensures inventory, doctor commissions, and financial reports reflect the correct service code.',
+      ruleTitle: 'Midnight Auto No-Show Rule',
+      ruleCallout: '⚠️ Crucial Rule: The system automatically marks any un-updated "Booked" appointments as "No-Show" at 12:00 AM daily. Update all statuses before ending your shift!',
+      isWarningRule: true,
     ),
-    _GuidelineItemData(
-      category: 'Payments & Refunds',
-      tag: 'FINANCIAL SOP',
-      tagColor: Color(0xFFDC2626),
-      icon: Icons.account_balance_wallet_rounded,
-      iconColor: Color(0xFFDC2626),
-      title: 'Refunded vs Cancelled (Golden Rule)',
-      highlight: 'If money was collected, ALWAYS choose "Refunded", NEVER "Cancelled".',
-      steps: [
-        'Choosing "Cancelled" does NOT log a refund transaction in financial reports or payment gateways.',
-        'Choosing "Refunded" automatically creates an accounting credit note, updates daily net revenue, and records refund details.',
-        'Only choose "Cancelled" if RM 0.00 was paid and no payment was attempted.',
+    _SopStep(
+      number: 3,
+      shortTitle: '3. Checkout & Rebook',
+      title: 'Payment Collection & Milestone Rebooking',
+      description: 'Balance settlement, loyalty points auto-crediting, and pregnant milestone next scan rebooking.',
+      icon: Icons.point_of_sale_rounded,
+      accentColor: Color(0xFF10B981),
+      tasks: [
+        _SopTask(
+          title: 'Collect Balance Payment',
+          description: 'Click "Checkout" in appointment details. System automatically deducts the online booking deposit (e.g. RM 20) from the gross bill to calculate collectable balance.',
+          icon: Icons.payments_rounded,
+          badge: 'BALANCE BILL',
+        ),
+        _SopTask(
+          title: 'Auto Loyalty Points',
+          description: 'Every RM 10 spent automatically credits 1 Aurora Point to the patient\'s mobile app account.',
+          icon: Icons.stars_rounded,
+          badge: 'POINTS',
+        ),
+        _SopTask(
+          title: 'Milestone Rebooking',
+          description: 'Offer patient the next scan in their pregnancy journey: Dating/NT Scan → W18–24 Detail Anomaly → W26–32 4D/5D HD Live → W33–36 Growth & Doppler → Postnatal.',
+          icon: Icons.child_care_rounded,
+          badge: 'SCAN CHAIN',
+        ),
+        _SopTask(
+          title: 'Mark Completed & Send WhatsApp Receipt',
+          description: 'Mark status as "Completed" immediately after counter payment. Tap WhatsApp to send the patient their digital receipt and next booking confirmation.',
+          icon: Icons.receipt_long_rounded,
+          badge: 'RECEIPT',
+        ),
       ],
-      alertTip: '⚠️ In Payment Report, successfully refunded bookings are cleanly separated from actual clinic revenue.',
+      ruleTitle: 'Shift Settlement',
+      ruleCallout: 'Marking "Completed" locks the booking and ensures daily counter collections match the branch financial summary.',
+      isWarningRule: false,
     ),
-    _GuidelineItemData(
-      category: 'Arrival & Status',
-      tag: 'PATIENT RESCUE',
-      tagColor: Color(0xFF059669),
-      icon: Icons.chat_rounded,
-      iconColor: Color(0xFF059669),
-      title: 'WhatsApp Direct Chat & Checkout Rescue',
-      highlight: 'Reach out to patients in 1 tap without saving phone numbers.',
-      steps: [
-        'Tap the green WhatsApp icon beside any appointment to instantly open a pre-filled WhatsApp conversation on your browser/desktop.',
-        'Use WhatsApp for sending appointment reminders, location pins, pre-treatment instructions, and post-care follow-ups.',
-        'In Payment Report → "Needs Rescue", you can message patients who dropped off at checkout. Patients who already retried and paid are automatically filtered out.',
+    _SopStep(
+      number: 4,
+      shortTitle: '4. Reschedule & Transfer',
+      title: 'Schedule Changes & Inter-Branch Transfers',
+      description: 'Protect slot allocations with the 24-hour rule and the 3-step branch transfer protocol.',
+      icon: Icons.swap_horiz_rounded,
+      accentColor: Color(0xFF0284C7),
+      tasks: [
+        _SopTask(
+          title: '24-Hour Reschedule Policy',
+          description: '> 24 hours away: Patient can self-reschedule in their Aurora App.\n< 24 hours (Same-Day): Patient app is locked; only clinic staff can reschedule from this portal after verifying doctor availability.',
+          icon: Icons.schedule_rounded,
+          badge: '24H RULE',
+        ),
+        _SopTask(
+          title: '3-Step Branch Transfer Protocol',
+          description: '1. Contact receiving branch to verify doctor slot.\n2. Receiving branch creates new appointment.\n3. Origin branch updates existing appointment to "Transferred".',
+          icon: Icons.storefront_rounded,
+          badge: 'TRANSFER',
+        ),
+        _SopTask(
+          title: 'Preserve Audit Trail',
+          description: 'Never delete an appointment when transferring — "Transferred" status preserves historical booking logs for both branches.',
+          icon: Icons.history_edu_rounded,
+          badge: 'AUDIT',
+        ),
       ],
-      alertTip: 'Polite checkout assistance via WhatsApp recovers up to 25% of dropped online booking fees!',
+      ruleTitle: 'Service / Treatment Changes',
+      ruleCallout: 'If changing to a different service with differing fees, refund the existing booking and create a new booking to keep financial reports and commissions balanced.',
+      isWarningRule: false,
+    ),
+    _SopStep(
+      number: 5,
+      shortTitle: '5. Closing & Audit',
+      title: 'Financial Accounting & Daily Closing Checklist',
+      description: 'Distinguish refunds from cancellations and complete the frontdesk closing checklist.',
+      icon: Icons.fact_check_rounded,
+      accentColor: Color(0xFF059669),
+      tasks: [
+        _SopTask(
+          title: 'Refunded vs Cancelled (Golden Rule)',
+          description: 'If money was collected (including online deposit), ALWAYS choose "Refunded" with reason. Choose "Cancelled" ONLY if RM 0.00 was paid and no money was collected.',
+          icon: Icons.account_balance_wallet_rounded,
+          badge: 'GOLDEN RULE',
+        ),
+        _SopTask(
+          title: 'Accounting Credit Notes',
+          description: 'Choosing "Refunded" automatically generates a ledger credit note, adjusts daily net revenue, and keeps Payment Reports audit-ready.',
+          icon: Icons.receipt_rounded,
+          badge: 'LEDGER',
+        ),
+      ],
+      ruleTitle: 'Audit Invariant',
+      ruleCallout: '⚠️ In Payment Report, refunded bookings are cleanly separated from actual clinic revenue.',
+      isWarningRule: true,
     ),
   ];
 
   static const List<String> _checklistItems = [
     'Morning Sync: Clicked "Refresh" to load latest online bookings from app.',
-    'Appointment Reminders: Sent WhatsApp reminders for today\'s afternoon sessions.',
-    'Post-Consultation: Updated all attended patients to "Completed" status.',
-    'Same-Day Reschedules: Verified doctor availability before shifting times.',
-    'Accounting Rule: Marked paid cancellations as "Refunded" (not "Cancelled").',
-    'Branch Transfers: Confirmed receiving branch created appointment before marking "Transferred".',
-    'Zero Leftovers: Ensured 0 appointments remain in "Booked" status by closing time.',
+    'WhatsApp Reminders: Sent reminder alerts to today\'s scheduled afternoon patients.',
+    'Doctor Hand-Off: Verified doctor and room allocations for today\'s roster.',
+    'Counter Checkout: Processed balance payments and marked attended visits as "Completed".',
+    'Milestone Rebooking: Offered next pregnancy scan milestone during patient checkout.',
+    'Accounting Rule: Marked all paid cancellations as "Refunded" (not "Cancelled").',
+    'Zero Leftovers: Ensured 0 appointments remain in "Booked" status before closing shift.',
   ];
 
   @override
   Widget build(BuildContext context) {
-    final filteredItems = _selectedCategory == 'All'
-        ? _items
-        : _items.where((it) => it.category == _selectedCategory).toList();
+    final isMobile = MediaQuery.of(context).size.width < 768;
+    final currentStepData = _steps[_currentStep];
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 40, vertical: 24),
       clipBehavior: Clip.antiAlias,
       child: Container(
-        width: isMobile ? double.infinity : 740,
+        width: isMobile ? double.infinity : 760,
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
         color: appSurfaceSubtle,
         child: Column(
@@ -2355,7 +2386,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
           children: [
             // Executive Gradient Header
             Container(
-              padding: const EdgeInsets.fromLTRB(22, 18, 16, 18),
+              padding: const EdgeInsets.fromLTRB(22, 16, 16, 16),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFFDF6E98), Color(0xFF7E2D40)],
@@ -2390,7 +2421,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'End-to-End Standard Operating Procedures (SOP) for Frontdesk',
+                          'Frontdesk Standard Operating Procedures (SOP) & Stepper Flow',
                           style: TextStyle(fontSize: 12, color: Colors.white.withAlpha(220)),
                         ),
                       ],
@@ -2399,105 +2430,279 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                   IconButton(
                     icon: const Icon(Icons.close_rounded, color: Colors.white, size: 22),
                     tooltip: 'Close',
-                    onPressed: () => context.pop(),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
 
-            // Segmented Category Filter Bar + Expand/Collapse All
+            // Stepper Navigation Tabs Bar + Progress Track
             Container(
               color: appSurface,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: _categories.map((cat) {
-                          final isSelected = _selectedCategory == cat;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: InkWell(
-                              onTap: () => setState(() => _selectedCategory = cat),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? appInkPrimary : appSurfaceSubtle,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _steps.asMap().entries.map((entry) {
+                              final idx = entry.key;
+                              final step = entry.value;
+                              final isActive = _currentStep == idx && !_viewingAllSteps;
+                              final isCompleted = _currentStep > idx && !_viewingAllSteps;
+
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _viewingAllSteps = false;
+                                      _currentStep = idx;
+                                    });
+                                  },
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: isSelected ? appInkPrimary : appBorder),
-                                ),
-                                child: Text(
-                                  cat,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                    color: isSelected ? Colors.white : appInkSecondary,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6.5),
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? primary
+                                          : (isCompleted ? appSuccessSoft : appSurfaceSubtle),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isActive
+                                            ? primary
+                                            : (isCompleted
+                                                ? (appIsDarkMode ? const Color(0xFF166534) : const Color(0xFF86EFAC))
+                                                : appBorder),
+                                        width: isActive ? 1.5 : 1.0,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 18,
+                                          height: 18,
+                                          decoration: BoxDecoration(
+                                            color: isActive
+                                                ? Colors.white.withAlpha(50)
+                                                : (isCompleted
+                                                    ? accessibleAccent(const Color(0xFF16A34A)).withAlpha(35)
+                                                    : appBorder),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: isCompleted
+                                                ? Icon(Icons.check_rounded, size: 12, color: accessibleAccent(const Color(0xFF16A34A)))
+                                                : Text(
+                                                    '${idx + 1}',
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.w800,
+                                                      color: isActive ? Colors.white : appInkMuted,
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 7),
+                                        Text(
+                                          step.shortTitle,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+                                            color: isActive
+                                                ? Colors.white
+                                                : (isCompleted ? appSuccessText : appInkSecondary),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
+                          ),
+                        ),
                       ),
+                      const SizedBox(width: 8),
+                      // Toggle View All / Stepper Mode
+                      InkWell(
+                        onTap: () => setState(() => _viewingAllSteps = !_viewingAllSteps),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _viewingAllSteps ? primary : appSurfaceSubtle,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: _viewingAllSteps ? primary : appBorder),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _viewingAllSteps ? Icons.view_carousel_rounded : Icons.view_agenda_rounded,
+                                size: 14,
+                                color: _viewingAllSteps ? Colors.white : appInkSecondary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _viewingAllSteps ? 'Stepper' : 'View All',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: _viewingAllSteps ? Colors.white : appInkSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Progress Track
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: _viewingAllSteps ? 1.0 : (_currentStep + 1) / _steps.length,
+                      minHeight: 3,
+                      backgroundColor: appSurfaceSubtle,
+                      valueColor: AlwaysStoppedAnimation<Color>(accessibleAccent(primary)),
                     ),
                   ),
-                  if (_selectedCategory != 'Daily SOP Checklist') ...[
-                    const SizedBox(width: 8),
-                    InkWell(
-                      onTap: _toggleExpandAll,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5.5),
-                        decoration: BoxDecoration(
-                          color: appSurfaceSubtle,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: appBorder),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _expandedTitles.length >= _items.length
-                                  ? Icons.unfold_less_rounded
-                                  : Icons.unfold_more_rounded,
-                              size: 14,
-                              color: appInkSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _expandedTitles.length >= _items.length ? 'Collapse All' : 'Expand All',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkSecondary),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
             Divider(height: 1, color: appBorder),
 
-            // Scrollable Content
+            // Animated Step Body / Scrollable Content
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (_selectedCategory != 'Daily SOP Checklist') ...[
-                      for (final item in filteredItems) _buildCard(item),
-                    ],
+                child: _viewingAllSteps
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (final s in _steps) ...[
+                            _buildStepCardBlock(s),
+                            const SizedBox(height: 14),
+                          ],
+                          _buildChecklistSection(),
+                        ],
+                      )
+                    : AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 280),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0.04, 0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: KeyedSubtree(
+                          key: ValueKey<int>(_currentStep),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildStepHeader(currentStepData),
+                              const SizedBox(height: 12),
+                              for (final task in currentStepData.tasks)
+                                _buildTaskCard(task, currentStepData.accentColor),
+                              if (currentStepData.ruleCallout != null)
+                                _buildRuleBox(
+                                  currentStepData.ruleTitle ?? 'Operational Rule',
+                                  currentStepData.ruleCallout!,
+                                  isWarning: currentStepData.isWarningRule,
+                                ),
+                              if (_currentStep == _steps.length - 1) ...[
+                                const SizedBox(height: 8),
+                                _buildChecklistSection(),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+              ),
+            ),
 
-                    if (_selectedCategory == 'All' || _selectedCategory == 'Daily SOP Checklist') ...[
-                      const SizedBox(height: 6),
-                      _buildChecklistSection(),
+            // Stepper Bottom Navigation Footer
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: appSurface,
+                border: Border(top: BorderSide(color: appBorder)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: _currentStep > 0 && !_viewingAllSteps
+                        ? () => setState(() => _currentStep--)
+                        : null,
+                    icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                    label: const Text('Previous'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: appInkPrimary,
+                      disabledForegroundColor: appInkMuted.withAlpha(100),
+                      side: BorderSide(color: appBorder),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _viewingAllSteps
+                            ? 'Overview (${_steps.length} Steps)'
+                            : 'Step ${_currentStep + 1} of ${_steps.length}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: appInkMuted,
+                        ),
+                      ),
                     ],
-                  ],
-                ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      if (_viewingAllSteps || _currentStep >= _steps.length - 1) {
+                        Navigator.of(context).pop();
+                      } else {
+                        setState(() => _currentStep++);
+                      }
+                    },
+                    icon: Icon(
+                      _viewingAllSteps || _currentStep >= _steps.length - 1
+                          ? Icons.check_circle_rounded
+                          : Icons.arrow_forward_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      _viewingAllSteps || _currentStep >= _steps.length - 1 ? 'Got It' : 'Next Step',
+                      style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primary,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 0,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -2506,159 +2711,245 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
     );
   }
 
-  Widget _buildCard(_GuidelineItemData item) {
-    final isExpanded = _expandedTitles.contains(item.title);
-
+  Widget _buildStepHeader(_SopStep step) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: appSurface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: isExpanded ? item.iconColor.withAlpha(90) : appBorder, width: isExpanded ? 1.5 : 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: isExpanded ? item.iconColor.withAlpha(15) : Colors.black.withAlpha(5),
-            blurRadius: isExpanded ? 8 : 4,
-            offset: const Offset(0, 2),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: appBorder),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: accessibleAccent(step.accentColor).withAlpha(25),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(step.icon, color: accessibleAccent(step.accentColor), size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: accessibleAccent(step.accentColor).withAlpha(25),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'STEP ${step.number}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: accessibleAccent(step.accentColor),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        step.title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: appInkPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  step.description,
+                  style: TextStyle(fontSize: 12, color: appInkSecondary),
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStepCardBlock(_SopStep step) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: appSurface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: () => _toggleExpand(item.title),
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: item.iconColor.withAlpha(25),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(item.icon, color: item.iconColor, size: 17),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                item.title,
-                                style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: appInkPrimary),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: item.tagColor.withAlpha(20),
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(color: item.tagColor.withAlpha(50)),
-                              ),
-                              child: Text(
-                                item.tag,
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: item.tagColor),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          item.highlight,
-                          style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: item.iconColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(6)),
-                    child: Icon(
-                      isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
-                      size: 16,
-                      color: appInkMuted,
-                    ),
-                  ),
-                ],
+          Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: accessibleAccent(step.accentColor).withAlpha(25),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                child: Icon(step.icon, color: accessibleAccent(step.accentColor), size: 16),
               ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Step ${step.number}: ${step.title}',
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: appInkPrimary),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          for (final task in step.tasks)
+            _buildTaskCard(task, step.accentColor),
+          if (step.ruleCallout != null)
+            _buildRuleBox(
+              step.ruleTitle ?? 'Operational Rule',
+              step.ruleCallout!,
+              isWarning: step.isWarningRule,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskCard(_SopTask task, Color accentColor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: appSurfaceSubtle,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: appBorder, width: 0.8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: accessibleAccent(accentColor).withAlpha(25),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(task.icon, color: accessibleAccent(accentColor), size: 15),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        task.title,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: appInkPrimary,
+                        ),
+                      ),
+                    ),
+                    if (task.badge != null) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: accessibleAccent(accentColor).withAlpha(20),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: accessibleAccent(accentColor).withAlpha(50)),
+                        ),
+                        child: Text(
+                          task.badge!,
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: accessibleAccent(accentColor),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  task.description,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    height: 1.45,
+                    color: appInkSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
-          if (isExpanded) ...[
-            Divider(height: 1, color: appSurfaceSubtle),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (int sIdx = 0; sIdx < item.steps.length; sIdx++)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 18,
-                            height: 18,
-                            margin: const EdgeInsets.only(top: 1, right: 8),
-                            decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(9)),
-                            child: Center(
-                              child: Text(
-                                '${sIdx + 1}',
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appInkSecondary),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              item.steps[sIdx],
-                              style: TextStyle(fontSize: 12, height: 1.45, color: appInkSecondary),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (item.alertTip != null) ...[
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: appWarningSoft,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFFDE68A)),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFB45309)),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              item.alertTip!,
-                              style: const TextStyle(
-                                fontSize: 11.5,
-                                height: 1.4,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF92400E),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRuleBox(String title, String callout, {required bool isWarning}) {
+    final bgColor = isWarning ? appWarningSoft : appInfoSoft;
+    final borderColor = isWarning
+        ? (appIsDarkMode ? const Color(0xFF78350F) : const Color(0xFFFDE68A))
+        : (appIsDarkMode ? const Color(0xFF1E3A8A) : const Color(0xFFBFDBFE));
+    final iconColor = isWarning
+        ? accessibleAccent(const Color(0xFFD97706))
+        : accessibleAccent(const Color(0xFF2563EB));
+    final textColor = isWarning ? appWarningText : appInfoText;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 4, bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(isWarning ? Icons.warning_amber_rounded : Icons.info_outline_rounded,
+              size: 15, color: iconColor),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  callout,
+                  style: TextStyle(
+                    fontSize: 11,
+                    height: 1.4,
+                    fontWeight: FontWeight.w500,
+                    color: textColor,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -2667,54 +2958,72 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
   Widget _buildChecklistSection() {
     final doneCount = _checkedChecklist.length;
     final totalCount = _checklistItems.length;
+    final isAllDone = doneCount == totalCount;
 
     return Container(
+      margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
         color: appSuccessSoft,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF86EFAC)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: appIsDarkMode ? const Color(0xFF166534) : const Color(0xFF86EFAC),
+        ),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.checklist_rounded, color: Color(0xFF16A34A), size: 20),
-                  SizedBox(width: 8),
+                  Icon(Icons.checklist_rounded,
+                      color: accessibleAccent(const Color(0xFF16A34A)), size: 18),
+                  const SizedBox(width: 8),
                   Text(
                     'Daily Frontdesk Closing Checklist',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF166534)),
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: appSuccessText,
+                    ),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: doneCount == totalCount ? const Color(0xFF16A34A) : appSuccessSoft,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF86EFAC)),
+                  color: isAllDone
+                      ? accessibleAccent(const Color(0xFF16A34A))
+                      : (appIsDarkMode ? const Color(0xFF133E3B) : const Color(0xFFD1FAE5)),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isAllDone
+                        ? accessibleAccent(const Color(0xFF16A34A))
+                        : (appIsDarkMode ? const Color(0xFF166534) : const Color(0xFF86EFAC)),
+                  ),
                 ),
                 child: Text(
                   '$doneCount / $totalCount Completed',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: doneCount == totalCount ? Colors.white : const Color(0xFF166534),
+                    color: isAllDone ? Colors.white : appSuccessText,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          const Text(
-            'Tap items below to check off your daily operational tasks:',
-            style: TextStyle(fontSize: 11.5, color: Color(0xFF15803D)),
+          const SizedBox(height: 6),
+          Text(
+            'Tap items below to check off your daily operational closing tasks:',
+            style: TextStyle(
+              fontSize: 11.5,
+              color: appSuccessText.withValues(alpha: 0.9),
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           for (int i = 0; i < _checklistItems.length; i++) ...[
             InkWell(
               onTap: () {
@@ -2726,7 +3035,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                   }
                 });
               },
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                 child: Row(
@@ -2737,15 +3046,17 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                           ? Icons.check_box_rounded
                           : Icons.check_box_outline_blank_rounded,
                       size: 18,
-                      color: _checkedChecklist.contains(i) ? const Color(0xFF16A34A) : appInkMuted,
+                      color: _checkedChecklist.contains(i)
+                          ? accessibleAccent(const Color(0xFF16A34A))
+                          : appInkMuted,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _checklistItems[i],
                         style: TextStyle(
-                          fontSize: 12.5,
-                          color: _checkedChecklist.contains(i) ? const Color(0xFF15803D) : appInkPrimary,
+                          fontSize: 12,
+                          color: _checkedChecklist.contains(i) ? appSuccessText : appInkPrimary,
                           decoration: _checkedChecklist.contains(i) ? TextDecoration.lineThrough : null,
                           fontWeight: _checkedChecklist.contains(i) ? FontWeight.w500 : FontWeight.w600,
                         ),
