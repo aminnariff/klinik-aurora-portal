@@ -79,6 +79,11 @@ const Duration scheduledNotificationInterval = Duration(minutes: 30);
 
 double fileSizeLimit = 1.0;
 
+// Hosted Legal Policies
+const String privacyPolicyUrl = 'https://klinikauroramembership.com/privacy-policy';
+const String termsAndConditionsUrl = 'https://klinikauroramembership.com/terms-and-conditions';
+const String refundPolicyUrl = 'https://klinikauroramembership.com/refund-policy';
+
 
     // "permissionId": "1bda631e-ef17-11ee-bd1b-cc801b09db2f",
     // "permissionName": "User Management",
