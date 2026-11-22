@@ -119,10 +119,33 @@ class AppointmentDetails extends StatefulWidget {
 class _AppointmentDetailsState extends State<AppointmentDetails> {
   String? _selectedUserId;
   String? _selectedUserNric;
+  bool _isEddFromBabyTracker = false;
   final TextEditingController _patientSearchCtrl = TextEditingController();
   List<UserResponse> _patientSearchResults = [];
   bool _isSearchingPatients = false;
   final Debouncer _patientDebouncer = Debouncer(milliseconds: 300);
+
+  void _fetchAndPrepopulateBabyTrackerEdd(String userId) {
+    UserController.babyTracker(context, userId).then((res) {
+      if (!mounted) return;
+      if (res.data is Map<String, dynamic>) {
+        final profile = (res.data as Map<String, dynamic>)['profile'];
+        final eddStr = profile?['eddDate']?.toString();
+        if (eddStr != null && eddStr.isNotEmpty && dueDateController.controller.text.isEmpty) {
+          final formatted = dateConverter(eddStr, format: 'dd-MM-yyyy');
+          if (formatted != null && formatted.isNotEmpty) {
+            setState(() {
+              dueDateController.controller.text = formatted;
+              _isEddFromBabyTracker = true;
+            });
+            if (dateTimeController.text.isNotEmpty) {
+              calculateGestational();
+            }
+          }
+        }
+      }
+    }).catchError((_) {});
+  }
 
   final InputFieldAttribute patientNameController = InputFieldAttribute(
     controller: TextEditingController(),
@@ -231,6 +254,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         widget.appointment?.appointmentNote ?? widget.initialNote ?? '';
     dueDateController.controller.text =
         dateConverter(widget.appointment?.customerDueDate, format: 'dd-MM-yyyy') ?? widget.initialDueDate ?? '';
+    if (widget.type == 'create' && _selectedUserId != null && dueDateController.controller.text.isEmpty) {
+      _fetchAndPrepopulateBabyTrackerEdd(_selectedUserId!);
+    }
     _attachmentUrlController.text = widget.appointment?.appointmentAttachmentUrl ?? '';
     _referralLetterUrlController.text = widget.appointment?.appointmentReferralLetterUrl ?? '';
 
@@ -1122,6 +1148,27 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               ),
                                                             ),
                                                           ),
+                                                    if (_isEddFromBabyTracker && dueDateController.controller.text.isNotEmpty) ...[
+                                                      const SizedBox(height: 6),
+                                                      Container(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                                        decoration: BoxDecoration(
+                                                          color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                                                          borderRadius: BorderRadius.circular(6),
+                                                        ),
+                                                        child: const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Icon(Icons.child_care_rounded, size: 13, color: Color(0xFF7C3AED)),
+                                                            SizedBox(width: 4),
+                                                            Text(
+                                                              'Pre-filled from Baby Tracker (Click to change)',
+                                                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF7C3AED)),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ],
                                                   if (((notNullOrEmptyString(
                                                                 widget.appointment?.service?.eddRequired,
@@ -2171,6 +2218,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       if (dueDateController.errorMessage != null) {
         dueDateController.errorMessage = null;
       }
+      _isEddFromBabyTracker = false;
       dueDateController.controller.text = dateConverter('${results.first}', format: 'dd-MM-yyyy') ?? '';
       calculateGestational();
     }
@@ -2643,6 +2691,9 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       _patientSearchResults.clear();
       _patientSearchCtrl.clear();
     });
+    if (u.userId != null) {
+      _fetchAndPrepopulateBabyTrackerEdd(u.userId!);
+    }
     rebuild.add(DateTime.now());
   }
 
@@ -3438,6 +3489,27 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           ),
                         ),
                       ),
+                if (_isEddFromBabyTracker && dueDateController.controller.text.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.child_care_rounded, size: 13, color: Color(0xFF7C3AED)),
+                        SizedBox(width: 4),
+                        Text(
+                          'Pre-filled from Baby Tracker (Click to change)',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF7C3AED)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 if (((notNullOrEmptyString(widget.appointment?.service?.eddRequired) &&
                             widget.appointment?.service?.dueDateToggle == 1) ||
                         (selectedService?.dueDateToggle == 1 && selectedService?.eddRequired != null)) &&
