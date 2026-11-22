@@ -517,59 +517,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   void _quickUpdateStatus(int newStatus, String statusName) {
     if (newStatus == 5) {
-      final needsCompletionCheck =
-          widget.appointment?.appointmentStatus != 5 &&
-          (double.tryParse(widget.appointment?.service?.serviceBookingFee ?? '0') ?? 0) > 0;
-
-      final alreadyPaid = isBookingFeePaid(
-        widget.appointment?.appointmentNote,
-        payments: widget.appointment?.payment,
-      );
-
-      if (needsCompletionCheck && !alreadyPaid && !_bookingFeeCollected) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            title: const Text('Unpaid Booking Fee', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'This appointment has an unpaid booking fee. Please enter receipt number to confirm collection before completing.',
-                  style: TextStyle(fontSize: 13, color: appInkMuted),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: _receiptNumberController,
-                  decoration: const InputDecoration(
-                    labelText: 'Receipt No. / Ref No.',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.receipt_long_rounded),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(onPressed: () => ctx.pop(), child: const Text('Cancel')),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF059669),
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  if (_receiptNumberController.text.trim().isEmpty) {
-                    showDialogError(context, 'Please enter a receipt number');
-                    return;
-                  }
-                  ctx.pop();
-                  _doUpdateStatus(5, 'Completed', bookingFeeCollected: true, receiptNo: _receiptNumberController.text.trim());
-                },
-                child: const Text('Confirm & Complete'),
-              ),
-            ],
-          ),
+      if (widget.appointment?.appointmentId != null) {
+        AppointmentCheckoutDialog.show(
+          context,
+          appointmentId: widget.appointment!.appointmentId!,
+          onCompleted: () {
+            if (widget.refreshData != null) widget.refreshData!();
+            Navigator.of(context, rootNavigator: true).pop();
+          },
         );
         return;
       }

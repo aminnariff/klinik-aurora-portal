@@ -195,6 +195,7 @@ class AppointmentCheckoutController {
   static Future<ApiResponse<CheckoutResultData>> submitCheckout(
     BuildContext context,
     String appointmentId, {
+    double? totalSpend,
     required double basePrice,
     required double bookingFeePaid,
     required List<CheckoutAddOnItem> extraItems,
@@ -212,6 +213,8 @@ class AppointmentCheckoutController {
       method: Method.post,
       endpoint: 'admin/appointment/$appointmentId/checkout',
       data: {
+        'totalSpend': totalSpend ?? basePrice,
+        'grossTotal': totalSpend ?? basePrice,
         'basePrice': basePrice,
         'bookingFeePaid': bookingFeePaid,
         'extraItems': extraItems.map((e) => e.toJson()).toList(),
