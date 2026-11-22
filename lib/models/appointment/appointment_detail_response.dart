@@ -28,6 +28,12 @@ class Data {
   String? appointmentAttachmentUrl;
   String? appointmentReferralLetterUrl;
   String? customerDueDate;
+
+  /// Baby Tracker choice: 1 single, 2 twins, null = no profile.
+  int? babyCount;
+
+  /// Who the booked service is for: "single", "twin", or null for both.
+  String? servicePregnancyType;
   String? appointmentRating;
   String? appointmentFeedback;
   int? appointmentStatus;
@@ -75,6 +81,8 @@ class Data {
     appointmentAttachmentUrl = json['appointmentAttachmentUrl'];
     appointmentReferralLetterUrl = json['appointmentReferralLetterUrl'];
     customerDueDate = json['customerDueDate'];
+    babyCount = (json['babyCount'] as num?)?.toInt();
+    servicePregnancyType = json['servicePregnancyType']?.toString();
     appointmentRating = json['appointmentRating'];
     appointmentFeedback = json['appointmentFeedback'];
     appointmentStatus = json['appointmentStatus'];

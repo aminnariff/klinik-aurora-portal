@@ -132,6 +132,7 @@ void main() {
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Nama Barangan *'), 'Besen Mandi Bayi');
       await tester.enterText(find.widgetWithText(TextFormField, 'Cadangan Kuantiti'), '1 unit');
+      await tester.enterText(find.widgetWithText(TextFormField, 'Kuantiti untuk Kembar (pilihan)'), '2 unit');
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Spesifikasi (Pilihan Fabrik & Saiz)'),
         'Ergonomik dengan penyokong leher',
@@ -152,6 +153,7 @@ void main() {
       expect(savedData, isNotNull);
       expect(savedData!['title'], 'Besen Mandi Bayi');
       expect(savedData!['quantity'], '1 unit');
+      expect(savedData!['twinQuantity'], '2 unit');
       expect(savedData!['categoryKey'], 'mandi');
       expect(savedData!['isWajib'], true);
       expect(savedData!['isHospitalBag'], false);
@@ -290,7 +292,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final textFields = tester.widgetList<TextField>(find.byType(TextField));
-      expect(textFields.length, equals(5));
+      expect(textFields.length, equals(6)); // incl. twin quantity
       for (final tf in textFields) {
         expect(tf.style?.fontSize, isNotNull);
         expect(tf.style!.fontSize!, lessThanOrEqualTo(14.0));

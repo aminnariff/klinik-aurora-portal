@@ -62,6 +62,9 @@ import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/typography/typography.dart';
 import 'package:provider/provider.dart';
 
+/// Signature of [UserController.babyTracker] (the patient's Baby Tracker profile).
+typedef BabyTrackerProfileLoader = Future<ApiResponse<dynamic>> Function(BuildContext context, String userId);
+
 /// Signature of [ServiceBranchController.available].
 typedef AvailableServicesLoader = Future<ApiResponse<service_branch_available_model.ServiceBranchAvailableResponse>>
     Function(BuildContext context, {String? branchId});
@@ -95,6 +98,9 @@ class AppointmentDetails extends StatefulWidget {
   /// tests pass a fake.
   final AvailableServicesLoader loadAvailableServices;
 
+  /// API seam for the Baby Tracker profile used to pre-fill the EDD.
+  final BabyTrackerProfileLoader loadBabyTrackerProfile;
+
   const AppointmentDetails({
     super.key,
     this.appointment,
@@ -110,6 +116,7 @@ class AppointmentDetails extends StatefulWidget {
     this.initialNote,
     this.initialServiceKeyword,
     this.loadAvailableServices = ServiceBranchController.available,
+    this.loadBabyTrackerProfile = UserController.babyTracker,
   });
 
   @override
@@ -126,11 +133,16 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   final Debouncer _patientDebouncer = Debouncer(milliseconds: 300);
 
   void _fetchAndPrepopulateBabyTrackerEdd(String userId) {
-    UserController.babyTracker(context, userId).then((res) {
+    widget.loadBabyTrackerProfile(context, userId).then((res) {
       if (!mounted) return;
       if (res.data is Map<String, dynamic>) {
-        final profile = (res.data as Map<String, dynamic>)['profile'];
-        final eddStr = profile?['eddDate']?.toString();
+        // The API answers {message, data: {profile, ...}}.
+        final body = res.data as Map<String, dynamic>;
+        final payload = body['data'] is Map<String, dynamic> ? body['data'] as Map<String, dynamic> : body;
+        final profile = payload['profile'];
+        // A recorded birth means that pregnancy is over: don't reuse its EDD.
+        final bool isBorn = profile is Map && profile['birthDate'] != null;
+        final String? eddStr = isBorn ? null : (profile is Map ? profile['eddDate']?.toString() : null);
         if (eddStr != null && eddStr.isNotEmpty && dueDateController.controller.text.isEmpty) {
           final formatted = dateConverter(eddStr, format: 'dd-MM-yyyy');
           if (formatted != null && formatted.isNotEmpty) {

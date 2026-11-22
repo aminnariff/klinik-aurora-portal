@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/widgets/patient/twins_badge.dart';
 import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
@@ -22,6 +23,20 @@ import 'package:klinik_aurora_portal/views/widgets/global/status.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
 import 'package:klinik_aurora_portal/views/widgets/selectable_text/app_selectable_text.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
+
+
+/// Warning when the booked service does not match the mother's Single/Twins
+/// choice in the app's Baby Tracker; null when they agree or either is unknown.
+String? pregnancyTypeMismatch(int? babyCount, String? servicePregnancyType) {
+  if (babyCount == 2 && servicePregnancyType == 'single') {
+    return 'Baby Tracker says twins, but this is a single-pregnancy service. '
+        'Check whether the twin version should be booked (duration and price differ).';
+  }
+  if (babyCount == 1 && servicePregnancyType == 'twin') {
+    return 'Baby Tracker says one baby, but this is a twin service. Confirm with the patient.';
+  }
+  return null;
+}
 
 class AppointmentDetailsView extends StatelessWidget {
   final AppointmentDetailResponse? response;
@@ -442,6 +457,31 @@ class AppointmentDetailsView extends StatelessWidget {
                   '—',
             ),
           ],
+        ],
+        if (data?.babyCount == 2) ...[
+          const SizedBox(height: 10),
+          const TwinsBadge(),
+        ],
+        if (pregnancyTypeMismatch(data?.babyCount, data?.servicePregnancyType) case final warning?) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF3C7),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFFCD34D)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFF92400E)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(warning, style: const TextStyle(fontSize: 12, height: 1.35, color: Color(0xFF92400E))),
+                ),
+              ],
+            ),
+          ),
         ],
       ],
     );

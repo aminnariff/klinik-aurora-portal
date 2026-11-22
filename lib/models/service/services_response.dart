@@ -49,6 +49,16 @@ class Data {
   String? createdDate;
   String? modifiedDate;
 
+  /// Gestational range, e.g. "11w0d-13w6d". Booking eligibility, and the
+  /// patient scan timeline window when [scanMilestones] is set.
+  String? eddRequired;
+
+  /// Antenatal timeline steps this service covers: nt_scan, detail_scan, scan_4d5d, growth_scan.
+  List<String> scanMilestones = const [];
+
+  /// "single", "twin", or null for both.
+  String? pregnancyType;
+
   Data({
     this.serviceId,
     this.serviceName,
@@ -82,6 +92,9 @@ class Data {
     serviceStatus = json['serviceStatus'];
     createdDate = json['createdDate'];
     modifiedDate = json['modifiedDate'];
+    eddRequired = json['eddRequired']?.toString();
+    scanMilestones = (json['scanMilestones'] is List) ? List<String>.from(json['scanMilestones']) : const [];
+    pregnancyType = json['pregnancyType']?.toString();
   }
 
   Map<String, dynamic> toJson() {

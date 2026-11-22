@@ -42,6 +42,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
 
   late final TextEditingController _titleCtrl;
   late final TextEditingController _qtyCtrl;
+  late final TextEditingController _twinQtyCtrl;
   late final TextEditingController _specsCtrl;
   late final TextEditingController _safetyCtrl;
   late final TextEditingController _tipCtrl;
@@ -77,6 +78,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
 
     _titleCtrl = TextEditingController(text: item?['title']?.toString() ?? '');
     _qtyCtrl = TextEditingController(text: item?['quantity']?.toString() ?? '');
+    _twinQtyCtrl = TextEditingController(text: item?['twinQuantity']?.toString() ?? '');
 
     final drAdvice = item?['drAuroraAdvice'];
     _specsCtrl = TextEditingController(
@@ -102,6 +104,7 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
   void dispose() {
     _titleCtrl.dispose();
     _qtyCtrl.dispose();
+    _twinQtyCtrl.dispose();
     _specsCtrl.dispose();
     _safetyCtrl.dispose();
     _tipCtrl.dispose();
@@ -209,6 +212,8 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
         'categoryKey': _categoryKey,
         'title': _titleCtrl.text.trim(),
         'quantity': _qtyCtrl.text.trim(),
+        // Empty = twin mothers see the same quantity (shared item).
+        'twinQuantity': _twinQtyCtrl.text.trim(),
         'isWajib': _isWajib,
         'isHospitalBag': _isHospitalBag,
         'specs': _specsCtrl.text.trim(),
@@ -438,6 +443,20 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
             labelText: 'Cadangan Kuantiti',
             hintText: 'cth: 3-4 pasang',
             prefixIcon: Icon(Icons.format_list_numbered_rounded, color: appInkMuted, size: 20),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _twinQtyCtrl,
+          style: TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            color: appInkPrimary,
+          ),
+          decoration: _inputDecoration(
+            labelText: 'Kuantiti untuk Kembar (pilihan)',
+            hintText: 'cth: 6-8 pasang · kosongkan jika sama (barang dikongsi)',
+            prefixIcon: Icon(Icons.people_outline_rounded, color: appInkMuted, size: 20),
           ),
         ),
         const SizedBox(height: 16),

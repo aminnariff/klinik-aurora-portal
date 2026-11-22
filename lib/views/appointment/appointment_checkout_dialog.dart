@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/controllers/api_controller.dart';
@@ -52,21 +53,35 @@ class NextMilestoneRecommendation {
   });
 }
 
-NextMilestoneRecommendation nextMilestoneAfter(String? completedMilestoneKey) {
+/// The scan to recommend after [completedMilestoneKey]. Titles come from the
+/// checkout preview's [milestones] (labels like "W18–24 Detail Anomaly Scan",
+/// with the clinic's windows for this patient, single or twins); without them
+/// the title has no weeks rather than guessing.
+NextMilestoneRecommendation nextMilestoneAfter(
+  String? completedMilestoneKey, {
+  List<CheckoutMilestoneRule> milestones = const [],
+}) {
+  String titleFor(String key, String fallback) {
+    for (final m in milestones) {
+      if (m.key == key && m.label.isNotEmpty) return m.label;
+    }
+    return fallback;
+  }
+
   return switch (completedMilestoneKey) {
-    'nt_scan' => const NextMilestoneRecommendation(
-        title: 'W18–24 Detail Anomaly Scan',
-        description: 'Comprehensive organ anatomy & defect screening (~6–8 weeks from now).',
+    'nt_scan' => NextMilestoneRecommendation(
+        title: titleFor('detail_scan', 'Detail Anomaly Scan'),
+        description: 'Comprehensive organ anatomy & defect screening.',
         serviceKeyword: 'detail',
       ),
-    'detail_scan' => const NextMilestoneRecommendation(
-        title: 'W26–32 4D/5D HD Live Baby Scan',
-        description: 'Real-time facial features & emotional bonding ultrasound (~6–8 weeks from now).',
+    'detail_scan' => NextMilestoneRecommendation(
+        title: titleFor('scan_4d5d', '4D/5D HD Live Baby Scan'),
+        description: 'Real-time facial features & emotional bonding ultrasound.',
         serviceKeyword: '4d',
       ),
-    'scan_4d5d' => const NextMilestoneRecommendation(
-        title: 'W33–36 Growth & Position Doppler Scan',
-        description: 'Late pregnancy fetal biometry & placental check (~4–6 weeks from now).',
+    'scan_4d5d' => NextMilestoneRecommendation(
+        title: titleFor('growth_scan', 'Growth & Position Scan'),
+        description: 'Late pregnancy fetal biometry & placental check.',
         serviceKeyword: 'growth',
       ),
     'growth_scan' => const NextMilestoneRecommendation(
@@ -87,6 +102,7 @@ class AppointmentCheckoutDialog extends StatefulWidget {
   final CheckoutPreviewLoader loadPreview;
   final CheckoutSubmitter submitCheckout;
   final AvailableServicesLoader loadRebookingServices;
+  final BabyTrackerProfileLoader loadBabyTrackerProfile;
 
   const AppointmentCheckoutDialog({
     super.key,
@@ -95,6 +111,7 @@ class AppointmentCheckoutDialog extends StatefulWidget {
     this.loadPreview = AppointmentCheckoutController.fetchPreview,
     this.submitCheckout = AppointmentCheckoutController.submitCheckout,
     this.loadRebookingServices = ServiceBranchController.available,
+    this.loadBabyTrackerProfile = UserController.babyTracker,
   });
 
   static Future<bool?> show(
@@ -674,13 +691,17 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
         initialNote: note,
         refreshData: () => onCompleted?.call(),
         loadAvailableServices: widget.loadRebookingServices,
+        loadBabyTrackerProfile: widget.loadBabyTrackerProfile,
       ),
     );
   }
 
   Widget _buildReceiptView(AppColors colors) {
     final res = _result!;
-    final nextMilestone = nextMilestoneAfter(_preview?.detectedMilestone?.key);
+    final nextMilestone = nextMilestoneAfter(
+      _preview?.detectedMilestone?.key,
+      milestones: _preview?.milestones ?? const [],
+    );
     final deposit = _deposit;
     final counterPaid = _counterPaid;
     final extra = _extraAmount;

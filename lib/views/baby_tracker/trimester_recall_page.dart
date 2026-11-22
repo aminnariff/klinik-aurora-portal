@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/widgets/patient/twins_badge.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
@@ -611,6 +612,7 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
                         ),
                       ),
                     ),
+                    if (item.babyCount == 2) ...[const SizedBox(width: 6), const TwinsBadge()],
                   ],
                 ),
                 const SizedBox(height: 6),

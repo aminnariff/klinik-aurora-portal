@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/widgets/patient/twins_badge.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
@@ -768,7 +769,22 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    name,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                                  ),
+                                ),
+                                if (TwinsBadge.isTwins(p['babyCount'])) ...[
+                                  const SizedBox(width: 6),
+                                  const TwinsBadge(fontSize: 10),
+                                ],
+                              ],
+                            ),
                             Text('$phone • $branch', style: TextStyle(fontSize: 11.5, color: appInkMuted)),
                           ],
                         ),

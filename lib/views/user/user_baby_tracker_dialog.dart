@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/widgets/patient/twins_badge.dart';
 import 'package:intl/intl.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
@@ -24,6 +25,9 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
   Map<String, dynamic>? _profile;
   int _todayKicks = 0;
   List<dynamic> _sessions = [];
+
+  /// Finished pregnancies, newest first (baby_tracker_pregnancy_history).
+  List<dynamic> _pregnancyHistory = [];
 
   // Checklist state
   bool _isLoadingChecklist = false;
@@ -60,6 +64,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
           _profile = payload?['profile'] as Map<String, dynamic>?;
           _todayKicks = int.tryParse(payload?['todayKicks']?.toString() ?? '') ?? 0;
           _sessions = payload?['sessions'] as List<dynamic>? ?? [];
+          _pregnancyHistory = payload?['pregnancyHistory'] as List<dynamic>? ?? [];
         });
       } else {
         setState(() {
@@ -99,7 +104,8 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
 
   int? get _gestationalWeek {
     final eddStr = _profile?['eddDate']?.toString();
-    if (eddStr == null) return null;
+    // No gestational week once the baby is born.
+    if (eddStr == null || _profile?['birthDate'] != null) return null;
     final edd = DateTime.tryParse(eddStr);
     if (edd == null) return null;
     final lmp = edd.subtract(const Duration(days: 280));
@@ -317,9 +323,10 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                   value: _profile?['eddDate'] != null
                       ? DateFormat('d MMM yyyy').format(DateTime.parse(_profile!['eddDate']))
                       : 'Not Set',
-                  subtitle: _gestationalWeek != null
-                      ? 'Week $_gestationalWeek · $_trimester'
-                      : 'Pregnancy tracking',
+                  subtitle: [
+                    _gestationalWeek != null ? 'Week $_gestationalWeek · $_trimester' : 'Pregnancy tracking',
+                    if (TwinsBadge.isTwins(_profile?['babyCount'])) 'Twins',
+                  ].join(' · '),
                   icon: Icons.calendar_today_rounded,
                   color: pinkColor,
                 ),
@@ -346,6 +353,19 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
               ),
             ],
           ),
+          if (_profile?['birthDate'] != null) ...[
+            const SizedBox(height: 14),
+            _birthBanner(_profile!),
+          ],
+          if (_pregnancyHistory.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Text(
+              'Previous Pregnancies',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: appInkPrimary),
+            ),
+            const SizedBox(height: 8),
+            for (final p in _pregnancyHistory.whereType<Map<String, dynamic>>()) _pregnancyHistoryRow(p),
+          ],
           const SizedBox(height: 24),
           Text(
             'Kick Session History',
@@ -817,6 +837,55 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
           fontWeight: FontWeight.w600,
           color: appInkSecondary,
         ),
+      ),
+    );
+  }
+
+  String _formatYmd(Object? ymd) {
+    final d = DateTime.tryParse(ymd?.toString() ?? '');
+    return d == null ? '—' : DateFormat('d MMM yyyy').format(d);
+  }
+
+  Widget _birthBanner(Map<String, dynamic> profile) {
+    final name = profile['babyName']?.toString();
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDCFCE7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF86EFAC)),
+      ),
+      child: Text(
+        '👶 Born ${_formatYmd(profile['birthDate'])}${name != null && name.isNotEmpty ? ' · $name' : ''}',
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF166534)),
+      ),
+    );
+  }
+
+  Widget _pregnancyHistoryRow(Map<String, dynamic> p) {
+    final born = p['outcome'] == 'born';
+    final name = p['babyName']?.toString();
+    final parts = [
+      'EDD ${_formatYmd(p['eddDate'])}',
+      if (TwinsBadge.isTwins(p['babyCount'])) 'Twins',
+      born
+          ? 'Born ${_formatYmd(p['birthDate'])}${name != null && name.isNotEmpty ? ' ($name)' : ''}'
+          : 'Ended ${_formatYmd(p['endedDate'])} (no birth recorded)',
+    ];
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: appSurfaceSubtle,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: appBorder),
+      ),
+      child: Row(
+        children: [
+          Icon(born ? Icons.child_care_rounded : Icons.event_busy_rounded, size: 16, color: appInkMuted),
+          const SizedBox(width: 8),
+          Expanded(child: Text(parts.join(' · '), style: TextStyle(fontSize: 12.5, color: appInkSecondary))),
+        ],
       ),
     );
   }

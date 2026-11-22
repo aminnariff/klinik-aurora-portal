@@ -96,6 +96,36 @@ class ServiceController extends ChangeNotifier {
         });
   }
 
+  /// Superadmin only: gestational range, antenatal timeline steps and who the
+  /// service is for. See membership-api `PUT /admin/service/scan-settings`.
+  static Future<ApiResponse<UpdateServiceResponse>> updateScanSettings(
+    BuildContext context, {
+    required String serviceId,
+    required String? eddRequired,
+    required List<String> scanMilestones,
+    required String? pregnancyType,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.put,
+          endpoint: 'admin/service/scan-settings',
+          data: {
+            'serviceId': serviceId,
+            'eddRequired': eddRequired,
+            'scanMilestones': scanMilestones,
+            'pregnancyType': pregnancyType,
+          },
+        )
+        .then((value) {
+          try {
+            return ApiResponse(code: value.code, data: UpdateServiceResponse.fromJson(value.data));
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
   static Future<ApiResponse<UpdateServiceResponse>> upload(
     BuildContext context,
     String serviceId,

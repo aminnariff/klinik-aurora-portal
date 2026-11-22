@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/views/widgets/patient/twins_badge.dart';
 import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
@@ -315,6 +316,8 @@ class _PatientQuickDrawerState extends State<PatientQuickDrawer> with SingleTick
                               'EDD: ${data.babyTracker!.eddDate} · Today\'s Kicks: ${data.babyTracker!.todayKicks}',
                               style: TextStyle(fontSize: 12, color: colors.inkSecondary),
                             ),
+                            if (data.babyTracker!.babyCount == 2 && !data.babyTracker!.isBabyBorn)
+                              const Padding(padding: EdgeInsets.only(top: 4), child: TwinsBadge()),
                           ],
                         ),
                       ),

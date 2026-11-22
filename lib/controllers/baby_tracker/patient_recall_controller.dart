@@ -9,6 +9,9 @@ class PatientRecallItem {
   final String? branchId;
   final String branchName;
   final String eddDate;
+
+  /// 1 single, 2 twins (Baby Tracker choice); twins get twin scan windows.
+  final int babyCount;
   final int gestationalWeek;
   final String milestoneKey;
   final String milestoneLabel;
@@ -29,6 +32,7 @@ class PatientRecallItem {
     this.branchId,
     required this.branchName,
     required this.eddDate,
+    this.babyCount = 1,
     required this.gestationalWeek,
     required this.milestoneKey,
     required this.milestoneLabel,
@@ -50,6 +54,7 @@ class PatientRecallItem {
         branchId: json['branchId']?.toString(),
         branchName: json['branchName']?.toString() ?? 'Unassigned',
         eddDate: json['eddDate']?.toString() ?? '',
+        babyCount: (json['babyCount'] as num?)?.toInt() == 2 ? 2 : 1,
         gestationalWeek: (json['gestationalWeek'] as num?)?.toInt() ?? 0,
         milestoneKey: json['milestoneKey']?.toString() ?? '',
         milestoneLabel: json['milestoneLabel']?.toString() ?? '',

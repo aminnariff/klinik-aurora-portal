@@ -108,6 +108,9 @@ class PatientRecentAppointment {
 
 class PatientBabyTrackerSummary {
   final String eddDate;
+
+  /// 1 single, 2 twins (Baby Tracker choice).
+  final int babyCount;
   final int gestationalWeek;
   final int trimester;
   final bool isOverdue;
@@ -117,6 +120,7 @@ class PatientBabyTrackerSummary {
 
   const PatientBabyTrackerSummary({
     required this.eddDate,
+    this.babyCount = 1,
     required this.gestationalWeek,
     required this.trimester,
     required this.isOverdue,
@@ -127,6 +131,7 @@ class PatientBabyTrackerSummary {
 
   factory PatientBabyTrackerSummary.fromJson(Map<String, dynamic> json) => PatientBabyTrackerSummary(
         eddDate: json['eddDate']?.toString() ?? '',
+        babyCount: (json['babyCount'] as num?)?.toInt() == 2 ? 2 : 1,
         gestationalWeek: (json['gestationalWeek'] as num?)?.toInt() ?? 0,
         trimester: (json['trimester'] as num?)?.toInt() ?? 1,
         isOverdue: json['isOverdue'] == true,

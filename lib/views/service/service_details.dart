@@ -7,11 +7,13 @@ import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
+import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/models/service/create_service_request.dart';
 import 'package:klinik_aurora_portal/models/service/services_response.dart';
 import 'package:klinik_aurora_portal/models/service/update_service_request.dart';
 import 'package:klinik_aurora_portal/utils/image_helper.dart';
+import 'package:klinik_aurora_portal/views/service/pregnancy_scan_settings_card.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/input_field/app_form_field.dart';
@@ -487,6 +489,12 @@ class _ServiceDetailsState extends State<ServiceDetails> {
             ],
           ),
         ),
+        if (widget.type == 'update' &&
+            widget.service?.serviceId != null &&
+            context.read<AuthController>().isSuperAdmin) ...[
+          const SizedBox(height: 16),
+          PregnancyScanSettingsCard(service: widget.service!),
+        ],
         if (widget.type == 'update') ...[
           const SizedBox(height: 16),
           Container(

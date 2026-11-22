@@ -30,6 +30,14 @@ const _detailMilestone = CheckoutMilestoneRule(
   maxWeek: 24,
 );
 
+/// The windows the checkout preview sends (from the clinic's tagged services).
+const _serverMilestones = [
+  CheckoutMilestoneRule(key: 'nt_scan', label: 'W11–13 NT & 1st Trimester Scan', bonusPoints: 50, minWeek: 11, maxWeek: 13),
+  _detailMilestone,
+  CheckoutMilestoneRule(key: 'scan_4d5d', label: 'W26–32 4D/5D/HD Live Scan', bonusPoints: 100, minWeek: 26, maxWeek: 32),
+  CheckoutMilestoneRule(key: 'growth_scan', label: 'W33–36 Growth & Position Scan', bonusPoints: 50, minWeek: 33, maxWeek: 36),
+];
+
 CheckoutPreviewData _preview({
   double basePrice = 150.0,
   double bookingFeePaid = 30.0,
@@ -52,7 +60,7 @@ CheckoutPreviewData _preview({
     currentPoints: currentPoints,
     gestationalWeek: 20,
     detectedMilestone: milestone,
-    milestones: const [],
+    milestones: _serverMilestones,
     suggestedAddOns: const [],
   );
 }
@@ -61,7 +69,7 @@ CheckoutPreviewData _preview({
 final _branchServices = <sba.Data>[
   sba.Data(serviceBranchId: 'sb-growth', serviceName: 'Growth Scan'),
   sba.Data(serviceBranchId: 'sb-nt', serviceName: 'NT Dating Scan'),
-  sba.Data(serviceBranchId: 'sb-detail', serviceName: 'Detail Anomaly Scan'),
+  sba.Data(serviceBranchId: 'sb-detail', serviceName: 'Detail Anomaly Scan', dueDateToggle: 1),
   sba.Data(serviceBranchId: 'sb-4d', serviceName: '4D/5D HD Live Scan'),
 ];
 
@@ -72,6 +80,26 @@ class _FakeApi {
   final CheckoutPreviewData preview;
   final List<Map<String, Object?>> submissions = [];
   final List<String?> serviceRequests = [];
+  final List<String> babyTrackerRequests = [];
+
+  /// The patient's Baby Tracker EDD and birth, as admin/user-management/baby-tracker answers.
+  String? babyTrackerEdd;
+  String? babyTrackerBirth;
+
+  Future<ApiResponse<dynamic>> loadBabyTracker(BuildContext context, String userId) async {
+    babyTrackerRequests.add(userId);
+    return ApiResponse(
+      code: 200,
+      data: {
+        'message': 'ok',
+        'data': {
+          'profile': babyTrackerEdd == null
+              ? null
+              : {'eddDate': babyTrackerEdd, 'babyCount': 1, 'birthDate': babyTrackerBirth},
+        },
+      },
+    );
+  }
 
   Future<ApiResponse<CheckoutPreviewData>> loadPreview(BuildContext context, String appointmentId) async {
     return ApiResponse(code: 200, data: preview);
@@ -80,6 +108,7 @@ class _FakeApi {
   Future<ApiResponse<CheckoutResultData>> submit(
     BuildContext context,
     String appointmentId, {
+    double? totalSpend,
     required double basePrice,
     required double bookingFeePaid,
     required List<CheckoutAddOnItem> extraItems,
@@ -93,6 +122,7 @@ class _FakeApi {
     String? adminNotes,
   }) async {
     submissions.add({
+      'totalSpend': totalSpend,
       'basePrice': basePrice,
       'bookingFeePaid': bookingFeePaid,
       'netCollected': netCollected,
@@ -105,7 +135,7 @@ class _FakeApi {
         appointmentId: appointmentId,
         patientName: preview.patientName,
         serviceName: preview.serviceName,
-        grossTotal: basePrice,
+        grossTotal: totalSpend ?? basePrice,
         bookingFeePaid: bookingFeePaid,
         netCollected: netCollected,
         paymentMethod: paymentMethod,
@@ -184,6 +214,7 @@ Future<_Harness> _openCheckout(WidgetTester tester, CheckoutPreviewData preview)
                       loadPreview: harness.api.loadPreview,
                       submitCheckout: harness.api.submit,
                       loadRebookingServices: harness.api.loadServices,
+                      loadBabyTrackerProfile: harness.api.loadBabyTracker,
                     ),
                   );
                   harness.checkoutClosed = true;
@@ -199,7 +230,7 @@ Future<_Harness> _openCheckout(WidgetTester tester, CheckoutPreviewData preview)
 
   await tester.tap(find.text('open checkout'));
   await tester.pumpAndSettle();
-  expect(find.text('Counter Checkout & Points Calculator'), findsOneWidget);
+  expect(find.text('Complete Visit & Award Points'), findsOneWidget);
   return harness;
 }
 
@@ -210,21 +241,22 @@ String _receiptAmount(WidgetTester tester, String label) {
   return texts.last.data!;
 }
 
-Future<void> _setField(WidgetTester tester, String label, String value) async {
-  final field = find.descendant(
-    of: find.ancestor(of: find.text(label), matching: find.byType(Column)).first,
-    matching: find.byType(TextField),
-  );
-  await tester.enterText(field, value);
+/// The amount-paid-at-counter field (the form's first text field).
+Finder get _counterPaidField => find.byType(TextField).first;
+
+Future<void> _setCounterPaid(WidgetTester tester, String value) async {
+  await tester.enterText(_counterPaidField, value);
   await tester.pump();
 }
 
+String _counterPaidText(WidgetTester tester) => tester.widget<TextField>(_counterPaidField).controller!.text;
+
 Future<void> _completeCheckout(WidgetTester tester) async {
-  final button = find.textContaining('Complete & Credit');
+  final button = find.textContaining('Complete & Award');
   await tester.ensureVisible(button);
   await tester.tap(button);
   await tester.pumpAndSettle();
-  expect(find.text('Visit Completed & Receipt Generated'), findsOneWidget);
+  expect(find.text('Appointment Completed!'), findsOneWidget);
 }
 
 Future<void> _tapAndSettle(WidgetTester tester, Finder finder) async {
@@ -259,10 +291,18 @@ void main() {
   // ── Pure rules ───────────────────────────────────────────────────────────
 
   group('nextMilestoneAfter: scan chain NT/dating → Detail → 4D/5D → Growth', () {
+    // Labels as the checkout preview sends them (weeks from the clinic's services).
+    const serverMilestones = [
+      CheckoutMilestoneRule(key: 'nt_scan', label: 'W11–13 NT & 1st Trimester Scan', bonusPoints: 50, minWeek: 11, maxWeek: 13),
+      CheckoutMilestoneRule(key: 'detail_scan', label: 'W18–24 Detail Anomaly Scan', bonusPoints: 100, minWeek: 18, maxWeek: 24),
+      CheckoutMilestoneRule(key: 'scan_4d5d', label: 'W26–32 4D/5D/HD Live Scan', bonusPoints: 100, minWeek: 26, maxWeek: 32),
+      CheckoutMilestoneRule(key: 'growth_scan', label: 'W33–36 Growth & Position Scan', bonusPoints: 50, minWeek: 33, maxWeek: 36),
+    ];
+
     final chain = <String?, (String title, String? keyword)>{
       'nt_scan': ('W18–24 Detail Anomaly Scan', 'detail'),
-      'detail_scan': ('W26–32 4D/5D HD Live Baby Scan', '4d'),
-      'scan_4d5d': ('W33–36 Growth & Position Doppler Scan', 'growth'),
+      'detail_scan': ('W26–32 4D/5D/HD Live Scan', '4d'),
+      'scan_4d5d': ('W33–36 Growth & Position Scan', 'growth'),
       'growth_scan': ('Postnatal & Newborn Care Visit', null),
       null: ('Next Follow-Up Appointment', null),
       'postnatal': ('Next Follow-Up Appointment', null),
@@ -270,10 +310,21 @@ void main() {
 
     chain.forEach((completed, expected) {
       test('after ${completed ?? 'no milestone'} → ${expected.$1}', () {
-        final next = nextMilestoneAfter(completed);
+        final next = nextMilestoneAfter(completed, milestones: serverMilestones);
         expect(next.title, expected.$1);
         expect(next.serviceKeyword, expected.$2);
       });
+    });
+
+    test('titles follow the windows the server sends (e.g. twins)', () {
+      const twin = [
+        CheckoutMilestoneRule(key: 'scan_4d5d', label: 'W20–28 4D/5D/HD Live Scan', bonusPoints: 100, minWeek: 20, maxWeek: 28),
+      ];
+      expect(nextMilestoneAfter('detail_scan', milestones: twin).title, 'W20–28 4D/5D/HD Live Scan');
+    });
+
+    test('without server milestones the title has no weeks', () {
+      expect(nextMilestoneAfter('nt_scan').title, 'Detail Anomaly Scan');
     });
 
     test('each scan keyword selects exactly the next scan from the branch menu', () {
@@ -314,67 +365,84 @@ void main() {
   // ── Counter checkout math ──────────────────────────────────────────────
 
   group('Counter checkout math', () {
-    testWidgets('balance collectable = gross bill − online booking fee', (tester) async {
+    testWidgets('expected counter balance = service price − online deposit, pre-filled', (tester) async {
       final h = await _openCheckout(tester, _preview(basePrice: 150, bookingFeePaid: 30));
 
-      expect(_receiptAmount(tester, 'Gross Subtotal'), 'RM 150.00');
-      expect(_receiptAmount(tester, 'Less Online Deposit'), '-RM 30.00');
-      expect(_receiptAmount(tester, 'Balance Payable at Counter:'), 'RM 120.00');
-
-      // Add-ons bought at the counter raise the gross bill; the fee still comes off it.
-      await _tapAndSettle(tester, find.text('+ Obimin Vitamins (RM 45)'));
-      await _tapAndSettle(tester, find.text('+ Photo Print (RM 20)'));
-      await _tapAndSettle(tester, find.text('+ Photo Print (RM 20)'));
-
-      expect(_receiptAmount(tester, 'Add-on Items (2)'), '+RM 85.00');
-      expect(_receiptAmount(tester, 'Gross Subtotal'), 'RM 235.00');
-      expect(_receiptAmount(tester, 'Balance Payable at Counter:'), 'RM 205.00');
+      expect(_receiptAmount(tester, 'Service Price'), 'RM 150.00');
+      expect(_receiptAmount(tester, 'Deposit (Paid Online / Booked)'), '-RM 30.00');
+      expect(_receiptAmount(tester, 'Expected Counter Balance'), 'RM 120.00');
+      expect(find.text('Amount Paid at Counter Today (RM)'), findsOneWidget);
+      expect(_counterPaidText(tester), '120.00');
+      expect(_receiptAmount(tester, 'Total Patient Spend Today'), 'RM 150.00');
 
       await _completeCheckout(tester);
-      expect(h.api.submissions.single['basePrice'], 150.0);
-      expect(h.api.submissions.single['bookingFeePaid'], 30.0);
+      final sent = h.api.submissions.single;
+      expect(sent['basePrice'], 150.0);
+      expect(sent['bookingFeePaid'], 30.0);
+      expect(sent['netCollected'], 120.0);
+      expect(sent['totalSpend'], 150.0);
+    });
+
+    testWidgets('paying more at the counter shows the extra as add-ons and raises the spend', (tester) async {
+      final h = await _openCheckout(tester, _preview(basePrice: 150, bookingFeePaid: 30));
+
+      await _setCounterPaid(tester, '205');
+      expect(_receiptAmount(tester, 'Extra Add-ons / Items'), '+RM 85.00');
+      expect(_receiptAmount(tester, 'Total Patient Spend Today'), 'RM 235.00');
+
+      await _completeCheckout(tester);
       expect(h.api.submissions.single['netCollected'], 205.0);
+      expect(h.api.submissions.single['totalSpend'], 235.0);
+      expect(_receiptAmount(tester, 'Extra Add-ons'), '+RM 85.00');
+      expect(_receiptAmount(tester, 'Total Spend'), 'RM 235.00');
     });
 
-    testWidgets('balance never goes negative when the booking fee exceeds the bill', (tester) async {
-      await _openCheckout(tester, _preview(basePrice: 20, bookingFeePaid: 30));
-
-      expect(_receiptAmount(tester, 'Balance Payable at Counter:'), 'RM 0.00');
-      expect(find.text('Complete & Credit 0 Pts'), findsOneWidget);
-    });
-
-    testWidgets('editing the base price or fee recomputes the balance live', (tester) async {
+    testWidgets('paying less at the counter shows a discount', (tester) async {
       await _openCheckout(tester, _preview(basePrice: 150, bookingFeePaid: 30));
 
-      await _setField(tester, 'Base Service (RM)', '280.50');
-      await _setField(tester, 'Online Booking Fee (RM)', '50');
+      await _setCounterPaid(tester, '100');
+      expect(_receiptAmount(tester, 'Discount / Adjustment'), '-RM 20.00');
+      expect(_receiptAmount(tester, 'Total Patient Spend Today'), 'RM 130.00');
+    });
 
-      expect(_receiptAmount(tester, 'Gross Subtotal'), 'RM 280.50');
-      expect(_receiptAmount(tester, 'Balance Payable at Counter:'), 'RM 230.50');
+    testWidgets('without a deposit the field is pre-filled with the service price', (tester) async {
+      await _openCheckout(tester, _preview(basePrice: 80, bookingFeePaid: 0));
+
+      expect(find.text('Total Amount Paid (RM)'), findsOneWidget);
+      expect(find.text('Deposit (Paid Online / Booked)'), findsNothing);
+      expect(_counterPaidText(tester), '80.00');
+    });
+
+    testWidgets('the balance never goes negative when the deposit exceeds the price', (tester) async {
+      await _openCheckout(tester, _preview(basePrice: 20, bookingFeePaid: 30));
+
+      expect(_receiptAmount(tester, 'Expected Counter Balance'), 'RM 0.00');
+      expect(_counterPaidText(tester), '0.00');
+      // Points still count the deposit the patient paid: floor(30 / 10).
+      expect(find.text('Complete & Award 3 Pts'), findsOneWidget);
     });
   });
 
-  group('Cashier points: floor(amount collected at counter / 10)', () {
-    // Points are earned on what the cashier collects, i.e. the gross bill
-    // after the online booking fee. This matches the API, which recomputes
-    // floor(netCollected / 10) server side. With no booking fee the balance
-    // equals the gross bill, so it is floor(totalGross / 10).
-    final cases = <(double gross, double fee, int points)>[
-      (150, 0, 15), //  no fee: floor(150 / 10)
+  group('Cashier points: floor(total spend / 10), deposit included', () {
+    // Points are earned on the patient's whole spend for the visit: the online
+    // deposit plus what the cashier collects (fix 61b0dab, "award points on
+    // full gross spend including deposit").
+    final cases = <(double price, double deposit, int points)>[
+      (150, 0, 15), //  floor(150 / 10)
       (159.99, 0, 15), //  rounds down, never up
       (9.99, 0, 0), //  under RM 10 earns nothing
       (10, 0, 1), //  exactly RM 10
-      (150, 30, 12), //  fee paid online: floor(120 / 10)
-      (215, 30, 18), //  floor(185 / 10), not 18.5
+      (150, 30, 15), //  deposit counts: floor((120 + 30) / 10)
+      (215, 30, 21), //  floor(215 / 10), not 21.5
     ];
 
-    for (final (gross, fee, points) in cases) {
-      testWidgets('gross RM $gross, fee RM $fee → $points pts', (tester) async {
-        final h = await _openCheckout(tester, _preview(basePrice: gross, bookingFeePaid: fee, currentPoints: 200));
+    for (final (price, deposit, points) in cases) {
+      testWidgets('price RM $price, deposit RM $deposit → $points pts', (tester) async {
+        final h = await _openCheckout(tester, _preview(basePrice: price, bookingFeePaid: deposit, currentPoints: 200));
 
-        expect(find.text('Complete & Credit $points Pts'), findsOneWidget);
-        expect(find.textContaining('+$points pts', findRichText: true), findsOneWidget);
-        expect(find.textContaining('(200 ➔ ${200 + points} pts)', findRichText: true), findsOneWidget);
+        expect(find.text('Complete & Award $points Pts'), findsOneWidget);
+        expect(find.text('+$points Aurora Points'), findsOneWidget);
+        expect(find.textContaining('New balance: ${200 + points} pts'), findsOneWidget);
 
         await _completeCheckout(tester);
         expect(h.api.submissions.single['basePoints'], points);
@@ -382,12 +450,12 @@ void main() {
       });
     }
 
-    testWidgets('add-ons earn points through the gross bill', (tester) async {
+    testWidgets('extra items paid at the counter earn points too', (tester) async {
       final h = await _openCheckout(tester, _preview(basePrice: 100, bookingFeePaid: 0));
 
-      expect(find.text('Complete & Credit 10 Pts'), findsOneWidget);
-      await _tapAndSettle(tester, find.text('+ Blood Screen (RM 60)'));
-      expect(find.text('Complete & Credit 16 Pts'), findsOneWidget);
+      expect(find.text('Complete & Award 10 Pts'), findsOneWidget);
+      await _setCounterPaid(tester, '160');
+      expect(find.text('Complete & Award 16 Pts'), findsOneWidget);
 
       await _completeCheckout(tester);
       expect(h.api.submissions.single['basePoints'], 16);
@@ -397,10 +465,11 @@ void main() {
   // ── Dual re-booking after checkout ─────────────────────────────────────
 
   group('Dual re-booking buttons on the receipt', () {
+    // Titles come from the preview's server milestones (_serverMilestones).
     final scanChain = <String, (String title, String service)>{
       'nt_scan': ('W18–24 Detail Anomaly Scan', 'Detail Anomaly Scan'),
-      'detail_scan': ('W26–32 4D/5D HD Live Baby Scan', '4D/5D HD Live Scan'),
-      'scan_4d5d': ('W33–36 Growth & Position Doppler Scan', 'Growth Scan'),
+      'detail_scan': ('W26–32 4D/5D/HD Live Scan', '4D/5D HD Live Scan'),
+      'scan_4d5d': ('W33–36 Growth & Position Scan', 'Growth Scan'),
     };
 
     testWidgets('both options render after checkout completes', (tester) async {
@@ -409,7 +478,7 @@ void main() {
 
       await _completeCheckout(tester);
 
-      expect(find.text('Imbasan Seterusnya: W26–32 4D/5D HD Live Baby Scan'), findsOneWidget);
+      expect(find.text('Imbasan Seterusnya: W26–32 4D/5D/HD Live Scan'), findsOneWidget);
       expect(find.text(_followUpLabel), findsOneWidget);
     });
 
@@ -435,6 +504,8 @@ void main() {
         expect(form.initialBranchId, 'br-1');
         expect(form.initialNote, 'Follow-up ${next.$1} after completing Detail Anomaly Scan');
         expect(h.api.serviceRequests, contains('br-1'));
+        // The form looks up the patient's Baby Tracker EDD to pre-fill it.
+        expect(h.api.babyTrackerRequests, contains('usr-456'));
 
         // And the user sees the patient and the next scan already chosen.
         expect(find.text('Siti Nurhaliza'), findsWidgets);
@@ -457,6 +528,30 @@ void main() {
       for (final s in _branchServices) {
         expect(find.text(s.serviceName!), findsNothing);
       }
+    });
+
+    testWidgets('the re-booking form pre-fills the EDD from the patient\'s Baby Tracker', (tester) async {
+      final h = await _openCheckout(tester, _preview(serviceName: 'Detail Anomaly Scan'));
+      h.api.babyTrackerEdd = '2027-05-01';
+      await _completeCheckout(tester);
+
+      await _tapAndSettle(tester, find.text(_followUpLabel));
+
+      expect(h.api.babyTrackerRequests, ['usr-456']);
+      expect(find.text('01-05-2027'), findsOneWidget);
+    });
+
+    testWidgets('no EDD pre-fill once the Baby Tracker records the birth', (tester) async {
+      final h = await _openCheckout(tester, _preview(serviceName: 'Detail Anomaly Scan'));
+      h.api
+        ..babyTrackerEdd = '2027-05-01'
+        ..babyTrackerBirth = '2027-04-28';
+      await _completeCheckout(tester);
+
+      await _tapAndSettle(tester, find.text(_followUpLabel));
+
+      expect(h.api.babyTrackerRequests, ['usr-456']);
+      expect(find.text('01-05-2027'), findsNothing);
     });
 
     testWidgets('"Susulan / Ulang Servis Sama" re-books the same service', (tester) async {
