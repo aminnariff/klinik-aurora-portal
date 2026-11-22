@@ -121,7 +121,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
   String? _error;
   CheckoutPreviewData? _preview;
 
-  late TextEditingController _totalSpendCtrl;
+  late TextEditingController _counterPaidCtrl;
   late TextEditingController _notesCtrl;
   bool _submitting = false;
 
@@ -130,17 +130,31 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
   @override
   void initState() {
     super.initState();
-    _totalSpendCtrl = TextEditingController(text: '0.00');
+    _counterPaidCtrl = TextEditingController(text: '0.00');
     _notesCtrl = TextEditingController();
     _loadPreview();
   }
 
   @override
   void dispose() {
-    _totalSpendCtrl.dispose();
+    _counterPaidCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
   }
+
+  double get _basePrice => _preview?.basePrice ?? 0.0;
+  double get _deposit {
+    if (_preview == null) return 0.0;
+    return _preview!.serviceBookingFee > 0 ? _preview!.serviceBookingFee : _preview!.bookingFeePaid;
+  }
+
+  double get _expectedBalance => math.max(0.0, _basePrice - _deposit);
+  double get _counterPaid => double.tryParse(_counterPaidCtrl.text.trim()) ?? 0.0;
+  double get _totalSpend => math.max(0.0, _counterPaid + _deposit);
+  double get _extraAmount => _counterPaid > _expectedBalance ? (_counterPaid - _expectedBalance) : 0.0;
+  double get _discountAmount =>
+      (_expectedBalance > _counterPaid && _counterPaid > 0) ? (_expectedBalance - _counterPaid) : 0.0;
+  int get _pointsAwarded => math.max(0, (_totalSpend / 10).floor());
 
   Future<void> _loadPreview() async {
     setState(() {
@@ -153,9 +167,12 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
 
     if (responseCode(res.code) && res.data != null) {
       final data = res.data!;
+      final deposit = data.serviceBookingFee > 0 ? data.serviceBookingFee : data.bookingFeePaid;
+      final expected = math.max(0.0, data.basePrice - deposit);
+
       setState(() {
         _preview = data;
-        _totalSpendCtrl.text = data.basePrice.toStringAsFixed(2);
+        _counterPaidCtrl.text = expected.toStringAsFixed(2);
         _loading = false;
       });
     } else {
@@ -166,13 +183,10 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
     }
   }
 
-  double get _totalSpend => double.tryParse(_totalSpendCtrl.text.trim()) ?? 0.0;
-  int get _pointsAwarded => math.max(0, (_totalSpend / 10).floor());
-
   Future<void> _submitCheckout() async {
     if (_submitting) return;
-    if (_totalSpend < 0) {
-      AppToast.snackbar(context, 'Please enter a valid total spend amount.');
+    if (_counterPaid < 0) {
+      AppToast.snackbar(context, 'Please enter a valid counter payment amount.');
       return;
     }
 
@@ -182,10 +196,10 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
       context,
       widget.appointmentId,
       totalSpend: _totalSpend,
-      basePrice: _totalSpend,
-      bookingFeePaid: _preview?.bookingFeePaid ?? 0.0,
+      basePrice: _basePrice,
+      bookingFeePaid: _deposit,
       extraItems: const [],
-      netCollected: _totalSpend,
+      netCollected: _counterPaid,
       paymentMethod: 'other',
       awardPoints: true,
       basePoints: _pointsAwarded,
@@ -209,7 +223,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final screenW = MediaQuery.sizeOf(context).width;
-    final dialogW = math.min(520.0, screenW - 32);
+    final dialogW = math.min(540.0, screenW - 32);
 
     return Dialog(
       backgroundColor: colors.surface,
@@ -220,7 +234,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: dialogW,
-          maxHeight: MediaQuery.sizeOf(context).height * 0.90,
+          maxHeight: MediaQuery.sizeOf(context).height * 0.92,
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -276,6 +290,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
 
   Widget _buildFormView(AppColors colors) {
     final p = _preview!;
+    final deposit = _deposit;
     final pts = _pointsAwarded;
     final newBalance = p.currentPoints + pts;
 
@@ -307,7 +322,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Key in patient total spend to credit loyalty points.',
+                      'Verify counter payment & award patient points.',
                       style: TextStyle(fontSize: 12, color: colors.inkMuted),
                     ),
                   ],
@@ -369,16 +384,50 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // ── Total Amount Spent Field ───────────────────────────────
+          // ── Service & Deposit Context Breakdown ───────────────────
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: colors.surfaceSubtle,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: colors.border),
+            ),
+            child: Column(
+              children: [
+                _breakdownRow(
+                  'Service Price',
+                  'RM ${_basePrice.toStringAsFixed(2)}',
+                  colors.inkPrimary,
+                ),
+                if (deposit > 0) ...[
+                  _breakdownRow(
+                    'Deposit (Paid Online / Booked)',
+                    '-RM ${deposit.toStringAsFixed(2)}',
+                    colors.brandText,
+                  ),
+                  const Divider(height: 12),
+                  _breakdownRow(
+                    'Expected Counter Balance',
+                    'RM ${_expectedBalance.toStringAsFixed(2)}',
+                    colors.inkPrimary,
+                    isBold: true,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // ── Counter Payment Input Field ───────────────────────────
           Text(
-            'Total Amount Spent (RM)',
+            deposit > 0 ? 'Amount Paid at Counter Today (RM)' : 'Total Amount Paid (RM)',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: colors.inkPrimary),
           ),
           const SizedBox(height: 6),
           TextField(
-            controller: _totalSpendCtrl,
+            controller: _counterPaidCtrl,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
@@ -402,12 +451,73 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
-            'Total amount spent by patient today (including deposit if any)',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: colors.inkMuted),
+            deposit > 0
+                ? 'Pre-populated with expected balance RM ${_expectedBalance.toStringAsFixed(2)}. If patient bought extra items (e.g. vitamins), key in the actual amount paid at counter.'
+                : 'Pre-populated with service price RM ${_basePrice.toStringAsFixed(2)}. Key in total paid today.',
+            style: TextStyle(fontSize: 11, color: colors.inkMuted),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
+
+          // ── Live Spend Breakdown Card ─────────────────────────────
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colors.brandSoftBg.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: colors.brandBorder),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (deposit > 0)
+                  _breakdownRow(
+                    'Online Booking Deposit',
+                    'RM ${deposit.toStringAsFixed(2)}',
+                    colors.inkSecondary,
+                  ),
+                _breakdownRow(
+                  'Paid at Counter Today',
+                  'RM ${_counterPaid.toStringAsFixed(2)}',
+                  colors.inkSecondary,
+                ),
+                if (_extraAmount > 0)
+                  _breakdownRow(
+                    'Extra Add-ons / Items',
+                    '+RM ${_extraAmount.toStringAsFixed(2)}',
+                    colors.success,
+                    isBold: true,
+                  ),
+                if (_discountAmount > 0)
+                  _breakdownRow(
+                    'Discount / Adjustment',
+                    '-RM ${_discountAmount.toStringAsFixed(2)}',
+                    colors.danger,
+                  ),
+                const Divider(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Total Patient Spend Today',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: colors.inkPrimary),
+                    ),
+                    Text(
+                      'RM ${_totalSpend.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        color: colors.brandText,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
 
           // ── Points Preview Card ────────────────────────────────────
           Container(
@@ -459,7 +569,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'New balance: $newBalance pts (Current: ${p.currentPoints} pts)',
+                        'Points calculated on Total Spend RM ${_totalSpend.toStringAsFixed(2)} · New balance: $newBalance pts',
                         style: TextStyle(fontSize: 11, color: colors.inkMuted),
                       ),
                     ],
@@ -468,7 +578,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           // ── Staff Checkout Note ────────────────────────────────────
           TextField(
@@ -476,12 +586,12 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
             style: const TextStyle(fontSize: 13),
             decoration: InputDecoration(
               labelText: 'Staff Remarks / Note (Optional)',
-              hintText: 'e.g. Free supplement given, combo discount',
+              hintText: 'e.g. Free supplement given, extra printout',
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 20),
 
           // ── Action Buttons ─────────────────────────────────────────
           Row(
@@ -498,6 +608,34 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                 onPressed: _submitting ? null : _submitCheckout,
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _breakdownRow(String title, String amount, Color textColor, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+              color: textColor,
+            ),
+          ),
+          Text(
+            amount,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
+              color: textColor,
+              fontFamily: 'monospace',
+            ),
           ),
         ],
       ),
@@ -543,6 +681,9 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
   Widget _buildReceiptView(AppColors colors) {
     final res = _result!;
     final nextMilestone = nextMilestoneAfter(_preview?.detectedMilestone?.key);
+    final deposit = _deposit;
+    final counterPaid = _counterPaid;
+    final extra = _extraAmount;
 
     return SingleChildScrollView(
       child: Column(
@@ -589,7 +730,11 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
               children: [
                 _receiptRow('Patient', res.patientName, colors.inkPrimary),
                 _receiptRow('Service', res.serviceName, colors.inkPrimary),
-                _receiptRow('Total Spend (inc. deposit)', 'RM ${res.grossTotal.toStringAsFixed(2)}', colors.brandText),
+                if (deposit > 0) _receiptRow('Deposit (Included)', 'RM ${deposit.toStringAsFixed(2)}', colors.inkSecondary),
+                _receiptRow('Paid at Counter Today', 'RM ${counterPaid.toStringAsFixed(2)}', colors.inkSecondary),
+                if (extra > 0) _receiptRow('Extra Add-ons', '+RM ${extra.toStringAsFixed(2)}', colors.success),
+                const Divider(height: 12),
+                _receiptRow('Total Spend', 'RM ${res.grossTotal.toStringAsFixed(2)}', colors.brandText),
                 _receiptRow('Points Awarded', '+${res.pointsAwarded} pts', _purpleAccent),
                 _receiptRow('New Patient Balance', '${res.newTotalPoints} pts', colors.success),
               ],

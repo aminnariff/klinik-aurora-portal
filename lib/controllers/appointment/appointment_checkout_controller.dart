@@ -59,6 +59,7 @@ class CheckoutPreviewData {
   final String? doctorName;
   final String serviceName;
   final double basePrice;
+  final double serviceBookingFee;
   final double bookingFeePaid;
   final double expectedBalance;
   final int currentPoints;
@@ -77,6 +78,7 @@ class CheckoutPreviewData {
     this.doctorName,
     required this.serviceName,
     required this.basePrice,
+    this.serviceBookingFee = 0.0,
     required this.bookingFeePaid,
     required this.expectedBalance,
     required this.currentPoints,
@@ -98,6 +100,7 @@ class CheckoutPreviewData {
       doctorName: d['doctorName']?.toString(),
       serviceName: d['serviceName']?.toString() ?? 'Consultation',
       basePrice: (d['basePrice'] as num?)?.toDouble() ?? 0.0,
+      serviceBookingFee: (d['serviceBookingFee'] as num?)?.toDouble() ?? 0.0,
       bookingFeePaid: (d['bookingFeePaid'] as num?)?.toDouble() ?? 0.0,
       expectedBalance: (d['expectedBalance'] as num?)?.toDouble() ?? 0.0,
       currentPoints: (d['currentPoints'] as num?)?.toInt() ?? 0,
