@@ -1564,7 +1564,6 @@ class _PointHomepageState extends State<PointHomepage> {
     final formattedPhone = rawPhone.startsWith('60')
         ? rawPhone
         : (rawPhone.startsWith('0') ? '6$rawPhone' : '60$rawPhone');
-    final rmValue = (newTotalPoints / 10).toStringAsFixed(2);
     final patientName = patient.userFullname ?? 'Pelanggan';
 
     final text = '''
@@ -1576,7 +1575,7 @@ Mata ganjaran kesetiaan anda telah berjaya dikreditkan ke akaun Klinik Aurora an
 
 💵 *Jumlah Bayaran:* RM ${paymentAmount.toStringAsFixed(2)}
 ⭐ *Mata Diperoleh:* +$earnedPoints pts
-🏆 *Jumlah Terkini:* $newTotalPoints pts (Bernilai ~RM $rmValue)
+🏆 *Baki Terkini:* $newTotalPoints pts
 
 _Tebus mata ganjaran anda untuk diskaun rawatan, konsultasi & imbasan seterusnya di mana-mana cawangan Klinik Aurora._
 
@@ -1584,7 +1583,7 @@ Layari aplikasi Klinik Aurora untuk semakan baki dan temujanji anda.
 Terima kasih kerana mempercayai Klinik Aurora! 🌸
 ''';
 
-    final uri = Uri.parse('https://wa.me/$formattedPhone?text=${Uri.encodeComponent(text)}');
+    final uri = Uri.parse('https://api.whatsapp.com/send?phone=$formattedPhone&text=${Uri.encodeComponent(text)}');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {

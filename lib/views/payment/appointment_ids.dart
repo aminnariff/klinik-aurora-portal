@@ -75,7 +75,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
 
     final message =
         "Hi $patientName, this is $branch. We noticed an incomplete payment for your $service appointment scheduled for $dt. Would you like us to assist you with completing your booking?";
-    final url = "https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}";
+    final url = "https://api.whatsapp.com/send?phone=$cleanPhone&text=${Uri.encodeComponent(message)}";
     final uri = Uri.parse(url);
     try {
       await launchUrl(uri, mode: LaunchMode.externalApplication);

@@ -298,7 +298,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
     final msg = Uri.encodeComponent(
       'Assalamualaikum / Hi ${item.patientName}, ini dari Klinik Aurora berkenaan temujanji anda (${item.serviceName}) hari ini. Kami sedia membantu.',
     );
-    launchWebUrl('https://wa.me/$full?text=$msg', webOnlyWindowName: '_blank');
+    launchWebUrl('https://api.whatsapp.com/send?phone=$full&text=$msg', webOnlyWindowName: '_blank');
   }
 
   List<QueueAppointmentItem> _filtered(String stage) {

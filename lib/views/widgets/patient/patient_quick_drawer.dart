@@ -85,7 +85,7 @@ class _PatientQuickDrawerState extends State<PatientQuickDrawer> with SingleTick
     if (digits.startsWith('0')) digits = '6$digits';
     if (!digits.startsWith('60') && digits.isNotEmpty) digits = '60$digits';
     final msg = Uri.encodeComponent('Hi $name, menghubungi dari Klinik Aurora.');
-    return 'https://wa.me/$digits?text=$msg';
+    return 'https://api.whatsapp.com/send?phone=$digits&text=$msg';
   }
 
   @override

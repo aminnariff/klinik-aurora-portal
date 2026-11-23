@@ -96,7 +96,7 @@ void main() {
           'milestoneBonusPoints': 100,
           'newTotalPoints': 505,
           'whatsappReceipt': 'Official receipt text',
-          'whatsappUrl': 'https://wa.me/60123456789?text=...',
+          'whatsappUrl': 'https://api.whatsapp.com/send?phone=60123456789&text=...',
         }
       };
 
@@ -104,7 +104,7 @@ void main() {
       expect(res.netCollected, 205.0);
       expect(res.pointsAwarded, 305);
       expect(res.newTotalPoints, 505);
-      expect(res.whatsappUrl, contains('wa.me'));
+      expect(res.whatsappUrl, contains('api.whatsapp.com'));
     });
   });
 
@@ -130,7 +130,7 @@ void main() {
               'hasUpcomingBooking': false,
               'alreadyContactedRecently': false,
               'suggestedMessage': 'Hi Nurul...',
-              'whatsappUrl': 'https://wa.me/60198765432?text=...',
+              'whatsappUrl': 'https://api.whatsapp.com/send?phone=60198765432&text=...',
             }
           ]
         }
