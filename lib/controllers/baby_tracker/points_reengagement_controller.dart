@@ -89,7 +89,7 @@ class PointsReengagementController {
   static Future<ApiResponse<PointsReengagementResponse>> fetch(
     BuildContext context, {
     String? branchId,
-    int minPoints = 50,
+    int minPoints = 500,
     bool onlyUnbooked = true,
   }) async {
     final q = <String, String>{

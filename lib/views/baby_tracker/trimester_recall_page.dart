@@ -121,7 +121,7 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
         final res = await PointsReengagementController.fetch(
           context,
           branchId: _selectedBranchId,
-          minPoints: 50,
+          minPoints: 500,
           onlyUnbooked: _onlyUnbooked,
         );
         if (!mounted) return;

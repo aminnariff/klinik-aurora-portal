@@ -176,15 +176,12 @@ String convert24HourToAmPmFormat(String time) {
   }
 }
 
+/// RM 1 = 1 point. Mirrors membership-api create-point: any positive spend
+/// earns at least 1 point, capped at 10,000 per transaction.
 int calculateCustomerPoints(String amount) {
-  double paidAmount = double.tryParse(amount) ?? 0.0;
-  int points = (paidAmount / 10).floor();
-
-  if (paidAmount < 10 && paidAmount > 0) {
-    return 1;
-  }
-
-  return points;
+  final paidAmount = double.tryParse(amount) ?? 0.0;
+  if (paidAmount <= 0) return 0;
+  return paidAmount.floor().clamp(1, 10000);
 }
 
 String convertMalaysiaTimeToUtc(String malaysiaTimeStr, {bool plainFormat = false}) {

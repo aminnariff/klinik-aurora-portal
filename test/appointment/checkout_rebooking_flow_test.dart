@@ -418,22 +418,22 @@ void main() {
 
       expect(_receiptAmount(tester, 'Expected Counter Balance'), 'RM 0.00');
       expect(_counterPaidText(tester), '0.00');
-      // Points still count the deposit the patient paid: floor(30 / 10).
-      expect(find.text('Complete & Award 3 Pts'), findsOneWidget);
+      // Points still count the deposit the patient paid: floor(30) at RM 1 = 1 pt.
+      expect(find.text('Complete & Award 30 Pts'), findsOneWidget);
     });
   });
 
-  group('Cashier points: floor(total spend / 10), deposit included', () {
+  group('Cashier points: floor(total spend), RM 1 = 1 pt, deposit included', () {
     // Points are earned on the patient's whole spend for the visit: the online
     // deposit plus what the cashier collects (fix 61b0dab, "award points on
     // full gross spend including deposit").
     final cases = <(double price, double deposit, int points)>[
-      (150, 0, 15), //  floor(150 / 10)
-      (159.99, 0, 15), //  rounds down, never up
-      (9.99, 0, 0), //  under RM 10 earns nothing
-      (10, 0, 1), //  exactly RM 10
-      (150, 30, 15), //  deposit counts: floor((120 + 30) / 10)
-      (215, 30, 21), //  floor(215 / 10), not 21.5
+      (150, 0, 150), //  RM 1 = 1 pt
+      (159.99, 0, 159), //  rounds down, never up
+      (0.99, 0, 0), //  under RM 1 earns nothing
+      (1, 0, 1), //  exactly RM 1
+      (150, 30, 150), //  deposit counts: floor(120 + 30)
+      (215.75, 30, 215), //  floor(215.75), not 216
     ];
 
     for (final (price, deposit, points) in cases) {
@@ -453,12 +453,12 @@ void main() {
     testWidgets('extra items paid at the counter earn points too', (tester) async {
       final h = await _openCheckout(tester, _preview(basePrice: 100, bookingFeePaid: 0));
 
-      expect(find.text('Complete & Award 10 Pts'), findsOneWidget);
+      expect(find.text('Complete & Award 100 Pts'), findsOneWidget);
       await _setCounterPaid(tester, '160');
-      expect(find.text('Complete & Award 16 Pts'), findsOneWidget);
+      expect(find.text('Complete & Award 160 Pts'), findsOneWidget);
 
       await _completeCheckout(tester);
-      expect(h.api.submissions.single['basePoints'], 16);
+      expect(h.api.submissions.single['basePoints'], 160);
     });
   });
 

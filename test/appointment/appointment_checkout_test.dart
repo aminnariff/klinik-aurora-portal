@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:klinik_aurora_portal/controllers/appointment/appointment_checkout_controller.dart';
 import 'package:klinik_aurora_portal/controllers/baby_tracker/points_reengagement_controller.dart';
+import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
 void main() {
   group('Appointment Checkout Models & Mathematics', () {
@@ -56,7 +57,7 @@ void main() {
       expect(data.suggestedAddOns.first.price, 45.0);
     });
 
-    test('Checkout math calculates correct gross, balance and points with RM 10 = 1 pt', () {
+    test('Checkout math calculates correct gross, balance and points with RM 1 = 1 pt', () {
       const basePrice = 150.0;
       const bookingDeposit = 30.0;
       final addOns = [
@@ -76,9 +77,18 @@ void main() {
       final balancePayable = grossTotal - bookingDeposit;
       expect(balancePayable, 205.0); // 235 - 30
 
-      // Clinic formula: Spend RM 100 = 10 pts (RM 10 = 1 pt)
-      final basePoints = (balancePayable / 10).floor();
-      expect(basePoints, 20); // 205 / 10 = 20 pts
+      // Clinic formula: RM 1 = 1 pt on full gross spend (deposit included).
+      expect(calculateCustomerPoints(grossTotal.toString()), 235);
+    });
+
+    test('calculateCustomerPoints: RM 1 = 1 pt, min 1, max 10,000', () {
+      expect(calculateCustomerPoints('350'), 350);
+      expect(calculateCustomerPoints('350.99'), 350);
+      expect(calculateCustomerPoints('0.50'), 1);
+      expect(calculateCustomerPoints('0'), 0);
+      expect(calculateCustomerPoints('-20'), 0);
+      expect(calculateCustomerPoints('abc'), 0);
+      expect(calculateCustomerPoints('25000'), 10000);
     });
 
     test('CheckoutResultData correctly parses result and WhatsApp receipt', () {

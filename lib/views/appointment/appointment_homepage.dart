@@ -2314,7 +2314,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
         ),
         _SopTask(
           title: 'Auto Loyalty Points Credited',
-          description: 'Marking "Completed" automatically credits 1 Aurora Point per RM 10 spent to the patient’s mobile app account.',
+          description: 'Marking "Completed" automatically credits 1 Aurora Point per RM 1 spent to the patient’s mobile app account.',
           icon: Icons.stars_rounded,
           badge: 'LOYALTY POINTS',
         ),

@@ -171,7 +171,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
   double get _extraAmount => _counterPaid > _expectedBalance ? (_counterPaid - _expectedBalance) : 0.0;
   double get _discountAmount =>
       (_expectedBalance > _counterPaid && _counterPaid > 0) ? (_expectedBalance - _counterPaid) : 0.0;
-  int get _pointsAwarded => math.max(0, (_totalSpend / 10).floor());
+  int get _pointsAwarded => math.max(0, _totalSpend.floor());
 
   Future<void> _loadPreview() async {
     setState(() {
@@ -578,7 +578,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: const Text(
-                              'RM 10 = 1 pt',
+                              'RM 1 = 1 pt',
                               style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _purpleAccent),
                             ),
                           ),

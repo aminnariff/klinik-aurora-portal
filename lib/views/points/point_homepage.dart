@@ -447,7 +447,7 @@ class _PointHomepageState extends State<PointHomepage> {
                   Icon(Icons.info_outline_rounded, size: 14, color: appInkMuted),
                   const SizedBox(width: 6),
                   Text(
-                    'RM 10 = 1 pt',
+                    'RM 1 = 1 pt',
                     style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: appInkSecondary),
                   ),
                 ],
@@ -629,7 +629,7 @@ class _PointHomepageState extends State<PointHomepage> {
   Widget _selectedPatientHeroCard() {
     final item = _selectedPatient!;
     final currentPoints = item.totalPoint ?? 0;
-    final rmValue = (currentPoints / 10).toStringAsFixed(2);
+    final rmValue = (currentPoints / 100).toStringAsFixed(2);
 
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -1515,7 +1515,7 @@ class _PointHomepageState extends State<PointHomepage> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    '10 points = RM 1.00 redemption discount on upcoming visits.',
+                    'Points redeem for Rewards Catalog items (100 pts ≈ RM 1 of reward value).',
                     style: TextStyle(fontSize: 11, color: appInkMuted),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -2095,7 +2095,7 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
           const SizedBox(width: 8),
           Flexible(
             child: Text(
-              'RM 10 = 1 pt  ·  10 pts = RM 1 discount  ·  12-month expiry',
+              'RM 1 = 1 pt  ·  100 pts ≈ RM 1 reward value  ·  12-month expiry',
               style: TextStyle(fontSize: 11, color: appInkMuted, fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
             ),
@@ -2232,14 +2232,14 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
                 const SizedBox(height: 16),
 
                 _tcSection('Earning Points', Icons.trending_up_rounded, [
-                  'For every RM 10 spent, patients earn 1 point.',
-                  'Each transaction earns a minimum of 1 and a maximum of 1,000 points.',
+                  'For every RM 1 spent, patients earn 1 point.',
+                  'Each transaction earns a minimum of 1 and a maximum of 10,000 points.',
                   'Earn extra points on special occasions and during promotional events.',
                 ]),
                 const SizedBox(height: 16),
                 _tcSection('Redeeming Points', Icons.card_giftcard_rounded, [
                   'Points can be redeemed for discounts or exclusive rewards at Klinik Aurora.',
-                  '10 points = RM 1 redemption value.',
+                  'Rewards are redeemed at their Rewards Catalog point price (100 points ≈ RM 1 of reward value).',
                 ]),
                 const SizedBox(height: 16),
                 _tcSection('Expiry', Icons.timer_outlined, ['Points expire after 12 months of inactivity.']),
