@@ -1575,7 +1575,7 @@ Mata ganjaran kesetiaan anda telah berjaya dikreditkan ke akaun Klinik Aurora an
 
 💵 *Jumlah Bayaran:* RM ${paymentAmount.toStringAsFixed(2)}
 ⭐ *Mata Diperoleh:* +$earnedPoints pts
-🏆 *Baki Terkini:* $newTotalPoints pts
+🏆 *Jumlah Terkini:* $newTotalPoints pts
 
 _Tebus mata ganjaran anda untuk diskaun rawatan, konsultasi & imbasan seterusnya di mana-mana cawangan Klinik Aurora._
 
@@ -1597,8 +1597,6 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
     required double paymentAmount,
     required int newTotalPoints,
   }) {
-    final rmValue = (newTotalPoints / 10).toStringAsFixed(2);
-
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1655,10 +1653,6 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
                           Text(
                             '$newTotalPoints pts',
                             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF1E822B)),
-                          ),
-                          Text(
-                            '≈ RM $rmValue redemption value',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF2ECC40)),
                           ),
                         ],
                       ),
