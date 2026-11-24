@@ -6,12 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
-import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/models/service_branch/service_branch_response.dart' as service_branch_model;
 import 'package:klinik_aurora_portal/models/service_branch/update_service_branch_request.dart';
 import 'package:klinik_aurora_portal/views/service/change_service_duration_dialog.dart';
-import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/padding/app_padding.dart';
@@ -92,79 +90,17 @@ class _ServiceBranchState extends State<ServiceBranch> {
                                     AppPadding.vertical(denominator: 2),
                                     for (service_branch_model.Data? item in widget.serviceBranch?.data ?? [])
                                       ListTile(
-                                        onTap: () {
-                                          showLoading();
-                                          ServiceBranchAvailableDtController.get(
-                                            context,
-                                            1,
-                                            100,
-                                            serviceBranchId: item?.serviceBranchId,
-                                          ).then((value) {
-                                            dismissLoading();
-                                            if (responseCode(value.code)) {
-                                              DateTime now = DateTime.now();
-                                              String? updateId;
-                                              bool haveElements = false;
-                                              try {
-                                                updateId = value.data?.data
-                                                    ?.firstWhere(
-                                                      (element) => element.serviceBranchId == item?.serviceBranchId,
-                                                    )
-                                                    .serviceBranchAvailableDatetimeId;
-                                              } catch (e) {
-                                                debugPrint(e.toString());
-                                              }
-                                              try {
-                                                if ((value.data?.data?.first.availableDatetimes?.length ?? 0) > 0) {
-                                                  haveElements = true;
-                                                }
-                                              } catch (e) {
-                                                debugPrint(e.toString());
-                                              }
-                                              showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: CardContainer(
-                                                          Stack(
-                                                            alignment: Alignment.topRight,
-                                                            children: [
-                                                              Container(
-                                                                padding: EdgeInsets.all(screenPadding),
-                                                                child: MultiTimeCalendarPage(
-                                                                  serviceBranchId: item?.serviceBranchId ?? '',
-                                                                  serviceTiming: item?.serviceTime ?? '',
-                                                                  serviceBranchAvailableDatetimeId: updateId,
-                                                                  startMonth: now.month,
-                                                                  year: now.year,
-                                                                  totalMonths: 6,
-                                                                  initialDateTimes: haveElements
-                                                                      ? value.data?.data?.first.availableDatetimes
-                                                                      : null,
-                                                                ),
-                                                              ),
-                                                              CloseButton(),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            } else {
-                                              showDialogError(
-                                                context,
-                                                value.message ?? value.data?.message ?? 'Failed to load time slots',
-                                              );
-                                            }
-                                          }).catchError((e) {
-                                            dismissLoading();
-                                            showDialogError(context, e.toString());
-                                          });
-                                        },
+                                        onTap: item == null
+                                            ? null
+                                            : () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) => ChangeServiceDurationDialog(
+                                                    serviceBranch: item,
+                                                    onSuccess: () => rebuild.add(DateTime.now()),
+                                                  ),
+                                                );
+                                              },
                                         title: Text('${item?.branchName}', style: AppTypography.bodyMedium(context)),
                                         subtitle: Row(
                                           children: [

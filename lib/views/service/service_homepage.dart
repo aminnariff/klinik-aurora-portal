@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/controllers/api_response_controller.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
-import 'package:klinik_aurora_portal/controllers/service/service_branch_available_dt_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_branch_controller.dart';
 import 'package:klinik_aurora_portal/controllers/service/service_controller.dart';
 import 'package:klinik_aurora_portal/controllers/top_bar/top_bar_controller.dart';
@@ -23,8 +21,6 @@ import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/service/change_service_duration_dialog.dart';
 import 'package:klinik_aurora_portal/views/service/service_branch.dart';
 import 'package:klinik_aurora_portal/views/service/service_details.dart';
-import 'package:klinik_aurora_portal/views/widgets/calendar/multi_time_calendar.dart';
-import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/dropdown/dropdown_attribute.dart';
@@ -493,7 +489,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                         }
                         return i % 2 == 0 ? appSurface : appTableRowAlt;
                       }),
-                      onTap: () => _openBranchServiceTimingOptions(items[i]),
+                      onTap: () => _handleAdminMenuSelection('changeDuration', items[i]),
                       cells: [
                         DataCell(
                           _serviceNameCell(
@@ -582,27 +578,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
               const SizedBox(width: 10),
               const Text(
                 'Change Duration',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF1F2937)),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'update',
-          height: 40,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: primary.withAlpha(25),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Icon(Icons.calendar_month_outlined, size: 16, color: primary),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Manage Time Slots',
                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF1F2937)),
               ),
             ],
@@ -990,7 +965,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     price: s.servicePrice,
                     isActive: s.serviceBranchStatus == 1,
                     drType: s.doctorType,
-                    onTap: () => _handleAdminMenuSelection('update', s),
+                    onTap: () => _handleAdminMenuSelection('changeDuration', s),
                   ),
                 )
                 .toList(),
@@ -1224,201 +1199,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
     }
   }
 
-  void _openBranchServiceTimingOptions(service_branch_model.Data serviceBranch) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return Center(
-          child: Container(
-            width: math.min(560.0, screenWidth(92)),
-            margin: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: appSurface,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.14),
-                  blurRadius: 28,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Material(
-                color: appSurface,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-                      decoration: BoxDecoration(
-                        color: appSurfaceSubtle,
-                        border: Border(bottom: BorderSide(color: appSurfaceSubtle)),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF246E7A), Color(0xFF1B545E)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(Icons.schedule_rounded, size: 20, color: Colors.white),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  serviceBranch.serviceName ?? 'Service Timing & Schedule',
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: appInkPrimary),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  serviceBranch.branchName != null && serviceBranch.branchName!.isNotEmpty
-                                      ? 'Branch: ${serviceBranch.branchName}'
-                                      : 'Configure service timing and calendar for your branch',
-                                  style: TextStyle(fontSize: 11, color: appInkMuted),
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-  tooltip: 'Tutup',
-                            icon: Icon(Icons.close_rounded, size: 20, color: appInkMuted),
-                            onPressed: () => Navigator.pop(ctx),
-                            hoverColor: appSurfaceSubtle,
-                            splashRadius: 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Options
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          _timingOptionCard(
-                            icon: Icons.timer_outlined,
-                            iconColor: const Color(0xFF0284C7),
-                            iconBg: appInfoSoft,
-                            title: 'Edit Service Timing & Duration',
-                            badgeText: 'Duration & Rules',
-                            subtitle: 'Adjust appointment duration (e.g. 15m, 30m, 1h) and customize weekday/weekend rules.',
-                            onTap: () {
-                              Navigator.pop(ctx);
-                              _handleAdminMenuSelection('changeDuration', serviceBranch);
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          _timingOptionCard(
-                            icon: Icons.calendar_month_outlined,
-                            iconColor: const Color(0xFF246E7A),
-                            iconBg: appTealSoft,
-                            title: 'Manage Time Slots & Calendar',
-                            badgeText: 'Available Datetimes',
-                            subtitle: 'Open the 3-month clinic calendar to allocate, review, and customize available appointment booking slots.',
-                            onTap: () {
-                              Navigator.pop(ctx);
-                              _handleAdminMenuSelection('update', serviceBranch);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _timingOptionCard({
-    required IconData icon,
-    required Color iconColor,
-    required Color iconBg,
-    required String title,
-    required String badgeText,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: appSurfaceSubtle,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: appBorder),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(10)),
-              child: Icon(icon, size: 22, color: iconColor),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          title,
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appInkPrimary),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: iconColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          badgeText,
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: iconColor),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 11, color: appInkMuted, height: 1.3),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: appInkMuted),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _handleAdminMenuSelection(String value, service_branch_model.Data serviceBranch) async {
     if (value == 'changeDuration') {
       showDialog(
@@ -1428,63 +1208,6 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           onSuccess: () => filtering(enableDebounce: false),
         ),
       );
-    } else if (value == 'update') {
-      showLoading();
-      ServiceBranchAvailableDtController.get(context, 1, 100, serviceBranchId: serviceBranch.serviceBranchId).then((
-        value,
-      ) {
-        dismissLoading();
-        DateTime now = DateTime.now();
-        String? updateId;
-        bool haveElements = false;
-        try {
-          updateId = value.data?.data
-              ?.firstWhere((e) => e.serviceBranchId == serviceBranch.serviceBranchId)
-              .serviceBranchAvailableDatetimeId;
-        } catch (e) {
-          debugPrint(e.toString());
-        }
-        try {
-          if ((value.data?.data?.first.availableDatetimes?.length ?? 0) > 0) {
-            haveElements = true;
-          }
-        } catch (e) {
-          debugPrint(e.toString());
-        }
-        showDialog(
-          context: context,
-          builder: (_) => Row(
-            children: [
-              Expanded(
-                child: CardContainer(
-                  Stack(
-                    alignment: Alignment.topRight,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(screenPadding),
-                        child: MultiTimeCalendarPage(
-                          serviceBranchId: serviceBranch.serviceBranchId ?? '',
-                          serviceTiming: serviceBranch.serviceTime ?? '',
-                          serviceBranchAvailableDatetimeId: updateId,
-                          startMonth: now.month,
-                          year: now.year,
-                          totalMonths: 6,
-                          branchId: serviceBranch.branchId,
-                          initialDateTimes: haveElements ? value.data?.data?.first.availableDatetimes : null,
-                        ),
-                      ),
-                      const CloseButton(),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).catchError((e) {
-        dismissLoading();
-        showDialogError(context, e.toString());
-      });
     } else if (value == 'enableDisable') {
       try {
         if (await showConfirmDialog(
