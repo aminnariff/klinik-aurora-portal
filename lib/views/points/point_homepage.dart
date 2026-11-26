@@ -18,6 +18,7 @@ import 'package:klinik_aurora_portal/models/point_management/user_points_respons
 import 'package:klinik_aurora_portal/models/user/user_all_response.dart';
 import 'package:klinik_aurora_portal/views/homepage/homepage.dart';
 import 'package:klinik_aurora_portal/views/widgets/aurora/aurora_3d_star_badge.dart';
+import 'package:klinik_aurora_portal/views/widgets/reward/eligible_rewards_panel.dart';
 import 'package:klinik_aurora_portal/views/widgets/card/card_container.dart';
 import 'package:klinik_aurora_portal/views/widgets/debouncer/debouncer.dart';
 import 'package:klinik_aurora_portal/views/widgets/dialog/reusable_dialog.dart';
@@ -629,7 +630,7 @@ class _PointHomepageState extends State<PointHomepage> {
   Widget _selectedPatientHeroCard() {
     final item = _selectedPatient!;
     final currentPoints = item.totalPoint ?? 0;
-    final rmValue = (currentPoints / 100).toStringAsFixed(2);
+    final pendingEarn = _calculateTotalPoints(_amount.controller.text);
 
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -809,25 +810,25 @@ class _PointHomepageState extends State<PointHomepage> {
                     ),
                   ],
                 ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
-                  ),
-                  child: Text(
-                    '≈ RM $rmValue off next visit',
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF10B981),
-                    ),
-                  ),
-                ),
               ],
             ),
+          ),
+          EligibleRewardsPanel(
+            userId: item.userId ?? '',
+            patientName: item.userFullname ?? 'Patient',
+            currentPoints: currentPoints,
+            projectedPoints: currentPoints + pendingEarn,
+            onPointsUpdated: (newTotal) {
+              setState(() {
+                _selectedPatient?.totalPoint = newTotal;
+                for (final p in _recentPatients) {
+                  if (p.userId == item.userId) {
+                    p.totalPoint = newTotal;
+                  }
+                }
+              });
+              filtering(enableDebounce: false);
+            },
           ),
         ],
       ),

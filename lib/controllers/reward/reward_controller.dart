@@ -15,6 +15,80 @@ import 'package:klinik_aurora_portal/models/reward/update_reward_request.dart';
 import 'package:klinik_aurora_portal/models/reward/update_reward_response.dart';
 import 'package:klinik_aurora_portal/views/widgets/global/global.dart';
 
+class EligibleRewardItem {
+  final String rewardId;
+  final String rewardName;
+  final String? rewardDescription;
+  final int rewardPoint;
+  final String? rewardImage;
+  final int? remaining;
+
+  const EligibleRewardItem({
+    required this.rewardId,
+    required this.rewardName,
+    this.rewardDescription,
+    required this.rewardPoint,
+    this.rewardImage,
+    this.remaining,
+  });
+
+  factory EligibleRewardItem.fromJson(Map<String, dynamic> json) {
+    return EligibleRewardItem(
+      rewardId: json['rewardId']?.toString() ?? '',
+      rewardName: json['rewardName']?.toString() ?? '',
+      rewardDescription: json['rewardDescription']?.toString(),
+      rewardPoint: (json['rewardPoint'] as num?)?.toInt() ?? 0,
+      rewardImage: json['rewardImage']?.toString(),
+      remaining: (json['remaining'] as num?)?.toInt(),
+    );
+  }
+}
+
+class EligibleRewardsResult {
+  final int currentPoints;
+  final List<EligibleRewardItem> rewards;
+
+  const EligibleRewardsResult({
+    required this.currentPoints,
+    required this.rewards,
+  });
+
+  factory EligibleRewardsResult.fromJson(Map<String, dynamic> json) {
+    final d = (json['data'] as Map<String, dynamic>?) ?? json;
+    return EligibleRewardsResult(
+      currentPoints: (d['currentPoints'] as num?)?.toInt() ?? 0,
+      rewards: ((d['rewards'] as List?) ?? [])
+          .whereType<Map<String, dynamic>>()
+          .map(EligibleRewardItem.fromJson)
+          .toList(),
+    );
+  }
+}
+
+class AdminClaimRewardResult {
+  final String rewardId;
+  final String rewardName;
+  final int pointsDeducted;
+  final int newTotalPoints;
+
+  const AdminClaimRewardResult({
+    required this.rewardId,
+    required this.rewardName,
+    required this.pointsDeducted,
+    required this.newTotalPoints,
+  });
+
+  factory AdminClaimRewardResult.fromJson(Map<String, dynamic> json) {
+    final d = (json['data'] as Map<String, dynamic>?) ?? json;
+    return AdminClaimRewardResult(
+      rewardId: d['rewardId']?.toString() ?? '',
+      rewardName: d['rewardName']?.toString() ?? '',
+      pointsDeducted: (d['pointsDeducted'] as num?)?.toInt() ?? 0,
+      newTotalPoints: (d['newTotalPoints'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
 class RewardController extends ChangeNotifier {
   ApiResponse<RewardAllResponse>? _rewardAllResponse;
   ApiResponse<RewardAllResponse>? get rewardAllResponse => _rewardAllResponse;
@@ -158,5 +232,54 @@ class RewardController extends ChangeNotifier {
     } catch (e) {
       return ApiResponse(code: 400, message: e.toString());
     }
+  }
+
+  static Future<ApiResponse<EligibleRewardsResult>> getEligibleForPatient(
+    BuildContext context,
+    String userId,
+  ) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.get,
+          endpoint: 'admin/reward-management/eligible',
+          queryParameters: {'userId': userId},
+        )
+        .then((value) {
+          try {
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: value.data != null ? EligibleRewardsResult.fromJson(value.data) : null,
+            );
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
+  }
+
+  static Future<ApiResponse<AdminClaimRewardResult>> claimForPatient(
+    BuildContext context, {
+    required String userId,
+    required String rewardId,
+  }) async {
+    return ApiController()
+        .call(
+          context,
+          method: Method.post,
+          endpoint: 'admin/reward-management/claim',
+          data: {'userId': userId, 'rewardId': rewardId},
+        )
+        .then((value) {
+          try {
+            return ApiResponse(
+              code: value.code,
+              message: value.message,
+              data: value.data != null ? AdminClaimRewardResult.fromJson(value.data) : null,
+            );
+          } catch (e) {
+            return ApiResponse(code: 400, message: e.toString());
+          }
+        });
   }
 }

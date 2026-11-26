@@ -11,6 +11,7 @@ import 'package:klinik_aurora_portal/controllers/service/service_branch_controll
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
 import 'package:klinik_aurora_portal/views/widgets/button/app_button.dart';
 import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
+import 'package:klinik_aurora_portal/views/widgets/reward/eligible_rewards_panel.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 
 const Color _purpleAccent = Color(0xFF7C3AED);
@@ -143,6 +144,8 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
   bool _submitting = false;
 
   CheckoutResultData? _result;
+  int? _liveCurrentPoints;
+  int? _liveReceiptPoints;
 
   @override
   void initState() {
@@ -309,7 +312,8 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
     final p = _preview!;
     final deposit = _deposit;
     final pts = _pointsAwarded;
-    final newBalance = p.currentPoints + pts;
+    final currentPts = _liveCurrentPoints ?? p.currentPoints;
+    final newBalance = currentPts + pts;
 
     return SingleChildScrollView(
       child: Column(
@@ -595,6 +599,16 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
               ],
             ),
           ),
+          EligibleRewardsPanel(
+            userId: p.userId,
+            patientName: p.patientName,
+            currentPoints: currentPts,
+            projectedPoints: newBalance,
+            compact: true,
+            onPointsUpdated: (newTotal) {
+              setState(() => _liveCurrentPoints = newTotal);
+            },
+          ),
           const SizedBox(height: 16),
 
           // ── Staff Checkout Note ────────────────────────────────────
@@ -757,9 +771,18 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                 const Divider(height: 12),
                 _receiptRow('Total Spend', 'RM ${res.grossTotal.toStringAsFixed(2)}', colors.brandText),
                 _receiptRow('Points Awarded', '+${res.pointsAwarded} pts', _purpleAccent),
-                _receiptRow('New Patient Balance', '${res.newTotalPoints} pts', colors.success),
+                _receiptRow('New Patient Balance', '${_liveReceiptPoints ?? res.newTotalPoints} pts', colors.success),
               ],
             ),
+          ),
+          EligibleRewardsPanel(
+            userId: _preview?.userId ?? '',
+            patientName: res.patientName,
+            currentPoints: _liveReceiptPoints ?? res.newTotalPoints,
+            compact: true,
+            onPointsUpdated: (newTotal) {
+              setState(() => _liveReceiptPoints = newTotal);
+            },
           ),
           const SizedBox(height: 16),
 
