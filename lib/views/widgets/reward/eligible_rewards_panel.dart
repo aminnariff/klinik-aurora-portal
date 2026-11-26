@@ -179,66 +179,92 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading || widget.userId.isEmpty) {
+    if (_loading || widget.userId.isEmpty || _rewards.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final claimableNow = _rewards.where((r) => r.rewardPoint <= widget.currentPoints).toList();
+    final eligibleCount = _rewards.where((r) => r.rewardPoint <= widget.currentPoints).length;
+    final hasAnyEligible = eligibleCount > 0;
     final unlockingAfterPay = _rewards
         .where((r) => r.rewardPoint > widget.currentPoints && r.rewardPoint <= widget.projectedPoints)
         .toList();
 
-    if (claimableNow.isEmpty && unlockingAfterPay.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (claimableNow.isNotEmpty) ...[
-          Container(
-            margin: EdgeInsets.only(top: widget.compact ? 8 : 10),
-            padding: EdgeInsets.all(widget.compact ? 10 : 12),
-            decoration: BoxDecoration(
-              color: appIsDarkMode ? const Color(0xFF292011) : const Color(0xFFFFFBEB),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: const Color(0xFFF59E0B).withValues(alpha: 0.45),
-              ),
+        Container(
+          margin: EdgeInsets.only(top: widget.compact ? 8 : 10),
+          padding: EdgeInsets.all(widget.compact ? 10 : 12),
+          decoration: BoxDecoration(
+            color: hasAnyEligible
+                ? (appIsDarkMode ? const Color(0xFF292011) : const Color(0xFFFFFBEB))
+                : appSurfaceSubtle,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: hasAnyEligible
+                  ? const Color(0xFFF59E0B).withValues(alpha: 0.45)
+                  : appBorder,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.card_giftcard_rounded, size: 15, color: Color(0xFFD97706)),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        'Eligible Rewards (${claimableNow.length}) — Ask patient if they want to claim:',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w700,
-                          color: appIsDarkMode ? const Color(0xFFFCD34D) : const Color(0xFF92400E),
-                        ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.card_giftcard_rounded,
+                    size: 15,
+                    color: hasAnyEligible ? const Color(0xFFD97706) : appInkMuted,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      hasAnyEligible
+                          ? 'Rewards ($eligibleCount eligible) — Ask patient if they want to claim:'
+                          : 'Rewards (${_rewards.length} available) — Patient needs more points to claim:',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: hasAnyEligible
+                            ? (appIsDarkMode ? const Color(0xFFFCD34D) : const Color(0xFF92400E))
+                            : appInkSecondary,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                ...claimableNow.map((reward) {
-                  final isClaiming = _claimingRewardId == reward.rewardId;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ..._rewards.map((reward) {
+                final isEligible = reward.rewardPoint <= widget.currentPoints;
+                final unlocksOnPay = !isEligible && reward.rewardPoint <= widget.projectedPoints;
+                final ptsNeeded = reward.rewardPoint - widget.currentPoints;
+                final isClaiming = _claimingRewardId == reward.rewardId;
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Opacity(
+                    opacity: isEligible ? 1.0 : 0.62,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                       decoration: BoxDecoration(
-                        color: appSurface,
+                        color: isEligible ? appSurface : appCanvas,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: appBorder),
+                        border: Border.all(
+                          color: unlocksOnPay
+                              ? const Color(0xFF0EA5E9).withValues(alpha: 0.5)
+                              : appBorder,
+                        ),
                       ),
                       child: Row(
                         children: [
+                          Icon(
+                            isEligible ? Icons.check_circle_rounded : Icons.lock_outline_rounded,
+                            size: 15,
+                            color: isEligible
+                                ? const Color(0xFFD97706)
+                                : (unlocksOnPay ? const Color(0xFF0284C7) : appInkMuted),
+                          ),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,55 +274,78 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    color: appInkPrimary,
+                                    color: isEligible ? appInkPrimary : appInkMuted,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  '${reward.rewardPoint} pts${reward.remaining != null ? ' · ${reward.remaining} left' : ''}',
+                                  isEligible
+                                      ? '${reward.rewardPoint} pts${reward.remaining != null ? ' · ${reward.remaining} left' : ''}'
+                                      : unlocksOnPay
+                                          ? '${reward.rewardPoint} pts · Unlocks after this payment (+${widget.projectedPoints - widget.currentPoints} pts)'
+                                          : '${reward.rewardPoint} pts · Need $ptsNeeded more pts',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: appInkMuted,
+                                    color: unlocksOnPay ? const Color(0xFF0284C7) : appInkMuted,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 8),
-                          SizedBox(
-                            height: 28,
-                            child: ElevatedButton(
-                              onPressed: _claimingRewardId != null ? null : () => _confirmAndClaim(reward),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFD97706),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                          if (isEligible)
+                            SizedBox(
+                              height: 28,
+                              child: ElevatedButton(
+                                onPressed: _claimingRewardId != null ? null : () => _confirmAndClaim(reward),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFD97706),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                ),
+                                child: isClaiming
+                                    ? const SizedBox(
+                                        width: 12,
+                                        height: 12,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Text(
+                                        'Claim',
+                                        style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                                      ),
                               ),
-                              child: isClaiming
-                                  ? const SizedBox(
-                                      width: 12,
-                                      height: 12,
-                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                    )
-                                  : const Text(
-                                      'Claim',
-                                      style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
-                                    ),
+                            )
+                          else
+                            Container(
+                              height: 28,
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: appBorder.withValues(alpha: 0.4),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Locked',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: appInkMuted,
+                                ),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
-                  );
-                }),
-              ],
-            ),
+                  ),
+                );
+              }),
+            ],
           ),
-        ],
+        ),
         if (unlockingAfterPay.isNotEmpty) ...[
           Container(
             margin: const EdgeInsets.only(top: 6),
