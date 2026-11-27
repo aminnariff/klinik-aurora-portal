@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/views/widgets/layout/deferred_reload_stub.dart'
+    if (dart.library.js_interop) 'package:klinik_aurora_portal/views/widgets/layout/deferred_reload_web.dart';
 
 /// Lazily loads a Dart `deferred as` library on demand, caching the loaded
 /// state by [libraryKey] so subsequent visits render synchronously without
@@ -65,6 +68,9 @@ class _DeferredPageState extends State<DeferredPage> {
       }
     }).catchError((Object err) {
       _inFlight.remove(key);
+      if (kIsWeb && tryAutoReloadOnce(key)) {
+        return;
+      }
       if (mounted && widget.libraryKey == key) {
         setState(() {
           _error = err;
@@ -74,6 +80,10 @@ class _DeferredPageState extends State<DeferredPage> {
   }
 
   void _retry() {
+    if (kIsWeb) {
+      reloadAppWithCacheBust(widget.libraryKey);
+      return;
+    }
     _loadedKeys.remove(widget.libraryKey);
     _inFlight.remove(widget.libraryKey);
     setState(() {
@@ -106,14 +116,16 @@ class _DeferredPageState extends State<DeferredPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Check your network connection and retry.',
+                  kIsWeb
+                      ? 'A new update may be available, or your connection dropped.'
+                      : 'Check your network connection and retry.',
                   style: TextStyle(fontSize: 13, color: colors.inkMuted),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: _retry,
                   icon: const Icon(Icons.refresh_rounded, size: 16),
-                  label: const Text('Retry'),
+                  label: Text(kIsWeb ? 'Reload Page' : 'Retry'),
                 ),
               ],
             ),
