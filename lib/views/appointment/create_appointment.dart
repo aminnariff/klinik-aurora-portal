@@ -127,6 +127,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   String? _selectedUserId;
   String? _selectedUserNric;
   bool _isEddFromBabyTracker = false;
+  String _sessionPreference = 'both';
   final TextEditingController _patientSearchCtrl = TextEditingController();
   List<UserResponse> _patientSearchResults = [];
   bool _isSearchingPatients = false;
@@ -1842,6 +1843,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                                     .serviceBranchAvailableTimingResponse =
                                                                 value.data;
                                                             availableDateTime = value.data?.slots ?? [];
+                                                            _sessionPreference = value.data?.sessionPreference ?? 'both';
                                                             rebuild.add(DateTime.now());
                                                             rebuildDropdown.add(DateTime.now());
                                                           }
@@ -3859,6 +3861,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
       if (!silent) dismissLoading();
       if (responseCode(value.code)) {
         availableDateTime = value.data?.slots ?? [];
+        _sessionPreference = value.data?.sessionPreference ?? 'both';
         availableDateTime = removePastDates(availableDateTime);
         availableDateTime.sort((a, b) => DateTime.parse(a).compareTo(DateTime.parse(b)));
         context.read<ServiceBranchAvailableDtController>().serviceBranchAvailableTimingResponse = value.data;
@@ -4221,8 +4224,35 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     );
   }
 
-  void _submitAppointment() {
+  Future<bool> _confirmSessionOverrideIfNeeded() async {
+    if (_sessionPreference != 'first_half' && _sessionPreference != 'second_half') return true;
+    final raw = dateTimeController.text.trim();
+    if (raw.isEmpty) return true;
+    DateTime? myDt;
+    try {
+      myDt = DateFormat('dd-MM-yyyy HH:mm').parseStrict(raw);
+    } catch (_) {
+      myDt = DateTime.tryParse(raw);
+    }
+    if (myDt == null) return true;
+
+    final isFirstHalfMismatch = _sessionPreference == 'first_half' && myDt.hour >= 12;
+    final isSecondHalfMismatch = _sessionPreference == 'second_half' && myDt.hour < 12;
+    if (!isFirstHalfMismatch && !isSecondHalfMismatch) return true;
+
+    final prefLabel = _sessionPreference == 'first_half'
+        ? 'First Half (before 12:00 PM)'
+        : 'Second Half (12:00 PM onwards)';
+    return await showConfirmDialog(
+      context,
+      'This service is configured for $prefLabel. The selected slot is outside the preferred session. Are you sure you want to proceed?',
+    );
+  }
+
+  void _submitAppointment() async {
     if (validate()) {
+      if (!await _confirmSessionOverrideIfNeeded()) return;
+      if (!mounted) return;
       showLoading();
       if (widget.type == 'create') {
         AppointmentController.create(

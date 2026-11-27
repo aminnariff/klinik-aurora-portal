@@ -45,6 +45,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
   String? _weekdayDuration;
   String? _weekendDuration;
   final Map<String, String> _dateOverrides = {};
+  String _preferredSession = 'both';
   bool _showAdvancedRules = false;
 
   final List<String> _timingOptions = [
@@ -62,7 +63,8 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
   bool get _hasActiveAdvancedRules =>
       (_weekdayDuration != null && _weekdayDuration!.isNotEmpty) ||
       (_weekendDuration != null && _weekendDuration!.isNotEmpty) ||
-      _dateOverrides.isNotEmpty;
+      _dateOverrides.isNotEmpty ||
+      _preferredSession != 'both';
 
   String get _hqTime {
     final hq = widget.serviceBranch.hqServiceTime;
@@ -104,6 +106,10 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
         if (_dateOverrides.isNotEmpty) {
           _showAdvancedRules = true;
         }
+      }
+      final s = existingRules['session']?.toString();
+      if (s == 'first_half' || s == 'second_half') {
+        _preferredSession = s!;
       }
     }
   }
@@ -177,6 +183,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
       _weekdayDuration = null;
       _weekendDuration = null;
       _dateOverrides.clear();
+      _preferredSession = 'both';
       _showAdvancedRules = false;
     });
   }
@@ -219,6 +226,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
     }
     if (_dateOverrides.isNotEmpty) {
       rules['date_overrides'] = Map<String, String>.from(_dateOverrides);
+    }
+    if (_preferredSession != 'both') {
+      rules['session'] = _preferredSession;
     }
 
     final hadExistingRules = widget.serviceBranch.serviceTimeRules != null;
@@ -557,6 +567,28 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                           ],
                         ],
                       ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Preferred Session (Morning / Afternoon)
+                    Text(
+                      'Preferred Session (Mobile Booking)',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: appInkSecondary),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        _sessionChip('both', 'Both (All Day)', Icons.schedule_rounded),
+                        const SizedBox(width: 8),
+                        _sessionChip('first_half', 'First Half (< 12 PM)', Icons.wb_sunny_outlined),
+                        const SizedBox(width: 8),
+                        _sessionChip('second_half', 'Second Half (≥ 12 PM)', Icons.nights_stay_outlined),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Mobile app hides slots outside this session. Staff can still override with a confirmation prompt.',
+                      style: TextStyle(fontSize: 11, color: appInkMuted),
                     ),
                     const SizedBox(height: 16),
 
@@ -939,6 +971,45 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                             ),
                     ),
                   ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sessionChip(String value, String label, IconData icon) {
+    final selected = _preferredSession == value;
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() {
+          _preferredSession = value;
+          _isResetToHq = false;
+        }),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+          decoration: BoxDecoration(
+            color: selected ? primary.withValues(alpha: 0.1) : appSurfaceSubtle,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: selected ? primary : appBorder,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, size: 15, color: selected ? primary : appInkMuted),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: selected ? primary : appInkSecondary,
                 ),
               ),
             ],
