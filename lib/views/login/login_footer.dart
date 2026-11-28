@@ -17,8 +17,9 @@ class LoginFooter extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text('Trouble signing in?', style: TextStyle(fontSize: 12.5, color: appInkMuted)),
             const SizedBox(width: 5),

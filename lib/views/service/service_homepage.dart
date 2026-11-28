@@ -1152,7 +1152,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           context.read<ServiceBranchController>().serviceBranchResponse = value.data;
           showDialog(
             context: context,
-            builder: (_) => ServiceBranch(serviceBranch: value.data),
+            builder: (_) => ServiceBranch(serviceBranch: value.data, serviceName: service.serviceName),
           );
         }
       });

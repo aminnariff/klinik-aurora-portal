@@ -19,7 +19,10 @@ import 'package:provider/provider.dart';
 
 class ServiceBranch extends StatefulWidget {
   final service_branch_model.ServiceBranchResponse? serviceBranch;
-  const ServiceBranch({super.key, required this.serviceBranch});
+
+  /// Shown in the header; the branch list can be empty when no branch offers the service yet.
+  final String? serviceName;
+  const ServiceBranch({super.key, required this.serviceBranch, this.serviceName});
 
   @override
   State<ServiceBranch> createState() => _ServiceBranchState();
@@ -62,7 +65,7 @@ class _ServiceBranchState extends State<ServiceBranch> {
                           child: Row(
                             children: [
                               Text(
-                                'Service: ${widget.serviceBranch?.data?.first.serviceName}',
+                                'Service: ${widget.serviceName ?? widget.serviceBranch?.data?.firstOrNull?.serviceName ?? '-'}',
                                 style: AppTypography.bodyMedium(context).apply(fontWeightDelta: 1),
                               ),
                             ],

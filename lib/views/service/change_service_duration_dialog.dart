@@ -253,7 +253,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
         final overlaps = res.data?.overlaps ?? [];
         final previewLines = overlaps
             .take(5)
-            .map((o) => '• ${o['patientName']} (${o['appointmentTime']}) ↔ ${o['conflictWithPatient']} (${o['conflictWithTime']})')
+            .map((o) => '• ${o['patientName']} (${o['appointmentTime']}) clashes with ${o['conflictWithPatient']} (${o['conflictWithTime']})')
             .join('\n');
         final moreText = overlaps.length > 5 ? '\n...and ${overlaps.length - 5} more' : '';
         final confirmed = await showDialog<bool>(

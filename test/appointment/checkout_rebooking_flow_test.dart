@@ -403,6 +403,7 @@ void main() {
       await _setCounterPaid(tester, '100');
       expect(_receiptAmount(tester, 'Discount / Adjustment'), '-RM 20.00');
       expect(_receiptAmount(tester, 'Total Patient Spend Today'), 'RM 130.00');
+      await tester.pump(const Duration(seconds: 2));
     });
 
     testWidgets('without a deposit the field is pre-filled with the service price', (tester) async {
@@ -411,6 +412,7 @@ void main() {
       expect(find.text('Total Amount Paid (RM)'), findsOneWidget);
       expect(find.text('Deposit (Paid Online / Booked)'), findsNothing);
       expect(_counterPaidText(tester), '80.00');
+      await tester.pump(const Duration(seconds: 2));
     });
 
     testWidgets('the balance never goes negative when the deposit exceeds the price', (tester) async {
@@ -420,6 +422,7 @@ void main() {
       expect(_counterPaidText(tester), '0.00');
       // Points still count the deposit the patient paid: floor(30) at RM 1 = 1 pt.
       expect(find.text('Complete & Award 30 Pts'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 2));
     });
   });
 

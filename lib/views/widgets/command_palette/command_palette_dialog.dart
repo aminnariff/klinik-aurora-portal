@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/controllers/dark_mode/dark_mode_controller.dart';
 import 'package:klinik_aurora_portal/views/appointment/create_appointment.dart';
@@ -9,6 +10,7 @@ import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.d
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CommandItem {
   final String title;
@@ -85,6 +87,13 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
       icon: Icons.dark_mode_outlined,
       subtitle: 'Switch between bright reception view and low-glare dark mode',
       onSelect: (ctx) => ctx.read<DarkModeController>().toggleDarkMode(ctx),
+    ),
+    CommandItem(
+      title: 'Product Tour',
+      category: 'Quick Actions',
+      icon: Icons.play_circle_outline_rounded,
+      subtitle: 'Watch each task step by step, then practise it with sample data',
+      onSelect: (_) => launchUrl(productTourUri, webOnlyWindowName: '_blank'),
     ),
     CommandItem(
       title: 'Keyboard Shortcuts (?)',

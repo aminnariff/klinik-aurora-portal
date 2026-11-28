@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
 import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NavGroup {
   final String key;
@@ -699,6 +701,55 @@ class _AuroraCollapsibleSidebarState extends State<AuroraCollapsibleSidebar> {
       children: [
         Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
         const SizedBox(height: 4),
+
+        // Product tour: practise every task on sample data (opens /tour/ in a new tab).
+        Tooltip(
+          message: 'Product Tour: practise with sample data',
+          child: InkWell(
+            onTap: () {
+              if (widget.isMobileDrawer) Navigator.of(context).pop();
+              launchUrl(productTourUri, webOnlyWindowName: '_blank');
+            },
+            borderRadius: BorderRadius.circular(8),
+            hoverColor: Colors.white.withValues(alpha: 0.15),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final showLabels = extended && constraints.maxWidth >= 120;
+                  return Row(
+                    mainAxisAlignment: showLabels ? MainAxisAlignment.start : MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.play_circle_outline_rounded, color: Color(0xE6FFFFFF), size: 19),
+                      if (showLabels) ...[
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'Product Tour',
+                            style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13, fontWeight: FontWeight.w500),
+                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDF6E98),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Text(
+                            'NEW',
+                            style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6),
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
 
         // Appearance & Theme
         Tooltip(

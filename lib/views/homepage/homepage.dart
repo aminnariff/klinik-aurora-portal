@@ -485,6 +485,12 @@ class _HomepageState extends State<Homepage> {
           ),
           const SizedBox(width: 4),
           if (constraints.maxWidth >= 420) IconButton(
+            icon: const Icon(Icons.play_circle_outline_rounded, size: 21),
+            color: colors.inkSecondary,
+            tooltip: 'Product Tour: practise with sample data',
+            onPressed: () => launchUrl(productTourUri, webOnlyWindowName: '_blank'),
+          ),
+          if (constraints.maxWidth >= 420) IconButton(
             icon: const Icon(Icons.keyboard_outlined, size: 20),
             color: colors.inkSecondary,
             tooltip: 'Keyboard Shortcuts (?)',
