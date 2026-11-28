@@ -1834,7 +1834,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           context,
                                                           serviceBranchId: _service?.key,
                                                           branchId: _appointmentBranch?.key ?? widget.appointment?.branch?.branchId,
-                                                          serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : selectedService?.serviceTime,
+                                                          serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
                                                           durationMinutes: _isCurrentRescan ? _rescanDuration : null,
                                                         ).then((value) {
                                                           if (responseCode(value.code)) {
@@ -3855,7 +3855,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
         context,
         serviceBranchId: sBranchId,
         branchId: bId,
-        serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : selectedService?.serviceTime,
+        serviceTime: _isCurrentRescan ? '$_rescanDuration minutes' : null,
         durationMinutes: _isCurrentRescan ? _rescanDuration : null,
       );
       if (!silent) dismissLoading();
