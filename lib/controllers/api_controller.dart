@@ -109,19 +109,14 @@ class ApiController {
       debugPrint("Error popping dialogs on session expired: $e");
     }
 
-    // 2. Clear authentication state
+    // 2. Clear authentication state synchronously via singleton + storage
+    appAuthController.clearAuthMemory();
     try {
       final ctx = rootNavigatorKey.currentContext ?? callerContext;
       if (ctx != null && ctx.mounted) {
         ctx.read<AuthController>().logout(ctx);
-      } else {
-        prefs.remove(authResponse);
-        prefs.remove(token);
       }
-    } catch (e) {
-      prefs.remove(authResponse);
-      prefs.remove(token);
-    }
+    } catch (_) {}
 
     // 3. Mark session expired on LoginPage so it displays a clean, non-blocking banner
     sessionExpiredNotice.value = true;

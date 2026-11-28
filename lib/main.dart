@@ -84,6 +84,7 @@ Future<void> main() async {
       AppVersion.init();
       AppLoading.init();
       await Storage.init();
+      appAuthController.hydrateFromStorage();
       runApp(
         EasyLocalization(
           supportedLocales: const [Locale('en', 'US')],
@@ -149,7 +150,7 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider<AppointmentDashboardController>(create: (_) => AppointmentDashboardController()),
             ChangeNotifierProvider<BranchOperationsController>(create: (_) => BranchOperationsController()),
             ChangeNotifierProvider<BranchPerformanceController>(create: (_) => BranchPerformanceController()),
-            ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
+            ChangeNotifierProvider<AuthController>.value(value: appAuthController),
             ChangeNotifierProvider<BranchController>(create: (_) => BranchController()),
             ChangeNotifierProvider<DashboardController>(create: (_) => DashboardController()),
             ChangeNotifierProvider<ServicePerformanceController>(create: (_) => ServicePerformanceController()),

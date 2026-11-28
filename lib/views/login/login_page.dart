@@ -20,7 +20,6 @@ import 'package:klinik_aurora_portal/views/widgets/global/error_message.dart';
 import 'package:klinik_aurora_portal/views/widgets/motion/emil_motion.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:klinik_aurora_portal/controllers/auth/google_auth_service.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:klinik_aurora_portal/views/login/login_footer.dart';
 
@@ -103,26 +102,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) => _view();
-
-  Widget _view() {
-    return Consumer<AuthController>(
-      builder: (context, controller, _) {
-        if (controller.authenticationResponse != null &&
-            DateTime.parse(
-                  controller.authenticationResponse?.data?.expiryDt ?? '',
-                ).difference(DateTime.now()).isNegative ==
-                false &&
-            widget.resetUser != true) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (context.mounted) context.replaceNamed(Homepage.routeName);
-          });
-          return _loadingScreen();
-        }
-        return _authPage();
-      },
-    );
-  }
+  Widget build(BuildContext context) => _authPage();
 
   Widget _authPage() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -1228,17 +1208,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       builder: (BuildContext dialogContext) {
         return _ForgotPasswordDialog(initialEmail: initialEmail);
       },
-    );
-  }
-
-  Widget _loadingScreen() {
-    return Scaffold(
-      backgroundColor: appCanvas,
-      body: Center(child: SizedBox(width: 140, child: Lottie.asset(
-        'assets/lottie/simple-loading.json',
-        width: 140,
-        animate: !MediaQuery.disableAnimationsOf(context),
-      ))),
     );
   }
 }

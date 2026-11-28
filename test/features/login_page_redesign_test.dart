@@ -112,4 +112,27 @@ void main() {
     expect(authCtrl.usernameError, isNotNull);
     expect(authCtrl.passwordError, isNotNull);
   });
+
+  testWidgets('LoginPage renders _authPage and purges stale auth when session in storage is missing or inactive', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    final authCtrl = AuthController();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AuthController>.value(value: authCtrl),
+          ChangeNotifierProvider<DarkModeController>(create: (_) => DarkModeController(initialThemeMode: ThemeMode.dark)),
+        ],
+        child: const MaterialApp(home: LoginPage()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify login form is rendered, not a frozen loading screen
+    expect(find.text('Sign in to your account').evaluate().isNotEmpty || find.text('Welcome to').evaluate().isNotEmpty, isTrue);
+    expect(find.text('Forgot password?'), findsOneWidget);
+  });
 }

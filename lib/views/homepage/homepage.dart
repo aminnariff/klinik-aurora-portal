@@ -183,7 +183,6 @@ class _HomepageState extends State<Homepage> {
       ),
     ];
     getAuthController();
-    super.initState();
   }
 
   void getAuthController() {
@@ -260,6 +259,8 @@ class _HomepageState extends State<Homepage> {
             context.goNamed(RouteNames.noPermission);
           }
           if (mounted) setState(() {});
+        } else {
+          if (mounted) ApiController.handleSessionExpired(context);
         }
       });
     });

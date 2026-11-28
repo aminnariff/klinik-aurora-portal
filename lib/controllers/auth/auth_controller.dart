@@ -9,16 +9,42 @@ import 'package:klinik_aurora_portal/controllers/refresh_token/refresh_token_con
 import 'package:klinik_aurora_portal/models/auth/auth_request.dart';
 import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
 
+/// Shared singleton [AuthController] used as the single source of truth across
+/// [GoRouter], [MyApp], and [ApiController] so routing and UI never desync.
+final AuthController appAuthController = AuthController();
+
 class AuthController extends ChangeNotifier {
   /// Hydrate persisted auth synchronously on construction so the session is
   /// available to route guards / early API calls immediately after a page
   /// reload, before the async [init] flow completes.
   AuthController() {
-    _hydrateFromStorage();
+    hydrateFromStorage();
   }
 
   AuthResponse? _authenticationResponse;
   AuthResponse? get authenticationResponse => _authenticationResponse;
+
+  bool _isSigningOut = false;
+  bool get isSigningOut => _isSigningOut;
+
+  /// Single source of truth for whether the current session is authenticated
+  /// and active (matches ezypayment-app's `AuthState.isAuthenticated`).
+  bool get isAuthenticated {
+    if (_isSigningOut) return false;
+    final auth = _authenticationResponse;
+    if (auth == null) return false;
+    final accessToken = auth.data?.accessToken;
+    if (accessToken == null || accessToken.isEmpty) return false;
+    if (isSessionInactive()) return false;
+    final expiryStr = auth.data?.expiryDt;
+    if (expiryStr != null && expiryStr.isNotEmpty) {
+      final expiry = DateTime.tryParse(expiryStr);
+      if (expiry != null && expiry.difference(DateTime.now()).isNegative) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   String? _usernameError;
   String? get usernameError => _usernameError;
@@ -74,21 +100,29 @@ class AuthController extends ChangeNotifier {
   /// Reads from persisted storage so the check works across browser tabs /
   /// page reloads.
   bool isSessionInactive() {
-    final raw = prefs.getString(lastActivityTimestamp);
-    if (raw == null || raw.isEmpty) return false; // first visit – not inactive
-    final lastActive = DateTime.tryParse(raw);
-    if (lastActive == null) return false;
-    final elapsed = DateTime.now().difference(lastActive);
-    return elapsed >= inactivityTimeout;
+    try {
+      final raw = prefs.getString(lastActivityTimestamp);
+      if (raw == null || raw.isEmpty) return false; // first visit – not inactive
+      final lastActive = DateTime.tryParse(raw);
+      if (lastActive == null) return false;
+      final elapsed = DateTime.now().difference(lastActive);
+      return elapsed >= inactivityTimeout;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Returns how long the user has been idle (for UI display if needed).
   Duration getIdleDuration() {
-    final raw = prefs.getString(lastActivityTimestamp);
-    if (raw == null || raw.isEmpty) return Duration.zero;
-    final lastActive = DateTime.tryParse(raw);
-    if (lastActive == null) return Duration.zero;
-    return DateTime.now().difference(lastActive);
+    try {
+      final raw = prefs.getString(lastActivityTimestamp);
+      if (raw == null || raw.isEmpty) return Duration.zero;
+      final lastActive = DateTime.tryParse(raw);
+      if (lastActive == null) return Duration.zero;
+      return DateTime.now().difference(lastActive);
+    } catch (_) {
+      return Duration.zero;
+    }
   }
 
   // ── Token expiry helpers ────────────────────────────────────────────────
@@ -125,19 +159,54 @@ class AuthController extends ChangeNotifier {
 
   /// Synchronously load the persisted auth response into memory.
   /// Reads come from the SecurePrefs in-memory cache, so this is safe to run
-  /// in the constructor. Never clears storage — [init] owns validation.
-  void _hydrateFromStorage() {
+  /// in the constructor and after [Storage.init]. Never hydrates inactive or expired sessions.
+  void hydrateFromStorage() {
     try {
+      if (isSessionInactive()) {
+        try {
+          prefs.remove(authResponse);
+          prefs.remove(token);
+        } catch (_) {}
+        _authenticationResponse = null;
+        _branchId = null;
+        return;
+      }
       final rawAuth = prefs.getString(authResponse);
-      if (rawAuth == null || rawAuth.trim().isEmpty) return;
+      if (rawAuth == null || rawAuth.trim().isEmpty) {
+        _authenticationResponse = null;
+        _branchId = null;
+        return;
+      }
       final decoded = json.decode(rawAuth);
-      if (decoded is! Map<String, dynamic>) return;
+      if (decoded is! Map<String, dynamic>) {
+        _authenticationResponse = null;
+        _branchId = null;
+        return;
+      }
       final parsed = AuthResponse.fromJson(decoded);
+
+      // Check token expiry
+      final expiryStr = parsed.data?.expiryDt;
+      if (expiryStr != null && expiryStr.isNotEmpty) {
+        final expiry = DateTime.tryParse(expiryStr);
+        if (expiry != null && expiry.difference(DateTime.now()).isNegative) {
+          try {
+            prefs.remove(authResponse);
+            prefs.remove(token);
+          } catch (_) {}
+          _authenticationResponse = null;
+          _branchId = null;
+          return;
+        }
+      }
+
       _authenticationResponse = parsed;
       _branchId = parsed.data?.user?.branchId;
       _rememberMe = prefs.getBool(rememberMe) ?? false;
     } catch (e) {
       debugPrint("Failed to hydrate auth from storage: $e");
+      _authenticationResponse = null;
+      _branchId = null;
     }
   }
 
@@ -149,6 +218,7 @@ class AuthController extends ChangeNotifier {
   /// Returns `true` if refresh succeeded, `false` otherwise.
   /// Concurrent callers await the same in-flight request.
   Future<bool> tryRefreshToken(BuildContext context) {
+    if (_isSigningOut || _authenticationResponse == null) return Future.value(false);
     final inFlight = _refreshInFlight;
     if (inFlight != null) return inFlight;
     final future = _refreshTokenCall(context).whenComplete(() => _refreshInFlight = null);
@@ -157,6 +227,7 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<bool> _refreshTokenCall(BuildContext context) async {
+    if (_isSigningOut || _authenticationResponse == null) return false;
     final refreshToken = _authenticationResponse?.data?.refreshToken;
     if (refreshToken == null || refreshToken.isEmpty) {
       debugPrint("No refresh token available.");
@@ -164,6 +235,8 @@ class AuthController extends ChangeNotifier {
     }
     try {
       final response = await RefreshTokenController.refresh(context, refreshToken: refreshToken);
+      // Never revive a session that was signed out while the refresh was in-flight.
+      if (_isSigningOut || _authenticationResponse == null) return false;
       if (response.code != null && response.code! >= 200 && response.code! < 300 && response.data != null) {
         await setAuthenticationResponse(response.data);
         debugPrint("Token refreshed successfully.");
@@ -374,6 +447,20 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  /// Synchronously clears in-memory auth state and storage keys,
+  /// immediately preventing stale auth loops.
+  void clearAuthMemory() {
+    try {
+      prefs.remove(authResponse);
+      prefs.remove(token);
+    } catch (_) {}
+    _authenticationResponse = null;
+    branchId = null;
+    _sessionExpiredByInactivity = false;
+    stopInactivityMonitor();
+    notifyListeners();
+  }
+
   /// Clears all persisted auth state and resets in-memory fields.
   Future<void> _clearAuthState() async {
     prefs.remove(authResponse);
@@ -478,8 +565,30 @@ class AuthController extends ChangeNotifier {
 
   // ── Logout ──────────────────────────────────────────────────────────────
 
+  /// Expires the current session due to inactivity, clearing both storage and
+  /// in-memory auth state. Pass `notify: false` when called inside `GoRouter.redirect`.
+  void expireSessionByInactivity({bool notify = true}) {
+    _authenticationResponse = null;
+    _branchId = null;
+    _sessionExpiredByInactivity = true;
+    stopInactivityMonitor();
+    try {
+      prefs.remove(authResponse);
+      prefs.remove(token);
+    } catch (_) {}
+    if (notify) notifyListeners();
+  }
+
   Future<void> logout(BuildContext context) async {
-    prefs.remove(jwtResponse);
-    await _clearAuthState();
+    if (_isSigningOut) return;
+    _isSigningOut = true;
+    try {
+      try {
+        prefs.remove(jwtResponse);
+      } catch (_) {}
+      await _clearAuthState();
+    } finally {
+      _isSigningOut = false;
+    }
   }
 }

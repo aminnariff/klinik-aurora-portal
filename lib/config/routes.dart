@@ -1,12 +1,9 @@
 import '../views/widgets/motion/emil_motion.dart';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
-import 'package:klinik_aurora_portal/config/storage.dart';
-import 'package:klinik_aurora_portal/models/auth/auth_response.dart';
+import 'package:klinik_aurora_portal/controllers/auth/auth_controller.dart';
 import 'package:klinik_aurora_portal/privacy/privacy_policy.dart' deferred as privacy_policy_lib;
 import 'package:klinik_aurora_portal/views/admin/admin_homepage.dart' deferred as admin_lib;
 import 'package:klinik_aurora_portal/views/appointment/appointment_homepage.dart';
@@ -44,12 +41,19 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 final router = GoRouter(
   initialLocation: RouteNames.login,
   navigatorKey: rootNavigatorKey,
+  refreshListenable: appAuthController,
   redirect: (context, state) {
     final uri = state.uri.path;
 
-    // 1. Allow public routes
-    if (uri == RouteNames.login ||
-        uri == RouteNames.noPermission ||
+    // 0. Check inactivity timeout first — keeps AuthController and storage in sync.
+    if (appAuthController.isSessionInactive() && appAuthController.authenticationResponse != null) {
+      appAuthController.expireSessionByInactivity(notify: false);
+      sessionExpiredNotice.value = true;
+      return uri == RouteNames.login ? null : RouteNames.login;
+    }
+
+    // 1. Public routes (always accessible)
+    if (uri == RouteNames.noPermission ||
         uri == RouteNames.passwordRecovery ||
         uri == RouteNames.privacyPolicy ||
         uri == RouteNames.termsAndConditions ||
@@ -57,35 +61,23 @@ final router = GoRouter(
       return null;
     }
 
-    // 2. Check for missing authentication completely
-    final rawAuth = prefs.getString(authResponse);
-    if (rawAuth == null || rawAuth.isEmpty) {
+    // 2. Login route: redirect authenticated users straight to home; otherwise allow login.
+    if (uri == RouteNames.login) {
+      return appAuthController.isAuthenticated ? RouteNames.home : null;
+    }
+
+    // 3. Protected routes: require active authenticated session.
+    if (!appAuthController.isAuthenticated) {
+      if (appAuthController.isSessionInactive()) {
+        appAuthController.expireSessionByInactivity(notify: false);
+        sessionExpiredNotice.value = true;
+      }
       return RouteNames.login;
     }
 
-    // 2b. Check inactivity timeout (3h) — redirect to login if exceeded.
-    final lastActiveRaw = prefs.getString(lastActivityTimestamp);
-    if (lastActiveRaw != null && lastActiveRaw.isNotEmpty) {
-      final lastActive = DateTime.tryParse(lastActiveRaw);
-      if (lastActive != null) {
-        final elapsed = DateTime.now().difference(lastActive);
-        if (elapsed >= sessionInactivityTimeout) {
-          prefs.remove(authResponse);
-          prefs.remove(token);
-          sessionExpiredNotice.value = true;
-          return RouteNames.login;
-        }
-      }
-    }
-
-    // 3. Synchronously unpack the token payload to check for permissions
+    // 4. Unpack permissions from the authoritative AuthController session.
+    final parsed = appAuthController.authenticationResponse!;
     try {
-      final decoded = json.decode(rawAuth);
-      final parsed = AuthResponse.fromJson(decoded);
-
-      if (parsed.data?.accessToken == null) {
-        return RouteNames.login;
-      }
 
       final isSuperAdmin = parsed.data?.user?.isSuperadmin ?? false;
       final permissions = parsed.data?.user?.permissions ?? <String>[];
