@@ -207,7 +207,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
     }
   }
 
-  Future<void> _handleSave() async {
+  Future<void> _handleSave({bool confirmOverlap = false}) async {
     final serviceBranchId = widget.serviceBranch.serviceBranchId;
     if (serviceBranchId == null || serviceBranchId.isEmpty) {
       showDialogError(context, 'Missing service branch identifier.');
@@ -240,12 +240,46 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
       serviceTime: _isResetToHq ? null : _currentConfiguredDuration,
       serviceTimeRules: rules.isNotEmpty ? rules : null,
       resetServiceTimeRules: resetRules,
+      confirmOverlap: confirmOverlap,
     );
 
     try {
       final res = await ServiceBranchController.update(context, request);
       dismissLoading();
       setState(() => _isSubmitting = false);
+
+      if (res.code == 409 && res.data?.requiresConfirmation == true) {
+        if (!mounted) return;
+        final overlaps = res.data?.overlaps ?? [];
+        final previewLines = overlaps
+            .take(5)
+            .map((o) => '• ${o['patientName']} (${o['appointmentTime']}) ↔ ${o['conflictWithPatient']} (${o['conflictWithTime']})')
+            .join('\n');
+        final moreText = overlaps.length > 5 ? '\n...and ${overlaps.length - 5} more' : '';
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (dialogCtx) => AlertDialog(
+            title: const Text('Future Appointments Will Overlap'),
+            content: Text(
+              'Changing this duration will update future appointments and cause ${overlaps.length} slot overlap(s):\n\n$previewLines$moreText\n\nAre you sure you want to proceed?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(dialogCtx).pop(true),
+                child: const Text('Proceed Anyway'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed == true && mounted) {
+          await _handleSave(confirmOverlap: true);
+        }
+        return;
+      }
 
       if (responseCode(res.code)) {
         if (mounted) {

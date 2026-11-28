@@ -330,7 +330,8 @@ class ApiController {
             } else if (e.response?.statusCode == 409) {
               if (e.response?.data is Map &&
                   (e.response?.data['error'] == 'ACTIVE_APPOINTMENTS' ||
-                      e.response?.data['code'] == 'ACTIVE_APPOINTMENTS')) {
+                      e.response?.data['code'] == 'ACTIVE_APPOINTMENTS' ||
+                      e.response?.data['requiresConfirmation'] == true)) {
                 return ApiResponse(
                   code: e.response?.statusCode,
                   message: e.response?.data['message']?.toString(),

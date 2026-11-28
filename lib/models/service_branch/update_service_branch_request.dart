@@ -6,6 +6,7 @@ class UpdateServiceBranchRequest {
   Map<String, dynamic>? serviceTimeRules;
   bool resetServiceTimeRules = false;
   bool resetToHqDefault = false;
+  bool confirmOverlap = false;
 
   UpdateServiceBranchRequest({
     this.serviceBranchId,
@@ -15,6 +16,7 @@ class UpdateServiceBranchRequest {
     this.serviceTimeRules,
     this.resetServiceTimeRules = false,
     this.resetToHqDefault = false,
+    this.confirmOverlap = false,
   });
 
   UpdateServiceBranchRequest.fromJson(Map<String, dynamic> json) {
@@ -48,6 +50,9 @@ class UpdateServiceBranchRequest {
       } else if (serviceTimeRules != null) {
         data['serviceTimeRules'] = serviceTimeRules;
       }
+    }
+    if (confirmOverlap) {
+      data['confirmOverlap'] = true;
     }
     return data;
   }
