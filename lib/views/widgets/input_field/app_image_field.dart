@@ -69,9 +69,9 @@ class _AppImageFieldState extends State<AppImageField> {
               Text('Replace Image?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ],
           ),
-          content: const Text(
+          content: Text(
             'Uploading a new image will stage it for this record. Remember to click "Update" or "Create" at the bottom to save your changes to the database.',
-            style: TextStyle(fontSize: 13, color: Color(0xFF4B5563)),
+            style: TextStyle(fontSize: 13, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
           ),
           actions: [
             TextButton(
@@ -146,9 +146,9 @@ class _AppImageFieldState extends State<AppImageField> {
             Text('Remove Image?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           ],
         ),
-        content: const Text(
+        content: Text(
           'This will remove the image from this record. Click "Update" or "Create" at the bottom to save your changes to the database.',
-          style: TextStyle(fontSize: 13, color: Color(0xFF4B5563)),
+          style: TextStyle(fontSize: 13, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
         ),
         actions: [
           TextButton(

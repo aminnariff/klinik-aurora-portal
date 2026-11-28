@@ -468,14 +468,14 @@ class _PromotionDetailState extends State<PromotionDetail> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: _showOnStart ? const Color(0xFFB45309) : appInkSecondary,
+                    color: _showOnStart ? appWarningText : appInkSecondary,
                   ),
                 ),
                 Text(
                   'Shows full-screen popup banner when mobile app opens',
                   style: TextStyle(
                     fontSize: 11,
-                    color: _showOnStart ? const Color(0xFF92400E) : appInkMuted,
+                    color: _showOnStart ? appAmberText : appInkMuted,
                   ),
                 ),
               ],

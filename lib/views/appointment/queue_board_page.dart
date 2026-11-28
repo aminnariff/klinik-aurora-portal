@@ -793,6 +793,9 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
             ],
           );
         }
+        final colWidth = constraints.maxWidth < 768
+            ? (constraints.maxWidth * 0.88).clamp(260.0, 360.0)
+            : 310.0;
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -800,7 +803,7 @@ class _QueueBoardPageState extends State<QueueBoardPage> {
             children: [
               for (int i = 0; i < cols.length; i++) ...[
                 if (i > 0) const SizedBox(width: 12),
-                SizedBox(width: 310, child: cols[i]),
+                SizedBox(width: colWidth, child: cols[i]),
               ],
             ],
           ),

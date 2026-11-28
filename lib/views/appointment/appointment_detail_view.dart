@@ -467,17 +467,17 @@ class AppointmentDetailsView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFEF3C7),
+              color: appIsDarkMode ? const Color(0xFF35260C) : const Color(0xFFFEF3C7),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFFCD34D)),
+              border: Border.all(color: const Color(0xFFFCD34D).withValues(alpha: appIsDarkMode ? 0.4 : 1)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFF92400E)),
+                Icon(Icons.warning_amber_rounded, size: 16, color: appAmberText),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(warning, style: const TextStyle(fontSize: 12, height: 1.35, color: Color(0xFF92400E))),
+                  child: Text(warning, style: TextStyle(fontSize: 12, height: 1.35, color: appAmberText)),
                 ),
               ],
             ),

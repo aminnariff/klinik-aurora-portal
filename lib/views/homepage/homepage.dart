@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
+import 'package:klinik_aurora_portal/config/constants.dart';
 import 'package:klinik_aurora_portal/config/loading.dart';
 import 'package:klinik_aurora_portal/config/route_names.dart';
 import 'package:klinik_aurora_portal/config/storage.dart';
@@ -20,12 +21,12 @@ import 'package:klinik_aurora_portal/views/settings/appearance_settings_dialog.d
 import 'package:klinik_aurora_portal/views/widgets/command_palette/command_palette_dialog.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/aurora_collapsible_sidebar.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/deferred_page.dart';
-import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.dart';
 import 'package:klinik_aurora_portal/views/widgets/size.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final pageController = SidebarXController(selectedIndex: 0, extended: true);
 List<SidebarXItem> sideBarAttribute = [];
@@ -289,7 +290,7 @@ class _HomepageState extends State<Homepage> {
         authCtrl.startInactivityMonitor();
 
         return InactivityWatcher(
-          child: LayoutWidget(mobile: mobileView(context), tablet: mobileView(context), desktop: desktopView(context)),
+          child: isExpandedWidth(context) ? desktopView(context) : mobileView(context),
         );
       },
     );
@@ -549,6 +550,16 @@ class _HomepageState extends State<Homepage> {
                     ],
                   ),
                 ),
+              const PopupMenuItem<String>(
+                value: 'tour',
+                child: Row(
+                  children: [
+                    Icon(Icons.play_circle_outline_rounded, size: 18),
+                    SizedBox(width: 10),
+                    Text('Product Tour'),
+                  ],
+                ),
+              ),
               const PopupMenuDivider(),
               const PopupMenuItem<String>(
                 value: 'logout',
@@ -620,6 +631,7 @@ class _HomepageState extends State<Homepage> {
     final colors = context.appColors;
     final themeCtrl = context.watch<DarkModeController>();
     final isDark = themeCtrl.isDarkActive(context);
+    final compact = isCompactWidth(context);
 
     return Scaffold(
       backgroundColor: colors.canvas,
@@ -628,6 +640,14 @@ class _HomepageState extends State<Homepage> {
         foregroundColor: Colors.white,
         elevation: 0,
         titleSpacing: 0,
+        leading: Builder(
+          builder: (scaffoldCtx) => IconButton(
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            icon: const Icon(Icons.menu_rounded, color: Colors.white),
+            tooltip: 'Open navigation menu',
+            onPressed: () => Scaffold.of(scaffoldCtx).openDrawer(),
+          ),
+        ),
         title: Text(
           _breadcrumb,
           maxLines: 1,
@@ -636,11 +656,13 @@ class _HomepageState extends State<Homepage> {
         ),
         actions: [
           IconButton(
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
             icon: const Icon(Icons.search_rounded, color: Colors.white),
-            tooltip: 'Quick Search (⌘K)',
+            tooltip: 'Quick Search',
             onPressed: () => CommandPaletteDialog.show(context),
           ),
           IconButton(
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
             icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded, size: 20, color: Colors.white),
             tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
             onPressed: () => themeCtrl.toggleDarkMode(context),
@@ -658,22 +680,31 @@ class _HomepageState extends State<Homepage> {
               const PopupMenuItem<String>(value: 'appearance', child: Text('Appearance & Theme')),
               if (context.read<AuthController>().isSuperAdmin)
                 const PopupMenuItem<String>(value: 'announcement', child: Text('Announcement')),
+              const PopupMenuItem<String>(value: 'tour', child: Text('Product Tour')),
               const PopupMenuItem<String>(value: 'logout', child: Text('Logout')),
             ],
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Consumer<AuthController>(
-                    builder: (context, authController, _) => Text(
-                      authController.authenticationResponse?.data?.user?.userFullname ?? '',
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
-                      overflow: TextOverflow.ellipsis,
+                  if (!compact) ...[
+                    Consumer<AuthController>(
+                      builder: (context, authController, _) => ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 160),
+                        child: Text(
+                          authController.authenticationResponse?.data?.user?.userFullname ?? '',
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
+                    const SizedBox(width: 6),
+                  ],
                   Container(
-                    padding: const EdgeInsets.all(4),
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(color: colors.brandPrimary, shape: BoxShape.circle),
                     child: const Icon(Icons.person, color: Colors.white, size: 18),
                   ),
@@ -719,6 +750,8 @@ class _HomepageState extends State<Homepage> {
           );
         },
       );
+    } else if (value == 'tour') {
+      await launchUrl(productTourUri, webOnlyWindowName: '_blank');
     } else if (value == 'relocate') {
       AppToast.snackbar(context, 'We\'re actively developing this feature and it\'s on its way.');
     }

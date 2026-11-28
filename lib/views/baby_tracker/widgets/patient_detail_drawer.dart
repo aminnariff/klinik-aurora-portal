@@ -317,7 +317,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
-                        color: isOverdue ? const Color(0xFFB91C1C) : const Color(0xFFB45309),
+                        color: isOverdue ? appDangerText : appWarningText,
                       ),
                     ),
                   ),
@@ -412,7 +412,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
-                            color: _todayKicks >= 10 ? const Color(0xFF15803D) : const Color(0xFFD97706),
+                            color: _todayKicks >= 10 ? appSuccessText : const Color(0xFFD97706),
                           ),
                         ),
                         const SizedBox(width: 4),
@@ -434,7 +434,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.bold,
-                          color: _todayKicks >= 10 ? const Color(0xFF15803D) : const Color(0xFFB45309),
+                          color: _todayKicks >= 10 ? appSuccessText : appWarningText,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -574,7 +574,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
                         color: hbPercentage == 100
-                            ? const Color(0xFF15803D)
+                            ? appSuccessText
                             : hbPercentage >= 50
                                 ? const Color(0xFF0284C7)
                                 : const Color(0xFFD97706),
@@ -648,7 +648,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                     children: [
                       Icon(
                         isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                        color: isChecked ? const Color(0xFF15803D) : appInkMuted,
+                        color: isChecked ? appSuccessText : appInkMuted,
                         size: 18,
                       ),
                       const SizedBox(width: 10),
@@ -798,7 +798,7 @@ class _PatientDetailDrawerState extends State<PatientDetailDrawer> with SingleTi
                             Icon(
                               isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
                               size: 16,
-                              color: isChecked ? const Color(0xFF15803D) : appInkMuted,
+                              color: isChecked ? appSuccessText : appInkMuted,
                             ),
                             const SizedBox(width: 10),
                             Expanded(

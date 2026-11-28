@@ -75,7 +75,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
+    return LayoutWidget(mobile: _mobileView(), tablet: _mobileView(), desktop: _desktopView());
   }
 
   Widget _desktopView() {
@@ -478,7 +478,7 @@ class _RewardHistoryHomepageState extends State<RewardHistoryHomepage> {
       ),
       child: Text(
         '${points ?? 0} pts',
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0369A1)),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appSkyText),
       ),
     );
   }

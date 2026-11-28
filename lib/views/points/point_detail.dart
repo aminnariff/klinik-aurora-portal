@@ -322,7 +322,7 @@ class _PointDetailState extends State<PointDetail> {
                 const SizedBox(width: 4),
                 Text(
                   '$points pts',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: appWarningText),
                 ),
               ],
             ),

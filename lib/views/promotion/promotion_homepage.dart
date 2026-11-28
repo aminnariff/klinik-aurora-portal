@@ -134,10 +134,11 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
   }
 
   Widget _buildToolbar() {
+    final isNarrow = !isExpandedWidth(context);
     return Container(
       color: appSurface,
       padding: EdgeInsets.symmetric(horizontal: screenPadding, vertical: screenPadding * 0.6),
-      child: isMobile
+      child: isNarrow
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -149,7 +150,10 @@ class _PromotionHomepageState extends State<PromotionHomepage> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                _buildStatusChips(),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: _buildStatusChips(),
+                ),
               ],
             )
           : Row(
@@ -865,14 +869,14 @@ class _PromotionFormDialogState extends State<_PromotionFormDialog> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: value ? const Color(0xFFB45309) : appInkSecondary,
+                            color: value ? appWarningText : appInkSecondary,
                           ),
                         ),
                         Text(
                           'Shows full-screen popup banner when mobile app opens',
                           style: TextStyle(
                             fontSize: 11,
-                            color: value ? const Color(0xFF92400E) : appInkMuted,
+                            color: value ? appAmberText : appInkMuted,
                           ),
                         ),
                       ],

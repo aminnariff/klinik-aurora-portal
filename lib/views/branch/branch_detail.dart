@@ -1011,7 +1011,7 @@ class _BranchDetailState extends State<BranchDetail> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: active ? const Color(0xFF15803D) : const Color(0xFF991B1B),
+                        color: active ? appSuccessText : const Color(0xFF991B1B),
                       ),
                     ),
                     Text(

@@ -284,27 +284,32 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
     final items = _filteredItems;
     final colors = context.appColors;
     final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 600;
 
     return KeyboardListener(
       focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: _handleKeyDown,
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: screenWidth < 600 ? 32 : 80,
-            bottom: 32,
-            left: screenWidth < 600 ? 12 : 24,
-            right: screenWidth < 600 ? 12 : 24,
-          ),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Material(
-              color: Colors.transparent,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600, maxHeight: 520),
-                child: Container(
-                  width: double.infinity,
+      child: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: isCompact ? 16 : 80,
+              bottom: isCompact ? 16 : 32,
+              left: isCompact ? 12 : 24,
+              right: isCompact ? 12 : 24,
+            ),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Material(
+                color: Colors.transparent,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: isCompact ? screenWidth - 24 : 600,
+                    maxHeight: 520,
+                  ),
+                  child: Container(
+                    width: isCompact ? screenWidth - 24 : double.infinity,
                   decoration: BoxDecoration(
                     color: colors.surface,
                     borderRadius: BorderRadius.circular(12),
@@ -395,99 +400,114 @@ class _CommandPaletteDialogState extends State<CommandPaletteDialog> {
                                     onHover: (hovered) {
                                       if (hovered) setState(() => _selectedIndex = index);
                                     },
-                                    child: Container(
-                                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: isSelected ? colors.brandSoftBg : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: isSelected ? colors.brandBorder : Colors.transparent,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.all(7),
-                                            decoration: BoxDecoration(
-                                              color: isSelected ? colors.brandSoftBg : colors.surfaceSubtle,
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Icon(
-                                              item.icon,
-                                              size: 18,
-                                              color: isSelected ? colors.brandText : colors.inkMuted,
-                                            ),
+                                    child: ConstrainedBox(
+                                      constraints: const BoxConstraints(minHeight: 48),
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? colors.brandSoftBg : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: isSelected ? colors.brandBorder : Colors.transparent,
                                           ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  item.title,
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                                    color: colors.inkPrimary,
-                                                  ),
-                                                ),
-                                                if (item.subtitle != null) ...[
-                                                  const SizedBox(height: 2),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(7),
+                                              decoration: BoxDecoration(
+                                                color: isSelected ? colors.brandSoftBg : colors.surfaceSubtle,
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Icon(
+                                                item.icon,
+                                                size: 18,
+                                                color: isSelected ? colors.brandText : colors.inkMuted,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
                                                   Text(
-                                                    item.subtitle!,
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: isSelected ? colors.brandText : colors.inkMuted,
-                                                    ),
+                                                    item.title,
                                                     maxLines: 1,
                                                     overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                                      color: colors.inkPrimary,
+                                                    ),
                                                   ),
+                                                  if (item.subtitle != null) ...[
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      item.subtitle!,
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: isSelected ? colors.brandText : colors.inkMuted,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
                                                 ],
-                                              ],
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            item.category,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: colors.inkMuted,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                            if (!isCompact) ...[
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                item.category,
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: colors.inkMuted,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   );
                                 },
                               ),
                       ),
-                      Divider(height: 1, thickness: 1, color: colors.border),
-                      // Footer hint
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        child: Row(
-                          children: [
-                            _keyHint(context, '↑↓', 'Navigate'),
-                            const SizedBox(width: 14),
-                            _keyHint(context, '↵', 'Select'),
-                            const SizedBox(width: 14),
-                            _keyHint(context, 'ESC', 'Dismiss'),
-                            const Spacer(),
-                            if (screenWidth >= 480)
-                              Text(
-                                'Klinik Aurora Command',
-                                style: TextStyle(fontSize: 11, color: colors.inkMuted, fontWeight: FontWeight.w600),
+                      if (!isCompact) ...[
+                        Divider(height: 1, thickness: 1, color: colors.border),
+                        // Footer hint
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          child: Row(
+                            children: [
+                              _keyHint(context, '↑↓', 'Navigate'),
+                              const SizedBox(width: 14),
+                              _keyHint(context, '↵', 'Select'),
+                              const SizedBox(width: 14),
+                              _keyHint(context, 'ESC', 'Dismiss'),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Klinik Aurora Command',
+                                  textAlign: TextAlign.right,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 11, color: colors.inkMuted, fontWeight: FontWeight.w600),
+                                ),
                               ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
               ),
             ),
           ),
+        ),
         ),
       ),
     );

@@ -185,7 +185,14 @@ class _NotificationHomepageState extends State<NotificationHomepage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Announcement Center', style: AppTypography.displayMedium(context)),
+                    Expanded(
+                      child: Text(
+                        'Announcement Center',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.displayMedium(context),
+                      ),
+                    ),
                     IconButton(
   tooltip: 'Tutup',
                       icon: const Icon(Icons.close_rounded),
@@ -288,8 +295,10 @@ class _StepIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const steps = ['Channel', 'Compose', 'Review'];
-    return Row(
-      children: [
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
         for (var i = 0; i < steps.length; i++) ...[
           if (i > 0) ...[
             const SizedBox(width: 8),
@@ -326,7 +335,8 @@ class _StepIndicator extends StatelessWidget {
             ],
           ),
         ],
-      ],
+        ],
+      ),
     );
   }
 }
@@ -342,15 +352,18 @@ class _SegmentedControl extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(color: appSurfaceSubtle, borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _Segment(label: 'Compose', isSelected: selected == 0, onTap: () => onChanged(0)),
-          const SizedBox(width: 4),
-          _Segment(label: 'Scheduled', isSelected: selected == 1, onTap: () => onChanged(1)),
-          const SizedBox(width: 4),
-          _Segment(label: 'History', isSelected: selected == 2, onTap: () => onChanged(2)),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _Segment(label: 'Compose', isSelected: selected == 0, onTap: () => onChanged(0)),
+            const SizedBox(width: 4),
+            _Segment(label: 'Scheduled', isSelected: selected == 1, onTap: () => onChanged(1)),
+            const SizedBox(width: 4),
+            _Segment(label: 'History', isSelected: selected == 2, onTap: () => onChanged(2)),
+          ],
+        ),
       ),
     );
   }

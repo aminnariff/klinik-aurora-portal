@@ -585,12 +585,12 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.mark_email_read_outlined, size: 18, color: Color(0xFF15803D)),
+                Icon(Icons.mark_email_read_outlined, size: 18, color: appSuccessText),
                 const SizedBox(width: 10),
                 Expanded(
                   child: RichText(
                     text: TextSpan(
-                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF166534)),
+                      style: TextStyle(fontSize: 12.5, color: appGreenText),
                       children: [
                         const TextSpan(text: 'Code sent to '),
                         TextSpan(
@@ -604,14 +604,14 @@ class _AdminPasswordRecoveryPageState extends State<AdminPasswordRecoveryPage> {
                 InkWell(
                   onTap: () => context.goNamed(LoginPage.routeName),
                   borderRadius: BorderRadius.circular(6),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     child: Text(
                       'Change',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF15803D),
+                        color: appSuccessText,
                         decoration: TextDecoration.underline,
                       ),
                     ),

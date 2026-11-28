@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/views/widgets/patient/twins_badge.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
@@ -19,8 +20,8 @@ import 'package:klinik_aurora_portal/views/widgets/shortcuts/portal_shortcuts.da
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 import 'package:provider/provider.dart';
 
-const Color _purpleAccent = Color(0xFF7C3AED);
-const Color _purpleSoftBg = Color(0xFFF5F3FF);
+Color get _purpleAccent => appVioletText;
+Color get _purpleSoftBg => appPurpleSoft;
 
 enum _RecallTab { scanRecalls, pointsReengagement, milestoneRules }
 
@@ -723,7 +724,7 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
                 ),
                 child: Text(
                   'Eligible Members: ${_pointsData?.totalEligible ?? 0}',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _purpleAccent),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _purpleAccent),
                 ),
               ),
               Container(
@@ -799,11 +800,11 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.diamond_outlined, size: 12, color: _purpleAccent),
+                          Icon(Icons.diamond_outlined, size: 12, color: _purpleAccent),
                           const SizedBox(width: 4),
                           Text(
                             '${item.totalPoints} pts (RM ${item.cashValueRm.toStringAsFixed(2)})',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _purpleAccent),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _purpleAccent),
                           ),
                         ],
                       ),
@@ -1018,7 +1019,7 @@ class _TrimesterRecallPageState extends State<TrimesterRecallPage> {
                       ),
                       child: Text(
                         r.$3,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: _purpleAccent),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: _purpleAccent),
                       ),
                     ),
                   ],

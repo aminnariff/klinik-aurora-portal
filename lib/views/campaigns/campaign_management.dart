@@ -441,12 +441,12 @@ class _MultiplierBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bolt_rounded, size: 13, color: Color(0xFFB45309)),
+          Icon(Icons.bolt_rounded, size: 13, color: appWarningText),
           const SizedBox(width: 3),
           Text(
             '${multiplier}x Points App-Wide',
             style: AppTypography.bodyMedium(context).apply(
-              color: const Color(0xFFB45309),
+              color: appWarningText,
               fontSizeDelta: -3,
               fontWeightDelta: 3,
             ),
@@ -604,12 +604,12 @@ class _Warning extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.warning_amber_rounded, size: 18, color: Color(0xFFB45309)),
+          Icon(Icons.warning_amber_rounded, size: 18, color: appWarningText),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: AppTypography.bodyMedium(context).apply(color: const Color(0xFF92400E), fontSizeDelta: -2),
+              style: AppTypography.bodyMedium(context).apply(color: appAmberText, fontSizeDelta: -2),
             ),
           ),
         ],

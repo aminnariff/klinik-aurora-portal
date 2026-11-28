@@ -133,7 +133,7 @@ class _NotificationScheduledTabState extends State<NotificationScheduledTab> {
             decoration: BoxDecoration(color: appWarningSoft, borderRadius: BorderRadius.circular(8)),
             child: Row(
               children: [
-                const Icon(Icons.warning_amber_rounded, size: 18, color: Color(0xFFB45309)),
+                Icon(Icons.warning_amber_rounded, size: 18, color: appWarningText),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -141,7 +141,7 @@ class _NotificationScheduledTabState extends State<NotificationScheduledTab> {
                     'have not gone out. The scheduler job may not be running.',
                     style: AppTypography.bodyMedium(
                       context,
-                    ).apply(color: const Color(0xFF92400E), fontSizeDelta: -2),
+                    ).apply(color: appAmberText, fontSizeDelta: -2),
                   ),
                 ),
               ],

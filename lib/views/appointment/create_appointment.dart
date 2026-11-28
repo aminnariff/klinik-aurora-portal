@@ -1169,14 +1169,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                           color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
                                                           borderRadius: BorderRadius.circular(6),
                                                         ),
-                                                        child: const Row(
+                                                        child: Row(
                                                           mainAxisSize: MainAxisSize.min,
                                                           children: [
-                                                            Icon(Icons.child_care_rounded, size: 13, color: Color(0xFF7C3AED)),
-                                                            SizedBox(width: 4),
+                                                            Icon(Icons.child_care_rounded, size: 13, color: appVioletText),
+                                                            const SizedBox(width: 4),
                                                             Text(
                                                               'Pre-filled from Baby Tracker (Click to change)',
-                                                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF7C3AED)),
+                                                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appVioletText),
                                                             ),
                                                           ],
                                                         ),
@@ -1874,18 +1874,18 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                         color: const Color(0xFFFB923C).withAlpha(80),
                                                       ),
                                                     ),
-                                                    child: const Row(
+                                                    child: Row(
                                                       children: [
-                                                        Icon(
+                                                        const Icon(
                                                           Icons.info_outline_rounded,
                                                           size: 14,
                                                           color: Color(0xFFEA580C),
                                                         ),
-                                                        SizedBox(width: 6),
+                                                        const SizedBox(width: 6),
                                                         Flexible(
                                                           child: Text(
                                                             'Booking fee required — upload payment proof below',
-                                                            style: TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
+                                                            style: TextStyle(fontSize: 12, color: appOrangeText),
                                                           ),
                                                         ),
                                                       ],
@@ -1959,22 +1959,22 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                                               _status?.key == '6'
                                                                   ? 'Refund Policy'
                                                                   : 'Cancellation Policy',
-                                                              style: const TextStyle(
+                                                              style: TextStyle(
                                                                 fontSize: 12,
                                                                 fontWeight: FontWeight.w700,
-                                                                color: Color(0xFF9A3412),
+                                                                color: appOrangeText,
                                                               ),
                                                             ),
                                                           ],
                                                         ),
                                                         const SizedBox(height: 6),
-                                                        const Text(
+                                                        Text(
                                                           '• Each appointment may only be rescheduled once.\n'
                                                           '• Refunds, if approved, are processed within 5–7 business days.\n'
                                                           '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
                                                           style: TextStyle(
                                                             fontSize: 11.5,
-                                                            color: Color(0xFF9A3412),
+                                                            color: appOrangeText,
                                                             height: 1.6,
                                                           ),
                                                         ),
@@ -3022,7 +3022,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               ? Icons.check_circle_outline_rounded
                               : Icons.account_balance_wallet_outlined,
                           size: 14,
-                          color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+                          color: isCompleted || balance == 0 ? appSuccessText : const Color(0xFFC2410C),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -3030,7 +3030,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+                            color: isCompleted || balance == 0 ? appSuccessText : const Color(0xFFC2410C),
                           ),
                         ),
                       ],
@@ -3040,7 +3040,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
-                        color: isCompleted || balance == 0 ? const Color(0xFF15803D) : const Color(0xFFC2410C),
+                        color: isCompleted || balance == 0 ? appSuccessText : const Color(0xFFC2410C),
                       ),
                     ),
                   ],
@@ -3057,7 +3057,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 _proofButton(
                   label: 'appointmentPage'.tr(gender: 'paymentProof'),
                   icon: Icons.receipt_outlined,
-                  color: const Color(0xFF0369A1),
+                  color: appSkyText,
                   onTap: () => showDialog(
                     context: context,
                     builder: (_) => GestureDetector(
@@ -3082,7 +3082,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                 _proofButton(
                   label: 'appointmentPage'.tr(gender: 'refundProof'),
                   icon: Icons.undo_rounded,
-                  color: const Color(0xFFDC2626),
+                  color: appIsDarkMode ? const Color(0xFFFCA5A5) : const Color(0xFFDC2626),
                   onTap: () => showDialog(
                     context: context,
                     builder: (_) => GestureDetector(
@@ -3377,20 +3377,20 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                                   const SizedBox(width: 6),
                                   Text(
                                     _status?.key == '6' ? 'Refund Policy' : 'Cancellation Policy',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
-                                      color: Color(0xFF9A3412),
+                                      color: appOrangeText,
                                     ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              const Text(
+                              Text(
                                 '• Each appointment may only be rescheduled once.\n'
                                 '• Refunds, if approved, are processed within 5–7 business days.\n'
                                 '• Klinik Aurora reserves the right to decline refund requests based on internal review.',
-                                style: TextStyle(fontSize: 11, color: Color(0xFF9A3412), height: 1.4),
+                                style: TextStyle(fontSize: 11, color: appOrangeText, height: 1.4),
                               ),
                             ],
                           ),
@@ -3511,14 +3511,14 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                       color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.child_care_rounded, size: 13, color: Color(0xFF7C3AED)),
-                        SizedBox(width: 4),
+                        Icon(Icons.child_care_rounded, size: 13, color: appVioletText),
+                        const SizedBox(width: 4),
                         Text(
                           'Pre-filled from Baby Tracker (Click to change)',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF7C3AED)),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appVioletText),
                         ),
                       ],
                     ),

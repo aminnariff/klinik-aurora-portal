@@ -385,7 +385,7 @@ class _Summary extends StatelessWidget {
         Icon(
           isPast ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
           size: 16,
-          color: isPast ? const Color(0xFFB45309) : const Color(0xFF16A34A),
+          color: isPast ? appWarningText : const Color(0xFF16A34A),
         ),
         const SizedBox(width: 6),
         Expanded(
@@ -394,7 +394,7 @@ class _Summary extends StatelessWidget {
                 ? 'That time has already passed — pick a time in the future.'
                 : 'Goes out on ${formatDeliveryDate(scheduled)} at ${formatDeliveryTime(scheduled)}.',
             style: AppTypography.bodyMedium(context).apply(
-              color: isPast ? const Color(0xFF92400E) : appInkMuted,
+              color: isPast ? appAmberText : appInkMuted,
               fontSizeDelta: -2,
             ),
           ),

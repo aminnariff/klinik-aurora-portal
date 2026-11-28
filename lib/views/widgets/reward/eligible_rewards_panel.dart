@@ -77,15 +77,16 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: appSurfaceElevated,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.card_giftcard_rounded, color: Color(0xFFD97706), size: 22),
-            SizedBox(width: 8),
+            const Icon(Icons.card_giftcard_rounded, color: Color(0xFFD97706), size: 22),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Claim Reward for Patient?',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: appInkPrimary),
               ),
             ),
           ],
@@ -96,36 +97,36 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
           children: [
             Text(
               'Patient: ${widget.patientName}',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appInkPrimary),
             ),
             const SizedBox(height: 6),
             Text(
               'Reward: ${reward.rewardName}',
-              style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: appWarningText),
             ),
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF3C7).withValues(alpha: 0.5),
+                color: appWarningSoft,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.4)),
+                border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.45)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Points Deducted: -${reward.rewardPoint} pts',
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: appInkPrimary),
                   ),
                   Text(
                     'Balance After Claim: ${widget.currentPoints} pts → $remainingPts pts',
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: 12, color: appInkSecondary),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Reward history will be auto-marked as Completed.',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
+                    style: TextStyle(fontSize: 11, color: appInkMuted),
                   ),
                 ],
               ),
@@ -135,6 +136,7 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
+            style: TextButton.styleFrom(foregroundColor: appInkSecondary),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
@@ -176,6 +178,9 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
       AppToast.snackbar(context, res.message ?? 'Failed to claim reward.');
     }
   }
+
+  /// Sky blue for "unlocks after this payment"; the light-mode shade is too dark on dark surfaces.
+  Color get _unlockBlue => appIsDarkMode ? const Color(0xFF7DD3FC) : const Color(0xFF0284C7);
 
   @override
   Widget build(BuildContext context) {
@@ -243,7 +248,8 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 6),
                   child: Opacity(
-                    opacity: isEligible ? 1.0 : 0.62,
+                    // Dimming locked rewards further on a dark surface makes them unreadable.
+                    opacity: isEligible ? 1.0 : (appIsDarkMode ? 0.85 : 0.62),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                       decoration: BoxDecoration(
@@ -262,7 +268,7 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
                             size: 15,
                             color: isEligible
                                 ? const Color(0xFFD97706)
-                                : (unlocksOnPay ? const Color(0xFF0284C7) : appInkMuted),
+                                : (unlocksOnPay ? _unlockBlue : appInkMuted),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -288,7 +294,7 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: unlocksOnPay ? const Color(0xFF0284C7) : appInkMuted,
+                                    color: unlocksOnPay ? _unlockBlue : appInkMuted,
                                   ),
                                 ),
                               ],
@@ -351,21 +357,21 @@ class _EligibleRewardsPanelState extends State<EligibleRewardsPanel> {
             margin: const EdgeInsets.only(top: 6),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
             decoration: BoxDecoration(
-              color: const Color(0xFF0EA5E9).withValues(alpha: 0.08),
+              color: const Color(0xFF0EA5E9).withValues(alpha: appIsDarkMode ? 0.14 : 0.08),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFF0EA5E9).withValues(alpha: 0.25)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.auto_awesome_rounded, size: 14, color: Color(0xFF0284C7)),
+                Icon(Icons.auto_awesome_rounded, size: 14, color: _unlockBlue),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     'After this payment (${widget.projectedPoints} pts), unlocks: ${unlockingAfterPay.map((r) => '${r.rewardName} (${r.rewardPoint} pts)').join(', ')}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF0369A1),
+                      color: appIsDarkMode ? const Color(0xFF7DD3FC) : appSkyText,
                     ),
                   ),
                 ),

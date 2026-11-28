@@ -188,7 +188,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: unrecoveredTotal > 0 ? const Color(0xFFDC2626) : const Color(0xFF15803D),
+                          color: unrecoveredTotal > 0 ? const Color(0xFFDC2626) : appSuccessText,
                         ),
                       ),
                     )
@@ -286,7 +286,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: _selectedTab == 0 ? const Color(0xFFDC2626) : const Color(0xFF4B5563),
+                                color: _selectedTab == 0 ? const Color(0xFFDC2626) : appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                               ),
                             ),
                           ],
@@ -320,7 +320,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: _selectedTab == 1 ? const Color(0xFF2563EB) : const Color(0xFF4B5563),
+                                color: _selectedTab == 1 ? const Color(0xFF2563EB) : appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                               ),
                             ),
                           ],
@@ -390,7 +390,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF4B5563),
+                      foregroundColor: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     ),
                     child: const Text('Close', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -459,7 +459,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                       ),
                       child: Text(
                         amountStr,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1F2937)),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appIsDarkMode ? appInkPrimary : const Color(0xFF1F2937)),
                       ),
                     ),
                   ],
@@ -501,14 +501,14 @@ class _AppointmentIdsState extends State<AppointmentIds> {
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: const Color(0xFF86EFAC)),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.check_circle_rounded, size: 12, color: Color(0xFF15803D)),
+                              Icon(Icons.check_circle_rounded, size: 12, color: appSuccessText),
                               SizedBox(width: 4),
                               Text(
                                 'Recovered (Paid)',
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF15803D)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appSuccessText),
                               ),
                             ],
                           ),

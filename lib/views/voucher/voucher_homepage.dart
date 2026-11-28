@@ -72,7 +72,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
   @override
   Widget build(BuildContext context) {
     Theme.of(context);
-    return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
+    return LayoutWidget(mobile: _mobileView(), tablet: _mobileView(), desktop: _desktopView());
   }
 
   // ── Mobile ──────────────────────────────────────────────────────────────────
@@ -636,7 +636,7 @@ class _VoucherHomepageState extends State<VoucherHomepage> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+          color: isActive ? appSuccessText : appDangerText,
         ),
       ),
     );

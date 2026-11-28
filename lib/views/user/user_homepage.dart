@@ -145,7 +145,7 @@ class _UserHomepageState extends State<UserHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
+    return LayoutWidget(mobile: mobileView(), tablet: mobileView(), desktop: desktopView());
   }
 
 

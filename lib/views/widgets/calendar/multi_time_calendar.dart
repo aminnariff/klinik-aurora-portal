@@ -1148,7 +1148,7 @@ class _ApplyToServicesDialogState extends State<_ApplyToServicesDialog> {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                    color: isSelected ? appInkPrimary : const Color(0xFF4B5563),
+                                    color: isSelected ? appInkPrimary : appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                                   ),
                                 ),
                                 if (s.serviceTime != null || s.doctorType != null)

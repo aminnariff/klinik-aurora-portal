@@ -77,7 +77,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
+    return LayoutWidget(mobile: _mobileView(), tablet: _mobileView(), desktop: _desktopView());
   }
 
   Widget _desktopView() {
@@ -556,7 +556,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: appBorder),
         ),
-        child: const Icon(Icons.more_vert_rounded, size: 18, color: Color(0xFF4B5563)),
+        child: Icon(Icons.more_vert_rounded, size: 18, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 4,
@@ -576,9 +576,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                 child: const Icon(Icons.timer_outlined, size: 16, color: secondaryColor),
               ),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 'Change Duration',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF1F2937)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkPrimary : const Color(0xFF1F2937)),
               ),
             ],
           ),
@@ -650,9 +650,9 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: const Color(0xFFFDE68A)),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Custom',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFB45309)),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appWarningText),
                   ),
                 ),
               if (hasRules)
@@ -714,7 +714,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
 
     if (doctorType == 2 || catLower.contains('scan') || catLower.contains('ultra') || catLower.contains('baby')) {
       // Ultrasound / Sonographer
-      bg = const Color(0xFFCCFBF1);
+      bg = appIsDarkMode ? const Color(0xFF0E2E30) : const Color(0xFFCCFBF1);
       fg = primary;
       icon = Icons.sensors_rounded;
     } else if (doctorType == 3 ||
@@ -725,22 +725,22 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         catLower.contains('skin')) {
       // Spa / Aesthetics / Therapist
       bg = appDangerSoft;
-      fg = const Color(0xFFBE185D);
+      fg = appIsDarkMode ? const Color(0xFFF9A8D4) : const Color(0xFFBE185D);
       icon = Icons.spa_rounded;
     } else if (doctorType == 5 || catLower.contains('diet') || catLower.contains('nutri') || catLower.contains('weight')) {
       // Dietitian / Wellness
       bg = appSuccessSoft;
-      fg = const Color(0xFF15803D);
+      fg = appSuccessText;
       icon = Icons.eco_rounded;
     } else if (catLower.contains('blood') || catLower.contains('lab') || catLower.contains('test') || catLower.contains('screening')) {
       // Laboratory / Blood test
       bg = appPurpleSoft;
-      fg = const Color(0xFF7E22CE);
+      fg = appIsDarkMode ? const Color(0xFFD8B4FE) : const Color(0xFF7E22CE);
       icon = Icons.science_rounded;
     } else {
       // General Doctor / Consultation / Medical
       bg = appInfoSoft;
-      fg = const Color(0xFF4338CA);
+      fg = appIsDarkMode ? const Color(0xFFA5B4FC) : const Color(0xFF4338CA);
       icon = Icons.medical_services_rounded;
     }
 
@@ -816,7 +816,7 @@ class _ServiceHomepageState extends State<ServiceHomepage> {
         cleanDesc,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 12, color: Color(0xFF4B5563), height: 1.3),
+        style: TextStyle(fontSize: 12, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563), height: 1.3),
       ),
     );
   }

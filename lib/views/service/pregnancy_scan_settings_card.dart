@@ -128,10 +128,10 @@ class _PregnancyScanSettingsCardState extends State<PregnancyScanSettingsCard> {
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(6)),
-                child: const Text(
+                decoration: BoxDecoration(color: appIsDarkMode ? const Color(0xFF35260C) : const Color(0xFFFEF3C7), borderRadius: BorderRadius.circular(6)),
+                child: Text(
                   'Superadmin',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF92400E)),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: appAmberText),
                 ),
               ),
             ],
@@ -153,7 +153,7 @@ class _PregnancyScanSettingsCardState extends State<PregnancyScanSettingsCard> {
             subtitle: _unparsedRange
                 ? Text(
                     'Stored value "${widget.service.eddRequired}" is not in the 11w0d-13w6d format and will be replaced.',
-                    style: const TextStyle(fontSize: 11, color: Color(0xFFB91C1C)),
+                    style: TextStyle(fontSize: 11, color: appDangerText),
                   )
                 : null,
           ),
@@ -179,11 +179,11 @@ class _PregnancyScanSettingsCardState extends State<PregnancyScanSettingsCard> {
               ],
             ),
             if (!_range.isValid)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 6),
                 child: Text(
                   'The range must end on or after its start.',
-                  style: TextStyle(fontSize: 11, color: Color(0xFFB91C1C)),
+                  style: TextStyle(fontSize: 11, color: appDangerText),
                 ),
               ),
           ],
@@ -225,11 +225,11 @@ class _PregnancyScanSettingsCardState extends State<PregnancyScanSettingsCard> {
             ],
           ),
           if (_steps.isNotEmpty && !_hasRange)
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(top: 12),
               child: Text(
                 'Without a range this service does not set a timeline window. Completed appointments still count.',
-                style: TextStyle(fontSize: 11, color: Color(0xFF92400E)),
+                style: TextStyle(fontSize: 11, color: appAmberText),
               ),
             ),
           const SizedBox(height: 16),

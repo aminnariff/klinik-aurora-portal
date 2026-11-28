@@ -84,6 +84,10 @@ const String privacyPolicyUrl = 'https://klinikauroramembership.com/privacy-poli
 const String termsAndConditionsUrl = 'https://klinikauroramembership.com/terms-and-conditions';
 const String refundPolicyUrl = 'https://klinikauroramembership.com/refund-policy';
 
+/// Interactive product tour (fake data, runs in the browser only).
+/// Built from /tour into web/tour, so it is served by this same site at /tour/.
+Uri get productTourUri => Uri.base.resolve('/tour/');
+
 
     // "permissionId": "1bda631e-ef17-11ee-bd1b-cc801b09db2f",
     // "permissionName": "User Management",

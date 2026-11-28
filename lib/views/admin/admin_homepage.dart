@@ -81,7 +81,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
+    return LayoutWidget(mobile: mobileView(), tablet: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -378,42 +378,42 @@ class _AdminHomepageState extends State<AdminHomepage> {
         filtering(enableDebounce: false, page: 1);
       },
       itemBuilder: (_) => [
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'name_asc',
           child: Row(
             children: [
-              Icon(Icons.sort_by_alpha_rounded, size: 16, color: Color(0xFF4B5563)),
+              Icon(Icons.sort_by_alpha_rounded, size: 16, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
               SizedBox(width: 8),
               Text('Name (A–Z)', style: TextStyle(fontSize: 13)),
             ],
           ),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'name_desc',
           child: Row(
             children: [
-              Icon(Icons.sort_by_alpha_rounded, size: 16, color: Color(0xFF4B5563)),
+              Icon(Icons.sort_by_alpha_rounded, size: 16, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
               SizedBox(width: 8),
               Text('Name (Z–A)', style: TextStyle(fontSize: 13)),
             ],
           ),
         ),
         const PopupMenuDivider(height: 1),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'date_desc',
           child: Row(
             children: [
-              Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF4B5563)),
+              Icon(Icons.calendar_today_rounded, size: 16, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
               SizedBox(width: 8),
               Text('Created (Newest First)', style: TextStyle(fontSize: 13)),
             ],
           ),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'date_asc',
           child: Row(
             children: [
-              Icon(Icons.history_rounded, size: 16, color: Color(0xFF4B5563)),
+              Icon(Icons.history_rounded, size: 16, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
               SizedBox(width: 8),
               Text('Created (Oldest First)', style: TextStyle(fontSize: 13)),
             ],
@@ -742,7 +742,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+          color: isActive ? appSuccessText : appDangerText,
         ),
       ),
     );

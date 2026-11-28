@@ -39,6 +39,134 @@ class SuperadminDashboardView extends StatelessWidget {
             // ── 1. Executive Network KPIs Row ────────────────────────────────────
             LayoutBuilder(
               builder: (context, constraints) {
+                final isPhone = constraints.maxWidth < 600;
+                final isVeryNarrow = constraints.maxWidth < 360;
+                if (isVeryNarrow) {
+                  return Column(
+                    children: [
+                      DashboardMetricCard(
+                        index: 0,
+                        label: 'Network Revenue',
+                        value: revenueThisMonth,
+                        accentColor: const Color(0xFF16A34A),
+                        icon: Icons.payments_rounded,
+                        subtitle: 'This Month',
+                        subtitleColor: const Color(0xFF16A34A),
+                      ),
+                      const SizedBox(height: 10),
+                      DashboardMetricCard(
+                        index: 1,
+                        label: 'Total Appointments',
+                        value: totalAppointments,
+                        accentColor: const Color(0xFF2563EB),
+                        icon: Icons.event_available_rounded,
+                        subtitle: 'This Month',
+                        subtitleColor: const Color(0xFF2563EB),
+                      ),
+                      const SizedBox(height: 10),
+                      DashboardMetricCard(
+                        index: 2,
+                        label: 'Doctors on Duty',
+                        value: doctorsOnDuty,
+                        accentColor: const Color(0xFF0D9488),
+                        icon: Icons.medical_services_rounded,
+                        subtitle: 'Active Roster Today',
+                        subtitleColor: const Color(0xFF0D9488),
+                      ),
+                      const SizedBox(height: 10),
+                      DashboardMetricCard(
+                        index: 3,
+                        label: 'Active Clinics',
+                        value: totalBranches,
+                        accentColor: const Color(0xFFD97706),
+                        icon: Icons.store_rounded,
+                        subtitle: '100% Operational',
+                        subtitleColor: const Color(0xFFD97706),
+                      ),
+                      const SizedBox(height: 10),
+                      DashboardMetricCard(
+                        index: 4,
+                        label: 'Total Patients',
+                        value: totalUsers,
+                        accentColor: const Color(0xFF7C3AED),
+                        icon: Icons.people_alt_rounded,
+                        subtitle: '$activeUsers Active Users',
+                        subtitleColor: const Color(0xFF7C3AED),
+                      ),
+                    ],
+                  );
+                }
+                if (isPhone) {
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DashboardMetricCard(
+                              index: 0,
+                              label: 'Network Revenue',
+                              value: revenueThisMonth,
+                              accentColor: const Color(0xFF16A34A),
+                              icon: Icons.payments_rounded,
+                              subtitle: 'This Month',
+                              subtitleColor: const Color(0xFF16A34A),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: DashboardMetricCard(
+                              index: 1,
+                              label: 'Total Appointments',
+                              value: totalAppointments,
+                              accentColor: const Color(0xFF2563EB),
+                              icon: Icons.event_available_rounded,
+                              subtitle: 'This Month',
+                              subtitleColor: const Color(0xFF2563EB),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DashboardMetricCard(
+                              index: 2,
+                              label: 'Doctors on Duty',
+                              value: doctorsOnDuty,
+                              accentColor: const Color(0xFF0D9488),
+                              icon: Icons.medical_services_rounded,
+                              subtitle: 'Active Roster Today',
+                              subtitleColor: const Color(0xFF0D9488),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: DashboardMetricCard(
+                              index: 3,
+                              label: 'Active Clinics',
+                              value: totalBranches,
+                              accentColor: const Color(0xFFD97706),
+                              icon: Icons.store_rounded,
+                              subtitle: '100% Operational',
+                              subtitleColor: const Color(0xFFD97706),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      DashboardMetricCard(
+                        index: 4,
+                        label: 'Total Patients',
+                        value: totalUsers,
+                        accentColor: const Color(0xFF7C3AED),
+                        icon: Icons.people_alt_rounded,
+                        subtitle: '$activeUsers Active Users',
+                        subtitleColor: const Color(0xFF7C3AED),
+                      ),
+                    ],
+                  );
+                }
                 final isCompact = constraints.maxWidth < 1100;
                 if (isCompact) {
                   return Column(

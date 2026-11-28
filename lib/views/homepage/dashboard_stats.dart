@@ -129,89 +129,82 @@ class _MobileStats extends StatelessWidget {
   Widget build(BuildContext context) {
     Theme.of(context);
     final gap = screenPadding / 2;
+    final isVeryNarrow = MediaQuery.sizeOf(context).width < 360;
+    final cards = <Widget>[
+      _StatCard(
+        label: 'Active Branches',
+        value: data?.totalActiveBranch,
+        icon: Icons.store_outlined,
+        accent: const Color(0xFFDF6E98),
+        bg: const Color(0xFF2A0D18),
+      ),
+      _StatCard(
+        label: 'Active Promotions',
+        value: data?.totalActivePromotion,
+        icon: Icons.local_offer_outlined,
+        accent: const Color(0xFFFFB74D),
+        bg: const Color(0xFF2A1D0D),
+      ),
+      _StatCard(
+        label: 'Appts This Month',
+        value: data?.totalAppointmentsThisMonth ?? thisMonthAppointments,
+        icon: Icons.calendar_month_outlined,
+        accent: const Color(0xFF7C3AED),
+        bg: const Color(0xFF1A0D2E),
+      ),
+      _StatCard(
+        label: 'Appts Today',
+        value: data?.totalAppointmentsToday,
+        icon: Icons.today_outlined,
+        accent: const Color(0xFF2196F3),
+        bg: const Color(0xFF0D1A2E),
+      ),
+      _StatCard(
+        label: 'Revenue This Month',
+        valueText: data?.revenueThisMonth != null
+            ? NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2)
+                  .format(data!.revenueThisMonth)
+            : null,
+        icon: Icons.payments_outlined,
+        accent: const Color(0xFF02D39A),
+        bg: const Color(0xFF0D2A1D),
+      ),
+      _StatCard(
+        label: 'Points Expiring (30d)',
+        value: data?.totalPointsExpiring30Days?.toInt(),
+        icon: Icons.hourglass_bottom_rounded,
+        accent: const Color(0xFFEF4444),
+        bg: const Color(0xFF2A0D0D),
+      ),
+    ];
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenPadding),
       child: Column(
         children: [
-          SizedBox(
-            height: 150,
+          IntrinsicHeight(
             child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [_UserDonutCard(data: data)]),
           ),
           SizedBox(height: gap),
-          SizedBox(
-            height: 90,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _StatCard(
-                  label: 'Active Branches',
-                  value: data?.totalActiveBranch,
-                  icon: Icons.store_outlined,
-                  accent: const Color(0xFFDF6E98),
-                  bg: const Color(0xFF2A0D18),
+          if (isVeryNarrow)
+            for (int i = 0; i < cards.length; i++) ...[
+              if (i > 0) SizedBox(height: gap),
+              IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [cards[i]])),
+            ]
+          else
+            for (int i = 0; i < cards.length; i += 2) ...[
+              if (i > 0) SizedBox(height: gap),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    cards[i],
+                    SizedBox(width: gap),
+                    cards[i + 1],
+                  ],
                 ),
-                SizedBox(width: gap),
-                _StatCard(
-                  label: 'Active Promotions',
-                  value: data?.totalActivePromotion,
-                  icon: Icons.local_offer_outlined,
-                  accent: const Color(0xFFFFB74D),
-                  bg: const Color(0xFF2A1D0D),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: gap),
-          SizedBox(
-            height: 90,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _StatCard(
-                  label: 'Appts This Month',
-                  value: data?.totalAppointmentsThisMonth ?? thisMonthAppointments,
-                  icon: Icons.calendar_month_outlined,
-                  accent: const Color(0xFF7C3AED),
-                  bg: const Color(0xFF1A0D2E),
-                ),
-                SizedBox(width: gap),
-                _StatCard(
-                  label: 'Appts Today',
-                  value: data?.totalAppointmentsToday,
-                  icon: Icons.today_outlined,
-                  accent: const Color(0xFF2196F3),
-                  bg: const Color(0xFF0D1A2E),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: gap),
-          SizedBox(
-            height: 90,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _StatCard(
-                  label: 'Revenue This Month',
-                  valueText: data?.revenueThisMonth != null
-                      ? NumberFormat.currency(locale: 'en_MY', symbol: 'RM ', decimalDigits: 2)
-                            .format(data!.revenueThisMonth)
-                      : null,
-                  icon: Icons.payments_outlined,
-                  accent: const Color(0xFF02D39A),
-                  bg: const Color(0xFF0D2A1D),
-                ),
-                SizedBox(width: gap),
-                _StatCard(
-                  label: 'Points Expiring (30d)',
-                  value: data?.totalPointsExpiring30Days?.toInt(),
-                  icon: Icons.hourglass_bottom_rounded,
-                  accent: const Color(0xFFEF4444),
-                  bg: const Color(0xFF2A0D0D),
-                ),
-              ],
-            ),
-          ),
+              ),
+            ],
         ],
       ),
     );

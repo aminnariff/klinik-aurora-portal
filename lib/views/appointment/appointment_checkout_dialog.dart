@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:klinik_aurora_portal/config/color.dart';
 import 'package:klinik_aurora_portal/controllers/user/user_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:klinik_aurora_portal/config/app_colors.dart';
@@ -14,8 +15,8 @@ import 'package:klinik_aurora_portal/views/widgets/launcher/web_launcher.dart';
 import 'package:klinik_aurora_portal/views/widgets/reward/eligible_rewards_panel.dart';
 import 'package:klinik_aurora_portal/views/widgets/toast/toast.dart';
 
-const Color _purpleAccent = Color(0xFF7C3AED);
-const Color _purpleSoftBg = Color(0xFFF5F3FF);
+Color get _purpleAccent => appVioletText;
+Color get _purpleSoftBg => appPurpleSoft;
 
 /// Signature of [AppointmentCheckoutController.fetchPreview].
 typedef CheckoutPreviewLoader = Future<ApiResponse<CheckoutPreviewData>> Function(
@@ -393,11 +394,11 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.stars_rounded, size: 14, color: _purpleAccent),
+                      Icon(Icons.stars_rounded, size: 14, color: _purpleAccent),
                       const SizedBox(width: 4),
                       Text(
                         '${p.currentPoints} pts',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _purpleAccent),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _purpleAccent),
                       ),
                     ],
                   ),
@@ -557,7 +558,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                     color: _purpleAccent.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.stars_rounded, color: _purpleAccent, size: 22),
+                  child: Icon(Icons.stars_rounded, color: _purpleAccent, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -568,7 +569,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                         children: [
                           Text(
                             '+$pts Aurora Points',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
                               color: _purpleAccent,
@@ -581,7 +582,7 @@ class _AppointmentCheckoutDialogState extends State<AppointmentCheckoutDialog> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
+                            child: Text(
                               'RM 1 = 1 pt',
                               style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: _purpleAccent),
                             ),

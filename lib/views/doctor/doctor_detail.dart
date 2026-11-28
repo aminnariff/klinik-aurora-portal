@@ -557,7 +557,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   Widget _sectionLabel(String title, IconData icon, {bool isRequired = false}) {
     return Row(
       children: [
-        Icon(icon, size: 15, color: const Color(0xFF4B5563)),
+        Icon(icon, size: 15, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
         const SizedBox(width: 6),
         Text(
           title,

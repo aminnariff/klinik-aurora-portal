@@ -46,6 +46,9 @@ class PointHomepage extends StatefulWidget {
 }
 
 class _PointHomepageState extends State<PointHomepage> {
+  /// Green for balance figures; #1E822B is unreadable on dark surfaces.
+  Color get _successInk => appIsDarkMode ? const Color(0xFF6EE7B7) : const Color(0xFF1E822B);
+
   int _page = 1;
   int _pageSize = pageSize;
   int _totalCount = 0;
@@ -126,7 +129,7 @@ class _PointHomepageState extends State<PointHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
+    return LayoutWidget(mobile: mobileView(), tablet: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -779,12 +782,12 @@ class _PointHomepageState extends State<PointHomepage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'LOYALTY VAULT BALANCE',
                       style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF059669),
+                        color: appIsDarkMode ? const Color(0xFF6EE7B7) : const Color(0xFF059669),
                         letterSpacing: 0.6,
                       ),
                     ),
@@ -1641,19 +1644,19 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
                     children: [
                       Column(
                         children: [
-                          const Text(
+                          Text(
                             'NEW TOTAL BALANCE',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF1E822B),
+                              color: _successInk,
                               letterSpacing: 0.5,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             '$newTotalPoints pts',
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF1E822B)),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _successInk),
                           ),
                         ],
                       ),
@@ -1873,10 +1876,10 @@ Terima kasih kerana mempercayai Klinik Aurora! 🌸
                         Expanded(
                           child: Text(
                             '$todayCount patients rewarded · $todayPoints pts issued today',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF1E822B),
+                              color: _successInk,
                             ),
                           ),
                         ),

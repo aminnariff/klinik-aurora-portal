@@ -92,7 +92,7 @@ class _DoctorHomepageState extends State<DoctorHomepage> {
   }
 
   @override
-  Widget build(BuildContext context) => LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
+  Widget build(BuildContext context) => LayoutWidget(mobile: _mobileView(), tablet: _mobileView(), desktop: _desktopView());
 
   Widget _mobileView() {
     return Consumer<DoctorController>(

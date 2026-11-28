@@ -268,7 +268,10 @@ class AppearanceSettingsDialog extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -286,7 +289,6 @@ class AppearanceSettingsDialog extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
@@ -302,21 +304,25 @@ class AppearanceSettingsDialog extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const Spacer(),
-                                Container(
-                                  width: 24,
-                                  height: 14,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    gradient: LinearGradient(
-                                      colors: [colors.sidebarTop, colors.sidebarBottom],
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 24,
+                                      height: 14,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        gradient: LinearGradient(
+                                          colors: [colors.sidebarTop, colors.sidebarBottom],
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Sidebar Pair',
-                                  style: TextStyle(fontSize: 11, color: colors.inkMuted),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Sidebar Pair',
+                                      style: TextStyle(fontSize: 11, color: colors.inkMuted),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -354,14 +360,17 @@ class AppearanceSettingsDialog extends StatelessWidget {
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
                   border: Border(top: BorderSide(color: colors.border)),
                 ),
-                child: Row(
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     TextButton.icon(
                       onPressed: () => themeCtrl.resetToDefaults(),
                       icon: const Icon(Icons.restart_alt_rounded, size: 16),
                       label: const Text('Reset Default'),
                     ),
-                    const Spacer(),
                     AppButton.primary(
                       text: 'Done',
                       onPressed: () => Navigator.of(context).pop(),

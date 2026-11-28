@@ -4,6 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:klinik_aurora_portal/views/widgets/layout/layout.dart';
 
+// Context-aware responsive helpers backed by MediaQuery.sizeOf(context).width
+// so browser resizes and mobile rotations rebuild immediately.
+bool isCompactWidth(BuildContext context) => MediaQuery.sizeOf(context).width < 600;
+bool isMediumWidth(BuildContext context) {
+  final width = MediaQuery.sizeOf(context).width;
+  return width >= 600 && width < 1024;
+}
+bool isExpandedWidth(BuildContext context) => MediaQuery.sizeOf(context).width >= 1024;
+
 // Getters so these recompute on every read — the previous top-level variables
 // were evaluated once and went stale when the window resized or rotated.
 double get screenPadding => screenPaddingCalculate();
@@ -79,7 +88,7 @@ double screenWidthByBreakpoint(double mobile, double? tablet, double desktop, {b
 }
 
 double screenHeightByBreakpoint(double mobile, double? tablet, double desktop, {bool useAbsoluteValueDesktop = false}) {
-  double height = ScreenUtil().screenWidth;
+  double height = ScreenUtil().screenHeight;
   switch (breakpoint()) {
     case Breakpoint.mobile:
       return height * (mobile / 100);
@@ -131,7 +140,10 @@ Widget breakpointWidget(LayoutWidget layout) {
 // Fixed 1728×829 design-size helpers, clamped to the actual viewport so the
 // values can never exceed what fits on small screens (mobile browsers).
 double screenWidth1728(double width) {
-  final double cap = ScreenUtil().screenWidth * ((isMobile || isTablet) ? 0.7 : 0.9);
+  final double screenW = ScreenUtil().screenWidth;
+  final double cap = isMobile
+      ? math.max(0.0, math.min(screenW - 32, 520.0))
+      : screenW * 0.9;
   return math.min(1728 * (width / 100), cap);
 }
 

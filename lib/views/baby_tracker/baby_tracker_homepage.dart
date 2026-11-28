@@ -191,77 +191,89 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   // Header with Tabs
   // ---------------------------------------------------------------------------
   Widget _buildTopBar(Color accentColor) {
+    final isNarrow = MediaQuery.sizeOf(context).width < 768;
+    final titleSection = Row(
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: appSurfaceSubtle,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: appBorder),
+          ),
+          alignment: Alignment.center,
+          child: Icon(Icons.pregnant_woman_rounded, color: appInkPrimary, size: 20),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Aurora Baby Hub',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: appInkPrimary,
+                  letterSpacing: -0.3,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Pemantauan Pergerakan Bayi & Kawalan Senarai Semak Kelahiran',
+                style: TextStyle(fontSize: 12, color: appInkMuted),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+    final tabSwitcher = SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: appSurfaceSubtle,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
+            const SizedBox(width: 4),
+            _tabButton(1, Icons.tune_rounded, 'Templat Senarai Semak', accentColor),
+          ],
+        ),
+      ),
+    );
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: isNarrow ? 14 : 24, vertical: 14),
       decoration: BoxDecoration(
         color: appSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: appBorder),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Row(
+      child: isNarrow
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: appSurfaceSubtle,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: appBorder),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(Icons.pregnant_woman_rounded, color: appInkPrimary, size: 20),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Aurora Baby Hub',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: appInkPrimary,
-                          letterSpacing: -0.3,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Pemantauan Pergerakan Bayi & Kawalan Senarai Semak Kelahiran',
-                        style: TextStyle(fontSize: 12, color: appInkMuted),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
+                titleSection,
+                const SizedBox(height: 12),
+                tabSwitcher,
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(child: titleSection),
+                const SizedBox(width: 12),
+                tabSwitcher,
               ],
             ),
-          ),
-          const SizedBox(width: 12),
-          // Tab Switcher
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              color: appSurfaceSubtle,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _tabButton(0, Icons.insights_rounded, 'Laporan Kehamilan', accentColor),
-                const SizedBox(width: 4),
-                _tabButton(1, Icons.tune_rounded, 'Templat Senarai Semak', accentColor),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -323,6 +335,40 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   // ===========================================================================
 
   Widget _buildReportsTab(Color accentColor) {
+    final isNarrow = MediaQuery.sizeOf(context).width < 768;
+    final content = _isLoadingReports
+        ? const Center(child: CircularProgressIndicator())
+        : _patients.isEmpty
+            ? SingleChildScrollView(
+                child: _buildEmptyState(
+                  'Tiada rekod kehamilan dijumpai.',
+                  'Pesakit yang mendaftar EDD di aplikasi Aurora Baby akan dipaparkan di sini.',
+                ),
+              )
+            : _isCardView
+                ? _buildPatientCardGrid()
+                : _buildReportsTable(accentColor);
+
+    if (isNarrow) {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildMetricCards(),
+            const SizedBox(height: 12),
+            _buildReportsFilterBar(accentColor),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: _patients.isEmpty ? 260 : 420,
+              child: content,
+            ),
+            const SizedBox(height: 10),
+            _buildPaginationBar(),
+          ],
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -335,15 +381,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
         const SizedBox(height: 12),
 
         // Patients Content (Data Table or Card Grid)
-        Expanded(
-          child: _isLoadingReports
-              ? const Center(child: CircularProgressIndicator())
-              : _patients.isEmpty
-                  ? _buildEmptyState('Tiada rekod kehamilan dijumpai.', 'Pesakit yang mendaftar EDD di aplikasi Aurora Baby akan dipaparkan di sini.')
-                  : _isCardView
-                      ? _buildPatientCardGrid()
-                      : _buildReportsTable(accentColor),
-        ),
+        Expanded(child: content),
         const SizedBox(height: 10),
 
         // Pagination Bar
@@ -382,65 +420,96 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   Widget _buildMetricCards() {
     final overdueCount = _reportSummary['totalOverdue'] ?? 0;
     final alertCount = _reportSummary['totalAlerts'] ?? 0;
+    final cards = [
+      _kpiCard(
+        label: 'Ibu Hamil Aktif',
+        value: '${_reportSummary['totalActive'] ?? 0}',
+        subtitle: 'Dalam pemantauan antenatal',
+        onTap: () {
+          setState(() {
+            _reportStatus = 'all';
+            _reportPage = 1;
+          });
+          _fetchReports();
+        },
+      ),
+      _kpiCard(
+        label: 'Melebihi 40 Minggu',
+        value: '$overdueCount',
+        subtitle: overdueCount > 0 ? 'Perlu tindakan induksi klinikal' : 'Tiada kes tertunggak',
+        valueColor: overdueCount > 0 ? const Color(0xFFDC2626) : appInkPrimary,
+        onTap: () {
+          setState(() {
+            _reportStatus = 'overdue';
+            _reportPage = 1;
+          });
+          _fetchReports();
+        },
+      ),
+      _kpiCard(
+        label: 'Amaran Tendangan',
+        value: '$alertCount',
+        subtitle: '< 10 pergerakan hari ini (Wk 28+)',
+        valueColor: alertCount > 0 ? const Color(0xFFD97706) : appInkPrimary,
+        onTap: () {
+          setState(() {
+            _reportStatus = 'alert';
+            _reportPage = 1;
+          });
+          _fetchReports();
+        },
+      ),
+      _kpiCard(
+        label: 'Purata Beg Hospital',
+        value: '${_reportSummary['avgHospitalBagPercentage'] ?? 0}%',
+        subtitle: 'Kesiapan 10 barangan wad',
+        valueColor: const Color(0xFF0284C7),
+      ),
+    ];
 
-    return Row(
-      children: [
-        Expanded(
-          child: _kpiCard(
-            label: 'Ibu Hamil Aktif',
-            value: '${_reportSummary['totalActive'] ?? 0}',
-            subtitle: 'Dalam pemantauan antenatal',
-            onTap: () {
-              setState(() {
-                _reportStatus = 'all';
-                _reportPage = 1;
-              });
-              _fetchReports();
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _kpiCard(
-            label: 'Melebihi 40 Minggu',
-            value: '$overdueCount',
-            subtitle: overdueCount > 0 ? 'Perlu tindakan induksi klinikal' : 'Tiada kes tertunggak',
-            valueColor: overdueCount > 0 ? const Color(0xFFDC2626) : appInkPrimary,
-            onTap: () {
-              setState(() {
-                _reportStatus = 'overdue';
-                _reportPage = 1;
-              });
-              _fetchReports();
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _kpiCard(
-            label: 'Amaran Tendangan',
-            value: '$alertCount',
-            subtitle: '< 10 pergerakan hari ini (Wk 28+)',
-            valueColor: alertCount > 0 ? const Color(0xFFD97706) : appInkPrimary,
-            onTap: () {
-              setState(() {
-                _reportStatus = 'alert';
-                _reportPage = 1;
-              });
-              _fetchReports();
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _kpiCard(
-            label: 'Purata Beg Hospital',
-            value: '${_reportSummary['avgHospitalBagPercentage'] ?? 0}%',
-            subtitle: 'Kesiapan 10 barangan wad',
-            valueColor: const Color(0xFF0284C7),
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 360) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (int i = 0; i < cards.length; i++) ...[
+                if (i > 0) const SizedBox(height: 10),
+                cards[i],
+              ],
+            ],
+          );
+        }
+        if (constraints.maxWidth < 768) {
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(child: cards[0]),
+                  const SizedBox(width: 10),
+                  Expanded(child: cards[1]),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(child: cards[2]),
+                  const SizedBox(width: 10),
+                  Expanded(child: cards[3]),
+                ],
+              ),
+            ],
+          );
+        }
+        return Row(
+          children: [
+            for (int i = 0; i < cards.length; i++) ...[
+              if (i > 0) const SizedBox(width: 12),
+              Expanded(child: cards[i]),
+            ],
+          ],
+        );
+      },
     );
   }
 
@@ -497,6 +566,173 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
   }
 
   Widget _buildReportsFilterBar(Color accentColor) {
+    final searchBox = TextField(
+      style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal, color: appInkPrimary),
+      onChanged: (val) {
+        _reportSearch = val;
+        _debouncer.run(_fetchReports);
+      },
+      decoration: InputDecoration(
+        hintText: 'Cari nama pesakit, nombor telefon, atau emel...',
+        hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
+        prefixIcon: Icon(Icons.search_rounded, size: 18, color: appInkMuted),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        filled: true,
+        fillColor: appSurfaceSubtle,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: appBorder),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: appBorder),
+        ),
+      ),
+    );
+
+    final filterControls = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _filterChip('all', 'Semua', appInkPrimary),
+        const SizedBox(width: 6),
+        _filterChip('overdue', 'Overdue (>40 M)', const Color(0xFFDC2626)),
+        const SizedBox(width: 6),
+        _filterChip('alert', 'Pergerakan Rendah', const Color(0xFFD97706)),
+        const SizedBox(width: 6),
+        _filterChip('third_trimester', 'Trimester 3 (28+ M)', const Color(0xFF0284C7)),
+        if (_filterGestationalWeek != null) ...[
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: appSurfaceSubtle,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: appBorderStrong),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Minggu $_filterGestationalWeek',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: appInkPrimary,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _filterGestationalWeek = null;
+                      _reportPage = 1;
+                    });
+                    _fetchReports();
+                  },
+                  borderRadius: BorderRadius.circular(6),
+                  child: Icon(Icons.close_rounded, size: 13, color: appInkMuted),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(width: 10),
+        IconButton(
+          icon: Icon(Icons.refresh_rounded, color: appInkMuted),
+          tooltip: 'Muat Semula',
+          onPressed: _fetchReports,
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: appSurfaceSubtle,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () => setState(() => _isCardView = false),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: !_isCardView ? appSurface : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: !_isCardView
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.table_rows_rounded,
+                        size: 15,
+                        color: !_isCardView ? appInkPrimary : appInkMuted,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Jadual',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: !_isCardView ? FontWeight.bold : FontWeight.w500,
+                          color: !_isCardView ? appInkPrimary : appInkMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () => setState(() => _isCardView = true),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _isCardView ? appSurface : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: _isCardView
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.grid_view_rounded,
+                        size: 15,
+                        color: _isCardView ? appInkPrimary : appInkMuted,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Kad Fail',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: _isCardView ? FontWeight.bold : FontWeight.w500,
+                          color: _isCardView ? appInkPrimary : appInkMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -504,180 +740,29 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: appBorder),
       ),
-      child: Row(
-        children: [
-          // Search box
-          Expanded(
-            flex: 3,
-            child: TextField(
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.normal, color: appInkPrimary),
-              onChanged: (val) {
-                _reportSearch = val;
-                _debouncer.run(_fetchReports);
-              },
-              decoration: InputDecoration(
-                hintText: 'Cari nama pesakit, nombor telefon, atau emel...',
-                hintStyle: TextStyle(fontSize: 13, color: appInkMuted),
-                prefixIcon: Icon(Icons.search_rounded, size: 18, color: appInkMuted),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                filled: true,
-                fillColor: appSurfaceSubtle,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: appBorder),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: appBorder),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-
-          // Status Filter Chips (Zero childish emojis)
-          _filterChip('all', 'Semua', appInkPrimary),
-          const SizedBox(width: 6),
-          _filterChip('overdue', 'Overdue (>40 M)', const Color(0xFFDC2626)),
-          const SizedBox(width: 6),
-          _filterChip('alert', 'Pergerakan Rendah', const Color(0xFFD97706)),
-          const SizedBox(width: 6),
-          _filterChip('third_trimester', 'Trimester 3 (28+ M)', const Color(0xFF0284C7)),
-          if (_filterGestationalWeek != null) ...[
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: appSurfaceSubtle,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: appBorderStrong),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Minggu $_filterGestationalWeek',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: appInkPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        _filterGestationalWeek = null;
-                        _reportPage = 1;
-                      });
-                      _fetchReports();
-                    },
-                    borderRadius: BorderRadius.circular(6),
-                    child: Icon(Icons.close_rounded, size: 13, color: appInkMuted),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          const SizedBox(width: 10),
-
-          // Refresh button
-          IconButton(
-            icon: Icon(Icons.refresh_rounded, color: appInkMuted),
-            tooltip: 'Muat Semula',
-            onPressed: _fetchReports,
-          ),
-          const SizedBox(width: 8),
-
-          // View mode toggle: Card Grid vs Data Table
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              color: appSurfaceSubtle,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 960) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                InkWell(
-                  onTap: () => setState(() => _isCardView = false),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: !_isCardView ? appSurface : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: !_isCardView
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.table_rows_rounded,
-                          size: 15,
-                          color: !_isCardView ? appInkPrimary : appInkMuted,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Jadual',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: !_isCardView ? FontWeight.bold : FontWeight.w500,
-                            color: !_isCardView ? appInkPrimary : appInkMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () => setState(() => _isCardView = true),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: _isCardView ? appSurface : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: _isCardView
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.grid_view_rounded,
-                          size: 15,
-                          color: _isCardView ? appInkPrimary : appInkMuted,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Kad Fail',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: _isCardView ? FontWeight.bold : FontWeight.w500,
-                            color: _isCardView ? appInkPrimary : appInkMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                searchBox,
+                const SizedBox(height: 10),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: filterControls,
                 ),
               ],
-            ),
-          ),
-        ],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(flex: 3, child: searchBox),
+              const SizedBox(width: 14),
+              filterControls,
+            ],
+          );
+        },
       ),
     );
   }
@@ -830,7 +915,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.bold,
                                   color: kicks >= 10
-                                      ? const Color(0xFF15803D)
+                                      ? appSuccessText
                                       : kicks > 0
                                           ? const Color(0xFFD97706)
                                           : appInkMuted,
@@ -897,10 +982,10 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                               fontSize: 11.5,
                               fontWeight: FontWeight.bold,
                               color: alertStatus == 'overdue'
-                                  ? const Color(0xFFB91C1C)
+                                  ? appDangerText
                                   : alertStatus == 'low_kicks'
-                                      ? const Color(0xFFB45309)
-                                      : const Color(0xFF15803D),
+                                      ? appWarningText
+                                      : appSuccessText,
                             ),
                           ),
                         ),
@@ -986,15 +1071,21 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: appBorder),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 10,
+        runSpacing: 8,
         children: [
           Text(
             'Menunjukkan rekod ${(page - 1) * _reportPageSize + (_patients.isNotEmpty ? 1 : 0)} – ${(page - 1) * _reportPageSize + _patients.length} daripada $totalCount pesakit',
             style: TextStyle(fontSize: 12, color: appInkMuted),
           ),
-          Row(
-            children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               OutlinedButton.icon(
                 onPressed: page > 1
                     ? () {
@@ -1037,6 +1128,7 @@ class _BabyTrackerHomepageState extends State<BabyTrackerHomepage> with SingleTi
                 ),
               ),
             ],
+          ),
           ),
         ],
       ),

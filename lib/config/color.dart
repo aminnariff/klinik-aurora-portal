@@ -67,6 +67,17 @@ Color get appWarningText => _activeIsDark ? const Color(0xFFFDE047) : const Colo
 Color get appInfoText => _activeIsDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8);
 Color get appPurpleText => _activeIsDark ? const Color(0xFFD8B4FE) : const Color(0xFF6D28D9);
 Color get appTealText => _activeIsDark ? const Color(0xFF5EEAD4) : const Color(0xFF0F766E);
+// Text on orange notice boxes (booking fee, cancellation policy).
+Color get appOrangeText => _activeIsDark ? const Color(0xFFFDBA74) : const Color(0xFF9A3412);
+// Violet chip text (e.g. "Pre-filled from Baby Tracker").
+Color get appVioletText => _activeIsDark ? const Color(0xFFC4B5FD) : const Color(0xFF7C3AED);
+// Sky-blue link/button text.
+Color get appSkyText => _activeIsDark ? const Color(0xFF7DD3FC) : const Color(0xFF0369A1);
+// Deep amber headings on warning boxes.
+Color get appAmberText => _activeIsDark ? const Color(0xFFFCD34D) : const Color(0xFF92400E);
+// Deep green text on success boxes.
+Color get appGreenText => _activeIsDark ? const Color(0xFF86EFAC) : const Color(0xFF166534);
+Color get appLeafText => _activeIsDark ? const Color(0xFF6EE7B7) : const Color(0xFF1E822B);
 
 // Live Theme-Aware Chart Tooltip Styling (Always dark high-contrast pill with crisp white text)
 Color get appTooltipBg => _activeIsDark ? const Color(0xFF1E293B) : const Color(0xFF0F172A);

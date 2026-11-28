@@ -334,7 +334,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFFDE68A)),
           ),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.local_shipping_outlined, size: 15, color: Color(0xFFD97706)),
@@ -342,7 +342,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
               Expanded(
                 child: Text(
                   'If the reward is being delivered, record the postal address or courier tracking number here.',
-                  style: TextStyle(fontSize: 11, color: Color(0xFF92400E), height: 1.3),
+                  style: TextStyle(fontSize: 11, color: appAmberText, height: 1.3),
                 ),
               ),
             ],
@@ -467,7 +467,7 @@ class _RewardHistoryDetailState extends State<RewardHistoryDetail> {
                 ),
                 child: Text(
                   '$points pts',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF0369A1)),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: appSkyText),
                 ),
               ),
             ],

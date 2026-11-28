@@ -606,12 +606,12 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
                   color: appInfoSoft,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
+                child: Text(
                   'Klinikal',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF0369A1),
+                    color: appSkyText,
                   ),
                 ),
               ),
@@ -670,8 +670,11 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
   Widget _buildFooterActions(bool isEdit) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 10,
+        runSpacing: 8,
         children: [
           TextButton(
             onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
@@ -685,7 +688,6 @@ class _TemplateItemEditorDialogState extends State<TemplateItemEditorDialog> {
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
             ),
           ),
-          const SizedBox(width: 10),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(

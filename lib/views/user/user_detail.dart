@@ -1042,7 +1042,7 @@ class _UserDetailState extends State<UserDetail> {
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: const Color(0xFFFDE68A)),
           ),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.warning_amber_rounded, size: 14, color: Color(0xFFD97706)),
@@ -1050,7 +1050,7 @@ class _UserDetailState extends State<UserDetail> {
               Expanded(
                 child: Text(
                   'Email unlocked. You will be responsible for this change.',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF92400E)),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appAmberText),
                 ),
               ),
             ],

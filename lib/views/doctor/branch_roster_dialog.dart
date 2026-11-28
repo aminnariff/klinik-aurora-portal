@@ -409,9 +409,9 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                 child: Icon(Icons.edit_calendar_rounded, size: 20, color: primary),
                               ),
                               const SizedBox(width: 12),
-                              const Text(
+                              Text(
                                 'Edit Practitioner Shift',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1E293B)),
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: appIsDarkMode ? appInkPrimary : const Color(0xFF1E293B)),
                               ),
                             ],
                           ),
@@ -424,7 +424,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                       const SizedBox(height: 20),
 
                       // Doctor Selection
-                      const Text('Practitioner', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                      Text('Practitioner', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563))),
                       const SizedBox(height: 6),
                       Container(
                         height: 42,
@@ -453,7 +453,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                       const SizedBox(height: 16),
 
                       // Shift Date
-                      const Text('Shift Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                      Text('Shift Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563))),
                       const SizedBox(height: 6),
                       InkWell(
                         onTap: () async {
@@ -490,7 +490,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                               const SizedBox(width: 8),
                               Text(
                                 DateFormat('EEEE, dd MMM yyyy').format(editDate),
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF1E293B)),
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkPrimary : const Color(0xFF1E293B)),
                               ),
                               const Spacer(),
                               Icon(Icons.arrow_drop_down, color: appInkMuted),
@@ -507,7 +507,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Start Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                                Text('Start Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563))),
                                 const SizedBox(height: 6),
                                 InkWell(
                                   onTap: () async {
@@ -547,7 +547,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('End Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                                Text('End Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563))),
                                 const SizedBox(height: 6),
                                 InkWell(
                                   onTap: () async {
@@ -1044,7 +1044,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
         children: [
           // Branch selector (only enabled for superadmins)
           if (isSuperAdmin && _branches.isNotEmpty) ...[
-            const Icon(Icons.location_on_outlined, size: 18, color: Color(0xFF4B5563)),
+            Icon(Icons.location_on_outlined, size: 18, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
             const SizedBox(width: 8),
             DropdownButtonHideUnderline(
               child: DropdownButton<String>(
@@ -1150,7 +1150,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                 ),
                 child: Text(
                   '${_selectedDates.length} Date${_selectedDates.length > 1 ? 's' : ''} × ${_timeSlots.length} Slot${_timeSlots.length > 1 ? 's' : ''} = $totalShiftsToCreate Shift${totalShiftsToCreate > 1 ? 's' : ''}',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF4B5563)),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
                 ),
               ),
             ],
@@ -1169,7 +1169,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Practitioner', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                    Text('Practitioner', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563))),
                     const SizedBox(height: 6),
                     Container(
                       height: 40,
@@ -1206,7 +1206,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Shift Dates (Multi-Select)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF4B5563))),
+                        Text('Shift Dates (Multi-Select)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563))),
                         if (_selectedDates.length > 1)
                           InkWell(
                             onTap: () => setState(() => _selectedDates = [_selectedDates.first]),
@@ -1314,7 +1314,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.schedule_rounded, size: 15, color: Color(0xFF4B5563)),
+                  Icon(Icons.schedule_rounded, size: 15, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
                   SizedBox(width: 6),
                   Text(
                     'Daily Shift Slots (Break Time Supported)',
@@ -1364,7 +1364,7 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                       const SizedBox(width: 6),
                       Text(
                         'Break: ${_formatTimeOfDay(prevSlot.endTime)} - ${_formatTimeOfDay(slot.startTime)} (${gapH > 0 ? '${gapH}h ' : ''}${gapM > 0 ? '${gapM}m' : ''})',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF4B5563)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
                       ),
                     ],
                   ),
@@ -1829,10 +1829,10 @@ class _BranchRosterDialogState extends State<BranchRosterDialog> {
                                       ),
                                       Text(
                                         '${_formatTime(shift.startTime)} - ${_formatTime(shift.endTime)}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w500,
-                                          color: Color(0xFF4B5563),
+                                          color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                                         ),
                                       ),
                                     ],

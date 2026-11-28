@@ -168,8 +168,8 @@ class BreakUiDevHarness extends StatelessWidget {
 
     return Positioned(
       bottom: 24,
-      left: 0,
-      right: 0,
+      left: 12,
+      right: 12,
       child: Center(
         child: Material(
           elevation: 16,
@@ -182,33 +182,36 @@ class BreakUiDevHarness extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFF334155), width: 1),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.bug_report_rounded, color: Color(0xFF38BDF8), size: 16),
-                      SizedBox(width: 6),
-                      Text(
-                        'Break UI',
-                        style: TextStyle(
-                          color: appInkMuted,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bug_report_rounded, color: Color(0xFF38BDF8), size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'Break UI',
+                          style: TextStyle(
+                            color: appInkMuted,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                _segment('Live Data', BreakUiMode.live),
-                _segment('Worst-Case', BreakUiMode.worstCase),
-                _segment('Empty', BreakUiMode.empty),
-                _segment('Single', BreakUiMode.single),
-              ],
+                  _segment('Live Data', BreakUiMode.live),
+                  _segment('Worst-Case', BreakUiMode.worstCase),
+                  _segment('Empty', BreakUiMode.empty),
+                  _segment('Single', BreakUiMode.single),
+                ],
+              ),
             ),
           ),
         ),

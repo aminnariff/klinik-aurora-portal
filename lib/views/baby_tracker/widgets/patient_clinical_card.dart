@@ -127,7 +127,7 @@ class PatientClinicalCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: isOverdue ? const Color(0xFFB91C1C) : const Color(0xFFB45309),
+                        color: isOverdue ? appDangerText : appWarningText,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

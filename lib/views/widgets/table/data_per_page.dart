@@ -32,7 +32,8 @@ class _PerPageWidgetState extends State<PerPageWidget> {
       attributeList: DropdownAttributeList(
         PerPageWidget.perPageOptions(),
         value: widget.perPage,
-        width: 80,
+        width: 92,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         onChanged: widget.dropdownAttributeList.onChanged,
         fieldColor: Colors.transparent,
         borderColor: Colors.transparent,

@@ -445,7 +445,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
-                                    color: isOverridden ? const Color(0xFFB45309) : const Color(0xFF15803D),
+                                    color: isOverridden ? appWarningText : appSuccessText,
                                   ),
                                 ),
                               ),
@@ -653,9 +653,9 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Advanced Timing Rules',
-                                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: appIsDarkMode ? appInkPrimary : const Color(0xFF1F2937)),
                                         ),
                                         Text(
                                           'Configure separate weekday, weekend, or date-specific durations',
@@ -867,11 +867,11 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                           ),
                                           child: Row(
                                             children: [
-                                              const Icon(Icons.event_outlined, size: 16, color: Color(0xFF4B5563)),
+                                              Icon(Icons.event_outlined, size: 16, color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563)),
                                               const SizedBox(width: 8),
                                               Text(
                                                 dateKey,
-                                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appIsDarkMode ? appInkPrimary : const Color(0xFF1F2937)),
                                               ),
                                               const Spacer(),
                                               SizedBox(
@@ -945,7 +945,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                               Icon(
                                 Icons.restart_alt_rounded,
                                 size: 16,
-                                color: _isResetToHq ? const Color(0xFF2563EB) : const Color(0xFF4B5563),
+                                color: _isResetToHq ? const Color(0xFF2563EB) : appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                               ),
                               const SizedBox(width: 6),
                               Text(
@@ -953,7 +953,7 @@ class _ChangeServiceDurationDialogState extends State<ChangeServiceDurationDialo
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: _isResetToHq ? const Color(0xFF2563EB) : const Color(0xFF4B5563),
+                                  color: _isResetToHq ? const Color(0xFF2563EB) : appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                                 ),
                               ),
                             ],

@@ -610,7 +610,7 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: completedCount == itemCount && itemCount > 0
-                          ? const Color(0xFF15803D)
+                          ? appSuccessText
                           : appInkSecondary,
                     ),
                   ),
@@ -851,13 +851,13 @@ class _UserBabyTrackerDialogState extends State<UserBabyTrackerDialog> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFDCFCE7),
+        color: appIsDarkMode ? const Color(0xFF0E2F26) : const Color(0xFFDCFCE7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF86EFAC)),
+        border: Border.all(color: const Color(0xFF86EFAC).withValues(alpha: appIsDarkMode ? 0.4 : 1)),
       ),
       child: Text(
         '👶 Born ${_formatYmd(profile['birthDate'])}${name != null && name.isNotEmpty ? ' · $name' : ''}',
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF166534)),
+        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: appGreenText),
       ),
     );
   }

@@ -298,7 +298,7 @@ class _ServiceDetailsState extends State<ServiceDetails> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                color: isActive ? appSuccessText : appDangerText,
               ),
             ),
           ],

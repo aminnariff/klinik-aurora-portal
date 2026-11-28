@@ -1341,10 +1341,10 @@ class _AppointmentHomepageState extends State<AppointmentHomepage> with SingleTi
                                         ),
                                         child: Text(
                                           deriveAgeFromNric(apt.user?.userNric)!,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
-                                            color: Color(0xFF4B5563),
+                                            color: appIsDarkMode ? appInkSecondary : const Color(0xFF4B5563),
                                           ),
                                         ),
                                       ),
@@ -2756,7 +2756,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D),
+                        color: isDark ? const Color(0xFF6EE7B7) : appSuccessText,
                       ),
                     ),
                   ),
@@ -2771,7 +2771,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                       style: TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w800,
-                        color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF166534),
+                        color: isDark ? const Color(0xFFA7F3D0) : appGreenText,
                       ),
                     ),
                   ),
@@ -2855,7 +2855,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D),
+                        color: isDark ? const Color(0xFF6EE7B7) : appSuccessText,
                       ),
                     ),
                   ],
@@ -3156,7 +3156,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF15803D),
+                      color: isDark ? const Color(0xFF6EE7B7) : appSuccessText,
                       letterSpacing: -0.2,
                     ),
                   ),
@@ -3192,7 +3192,7 @@ class _AppointmentGuidelineDialogState extends State<_AppointmentGuidelineDialog
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF166534),
+              color: isDark ? const Color(0xFFA7F3D0) : appGreenText,
             ),
           ),
           const SizedBox(height: 12),

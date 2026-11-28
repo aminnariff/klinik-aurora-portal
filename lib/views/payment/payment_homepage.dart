@@ -340,18 +340,18 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE3F2FD),
+                        color: appIsDarkMode ? const Color(0xFF0E2738) : const Color(0xFFE3F2FD),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: const Color(0xFF2196F3).withAlpha(60)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.store_rounded, size: 11, color: Color(0xFF1565C0)),
+                          Icon(Icons.store_rounded, size: 11, color: appIsDarkMode ? const Color(0xFF93C5FD) : const Color(0xFF1565C0)),
                           const SizedBox(width: 4),
                           Text(
                             branchName ?? 'Your Branch',
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1565C0)),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appIsDarkMode ? const Color(0xFF93C5FD) : const Color(0xFF1565C0)),
                           ),
                         ],
                       ),
@@ -382,7 +382,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                             child: DropdownButton<String>(
                               value: _selectedBranchId ?? '',
                               icon: Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: appInkMuted),
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: appIsDarkMode ? appInkPrimary : appIsDarkMode ? appInkPrimary : const Color(0xFF1F2937)),
                               onChanged: (val) {
                                 setState(() {
                                   _selectedBranchId = (val == null || val.isEmpty) ? null : val;
@@ -435,11 +435,11 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.clear_rounded, size: 12, color: Color(0xFF1D4ED8)),
+                              Icon(Icons.clear_rounded, size: 12, color: appInfoText),
                               const SizedBox(width: 4),
                               Text(
                                 _selectedBranchName != null ? 'Clear ($_selectedBranchName)' : 'Clear filter',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1D4ED8)),
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: appInfoText),
                               ),
                             ],
                           ),
@@ -1065,7 +1065,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                const Icon(Icons.store_rounded, size: 16, color: Color(0xFF7C3AED)),
+                Icon(Icons.store_rounded, size: 16, color: appVioletText),
                 const SizedBox(width: 8),
                 Text('Branch Overview', style: AppTypography.displayMedium(context)),
                 const Spacer(),
@@ -1685,8 +1685,8 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                               const SizedBox(width: 4),
                               Text(
                                 sortedData[i].successfulPayments ?? '0',
-                                style: const TextStyle(
-                                  color: Color(0xFF047857),
+                                style: TextStyle(
+                                  color: appIsDarkMode ? const Color(0xFF6EE7B7) : const Color(0xFF047857),
                                   fontWeight: FontWeight.w700,
                                   fontSize: 12,
                                 ),
@@ -1834,7 +1834,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                 border: Border(top: BorderSide(color: appBorderStrong, width: 1.5)),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Text('$totalSuccessful', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF047857))),
+              child: Text('$totalSuccessful', style: cellStyle.copyWith(fontWeight: FontWeight.w800, color: appIsDarkMode ? const Color(0xFF6EE7B7) : const Color(0xFF047857))),
             ),
             Container(
               decoration: BoxDecoration(

@@ -69,7 +69,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWidget(mobile: _mobileView(), desktop: _desktopView());
+    return LayoutWidget(mobile: _mobileView(), tablet: _mobileView(), desktop: _desktopView());
   }
 
 
@@ -456,10 +456,10 @@ class _RewardHomepageState extends State<RewardHomepage> {
       ),
       child: Text(
         '${points ?? 0} pts',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF0369A1),
+          color: appSkyText,
         ),
       ),
     );
@@ -502,7 +502,7 @@ class _RewardHomepageState extends State<RewardHomepage> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+          color: isActive ? appSuccessText : appDangerText,
         ),
       ),
     );

@@ -65,7 +65,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
   @override
   Widget build(BuildContext context) {
     Theme.of(context);
-    return LayoutWidget(mobile: mobileView(), desktop: desktopView());
+    return LayoutWidget(mobile: mobileView(), tablet: mobileView(), desktop: desktopView());
   }
 
   Widget mobileView() {
@@ -710,7 +710,7 @@ class _BranchHomepageState extends State<BranchHomepage> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+          color: isActive ? appSuccessText : appDangerText,
         ),
       ),
     );

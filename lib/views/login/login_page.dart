@@ -260,6 +260,20 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       ),
                     ),
 
+                    // Product tour: try the portal with fake data before using it for real.
+                    FadeTransition(
+                      opacity: _formFade,
+                      child: TextButton.icon(
+                        onPressed: () => launchUrl(productTourUri, webOnlyWindowName: '_blank'),
+                        icon: const Icon(Icons.play_circle_outline_rounded, size: 18),
+                        label: const Text('New here? Take the product tour'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: primary,
+                          textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(height: 8),
 
                     // Legal Policies
@@ -856,20 +870,20 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     children: [
                       const Icon(Icons.info_outline_rounded, color: Color(0xFFD97706), size: 16),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Your session has expired. Please sign in again.',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFFB45309),
+                            color: appWarningText,
                           ),
                         ),
                       ),
                       InkWell(
                         onTap: () => sessionExpiredNotice.value = false,
                         borderRadius: BorderRadius.circular(4),
-                        child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFFB45309)),
+                        child: Icon(Icons.close_rounded, size: 14, color: appWarningText),
                       ),
                     ],
                   ),
@@ -923,7 +937,8 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _fieldLabel('Password'),
+                Expanded(child: _fieldLabel('Password')),
+                const SizedBox(width: 8),
                 TextButton(
                   onPressed: forgotPassword,
                   style: TextButton.styleFrom(
@@ -1164,7 +1179,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                               style: TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                color: isDark ? Colors.white : appIsDarkMode ? appInkPrimary : const Color(0xFF1E293B),
                                 letterSpacing: 0.1,
                               ),
                             ),

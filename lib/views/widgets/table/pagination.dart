@@ -80,9 +80,13 @@ class _PaginationState extends State<Pagination> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
+    return Center(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
         IconButton(
           tooltip: 'Halaman Sebelumnya',
           icon:
@@ -137,7 +141,9 @@ class _PaginationState extends State<Pagination> {
           onPressed:
               widget.selectedPage < widget.numOfPages ? () => widget.onPageChanged(widget.selectedPage + 1) : null,
         ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 }

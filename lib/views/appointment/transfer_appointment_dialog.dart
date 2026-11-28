@@ -536,7 +536,7 @@ class _TransferAppointmentDialogState extends State<TransferAppointmentDialog> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.info_outline_rounded, size: 18, color: Color(0xFF1D4ED8)),
+                                Icon(Icons.info_outline_rounded, size: 18, color: appInfoText),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
