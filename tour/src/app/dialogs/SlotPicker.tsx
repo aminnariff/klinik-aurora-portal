@@ -4,7 +4,7 @@ import { Icon } from '../ui';
 import { availableSlots, fmtLongDate, fmtMonthYear, fmtTimeUpper, startOfToday, ymd } from '../data';
 
 /** SelectionCalendarView from lib/views/widgets/calendar/selection_calendar_view.dart */
-export function SlotPickerDialog({ serviceId, branchId, onPick }: { serviceId: string; branchId: string; onPick: (slot: string) => void }) {
+export function SlotPickerDialog({ serviceId, branchId, onPick, readOnly }: { serviceId: string; branchId: string; onPick: (slot: string) => void; readOnly?: boolean }) {
   const { db, closeDialog } = useApp();
   const slots = useMemo(() => availableSlots(db, serviceId, branchId), [db, serviceId, branchId]);
   const today = startOfToday();
@@ -23,6 +23,7 @@ export function SlotPickerDialog({ serviceId, branchId, onPick }: { serviceId: s
   return (
     <div className="ka-overlay" onClick={closeDialog}>
       <div className="ka-dialog" style={{ width: 560, padding: 20, borderRadius: 12, alignItems: 'center' }} onClick={(e) => e.stopPropagation()} data-tour="slot-dialog">
+        {readOnly && <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>{db.services.find((s) => s.id === serviceId)?.name} · available dates (view only)</div>}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button type="button" className="ka-tb-icon" data-tour="slot-prev" disabled={monthOffset === 0} style={{ opacity: monthOffset === 0 ? .35 : 1 }} onClick={() => setMonthOffset(monthOffset - 1)}><Icon n="chevron_left" /></button>
           <span style={{ fontSize: 16, fontWeight: 700, width: 170, textAlign: 'center' }}>{fmtMonthYear(y, m)}</span>
@@ -67,10 +68,12 @@ export function SlotPickerDialog({ serviceId, branchId, onPick }: { serviceId: s
             </div>
           </>
         )}
-        <button type="button" data-tour="slot-continue" disabled={!date || !time} onClick={() => { onPick(time!); closeDialog(); }}
+        {readOnly ? (
+          <button type="button" className="ka-btn" data-tour="slot-close" onClick={closeDialog} style={{ marginTop: 24, height: 40, padding: '0 28px', borderRadius: 20 }}>Close</button>
+        ) : <button type="button" data-tour="slot-continue" disabled={!date || !time} onClick={() => { onPick(time!); closeDialog(); }}
           style={{ marginTop: 24, height: 44, padding: '0 40px', borderRadius: 22, border: 'none', fontWeight: 600, fontSize: 14, background: date && time ? '#2196f3' : 'var(--border-strong)', color: date && time ? '#fff' : 'var(--ink-2)', boxShadow: date && time ? '0 2px 4px rgba(0,0,0,.2)' : 'none' }}>
           Continue
-        </button>
+        </button>}
       </div>
     </div>
   );

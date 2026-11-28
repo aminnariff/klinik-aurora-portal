@@ -13,6 +13,7 @@ import { FollowUp } from './pages/FollowUp';
 import { DailyClosing, PaymentRecords } from './pages/Billing';
 import { Doctors } from './pages/Doctors';
 import { Services } from './pages/Services';
+import { PaymentIssues } from './pages/PaymentIssues';
 import { ActivityLogs, Branches, Campaigns, PeakHours, Promotions, RewardsCatalog, Staff, Vouchers } from './pages/Admin';
 import { CheckoutDialog, CheckoutDoneDialog, ClaimUpdateDialog, RoomPickerDialog, TransferDialog } from './dialogs/FrontDesk';
 import { RegisterPatientDialog } from './dialogs/RegisterPatient';
@@ -249,6 +250,7 @@ function Page() {
     case 'branches': return <Branches />;
     case 'activity': return <ActivityLogs />;
     case 'peakHours': return <PeakHours />;
+    case 'paymentMismatch': return <PaymentIssues />;
     default: return <ComingSoon route={route} />;
   }
 }

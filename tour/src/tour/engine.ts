@@ -135,6 +135,14 @@ function setNativeValue(el: HTMLInputElement | HTMLTextAreaElement, value: strin
   el.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
+// ── Hover marker: lets CSS tooltips show under the fake cursor ──
+let hovered: HTMLElement | null = null;
+function markHover(el: HTMLElement | null) {
+  if (hovered && hovered !== el) delete hovered.dataset.hover;
+  hovered = el;
+  if (el) el.dataset.hover = '1';
+}
+
 // ── Step context ───────────────────────────────────────────
 export interface Ctx {
   wait(ms: number): Promise<void>;
@@ -154,12 +162,13 @@ function makeCtx(sig: AbortSignal, instant: boolean): Ctx {
     const r = relRect(el);
     const [fx, fy] = opts?.at ?? [0.5, 0.5];
     const x = r.left + r.width * fx, y = r.top + r.height * fy;
-    if (instant) { cursor.teleport(x, y); return el; }
+    if (instant) { cursor.teleport(x, y); markHover(null); return el; }
     await whilePaused(sig);
     const dist = Math.hypot(x - posNow().x, y - posNow().y);
     const ms = Math.min(950, 280 + dist * 0.45) / useTour.getState().speed;
     cursor.move(x, y, ms);
     await wait(ms * useTour.getState().speed + 60, sig, false);
+    markHover(el);
     return el;
   };
   const clickEl = async (el: HTMLElement) => {
@@ -168,6 +177,7 @@ function makeCtx(sig: AbortSignal, instant: boolean): Ctx {
       await wait(110, sig, false);
       cursor.ripple();
     }
+    markHover(null);
     el.click();
     if (!instant) {
       cursor.press(false);

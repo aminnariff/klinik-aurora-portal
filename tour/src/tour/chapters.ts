@@ -188,6 +188,69 @@ const ALL: Chapter[] = [
     ],
   },
   {
+    id: 'appointment-tools', group: FRONT, title: 'Check slots, calendar & guideline', icon: 'calendar_month', color: C.front, role: 'frontdesk',
+    setup: (app) => app.go('appointments'),
+    summary: 'The coloured buttons on the Appointments screen are quick tools: free slots for any service, a calendar layout, the front-desk playbook, and payment issues.',
+    steps: [
+      {
+        text: 'Patient calling to ask what is free? Press Check Slots (green) and pick a service to see its free dates and times, without booking anything.',
+        run: async (c) => {
+          await c.move('appt-tool-slots'); await c.wait(700);
+          await c.click('appt-tool-slots'); await c.wait(500);
+          await c.click('checkslot-sv-abdomen'); await c.wait(500);
+          if (c.count('slot-day-') < 4) { await c.click('slot-next'); await c.wait(400); }
+          await c.clickNth('slot-day-', 2); await c.wait(500);
+          await c.move('slot-times', { at: [0.5, 0.5] }); await c.wait(1000);
+          await c.click('slot-close'); await c.wait(300);
+          await c.click('checkslots-close'); await c.wait(400);
+        },
+      },
+      {
+        text: 'The purple button switches the layout between the table and a calendar. Each day shows how many bookings it has; tap a day to see them.',
+        run: async (c) => {
+          await c.move('appt-tool-layout'); await c.wait(600);
+          await c.click('appt-tool-layout'); await c.wait(700);
+          await c.clickNth('cal-day-has-', 1); await c.wait(500);
+          await c.move('cal-list', { at: [0.4, 0.2] }); await c.wait(1100);
+        },
+      },
+      {
+        text: 'Press it again to go back to the table. The portal remembers the layout you like.',
+        run: async (c) => { await c.click('appt-tool-layout'); await c.wait(700); },
+      },
+      {
+        text: 'Guideline opens the front-desk playbook: bookings, status updates, cancellations and refunds, transfers, and the end-of-shift checklist.',
+        run: async (c) => {
+          await c.move('appt-tool-guide'); await c.wait(500);
+          await c.click('appt-tool-guide'); await c.wait(600);
+          await c.click('guide-step-1'); await c.wait(500); await c.move('guide-rule', { at: [0.4, 0.5] }); await c.wait(1000);
+          await c.click('guide-step-2'); await c.wait(500); await c.move('guide-rule', { at: [0.4, 0.5] }); await c.wait(1000);
+          await c.click('guide-check-0'); await c.wait(200); await c.click('guide-check-1'); await c.wait(300);
+          await c.click('guide-done'); await c.wait(400);
+        },
+      },
+      {
+        text: 'Payment Issues (red) lists patients who paid online but whose booking never reached the schedule. Press Reclaim to put them back in.',
+        run: async (c) => {
+          await c.move('appt-tool-issues'); await c.wait(600);
+          await c.click('appt-tool-issues'); await c.wait(700);
+          await c.move('issues-table', { at: [0.3, 0.15] }); await c.wait(700);
+          await c.click('issue-reclaim-mm-1'); await c.wait(500);
+          await c.click('confirm-yes'); await c.wait(1000);
+          await c.click('status-overlay', { at: [0.8, 0.85] }); await c.wait(400);
+        },
+      },
+      {
+        text: "Audit Fiuu Payments double-checks unpaid online payments against Fiuu, in case one went through without us knowing.",
+        run: async (c) => { await c.click('issues-audit'); await c.wait(500); await c.click('fiuu-start'); await c.wait(1800); await c.move('fiuu-progress', { at: [0.4, 0.6] }); await c.wait(900); await c.click('fiuu-close'); await c.wait(300); },
+      },
+      {
+        text: 'Back on Appointments, Refresh (blue) clears your filters and reloads the list.',
+        run: async (c) => { await c.click('issues-back'); await c.wait(500); await c.click('tab-Completed'); await c.wait(600); await c.move('appt-tool-refresh'); await c.wait(500); await c.click('appt-tool-refresh'); await c.wait(700); },
+      },
+    ],
+  },
+  {
     id: 'todays-schedule', group: FRONT, title: "Today's schedule & check-in", icon: 'view_kanban', color: C.front, role: 'frontdesk',
     summary: "Today's Schedule is the front-desk board: every patient booked today, from arrival to checkout, in one place.",
     steps: [
@@ -770,7 +833,7 @@ const ALL: Chapter[] = [
 /** Staff chapters follow a patient's day; superadmin chapters follow HQ setup → loyalty → reports. */
 const ORDER = [
   // Branch staff
-  'find-your-way', 'register-patient', 'book-appointment', 'manage-appointments', 'todays-schedule', 'checkout', 'award-points', 'redemption-history',
+  'find-your-way', 'register-patient', 'book-appointment', 'manage-appointments', 'appointment-tools', 'todays-schedule', 'checkout', 'award-points', 'redemption-history',
   'baby-tracker', 'follow-up', 'payment-records', 'daily-closing', 'roster', 'branch-timing',
   // Superadmin
   'find-your-way-hq', 'services', 'branches', 'staff-accounts', 'service-timing', 'rewards-catalog', 'vouchers', 'promotions', 'campaigns', 'reports',

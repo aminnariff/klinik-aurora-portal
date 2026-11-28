@@ -46,6 +46,9 @@ export const emptyTiming = (): TimingRule => ({ dates: {}, session: 'both' });
 export interface Shift { id: string; practitionerId: string; branchId: string; date: string; start: string; end: string }
 export interface SlotConfig { times: string[]; dates: string[] }
 
+/** Paid online but the booking is not in the schedule (payment_mismatch_view.dart). */
+export interface Mismatch { id: string; patientId: string; serviceId: string; start: string; amount: number; ref: string; flaggedAt: string }
+
 export interface Db {
   branches: Branch[];
   services: Service[];
@@ -63,6 +66,7 @@ export interface Db {
   shifts: Shift[];
   slotConfig: Record<string, SlotConfig>;
   timing: Record<string, TimingRule>;
+  mismatches: Mismatch[];
   vouchers: Voucher[];
   promotions: Promotion[];
   campaigns: Campaign[];
@@ -391,6 +395,10 @@ export function seedDb(): Db {
     shifts: seedShifts(),
     slotConfig: seedSlotConfig(),
     timing: {},
+    mismatches: [
+      { id: 'mm-1', patientId: 'pt-10', serviceId: 'sv-breast', start: iso(at(addDays(startOfToday(), 2), 11, 0)), amount: 50, ref: 'FIUU482917', flaggedAt: iso(at(addDays(startOfToday(), -1), 21, 14)) },
+      { id: 'mm-2', patientId: 'pt-13', serviceId: 'sv-5d', start: iso(at(addDays(startOfToday(), 4), 15, 30)), amount: 50, ref: 'FIUU483054', flaggedAt: iso(at(startOfToday(), 7, 52)) },
+    ],
     vouchers: seedVouchers(),
     promotions: seedPromotions(),
     campaigns: seedCampaigns(),

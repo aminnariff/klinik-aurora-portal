@@ -184,8 +184,8 @@ button.ka-sb-section:hover { color: #fff; }
 .ka-table tr.hl td { animation: ka-row-hl 2.4s ease-out; }
 @keyframes ka-row-hl { 0%, 40% { background: color-mix(in srgb, var(--primary) 10%, transparent); } 100% { background: transparent; } }
 .ka-cell-person { display: flex; align-items: center; gap: 10px; }
-.ka-cell-person b { display: block; font-weight: 500; font-size: 14px; color: var(--primary-ink); }
-.ka-cell-person span { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.ka-cell-person > div > b { display: block; font-weight: 500; font-size: 14px; color: var(--primary-ink); }
+.ka-cell-person > div > span:not(.ka-pill) { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
 .ka-dots { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; }
 .ka-dots .mi { font-size: 16px; color: var(--ink-2); }
 .ka-pager { height: 64px; flex: none; display: flex; align-items: center; justify-content: center; gap: 20px; position: relative; border-top: 1px solid var(--border); }
@@ -254,3 +254,14 @@ button.ka-sb-section:hover { color: #fff; }
 .ka-empty b { display: block; color: var(--ink); font-weight: 600; font-size: 15px; margin-bottom: 4px; }
 
 @keyframes ka-slide-in { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: none; } }
+
+/* Tooltip (Flutter Tooltip look). Shows on hover, and on the tour cursor via data-hover. */
+.ka-tip { position: relative; }
+.ka-tip::after {
+  content: attr(data-tip); position: absolute; top: calc(100% + 8px); left: 50%; transform: translate(-50%, -3px);
+  background: #1e293b; color: #f8fafc; font-size: 12px; font-weight: 500; line-height: 1.2; padding: 6px 9px; border-radius: 4px;
+  white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .12s ease, transform .12s ease; z-index: 60;
+}
+.ka-tip.r::after { left: auto; right: 0; transform: translateY(-3px); }
+.ka-tip:hover::after, .ka-tip[data-hover='1']::after { opacity: 1; transform: translate(-50%, 0); }
+.ka-tip.r:hover::after, .ka-tip.r[data-hover='1']::after { transform: none; }

@@ -5,13 +5,14 @@ export type Route =
   | 'dashboard' | 'queue' | 'appointments' | 'patients' | 'points'
   | 'babyTracker' | 'followUp' | 'doctors' | 'services' | 'branches' | 'peakHours'
   | 'payments' | 'eod' | 'vouchers' | 'rewards' | 'redemptions' | 'campaigns' | 'promotions'
-  | 'staff' | 'activity';
+  | 'staff' | 'activity' | 'paymentMismatch';
 
 export const ROUTE_TITLES: Record<Route, string> = {
   dashboard: 'Dashboard', queue: "Today's Schedule", appointments: 'Appointments', patients: 'Patients', points: 'Points',
   babyTracker: 'Baby Tracker', followUp: 'Patient Follow-Up', doctors: 'Doctors', services: 'Services & Pricing', branches: 'Branches',
   peakHours: 'Peak Hours & Capacity', payments: 'Payment Records', eod: 'Daily Closing (EOD)', vouchers: 'Vouchers', rewards: 'Rewards',
   redemptions: 'Redemption History', campaigns: 'Campaigns', promotions: 'Promotions', staff: 'Staff Accounts', activity: 'Activity Logs',
+  paymentMismatch: 'Payment Issues',
 };
 
 export interface CheckoutSummary {
@@ -23,7 +24,7 @@ export type Dialog =
   | { kind: 'newAppointment'; patientId: string }
   | { kind: 'updateAppointment'; appointmentId: string }
   | { kind: 'transfer'; appointmentId: string }
-  | { kind: 'slotPicker'; serviceId: string; branchId: string; onPick: (slot: string) => void }
+  | { kind: 'slotPicker'; serviceId: string; branchId: string; onPick: (slot: string) => void; readOnly?: boolean }
   | { kind: 'roomPicker'; appointmentId: string }
   | { kind: 'checkout'; appointmentId: string }
   | { kind: 'checkoutDone'; summary: CheckoutSummary }
@@ -46,6 +47,8 @@ interface AppState {
   toast: Toast | null;
   groupsOpen: Record<string, boolean>;
   highlightId: string | null;
+  /** Appointments layout (the portal remembers it in prefs 'calendarView'). */
+  apptCalendar: boolean;
 
   reset: (role?: Role) => void;
   go: (route: Route) => void;
@@ -82,9 +85,10 @@ export const useApp = create<AppState>((set, get) => ({
   toast: null,
   groupsOpen: { ...initialGroups },
   highlightId: null,
+  apptCalendar: false,
 
   reset: (role = 'frontdesk') =>
-    set({ role, route: 'dashboard', db: seedDb(), dialogs: [], toast: null, groupsOpen: { ...initialGroups, staff: role === 'superadmin', vouchers: role === 'superadmin' }, highlightId: null }),
+    set({ role, route: 'dashboard', db: seedDb(), dialogs: [], toast: null, groupsOpen: { ...initialGroups, staff: role === 'superadmin', vouchers: role === 'superadmin' }, highlightId: null, apptCalendar: false }),
   go: (route) => set({ route, dialogs: [] }),
   setDark: (dark) => set({ dark }),
   toggleGroup: (key) => set((s) => ({ groupsOpen: { ...s.groupsOpen, [key]: !s.groupsOpen[key] } })),

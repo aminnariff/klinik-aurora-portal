@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { useApp } from '../store';
 import { Icon, Pager, Popover } from '../ui';
-import { HOME_BRANCH, ageOf, fmtDayDate, fmtRange, type ApptStatus } from '../data';
+import { HOME_BRANCH, addDays, ageOf, fmtDayDate, fmtLongDate, fmtMonthYear, fmtRange, startOfToday, ymd, type Appointment, type ApptStatus } from '../data';
+import { CheckSlotsDialog, GuidelineDialog } from '../dialogs/AppointmentTools';
 
 type Tab = 'Upcoming' | 'Completed' | 'No-Show' | 'Cancelled';
 const TAB_STATUS: Record<Tab, ApptStatus[]> = { Upcoming: ['Booked', 'Rescheduled'], Completed: ['Completed'], 'No-Show': ['No-Show'], Cancelled: ['Cancelled'] };
@@ -47,8 +48,91 @@ function RowMenu({ id, patientId, status }: { id: string; patientId: string; sta
   );
 }
 
+function ToolButton({ icon, tip, color, tour, onClick, alignRight }: { icon: string; tip: string; color: string; tour: string; onClick: () => void; alignRight?: boolean }) {
+  return (
+    <button type="button" className={`ka-tip${alignRight ? ' r' : ''}`} data-tip={tip} data-tour={tour} aria-label={tip} onClick={onClick}
+      style={{ width: 34, height: 34, borderRadius: 8, border: 'none', display: 'grid', placeItems: 'center', background: `color-mix(in srgb, ${color} 12%, transparent)` }}>
+      <Icon n={icon} size={18} style={{ color }} />
+    </button>
+  );
+}
+
+/** appointment_calendar_view.dart — month grid with counts, selected day's bookings on the right. */
+function CalendarLayout({ rows }: { rows: Appointment[] }) {
+  const db = useApp((s) => s.db);
+  const today = startOfToday();
+  const [offset, setOffset] = useState(0);
+  const [twoWeeks, setTwoWeeks] = useState(false);
+  const [sel, setSel] = useState(ymd(today));
+  const view = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+  const y = view.getFullYear(), m = view.getMonth();
+  let cells: (Date | null)[] = [...Array(view.getDay()).fill(null), ...Array.from({ length: new Date(y, m + 1, 0).getDate() }, (_, i) => new Date(y, m, i + 1))];
+  while (cells.length % 7) cells.push(null);
+  if (twoWeeks) {
+    const start = addDays(today, -today.getDay());
+    cells = Array.from({ length: 14 }, (_, i) => addDays(start, i));
+  }
+  const byDay = (k: string) => rows.filter((a) => ymd(new Date(a.start)) === k);
+  const day = byDay(sel).sort((a, b) => a.start.localeCompare(b.start));
+  const tomorrow = ymd(addDays(today, 1));
+  const label = sel === ymd(today) ? 'Today' : sel === tomorrow ? 'Tomorrow' : fmtLongDate(sel);
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', borderTop: '1px solid var(--border)' }} data-tour="cal-view">
+      <div style={{ width: 540, flex: 'none', padding: '18px 24px', background: 'var(--surface)', borderRight: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <button type="button" className="ka-tb-icon" onClick={() => setOffset(offset - 1)}><Icon n="chevron_left" /></button>
+          <b style={{ fontSize: 17, flex: 1 }}>{fmtMonthYear(y, m)}</b>
+          <button type="button" data-tour="cal-weeks" onClick={() => setTwoWeeks(!twoWeeks)} style={{ height: 28, padding: '0 12px', borderRadius: 8, border: 'none', background: 'var(--primary)', color: '#fff', fontSize: 13, fontWeight: 700 }}>{twoWeeks ? 'Month' : '2 weeks'}</button>
+          <button type="button" className="ka-tb-icon" onClick={() => setOffset(offset + 1)}><Icon n="chevron_right" /></button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', rowGap: 6 }}>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => <span key={d} style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink-2)', paddingBottom: 6 }}>{d}</span>)}
+          {cells.map((d, i) => {
+            if (!d) return <span key={i} />;
+            const k = ymd(d);
+            const n = byDay(k).length;
+            const isToday = k === ymd(today);
+            const isSel = k === sel;
+            const outside = d.getMonth() !== m && !twoWeeks;
+            return (
+              <button key={i} type="button" data-tour={n ? `cal-day-has-${k}` : `cal-day-${k}`} onClick={() => setSel(k)}
+                style={{ height: 48, border: isSel && !isToday ? '1.5px solid var(--primary)' : '1.5px solid transparent', borderRadius: 8, background: isSel ? 'var(--primary-soft)' : 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                <span style={{ width: 26, height: 26, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: isToday ? 800 : 500, background: isToday ? 'var(--primary)' : 'transparent', color: isToday ? '#fff' : outside ? 'var(--border-strong)' : 'var(--ink)' }}>{d.getDate()}</span>
+                {n > 0 && <span style={{ minWidth: 16, height: 16, borderRadius: 8, padding: '0 4px', fontSize: 10, fontWeight: 700, display: 'grid', placeItems: 'center', background: 'var(--danger-soft)', color: 'var(--primary-ink)' }}>{n}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div style={{ flex: 1, minWidth: 0, padding: '18px 20px', overflow: 'auto', background: 'var(--canvas)' }} data-tour="cal-list">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <Icon n="event" v="o" size={18} style={{ color: 'var(--primary-ink)' }} />
+          <b style={{ fontSize: 15 }}>{label}</b>
+          <span className="ka-pill red" style={{ background: 'var(--danger-soft)', color: 'var(--primary-ink)' }}>{day.length} appointment{day.length === 1 ? '' : 's'}</span>
+        </div>
+        {day.length === 0 && <div className="ka-empty" style={{ paddingTop: 140 }}><div><div className="ka-empty-icon" style={{ background: 'var(--surface-subtle)' }}><Icon n="event_busy" style={{ color: 'var(--muted)' }} /></div>No appointments on this day</div></div>}
+        {day.map((a) => {
+          const p = db.patients.find((x) => x.id === a.patientId)!;
+          const s = db.services.find((x) => x.id === a.serviceId)!;
+          const pr = db.practitioners.find((x) => x.id === a.practitionerId);
+          return (
+            <div key={a.id} className="ka-card" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 10, marginBottom: 8 }}>
+              <div style={{ width: 120, fontSize: 12.5, fontWeight: 700, color: 'var(--primary-ink)' }}>{fmtRange(a.start, s.minutes)}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{p.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{s.name} · {pr?.name ?? 'N/A'}</div>
+              </div>
+              <StatusPill s={a.status} />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function Appointments() {
-  const { db, role, highlightId } = useApp();
+  const { db, role, highlightId, apptCalendar, openDialog, go } = useApp();
   const [tab, setTab] = useState<Tab>('Upcoming');
   const [range, setRange] = useState('All Time');
   const branch = db.branches.find((b) => b.id === HOME_BRANCH)!;
@@ -64,7 +148,7 @@ export function Appointments() {
           <Icon n="keyboard_arrow_down" size={20} />
         </div>
         <span style={{ width: 1, height: 28, background: 'var(--border)', margin: '0 6px' }} />
-        {RANGES.map((r) => (
+        {!apptCalendar && RANGES.map((r) => (
           <button key={r} type="button" className="ka-btn" onClick={() => setRange(r)}
             style={{ height: 36, fontSize: 12.5, fontWeight: r === range ? 700 : 500, padding: '0 12px', ...(r === range ? { background: 'var(--primary)', color: '#fff', borderColor: 'var(--primary)' } : {}) }}>
             {r === range && <Icon n="check" size={15} />}{r}
@@ -85,10 +169,15 @@ export function Appointments() {
           );
         })}
         <span style={{ flex: 1 }} />
-        {[['refresh', '#2196f3'], ['calendar_view_month', '#16a34a'], ['calendar_month', '#7c3aed'], ['menu_book', '#9f1239'], ['warning_amber', '#dc2626']].map(([n, c]) => (
-          <span key={n} style={{ width: 34, height: 34, borderRadius: 8, display: 'grid', placeItems: 'center', background: `color-mix(in srgb, ${c} 12%, transparent)` }}><Icon n={n!} size={18} style={{ color: c }} /></span>
-        ))}
+        <div style={{ display: 'flex', gap: 4 }}>
+          <ToolButton tour="appt-tool-refresh" icon="refresh" tip="Refresh" color="#2196f3" onClick={() => { setTab('Upcoming'); setRange('All Time'); }} />
+          <ToolButton tour="appt-tool-slots" icon="calendar_month" tip="Check Slots" color="#059669" onClick={() => openDialog({ kind: 'custom', render: () => <CheckSlotsDialog /> })} />
+          <ToolButton tour="appt-tool-layout" icon={apptCalendar ? 'table_chart' : 'calendar_month'} tip={apptCalendar ? 'Table View' : 'Calendar View'} color="#7c3aed" onClick={() => useApp.setState({ apptCalendar: !apptCalendar })} />
+          <ToolButton tour="appt-tool-guide" icon="menu_book" tip="Guideline" color="var(--primary)" onClick={() => openDialog({ kind: 'custom', render: () => <GuidelineDialog /> })} />
+          <ToolButton tour="appt-tool-issues" icon="warning_amber" tip="Payment Issues (paid but not in schedule)" color="#ef4444" alignRight onClick={() => go('paymentMismatch')} />
+        </div>
       </div>
+      {apptCalendar ? <CalendarLayout rows={rows} /> : (<>
       <div className="ka-card ka-table-wrap" style={{ margin: '0 32px', borderRadius: 10, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
         <div className="ka-table-scroll">
           <table className="ka-table">
@@ -141,6 +230,7 @@ export function Appointments() {
         </div>
       </div>
       <div style={{ margin: '0 0 0', background: 'var(--canvas)' }}><Pager total={rows.length} shown={rows.length} /></div>
+      </>)}
     </div>
   );
 }
