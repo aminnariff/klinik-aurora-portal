@@ -22,7 +22,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:klinik_aurora_portal/controllers/auth/google_auth_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:klinik_aurora_portal/views/login/login_footer.dart';
 
 bool isSessionExpiredDialogOpen = false;
 final ValueNotifier<bool> sessionExpiredNotice = ValueNotifier<bool>(false);
@@ -245,53 +245,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
-                    // Footer Assistance
+                    // Password help, product tour and legal links.
                     FadeTransition(
                       opacity: _formFade,
-                      child: TextButton(
-                        onPressed: forgotPassword,
-                        style: TextButton.styleFrom(
-                          foregroundColor: appInkMuted,
-                          textStyle: const TextStyle(fontSize: 12),
-                        ),
-                        child: const Text('Having trouble signing in? Reset Password'),
-                      ),
-                    ),
-
-                    // Product tour: try the portal with fake data before using it for real.
-                    FadeTransition(
-                      opacity: _formFade,
-                      child: TextButton.icon(
-                        onPressed: () => launchUrl(productTourUri, webOnlyWindowName: '_blank'),
-                        icon: const Icon(Icons.play_circle_outline_rounded, size: 18),
-                        label: const Text('New here? Take the product tour'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: primary,
-                          textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Legal Policies
-                    FadeTransition(
-                      opacity: _formFade,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          _legalLink('Privacy Policy', privacyPolicyUrl),
-                          Text('•', style: TextStyle(color: appInkMuted, fontSize: 10)),
-                          _legalLink('Terms & Conditions', termsAndConditionsUrl),
-                          Text('•', style: TextStyle(color: appInkMuted, fontSize: 10)),
-                          _legalLink('Refund Policy', refundPolicyUrl),
-                        ],
-                      ),
+                      child: LoginFooter(onResetPassword: forgotPassword),
                     ),
                   ],
                 ),
@@ -300,30 +259,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _legalLink(String title, String url) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(4),
-      onTap: () async {
-        final uri = Uri.parse(url);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, webOnlyWindowName: '_blank');
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 11,
-            color: appInkMuted,
-            decoration: TextDecoration.underline,
-            decorationColor: appInkMuted.withValues(alpha: 0.4),
-          ),
-        ),
-      ),
     );
   }
 
